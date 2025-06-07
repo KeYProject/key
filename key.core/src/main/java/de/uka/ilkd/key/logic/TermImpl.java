@@ -13,6 +13,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Property;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -37,7 +38,7 @@ class TermImpl implements JTerm {
     /**
      * A static empty list of quantifiable variables used for memory reasons.
      */
-    private static final ImmutableArray<JQuantifiableVariable> EMPTY_VAR_LIST =
+    private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
         new ImmutableArray<>();
 
     /**
@@ -52,7 +53,7 @@ class TermImpl implements JTerm {
     // content
     private final Operator op;
     private final ImmutableArray<JTerm> subs;
-    private final ImmutableArray<JQuantifiableVariable> boundVars;
+    private final ImmutableArray<QuantifiableVariable> boundVars;
 
     // caches
     private enum ThreeValuedTruth {
@@ -64,7 +65,7 @@ class TermImpl implements JTerm {
      * A cached value for computing the term's rigidness.
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
-    private ImmutableSet<JQuantifiableVariable> freeVars = null;
+    private ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
@@ -94,7 +95,7 @@ class TermImpl implements JTerm {
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<QuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
         assert subs != null;
@@ -105,7 +106,7 @@ class TermImpl implements JTerm {
     }
 
     TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<JQuantifiableVariable> boundVars) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
         this(op, subs, boundVars, "");
     }
 
@@ -125,15 +126,15 @@ class TermImpl implements JTerm {
     // -------------------------------------------------------------------------
 
 
-    private ImmutableSet<JQuantifiableVariable> determineFreeVars() {
-        ImmutableSet<JQuantifiableVariable> localFreeVars =
+    private ImmutableSet<QuantifiableVariable> determineFreeVars() {
+        ImmutableSet<QuantifiableVariable> localFreeVars =
             DefaultImmutableSet.nil();
 
         if (op instanceof JQuantifiableVariable) {
-            localFreeVars = localFreeVars.add((JQuantifiableVariable) op);
+            localFreeVars = localFreeVars.add((QuantifiableVariable) op);
         }
         for (int i = 0, ar = arity(); i < ar; i++) {
-            ImmutableSet<JQuantifiableVariable> subFreeVars = sub(i).freeVars();
+            ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
             for (int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
                 subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
             }
@@ -189,13 +190,13 @@ class TermImpl implements JTerm {
 
 
     @Override
-    public ImmutableArray<JQuantifiableVariable> boundVars() {
+    public ImmutableArray<QuantifiableVariable> boundVars() {
         return boundVars;
     }
 
 
     @Override
-    public ImmutableArray<JQuantifiableVariable> varsBoundHere(int n) {
+    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
         return op.bindVarsAt(n) ? boundVars : EMPTY_VAR_LIST;
     }
 
@@ -268,7 +269,7 @@ class TermImpl implements JTerm {
 
 
     @Override
-    public ImmutableSet<JQuantifiableVariable> freeVars() {
+    public ImmutableSet<QuantifiableVariable> freeVars() {
         if (freeVars == null) {
             freeVars = determineFreeVars();
         }

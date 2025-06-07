@@ -25,6 +25,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
@@ -103,7 +104,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return null;
     }
 
-    protected void unbindVars(Namespace<JQuantifiableVariable> orig) {
+    protected void unbindVars(Namespace<QuantifiableVariable> orig) {
         namespaces().setVariables(orig);
     }
 
@@ -244,7 +245,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().ruleSets();
     }
 
-    protected Namespace<JQuantifiableVariable> variables() {
+    protected Namespace<QuantifiableVariable> variables() {
         return namespaces().variables();
     }
 

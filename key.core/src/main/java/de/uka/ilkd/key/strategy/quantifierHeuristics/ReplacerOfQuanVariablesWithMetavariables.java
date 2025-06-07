@@ -30,7 +30,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
         Term t = allTerm;
         var op = t.op();
         while (op instanceof Quantifier) {
-            JQuantifiableVariable q = (JQuantifiableVariable) t.varsBoundHere(0).get(0);
+            QuantifiableVariable q = t.varsBoundHere(0).get(0);
             Term m;
             if (op == Quantifier.ALL) {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());

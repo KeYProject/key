@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -113,17 +114,17 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         final TermBuilder tb = services.getTermBuilder();
 
         final Set<Name> freeVarNamesInU = new HashSet<>();
-        for (JQuantifiableVariable freeVar : u.freeVars()) {
+        for (QuantifiableVariable freeVar : u.freeVars()) {
             freeVarNamesInU.add(freeVar.name());
         }
 
-        final JQuantifiableVariable[] boundVarsInPhi =
-            phi.boundVars().toArray(new JQuantifiableVariable[0]);
+        final QuantifiableVariable[] boundVarsInPhi =
+            phi.boundVars().toArray(new QuantifiableVariable[0]);
 
         final JTerm[] updatedSubs = phi.subs().toArray(new JTerm[0]);
         // Check for any name clashes and change the variables' names if necessary
         for (int i = 0; i < boundVarsInPhi.length; i++) {
-            final JQuantifiableVariable currentBoundVar = boundVarsInPhi[i];
+            final QuantifiableVariable currentBoundVar = boundVarsInPhi[i];
             if (freeVarNamesInU.contains(currentBoundVar.name())) {
                 final LogicVariable renamedVar =
                     new LogicVariable(createNonCollidingNameFor(currentBoundVar, u, phi, services),
@@ -162,10 +163,10 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @param services the {@link TermServices} to help create terms
      * @return a non-colliding {@link Name} for <code>var</code>
      */
-    private static Name createNonCollidingNameFor(JQuantifiableVariable var, JTerm u, JTerm phi,
+    private static Name createNonCollidingNameFor(QuantifiableVariable var, JTerm u, JTerm phi,
             TermServices services) {
         ClashFreeSubst.VariableCollectVisitor vcv = new ClashFreeSubst.VariableCollectVisitor();
-        ImmutableSet<JQuantifiableVariable> usedVars = u.freeVars();
+        ImmutableSet<QuantifiableVariable> usedVars = u.freeVars();
         phi.execPostOrder(vcv);
         usedVars = usedVars.union(vcv.vars());
 
@@ -191,9 +192,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @param services the {@link TermServices} to help create terms
      * @return true iff <code>name</code> is already used in <code>qvars</code>
      */
-    private static boolean nameIsAlreadyUsed(Name name, ImmutableSet<JQuantifiableVariable> qvars,
+    private static boolean nameIsAlreadyUsed(Name name, ImmutableSet<QuantifiableVariable> qvars,
             TermServices services) {
-        for (JQuantifiableVariable qvar : qvars) {
+        for (QuantifiableVariable qvar : qvars) {
             if (qvar.name().equals(name)) {
                 return true;
             }

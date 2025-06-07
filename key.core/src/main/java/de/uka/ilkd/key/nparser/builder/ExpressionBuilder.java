@@ -36,6 +36,7 @@ import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
@@ -1011,8 +1012,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitIfExThenElseTerm(KeYParser.IfExThenElseTermContext ctx) {
-        Namespace<JQuantifiableVariable> orig = variables();
-        List<JQuantifiableVariable> exVars = accept(ctx.bound_variables());
+        Namespace<QuantifiableVariable> orig = variables();
+        List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
         JTerm condF = accept(ctx.condF);
         if (condF.sort() != JavaDLTheory.FORMULA) {
             semanticError(ctx, "Condition of an \\ifEx-then-else term has to be a formula.");
@@ -1020,7 +1021,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         JTerm thenT = accept(ctx.thenT);
         JTerm elseT = accept(ctx.elseT);
-        ImmutableArray<JQuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
+        ImmutableArray<QuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
         JTerm result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
             new JTerm[] { condF, thenT, elseT }, exVarsArray, null);
         unbindVars(orig);
@@ -1030,17 +1031,17 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public JTerm visitQuantifierterm(KeYParser.QuantifiertermContext ctx) {
         Operator op = null;
-        Namespace<JQuantifiableVariable> orig = variables();
+        Namespace<QuantifiableVariable> orig = variables();
         if (ctx.FORALL() != null) {
             op = Quantifier.ALL;
         }
         if (ctx.EXISTS() != null) {
             op = Quantifier.EX;
         }
-        List<JQuantifiableVariable> vs = accept(ctx.bound_variables());
+        List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         JTerm a1 = accept(ctx.sub);
         JTerm a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
-            new ImmutableArray<>(vs.toArray(new JQuantifiableVariable[0])), null);
+            new ImmutableArray<>(vs.toArray(new QuantifiableVariable[0])), null);
         unbindVars(orig);
         return a;
     }
@@ -1061,7 +1062,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitSubstitution_term(KeYParser.Substitution_termContext ctx) {
         SubstOp op = WarySubstOp.SUBST;
-        Namespace<JQuantifiableVariable> orig = variables();
+        Namespace<QuantifiableVariable> orig = variables();
         JAbstractSortedOperator v = accept(ctx.bv);
         unbindVars(orig);
         if (v instanceof LogicVariable) {
@@ -1074,7 +1075,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm a2 = oneOf(ctx.atom_prefix(), ctx.unary_formula());
         try {
             JTerm result =
-                getServices().getTermBuilder().subst(op, (JQuantifiableVariable) v, a1, a2);
+                getServices().getTermBuilder().subst(op, (QuantifiableVariable) v, a1, a2);
             return result;
         } catch (Exception e) {
             throw new BuildingException(ctx, e);
@@ -1093,12 +1094,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
 
-    public List<JQuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
+    public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
         return mapOf(ctx.one_bound_variable());
     }
 
     @Override
-    public JQuantifiableVariable visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
+    public QuantifiableVariable visitOne_bound_variable(KeYParser.One_bound_variableContext ctx) {
         String id = accept(ctx.simple_ident());
         Sort sort = accept(ctx.sortId());
 
@@ -1112,14 +1113,14 @@ public class ExpressionBuilder extends DefaultBuilder {
                         + " and use the syntax \"\\exists i;\" instead.");
             }
             bindVar();
-            return (JQuantifiableVariable) ts;
+            return (QuantifiableVariable) ts;
         }
 
         if (sort != null && id != null) {
             return bindVar(id, sort);
         }
 
-        JQuantifiableVariable result =
+        QuantifiableVariable result =
             doLookup(new Name(ctx.id.getText()), variables());
 
         if (result == null) {
@@ -1467,14 +1468,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
         String firstName = accept(ctx.simple_ident());
 
-        ImmutableArray<JQuantifiableVariable> boundVars = null;
-        Namespace<JQuantifiableVariable> orig = null;
+        ImmutableArray<QuantifiableVariable> boundVars = null;
+        Namespace<QuantifiableVariable> orig = null;
         JTerm[] args = null;
         if (ctx.call() != null) {
             orig = variables();
-            List<JQuantifiableVariable> bv = accept(ctx.call().boundVars);
+            List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
             boundVars =
-                bv != null ? new ImmutableArray<>(bv.toArray(new JQuantifiableVariable[0])) : null;
+                bv != null ? new ImmutableArray<>(bv.toArray(new QuantifiableVariable[0])) : null;
             args = visitArguments(ctx.call().argument_list());
             if (boundVars != null) {
                 unbindVars(orig);
@@ -1520,7 +1521,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 assert op instanceof Function;
                 for (int i = 0; i < args.length; i++) {
                     if (i < op.arity() && !op.bindVarsAt(i)) {
-                        for (JQuantifiableVariable qv : args[i].freeVars()) {
+                        for (QuantifiableVariable qv : args[i].freeVars()) {
                             if (boundVars.contains(qv)) {
                                 semanticError(ctx,
                                     "Building function term " + op
@@ -1530,7 +1531,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         }
                     }
                 }
-                ImmutableArray<JQuantifiableVariable> finalBoundVars = boundVars;
+                ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
                 // create term
                 JTerm[] finalArgs1 = args;
                 current = capsulateTf(ctx,

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
@@ -104,7 +105,7 @@ public class TestTerm {
         JTerm t_allxt1 = tb.all(x, t2());
         JTerm t_allxt1_andt2 = tf.createTerm(Junctor.AND, t_allxt1, t1());
         JTerm t_exw_allxt1_andt2 =
-            tb.ex(ImmutableSLList.<JQuantifiableVariable>nil().append(w, x), t_allxt1_andt2);
+            tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x), t_allxt1_andt2);
         assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
                 && !t_exw_allxt1_andt2.freeVars().contains(x));
     }

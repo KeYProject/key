@@ -24,6 +24,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -104,7 +105,7 @@ public abstract class TacletApp implements RuleApp {
      * @param instantiations the SVInstantiations so that the find(if)-expression matches
      * @return set of the bound variables
      */
-    protected static ImmutableSet<JQuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
+    protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
             SVInstantiations instantiations) {
         return collectPrefixInstantiations(prefix, instantiations);
     }
@@ -117,10 +118,10 @@ public abstract class TacletApp implements RuleApp {
      * @param pos the posInOccurrence describing the position of the schemavariable
      * @return set of the bound variables
      */
-    protected static ImmutableSet<JQuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
+    protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
             SVInstantiations instantiations, PosInOccurrence pos) {
 
-        ImmutableSet<JQuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
+        ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
         if (prefix.context()) {
             result = result.union(collectBoundVarsAbove(pos));
@@ -137,10 +138,10 @@ public abstract class TacletApp implements RuleApp {
      * @return the set of the logic variables whose elements are the instantiations of a bound
      *         SchemaVariable appearing in the TacletPrefix
      */
-    private static ImmutableSet<JQuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
+    private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
             SVInstantiations instantiations) {
 
-        ImmutableSet<JQuantifiableVariable> instanceSet = DefaultImmutableSet.nil();
+        ImmutableSet<QuantifiableVariable> instanceSet = DefaultImmutableSet.nil();
 
         for (final var prefixSchemaVar : pre.prefix()) {
             instanceSet = instanceSet.add(
@@ -268,7 +269,7 @@ public abstract class TacletApp implements RuleApp {
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
-    private static boolean contains(ImmutableArray<JQuantifiableVariable> boundVars,
+    private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
             LogicVariable x,
             SVInstantiations insts) {
         for (int i = 0; i < boundVars.size(); i++) {
@@ -631,7 +632,7 @@ public abstract class TacletApp implements RuleApp {
             }
         }
 
-        for (JQuantifiableVariable var : vcv.vars()) {
+        for (QuantifiableVariable var : vcv.vars()) {
             result.add(var.name().toString());
         }
 
@@ -1018,7 +1019,7 @@ public abstract class TacletApp implements RuleApp {
         return result;
     }
 
-    protected abstract ImmutableSet<JQuantifiableVariable> contextVars(SchemaVariable sv);
+    protected abstract ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv);
 
     /**
      * creates a new variable namespace by adding names of the instantiations of the schema
@@ -1029,9 +1030,9 @@ public abstract class TacletApp implements RuleApp {
      * @param var_ns the old variable namespace
      * @return the new created variable namespace
      */
-    public Namespace<@NonNull JQuantifiableVariable> extendVarNamespaceForSV(
-            Namespace<@NonNull JQuantifiableVariable> var_ns, SchemaVariable sv) {
-        Namespace<@NonNull JQuantifiableVariable> ns = new Namespace<>(var_ns);
+    public Namespace<@NonNull QuantifiableVariable> extendVarNamespaceForSV(
+            Namespace<@NonNull QuantifiableVariable> var_ns, SchemaVariable sv) {
+        Namespace<@NonNull QuantifiableVariable> ns = new Namespace<>(var_ns);
         TacletPrefix tacletPrefix = (TacletPrefix) taclet().getPrefix(sv);
         for (final var schemaVariable : tacletPrefix.prefix()) {
             if (instantiations().getInstantiation(schemaVariable) instanceof JTerm term &&
@@ -1044,7 +1045,7 @@ public abstract class TacletApp implements RuleApp {
             }
         }
         if (tacletPrefix.context()) {
-            for (final JQuantifiableVariable quantifiableVariable : contextVars(sv)) {
+            for (final QuantifiableVariable quantifiableVariable : contextVars(sv)) {
                 ns.add(quantifiableVariable);
             }
         }
@@ -1089,7 +1090,7 @@ public abstract class TacletApp implements RuleApp {
                 TacletPrefix prefix = (TacletPrefix) taclet().getPrefix(sv);
                 HashSet<Name> names = new LinkedHashSet<>();
                 if (prefix.context()) {
-                    for (JQuantifiableVariable quantifiableVariable : contextVars(sv)) {
+                    for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
                         names.add(quantifiableVariable.name());
                     }
                 }
@@ -1203,16 +1204,16 @@ public abstract class TacletApp implements RuleApp {
      * @param pos the PosInOccurrence describing a subterm in Term
      * @return a set of logic variables that are bound above the specified subterm
      */
-    protected static ImmutableSet<JQuantifiableVariable> collectBoundVarsAbove(
+    protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
             PosInOccurrence pos) {
-        ImmutableSet<JQuantifiableVariable> result = DefaultImmutableSet.nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         PIOPathIterator it = pos.iterator();
         int i;
-        ImmutableArray<JQuantifiableVariable> vars;
+        ImmutableArray<QuantifiableVariable> vars;
 
         while ((i = it.next()) != -1) {
-            vars = (ImmutableArray<JQuantifiableVariable>) it.getSubTerm().varsBoundHere(i);
+            vars = (ImmutableArray<QuantifiableVariable>) it.getSubTerm().varsBoundHere(i);
             for (i = 0; i < vars.size(); i++) {
                 result = result.add(vars.get(i));
             }

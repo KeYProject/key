@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -72,7 +73,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    VariableSV createVariableSV(JQuantifiableVariable v, String schemaPrefix,
+    VariableSV createVariableSV(QuantifiableVariable v, String schemaPrefix,
             Services services) {
         if (v == null) {
             return null;
@@ -100,14 +101,14 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    Map<JQuantifiableVariable, VariableSV> collectQuantifiableVariables(JTerm replaceWithTerm,
+    Map<QuantifiableVariable, VariableSV> collectQuantifiableVariables(JTerm replaceWithTerm,
             Services services) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         replaceWithTerm.execPreOrder(qvVisitor);
-        LinkedList<JQuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
-        final Map<JQuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
+        LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
+        final Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             new LinkedHashMap<>();
-        for (JQuantifiableVariable qv : quantifiableVariables) {
+        for (QuantifiableVariable qv : quantifiableVariables) {
             quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
         }
         return quantifiableVarsToSchemaVars;
@@ -155,7 +156,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     static class QuantifiableVariableVisitor implements Visitor<@NonNull JTerm> {
 
-        private final LinkedList<JQuantifiableVariable> vars = new LinkedList<>();
+        private final LinkedList<QuantifiableVariable> vars = new LinkedList<>();
 
         @Override
         public boolean visitSubtree(JTerm visited) {
@@ -182,7 +183,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         }
 
 
-        public LinkedList<JQuantifiableVariable> getResult() {
+        public LinkedList<QuantifiableVariable> getResult() {
             return vars;
         }
     }

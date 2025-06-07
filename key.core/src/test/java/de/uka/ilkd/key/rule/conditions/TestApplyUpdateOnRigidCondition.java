@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -59,7 +60,7 @@ public class TestApplyUpdateOnRigidCondition {
 
         JTerm term =
             TacletForTests.parseTerm("\\forall int b; {i:=b}\\forall java.lang.Object a; a = i");
-        JQuantifiableVariable b = term.boundVars().get(0);
+        QuantifiableVariable b = term.boundVars().get(0);
         JTerm result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         JTerm expected =
             TacletForTests.parseTerm("\\forall int b; \\forall java.lang.Object a; {i:=b} (a = i)");
@@ -96,7 +97,7 @@ public class TestApplyUpdateOnRigidCondition {
 
         JTerm term =
             TacletForTests.parseTerm("\\forall int a; {i:=a}\\forall java.lang.Object a; a = i");
-        JQuantifiableVariable a = term.boundVars().get(0);
+        QuantifiableVariable a = term.boundVars().get(0);
         JTerm result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
         JTerm expected = TacletForTests
                 .parseTerm("\\forall int a; \\forall java.lang.Object a1; {i:=a} (a1 = i)");
@@ -109,7 +110,7 @@ public class TestApplyUpdateOnRigidCondition {
         term = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; {i:=a}\\forall java.lang.Object a; i = a1");
         a = term.boundVars().get(0);
-        JQuantifiableVariable a1 = term.sub(0).boundVars().get(0);
+        QuantifiableVariable a1 = term.sub(0).boundVars().get(0);
         result = tb.all(a, tb.all(a1, applyUpdateOnFormula(term.sub(0).sub(0))));
         expected = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; \\forall java.lang.Object a2; {i:=a} (i = a1)");

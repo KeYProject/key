@@ -8,7 +8,6 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -25,6 +24,7 @@ import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
@@ -373,7 +373,7 @@ public class InitConfig {
     /**
      * returns the variable namespace of this initial configuration
      */
-    public Namespace<@NonNull JQuantifiableVariable> varNS() {
+    public Namespace<@NonNull QuantifiableVariable> varNS() {
         return namespaces().variables();
     }
 

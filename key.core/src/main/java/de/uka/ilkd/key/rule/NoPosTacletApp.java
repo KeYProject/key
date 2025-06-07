@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -149,7 +150,7 @@ public class NoPosTacletApp extends TacletApp {
                 continue;
             }
 
-            final ImmutableSet<JQuantifiableVariable> boundVarSet =
+            final ImmutableSet<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet((TacletPrefix) prefix, instantiations);
             final JTerm inst = (JTerm) instantiations.getInstantiation(sv);
             if (!inst.freeVars().subset(boundVarSet)) {
@@ -265,7 +266,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     @Override
-    protected ImmutableSet<JQuantifiableVariable> contextVars(SchemaVariable sv) {
+    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
         return DefaultImmutableSet.nil();
     }
 

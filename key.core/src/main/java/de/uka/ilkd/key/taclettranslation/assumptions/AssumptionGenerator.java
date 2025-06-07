@@ -19,6 +19,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -97,7 +98,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         JTerm[] subTerms = new JTerm[term.arity()];
 
-        ImmutableArray<JQuantifiableVariable> variables = term.boundVars();
+        ImmutableArray<QuantifiableVariable> variables = term.boundVars();
         for (int i = 0; i < term.arity(); i++) {
 
             subTerms[i] = rebuildTerm(term.sub(i));
@@ -110,7 +111,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         term = changeTerm(term);
 
         if (term.op() instanceof Quantifier) {
-            for (JQuantifiableVariable qv : variables) {
+            for (QuantifiableVariable qv : variables) {
                 for (TranslationListener l : listener) {
                     l.eventQuantifiedVariable(qv);
                 }
@@ -287,7 +288,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
             throws IllegalTacletException {
         TermBuilder tb = services.getTermBuilder();
         // Quantify over all free variables.
-        for (JQuantifiableVariable qv : term.freeVars()) {
+        for (QuantifiableVariable qv : term.freeVars()) {
 
             if (!(qv instanceof LogicVariable)) {
                 throw new IllegalTacletException("Error of translation: "
@@ -385,13 +386,13 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         // variable. In this case the schema variable is replaced with a
         // logical variable.
         if (term.op() instanceof Quantifier) {
-            LinkedList<JQuantifiableVariable> list = new LinkedList<>();
+            LinkedList<QuantifiableVariable> list = new LinkedList<>();
 
-            for (JQuantifiableVariable qv : term.varsBoundHere(0)) {
+            for (QuantifiableVariable qv : term.varsBoundHere(0)) {
                 list.add(getLogicVariable(qv.name(), qv.sort()));
             }
 
-            ImmutableArray<JQuantifiableVariable> array = new ImmutableArray<>(list);
+            ImmutableArray<QuantifiableVariable> array = new ImmutableArray<>(list);
 
             term = services.getTermFactory().createTerm(term.op(), term.subs(), array,
                 term.getLabels());

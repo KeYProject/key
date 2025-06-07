@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
@@ -89,7 +88,7 @@ public class Substitution {
 
     private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
         final ClashFreeSubst subst =
-            new ClashFreeSubst((JQuantifiableVariable) var,
+            new ClashFreeSubst(var,
                 (JTerm) instance, tb);
         return subst.apply((JTerm) t);
     }

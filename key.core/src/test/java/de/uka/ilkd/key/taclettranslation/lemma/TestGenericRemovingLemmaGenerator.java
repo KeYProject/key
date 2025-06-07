@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.Assertions;
@@ -57,7 +57,7 @@ public class TestGenericRemovingLemmaGenerator {
             sorts.add(sdf.getSortDependingOn());
         }
 
-        for (JQuantifiableVariable v : term.boundVars()) {
+        for (QuantifiableVariable v : term.boundVars()) {
             sorts.add(v.sort());
         }
     }

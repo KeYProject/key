@@ -21,6 +21,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -620,12 +621,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // add the sort definitions for the free variables of the bound terms
             for (int j = 0; j < f.arity(); j++) {
                 if (f.bindVarsAt(j)) {
-                    Iterator<JQuantifiableVariable> iter = t.sub(j).freeVars().iterator();
-                    ImmutableArray<JQuantifiableVariable> bv = t.boundVars();
+                    Iterator<QuantifiableVariable> iter = t.sub(j).freeVars().iterator();
+                    ImmutableArray<QuantifiableVariable> bv = t.boundVars();
                     while (iter.hasNext()) {
-                        JQuantifiableVariable q = iter.next();
+                        QuantifiableVariable q = iter.next();
                         boolean isBound = false;
-                        for (JQuantifiableVariable temp : bv) {
+                        for (QuantifiableVariable temp : bv) {
                             isBound = isBound || temp.equals(q);
                         }
                         if (!isBound) {
@@ -694,12 +695,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // add the sort definitions for the free variables of the bound terms
             for (int j = 0; j < t.op().arity(); j++) {
                 if (t.op().bindVarsAt(j)) {
-                    Iterator<JQuantifiableVariable> iter = t.sub(j).freeVars().iterator();
-                    ImmutableArray<JQuantifiableVariable> bv = t.boundVars();
+                    Iterator<QuantifiableVariable> iter = t.sub(j).freeVars().iterator();
+                    ImmutableArray<QuantifiableVariable> bv = t.boundVars();
                     while (iter.hasNext()) {
-                        JQuantifiableVariable q = iter.next();
+                        QuantifiableVariable q = iter.next();
                         boolean isBound = false;
-                        for (JQuantifiableVariable temp : bv) {
+                        for (QuantifiableVariable temp : bv) {
                             isBound = isBound || (temp.equals(q));
                         }
                         if (!isBound) {
@@ -1426,7 +1427,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private final StringBuilder translateTermIte(JTerm iteTerm,
-            List<JQuantifiableVariable> quantifiedVars, Services services)
+            List<QuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // make typecasts, if this is neccesary. Subterms might contain
@@ -1487,7 +1488,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *        It is only used for the translation of modulo terms, but must be looped through until
      *        we get there.
      */
-    protected StringBuilder translateTerm(JTerm term, List<JQuantifiableVariable> quantifiedVars,
+    protected StringBuilder translateTerm(JTerm term, List<QuantifiableVariable> quantifiedVars,
             Services services) throws IllegalFormulaException {
 
 
@@ -1549,7 +1550,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return this.translateTermIte(term, quantifiedVars, services);
             }
         } else if (op == Quantifier.ALL) {
-            ImmutableArray<JQuantifiableVariable> vars = term.varsBoundHere(0);
+            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
 
             quantifiedVars.add(vars.get(0));
@@ -1572,7 +1573,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             return this.translateLogicalAll(qv, sort, form);
 
         } else if (op == Quantifier.EX) {
-            ImmutableArray<JQuantifiableVariable> vars = term.varsBoundHere(0);
+            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
 
             quantifiedVars.add(vars.get(0));
@@ -1800,7 +1801,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsBindingUninterpretedPredicate(JTerm term, Function fun,
-            List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1843,13 +1844,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // add the free variables in the term to the bound functions as parameter
             for (int i = 0; i < term.arity(); i++) {
                 if (fun.bindVarsAt(i)) {
-                    Iterator<JQuantifiableVariable> iter = term.sub(i).freeVars().iterator();
+                    Iterator<QuantifiableVariable> iter = term.sub(i).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<JQuantifiableVariable> qv = term.boundVars();
+                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
-                        JQuantifiableVariable fv = iter.next();
+                        QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (JQuantifiableVariable temp : qv) {
+                        for (QuantifiableVariable temp : qv) {
                             isBound = isBound || temp.equals(fv);
                         }
                         if (!isBound) {
@@ -1877,13 +1878,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // add the free variables in the term to the bound functions as parameter
             for (int j = 0; j < term.arity(); j++) {
                 if (fun.bindVarsAt(j)) {
-                    Iterator<JQuantifiableVariable> iter = term.sub(j).freeVars().iterator();
+                    Iterator<QuantifiableVariable> iter = term.sub(j).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<JQuantifiableVariable> qv = term.boundVars();
+                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
-                        JQuantifiableVariable fv = iter.next();
+                        QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (JQuantifiableVariable temp : qv) {
+                        for (QuantifiableVariable temp : qv) {
                             isBound = isBound || temp.equals(fv);
                         }
                         if (!isBound) {
@@ -1912,7 +1913,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     private StringBuilder translateAsBindingUninterpretedFunction(JTerm term, Function fun,
-            List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1954,13 +1955,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // add the free variables in the term to the bound functions as parameter
             for (int i = 0; i < term.arity(); i++) {
                 if (fun.bindVarsAt(i)) {
-                    Iterator<JQuantifiableVariable> iter = term.sub(i).freeVars().iterator();
+                    Iterator<QuantifiableVariable> iter = term.sub(i).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<JQuantifiableVariable> qv = term.boundVars();
+                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
-                        JQuantifiableVariable fv = iter.next();
+                        QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (JQuantifiableVariable temp : qv) {
+                        for (QuantifiableVariable temp : qv) {
                             isBound = isBound || temp.equals(fv);
                         }
                         if (!isBound) {
@@ -1988,13 +1989,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // add the free variables of the bound terms as parameter
             for (int j = 0; j < term.arity(); j++) {
                 if (fun.bindVarsAt(j)) {
-                    Iterator<JQuantifiableVariable> iter = term.sub(j).freeVars().iterator();
+                    Iterator<QuantifiableVariable> iter = term.sub(j).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<JQuantifiableVariable> qv = term.boundVars();
+                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
-                        JQuantifiableVariable fv = iter.next();
+                        QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (JQuantifiableVariable temp : qv) {
+                        for (QuantifiableVariable temp : qv) {
                             isBound = isBound || temp.equals(fv);
                         }
                         if (!isBound) {
@@ -2012,7 +2013,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsUninterpretedFunction(JFunction fun,
-            List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
         // translate it as such
@@ -2108,7 +2109,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param services the services object to use.
      * @return a unique predicate representing a modality.
      */
-    private StringBuilder getModalityPredicate(JTerm t, List<JQuantifiableVariable> quantifiedVars,
+    private StringBuilder getModalityPredicate(JTerm t, List<QuantifiableVariable> quantifiedVars,
             Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (JTerm toMatch : modalityPredicates.keySet()) {
@@ -2120,13 +2121,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // if the program comes here, term has to be translated.
 
         // Collect all free Variable in the term
-        final ImmutableSet<JQuantifiableVariable> freeVars = t.freeVars();
-        JQuantifiableVariable[] args = freeVars.toArray(new JQuantifiableVariable[freeVars.size()]);
+        final ImmutableSet<QuantifiableVariable> freeVars = t.freeVars();
+        QuantifiableVariable[] args = freeVars.toArray(new QuantifiableVariable[freeVars.size()]);
         JTerm[] subs = new JTerm[args.length];
         Sort[] argsorts = new Sort[args.length];
         TermBuilder tb = services.getTermBuilder();
         for (int i = 0; i < args.length; i++) {
-            JQuantifiableVariable qv = args[i];
+            QuantifiableVariable qv = args[i];
             if (qv instanceof LogicVariable lv) {
                 subs[i] = tb.var(lv);
                 argsorts[i] = lv.sort();
@@ -2180,7 +2181,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     protected final StringBuilder translateUnknown(JTerm term,
-            List<JQuantifiableVariable> quantifiedVars, Services services)
+            List<QuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // translate the term as uninterpreted function/predicate
@@ -2503,7 +2504,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         tacletSetTranslation = new DefaultTacletSetTranslation(services, settings);
 
 
-        List<JQuantifiableVariable> vector = new ArrayList<>();
+        List<QuantifiableVariable> vector = new ArrayList<>();
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
         HashSet<Sort> tempSorts = new LinkedHashSet<>(usedRealSort.keySet());
 

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
@@ -298,20 +299,20 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return instantiatedOp;
     }
 
-    private ImmutableArray<JQuantifiableVariable> instantiateBoundVariables(JTerm visited) {
-        ImmutableArray<JQuantifiableVariable> vBoundVars = visited.boundVars();
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
+        ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
-            final JQuantifiableVariable[] newVars = new JQuantifiableVariable[vBoundVars.size()];
+            final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
             boolean varsChanged = false;
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
-                JQuantifiableVariable boundVar = vBoundVars.get(j);
+                QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final JTerm instantiationForBoundSchemaVariable =
                         (JTerm) svInst.getInstantiation(boundSchemaVariable);
                     // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
-                        boundVar = (JQuantifiableVariable) instantiationForBoundSchemaVariable.op();
+                        boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
                         varsChanged = true;
                     }
                 }
@@ -356,7 +357,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
-            final ImmutableArray<JQuantifiableVariable> boundVars =
+            final ImmutableArray<QuantifiableVariable> boundVars =
                 instantiateBoundVariables(visited);
 
             // instantiate sub terms
@@ -389,7 +390,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, Operator newTermOp,
             ImmutableArray<JTerm> newTermSubs,
-            ImmutableArray<JQuantifiableVariable> newTermBoundVars,
+            ImmutableArray<QuantifiableVariable> newTermBoundVars,
             ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.*;
@@ -1507,11 +1508,11 @@ public class LogicPrinter {
         layouter.end();
     }
 
-    private void printVariables(ImmutableArray<JQuantifiableVariable> vars,
+    private void printVariables(ImmutableArray<QuantifiableVariable> vars,
             QuantifiableVariablePrintMode mode) {
         int size = vars.size();
         for (int j = 0; j != size; j++) {
-            final JQuantifiableVariable v = vars.get(j);
+            final QuantifiableVariable v = vars.get(j);
             if (v instanceof LogicVariable) {
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
@@ -1588,7 +1589,7 @@ public class LogicPrinter {
      * @param phi the substituted term/formula
      * @param ass3 the int defining the associativity for phi
      */
-    public void printSubstTerm(String l, JQuantifiableVariable v, JTerm t, int ass2, String r,
+    public void printSubstTerm(String l, QuantifiableVariable v, JTerm t, int ass2, String r,
             JTerm phi, int ass3) {
         layouter.beginC().print(l);
         printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
@@ -1616,7 +1617,7 @@ public class LogicPrinter {
      * @param phi the quantified formula
      * @param ass associativity for phi
      */
-    public void printQuantifierTerm(String name, ImmutableArray<JQuantifiableVariable> vars,
+    public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
             JTerm phi, int ass) {
         layouter.beginC();
         layouter.keyWord(name);

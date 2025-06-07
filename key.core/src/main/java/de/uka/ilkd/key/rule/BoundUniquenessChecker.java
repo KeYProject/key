@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class BoundUniquenessChecker {
 
-    private final HashSet<JQuantifiableVariable> boundVars =
+    private final HashSet<QuantifiableVariable> boundVars =
         new LinkedHashSet<>();
     private ImmutableList<JTerm> terms = ImmutableSLList.nil();
 
@@ -71,11 +71,11 @@ public class BoundUniquenessChecker {
         /*
          * Note that a term can bound a variable in several subterms.
          */
-        final HashSet<JQuantifiableVariable> localVars = new LinkedHashSet<>(10);
+        final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<>(10);
 
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             for (int j = 0, sz = t.varsBoundHere(i).size(); j < sz; j++) {
-                final JQuantifiableVariable qv = t.varsBoundHere(i).get(j);
+                final QuantifiableVariable qv = t.varsBoundHere(i).get(j);
                 if (boundVars.contains(qv)) {
                     return false;
                 } else {

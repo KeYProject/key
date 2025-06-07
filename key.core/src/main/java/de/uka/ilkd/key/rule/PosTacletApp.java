@@ -8,9 +8,9 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -95,7 +95,7 @@ public class PosTacletApp extends TacletApp {
      * @return the set of the logicvariables that are bound for the indicated application position
      *         of the TacletApp.
      */
-    private static ImmutableSet<JQuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
+    private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
             PosInOccurrence pos) {
 
         if (!(taclet instanceof RewriteTaclet)) {
@@ -113,7 +113,7 @@ public class PosTacletApp extends TacletApp {
 
 
     @Override
-    protected ImmutableSet<JQuantifiableVariable> contextVars(SchemaVariable sv) {
+    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
         if (!taclet().getPrefix(sv).context()) {
             return DefaultImmutableSet.nil();
         }
@@ -131,7 +131,7 @@ public class PosTacletApp extends TacletApp {
             SVInstantiations insts, PosInOccurrence pos, Services services) {
 
         if (taclet.isContextInPrefix()) {
-            ImmutableSet<JQuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
+            ImmutableSet<QuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
             Iterator<SchemaVariable> it = allVariableSV(taclet);
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();

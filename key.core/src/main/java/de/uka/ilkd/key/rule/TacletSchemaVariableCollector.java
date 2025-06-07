@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Semisequent;
@@ -99,7 +100,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
         for (int j = 0, ar = visited.arity(); j < ar; j++) {
             for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
-                final JQuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
+                final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
                     varList = varList.prepend((SchemaVariable) qVar);
                 }

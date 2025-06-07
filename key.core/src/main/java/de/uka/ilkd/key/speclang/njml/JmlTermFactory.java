@@ -32,6 +32,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -262,7 +263,7 @@ public final class JmlTermFactory {
 
     public SLExpression forall(JTerm preTerm, JTerm bodyTerm, KeYJavaType declsType,
             ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
-        BiFunction<JQuantifiableVariable, JTerm, JTerm> quantify = tb::all;
+        BiFunction<QuantifiableVariable, JTerm, JTerm> quantify = tb::all;
         BiFunction<JTerm, JTerm, JTerm> combineGuard = tb::imp;
         return simpleQuantifier(preTerm, bodyTerm, declsType, declVars, nullable, resultType,
             quantify, combineGuard);
@@ -271,7 +272,7 @@ public final class JmlTermFactory {
     public SLExpression exists(JTerm preTerm, JTerm bodyTerm, KeYJavaType declsType,
             ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
         boolean isGeneralized = false;
-        BiFunction<JQuantifiableVariable, JTerm, JTerm> quantify = tb::ex;
+        BiFunction<QuantifiableVariable, JTerm, JTerm> quantify = tb::ex;
         BiFunction<JTerm, JTerm, JTerm> combineGuard = tb::andSC;
         return simpleQuantifier(preTerm, bodyTerm, declsType, declVars, nullable, resultType,
             quantify, combineGuard);
@@ -279,7 +280,7 @@ public final class JmlTermFactory {
 
     private SLExpression simpleQuantifier(JTerm preTerm, JTerm bodyTerm, KeYJavaType declsType,
             ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType,
-            BiFunction<JQuantifiableVariable, JTerm, JTerm> combine,
+            BiFunction<QuantifiableVariable, JTerm, JTerm> combine,
             BiFunction<JTerm, JTerm, JTerm> combineQuantifiedTerms) {
         final Type type = declsType.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
@@ -427,7 +428,7 @@ public final class JmlTermFactory {
     }
 
     private interface BoundedNumericalQuantifier {
-        JTerm apply(JQuantifiableVariable qv, JTerm lo, JTerm hi, JTerm body);
+        JTerm apply(QuantifiableVariable qv, JTerm lo, JTerm hi, JTerm body);
     }
     // endregion
 
@@ -849,7 +850,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression createSeqDef(SLExpression a, SLExpression b, SLExpression t,
-            KeYJavaType declsType, ImmutableList<? extends JQuantifiableVariable> declVars) {
+            KeYJavaType declsType, ImmutableList<? extends QuantifiableVariable> declVars) {
         if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
                 || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
             throw exc.createException0(
@@ -857,7 +858,7 @@ public final class JmlTermFactory {
         } else if (declVars.size() != 1) {
             throw exc.createException0("sequence definition must declare exactly one variable");
         }
-        JQuantifiableVariable qv = declVars.head();
+        QuantifiableVariable qv = declVars.head();
         JTerm tt = t.getTerm();
         if (tt.sort() == JavaDLTheory.FORMULA) {
             // bugfix (CS): t.getTerm() delivers a formula instead of a
@@ -878,7 +879,7 @@ public final class JmlTermFactory {
             JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
         guard = guard == null ? restr : tb.and(restr, guard);
         return createIntersect(tb.infiniteUnion(
-            declVars.second.toArray(new JQuantifiableVariable[declVars.second.size()]), guard,
+            declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), guard,
             expr),
             javaInfo);
     }

@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
@@ -30,7 +30,7 @@ public interface TranslationListener {
      *
      * @param var the quantified variable that has been found.
      */
-    void eventQuantifiedVariable(JQuantifiableVariable var);
+    void eventQuantifiedVariable(QuantifiableVariable var);
 
     /**
      * Called when the translator finds a schema variable of type formula. You can use this event to

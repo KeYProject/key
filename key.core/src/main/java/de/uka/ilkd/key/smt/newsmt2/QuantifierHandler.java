@@ -11,13 +11,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -107,15 +107,15 @@ public class QuantifierHandler implements SMTHandler {
             return term;
         }
 
-        List<JQuantifiableVariable> boundVars =
-            (List<JQuantifiableVariable>) term.boundVars().toList();
+        List<QuantifiableVariable> boundVars =
+            (List<QuantifiableVariable>) term.boundVars().toList();
         while (current.op() == type) {
             boundVars.addAll(current.boundVars().toList());
             current = current.sub(0);
         }
 
         ImmutableArray<JTerm> subs = new ImmutableArray<>(current);
-        ImmutableArray<JQuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
+        ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
         return services.getTermFactory().createTerm(type, subs, bvars, null);
     }
 

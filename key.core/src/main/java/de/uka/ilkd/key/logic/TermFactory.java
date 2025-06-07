@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
@@ -56,7 +56,7 @@ public final class TermFactory {
      * entire system.
      */
     public JTerm createTerm(@NonNull Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
@@ -70,7 +70,7 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<JQuantifiableVariable> boundVars) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
 
         return createTerm(op, subs, boundVars, null);
     }
@@ -80,7 +80,7 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs,
-            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
@@ -116,7 +116,7 @@ public final class TermFactory {
     }
 
     private JTerm doCreateTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =

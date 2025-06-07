@@ -18,6 +18,7 @@ import de.uka.ilkd.key.taclettranslation.DefaultTacletTranslator;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -64,7 +65,7 @@ public class SMTTacletTranslator {
         }
 
         JTerm[] subs = { smt };
-        ImmutableArray<JQuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
+        ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
         return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
     }
 
@@ -93,9 +94,9 @@ public class SMTTacletTranslator {
             }
         }
 
-        List<JQuantifiableVariable> qvars = new ArrayList<>();
+        List<QuantifiableVariable> qvars = new ArrayList<>();
         if (op instanceof Quantifier) {
-            for (JQuantifiableVariable boundVar : term.boundVars()) {
+            for (QuantifiableVariable boundVar : term.boundVars()) {
                 if (boundVar instanceof JOperatorSV sv) {
                     LogicVariable lv =
                         variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));

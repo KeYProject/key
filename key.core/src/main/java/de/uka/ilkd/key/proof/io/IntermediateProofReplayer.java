@@ -55,6 +55,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
@@ -956,7 +957,7 @@ public class IntermediateProofReplayer {
      * @return The parsed term.
      * @throws ParserException In case of an error.
      */
-    public static JTerm parseTerm(String value, Proof proof, Namespace<JQuantifiableVariable> varNS,
+    public static JTerm parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
@@ -1028,7 +1029,7 @@ public class IntermediateProofReplayer {
                 app.instantiations().add(msv, JModality.JavaModalityKind.getKind(value), services),
                 services);
         } else {
-            Namespace<JQuantifiableVariable> varNS = p.getNamespaces().variables();
+            Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();
             Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();

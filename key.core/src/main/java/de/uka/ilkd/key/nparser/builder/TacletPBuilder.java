@@ -30,6 +30,7 @@ import org.key_project.logic.Choice;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -422,7 +423,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private JTerm createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
-            JQuantifiableVariable qvX, JTerm phi, Sort dt) {
+            QuantifiableVariable qvX, JTerm phi, Sort dt) {
         var tb = services.getTermBuilder();
         var fn = functions().lookup(context.name.getText());
         if (context.argName.isEmpty())
@@ -438,7 +439,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             context.argName.stream()
                     .map(RuleContext::getText)
                     .toList();
-        var qvs = new ArrayList<JQuantifiableVariable>(args.length);
+        var qvs = new ArrayList<QuantifiableVariable>(args.length);
         var ind = new ArrayList<JTerm>(args.length);
 
         for (int i = 0; i < argSort.size(); i++) {

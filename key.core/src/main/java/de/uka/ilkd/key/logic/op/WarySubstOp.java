@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 
 
 public final class WarySubstOp extends SubstOp {
@@ -27,7 +28,7 @@ public final class WarySubstOp extends SubstOp {
 
     @Override
     public JTerm apply(JTerm term, TermBuilder tb) {
-        JQuantifiableVariable v = term.varsBoundHere(1).get(0);
+        QuantifiableVariable v = term.varsBoundHere(1).get(0);
         WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0), tb);
         return cfSubst.apply(term.sub(1));
     }
