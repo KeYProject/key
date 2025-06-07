@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -23,14 +23,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * variable with which the original variable should be substituted below modalities
      */
     private QuantifiableVariable newVar = null;
-    private Term newVarTerm = null;
+    private JTerm newVarTerm = null;
 
     /**
      * variables occurring within the original term and within the term to be substituted
      */
     private ImmutableSet<QuantifiableVariable> warysvars = null;
 
-    public WaryClashFreeSubst(QuantifiableVariable v, Term s, TermBuilder tb) {
+    public WaryClashFreeSubst(QuantifiableVariable v, JTerm s, TermBuilder tb) {
         super(v, s, tb);
         warysvars = null;
     }
@@ -40,8 +40,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * replacing bound variables in <code>t</code> if necessary.
      */
     @Override
-    public Term apply(Term t) {
-        Term res;
+    public JTerm apply(JTerm t) {
+        JTerm res;
 
         if (depth == 0) {
             if (!getSubstitutedTerm().isRigid()) {
@@ -67,7 +67,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * Determine a set of variables that do already appear within <code>t</code> or the substituted
      * term, and whose names should not be used for free variables
      */
-    private void findUsedVariables(Term t) {
+    private void findUsedVariables(JTerm t) {
         VariableCollectVisitor vcv;
 
         vcv = new VariableCollectVisitor();
@@ -104,10 +104,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * contains a free occurrence of <code>v</code>.
      */
     @Override
-    protected Term apply1(Term t) {
+    protected JTerm apply1(JTerm t) {
         // don't move to a different modality level
         if (!getSubstitutedTerm().isRigid()) {
-            if (t.op() instanceof Modality) {
+            if (t.op() instanceof JModality) {
                 return applyOnModality(t);
             }
             if (t.op() instanceof UpdateApplication) {
@@ -128,7 +128,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private Term applyOnModality(Term t) {
+    private JTerm applyOnModality(JTerm t) {
         return applyBelowModality(t);
     }
 
@@ -140,7 +140,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private Term applyOnTransformer(Term t) {
+    private JTerm applyOnTransformer(JTerm t) {
         return applyBelowTransformer(t);
     }
 
@@ -152,15 +152,15 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      *
      * PRECONDITION: <code>warysvars != null</code>
      */
-    private Term applyOnUpdate(Term t) {
+    private JTerm applyOnUpdate(JTerm t) {
 
         // only the last child is below the update
-        final Term target = UpdateApplication.getTarget(t);
+        final JTerm target = UpdateApplication.getTarget(t);
         if (!target.freeVars().contains(getVariable())) {
             return super.apply1(t);
         }
 
-        final Term[] newSubterms = new Term[t.arity()];
+        final JTerm[] newSubterms = new JTerm[t.arity()];
         @SuppressWarnings("unchecked")
         final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[t.arity()];
 
@@ -181,14 +181,14 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * Apply the substitution to a term/formula below a modality or update
      */
-    private Term applyBelowModality(Term t) {
+    private JTerm applyBelowModality(JTerm t) {
         return substWithNewVar(t);
     }
 
     /**
      * Apply the substitution to a term/formula below a transformer procedure
      */
-    private Term applyBelowTransformer(Term t) {
+    private JTerm applyBelowTransformer(JTerm t) {
         return substWithNewVar(t);
     }
 
@@ -196,7 +196,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * Prepend the given term with a wary substitution (substituting <code>newVar</code> with
      * <code>getSubstitutedTerm()</code>)
      */
-    private Term addWarySubst(Term t) {
+    private JTerm addWarySubst(JTerm t) {
         createVariable();
         return tb.subst(WarySubstOp.SUBST, newVar, getSubstitutedTerm(), t);
     }
@@ -204,7 +204,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * Rename the original variable to be substituted to <code>newVar</code>
      */
-    private Term substWithNewVar(Term t) {
+    private JTerm substWithNewVar(JTerm t) {
         createVariable();
         final ClashFreeSubst cfs = new ClashFreeSubst(getVariable(), newVarTerm, tb);
         return cfs.apply(t);

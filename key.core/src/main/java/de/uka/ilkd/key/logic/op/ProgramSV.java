@@ -13,9 +13,9 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
-public final class ProgramSV extends OperatorSV
+public final class ProgramSV extends JOperatorSV
         implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
@@ -228,7 +229,7 @@ public final class ProgramSV extends OperatorSV
 
         if (foundInst != null) {
             final Object newInst;
-            if (foundInst instanceof Term) {
+            if (foundInst instanceof JTerm) {
                 newInst = services.getTypeConverter().convertToLogicElement(pe,
                     insts.getExecutionContext());
             } else {
@@ -339,7 +340,7 @@ public final class ProgramSV extends OperatorSV
 
         final Object instant = instantiations.getInstantiation(this);
         if (instant == null || instant.equals(src)
-                || (instant instanceof Term && ((Term) instant).op().equals(src))) {
+                || (instant instanceof JTerm && ((JTerm) instant).op().equals(src))) {
 
             matchCond = addProgramInstantiation(src, matchCond, services);
 

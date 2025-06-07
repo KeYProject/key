@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
@@ -134,8 +134,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp) {
-        var t = ruleApp.posInOccurrence().subTerm();
-        Term term = TermBuilder.goBelowUpdates(t);
+        final JTerm term = TermBuilder.goBelowUpdates((JTerm) ruleApp.posInOccurrence().subTerm());
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
         return Objects.equals(getPm(), mf.getProgramMethod());

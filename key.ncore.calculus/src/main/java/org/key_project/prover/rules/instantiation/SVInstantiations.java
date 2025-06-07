@@ -29,7 +29,7 @@ public interface SVInstantiations {
     /// @return the instantiation of the schema variable, `null` if no instantiation for a
     /// schema variable of the
     /// specified name is available
-    Object lookupValue(Name name);
+    <T> T lookupValue(Name name);
 
     /// checks whether the given schema variable has been instantiated and
     /// returns its instantiation otherwise `null` is returned
@@ -39,7 +39,7 @@ public interface SVInstantiations {
     /// schema variable is
     /// available
     @Nullable
-    Object getInstantiation(SchemaVariable sv);
+    <T> T getInstantiation(SchemaVariable sv);
 
 
     /// checks whether the given schema variable has been instantiated

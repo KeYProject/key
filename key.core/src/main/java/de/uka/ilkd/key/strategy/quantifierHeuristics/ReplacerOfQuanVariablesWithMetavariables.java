@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -24,12 +25,12 @@ class ReplacerOfQuanVariablesWithMetavariables {
     private ReplacerOfQuanVariablesWithMetavariables() {}
 
     public static Substitution createSubstitutionForVars(Term allTerm, TermServices services) {
-        ImmutableMap<org.key_project.logic.op.QuantifiableVariable, Term> res =
+        ImmutableMap<QuantifiableVariable, Term> res =
             DefaultImmutableMap.nilMap();
         Term t = allTerm;
         var op = t.op();
         while (op instanceof Quantifier) {
-            QuantifiableVariable q = (QuantifiableVariable) t.varsBoundHere(0).get(0);
+            QuantifiableVariable q = t.varsBoundHere(0).get(0);
             Term m;
             if (op == Quantifier.ALL) {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());

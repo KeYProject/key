@@ -11,10 +11,10 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -56,13 +56,13 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
         // add new information flow symbols
         // (by the way: why only formal parameters?)
-        for (Term formalParam : symbExecVars.formalParams) {
+        for (JTerm formalParam : symbExecVars.formalParams) {
             addIFSymbol(formalParam);
         }
-        for (Term formalParam : ifVars.c1.formalParams) {
+        for (JTerm formalParam : ifVars.c1.formalParams) {
             addIFSymbol(formalParam);
         }
-        for (Term formalParam : ifVars.c2.formalParams) {
+        for (JTerm formalParam : ifVars.c2.formalParams) {
             addIFSymbol(formalParam);
         }
     }
@@ -76,10 +76,10 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
         // create proof obligation
         InfFlowPOSnippetFactory f =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, proofServices);
-        final Term selfComposedExec =
+        final JTerm selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        final Term finalTerm = tb.imp(selfComposedExec, post);
+        final JTerm post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        final JTerm finalTerm = tb.imp(selfComposedExec, post);
         addLabeledIFSymbol(selfComposedExec);
 
         // register final term, taclets and collect class axioms
@@ -104,7 +104,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
 
     @Override
-    public Term getMbyAtPre() {
+    public JTerm getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
         } else {
@@ -153,7 +153,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected JModality.JavaModalityKind getTerminationMarker() {
         return getContract().getModalityKind();
     }
 
@@ -188,7 +188,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     }
 
     @Override
-    public final void addIFSymbol(Term t) {
+    public final void addIFSymbol(JTerm t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
@@ -200,7 +200,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     }
 
     @Override
-    public void addLabeledIFSymbol(Term t) {
+    public void addLabeledIFSymbol(JTerm t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
@@ -218,8 +218,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -244,7 +244,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
@@ -254,7 +254,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected JTerm getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
@@ -265,7 +265,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
+    protected JTerm buildFrameClause(List<LocationVariable> modHeaps, Map<JTerm, JTerm> heapToAtPre,
             LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         throw new UnsupportedOperationException(
@@ -275,7 +275,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     @Deprecated
-    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+    protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");

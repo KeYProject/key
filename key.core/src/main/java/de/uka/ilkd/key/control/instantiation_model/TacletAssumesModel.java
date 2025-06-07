@@ -8,8 +8,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
@@ -101,7 +102,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
      * @return the term encoded in 's'
      * @throws RecognitionException In case an exception occurs during parse.
      */
-    public Term parseFormula(String s) throws RecognitionException {
+    public JTerm parseFormula(String s) throws RecognitionException {
         return new KeyIO(services).parseExpression(s);
     }
 
@@ -124,7 +125,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
                     true);
             }
 
-            Term term = parseFormula(manualInput);
+            JTerm term = parseFormula(manualInput);
             term = services.getTermBuilder().addLabelToAllSubs(term,
                 new NodeOrigin(SpecType.USER_INTERACTION,
                     app.rule().displayName(), goal.node().serialNr()));

@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
@@ -167,7 +168,7 @@ public class MergeRule implements BuiltInRule {
             new SymbolicExecutionState(thisSEState.symbolicState(), thisSEState.pathCondition(),
                 newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
-        LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
+        LinkedHashSet<JTerm> sideConditionsToProve = new LinkedHashSet<>();
         HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
 
         int cnt = 0;
@@ -192,7 +193,7 @@ public class MergeRule implements BuiltInRule {
             mergedState.setCorrespondingNode(newGoal.node());
         }
 
-        final Term resultPathCondition = mergedState.second;
+        final JTerm resultPathCondition = mergedState.second;
 
         // NOTE (DS): The following simplification has been commented
         // out since it was usually not successful and consumed an
@@ -233,12 +234,12 @@ public class MergeRule implements BuiltInRule {
         newGoal.indexOfTaclets().removeTaclets(partInstNoPosTacletsToRemove);
 
         // Add new antecedent (path condition)
-        for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
+        for (JTerm antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
             newGoal.addFormula(new SequentFormula(antecedentFormula), true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
-        final Term succedentFormula = tb.apply(mergedState.first, thisSEState.programCounter());
+        final JTerm succedentFormula = tb.apply(mergedState.first, thisSEState.programCounter());
         final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent, false, true);
         // The following line has the only effect of emptying the
@@ -255,7 +256,7 @@ public class MergeRule implements BuiltInRule {
 
         // Add new goals for side conditions that have to be proven
         if (!sideConditionsToProve.isEmpty()) {
-            final Iterator<Term> sideCondIt = sideConditionsToProve.iterator();
+            final Iterator<JTerm> sideCondIt = sideConditionsToProve.iterator();
 
             int i = 0;
             for (Goal sideConditionGoal : newGoals) {
@@ -270,7 +271,7 @@ public class MergeRule implements BuiltInRule {
 
                 clearSemisequent(sideConditionGoal, true);
                 clearSemisequent(sideConditionGoal, false);
-                final Term sideCondition = sideCondIt.next();
+                final JTerm sideCondition = sideCondIt.next();
 
                 sideConditionGoal.addFormula(new SequentFormula(sideCondition),
                     new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
@@ -305,7 +306,7 @@ public class MergeRule implements BuiltInRule {
     /* For deactivated equiv check */
     protected MergeStateEntry mergeStates(
             MergeProcedure mergeRule, SymbolicExecutionState state1, SymbolicExecutionState state2,
-            Term programCounter, Term distinguishingFormula, Services services) {
+            JTerm programCounter, JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -314,13 +315,13 @@ public class MergeRule implements BuiltInRule {
 
         // Side conditions remaining to be proven, e.g. after predicate
         // abstraction.
-        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
+        final LinkedHashSet<JTerm> sideConditionsToProve = new LinkedHashSet<>();
 
         // Construct path condition as (optimized) disjunction
         // NOTE: Deactivated this; This optimization can create shorter
         // formulas, but is very time consumptive. At the end, the result does
         // not always perform better than within the unoptimized version.
-        final Term newPathCondition = MergeRuleUtils.createSimplifiedDisjunctivePathCondition(
+        final JTerm newPathCondition = MergeRuleUtils.createSimplifiedDisjunctivePathCondition(
             state1.second, state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
@@ -331,15 +332,15 @@ public class MergeRule implements BuiltInRule {
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
 
-        ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
+        ImmutableList<JTerm> newElementaryUpdates = ImmutableSLList.nil();
 
         // New constraints on introduced Skolem constants
-        Term newAdditionalConstraints = null;
+        JTerm newAdditionalConstraints = null;
 
         for (LocationVariable v : progVars) {
 
-            Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-            Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+            JTerm rightSide1 = getUpdateRightSideFor(state1.first, v);
+            JTerm rightSide2 = getUpdateRightSideFor(state2.first, v);
 
             if (rightSide1 == null) {
                 rightSide1 = tb.var(v);
@@ -363,12 +364,12 @@ public class MergeRule implements BuiltInRule {
                     && rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING && !proofClosed
                     && !RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
-                Term predicateTerm =
+                JTerm predicateTerm =
                     tb.func(new JFunction(new Name("P"), JavaDLTheory.FORMULA, v.sort()),
                         tb.var(v));
-                Term appl1 = tb.apply(state1.first, predicateTerm);
-                Term appl2 = tb.apply(state2.first, predicateTerm);
-                Term toProve = tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
+                JTerm appl1 = tb.apply(state1.first, predicateTerm);
+                JTerm appl2 = tb.apply(state2.first, predicateTerm);
+                JTerm toProve = tb.and(tb.imp(appl1, appl2), tb.imp(appl2, appl1));
 
                 proofClosed = isProvableWithSplitting(toProve, services, SIMPLIFICATION_TIMEOUT_MS);
             }
@@ -430,7 +431,7 @@ public class MergeRule implements BuiltInRule {
         } // end for (LocationVariable v : progVars)
 
         // Construct weakened symbolic state
-        Term newSymbolicState = tb.parallel(newElementaryUpdates);
+        JTerm newSymbolicState = tb.parallel(newElementaryUpdates);
 
         // Note: We apply the symbolic state to the new constraints to enable
         // merge techniques, in particular predicate abstraction, to make
@@ -462,15 +463,15 @@ public class MergeRule implements BuiltInRule {
      * @return A merged heap term.
      */
     protected ValuesMergeResult mergeHeaps(final MergeProcedure mergeRule,
-            final LocationVariable heapVar, final Term heap1, final Term heap2,
+            final LocationVariable heapVar, final JTerm heap1, final JTerm heap2,
             final SymbolicExecutionState state1, final SymbolicExecutionState state2,
-            Term distinguishingFormula, final Services services) {
+            JTerm distinguishingFormula, final Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+        ImmutableSet<JTerm> newConstraints = DefaultImmutableSet.nil();
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
 
-        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
+        final LinkedHashSet<JTerm> sideConditionsToProve = new LinkedHashSet<>();
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps
@@ -497,15 +498,15 @@ public class MergeRule implements BuiltInRule {
             // Store operations.
 
             // Decompose the heap operations.
-            final Term subHeap1 = heap1.sub(0);
-            final Term pointer1 = heap1.sub(1);
-            final Term field1 = heap1.sub(2);
-            final Term value1 = heap1.sub(3);
+            final JTerm subHeap1 = heap1.sub(0);
+            final JTerm pointer1 = heap1.sub(1);
+            final JTerm field1 = heap1.sub(2);
+            final JTerm value1 = heap1.sub(3);
 
-            final Term subHeap2 = heap2.sub(0);
-            final Term pointer2 = heap2.sub(1);
-            final Term field2 = heap2.sub(2);
-            final Term value2 = heap2.sub(3);
+            final JTerm subHeap2 = heap2.sub(0);
+            final JTerm pointer2 = heap2.sub(1);
+            final JTerm field2 = heap2.sub(2);
+            final JTerm value2 = heap2.sub(3);
 
             if (pointer1.equals(pointer2) && field1.equals(field2)) {
                 // Potential for deep merge: Access of same object / field.
@@ -516,7 +517,7 @@ public class MergeRule implements BuiltInRule {
                 newNames.addAll(mergedSubHeap.newNames());
                 sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
-                Term mergedVal = null;
+                JTerm mergedVal = null;
 
                 if (value1.equals(value2)) {
                     // Idempotency...
@@ -546,11 +547,11 @@ public class MergeRule implements BuiltInRule {
             // Create operations.
 
             // Decompose the heap operations.
-            Term subHeap1 = heap1.sub(0);
-            Term pointer1 = heap1.sub(1);
+            JTerm subHeap1 = heap1.sub(0);
+            JTerm pointer1 = heap1.sub(1);
 
-            Term subHeap2 = heap2.sub(0);
-            Term pointer2 = heap2.sub(1);
+            JTerm subHeap2 = heap2.sub(0);
+            JTerm pointer2 = heap2.sub(1);
 
             if (pointer1.equals(pointer2)) {
                 // Same objects are created: merge.
@@ -616,7 +617,7 @@ public class MergeRule implements BuiltInRule {
 
         var selected = pio.subTerm();
 
-        org.key_project.logic.Term termAfterUpdate = selected;
+        Term termAfterUpdate = selected;
 
         if (selected.op() instanceof UpdateApplication) {
             var update = selected.sub(0);
@@ -639,8 +640,8 @@ public class MergeRule implements BuiltInRule {
 
         // Term after update must have the form "phi" or "\<{...}\> phi" or
         // "\[{...}\] phi", where phi must not contain a Java block.
-        if (termAfterUpdate.op() instanceof Modality
-                && termAfterUpdate.sub(0).op() instanceof Modality) {
+        if (termAfterUpdate.op() instanceof JModality
+                && termAfterUpdate.sub(0).op() instanceof JModality) {
             return false;
         } else if (termAfterUpdate.op() instanceof UpdateApplication) {
             return false;
@@ -719,11 +720,12 @@ public class MergeRule implements BuiltInRule {
      * @param newSymbolicState the new state
      * @param newIntroducedNames newly introduced names
      * @param sideConditionsToProve side condition required for merging
-     * @see #mergeStates(MergeProcedure, SymbolicExecutionState, SymbolicExecutionState, Term, Term,
+     * @see #mergeStates(MergeProcedure, SymbolicExecutionState, SymbolicExecutionState, JTerm,
+     *      JTerm,
      *      Services)
      */
     public record MergeStateEntry(SymbolicExecutionState newSymbolicState,
             LinkedHashSet<Name> newIntroducedNames,
-            LinkedHashSet<Term> sideConditionsToProve) {
+            LinkedHashSet<JTerm> sideConditionsToProve) {
     }
 }

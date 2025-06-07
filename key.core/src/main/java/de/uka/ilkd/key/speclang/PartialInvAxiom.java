@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
@@ -69,7 +69,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     }
 
     @Override
-    public SpecificationElement map(UnaryOperator<Term> op, Services services) {
+    public SpecificationElement map(UnaryOperator<JTerm> op, Services services) {
         PartialInvAxiom result = new PartialInvAxiom(inv.map(op, services), isStatic, services);
         result.displayName = displayName;
         return result;

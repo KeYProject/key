@@ -5,7 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.function.UnaryOperator;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -18,15 +18,15 @@ import org.key_project.util.collection.ImmutableSLList;
 public class InfFlowSpec {
     public static final InfFlowSpec EMPTY_INF_FLOW_SPEC = new InfFlowSpec();
 
-    public final ImmutableList<Term> preExpressions;
+    public final ImmutableList<JTerm> preExpressions;
 
-    public final ImmutableList<Term> postExpressions;
+    public final ImmutableList<JTerm> postExpressions;
 
-    public final ImmutableList<Term> newObjects;
+    public final ImmutableList<JTerm> newObjects;
 
 
-    public InfFlowSpec(final ImmutableList<Term> preExpressions,
-            final ImmutableList<Term> postExpressions, final ImmutableList<Term> newObjects) {
+    public InfFlowSpec(final ImmutableList<JTerm> preExpressions,
+            final ImmutableList<JTerm> postExpressions, final ImmutableList<JTerm> newObjects) {
         this.preExpressions = preExpressions;
         this.postExpressions = postExpressions;
         this.newObjects = newObjects;
@@ -38,7 +38,7 @@ public class InfFlowSpec {
      * @param op the operator to apply.
      * @return this InfFlow specification element with the operator applied.
      */
-    public InfFlowSpec map(UnaryOperator<Term> op) {
+    public InfFlowSpec map(UnaryOperator<JTerm> op) {
         return new InfFlowSpec(preExpressions.stream().map(op).collect(ImmutableList.collector()),
             postExpressions.stream().map(op).collect(ImmutableList.collector()),
             newObjects.stream().map(op).collect(ImmutableList.collector()));

@@ -9,10 +9,10 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -143,8 +143,8 @@ public class ClausesGraph {
      * @return ture if set contains one or more exists varaible that are also in exVars
      */
     private boolean containsExistentialVariables(
-            ImmutableSet<? extends org.key_project.logic.op.QuantifiableVariable> set) {
-        return TriggerUtils.intersect(set, exVars).size() > 0;
+            ImmutableSet<? extends QuantifiableVariable> set) {
+        return !TriggerUtils.intersect(set, exVars).isEmpty();
     }
 
     /**
@@ -183,7 +183,7 @@ public class ClausesGraph {
         }
         if (op == Quantifier.EX) {
             return existentialVars(formula.sub(0))
-                    .add((QuantifiableVariable) formula.varsBoundHere(0).last());
+                    .add(formula.varsBoundHere(0).last());
         }
         return DefaultImmutableSet.nil();
     }

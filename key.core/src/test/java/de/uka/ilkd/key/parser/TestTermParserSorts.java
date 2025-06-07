@@ -5,7 +5,7 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,8 +35,8 @@ public class TestTermParserSorts extends AbstractTestTermParser {
          * Test any::seqGet(s,i)
          */
         String pp = "s[i]";
-        Term expected = parseTerm("any::seqGet(s,i)");
-        Term actual = parseTerm(pp);
+        JTerm expected = parseTerm("any::seqGet(s,i)");
+        JTerm actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         assertEqualsIgnoreWhitespaces(printTerm(expected), pp); // test pretty-printing
 
@@ -72,7 +72,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     @Test
     public void testParseIntegerArgs() throws Exception {
         String s = "testTermParserSorts.IntegerMethods::queryByte(heap,a,Z(0(#)))";
-        Term t = parseTerm("a.queryByte(0)");
+        JTerm t = parseTerm("a.queryByte(0)");
         assertEquals(s, t.toString());
 
         s = "testTermParserSorts.IntegerMethods::queryByteArray(heap,a,ba)";

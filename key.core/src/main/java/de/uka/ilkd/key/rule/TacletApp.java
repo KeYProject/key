@@ -23,6 +23,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -143,7 +145,7 @@ public abstract class TacletApp implements RuleApp {
 
         for (final var prefixSchemaVar : pre.prefix()) {
             instanceSet = instanceSet.add(
-                (LogicVariable) ((Term) instantiations.getInstantiation(prefixSchemaVar)).op());
+                (LogicVariable) ((JTerm) instantiations.getInstantiation(prefixSchemaVar)).op());
         }
         return instanceSet;
     }
@@ -202,7 +204,7 @@ public abstract class TacletApp implements RuleApp {
 
         for (var pair : insts.getInstantiationMap()) {
             if (pair.key() instanceof VariableSV varSV) {
-                Term value = (Term) pair.value().getInstantiation();
+                JTerm value = (JTerm) pair.value().getInstantiation();
                 if (!collMap.containsKey(value.op())) {
                     collMap.put((LogicVariable) value.op(), varSV);
                 } else {
@@ -220,7 +222,7 @@ public abstract class TacletApp implements RuleApp {
      * @param term the term to be searched in
      * @return the term below the given quantifier in the given term
      */
-    private static Term getTermBelowQuantifier(SchemaVariable varSV, Term term) {
+    private static JTerm getTermBelowQuantifier(SchemaVariable varSV, JTerm term) {
         for (int i = 0; i < term.arity(); i++) {
             for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
                 if (term.varsBoundHere(i).get(j) == varSV) {
@@ -242,10 +244,10 @@ public abstract class TacletApp implements RuleApp {
      * @param varSV the searched bound SchemaVariable
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
-    private static Term getTermBelowQuantifier(org.key_project.prover.rules.Taclet taclet,
+    private static JTerm getTermBelowQuantifier(org.key_project.prover.rules.Taclet taclet,
             SchemaVariable varSV) {
         for (SequentFormula sequentFormula : taclet.assumesSequent()) {
-            Term result = getTermBelowQuantifier(varSV, (Term) sequentFormula.formula());
+            JTerm result = getTermBelowQuantifier(varSV, (JTerm) sequentFormula.formula());
             if (result != null) {
                 return result;
             }
@@ -267,10 +269,11 @@ public abstract class TacletApp implements RuleApp {
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
-    private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars, LogicVariable x,
+    private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
+            LogicVariable x,
             SVInstantiations insts) {
         for (int i = 0; i < boundVars.size(); i++) {
-            Term instance = (Term) insts.getInstantiation((SchemaVariable) boundVars.get(i));
+            JTerm instance = (JTerm) insts.getInstantiation((SchemaVariable) boundVars.get(i));
             if (instance.op() == x) {
                 return true;
             }
@@ -287,12 +290,12 @@ public abstract class TacletApp implements RuleApp {
             org.key_project.prover.rules.Taclet taclet, SVInstantiations insts,
             SchemaVariable varSV,
             Services services) {
-        Term term = getTermBelowQuantifier(taclet, varSV);
+        JTerm term = getTermBelowQuantifier(taclet, varSV);
         LogicVariable newVariable = new LogicVariable(
-            new Name(((Term) insts.getInstantiation(varSV)).op().name() + "0"),
-            ((Term) insts.getInstantiation(varSV)).sort());
+            new Name(((JTerm) insts.getInstantiation(varSV)).op().name() + "0"),
+            ((JTerm) insts.getInstantiation(varSV)).sort());
         // __CHANGE__ How to name the new variable? TODO
-        Term newVariableTerm = services.getTermBuilder().var(newVariable);
+        JTerm newVariableTerm = services.getTermBuilder().var(newVariable);
         return replaceInstantiation(insts, term, varSV, newVariableTerm, services);
     }
 
@@ -301,15 +304,15 @@ public abstract class TacletApp implements RuleApp {
      * SchemaVariable u to the Term (that is a LogicVariable) y.
      */
     private static de.uka.ilkd.key.rule.inst.SVInstantiations replaceInstantiation(
-            SVInstantiations insts, Term t, SchemaVariable u, Term y, Services services) {
+            SVInstantiations insts, JTerm t, SchemaVariable u, JTerm y, Services services) {
 
         var result = (de.uka.ilkd.key.rule.inst.SVInstantiations) insts;
-        LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
+        LogicVariable x = (LogicVariable) ((JTerm) insts.getInstantiation(u)).op();
         if (t.op() instanceof SchemaVariable sv) {
             if (!(t.op() instanceof VariableSV)) {
                 ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
                 result =
-                    result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)), services);
+                    result.replace(sv, cfSubst.apply((JTerm) insts.getInstantiation(sv)), services);
             }
         } else {
             for (int i = 0; i < t.arity(); i++) {
@@ -416,7 +419,7 @@ public abstract class TacletApp implements RuleApp {
      *        of "interesting" instantiations
      * @return the new TacletApp
      */
-    public TacletApp addCheckedInstantiation(SchemaVariable sv, Term term, Services services,
+    public TacletApp addCheckedInstantiation(SchemaVariable sv, JTerm term, Services services,
             boolean interesting) {
         if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add " + "the instantiation of " + sv
@@ -517,7 +520,7 @@ public abstract class TacletApp implements RuleApp {
         ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable variable : uninstantiatedVars()) {
-            if (!(variable instanceof OperatorSV operatorSv)) {
+            if (!(variable instanceof JOperatorSV operatorSv)) {
                 continue;
             }
             if (operatorSv.arity() != 0) {
@@ -622,7 +625,7 @@ public abstract class TacletApp implements RuleApp {
         VariableCollectVisitor vcv = new VariableCollectVisitor();
         for (final var nv : taclet().varsNotFreeIn()) {
             if (nv.first() == sv) {
-                Term term = (Term) instantiations.getInstantiation(nv.second());
+                JTerm term = (JTerm) instantiations.getInstantiation(nv.second());
                 if (term != null) {
                     term.execPostOrder(vcv);
                 }
@@ -647,7 +650,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new taclet app, or <code>null</code> if the sort of <code>sv</code> is generic
      *         and cannot be instantiated (at least at the time)
      */
-    private static TacletApp forceGenericSortInstantiation(TacletApp app, OperatorSV sv,
+    private static TacletApp forceGenericSortInstantiation(TacletApp app, JOperatorSV sv,
             Services services) {
         final GenericSortCondition c = GenericSortCondition.forceInstantiation(sv.sort(), false);
         if (c != null) {
@@ -666,7 +669,7 @@ public abstract class TacletApp implements RuleApp {
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(OperatorSV p_sv, TermServices services) {
+    public Sort getRealSort(JOperatorSV p_sv, TermServices services) {
         return instantiations().getGenericSortInstantiations().getRealSort(p_sv, services);
     }
 
@@ -677,7 +680,7 @@ public abstract class TacletApp implements RuleApp {
      *
      * @param services the Services class allowing access to the type model
      */
-    public TacletApp createSkolemConstant(String instantiation, OperatorSV sv,
+    public TacletApp createSkolemConstant(String instantiation, JOperatorSV sv,
             boolean interesting, Services services) {
         return createSkolemConstant(instantiation, sv, getRealSort(sv, services), interesting,
             services);
@@ -696,7 +699,7 @@ public abstract class TacletApp implements RuleApp {
         for (final var pair : insts.getInstantiationMap()) {
             final var sv = pair.key();
             if (sv instanceof SkolemTermSV skolemSV) {
-                final Term inst = insts.getInstantiation(skolemSV);
+                final JTerm inst = insts.getInstantiation(skolemSV);
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
@@ -714,7 +717,7 @@ public abstract class TacletApp implements RuleApp {
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
-    public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public abstract TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
             Services services);
 
     /**
@@ -1032,7 +1035,7 @@ public abstract class TacletApp implements RuleApp {
         Namespace<@NonNull QuantifiableVariable> ns = new Namespace<>(var_ns);
         TacletPrefix tacletPrefix = (TacletPrefix) taclet().getPrefix(sv);
         for (final var schemaVariable : tacletPrefix.prefix()) {
-            if (instantiations().getInstantiation(schemaVariable) instanceof Term term &&
+            if (instantiations().getInstantiation(schemaVariable) instanceof JTerm term &&
                     term.op() instanceof LogicVariable lv) {
                 ns.add(lv);
             } else {
@@ -1062,7 +1065,7 @@ public abstract class TacletApp implements RuleApp {
         Namespace<@NonNull Function> ns = new Namespace<>(func_ns);
         for (var pair : instantiations.getInstantiationMap()) {
             if (pair.key() instanceof SkolemTermSV skolemSV) {
-                Term inst = instantiations.getInstantiation(skolemSV);
+                JTerm inst = instantiations.getInstantiation(skolemSV);
                 Operator op = inst.op();
                 assert op instanceof Function
                         : "At this point the skolem instantiation is expected to "
@@ -1092,7 +1095,7 @@ public abstract class TacletApp implements RuleApp {
                     }
                 }
                 for (var varSV : prefix.prefix()) {
-                    Term inst = (Term) instantiations().getInstantiation(varSV);
+                    JTerm inst = (JTerm) instantiations().getInstantiation(varSV);
                     if (inst != null) {
                         Name name = inst.op().name();
                         if (!names.contains(name)) {
@@ -1147,7 +1150,7 @@ public abstract class TacletApp implements RuleApp {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
                     } else {
                         Expression peerInstExpr;
-                        if (peerInst instanceof Term peerTerm) {
+                        if (peerInst instanceof JTerm peerTerm) {
                             peerInstExpr = tc.convertToProgramElement(peerTerm);
                         } else {
                             peerInstExpr = (Expression) peerInst;
@@ -1183,7 +1186,7 @@ public abstract class TacletApp implements RuleApp {
         while (it.hasNext()) {
             var sv = it.next();
             if (sv instanceof TermSV || sv instanceof FormulaSV) {
-                if (!((Term) instantiations.getInstantiation(sv)).freeVars()
+                if (!((JTerm) instantiations.getInstantiation(sv)).freeVars()
                         .subset(boundAtOccurrenceSet((TacletPrefix) taclet.getPrefix(sv),
                             instantiations, pos))) {
 

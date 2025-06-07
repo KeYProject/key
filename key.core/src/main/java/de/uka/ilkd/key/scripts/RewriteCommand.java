@@ -122,7 +122,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null) {
-                Term term = (Term) sf.formula();
+                JTerm term = (JTerm) sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -134,7 +134,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null) {
-                Term term = (Term) sf.formula();
+                JTerm term = (JTerm) sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -220,13 +220,13 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pio PosInOccurrence of the to be returned term
      * @return term at pio
      */
-    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
+    public JTerm getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
         if (pio.isTopLevel()) {
-            return (Term) sf.formula();
+            return (JTerm) sf.formula();
 
         } else {
             PosInTerm pit = pio.posInTerm();
-            return getSubTerm((Term) sf.formula(), pit.iterator());
+            return getSubTerm((JTerm) sf.formula(), pit.iterator());
         }
 
     }
@@ -238,7 +238,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pit
      * @return subterm
      */
-    private Term getSubTerm(Term t, IntIterator pit) {
+    private JTerm getSubTerm(JTerm t, IntIterator pit) {
         if (pit.hasNext()) {
             int i = pit.next();
             return getSubTerm(t.sub(i), pit);
@@ -257,16 +257,16 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
          * Term, which should be replaced
          */
         @Option(value = "find")
-        public Term find;
+        public JTerm find;
         /**
          * Substitutent
          */
         @Option(value = "replace")
-        public Term replace;
+        public JTerm replace;
         /**
          * Formula, where to find {@see find}.
          */
         @Option(value = "formula", required = false)
-        public Term formula;
+        public JTerm formula;
     }
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
@@ -35,7 +35,7 @@ class BasicMatching {
             allsubs = allsubs.add(subst);
         }
         final var op = targetTerm.op();
-        if (!(op instanceof Modality || op instanceof UpdateApplication)) {
+        if (!(op instanceof JModality || op instanceof UpdateApplication)) {
             for (int i = 0; i < targetTerm.arity(); i++) {
                 allsubs = allsubs.union(getSubstitutions(trigger, targetTerm.sub(i)));
             }

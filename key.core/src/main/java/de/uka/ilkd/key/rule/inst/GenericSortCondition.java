@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -40,7 +40,7 @@ public abstract class GenericSortCondition {
             return null;
         }
 
-        return createCondition(((OperatorSV) sv).sort(), instantiation.sort(),
+        return createCondition(((JOperatorSV) sv).sort(), instantiation.sort(),
             !subSortsAllowed(sv));
     }
 

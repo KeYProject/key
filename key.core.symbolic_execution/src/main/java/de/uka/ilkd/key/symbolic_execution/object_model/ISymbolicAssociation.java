@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 
@@ -39,7 +39,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return The represented array index or {@code null} if a program variable is represented..
      */
-    Term getArrayIndex();
+    JTerm getArrayIndex();
 
     /**
      * Returns the human readable array index or {@code null} if a program variable is represented..
@@ -80,7 +80,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return The optional condition under which this association is valid.
      */
-    Term getCondition();
+    JTerm getCondition();
 
     /**
      * <p>

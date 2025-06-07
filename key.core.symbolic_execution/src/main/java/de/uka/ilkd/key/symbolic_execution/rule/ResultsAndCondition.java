@@ -5,7 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -15,5 +15,5 @@ import de.uka.ilkd.key.proof.Node;
  * @param conditions formulas of the antecedent
  * @param node the final node of the side proof
  */
-public record ResultsAndCondition(Term result, Set<Term> conditions, Node node) {
+public record ResultsAndCondition(JTerm result, Set<JTerm> conditions, Node node) {
 }

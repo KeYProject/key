@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
@@ -21,9 +21,9 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
     @Override
     public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
-        final Term actualTerm = (Term) actualElement;
+        final JTerm actualTerm = (JTerm) actualElement;
         if (actualTerm.op() instanceof QuantifiableVariable qv) {
-            final Term foundMapping = (Term) mc.getInstantiations().getInstantiation(op);
+            final JTerm foundMapping = mc.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
                 return addInstantiation(actualTerm, mc, services);
             } else if (foundMapping.op() == qv) {

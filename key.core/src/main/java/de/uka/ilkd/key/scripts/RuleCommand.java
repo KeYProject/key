@@ -19,6 +19,7 @@ import de.uka.ilkd.key.scripts.meta.Varargs;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -197,7 +198,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         for (SchemaVariable sv : result.uninstantiatedVars()) {
             if (result.isInstantiationRequired(sv)) {
-                Term inst = p.instantiations.get(sv.name().toString());
+                JTerm inst = p.instantiations.get(sv.name().toString());
                 if (inst == null) {
                     throw new ScriptException("missing instantiation for " + sv);
                 }
@@ -353,12 +354,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p,
             SequentFormula sf, Services services)
             throws ScriptException {
-        org.key_project.logic.Term term = sf.formula();
+        Term term = sf.formula();
         final boolean satisfiesFormulaParameter =
             p.formula != null && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula);
 
         final boolean satisfiesMatchesParameter = p.matches != null
-                && formatTermString(LogicPrinter.quickPrintTerm((Term) sf.formula(), services))
+                && formatTermString(LogicPrinter.quickPrintTerm((JTerm) sf.formula(), services))
                         .matches(".*" + p.matches + ".*");
 
         return (p.formula == null && p.matches == null) || satisfiesFormulaParameter
@@ -384,13 +385,13 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                Term term = (Term) pta.posInOccurrence().subTerm();
+                JTerm term = (JTerm) pta.posInOccurrence().subTerm();
                 boolean add =
                     p.on == null || RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.on);
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
-                    Term userInst = p.instantiations.get(sv.name().toString());
+                    JTerm userInst = p.instantiations.get(sv.name().toString());
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
@@ -410,9 +411,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         @Option(value = "#2")
         public String rulename;
         @Option(value = "on", required = false)
-        public Term on;
+        public JTerm on;
         @Option(value = "formula", required = false)
-        public Term formula;
+        public JTerm formula;
         @Option(value = "occ", required = false)
         public int occ = -1;
         /**
@@ -421,8 +422,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
          */
         @Option(value = "matches", required = false)
         public String matches = null;
-        @Varargs(as = Term.class, prefix = "inst_")
-        public Map<String, Term> instantiations = new HashMap<>();
+        @Varargs(as = JTerm.class, prefix = "inst_")
+        public Map<String, JTerm> instantiations = new HashMap<>();
     }
 
     private static class TacletNameFilter extends TacletFilter {

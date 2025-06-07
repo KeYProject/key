@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 
@@ -33,7 +33,7 @@ public final class ObserverCondition implements VariableCondition {
             MatchResultInfo mc,
             LogicServices services) {
         SVInstantiations svInst = mc.getInstantiations();
-        final Term obsInst = (Term) svInst.getInstantiation(obs);
+        final JTerm obsInst = (JTerm) svInst.getInstantiation(obs);
 
         if (obsInst == null) {
             return mc;
@@ -41,8 +41,8 @@ public final class ObserverCondition implements VariableCondition {
             return null;
         }
 
-        final Term heapInst = (Term) svInst.getInstantiation(heap);
-        final Term properHeapInst = obsInst.sub(0);
+        final JTerm heapInst = (JTerm) svInst.getInstantiation(heap);
+        final JTerm properHeapInst = obsInst.sub(0);
         if (heapInst == null) {
             svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(heap, properHeapInst,
                 services);

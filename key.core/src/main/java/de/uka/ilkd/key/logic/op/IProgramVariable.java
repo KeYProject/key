@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
 

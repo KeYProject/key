@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -89,7 +90,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     protected ExecutionContext extractContext(Node node, Services services) {
         RuleApp app = node.getAppliedRuleApp();
         PosInOccurrence pio = app.posInOccurrence();
-        JavaBlock jb = TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock();
+        JavaBlock jb = TermBuilder.goBelowUpdates((JTerm) pio.subTerm()).javaBlock();
         return JavaTools.getInnermostExecutionContext(jb, services);
     }
 

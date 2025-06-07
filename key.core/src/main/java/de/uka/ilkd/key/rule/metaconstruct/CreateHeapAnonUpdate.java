@@ -9,18 +9,18 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -38,16 +38,16 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term loopTerm = term.sub(0);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        final JTerm loopTerm = term.sub(0);
         final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
         if (loopSpec == null) {
             return null;
         }
 
-        final Term anonHeapTerm = term.sub(1);
-        final Term anonSavedHeapTerm = term.sub(2);
-        final Term anonPermissionsHeapTerm = term.sub(3);
+        final JTerm anonHeapTerm = term.sub(1);
+        final JTerm anonSavedHeapTerm = term.sub(2);
+        final JTerm anonPermissionsHeapTerm = term.sub(3);
 
         return createHeapAnonUpdate(loopSpec,
             MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
@@ -69,15 +69,15 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
-    private static Term createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
-            boolean isPermissions, Term anonHeapTerm, Term anonSavedHeapTerm,
-            Term anonPermissionsHeapTerm, Services services) {
+    private static JTerm createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
+            boolean isPermissions, JTerm anonHeapTerm, JTerm anonSavedHeapTerm,
+            JTerm anonPermissionsHeapTerm, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
+        final Map<LocationVariable, JTerm> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
             HeapContext.getModifiableHeaps(services, isTransaction);
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> mods = new LinkedHashMap<>();
         // The call to MiscTools.removeSingletonPVs removes from the modifiable clause
         // the program variables which of course should not be part of an anonymizing
         // heap expression. The reason why they're there at all is that for Abstract
@@ -89,7 +89,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        Term anonUpdate = tb.skip();
+        JTerm anonUpdate = tb.skip();
 
         anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getHeap(),
             anonHeapTerm, mods.get(heapLDT.getHeap()), services));
@@ -119,11 +119,12 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */
-    private static Term createElementaryAnonUpdate(LocationVariable heap, Term anonHeap, Term mod,
+    private static JTerm createElementaryAnonUpdate(LocationVariable heap, JTerm anonHeap,
+            JTerm mod,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
+        final JTerm anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         return tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)
                 ? tb.skip()

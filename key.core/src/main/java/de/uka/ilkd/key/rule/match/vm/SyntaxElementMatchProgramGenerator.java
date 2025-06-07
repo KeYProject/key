@@ -5,10 +5,13 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
@@ -27,10 +30,10 @@ public class SyntaxElementMatchProgramGenerator {
     /**
      * creates a matcher for the given pattern
      *
-     * @param pattern the {@link Term} specifying the pattern
+     * @param pattern the {@link JTerm} specifying the pattern
      * @return the specialized matcher for the given pattern
      */
-    public static VMInstruction[] createProgram(Term pattern) {
+    public static VMInstruction[] createProgram(JTerm pattern) {
         ArrayList<VMInstruction> program = new ArrayList<>();
         createProgram(pattern, program);
         return program.toArray(new VMInstruction[0]);
@@ -40,11 +43,11 @@ public class SyntaxElementMatchProgramGenerator {
      * creates a matching program for the given pattern. It appends the necessary match instruction
      * to the given list of instructions
      *
-     * @param pattern the Term used as pattern for which to create a matcher
+     * @param pattern the {@link JTerm} used as pattern for which to create a matcher
      * @param program the list of {@link MatchInstruction} to which the instructions for matching
      *        {@code pattern} are added.
      */
-    private static void createProgram(Term pattern, ArrayList<VMInstruction> program) {
+    private static void createProgram(JTerm pattern, ArrayList<VMInstruction> program) {
         final Operator op = pattern.op();
 
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
@@ -61,7 +64,7 @@ public class SyntaxElementMatchProgramGenerator {
             program.add(getMatchInstructionForSV(sv));
             program.add(gotoNextSiblingInstruction());
         } else {
-            program.add(getCheckNodeKindInstruction(Term.class));
+            program.add(getCheckNodeKindInstruction(JTerm.class));
             program.add(gotoNextInstruction());
             if (op instanceof final SortDependingFunction sortDependingFunction) {
                 program.add(getCheckNodeKindInstruction(SortDependingFunction.class));

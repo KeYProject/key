@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.util.TermHelper;
@@ -34,7 +34,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
     /**
      * does the work for applyReplacewith (wraps recursion)
      */
-    private Term replace(Term term, Term with, TermLabelState termLabelState,
+    private JTerm replace(JTerm term, JTerm with, TermLabelState termLabelState,
             TacletLabelHint labelHint, PosInOccurrence posOfFind,
             IntIterator it,
             MatchResultInfo mc,
@@ -42,7 +42,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
         if (it.hasNext()) {
             final int indexOfNextSubTerm = it.next();
 
-            final Term[] subs = new Term[term.arity()];
+            final JTerm[] subs = new JTerm[term.arity()];
             term.subs().arraycopy(0, subs, 0, term.arity());
 
             final Sort newMaxSort = TermHelper.getMaxSort(term, indexOfNextSubTerm);
@@ -53,7 +53,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
                 term.getLabels());
         }
 
-        with = (Term) syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services,
+        with = (JTerm) syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services,
             termLabelState, labelHint);
 
         if (!with.sort().extendsTrans(maxSort)) {
@@ -70,11 +70,11 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             Services services,
             MatchResultInfo matchCond,
             TacletApp ruleApp) {
-        final Term term = (Term) posOfFind.sequentFormula().formula();
+        final JTerm term = (JTerm) posOfFind.sequentFormula().formula();
         final IntIterator it = posOfFind.posInTerm().iterator();
-        final Term rwTemplate = gt.replaceWith();
+        final JTerm rwTemplate = gt.replaceWith();
 
-        Term formula = replace(term, rwTemplate, termLabelState, new TacletLabelHint(rwTemplate),
+        JTerm formula = replace(term, rwTemplate, termLabelState, new TacletLabelHint(rwTemplate),
             posOfFind, it, matchCond, term.sort(), goal, services, ruleApp);
         formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula,
             posOfFind, taclet, goal, null, rwTemplate);
@@ -118,8 +118,8 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             // Then there was no replacewith...
             // This is strange in a RewriteTaclet, but who knows...
             // However, term label refactorings have to be performed.
-            final Term oldFormula = (Term) posOfFind.sequentFormula().formula();
-            final Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState,
+            final JTerm oldFormula = (JTerm) posOfFind.sequentFormula().formula();
+            final JTerm newFormula = TermLabelManager.refactorSequentFormula(termLabelState,
                 services, oldFormula, posOfFind, taclet, goal, null, null);
             if (oldFormula != newFormula) {
                 currentSequent.combine(currentSequent.sequent()

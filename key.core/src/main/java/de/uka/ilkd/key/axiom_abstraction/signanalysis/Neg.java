@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
@@ -30,7 +30,7 @@ public class Neg extends SignAnalysisDomainElem {
     }
 
     @Override
-    public Term getDefiningAxiom(Term varOrConst, Services services) {
+    public JTerm getDefiningAxiom(JTerm varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
         return services.getTermBuilder().lt(varOrConst, tb.zero());
     }

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -15,16 +15,16 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
- * Stores the given {@link Term}, after substitution of {@link SchemaVariable}s, into the given
+ * Stores the given {@link JTerm}, after substitution of {@link SchemaVariable}s, into the given
  * {@link SchemaVariable} for later use in other conditions and transformers.
  *
  * @author Dominic Steinhoefel
  */
 public class StoreTermInCondition implements VariableCondition {
     private final SchemaVariable storeInSV;
-    private final Term term;
+    private final JTerm term;
 
-    public StoreTermInCondition(SchemaVariable resultVarSV, Term term) {
+    public StoreTermInCondition(SchemaVariable resultVarSV, JTerm term) {
         this.storeInSV = resultVarSV;
         this.term = term;
     }
@@ -42,7 +42,7 @@ public class StoreTermInCondition implements VariableCondition {
         final LightweightSyntacticalReplaceVisitor replVisitor = //
             new LightweightSyntacticalReplaceVisitor(svInst, (Services) services);
         term.execPostOrder(replVisitor);
-        final Term instantiatedTerm = replVisitor.getTerm();
+        final JTerm instantiatedTerm = replVisitor.getTerm();
 
         return matchCond.setInstantiations( //
             svInst.add(storeInSV, instantiatedTerm, services));
