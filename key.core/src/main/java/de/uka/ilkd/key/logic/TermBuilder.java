@@ -948,9 +948,9 @@ public class TermBuilder {
 
     public JTerm elementary(JTerm lhs, JTerm rhs) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        if (lhs.op() instanceof UpdateableJOperator) {
+        if (lhs.op() instanceof UpdateableOperator updateableOperator) {
             assert lhs.arity() == 0 : "uh oh: " + lhs;
-            return elementary((UpdateableOperator) lhs.op(), rhs);
+            return elementary(updateableOperator, rhs);
         } else if (heapLDT.getSortOfSelect(lhs.op()) != null
                 && lhs.sub(0).op().equals(heapLDT.getHeap())) {
             final JTerm heapTerm = lhs.sub(0);

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
 public final class ProgramSV extends JOperatorSV
-        implements ProgramConstruct, UpdateableJOperator {
+        implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ImmutableArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
