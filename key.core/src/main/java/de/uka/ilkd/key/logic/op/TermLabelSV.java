@@ -11,7 +11,7 @@ import org.key_project.logic.Name;
 /**
  * A schema variable which matches term labels
  */
-public final class TermLabelSV extends OperatorSV implements TermLabel {
+public final class TermLabelSV extends JOperatorSV implements TermLabel {
 
     TermLabelSV(Name name) {
         super(name, JavaDLTheory.TERMLABEL, true, false);

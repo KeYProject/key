@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -17,35 +19,35 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract sorted operator class offering some common functionality.
  */
-public abstract class AbstractSortedOperator extends org.key_project.logic.op.AbstractSortedOperator
-        implements Operator, Sorted {
+public abstract class JAbstractSortedOperator extends AbstractSortedOperator
+        implements Sorted, Operator {
 
-    protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+    protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts, sort, whereToBind, modifier);
     }
 
-    protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+    protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         this(name, argSorts, sort, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
-    protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
+    protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
             boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
             new ImmutableArray<>(whereToBind), isRigid);
     }
 
-    protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+    protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             boolean isRigid) {
         this(name, argSorts, sort, null, isRigid);
     }
 
-    protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, boolean isRigid) {
+    protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort, null, isRigid);
     }
 
-    protected AbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
+    protected JAbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
         this(name, new ImmutableArray<>(), sort, null, isRigid);
     }
 
@@ -57,7 +59,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
      * @param possibleSub the subterm to be ckecked.
      * @return true iff the given term can be subterm at the indicated position
      */
-    private boolean possibleSub(int at, Term possibleSub) {
+    private boolean possibleSub(int at, JTerm possibleSub) {
         final Sort s = possibleSub.sort();
 
         return s == AbstractTermTransformer.METASORT || s instanceof ProgramSVSort
@@ -78,7 +80,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, (Term) term.sub(i))) {
+            if (!possibleSub(i, (JTerm) term.sub(i))) {
                 throw new TermCreationException(this, term);
             }
         }

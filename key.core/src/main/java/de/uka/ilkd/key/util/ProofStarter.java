@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -65,7 +65,7 @@ public class ProofStarter {
                     : "ProofObligation for " + ProofSaver.printAnything(seq, null);
         }
 
-        public UserProvidedInput(Term formula, ProofEnvironment env) {
+        public UserProvidedInput(JTerm formula, ProofEnvironment env) {
             this(
                 JavaDLSequentKit.createSuccSequent(
                     ImmutableSLList.<SequentFormula>nil().prepend(new SequentFormula(formula))),
@@ -151,7 +151,7 @@ public class ProofStarter {
      *
      * @throws ProofInputException if the proof obligation generation fails
      */
-    public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
+    public void init(JTerm formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
         proof.setEnv(env);

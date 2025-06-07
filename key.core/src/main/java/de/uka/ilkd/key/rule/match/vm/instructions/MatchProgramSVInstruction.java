@@ -5,8 +5,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             }
         } else {
             Object peForCompare = pe;
-            if (inMap instanceof Term) {
+            if (inMap instanceof JTerm) {
                 try {
                     peForCompare =
                         ((Services) services).getTypeConverter().convertToLogicElement(pe,
@@ -82,7 +82,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term instantiationCandidate,
+    public MatchConditions match(JTerm instantiationCandidate,
             MatchConditions matchCond,
             LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();

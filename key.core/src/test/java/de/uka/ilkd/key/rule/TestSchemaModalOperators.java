@@ -9,7 +9,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -124,21 +125,21 @@ public class TestSchemaModalOperators {
         RewriteTacletBuilder<RewriteTaclet> rtb = new RewriteTacletBuilder<>();
 
         FormulaSV fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
-        ImmutableSet<Modality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
+        ImmutableSet<JModality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
         modalities =
-            modalities.add(Modality.JavaModalityKind.DIA).add(Modality.JavaModalityKind.BOX);
+            modalities.add(JModality.JavaModalityKind.DIA).add(JModality.JavaModalityKind.BOX);
         SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(new Name("diabox"),
             JavaDLTheory.FORMULA, modalities);
-        Term tpost = TB.tf().createTerm(fsv);
+        JTerm tpost = TB.tf().createTerm(fsv);
 
-        Term find = TB.tf().createTerm(
-            Modality.getModality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
-            new Term[] { tpost }, null, null);
+        JTerm find = TB.tf().createTerm(
+            JModality.getModality((JModality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
+            new JTerm[] { tpost }, null, null);
 
-        Term replace =
+        JTerm replace =
             TB.tf().createTerm(
-                Modality.getModality((Modality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
-                new Term[] { TB.tt() }, null, null);
+                JModality.getModality((JModality.JavaModalityKind) osv, JavaBlock.EMPTY_JAVABLOCK),
+                new JTerm[] { TB.tt() }, null, null);
 
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);
@@ -149,23 +150,23 @@ public class TestSchemaModalOperators {
 
         RewriteTaclet t = rtb.getRewriteTaclet();
 
-        Term goal = TB.prog(Modality.JavaModalityKind.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
+        JTerm goal = TB.prog(JModality.JavaModalityKind.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
         MatchConditions mc =
             t.getMatcher().matchFind(goal, EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
         assertNotNull(mc.getInstantiations().getInstantiation(osv));
         assertTrue(mc.getInstantiations().isInstantiated(osv),
             "Schemamodality " + osv + " has not been instantiated");
-        assertSame(Modality.JavaModalityKind.DIA, mc.getInstantiations().getInstantiation(osv));
+        assertSame(JModality.JavaModalityKind.DIA, mc.getInstantiations().getInstantiation(osv));
 
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
-        Term instReplace =
-            (Term) t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
+        JTerm instReplace =
+            (JTerm) t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
                 tacletApp).formula();
         assertNotNull(instReplace);
-        assertSame(Modality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());
+        assertSame(JModality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());
     }
 
     @Test

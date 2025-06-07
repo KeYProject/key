@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.logic.Property;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Modality;
 
 /**
  * A property that can be used in

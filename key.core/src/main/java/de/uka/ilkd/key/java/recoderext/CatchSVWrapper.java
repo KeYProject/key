@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
@@ -17,9 +17,9 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
      *
      */
     private static final long serialVersionUID = 6288254708744002494L;
-    protected final OperatorSV sv;
+    protected final JOperatorSV sv;
 
-    public CatchSVWrapper(OperatorSV sv) {
+    public CatchSVWrapper(JOperatorSV sv) {
         this.sv = sv;
     }
 
@@ -27,7 +27,7 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
     /**
      * returns a String name of this meta construct.
      */
-    public OperatorSV getSV() {
+    public JOperatorSV getSV() {
         return sv;
     }
 

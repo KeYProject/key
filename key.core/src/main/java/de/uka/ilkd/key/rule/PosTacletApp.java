@@ -7,10 +7,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -135,7 +135,7 @@ public class PosTacletApp extends TacletApp {
             Iterator<SchemaVariable> it = allVariableSV(taclet);
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();
-                Term inst = (Term) insts.getInstantiation(varSV);
+                JTerm inst = (JTerm) insts.getInstantiation(varSV);
                 if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
@@ -153,7 +153,7 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
             Services services) {
 
         if (interesting) {

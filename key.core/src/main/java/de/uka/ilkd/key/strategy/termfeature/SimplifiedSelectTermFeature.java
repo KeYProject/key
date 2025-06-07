@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 
 import org.key_project.logic.LogicServices;
@@ -29,7 +30,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, LogicServices services) {
-        var t = (de.uka.ilkd.key.logic.Term) term;
+        var t = (JTerm) term;
         boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
         return // either the operator is not a select operator
         !isSelectOp ||

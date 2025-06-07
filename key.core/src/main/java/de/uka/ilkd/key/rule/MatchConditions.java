@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.op.QuantifiableVariable;
 
 import org.jspecify.annotations.NonNull;
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -15,18 +15,18 @@ class BasicLoopExecutionWithInvariantSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(d, poVars);
 
         // loop invariant
-        final Term freeInv = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_INV);
-        final Term loopInv = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_INV);
-        final Term inv = d.tb.and(freeInv, loopInv);
+        final JTerm freeInv = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_INV);
+        final JTerm loopInv = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_INV);
+        final JTerm inv = d.tb.and(freeInv, loopInv);
 
         // symbolic execution
-        Term symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
+        JTerm symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
 
 
         // final symbolic execution term

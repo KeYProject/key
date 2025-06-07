@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.SuccTaclet;
 
@@ -32,7 +32,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      *
      * @return this SuccTacletBuilder
      */
-    public SuccTacletBuilder setFind(Term findTerm) {
+    public SuccTacletBuilder setFind(JTerm findTerm) {
         return setFind(
             JavaDLSequentKit.createSuccSequent(ImmutableList.of(new SequentFormula(findTerm))));
     }
