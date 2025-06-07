@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SortException;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Sequent;
@@ -131,13 +132,13 @@ public class TacletInstantiationModel {
                 AssumesFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();
-            Term ifFma;
+            JTerm ifFma;
             MatchConditions matchCond = app.matchConditions();
 
             ifChoiceModel = new TacletAssumesModel[size];
 
             for (int i = 0; i < size; i++) {
-                ifFma = (Term) it.next().formula();
+                ifFma = (JTerm) it.next().formula();
                 ifChoiceModel[i] =
                     new TacletAssumesModel(
                         ifFma,

@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,7 +34,7 @@ public interface PredicateEstimator {
      * which to prune, i.e. apply the delayed cut.
      */
     interface Result {
-        Term getPredicate();
+        JTerm getPredicate();
 
         Node getCommonParent();
     }
@@ -68,13 +68,13 @@ class StdPredicateEstimator implements PredicateEstimator {
                 branchLabel = branchLabel.substring(CUT_LABEL.length());
             }
 
-            final Term term = translate(branchLabel, proof.getServices());
+            final JTerm term = translate(branchLabel, proof.getServices());
 
             if (term != null) {
                 return new Result() {
 
                     @Override
-                    public Term getPredicate() {
+                    public JTerm getPredicate() {
                         if (!positive) {
                             return proof.getServices().getTermBuilder().not(term);
                         }
@@ -94,7 +94,7 @@ class StdPredicateEstimator implements PredicateEstimator {
         return new Result() {
 
             @Override
-            public Term getPredicate() {
+            public JTerm getPredicate() {
                 // The decision predicate has to be specified by the user.
                 return null;
             }
@@ -151,7 +151,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @param services The services object.
      * @return A term corresponding to the branch label.
      */
-    private Term translate(String estimation, Services services) {
+    private JTerm translate(String estimation, Services services) {
         try {
             return new KeyIO(services).parseExpression(estimation);
         } catch (Throwable e) {

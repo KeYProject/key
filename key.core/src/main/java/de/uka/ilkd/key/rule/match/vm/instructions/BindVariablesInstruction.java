@@ -4,15 +4,15 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
@@ -79,9 +79,9 @@ public class BindVariablesInstruction implements MatchInstruction {
             final Services services = (Services) p_services;
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
-                final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
+                final JTerm substTerm = services.getTermBuilder().var(instantiationCandidate);
                 return addInstantiation(substTerm, matchCond, services);
-            } else if (((Term) foundMapping).op() != instantiationCandidate) {
+            } else if (((JTerm) foundMapping).op() != instantiationCandidate) {
                 return null;
             } else {
                 return matchCond;
@@ -101,7 +101,7 @@ public class BindVariablesInstruction implements MatchInstruction {
             LogicServices services) {
         MatchConditions matchConditions = (MatchConditions) matchResult;
         final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
-            ((Term) actualElement).boundVars();
+            ((JTerm) actualElement).boundVars();
         matchConditions = matchConditions.extendRenameTable();
         if (variablesToMatchAndBind.size() == boundVarBinders.length) {
             for (int i = 0; i < boundVarBinders.length && matchConditions != null; i++) {

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -123,7 +123,7 @@ public class TestTermTacletAppIndex {
         ruleIdx.add(remove_f);
         ruleIdx.add(remove_zero);
 
-        Term term = TacletForTests.parseTerm("f(f(f(zero)))=one");
+        JTerm term = TacletForTests.parseTerm("f(f(f(zero)))=one");
         SequentFormula cfma = new SequentFormula(term);
 
         PosInOccurrence pio =
@@ -141,7 +141,7 @@ public class TestTermTacletAppIndex {
         checkTermIndex(pio, termIdx);
 
         // now a real change
-        Term term2 = TacletForTests.parseTerm("f(f(zero))=one");
+        JTerm term2 = TacletForTests.parseTerm("f(f(zero))=one");
         SequentFormula cfma2 = new SequentFormula(term2);
         PosInOccurrence pio2 =
             new PosInOccurrence(cfma2, PosInTerm.getTopLevel(), false);

@@ -544,7 +544,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToString(AbstractionPredicate pred) {
         final Services services = MainWindow.getInstance().getMediator().getServices();
-        final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
+        final Pair<LocationVariable, JTerm> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
         return "(" + predFormWithPh.first + ","
             + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -45,7 +45,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
             }
         } else {
             Object peForCompare = pe;
-            if (inMap instanceof Term) {
+            if (inMap instanceof JTerm) {
                 try {
                     peForCompare =
                         ((Services) services).getTypeConverter().convertToLogicElement(pe,
@@ -90,7 +90,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
         MatchResultInfo result = null;
         if (actualElement instanceof ProgramElement programElement) {
             result = match(programElement, mc, services);
-        } else if (actualElement instanceof Term term) {
+        } else if (actualElement instanceof JTerm term) {
             final ProgramSVSort svSort = (ProgramSVSort) op.sort();
             if (svSort.canStandFor(term)) {
                 return addInstantiation(term, mc, services);

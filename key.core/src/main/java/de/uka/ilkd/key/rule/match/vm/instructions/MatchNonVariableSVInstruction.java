@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
@@ -27,7 +27,7 @@ public class MatchNonVariableSVInstruction extends MatchSchemaVariableInstructio
     @Override
     public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
-        return addInstantiation((Term) actualElement, mc, services);
+        return addInstantiation((JTerm) actualElement, mc, services);
     }
 
 }

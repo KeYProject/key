@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  *
@@ -58,6 +58,6 @@ public interface InfFlowPOSnippetFactory {
     }
 
 
-    Term create(Snippet snippet) throws UnsupportedOperationException;
+    JTerm create(Snippet snippet) throws UnsupportedOperationException;
 
 }

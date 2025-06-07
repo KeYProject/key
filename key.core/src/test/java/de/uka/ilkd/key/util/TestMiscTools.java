@@ -70,14 +70,9 @@ public class TestMiscTools {
         String u = MiscTools.makeFilenameRelative(s, t);
         assertEquals("Windows", u);
         // do stupid things
-        try {
-            t = File.separator + "home" + File.separator + "daniel";
-            u = MiscTools.makeFilenameRelative(s, t);
-            fail();
-        } catch (RuntimeException e) {
-            assertTrue(true);
-        }
-
+        t = File.separator + "home" + File.separator + "daniel";
+        u = MiscTools.makeFilenameRelative(s, t);
+        assertEquals("..\\..\\Windows", u);
     }
 
     @Test

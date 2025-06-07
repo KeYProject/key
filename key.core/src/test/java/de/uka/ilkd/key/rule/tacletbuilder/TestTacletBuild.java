@@ -5,13 +5,11 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -20,6 +18,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestTacletBuild {
 
-    public static final Term[] NO_SUBTERMS = new Term[0];
+    public static final JTerm[] NO_SUBTERMS = new JTerm[0];
 
     private TermFactory tf;
 
@@ -56,10 +55,10 @@ public class TestTacletBuild {
     public void test0() {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup("u");
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup("v");
-        Term b = tf.createTerm((OperatorSV) TacletForTests.getSchemaVariables().lookup("b"),
+        JTerm b = tf.createTerm((JOperatorSV) TacletForTests.getSchemaVariables().lookup("b"),
             NO_SUBTERMS);
-        Term t1 = tb.ex((QuantifiableVariable) u, b);
-        Term t2 = tb.ex((QuantifiableVariable) v, b);
+        JTerm t1 = tb.ex((QuantifiableVariable) u, b);
+        JTerm t2 = tb.ex((QuantifiableVariable) v, b);
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
@@ -83,12 +82,12 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+        JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
-        Term t1 = tb.all((QuantifiableVariable) u, A);
+        JTerm t1 = tb.all((QuantifiableVariable) u, A);
         Sequent seq =
             JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t1)));
-        Term t2 = tb.ex((QuantifiableVariable) u, A);
+        JTerm t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
         sb.setFind(t2);
@@ -105,10 +104,10 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+        JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
-        Term t1 = tb.all((QuantifiableVariable) u, A);
-        Term t2 = tb.ex((QuantifiableVariable) u, A);
+        JTerm t1 = tb.all((QuantifiableVariable) u, A);
+        JTerm t2 = tb.ex((QuantifiableVariable) u, A);
         Sequent seq = JavaDLSequentKit
                 .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t2))
                         .prepend(new SequentFormula(t1)));
@@ -128,9 +127,9 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+        JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
-        Term t1 = tb.all((QuantifiableVariable) u, A);
+        JTerm t1 = tb.all((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setFind(tf.createTerm(Junctor.AND, t1, t1));
         try {

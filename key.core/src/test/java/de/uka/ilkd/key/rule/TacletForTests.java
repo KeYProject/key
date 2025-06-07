@@ -11,10 +11,9 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.*;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
@@ -188,7 +188,7 @@ public class TacletForTests {
         return getSorts().lookup(new Name(name));
     }
 
-    public static Term parseTerm(String termstr, Services services) {
+    public static JTerm parseTerm(String termstr, Services services) {
         if (termstr.isEmpty()) {
             return null;
         }
@@ -204,14 +204,14 @@ public class TacletForTests {
 
     }
 
-    public static Term parseTerm(String termstr, NamespaceSet set) {
+    public static JTerm parseTerm(String termstr, NamespaceSet set) {
         if (termstr.isEmpty()) {
             return null;
         }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 
-    public static Term parseTerm(String termstr) {
+    public static JTerm parseTerm(String termstr) {
         return parseTerm(termstr, services());
     }
 

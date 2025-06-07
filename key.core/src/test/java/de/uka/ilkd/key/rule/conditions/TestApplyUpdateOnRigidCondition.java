@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
@@ -28,9 +29,9 @@ public class TestApplyUpdateOnRigidCondition {
 
     @Test
     void updateWithoutVariables() {
-        Term term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
-        Term result = applyUpdateOnFormula(term);
-        Term expected = TacletForTests.parseTerm("\\forall int a; {i:=0}(a = i)");
+        JTerm term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
+        JTerm result = applyUpdateOnFormula(term);
+        JTerm expected = TacletForTests.parseTerm("\\forall int a; {i:=0}(a = i)");
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update without free variables was not properly applied on formula!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -57,11 +58,11 @@ public class TestApplyUpdateOnRigidCondition {
     void updateWithVariablesNoClash() {
         TermBuilder tb = TacletForTests.services().getTermBuilder();
 
-        Term term =
+        JTerm term =
             TacletForTests.parseTerm("\\forall int b; {i:=b}\\forall java.lang.Object a; a = i");
         QuantifiableVariable b = term.boundVars().get(0);
-        Term result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
-        Term expected =
+        JTerm result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
+        JTerm expected =
             TacletForTests.parseTerm("\\forall int b; \\forall java.lang.Object a; {i:=b} (a = i)");
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over quantification!");
@@ -94,11 +95,11 @@ public class TestApplyUpdateOnRigidCondition {
     void updateWithVariablesAndClash() {
         TermBuilder tb = TacletForTests.services().getTermBuilder();
 
-        Term term =
+        JTerm term =
             TacletForTests.parseTerm("\\forall int a; {i:=a}\\forall java.lang.Object a; a = i");
         QuantifiableVariable a = term.boundVars().get(0);
-        Term result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
-        Term expected = TacletForTests
+        JTerm result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
+        JTerm expected = TacletForTests
                 .parseTerm("\\forall int a; \\forall java.lang.Object a1; {i:=a} (a1 = i)");
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Renaming or applying update afterwards !");
@@ -122,18 +123,18 @@ public class TestApplyUpdateOnRigidCondition {
 
     @Test
     void notRigid() {
-        Term term = TacletForTests.parseTerm("{i:=0} i");
-        Term result = applyUpdateOnTerm(term);
-        Term expected = TacletForTests.parseTerm("{i:=0} i");
+        JTerm term = TacletForTests.parseTerm("{i:=0} i");
+        JTerm result = applyUpdateOnTerm(term);
+        JTerm expected = TacletForTests.parseTerm("{i:=0} i");
         assertEquals(expected, result,
             "The term should not change, as the update should not be applied");
     }
 
     @Test
     void arityZero() {
-        Term term = TacletForTests.parseTerm("{i:=0} A");
-        Term result = applyUpdateOnFormula(term);
-        Term expected = TacletForTests.parseTerm("{i:=0} A");
+        JTerm term = TacletForTests.parseTerm("{i:=0} A");
+        JTerm result = applyUpdateOnFormula(term);
+        JTerm expected = TacletForTests.parseTerm("{i:=0} A");
         assertEquals(expected, result,
             "The term should not change, as the update should not be applied");
 
@@ -159,7 +160,7 @@ public class TestApplyUpdateOnRigidCondition {
         assert mc != null;
         assertEquals(svInst, mc.getInstantiations());
 
-        Term update = TacletForTests.parseTerm("{i:=0}0").sub(0);
+        JTerm update = TacletForTests.parseTerm("{i:=0}0").sub(0);
         svInst = svInst.add(u, update, TacletForTests.services());
         mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
 
@@ -171,8 +172,8 @@ public class TestApplyUpdateOnRigidCondition {
 
     @Test
     void preInstantiatedResultMatching() {
-        Term term = TacletForTests.parseTerm("{i:=0}(i = 0)");
-        Term preInstResult = TacletForTests.parseTerm("{i:=0} i = {i:=0} 0");
+        JTerm term = TacletForTests.parseTerm("{i:=0}(i = 0)");
+        JTerm preInstResult = TacletForTests.parseTerm("{i:=0} i = {i:=0} 0");
 
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
         SchemaVariable phi = SchemaVariableFactory.createFormulaSV(new Name("phi"));
@@ -193,8 +194,8 @@ public class TestApplyUpdateOnRigidCondition {
 
     @Test
     void preInstantiatedResultNotMatching() {
-        Term term = TacletForTests.parseTerm("{i:=0}(i = 0)");
-        Term preInstWrongResult = TacletForTests.parseTerm("i = 0");
+        JTerm term = TacletForTests.parseTerm("{i:=0}(i = 0)");
+        JTerm preInstWrongResult = TacletForTests.parseTerm("i = 0");
 
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
         SchemaVariable phi = SchemaVariableFactory.createFormulaSV(new Name("phi"));
@@ -218,11 +219,11 @@ public class TestApplyUpdateOnRigidCondition {
      * update cannot be applied,
      * the original formula is returned.
      *
-     * @param term the {@link Term} that must be an update applied on a formula
+     * @param term the {@link JTerm} that must be an update applied on a formula
      * @return the original formula if the update cannot be applied; else, the updated formula is
      *         returned
      */
-    private Term applyUpdateOnFormula(Term term) {
+    private JTerm applyUpdateOnFormula(JTerm term) {
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
         SchemaVariable phi = SchemaVariableFactory.createFormulaSV(new Name("phi"));
         SchemaVariable result = SchemaVariableFactory.createFormulaSV(new Name("result"));
@@ -235,10 +236,10 @@ public class TestApplyUpdateOnRigidCondition {
      * cannot be applied,
      * the original term is returned.
      *
-     * @param term the {@link Term} that must be an update applied on a formula
+     * @param term the {@link JTerm} that must be an update applied on a formula
      * @return the original term if the update cannot be applied; else, the updated term is returned
      */
-    private Term applyUpdateOnTerm(Term term) {
+    private JTerm applyUpdateOnTerm(JTerm term) {
         Sort sort = term.sub(1).sort();
 
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
@@ -251,7 +252,7 @@ public class TestApplyUpdateOnRigidCondition {
     /**
      * Instantiates the given schema variables with the content of <code>term</code>.
      *
-     * @param term the {@link Term} that must be an update applied on a formula or term
+     * @param term the {@link JTerm} that must be an update applied on a formula or term
      * @param u the {@link UpdateSV} that is instantiated with the update in <code>term</code>
      * @param tOrPhi the {@link SchemaVariable} that is instantiated with the term or formula in
      *        <code>term</code>
@@ -262,10 +263,10 @@ public class TestApplyUpdateOnRigidCondition {
      * @return the original formula or term if the update cannot be applied; else, the updated
      *         formula or term is returned
      */
-    private Term instantiateAndCheck(Term term, UpdateSV u, SchemaVariable tOrPhi,
+    private JTerm instantiateAndCheck(JTerm term, UpdateSV u, SchemaVariable tOrPhi,
             SchemaVariable result) {
-        Term update = term.sub(0);
-        Term arg = term.sub(1);
+        JTerm update = term.sub(0);
+        JTerm arg = term.sub(1);
 
         SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         svInst = svInst.add(u, update, TacletForTests.services());

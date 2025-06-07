@@ -9,7 +9,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.matcher.vm.instruction.CheckNodeKindInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchIdentityInstruction;

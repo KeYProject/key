@@ -15,9 +15,8 @@ import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
 import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
 import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -33,13 +32,13 @@ public final class LocSetLDT extends LDT {
     public static final String SETMINUS_STRING = "setMinus";
     public static final String UNION_STRING = "union";
 
-    private final JFunction empty;
+    private final Function empty;
     private final Function allLocs;
     private final Function singleton;
     private final Function union;
     private final Function intersect;
     private final Function setMinus;
-    private final JFunction infiniteUnion;
+    private final Function infiniteUnion;
     private final Function allFields;
     private final Function allObjects;
     private final Function arrayRange;
@@ -70,7 +69,7 @@ public final class LocSetLDT extends LDT {
     }
 
 
-    public JFunction getEmpty() {
+    public Function getEmpty() {
         return empty;
     }
 
@@ -100,7 +99,7 @@ public final class LocSetLDT extends LDT {
     }
 
 
-    public JFunction getInfiniteUnion() {
+    public Function getInfiniteUnion() {
         return infiniteUnion;
     }
 
@@ -146,21 +145,21 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
-        return isResponsible(op, (Term) null, services, ec);
+        return isResponsible(op, (JTerm) null, services, ec);
     }
 
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof Singleton || op instanceof SetUnion || op instanceof Intersect
                 || op instanceof SetMinus || op instanceof AllFields;
@@ -168,7 +167,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof EmptySetLiteral;
         return services.getTermBuilder().func(empty);
     }
@@ -194,13 +193,13 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return f.equals(empty);
     }
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op().equals(empty)) {
             return EmptySetLiteral.LOCSET;
         }
@@ -210,7 +209,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }

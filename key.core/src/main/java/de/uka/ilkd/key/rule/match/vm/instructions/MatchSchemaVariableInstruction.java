@@ -5,12 +5,12 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
@@ -33,7 +33,7 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final MatchConditions addInstantiation(Term term, MatchResultInfo matchResultInfo,
+    protected final MatchConditions addInstantiation(JTerm term, MatchResultInfo matchResultInfo,
             LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {
@@ -43,7 +43,7 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
         final MatchConditions matchCond = (MatchConditions) matchResultInfo;
         final SVInstantiations inst = matchCond.getInstantiations();
 
-        final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
+        final JTerm t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
             if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                 return null;

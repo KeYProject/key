@@ -12,8 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -223,7 +223,7 @@ public final class DefaultTacletSetTranslation
         return toStore.toString();
     }
 
-    private String convertTerm(Term term) {
+    private String convertTerm(JTerm term) {
         String ret = LogicPrinter.quickPrintTerm(term, null);
         ret = "(" + ret + ")";
         return ret;
@@ -243,7 +243,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term) {
+    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, JTerm term) {
         /*
          * String s = ""; s += "taclet: " + t.name()+"\n"; s += "term: " + term +"\n"; s +=
          * "generic sort: " + dest + "\n"; s += "sort: "+ sort +"\n"; instantiationFailures =

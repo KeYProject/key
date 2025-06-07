@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 
 /**
@@ -12,5 +12,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
  * @author Alexander Weigl
  * @version 1 (23.04.24)
  */
-public record TranslatedDependencyContract(IObserverFunction observerFunction, Term rhs, Term mby) {
+public record TranslatedDependencyContract(IObserverFunction observerFunction, JTerm rhs,
+        JTerm mby) {
 }
