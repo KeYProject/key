@@ -87,7 +87,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
                 it -> {
-                    org.key_project.logic.Term formula = seqFormula.formula();
+                    Term formula = seqFormula.formula();
                     return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
                 })) {
                 Taclet tac = getHideTaclet("left");
@@ -102,7 +102,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         for (SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(
                 it -> {
-                    org.key_project.logic.Term formula = seqFormula.formula();
+                    Term formula = seqFormula.formula();
                     return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
                 })) {
                 Taclet tac = getHideTaclet("right");

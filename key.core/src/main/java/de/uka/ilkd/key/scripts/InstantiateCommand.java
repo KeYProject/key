@@ -20,6 +20,7 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
@@ -187,7 +188,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             "Variable '" + params.var + "' has no occurrence no. '" + params.occ + "'.");
     }
 
-    private org.key_project.logic.Term stripUpdates(org.key_project.logic.Term term) {
+    private Term stripUpdates(Term term) {
         while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
             term = term.sub(1);
         }

@@ -34,6 +34,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleApp;
@@ -739,14 +740,14 @@ public final class OneStepSimplifier implements BuiltInRule {
         /**
          * The {@link JTerm} to represent.
          */
-        private final org.key_project.logic.Term term;
+        private final Term term;
 
         /**
          * Constructor.
          *
          * @param term The {@link JTerm} to represent.
          */
-        public TermReplacementKey(org.key_project.logic.Term term) {
+        public TermReplacementKey(Term term) {
             assert term != null;
             this.term = term;
         }

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.scripts.meta.Varargs;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -353,7 +354,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p,
             SequentFormula sf, Services services)
             throws ScriptException {
-        org.key_project.logic.Term term = sf.formula();
+        Term term = sf.formula();
         final boolean satisfiesFormulaParameter =
             p.formula != null && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula);
 

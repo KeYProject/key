@@ -99,7 +99,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         }
 
         final MergePointStatement mps = (MergePointStatement) JavaTools
-                .getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
+                .getActiveStatement(TermBuilder.goBelowUpdates((JTerm) pio.subTerm()).javaBlock());
 
         final Services services = goal.proof().getServices();
         final MergeContract mc =

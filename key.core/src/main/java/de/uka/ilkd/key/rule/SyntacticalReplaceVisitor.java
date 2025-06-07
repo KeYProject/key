@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -328,7 +329,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final org.key_project.logic.Term p_visited) {
+    public void visit(final Term p_visited) {
         final JTerm visited = (JTerm) p_visited;
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
@@ -449,7 +450,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * {@inheritDoc}
      */
     @Override
-    public void subtreeEntered(org.key_project.logic.Term subtreeRoot) {
+    public void subtreeEntered(Term subtreeRoot) {
         tacletTermStack.push((JTerm) subtreeRoot);
     }
 
@@ -462,7 +463,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
-    public void subtreeLeft(org.key_project.logic.Term subtreeRoot) {
+    public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final JTerm newTerm = mop.transform((JTerm) subStack.pop(), svInst, services);

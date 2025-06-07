@@ -74,7 +74,7 @@ public abstract class AbstractSlicer {
         // Solve this reference
         PosInOccurrence pio =
             seedNode.getAppliedRuleApp().posInOccurrence();
-        var topLevel = pio.sequentFormula().formula();
+        final JTerm topLevel = (JTerm) pio.sequentFormula().formula();
         JTerm modalityTerm = TermBuilder.goBelowUpdates(topLevel);
         Services services = seedNode.proof().getServices();
         ExecutionContext ec =

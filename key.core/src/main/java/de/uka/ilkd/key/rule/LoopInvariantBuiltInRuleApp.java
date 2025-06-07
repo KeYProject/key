@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -122,7 +123,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             private JTerm result;
 
             @Override
-            public void visit(org.key_project.logic.Term visited) {
+            public void visit(Term visited) {
                 // TODO: Remove cast when/if term builder is moved
                 result = replace((JTerm) visited);
             }
@@ -154,7 +155,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             private JTerm result;
 
             @Override
-            public void visit(org.key_project.logic.Term visited) {
+            public void visit(Term visited) {
                 result = replace((JTerm) visited);
             }
 
@@ -276,7 +277,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public JTerm programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }
         return null;
     }

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -246,7 +247,7 @@ public class ClashFreeSubst {
         }
 
         @Override
-        public void visit(org.key_project.logic.Term t) {
+        public void visit(Term t) {
             if (t.op() instanceof JQuantifiableVariable qv) {
                 vars = vars.add(qv);
             } else {

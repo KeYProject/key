@@ -163,7 +163,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
             }
 
             @Override
-            public void validTopLevelException(org.key_project.logic.Term term)
+            public void validTopLevelException(Term term)
                     throws TermCreationException {
                 if (!(term.arity() == 2 && term.sub(1).sort()
                         .extendsTrans(numbers.getNumberSymbol().sort()))) {

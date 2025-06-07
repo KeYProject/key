@@ -2195,12 +2195,11 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public static JTerm goBelowUpdates(org.key_project.logic.Term term) {
-        var t = (JTerm) term;
-        while (t.op() instanceof UpdateApplication) {
-            t = UpdateApplication.getTarget(t);
+    public static JTerm goBelowUpdates(JTerm term) {
+        while (term.op() instanceof UpdateApplication) {
+            term = UpdateApplication.getTarget(term);
         }
-        return t;
+        return term;
     }
 
     /**

@@ -1824,7 +1824,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // the terms only have to match on those positions where functions are defined
                 if (fun.bindVarsAt(i)) {
                     Term term1 = t.sub(i);
-                    org.key_project.logic.Term formula = term.sub(i);
+                    Term formula = term.sub(i);
                     termsMatch = termsMatch
                             && RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula);
                 }
@@ -1935,8 +1935,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int i = 0; i < t.arity(); i++) {
                 // the terms only have to match on those positions where functions are defined
                 if (fun.bindVarsAt(i)) {
-                    org.key_project.logic.Term term1 = t.sub(i);
-                    org.key_project.logic.Term formula = term.sub(i);
+                    Term term1 = t.sub(i);
+                    Term formula = term.sub(i);
                     termsMatch = termsMatch
                             && RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula);
                 }
