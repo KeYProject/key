@@ -68,7 +68,8 @@ public abstract class Taclet implements Rule {
     protected final ChoiceExpr choices;
 
     /// map from a schemavariable to its prefix. The prefix is used to test correct instantiations
-    /// of the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a list
+    /// of the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a
+    /// list
     /// of all variables that may appear free in the instantiation of the schemavariable (a bit more
     /// complicated for rewrite taclets, see paper of M:Giese)
     protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
@@ -106,7 +107,7 @@ public abstract class Taclet implements Rule {
     ///
     /// @param name the name of the Taclet
     /// @param find the Term or Sequent that is the pattern that has to be found in a sequent and
-    ///             the places where it matches the Taclet can be applied
+    /// the places where it matches the Taclet can be applied
     /// @param applPart contains the application part of a Taclet that is the if-sequence, the
     /// variable conditions
     /// @param goalTemplates a list of goal descriptions.
@@ -389,12 +390,6 @@ public abstract class Taclet implements Rule {
                 sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));
             }
         }
-        return sb;
-    }
-
-    StringBuffer toStringAttribs(StringBuffer sb) {
-        // if (noninteractive()) sb = sb.append(" \\noninteractive");
-        sb.append("\nChoices: ").append(choices);
         return sb;
     }
 

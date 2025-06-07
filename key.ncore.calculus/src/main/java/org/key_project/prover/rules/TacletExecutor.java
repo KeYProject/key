@@ -151,7 +151,8 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     }
 
     ///
-    /// adds the given rules (i.e. the rules to add according to the Taclet goal template to the node
+    /// adds the given rules (i.e. the rules to add according to the Taclet goal template to the
+    /// node
     /// of the given goal)
     ///
     /// @param rules the rules to be added
