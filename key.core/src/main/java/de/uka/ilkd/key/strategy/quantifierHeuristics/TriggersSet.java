@@ -246,7 +246,7 @@ public class TriggersSet {
 
         private Set<JTerm> combineSubterms(JTerm oriTerm, Set<JTerm>[] possibleSubs,
                 JTerm[] chosenSubs,
-                ImmutableArray<JQuantifiableVariable> boundVars, int i,
+                ImmutableArray<QuantifiableVariable> boundVars, int i,
                 TermServices services) {
             final HashSet<JTerm> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {

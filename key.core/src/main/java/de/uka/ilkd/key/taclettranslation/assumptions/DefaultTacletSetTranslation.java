@@ -13,7 +13,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -69,7 +69,7 @@ public final class DefaultTacletSetTranslation
      * @deprecated weigl: This set is never queried only updated.
      */
     @Deprecated
-    private final Set<JQuantifiableVariable> usedQuantifiedVariable = new LinkedHashSet<>();
+    private final Set<QuantifiableVariable> usedQuantifiedVariable = new LinkedHashSet<>();
 
     private final Services services;
 
@@ -234,7 +234,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public void eventQuantifiedVariable(JQuantifiableVariable var) {
+    public void eventQuantifiedVariable(QuantifiableVariable var) {
         usedQuantifiedVariable.add(var);
     }
 

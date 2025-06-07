@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
@@ -34,9 +35,9 @@ public class TacletPrefixBuilder {
     }
 
     private void addVarsBoundHere(JTerm visited, int subTerm) {
-        ImmutableArray<JQuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
+        ImmutableArray<QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
         for (int i = 0; i < bdVars.size(); i++) {
-            JQuantifiableVariable boundVar = bdVars.get(i);
+            QuantifiableVariable boundVar = bdVars.get(i);
             if (boundVar instanceof VariableSV boundSV) {
                 currentlyBoundVars = currentlyBoundVars.add(boundSV);
             }

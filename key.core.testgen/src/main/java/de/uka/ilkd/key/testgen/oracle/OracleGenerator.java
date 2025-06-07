@@ -18,6 +18,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -269,7 +270,7 @@ public class OracleGenerator {
             return new OracleBinTerm(OR, notLeft, right);
         }
         // quantifiable variable
-        else if (op instanceof JQuantifiableVariable qop) {
+        else if (op instanceof QuantifiableVariable qop) {
             return new OracleVariable(qop.name().toString(), qop.sort());
         }
         // integers
@@ -631,8 +632,8 @@ public class OracleGenerator {
 
     private OracleMethod createQuantifierMethod(JTerm term, boolean initialSelect) {
         String methodName = generateMethodName();
-        ImmutableArray<JQuantifiableVariable> vars = term.varsBoundHere(0);
-        JQuantifiableVariable qv = vars.get(0);
+        ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+        QuantifiableVariable qv = vars.get(0);
         OracleVariable var = new OracleVariable(qv.name().toString(), qv.sort());
 
         String setName = getSetName(qv.sort());
@@ -661,7 +662,7 @@ public class OracleGenerator {
         return new OracleMethod(methodName, args, body);
     }
 
-    private String createForallBody(JQuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
+    private String createForallBody(QuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
         String tab = TestCaseGenerator.TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
             + "\n" + tab + tab + "if(" + neg.toString() + "){" + "\n" + tab + tab + tab
@@ -669,7 +670,7 @@ public class OracleGenerator {
             + "return true;";
     }
 
-    private String createExistsBody(JQuantifiableVariable qv, String setName, OracleTerm cond) {
+    private String createExistsBody(QuantifiableVariable qv, String setName, OracleTerm cond) {
         String tab = TestCaseGenerator.TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
             + "\n" + tab + tab + "if(" + cond.toString() + "){" + "\n" + tab + tab + tab

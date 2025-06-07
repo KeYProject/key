@@ -33,6 +33,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
@@ -415,7 +416,7 @@ public class TermBuilder {
     }
 
     // TODO: Inline?
-    public JTerm varOfQuantVar(JQuantifiableVariable op) {
+    public JTerm varOfQuantVar(QuantifiableVariable op) {
         if (op instanceof LogicVariable lv)
             return var(lv);
         return var((VariableSV) op);
@@ -441,7 +442,7 @@ public class TermBuilder {
         return tf.createTerm(f, s);
     }
 
-    public JTerm func(Function f, JTerm[] s, ImmutableArray<JQuantifiableVariable> boundVars) {
+    public JTerm func(Function f, JTerm[] s, ImmutableArray<QuantifiableVariable> boundVars) {
         return tf.createTerm((JFunction) f, s, boundVars, null);
     }
 
@@ -477,7 +478,7 @@ public class TermBuilder {
     /**
      * Construct a term with the \ifEx operator.
      */
-    public JTerm ifEx(JQuantifiableVariable qv, JTerm cond, JTerm _then, JTerm _else) {
+    public JTerm ifEx(QuantifiableVariable qv, JTerm cond, JTerm _then, JTerm _else) {
         return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
             new ImmutableArray<>(cond, _then, _else),
             new ImmutableArray<>(qv), null);
@@ -486,7 +487,7 @@ public class TermBuilder {
     /**
      * Construct a term with the \ifEx operator.
      */
-    public JTerm ifEx(ImmutableList<JQuantifiableVariable> qvs, JTerm cond, JTerm _then,
+    public JTerm ifEx(ImmutableList<QuantifiableVariable> qvs, JTerm cond, JTerm _then,
             JTerm _else) {
         if (qvs.isEmpty()) {
             throw new TermCreationException("no quantifiable variables in ifEx term");
@@ -510,14 +511,14 @@ public class TermBuilder {
         return ff;
     }
 
-    public JTerm all(JQuantifiableVariable qv, JTerm t) {
+    public JTerm all(QuantifiableVariable qv, JTerm t) {
         return tf.createTerm(Quantifier.ALL, new ImmutableArray<>(t),
             new ImmutableArray<>(qv), null);
     }
 
-    public JTerm all(Iterable<JQuantifiableVariable> qvs, JTerm t) {
+    public JTerm all(Iterable<QuantifiableVariable> qvs, JTerm t) {
         JTerm result = t;
-        for (JQuantifiableVariable fv : qvs) {
+        for (QuantifiableVariable fv : qvs) {
             result = all(fv, result);
         }
         return result;
@@ -539,20 +540,20 @@ public class TermBuilder {
         }
     }
 
-    public JTerm ex(JQuantifiableVariable qv, JTerm t) {
+    public JTerm ex(QuantifiableVariable qv, JTerm t) {
         return tf.createTerm(Quantifier.EX, new ImmutableArray<>(t),
             new ImmutableArray<>(qv), null);
     }
 
-    public JTerm ex(Iterable<JQuantifiableVariable> qvs, JTerm t) {
+    public JTerm ex(Iterable<QuantifiableVariable> qvs, JTerm t) {
         JTerm result = t;
-        for (JQuantifiableVariable fv : qvs) {
+        for (QuantifiableVariable fv : qvs) {
             result = ex(fv, result);
         }
         return result;
     }
 
-    public JTerm bsum(JQuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
+    public JTerm bsum(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
         Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum, new JTerm[] { a, b, t }, new ImmutableArray<>(qv));
     }
@@ -574,7 +575,7 @@ public class TermBuilder {
     /**
      * Constructs a bounded product comprehension expression.
      */
-    public JTerm bprod(JQuantifiableVariable qv, JTerm a, JTerm b, JTerm t, Services services) {
+    public JTerm bprod(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t, Services services) {
         Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
         return func(bprod, new JTerm[] { a, b, t }, new ImmutableArray<>(qv));
     }
@@ -598,10 +599,10 @@ public class TermBuilder {
     /**
      * minimum operator
      */
-    public JTerm min(ImmutableList<? extends JQuantifiableVariable> qvs, JTerm range, JTerm t,
+    public JTerm min(ImmutableList<? extends QuantifiableVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
         final Function min = services.getNamespaces().functions().lookup("min");
-        final Iterator<? extends JQuantifiableVariable> it = qvs.iterator();
+        final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         JTerm res = func(min, new JTerm[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
@@ -614,10 +615,10 @@ public class TermBuilder {
     /**
      * minimum operator
      */
-    public JTerm max(ImmutableList<? extends JQuantifiableVariable> qvs, JTerm range, JTerm t,
+    public JTerm max(ImmutableList<? extends QuantifiableVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
         final Function max = services.getNamespaces().functions().lookup("max");
-        final Iterator<? extends JQuantifiableVariable> it = qvs.iterator();
+        final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         JTerm res = func(max, new JTerm[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
@@ -804,13 +805,13 @@ public class TermBuilder {
      * @param substTerm the Term that replaces substVar
      * @param origTerm the Term that is substituted
      */
-    public JTerm subst(SubstOp op, JQuantifiableVariable substVar, JTerm substTerm,
+    public JTerm subst(SubstOp op, QuantifiableVariable substVar, JTerm substTerm,
             JTerm origTerm) {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
             new ImmutableArray<>(substVar), null);
     }
 
-    public JTerm subst(JQuantifiableVariable substVar, JTerm substTerm, JTerm origTerm) {
+    public JTerm subst(QuantifiableVariable substVar, JTerm substTerm, JTerm origTerm) {
         return subst(WarySubstOp.SUBST, substVar, substTerm, origTerm);
     }
 
@@ -1417,21 +1418,21 @@ public class TermBuilder {
         }
     }
 
-    public JTerm infiniteUnion(JQuantifiableVariable[] qvs, JTerm s) {
+    public JTerm infiniteUnion(QuantifiableVariable[] qvs, JTerm s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         return tf.createTerm(ldt.getInfiniteUnion(), new JTerm[] { s },
             new ImmutableArray<>(qvs), null);
     }
 
-    public JTerm infiniteUnion(JQuantifiableVariable[] qvs, JTerm guard, JTerm s) {
+    public JTerm infiniteUnion(QuantifiableVariable[] qvs, JTerm guard, JTerm s) {
         return infiniteUnion(qvs, ife(guard, s, empty()));
     }
 
-    public JTerm setComprehension(JQuantifiableVariable[] qvs, JTerm o, JTerm f) {
+    public JTerm setComprehension(QuantifiableVariable[] qvs, JTerm o, JTerm f) {
         return infiniteUnion(qvs, singleton(o, f));
     }
 
-    public JTerm setComprehension(JQuantifiableVariable[] qvs, JTerm guard, JTerm o, JTerm f) {
+    public JTerm setComprehension(QuantifiableVariable[] qvs, JTerm guard, JTerm o, JTerm f) {
         return infiniteUnion(qvs, guard, singleton(o, f));
     }
 
@@ -1990,7 +1991,7 @@ public class TermBuilder {
         final JTerm modifiableAtPre = or.replace(modifiable);
         final JTerm createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
-        ImmutableList<JQuantifiableVariable> quantVars = ImmutableSLList.nil();
+        ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList.nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
         // selects on permission heaps have to be explicitly typed as field type
@@ -2028,7 +2029,7 @@ public class TermBuilder {
 
         final OpReplacer or = new OpReplacer(normalToAtPre, tf);
 
-        ImmutableList<JQuantifiableVariable> quantVars = ImmutableSLList.nil();
+        ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList.nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
 
@@ -2214,7 +2215,7 @@ public class TermBuilder {
         return new Pair<>(updates, term);
     }
 
-    public JTerm seqDef(JQuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
+    public JTerm seqDef(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(), new JTerm[] { a, b, t },
             new ImmutableArray<>(qv));
     }

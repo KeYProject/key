@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -87,7 +88,7 @@ class GenericTranslator {
     private JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation, Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
         JTerm[] subTerms = new JTerm[term.arity()];
-        ImmutableArray<JQuantifiableVariable> variables = term.boundVars();
+        ImmutableArray<QuantifiableVariable> variables = term.boundVars();
         for (int i = 0; i < term.arity(); i++) {
             subTerms[i] = instantiateGeneric(term.sub(i), generic, instantiation, t);
 
@@ -158,11 +159,11 @@ class GenericTranslator {
         }
 
         if (term.op() instanceof Quantifier) {
-            JQuantifiableVariable[] copy = new JQuantifiableVariable[term.boundVars().size()];
+            QuantifiableVariable[] copy = new QuantifiableVariable[term.boundVars().size()];
             assert copy.length == 1;
             int i = 0;
 
-            for (JQuantifiableVariable var : term.boundVars()) {
+            for (QuantifiableVariable var : term.boundVars()) {
                 copy[i] = var;
                 if (copy[i].sort() instanceof GenericSort) {
 

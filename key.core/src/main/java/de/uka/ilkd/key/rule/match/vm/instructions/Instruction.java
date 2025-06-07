@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -70,12 +71,12 @@ public abstract class Instruction<OP extends Operator>
     }
 
     public static MatchInstruction matchAndBindVariables(
-            ImmutableArray<JQuantifiableVariable> boundVars) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
     }
 
     public static MatchInstruction unbindVariables(
-            ImmutableArray<JQuantifiableVariable> boundVars) {
+            ImmutableArray<QuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
 

@@ -21,6 +21,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -259,15 +260,15 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * Rebuilds a term recursively and replaces all schema variables with skolem terms/variables.
      */
     private JTerm rebuild(Taclet taclet, JTerm term, TermServices services,
-            HashSet<JQuantifiableVariable> boundedVariables) {
+            HashSet<QuantifiableVariable> boundedVariables) {
         JTerm[] newSubs = new JTerm[term.arity()];
         int i = 0;
-        LinkedList<JQuantifiableVariable> qvars = new LinkedList<>();
-        for (JQuantifiableVariable qvar : term.boundVars()) {
+        LinkedList<QuantifiableVariable> qvars = new LinkedList<>();
+        for (QuantifiableVariable qvar : term.boundVars()) {
             boundedVariables.add(qvar);
             if (qvar instanceof VariableSV) {
                 qvars.add(
-                    (JQuantifiableVariable) getInstantation(taclet, (VariableSV) qvar, services)
+                    (QuantifiableVariable) getInstantation(taclet, (VariableSV) qvar, services)
                             .op());
             }
         }

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -257,7 +258,7 @@ public class TestJMLTranslator {
         assertSame(unionOp, result.op());
         JTerm guard = TB.and(TB.convertToFormula(TB.created(TB.var(o))),
             TB.not(TB.equals(TB.var(o), TB.NULL())));
-        JTerm expected = TB.infiniteUnion(new JQuantifiableVariable[] { o },
+        JTerm expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
@@ -278,7 +279,7 @@ public class TestJMLTranslator {
         assertSame(unionOp, result.op());
         JTerm guard =
             TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
-        JTerm expected = TB.infiniteUnion(new JQuantifiableVariable[] { o },
+        JTerm expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);

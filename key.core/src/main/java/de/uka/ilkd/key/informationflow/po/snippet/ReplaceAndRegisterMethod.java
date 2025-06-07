@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -145,10 +146,10 @@ abstract class ReplaceAndRegisterMethod {
         }
     }
 
-    static JTerm replaceQuantifiableVariables(JTerm term, Set<JQuantifiableVariable> qvs,
+    static JTerm replaceQuantifiableVariables(JTerm term, Set<QuantifiableVariable> qvs,
             Services services) {
-        Map<JQuantifiableVariable, JQuantifiableVariable> replaceMap = new LinkedHashMap<>();
-        for (JQuantifiableVariable qv : qvs) {
+        Map<QuantifiableVariable, QuantifiableVariable> replaceMap = new LinkedHashMap<>();
+        for (QuantifiableVariable qv : qvs) {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
         }
         final OpReplacer op =
@@ -157,14 +158,14 @@ abstract class ReplaceAndRegisterMethod {
         return op.replace(term);
     }
 
-    static Set<JQuantifiableVariable> collectQuantifiableVariables(JTerm term) {
+    static Set<QuantifiableVariable> collectQuantifiableVariables(JTerm term) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         term.execPreOrder(qvVisitor);
         return qvVisitor.getResult();
     }
 
     private static final class QuantifiableVariableVisitor implements Visitor<JTerm> {
-        private final HashSet<JQuantifiableVariable> vars = new LinkedHashSet<>();
+        private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override
         public boolean visitSubtree(JTerm visited) {
@@ -184,6 +185,6 @@ abstract class ReplaceAndRegisterMethod {
         @Override
         public void subtreeLeft(JTerm subtreeRoot) { /* nothing to do */ }
 
-        public Set<JQuantifiableVariable> getResult() { return vars; }
+        public Set<QuantifiableVariable> getResult() { return vars; }
     }
 }

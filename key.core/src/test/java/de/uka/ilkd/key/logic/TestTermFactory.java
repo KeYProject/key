@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -144,7 +145,7 @@ public class TestTermFactory {
 
     @Test
     public void testQuantifierTerm() {
-        JTerm t_forallx_px = TB.all(ImmutableSLList.<JQuantifiableVariable>nil().append(x), t1());
+        JTerm t_forallx_px = TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x), t1());
         assertEquals(t_forallx_px, new TermImpl(Quantifier.ALL, new ImmutableArray<>(t1()),
             new ImmutableArray<>(x), null));
     }

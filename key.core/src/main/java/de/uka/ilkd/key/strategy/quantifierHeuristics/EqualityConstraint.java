@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
@@ -251,9 +252,9 @@ public class EqualityConstraint implements Constraint {
      * @param ownBoundVars variables bound above the current position
      * @param cmpBoundVars variables bound above the current position
      */
-    private static boolean compareBoundVariables(JQuantifiableVariable ownVar,
-            JQuantifiableVariable cmpVar, ImmutableList<JQuantifiableVariable> ownBoundVars,
-            ImmutableList<JQuantifiableVariable> cmpBoundVars) {
+    private static boolean compareBoundVariables(QuantifiableVariable ownVar,
+            QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars) {
 
         final int ownNum = indexOf(ownVar, ownBoundVars);
         final int cmpNum = indexOf(cmpVar, cmpBoundVars);
@@ -275,8 +276,8 @@ public class EqualityConstraint implements Constraint {
      * @return the index of the first occurrence of <code>var</code> in <code>list</code>, or
      *         <code>-1</code> if the variable is not an element of the list
      */
-    private static int indexOf(JQuantifiableVariable var,
-            ImmutableList<JQuantifiableVariable> list) {
+    private static int indexOf(QuantifiableVariable var,
+            ImmutableList<QuantifiableVariable> list) {
         int res = 0;
         while (!list.isEmpty()) {
             if (list.head() == var) {
@@ -310,8 +311,8 @@ public class EqualityConstraint implements Constraint {
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
     private Constraint unifyHelp(JTerm t0, JTerm t1,
-            ImmutableList<JQuantifiableVariable> ownBoundVars,
-            ImmutableList<JQuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
             boolean modifyThis, Services services) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
@@ -447,21 +448,21 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint descendRecursively(JTerm t0, JTerm t1,
-            ImmutableList<JQuantifiableVariable> ownBoundVars,
-            ImmutableList<JQuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
             boolean modifyThis, Services services) {
         Constraint newConstraint = this;
 
         for (int i = 0; i < t0.arity(); i++) {
-            ImmutableList<JQuantifiableVariable> subOwnBoundVars = ownBoundVars;
-            ImmutableList<JQuantifiableVariable> subCmpBoundVars = cmpBoundVars;
+            ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
+            ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
 
             if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
                 return TOP;
             }
             for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
-                final JQuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
-                final JQuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
+                final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
+                final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
                 if (ownVar.sort() != cmpVar.sort()) {
                     return TOP;
                 }
@@ -514,11 +515,11 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint handleQuantifiableVariable(JTerm t0, JTerm t1,
-            ImmutableList<JQuantifiableVariable> ownBoundVars,
-            ImmutableList<JQuantifiableVariable> cmpBoundVars) {
+            ImmutableList<QuantifiableVariable> ownBoundVars,
+            ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof JQuantifiableVariable)
-                && compareBoundVariables((JQuantifiableVariable) t0.op(),
-                    (JQuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
+                && compareBoundVariables((QuantifiableVariable) t0.op(),
+                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
             return TOP;
         }
         return this;

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -862,10 +863,10 @@ public class TacletGenerator {
 
         // prepare op replacer, new bound vars
         final Map<Operator, Operator> map = new LinkedHashMap<>();
-        final ImmutableArray<JQuantifiableVariable> boundVars = t.boundVars();
-        final JQuantifiableVariable[] newBoundVars = new JQuantifiableVariable[boundVars.size()];
+        final ImmutableArray<QuantifiableVariable> boundVars = t.boundVars();
+        final QuantifiableVariable[] newBoundVars = new QuantifiableVariable[boundVars.size()];
         for (int i = 0; i < newBoundVars.length; i++) {
-            final JQuantifiableVariable qv = boundVars.get(i);
+            final QuantifiableVariable qv = boundVars.get(i);
             if (qv instanceof LogicVariable) {
                 final VariableSV sv = SchemaVariableFactory.createVariableSV(qv.name(), qv.sort());
                 svs = svs.add(sv);

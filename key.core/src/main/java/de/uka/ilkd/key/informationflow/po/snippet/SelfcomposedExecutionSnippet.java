@@ -6,8 +6,9 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+
+import org.key_project.logic.op.QuantifiableVariable;
 
 
 /**
@@ -23,7 +24,7 @@ class SelfcomposedExecutionSnippet extends ReplaceAndRegisterMethod
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
 
         final JTerm exec1 = f1.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
-        final Set<JQuantifiableVariable> qvsToReplace = collectQuantifiableVariables(exec1);
+        final Set<QuantifiableVariable> qvsToReplace = collectQuantifiableVariables(exec1);
         final JTerm updatedExec1 =
             d.tb.apply(d.tb.elementary(d.tb.getBaseHeap(), poVars1.pre.heap), exec1);
         final JTerm exec2 = replaceQuantifiableVariables(

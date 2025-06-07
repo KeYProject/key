@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -22,15 +22,15 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * variable with which the original variable should be substituted below modalities
      */
-    private JQuantifiableVariable newVar = null;
+    private QuantifiableVariable newVar = null;
     private JTerm newVarTerm = null;
 
     /**
      * variables occurring within the original term and within the term to be substituted
      */
-    private ImmutableSet<JQuantifiableVariable> warysvars = null;
+    private ImmutableSet<QuantifiableVariable> warysvars = null;
 
-    public WaryClashFreeSubst(JQuantifiableVariable v, JTerm s, TermBuilder tb) {
+    public WaryClashFreeSubst(QuantifiableVariable v, JTerm s, TermBuilder tb) {
         super(v, s, tb);
         warysvars = null;
     }
@@ -162,7 +162,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
         final JTerm[] newSubterms = new JTerm[t.arity()];
         @SuppressWarnings("unchecked")
-        final ImmutableArray<JQuantifiableVariable>[] newBoundVars = new ImmutableArray[t.arity()];
+        final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[t.arity()];
 
         final int targetPos = UpdateApplication.targetPos();
         for (int i = 0; i < t.arity(); i++) {

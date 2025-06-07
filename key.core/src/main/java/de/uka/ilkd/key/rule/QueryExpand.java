@@ -25,6 +25,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleApp;
@@ -277,7 +278,7 @@ public class QueryExpand implements BuiltInRule {
         final int depth = term.depth();
         List<QueryEvalPos> qeps = new ArrayList<>();
         int[] path = new int[depth];
-        final ImmutableSLList<JQuantifiableVariable> instVars;
+        final ImmutableSLList<QuantifiableVariable> instVars;
         if (allowExpandBelowInstQuantifier) {
             instVars = ImmutableSLList.nil();
         } else {
@@ -333,7 +334,7 @@ public class QueryExpand implements BuiltInRule {
      */
     @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(JTerm t, int level, int[] pathInTerm,
-            ImmutableList<JQuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
+            ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
             boolean qepIsPositive, List<QueryEvalPos> qeps) {
         if (t == null) {
             return;
@@ -480,7 +481,7 @@ public class QueryExpand implements BuiltInRule {
 
         public final LogicVariable[] instVars;
 
-        public QueryEvalPos(JTerm query, int[] path, ImmutableList<JQuantifiableVariable> iVars,
+        public QueryEvalPos(JTerm query, int[] path, ImmutableList<QuantifiableVariable> iVars,
                 boolean isPositive) {
             this.query = query;
             pathInTerm = path;
@@ -574,7 +575,7 @@ public class QueryExpand implements BuiltInRule {
 
         }
 
-        final ImmutableArray<JQuantifiableVariable> newBoundVars = term.boundVars();
+        final ImmutableArray<QuantifiableVariable> newBoundVars = term.boundVars();
 
         final JTerm result;
         if (changedSubTerm) {

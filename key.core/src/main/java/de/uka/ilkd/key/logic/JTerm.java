@@ -6,12 +6,12 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -63,19 +63,19 @@ public interface JTerm
      * {@inheritDoc}
      */
     @Override
-    ImmutableArray<JQuantifiableVariable> boundVars();
+    ImmutableArray<QuantifiableVariable> boundVars();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    ImmutableArray<JQuantifiableVariable> varsBoundHere(int n);
+    ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    ImmutableSet<JQuantifiableVariable> freeVars();
+    ImmutableSet<QuantifiableVariable> freeVars();
 
     /**
      * The Java block at top level.

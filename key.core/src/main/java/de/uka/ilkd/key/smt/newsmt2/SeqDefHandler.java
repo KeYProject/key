@@ -17,7 +17,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
@@ -27,6 +26,7 @@ import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -109,7 +109,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     private void collectVars(Term term, Set<ParsableVariable> vars,
-            ImmutableSet<JQuantifiableVariable> boundVars) {
+            ImmutableSet<QuantifiableVariable> boundVars) {
 
         Operator op = term.op();
         if (op instanceof LogicVariable lv && !boundVars.contains(lv)) {
@@ -122,7 +122,7 @@ public class SeqDefHandler implements SMTHandler {
             return;
         }
 
-        ImmutableSet<JQuantifiableVariable> localBind = boundVars;
+        ImmutableSet<QuantifiableVariable> localBind = boundVars;
         for (var boundVar : ((JTerm) term).boundVars()) {
             localBind = localBind.add(boundVar);
         }

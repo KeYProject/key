@@ -8,11 +8,11 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -254,7 +254,7 @@ public class OpReplacer {
                 changedSubTerm = true;
             }
         }
-        final ImmutableArray<JQuantifiableVariable> newBoundVars = replace(term.boundVars());
+        final ImmutableArray<QuantifiableVariable> newBoundVars = replace(term.boundVars());
 
         final JTerm result;
         if (newOp != term.op() || changedSubTerm || newBoundVars != term.boundVars()) {
@@ -342,13 +342,13 @@ public class OpReplacer {
      * @param vars the array in which to perform the replacement.
      * @return the list of transformed variables.
      */
-    public ImmutableArray<JQuantifiableVariable> replace(
-            ImmutableArray<JQuantifiableVariable> vars) {
-        JQuantifiableVariable[] result = new JQuantifiableVariable[vars.size()];
+    public ImmutableArray<QuantifiableVariable> replace(
+            ImmutableArray<QuantifiableVariable> vars) {
+        QuantifiableVariable[] result = new QuantifiableVariable[vars.size()];
         boolean changed = false;
         for (int i = 0, n = vars.size(); i < n; i++) {
-            JQuantifiableVariable qv = vars.get(i);
-            JQuantifiableVariable newQv = (JQuantifiableVariable) replace(qv);
+            QuantifiableVariable qv = vars.get(i);
+            QuantifiableVariable newQv = (QuantifiableVariable) replace(qv);
             result[i++] = newQv;
             if (newQv != qv) {
                 changed = true;

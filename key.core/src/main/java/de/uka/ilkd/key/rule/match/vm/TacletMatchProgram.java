@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -104,7 +104,7 @@ public class TacletMatchProgram {
     private static void createProgram(JTerm pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
-        final ImmutableArray<JQuantifiableVariable> boundVars = pattern.boundVars();
+        final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
 
         if (!boundVars.isEmpty()) {
             program.add(Instruction.matchAndBindVariables(boundVars));

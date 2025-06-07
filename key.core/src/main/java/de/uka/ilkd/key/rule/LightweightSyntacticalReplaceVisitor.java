@@ -16,8 +16,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -173,20 +175,20 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         return instantiatedOp;
     }
 
-    private ImmutableArray<JQuantifiableVariable> instantiateBoundVariables(JTerm visited) {
-        ImmutableArray<JQuantifiableVariable> vBoundVars = visited.boundVars();
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
+        ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
-            final JQuantifiableVariable[] newVars = new JQuantifiableVariable[vBoundVars.size()];
+            final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
             boolean varsChanged = false;
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
-                JQuantifiableVariable boundVar = vBoundVars.get(j);
+                QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final JTerm instantiationForBoundSchemaVariable =
                         (JTerm) svInst.getInstantiation(boundSchemaVariable);
                     // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
-                        boundVar = (JQuantifiableVariable) instantiationForBoundSchemaVariable.op();
+                        boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
                         varsChanged = true;
                     }
                 }
@@ -229,7 +231,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
             final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
-            final ImmutableArray<JQuantifiableVariable> boundVars = //
+            final ImmutableArray<QuantifiableVariable> boundVars = //
                 instantiateBoundVariables(visited);
 
             // instantiate sub terms

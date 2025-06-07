@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.*;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
@@ -54,7 +54,7 @@ public class TacletForTests {
     public static InitConfig initConfig;
     public static Path lastFile = null;
 
-    private static Namespace<JQuantifiableVariable> variables = null;
+    private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
 
     public static final Profile profile = new JavaProfile() {
@@ -160,7 +160,7 @@ public class TacletForTests {
     }
 
 
-    public static Namespace<JQuantifiableVariable> getVariables() {
+    public static Namespace<QuantifiableVariable> getVariables() {
         return variables;
     }
 

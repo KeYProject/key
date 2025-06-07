@@ -38,6 +38,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
@@ -530,7 +531,7 @@ public class MergeRuleUtils {
      */
     public static JTerm exClosure(final JTerm term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<JTerm, ImmutableSet<JQuantifiableVariable>> anonymized =
+        Pair<JTerm, ImmutableSet<QuantifiableVariable>> anonymized =
             anonymizeProgramVariables(term, services);
 
         return tb.ex(anonymized.second, anonymized.first);
@@ -545,7 +546,7 @@ public class MergeRuleUtils {
      */
     public static JTerm allClosure(final JTerm term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<JTerm, ImmutableSet<JQuantifiableVariable>> anonymized =
+        Pair<JTerm, ImmutableSet<QuantifiableVariable>> anonymized =
             anonymizeProgramVariables(term, services);
 
         return tb.all(anonymized.second, anonymized.first);
@@ -1332,11 +1333,11 @@ public class MergeRuleUtils {
      * @return A term of the form <code>{ ... || x := vx || ...} term</code> for every PV x
      *         occurring in the term, where vx is a fresh variable.
      */
-    private static Pair<JTerm, ImmutableSet<JQuantifiableVariable>> anonymizeProgramVariables(
+    private static Pair<JTerm, ImmutableSet<QuantifiableVariable>> anonymizeProgramVariables(
             final JTerm term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        ImmutableSet<JQuantifiableVariable> freeVars = term.freeVars();
+        ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
         ImmutableList<JTerm> elementaries = ImmutableSLList.nil();
 
         for (LocationVariable loc : getLocationVariables(term, services)) {

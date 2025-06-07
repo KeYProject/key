@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class KeYFileForTests extends KeYFile {
 
-    private Namespace<JQuantifiableVariable> variables;
+    private Namespace<QuantifiableVariable> variables;
     private Namespace<SchemaVariable> schemaVariables;
 
     /**
@@ -85,7 +85,7 @@ public class KeYFileForTests extends KeYFile {
     // return result;
     // }
 
-    public Namespace<JQuantifiableVariable> variables() {
+    public Namespace<QuantifiableVariable> variables() {
         return variables;
     }
 

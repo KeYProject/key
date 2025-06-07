@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -23,7 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
  * transitive.
  */
 public class ClausesGraph {
-    private final ImmutableSet<JQuantifiableVariable> exVars;
+    private final ImmutableSet<QuantifiableVariable> exVars;
 
     /**
      * Map from <code>Term</code> to <code>ImmutableSet<Term></code>
@@ -177,14 +176,14 @@ public class ClausesGraph {
     /**
      * return the exists variables bound in the top level of a given cnf formula.
      */
-    private ImmutableSet<JQuantifiableVariable> existentialVars(Term formula) {
+    private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
         final var op = formula.op();
         if (op == Quantifier.ALL) {
             return existentialVars(formula.sub(0));
         }
         if (op == Quantifier.EX) {
             return existentialVars(formula.sub(0))
-                    .add((JQuantifiableVariable) formula.varsBoundHere(0).last());
+                    .add(formula.varsBoundHere(0).last());
         }
         return DefaultImmutableSet.nil();
     }

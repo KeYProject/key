@@ -1080,7 +1080,7 @@ public class SMTObjTranslator implements SMTTranslator {
             return SMTTerm.FALSE;
         } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
             return nullConstant;
-        } else if (op instanceof JQuantifiableVariable qop) {
+        } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
             SMTTermVariable var = translateVariable(qop);
             if (quantifiedVariables.contains(var)) {

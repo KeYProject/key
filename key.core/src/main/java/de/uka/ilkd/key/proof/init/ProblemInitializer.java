@@ -42,6 +42,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -295,7 +296,7 @@ public final class ProblemInitializer {
      * See bug report #1185, #1189 (in Mantis)
      */
     private void cleanupNamespaces(InitConfig initConfig) {
-        Namespace<JQuantifiableVariable> newVarNS = new Namespace<>();
+        Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
         Namespace<Function> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {

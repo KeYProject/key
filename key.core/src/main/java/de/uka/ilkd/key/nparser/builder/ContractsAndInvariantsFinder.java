@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.QuantifiableVariable;
 
 import org.jspecify.annotations.NonNull;
 
@@ -88,7 +88,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
 
     @Override
     public Object visitInvariants(KeYParser.InvariantsContext ctx) {
-        Namespace<JQuantifiableVariable> orig = variables();
+        Namespace<QuantifiableVariable> orig = variables();
         selfVar = (LocationVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
         unbindVars(orig);

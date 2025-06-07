@@ -10,12 +10,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 
@@ -43,7 +43,7 @@ public final class DefaultTermParser {
      *         correctly or the term has an invalid sort.
      */
     public JTerm parse(Reader in, Sort sort, Services services,
-            Namespace<JQuantifiableVariable> var_ns,
+            Namespace<QuantifiableVariable> var_ns,
             Namespace<Function> func_ns,
             Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
@@ -266,22 +267,22 @@ public abstract class Notation {
         }
 
         public void print(JTerm t, LogicPrinter sp) {
-            JQuantifiableVariable v = instQV(t, sp, 1);
+            QuantifiableVariable v = instQV(t, sp, 1);
             final int assTarget =
                 (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60)
                         : 110);
             sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1), assTarget);
         }
 
-        private JQuantifiableVariable instQV(JTerm t, LogicPrinter sp, int subTerm) {
-            JQuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
+        private QuantifiableVariable instQV(JTerm t, LogicPrinter sp, int subTerm) {
+            QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
             if (v instanceof SchemaVariable) {
                 Object object = (sp.getInstantiations().getInstantiation((SchemaVariable) v));
                 if (object != null) {
                     Debug.assertTrue(object instanceof JTerm);
                     Debug.assertTrue(((JTerm) object).op() instanceof JQuantifiableVariable);
-                    v = (JQuantifiableVariable) (((JTerm) object).op());
+                    v = (QuantifiableVariable) (((JTerm) object).op());
                 }
             }
             return v;

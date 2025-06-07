@@ -19,6 +19,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -139,8 +140,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
             if (op == Quantifier.ALL) {
                 JTerm top = subStack.peek();
                 if (top.op() == Quantifier.ALL) {
-                    JQuantifiableVariable[] bv =
-                        new JQuantifiableVariable[visited.varsBoundHere(0).size()
+                    QuantifiableVariable[] bv =
+                        new QuantifiableVariable[visited.varsBoundHere(0).size()
                                 + top.varsBoundHere(0).size()];
                     for (int i = 0; i < visited.varsBoundHere(0).size(); i++) {
                         bv[i] = visited.varsBoundHere(0).get(i);
@@ -150,7 +151,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                     }
                     subStack.pop();
                     subStack.push(TacletForTests.services().getTermBuilder().all(
-                        ImmutableSLList.<JQuantifiableVariable>nil().append(bv), top.sub(0)));
+                        ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
                     return;
                 }
             }
@@ -216,8 +217,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         JTerm t = parseTerm("\\exists x; q(x,v)");
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
         JTerm res = cfs.apply(t);
-        JQuantifiableVariable x1 = res.varsBoundHere(0).get(0);
-        Namespace<JQuantifiableVariable> ns = new Namespace<>(nss.variables());
+        QuantifiableVariable x1 = res.varsBoundHere(0).get(0);
+        Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("\\exists x1; q(x1,f(x))"), res, "clash resolution");
@@ -239,8 +240,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         JTerm t = parseTerm("{\\subst x; f(v)}g(x,v)");
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
         JTerm res = cfs.apply(t);
-        JQuantifiableVariable x1 = res.varsBoundHere(1).get(0);
-        Namespace<JQuantifiableVariable> ns = new Namespace<>(nss.variables());
+        QuantifiableVariable x1 = res.varsBoundHere(1).get(0);
+        Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"), res,
@@ -277,8 +278,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         JTerm t = toMulti(parseFma("\\forall y; \\forall x; \\forall z; q(g(x,y),g(v,z))"));
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
         JTerm res = cfs.apply(t);
-        JQuantifiableVariable x1 = res.varsBoundHere(0).get(1);
-        Namespace<JQuantifiableVariable> ns = new Namespace<>(nss.variables());
+        QuantifiableVariable x1 = res.varsBoundHere(0).get(1);
+        Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(
@@ -296,8 +297,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         JTerm t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
         JTerm res = cfs.apply(t);
-        JQuantifiableVariable x1 = res.varsBoundHere(0).get(2);
-        Namespace<JQuantifiableVariable> ns = new Namespace<>(nss.variables());
+        QuantifiableVariable x1 = res.varsBoundHere(0).get(2);
+        Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(toMulti(parseTerm("q(g(x1,y),g(f(x),z))")), res.sub(0),
@@ -328,8 +329,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         JTerm t = parseTerm("q(v,x) & {pv0:=v}q(x,v)");
         WaryClashFreeSubst cfs = new WaryClashFreeSubst(v, s, services.getTermBuilder());
         JTerm res = cfs.apply(t);
-        JQuantifiableVariable x1 = res.varsBoundHere(1).get(0);
-        Namespace<JQuantifiableVariable> ns = new Namespace<>(nss.variables());
+        QuantifiableVariable x1 = res.varsBoundHere(1).get(0);
+        Namespace<QuantifiableVariable> ns = new Namespace<>(nss.variables());
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst " + x1.name()

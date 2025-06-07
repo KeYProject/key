@@ -6,13 +6,13 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -22,10 +22,10 @@ public class BindVariablesInstruction implements MatchInstruction {
 
     private final VariableBinderSubinstruction[] boundVarBinders;
 
-    public BindVariablesInstruction(ImmutableArray<JQuantifiableVariable> boundVars) {
+    public BindVariablesInstruction(ImmutableArray<QuantifiableVariable> boundVars) {
         boundVarBinders = new VariableBinderSubinstruction[boundVars.size()];
         int i = 0;
-        for (JQuantifiableVariable boundVar : boundVars) {
+        for (QuantifiableVariable boundVar : boundVars) {
             if (boundVar instanceof LogicVariable) {
                 boundVarBinders[i] = new LogicVariableBinder((LogicVariable) boundVar);
             } else {
@@ -104,7 +104,7 @@ public class BindVariablesInstruction implements MatchInstruction {
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             LogicServices services) {
-        final ImmutableArray<JQuantifiableVariable> variablesToMatchAndBind =
+        final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
             termPosition.getCurrentSubterm().boundVars();
         matchConditions = matchConditions.extendRenameTable();
         if (variablesToMatchAndBind.size() == boundVarBinders.length) {
