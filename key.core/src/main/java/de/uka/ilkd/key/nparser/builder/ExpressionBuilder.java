@@ -261,11 +261,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm result = accept(ctx.sub);
         assert result != null;
         if (ctx.MINUS() != null) {
-            JFunction Z = (JFunction) functions().lookup("Z");
+            Function Z = functions().lookup("Z");
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
                 // This mimics the old KeyParser behaviour. Unknown if necessary.
-                final JFunction neglit = (JFunction) functions().lookup("neglit");
+                final Function neglit = functions().lookup("neglit");
                 final JTerm num = result.sub(0);
                 return capsulateTf(ctx,
                     () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
@@ -279,7 +279,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     // falling back to integer ldt (for instance for untyped schema variables)
                     ldt = services.getTypeConverter().getIntegerLDT();
                 }
-                JFunction op = (JFunction) ldt.getFunctionFor("neg", services);
+                Function op = ldt.getFunctionFor("neg", services);
                 if (op == null) {
                     semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
                 }
@@ -531,19 +531,19 @@ public class ExpressionBuilder extends DefaultBuilder {
     private JTerm toZNotation(BigInteger bi, Namespace<Function> functions) {
         boolean negative = bi.signum() < 0;
         String s = bi.abs().toString();
-        JTerm result = getTermFactory().createTerm((JFunction) functions.lookup(new Name("#")));
+        JTerm result = getTermFactory().createTerm(functions.lookup(new Name("#")));
 
         for (int i = 0; i < s.length(); i++) {
             result = getTermFactory().createTerm(
-                (JFunction) functions.lookup(new Name(s.substring(i, i + 1))),
+                functions.lookup(new Name(s.substring(i, i + 1))),
                 result);
         }
 
         if (negative) {
-            result = getTermFactory().createTerm((JFunction) functions.lookup(new Name("neglit")),
+            result = getTermFactory().createTerm(functions.lookup(new Name("neglit")),
                 result);
         }
-        return getTermFactory().createTerm((JFunction) functions.lookup(new Name("Z")), result);
+        return getTermFactory().createTerm(functions.lookup(new Name("Z")), result);
     }
 
     @Override
@@ -853,7 +853,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         String id = accept(ctx.simple_ident());
         List<JTerm> args = accept(ctx.args);
-        JFunction f = (JFunction) functions().lookup(new Name(id));
+        Function f = functions().lookup(new Name(id));
         if (f == null) {
             semanticError(ctx, "Unknown heap constructor " + id);
         }
@@ -875,7 +875,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm lt = getServices().getTermBuilder().dotLength(reference);
         JTerm one = toZNotation("1", functions());
         JTerm rangeTo =
-            getTermFactory().createTerm((JFunction) functions().lookup(new Name("sub")), lt, one);
+            getTermFactory().createTerm(functions().lookup(new Name("sub")), lt, one);
         // TODO construct
         return null;
     }
@@ -914,7 +914,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     new LogicVariable(new Name("i"), sorts().lookup(new Name("int")));
                 JTerm indexTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(indexVar));
 
-                JFunction leq = (JFunction) functions().lookup(new Name("leq"));
+                Function leq = functions().lookup(new Name("leq"));
                 JTerm fromTerm =
                     capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
                 JTerm toTerm =
@@ -1576,12 +1576,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private JTerm toZNotation(String number) {
-        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("Z")),
+        return getTermFactory().createTerm(functions().lookup(new Name("Z")),
             toNum(number));
     }
 
     private JTerm toCNotation(String number) {
-        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("C")),
+        return getTermFactory().createTerm(functions().lookup(new Name("C")),
             toNum(number));
     }
 
@@ -1589,14 +1589,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         String decBitString =
             Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
         // toNum("0")); // soon to disappear
-        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("FP")),
+        return getTermFactory().createTerm(functions().lookup(new Name("FP")),
             toNum(decBitString));
     }
 
     private JTerm toDFPNotation(String number) {
         String decBitString =
             Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
-        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("DFP")),
+        return getTermFactory().createTerm(functions().lookup(new Name("DFP")),
             toNum(decBitString)); // toNum("0")); // soon to disappear
     }
 
@@ -1614,16 +1614,16 @@ public class ExpressionBuilder extends DefaultBuilder {
                 Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
             }
         }
-        JTerm result = getTermFactory().createTerm((JFunction) functions().lookup(new Name("#")));
+        JTerm result = getTermFactory().createTerm(functions().lookup(new Name("#")));
 
         for (int i = 0; i < s.length(); i++) {
             result = getTermFactory()
-                    .createTerm((JFunction) functions().lookup(new Name(s.substring(i, i + 1))),
+                    .createTerm(functions().lookup(new Name(s.substring(i, i + 1))),
                         result);
         }
 
         if (negative) {
-            result = getTermFactory().createTerm((JFunction) functions().lookup(new Name("neglit")),
+            result = getTermFactory().createTerm(functions().lookup(new Name("neglit")),
                 result);
         }
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
@@ -54,12 +55,12 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public static RewriteTaclet switchfirstsucc;
     public static SuccTaclet closewitheq;
 
-    static JFunction func_0;
-    static JFunction func_eq;
-    static JFunction func_plus;
-    static JFunction func_min1;
-    static JFunction func_plus1;
-    static JFunction func_p; // Sort.FORMULA
+    static Function func_0;
+    static Function func_eq;
+    static Function func_plus;
+    static Function func_min1;
+    static Function func_plus1;
+    static Function func_p; // Sort.FORMULA
 
     static Sequent seq_test1;
     static Sequent seq_test2;
@@ -282,9 +283,9 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         nss.functions().add(func_p);
 
         // nat problem:
-        JFunction const_c = new JFunction(new Name("c"), nat, new SortImpl[0]);
+        Function const_c = new JFunction(new Name("c"), nat, new SortImpl[0]);
         nss.functions().add(const_c);
-        JFunction const_d = new JFunction(new Name("d"), nat, new SortImpl[0]);
+        Function const_d = new JFunction(new Name("d"), nat, new SortImpl[0]);
         nss.functions().add(const_d);
 
         JTerm t_c = tf.createTerm(const_c);

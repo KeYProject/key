@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
@@ -250,7 +249,7 @@ public abstract class LDT implements Named {
         return null;
     }
 
-    public abstract boolean hasLiteralFunction(JFunction f);
+    public abstract boolean hasLiteralFunction(Function f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
     public abstract Expression translateTerm(JTerm t, ExtList children, Services services);

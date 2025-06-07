@@ -205,7 +205,7 @@ public final class SymbolicExecutionSideProofUtil {
                 for (SequentFormula sf : sequent.antecedent()) {
                     final JTerm formula = (JTerm) sf.formula();
                     if (newPredicateIsSequentFormula) {
-                        if (JOperator.opEquals(formula.op(), operator)) {
+                        if (JavaDLOperatorUtil.opEquals(formula.op(), operator)) {
                             throw new IllegalStateException(
                                 "Result predicate found in antecedent.");
                         } else {
@@ -227,7 +227,7 @@ public final class SymbolicExecutionSideProofUtil {
                 for (SequentFormula sf : sequent.succedent()) {
                     final JTerm formula = (JTerm) sf.formula();
                     if (newPredicateIsSequentFormula) {
-                        if (JOperator.opEquals(formula.op(), operator)) {
+                        if (JavaDLOperatorUtil.opEquals(formula.op(), operator)) {
                             if (result != null) {
                                 throw new IllegalStateException(
                                     "Result predicate found multiple times in succedent.");
@@ -275,7 +275,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static JTerm constructResultIfContained(Services services, JTerm term,
             Operator operator) {
-        if (JOperator.opEquals(term.op(), operator)) {
+        if (JavaDLOperatorUtil.opEquals(term.op(), operator)) {
             return term.sub(0);
         } else {
             JTerm result = null;
@@ -303,7 +303,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
         return CollectionUtil.search(sequent,
-            element -> JOperator.opEquals(element.formula().op(),
+            element -> JavaDLOperatorUtil.opEquals(element.formula().op(),
                 operator)) != null;
     }
 

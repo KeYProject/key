@@ -334,7 +334,7 @@ public class TestMatchTaclet {
         Sort osort3 = new SortImpl(new Name("os3"), osort1);
         Sort osort4 = new SortImpl(new Name("os4"),
             DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
-        JFunction v4 = new JFunction(new Name("v4"), osort4, new Sort[0]);
+        Function v4 = new JFunction(new Name("v4"), osort4, new Sort[0]);
         JTerm match = TB.tf().createTerm(v4);
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_subsort_termSV").taclet();

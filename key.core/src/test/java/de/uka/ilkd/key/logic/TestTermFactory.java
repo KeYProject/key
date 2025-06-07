@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -39,18 +40,18 @@ public class TestTermFactory {
     private final Sort osort4 = new SortImpl(new Name("os4"),
         DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
 
-    final JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+    final Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
-    final JFunction q =
+    final Function q =
         new JFunction(new Name("q"), JavaDLTheory.FORMULA, new SortImpl(new Name("Whatever")));
     // q(:Whatever):BOOL
     final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
-    final JFunction r = new JFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
+    final Function r = new JFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
-    final JFunction f = new JFunction(new Name("f"), sort1, sort3);
+    final Function f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
 
     final LogicVariable v1 = new LogicVariable(new Name("v1"), osort1);
@@ -58,7 +59,7 @@ public class TestTermFactory {
     final LogicVariable v3 = new LogicVariable(new Name("v3"), osort3);
     final LogicVariable v4 = new LogicVariable(new Name("v4"), osort4);
 
-    final JFunction g = new JFunction(new Name("g"), osort3, osort2, osort1);
+    final Function g = new JFunction(new Name("g"), osort3, osort2, osort1);
     private TermBuilder TB;
     private TermFactory tf;
 
@@ -289,7 +290,7 @@ public class TestTermFactory {
     @Test
     public void testSubSortsSubst() {
         JTerm t = tf.createTerm(g, tf.createTerm(v2), tf.createTerm(v1));
-        JFunction c = new JFunction(new Name("c"), osort2, new Sort[0]);
+        Function c = new JFunction(new Name("c"), osort2, new Sort[0]);
         JTerm st = TB.subst(WarySubstOp.SUBST, v2, tf.createTerm(c), t);
         c = new JFunction(new Name("c"), osort4, new Sort[0]);
         st = TB.subst(WarySubstOp.SUBST, v2, tf.createTerm(c), t);

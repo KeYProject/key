@@ -64,7 +64,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created result {@link JFunction}.
      */
-    protected JFunction createResultFunction(Services services, Sort sort) {
+    protected Function createResultFunction(Services services, Sort sort) {
         return new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
             JavaDLTheory.FORMULA, sort);
     }
@@ -86,7 +86,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      */
     protected List<ResultsAndCondition> computeResultsAndConditions(Goal goal,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
-            JFunction newPredicate) throws ProofInputException {
+            Function newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(),
             goal.proof(),
             sideProofEnvironment, sequentToProve, newPredicate,

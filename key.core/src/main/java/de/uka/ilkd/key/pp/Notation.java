@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link NotationInfo} class associates a
- * Notation with every {@link JOperator}. The various inner classes of this
+ * Notation with every {@link Operator}. The various inner classes of this
  * class represent different kinds of concrete syntax, like prefix, infix, postfix, function style,
  * attribute style, etc.
  */

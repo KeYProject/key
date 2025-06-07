@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -187,7 +186,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param services The {@link Services} of the side proof.
      * @param tb The {@link TermBuilder} of the side proof.
      * @param info The side proof.
-     * @param resultOperator The {@link JOperator} of the result predicate.
+     * @param resultOperator The {@link Operator} of the result predicate.
      * @param siteProofSelectTerm The queried value.
      * @param siteProofCondition The condition under which the value is queried.
      * @return The created {@link ExecutionValue} instances.
@@ -253,7 +252,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * Groups all {@link Goal}s which provides the same value.
      *
      * @param goals All available {@link Goal}s to group.
-     * @param operator The {@link JOperator} of the {@link JTerm} which provides the value.
+     * @param operator The {@link Operator} of the {@link JTerm} which provides the value.
      * @param services The {@link Services} to use.
      */
     protected void groupGoalsByValue(ImmutableList<Goal> goals, Operator operator,

@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
@@ -793,7 +794,7 @@ public class Recoder2KeYConverter {
         }
 
 
-        final JFunction named = (JFunction) namespaceSet.functions().lookup(new Name(name));
+        final Function named = namespaceSet.functions().lookup(new Name(name));
 
         if (named == null) {
             // TODO provide position information?!

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -28,7 +29,7 @@ public class TestTermParser extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
 
     private Sort elem, list;
-    private JFunction head, tail, nil, cons, isempty;
+    private Function head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
     private JTerm t_x, t_y, t_z, t_xs, t_ys;
     private JTerm t_headxs, t_tailys, t_nil;
@@ -71,11 +72,11 @@ public class TestTermParser extends AbstractTestTermParser {
 
         elem = lookup_sort("elem");
         list = lookup_sort("list");
-        head = (JFunction) lookup_func("head");
-        tail = (JFunction) lookup_func("tail");
-        nil = (JFunction) lookup_func("nil");
-        cons = (JFunction) lookup_func("cons");
-        isempty = (JFunction) lookup_func("isempty");
+        head = lookup_func("head");
+        tail = lookup_func("tail");
+        nil = lookup_func("nil");
+        cons = lookup_func("cons");
+        isempty = lookup_func("isempty");
 
         // The declaration parser cannot parse LogicVariables; these
         // are normally declared in quantifiers, so we introduce them

@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.expression.operator.Subtype;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -78,7 +77,7 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return f instanceof SortDependingFunction sf && sf.isSimilar(ssort);
     }
 
