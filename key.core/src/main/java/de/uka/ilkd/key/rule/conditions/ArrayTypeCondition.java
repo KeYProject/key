@@ -48,13 +48,13 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
             return true;
         }
         Sort s = null;
-        if (candidate instanceof JTerm) {
-            s = ((JTerm) candidate).sort();
-        } else if (candidate instanceof Expression) {
-            s = ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext())
+        if (candidate instanceof JTerm termCandidate) {
+            s = termCandidate.sort();
+        } else if (candidate instanceof Expression candidateExpression) {
+            s = candidateExpression.getKeYJavaType(services, svInst.getExecutionContext())
                     .getSort();
-        } else if (candidate instanceof TypeReference) {
-            s = ((TypeReference) candidate).getKeYJavaType().getSort();
+        } else if (candidate instanceof TypeReference candidateTypeReference) {
+            s = candidateTypeReference.getKeYJavaType().getSort();
         }
 
         if (s == null) {

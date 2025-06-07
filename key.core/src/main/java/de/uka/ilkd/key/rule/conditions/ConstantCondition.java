@@ -43,7 +43,7 @@ public class ConstantCondition extends VariableConditionAdapter {
             return negated != atomic;
         }
         if (var instanceof FormulaSV) {
-            JTerm tInst = (JTerm) instMap.getInstantiation((FormulaSV) t);
+            JTerm tInst = instMap.getInstantiation((FormulaSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated != atomic;
         }
