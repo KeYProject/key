@@ -87,19 +87,6 @@ public class JavaCompilerCheckFacade {
 
         // gather configured bootstrap classpath and regular classpath
         List<String> options = new ArrayList<>();
-        if (false) {
-        options.addAll(Arrays.asList(
-            "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-            "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-            "--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"
-        ));
-        }
 
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
@@ -115,8 +102,6 @@ public class JavaCompilerCheckFacade {
             options.add("-processor");
             options.add(processors.stream().collect(Collectors.joining(",")));
         }
-
-        LOGGER.info("{}", options);
 
         ArrayList<Path> files = new ArrayList<>();
         if (javaPath.isDirectory()) {

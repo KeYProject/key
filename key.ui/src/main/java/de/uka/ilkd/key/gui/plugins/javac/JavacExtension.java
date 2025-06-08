@@ -26,6 +26,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
     experimental = false)
 public class JavacExtension
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup,
-        KeYSelectionListener {
+        KeYSelectionListener, KeYGuiExtension.Settings {
     /**
      * Color used for the label if javac didn't produce any diagnostics.
      */
@@ -149,10 +150,18 @@ public class JavacExtension
             File bootClassPath =
                 jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
             List<File> classpath = jm.getClassPathEntries();
-            if (false) {
-            if (classpath == null) classpath = new ArrayList<>();
-            classpath.addAll(Arrays.asList("build/classes/java/main:./build/libs/checker-3.42.0-eisop3.jar:./build/libs/checker-qual-3.42.0-eisop3.jar:./build/libs/checker-util-3.42.0-eisop3.jar:./build/libs/universe.jar:./build/resources/main".split(":./")).stream().map(p -> new File("/home/boby/Dev/java/universe/" + p)).toList());
+            JavacSettings settings = JavacSettingsProvider.getJavacSettings();
+
+            List<String> checkers = null;
+            if (settings.getUseCheckers()) {
+                if (classpath == null) classpath = new ArrayList<>();
+
+                classpath.addAll(Arrays.asList(settings.getCheckerPaths().split(System.lineSeparator()))
+                    .stream().map(p -> new File(p)).toList());
+
+                checkers = Arrays.asList(settings.getCheckers().split(System.lineSeparator()));
             }
+
             File javaPath = new File(jm.getModelDir());
 
             lblStatus.setForeground(Color.black);
@@ -160,8 +169,7 @@ public class JavacExtension
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, 
-                false ? Arrays.asList("universe.UniverseChecker"): null);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, checkers);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");
@@ -233,6 +241,10 @@ public class JavacExtension
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         loadProof(e.getSource().getSelectedProof());
+    }
+
+    public SettingsProvider getSettings() {
+        return new JavacSettingsProvider();
     }
 }
 
