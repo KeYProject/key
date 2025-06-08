@@ -4,13 +4,11 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -18,24 +16,29 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.GoalChooser;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
  * attempt.
- *
+ * <p>
  * After the proof attempt stops (successfully or not) the side proof is by default unregistered,
  * but can be accessed via this class.
+ * </p>
  *
  * @author Richard Bubel
  */
@@ -55,22 +58,23 @@ public class ProofStarter {
             this(seq, env, null);
         }
 
-        public UserProvidedInput(Sequent seq, ProofEnvironment env, String proofName) {
+        public UserProvidedInput(Sequent seq, ProofEnvironment env, @Nullable String proofName) {
             this.seq = seq;
             this.env = env;
-            this.proofName = proofName;
+            this.proofName = proofName != null ? proofName
+                    : "ProofObligation for " + ProofSaver.printAnything(seq, null);
         }
 
-        public UserProvidedInput(Term formula, ProofEnvironment env) {
-            this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                    .insertFirst(new SequentFormula(formula)).semisequent()),
+        public UserProvidedInput(JTerm formula, ProofEnvironment env) {
+            this(
+                JavaDLSequentKit.createSuccSequent(
+                    ImmutableSLList.<SequentFormula>nil().prepend(new SequentFormula(formula))),
                 env);
         }
 
         @Override
         public String name() {
-            return proofName != null ? proofName
-                    : "ProofObligation for " + ProofSaver.printAnything(seq, null);
+            return proofName;
         }
 
         @Override
@@ -89,9 +93,7 @@ public class ProofStarter {
 
         @Override
         public ProofAggregate getPO() throws ProofInputException {
-            final Proof proof = createProof(proofName != null ? proofName
-                    : "Proof object for " + ProofSaver.printAnything(seq, null));
-
+            final Proof proof = createProof(proofName);
             return ProofAggregate.createProofAggregate(proof,
                 "ProofAggregate for claim: " + proof.name());
         }
@@ -110,17 +112,17 @@ public class ProofStarter {
         }
     }
 
-    private Proof proof;
+    private @Nullable Proof proof;
 
     private int maxSteps = 2000;
 
     private long timeout = -1L;
 
-    private final ProverTaskListener ptl;
+    private @Nullable final ProverTaskListener ptl;
 
-    private AutoSaver autoSaver;
+    private @Nullable AutoSaver autoSaver;
 
-    private Strategy strategy;
+    private @Nullable Strategy strategy;
 
     /**
      * creates an instance of the ProofStarter
@@ -137,7 +139,7 @@ public class ProofStarter {
      * @param ptl the ProverTaskListener to be informed about certain events
      * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
-    public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
+    public ProofStarter(@Nullable ProverTaskListener ptl, boolean useAutoSaver) {
         this.ptl = ptl;
         if (useAutoSaver) {
             autoSaver = AutoSaver.getDefaultInstance();
@@ -147,9 +149,9 @@ public class ProofStarter {
     /**
      * creates a new proof object for formulaToProve and registers it in the given environment
      *
-     * @throws ProofInputException
+     * @throws ProofInputException if the proof obligation generation fails
      */
-    public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
+    public void init(JTerm formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
         proof.setEnv(env);
@@ -158,7 +160,7 @@ public class ProofStarter {
     /**
      * creates a new proof object for sequentToProve and registers it in the given environment
      *
-     * @throws ProofInputException
+     * @throws ProofInputException if the proof obligation generation fails
      */
     public void init(Sequent sequentToProve, ProofEnvironment env, String proofName)
             throws ProofInputException {
@@ -168,9 +170,9 @@ public class ProofStarter {
     }
 
     /**
-     * set timeout
+     * set timeout for the proof search; the value {@code -1} disables the timeout
      *
-     * @param timeout
+     * @param timeout long specifying the time limit in milliseconds (ms)
      */
     public void setTimeout(long timeout) {
         this.timeout = timeout;
@@ -188,7 +190,7 @@ public class ProofStarter {
     /**
      * set maximal steps to be performed
      *
-     * @param maxSteps
+     * @param maxSteps the maximal proof steps (rule applications) to be applied during proof search
      */
     public void setMaxRuleApplications(int maxSteps) {
         this.maxSteps = maxSteps;
@@ -198,6 +200,13 @@ public class ProofStarter {
         this.strategy = strategy;
     }
 
+    /**
+     * Initializes the strategy with the provided settings. The proof object must be created at that
+     * point.
+     *
+     * @param sp the Strategy properties to be used for the proof search
+     * @throws NullPointerException if the proof object is not yet created
+     */
     public void setStrategyProperties(StrategyProperties sp) {
         final Profile profile = proof.getInitConfig().getProfile();
         StrategyFactory factory = strategy != null ? profile.getStrategyFactory(strategy.name())
@@ -206,20 +215,23 @@ public class ProofStarter {
     }
 
     /**
-     * starts proof attempt
+     * Starts proof attempt. The proof object must be created at that point.
      *
      * @return the proof after the attempt terminated
+     *
+     * @throws NullPointerException if the proof object is not yet created
      */
-    public ApplyStrategyInfo start() {
+    public ProofSearchInformation<Proof, Goal> start() {
         return start(proof.openGoals());
     }
 
     /**
-     * starts proof attempt
+     * Starts the proof attempt. The proof object must be created at that point.
      *
      * @return the proof after the attempt terminated
+     * @throws NullPointerException if the proof object is not yet created
      */
-    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
+    public ProofSearchInformation<Proof, Goal> start(ImmutableList<Goal> goals) {
         try {
             final Profile profile = proof.getInitConfig().getProfile();
 
@@ -236,8 +248,8 @@ public class ProofStarter {
             // set!
             OneStepSimplifier.refreshOSS(proof);
 
-            GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-            ProverCore prover = new ApplyStrategy(goalChooser);
+            var goalChooser = profile.<Proof, Goal>getSelectedGoalChooserBuilder().create();
+            ProverCore<Proof, Goal> prover = new ApplyStrategy(goalChooser);
             if (ptl != null) {
                 prover.addProverTaskObserver(ptl);
             }
@@ -246,7 +258,7 @@ public class ProofStarter {
                 prover.addProverTaskObserver(autoSaver);
             }
 
-            ApplyStrategyInfo result;
+            ProofSearchInformation<Proof, Goal> result;
             proof.setRuleAppIndexToAutoMode();
 
             result = prover.start(proof, goals, maxSteps, timeout,
@@ -272,6 +284,13 @@ public class ProofStarter {
         }
     }
 
+    /**
+     * Initializes the proof starter with the provided proof object. All settings for the proof
+     * search
+     * are queried from the proof object
+     *
+     * @param proof the {@link Proof} on which to run the proof attempt
+     */
     public void init(Proof proof) {
         this.proof = proof;
         this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
@@ -284,7 +303,7 @@ public class ProofStarter {
      *
      * @return The managed side {@link Proof}.
      */
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 }

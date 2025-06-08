@@ -8,11 +8,9 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
@@ -27,6 +25,10 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -70,7 +72,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
     /**
      * @see #getLastFocusTerm()
      */
-    private Term lastFocusTerm;
+    private JTerm lastFocusTerm;
 
     /**
      * @see #getLastInstantiation()
@@ -89,19 +91,19 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @param services services.
      * @return the preconditions.
      */
-    private static Term[] createPreconditions(final Instantiation instantiation,
+    private static JTerm[] createPreconditions(final Instantiation instantiation,
             final BlockContract contract, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
-        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition =
+        final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
+        final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
-        final Term reachableInCondition =
+        final JTerm reachableInCondition =
             conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
-        final Term selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
+        final JTerm selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
             contract.getMethod(), contract.getKJT(), instantiation.self(), services);
-        return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
+        return new JTerm[] { precondition, wellFormedHeapsCondition, reachableInCondition,
             selfConditions };
     }
 
@@ -112,17 +114,17 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
-    private static Term[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+    private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
+        final JTerm postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final JTerm wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition =
+        final JTerm reachableOutCondition =
             conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition =
+        final JTerm atMostOneFlagSetCondition =
             conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-        return new Term[] { postcondition, wellFormedAnonymisationHeapsCondition,
+        return new JTerm[] { postcondition, wellFormedAnonymisationHeapsCondition,
             reachableOutCondition, atMostOneFlagSetCondition };
     }
 
@@ -135,29 +137,29 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @param services services.
      * @return the updates.
      */
-    private static Term[] createUpdates(final Term contextUpdate,
+    private static JTerm[] createUpdates(final JTerm contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final BlockContract.Variables variables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
-        final Map<LocationVariable, Term> modifiableClauses =
+        final Map<LocationVariable, JTerm> modifiableClauses =
             conditionsAndClausesBuilder.buildModifiableClauses();
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
-        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate =
+        final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final JTerm anonymisationUpdate =
             updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
-        final Term[] updates = new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
+        final JTerm[] updates = { contextUpdate, remembranceUpdate, anonymisationUpdate };
         return updates;
     }
 
     @Override
-    public Term getLastFocusTerm() {
+    public JTerm getLastFocusTerm() {
         return lastFocusTerm;
     }
 
     @Override
-    protected void setLastFocusTerm(Term lastFocusTerm) {
+    protected void setLastFocusTerm(JTerm lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
@@ -182,12 +184,13 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal,
+            final PosInOccurrence occurrence) {
         return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
         BlockContractExternalBuiltInRuleApp application =
@@ -199,31 +202,32 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         }
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
 
+        final var services = goal.getOverlayServices();
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JFunction> anonymisationHeaps =
+        final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Term[] preconditions = createPreconditions(instantiation, contract, heaps,
+        final JTerm[] preconditions = createPreconditions(instantiation, contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
-        final Term[] assumptions =
+        final JTerm[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
-        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
+        final JTerm freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
+        final JTerm[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, conditionsAndClausesBuilder, services);
 
         final ImmutableList<Goal> result;

@@ -15,8 +15,7 @@ import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.Configuration;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -224,7 +224,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         ImmutableList<LocationVariable> paramVarsList =
@@ -236,7 +236,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
+    protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
             ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
@@ -248,7 +248,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
+    protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =

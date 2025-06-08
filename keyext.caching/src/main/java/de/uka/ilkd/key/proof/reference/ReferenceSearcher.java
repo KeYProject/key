@@ -5,17 +5,17 @@ package de.uka.ilkd.key.proof.reference;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.*;
 
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 
@@ -149,7 +149,8 @@ public final class ReferenceSearcher {
         for (SequentFormula sf : subset) {
             boolean found = false;
             for (SequentFormula sf2 : superset) {
-                if (sf2.equalsModProofIrrelevancy(sf)) {
+                if ((Object) sf instanceof SequentFormula that
+                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf2, that)) {
                     found = true;
                     break;
                 }
@@ -173,7 +174,7 @@ public final class ReferenceSearcher {
         ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
-            Term term = seq.getFormulabyNr(i).formula();
+            JTerm term = (JTerm) seq.getFormulaByNr(i).formula();
             // first, check for a java block
             if (term.containsJavaBlockRecursive()) {
                 // not suitable for caching

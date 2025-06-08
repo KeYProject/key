@@ -7,9 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
@@ -17,7 +15,10 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -206,7 +207,7 @@ public class OracleGenerator {
 
     private void findConstants(Set<Term> constants, Term term) {
         LOGGER.debug("FindConstants: {} cls {} ", term, term.getClass().getName());
-        if (term.op() instanceof JFunction && term.arity() == 0) {
+        if (term.op() instanceof Function && term.arity() == 0) {
             constants.add(term);
         }
         if (term.op() instanceof ProgramVariable) {
@@ -303,7 +304,7 @@ public class OracleGenerator {
             return new OracleMethodCall(method, args);
         }
         // functions
-        else if (op instanceof JFunction) {
+        else if (op instanceof Function) {
             return translateFunction(term, initialSelect);
         }
         // program variables
@@ -631,7 +632,7 @@ public class OracleGenerator {
 
     private OracleMethod createQuantifierMethod(Term term, boolean initialSelect) {
         String methodName = generateMethodName();
-        ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+        ImmutableArray<? extends QuantifiableVariable> vars = term.varsBoundHere(0);
         QuantifiableVariable qv = vars.get(0);
         OracleVariable var = new OracleVariable(qv.name().toString(), qv.sort());
 

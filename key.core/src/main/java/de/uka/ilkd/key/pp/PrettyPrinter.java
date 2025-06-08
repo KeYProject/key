@@ -15,14 +15,25 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqPut;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
+import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
+import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -32,6 +43,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
@@ -321,12 +333,12 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) {
+    public void performActionOnSingleton(Singleton x) {
         printDLFunctionOperator("\\singleton", x);
     }
 
     @Override
-    public void performActionOnSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) {
+    public void performActionOnSetUnion(SetUnion x) {
         printDLFunctionOperator("\\set_union", x);
     }
 
@@ -336,19 +348,19 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x) {
+    public void performActionOnSetMinus(SetMinus x) {
         printDLFunctionOperator("\\set_minus", x);
     }
 
 
     @Override
-    public void performActionOnAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) {
+    public void performActionOnAllFields(AllFields x) {
         printDLFunctionOperator("\\all_fields", x);
     }
 
     @Override
     public void performActionOnAllObjects(
-            de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) {
+            AllObjects x) {
         printDLFunctionOperator("\\all_objects", x);
     }
 
@@ -373,35 +385,35 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnSeqSingleton(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x) {
+            SeqSingleton x) {
         printDLFunctionOperator("\\seq_singleton", x);
     }
 
     @Override
-    public void performActionOnSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x) {
+    public void performActionOnSeqConcat(SeqConcat x) {
         printDLFunctionOperator("\\singleton", x);
     }
 
     @Override
     public void performActionOnSeqIndexOf(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x) {
+            SeqIndexOf x) {
         printDLFunctionOperator("\\indexOf", x);
     }
 
     @Override
-    public void performActionOnSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x) {
+    public void performActionOnSeqSub(SeqSub x) {
         printDLFunctionOperator("\\seq_sub", x);
     }
 
     @Override
     public void performActionOnSeqReverse(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x) {
+            SeqReverse x) {
         printDLFunctionOperator("\\seq_reverse", x);
     }
 
     @Override
     public void performActionOnSeqPut(
-            de.uka.ilkd.key.java.expression.operator.adt.SeqPut x) {
+            SeqPut x) {
         printDLFunctionOperator("\\seq_upd", x);
     }
 
@@ -1164,8 +1176,8 @@ public class PrettyPrinter implements Visitor {
             }
         }
 
-        if (exec instanceof ExecutionContext) {
-            performActionOnExecutionContext((ExecutionContext) exec);
+        if (exec instanceof ExecutionContext executionContext) {
+            performActionOnExecutionContext(executionContext);
         } else if (exec != null) {
             performActionOnSchemaVariable((SchemaVariable) exec);
         }
@@ -1203,8 +1215,8 @@ public class PrettyPrinter implements Visitor {
         final TypeReference tr = x.getBodySourceAsTypeReference();
         if (tr instanceof SchemaTypeReference) {
             performActionOnSchemaTypeReference((SchemaTypeReference) tr);
-        } else if (tr instanceof SchemaVariable) {
-            performActionOnSchemaVariable((SchemaVariable) tr);
+        } else if (tr instanceof SchemaVariable sv) {
+            performActionOnSchemaVariable(sv);
         } else {
             tr.visit(this);
         }
@@ -1938,7 +1950,7 @@ public class PrettyPrinter implements Visitor {
             if (spec == null) {
                 layouter.print(jmlAssert.getCondition().getText().trim());
             } else {
-                Term t = spec.term(JmlAssert.INDEX_CONDITION);
+                JTerm t = spec.term(JmlAssert.INDEX_CONDITION);
                 String text = printInLogicPrinter(t);
                 layouter.print(text);
             }
@@ -1961,8 +1973,8 @@ public class PrettyPrinter implements Visitor {
         if (services != null) {
             var spec =
                 Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-            Term target = spec.term(SetStatement.INDEX_TARGET);
-            Term value = spec.term(SetStatement.INDEX_VALUE);
+            JTerm target = spec.term(SetStatement.INDEX_TARGET);
+            JTerm value = spec.term(SetStatement.INDEX_VALUE);
             layouter.print(printInLogicPrinter(target));
             layouter.print(" = ");
             layouter.print(printInLogicPrinter(value));
@@ -1978,7 +1990,7 @@ public class PrettyPrinter implements Visitor {
         layouter.end();
     }
 
-    public String printInLogicPrinter(Term t) {
+    public String printInLogicPrinter(JTerm t) {
         var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         lp.printTerm(t);
         return lp.result();

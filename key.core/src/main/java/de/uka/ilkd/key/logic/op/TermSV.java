@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -14,7 +13,7 @@ import org.key_project.logic.sort.Sort;
 /**
  * A schema variable that is used as placeholder for terms.
  */
-public final class TermSV extends OperatorSV implements TerminalSyntaxElement {
+public final class TermSV extends JOperatorSV implements TerminalSyntaxElement {
 
     /**
      * @param name the name of the schema variable
@@ -31,12 +30,11 @@ public final class TermSV extends OperatorSV implements TerminalSyntaxElement {
 
     @Override
     public String toString() {
-        return toString(sort().toString() + " term");
+        return toString(sort() + " term");
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\term ").print(sort().name().toString()).print(" ")
-                .print(name().toString());
+    public boolean isTerm() {
+        return true;
     }
 }

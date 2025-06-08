@@ -12,11 +12,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -66,7 +66,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @param contract a block contract.
      */
     FunctionalAuxiliaryContract(T contract) {
-        this(contract, Contract.INVALID_ID);
+        this(contract, INVALID_ID);
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         this.contract = contract;
         this.id = id;
 
-        if (id != Contract.INVALID_ID) {
+        if (id != INVALID_ID) {
             contract.setFunctionalContract(this);
         }
 
@@ -145,19 +145,20 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getMby() {
+    public JTerm getMby() {
         return contract.getMby();
     }
 
     @Override
-    public Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    public JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         return contract.getMby(selfVar, services);
     }
 
     @Override
-    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         return contract.getMby(heapTerms, selfTerm, atPres, services);
     }
 
@@ -167,7 +168,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getPre(LocationVariable heap, LocationVariable selfVar,
+    public JTerm getPre(LocationVariable heap, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         return contract.getPrecondition(heap, selfVar, atPreVars.entrySet().stream().collect(
@@ -177,14 +178,14 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    public JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Term result = null;
+        JTerm result = null;
 
         for (LocationVariable heap : heapContext) {
-            final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
+            final JTerm p = getPre(heap, selfVar, paramVars, atPreVars, services);
 
             if (result == null) {
                 result = p;
@@ -197,20 +198,21 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         return contract.getPrecondition(heap, heapTerm, selfTerm, atPres, services);
     }
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
-            Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+    public JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Term result = null;
+        JTerm result = null;
 
         for (LocationVariable heap : heapContext) {
-            final Term p =
+            final JTerm p =
                 getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
 
             if (result == null) {
@@ -224,41 +226,42 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+    public JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         return services.getTermBuilder().allLocs();
     }
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         return services.getTermBuilder().allLocs();
     }
 
     @Override
-    public Term getRequires(LocationVariable heap) {
+    public JTerm getRequires(LocationVariable heap) {
         return contract.getRequires(heap);
     }
 
     @Override
-    public Term getModifiable(LocationVariable heap) {
+    public JTerm getModifiable(LocationVariable heap) {
         return contract.getModifiable(heap);
     }
 
     @Override
-    public Term getAccessible(LocationVariable heap) {
+    public JTerm getAccessible(LocationVariable heap) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Term getGlobalDefs() {
+    public JTerm getGlobalDefs() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    public JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         throw new UnsupportedOperationException();
     }
 
@@ -372,7 +375,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @return this contract's modality.
      * @see AuxiliaryContract#getModalityKind()
      */
-    public Modality.JavaModalityKind getModalityKind() {
+    public JModality.JavaModalityKind getModalityKind() {
         return contract.getModalityKind();
     }
 }

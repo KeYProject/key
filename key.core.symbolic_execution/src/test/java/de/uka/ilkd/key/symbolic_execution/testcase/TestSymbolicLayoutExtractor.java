@@ -651,7 +651,8 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             createOracleFile(current, oracleFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 SymbolicLayoutReader reader = new SymbolicLayoutReader();
-                ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
+                ISymbolicLayout expected =
+                    reader.read(testCaseDirectory.resolve(oracleFile).toFile());
                 assertNotNull(expected);
                 assertModel(expected, current);
             }
@@ -672,7 +673,8 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             createOracleFile(current, oracleFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 SymbolicLayoutReader reader = new SymbolicLayoutReader();
-                ISymbolicLayout expected = reader.read(new File(testCaseDirectory, oracleFile));
+                ISymbolicLayout expected =
+                    reader.read(testCaseDirectory.resolve(oracleFile).toFile());
                 assertNotNull(expected);
                 assertModel(expected, current);
             }

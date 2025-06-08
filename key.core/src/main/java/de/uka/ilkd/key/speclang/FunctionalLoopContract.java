@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
@@ -42,7 +42,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
     }
 
     @Override
-    public FunctionalLoopContract map(UnaryOperator<Term> op, Services services) {
+    public FunctionalLoopContract map(UnaryOperator<JTerm> op, Services services) {
         return new FunctionalLoopContract(getAuxiliaryContract().map(op, services), id());
     }
 

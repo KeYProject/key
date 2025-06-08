@@ -5,15 +5,18 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -65,7 +68,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * Applies the update <code>u</code> on the rigid formula or term <code>phi</code>.
      * </p>
      * If there are free variables in <code>u</code>,
-     * {@link #applyUpdateOnRigidClashAware(Term, Term, TermServices)} is
+     * {@link #applyUpdateOnRigidClashAware(JTerm, JTerm, TermServices)} is
      * called to take care of potential name clashes.
      *
      * @param u the update applied on <code>phi</code>
@@ -74,11 +77,11 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
-    private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
+    private static JTerm applyUpdateOnRigid(JTerm u, JTerm phi, TermServices services) {
         // If there are no free variables in u, we don't have to check for name collisions
         if (u.freeVars().isEmpty()) {
             final TermBuilder tb = services.getTermBuilder();
-            final Term[] updatedSubs = new Term[phi.arity()];
+            final JTerm[] updatedSubs = new JTerm[phi.arity()];
             for (int i = 0; i < updatedSubs.length; i++) {
                 updatedSubs[i] = tb.apply(u, phi.sub(i));
             }
@@ -93,7 +96,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     /**
      * <p>
-     * This method is used by {@link #applyUpdateOnRigid(Term, Term, TermServices)} if there are
+     * This method is used by {@link #applyUpdateOnRigid(JTerm, JTerm, TermServices)} if there are
      * free variables in <code>u</code>.
      * </p>
      * If any name clashes exist between the free variables in <code>u</code> and the bound
@@ -106,7 +109,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
-    private static Term applyUpdateOnRigidClashAware(Term u, Term phi, TermServices services) {
+    private static JTerm applyUpdateOnRigidClashAware(JTerm u, JTerm phi, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Set<Name> freeVarNamesInU = new HashSet<>();
@@ -117,7 +120,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         final QuantifiableVariable[] boundVarsInPhi =
             phi.boundVars().toArray(new QuantifiableVariable[0]);
 
-        final Term[] updatedSubs = phi.subs().toArray(new Term[0]);
+        final JTerm[] updatedSubs = phi.subs().toArray(new JTerm[0]);
         // Check for any name clashes and change the variables' names if necessary
         for (int i = 0; i < boundVarsInPhi.length; i++) {
             final QuantifiableVariable currentBoundVar = boundVarsInPhi[i];
@@ -125,7 +128,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
                 final LogicVariable renamedVar =
                     new LogicVariable(createNonCollidingNameFor(currentBoundVar, u, phi, services),
                         currentBoundVar.sort());
-                final Term substTerm = tb.var(renamedVar);
+                final JTerm substTerm = tb.var(renamedVar);
 
                 final ClashFreeSubst subst = new ClashFreeSubst(currentBoundVar, substTerm, tb);
                 for (int j = 0; j < updatedSubs.length; j++) {
@@ -159,7 +162,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @param services the {@link TermServices} to help create terms
      * @return a non-colliding {@link Name} for <code>var</code>
      */
-    private static Name createNonCollidingNameFor(QuantifiableVariable var, Term u, Term phi,
+    private static Name createNonCollidingNameFor(QuantifiableVariable var, JTerm u, JTerm phi,
             TermServices services) {
         ClashFreeSubst.VariableCollectVisitor vcv = new ClashFreeSubst.VariableCollectVisitor();
         ImmutableSet<QuantifiableVariable> usedVars = u.freeVars();
@@ -201,11 +204,11 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc,
-            Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term uInst = (Term) svInst.getInstantiation(u);
-        Term phiInst = (Term) svInst.getInstantiation(phi);
-        Term resultInst = (Term) svInst.getInstantiation(result);
+            LogicServices services) {
+        var svInst = mc.getInstantiations();
+        JTerm uInst = (JTerm) svInst.getInstantiation(u);
+        JTerm phiInst = (JTerm) svInst.getInstantiation(phi);
+        JTerm resultInst = (JTerm) svInst.getInstantiation(result);
         if (uInst == null || phiInst == null) {
             return mc;
         }
@@ -213,11 +216,12 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) {
             return null;
         }
-        Term properResultInst = applyUpdateOnRigid(uInst, phiInst, services);
+        JTerm properResultInst = applyUpdateOnRigid(uInst, phiInst, (TermServices) services);
         if (resultInst == null) {
-            svInst = svInst.add(result, properResultInst, services);
+            svInst = ((SVInstantiations) svInst).add(result,
+                properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equalsModProperty(properResultInst, RENAMING_TERM_PROPERTY)) {
+        } else if (RENAMING_TERM_PROPERTY.equalsModThisProperty(resultInst, properResultInst)) {
             return mc;
         } else {
             return null;

@@ -8,13 +8,13 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -30,8 +30,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     private final BlockContract block;
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
-            Term accessible, Condition ensures, Term mby, Term rep, BlockContract block,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, BlockContract block,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
@@ -60,7 +60,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public BlockWellDefinedness map(UnaryOperator<Term> op, Services services) {
+    public BlockWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
         return new BlockWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
             op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
@@ -68,11 +68,12 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
+    SequentFormula generateSequent(SequentTerms seq,
+            TermServices services) {
         // wd(pre) & (pre & wf(anon) -> wd(modifiable) & {anon^modifiable}(wd(post)))
-        final Term imp =
+        final JTerm imp =
             TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdModifiable, seq.anonWdPost));
-        final Term wdPre = TB.wd(seq.pre);
+        final JTerm wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context, TB.and(wdPre, imp)));
     }
 

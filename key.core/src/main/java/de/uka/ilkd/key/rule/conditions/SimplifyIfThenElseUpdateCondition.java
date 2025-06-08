@@ -9,15 +9,18 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -42,32 +45,32 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     private static class ElementaryUpdateWrapper {
         private final UpdateableOperator op;
 
-        private Term rhs1;
-        private Term rhs2;
+        private JTerm rhs1;
+        private JTerm rhs2;
 
         public ElementaryUpdateWrapper(UpdateableOperator op, TermServices services) {
             super();
             this.op = op;
-            Term identity = services.getTermFactory().createTerm(op);
+            JTerm identity = services.getTermFactory().createTerm(op);
 
             rhs1 = identity;
             rhs2 = identity;
         }
 
-        public Term createIfElseTerm(Term phi, TermServices services) {
+        public JTerm createIfElseTerm(JTerm phi, TermServices services) {
             if (rhs1.equals(rhs2)) {
                 return services.getTermBuilder().elementary(op, rhs1);
             }
-            Term ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
+            JTerm ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
             return services.getTermBuilder().elementary(op, ifThenElse);
 
         }
 
-        public void setRhs1(Term rhs1) {
+        public void setRhs1(JTerm rhs1) {
             this.rhs1 = rhs1;
         }
 
-        public void setRhs2(Term rhs2) {
+        public void setRhs2(JTerm rhs2) {
             this.rhs2 = rhs2;
         }
 
@@ -84,7 +87,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
-            Term update, final boolean firstTerm, TermServices services) {
+            JTerm update, final boolean firstTerm, TermServices services) {
         ElementaryUpdate eu = (ElementaryUpdate) update.op();
         ElementaryUpdateWrapper euw = null;
         if (!map.containsKey(eu.lhs())) {
@@ -102,14 +105,14 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     private boolean collect(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
-            Term update, final boolean firstTerm, TermServices services) {
-        LinkedList<Term> updates = new LinkedList<>();
+            JTerm update, final boolean firstTerm, TermServices services) {
+        LinkedList<JTerm> updates = new LinkedList<>();
         TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
         // consider only parallel updates, where each variable occurs only once on
         // the left hand side.
         while (!updates.isEmpty()) {
-            Term next = updates.poll();
+            JTerm next = updates.poll();
             if (next.op() == UpdateJunctor.PARALLEL_UPDATE) {
                 updates.add(next.sub(0));
                 updates.add(next.sub(1));
@@ -129,7 +132,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private Term simplify(Term phi, Term u1, Term u2, Term t, TermServices services) {
+    private JTerm simplify(JTerm phi, JTerm u1, JTerm u2, JTerm t, TermServices services) {
 
         TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
 
@@ -140,7 +143,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         if (!collect(map, u2, false, services)) {
             return null;
         }
-        Term result = services.getTermBuilder().skip();
+        JTerm result = services.getTermBuilder().skip();
         for (ElementaryUpdateWrapper euw : map.values()) {
             result =
                 services.getTermBuilder().parallel(result, euw.createIfElseTerm(phi, services));
@@ -154,14 +157,15 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc,
-            Services services) {
+            LogicServices p_services) {
+        final Services services = (Services) p_services;
         SVInstantiations svInst = mc.getInstantiations();
 
-        Term u1Inst = (Term) svInst.getInstantiation(u1);
-        Term u2Inst = (Term) svInst.getInstantiation(u2);
-        Term tInst = (Term) svInst.getInstantiation(commonFormula);
-        Term phiInst = (Term) svInst.getInstantiation(phi);
-        Term resultInst = (Term) svInst.getInstantiation(result);
+        JTerm u1Inst = (JTerm) svInst.getInstantiation(u1);
+        JTerm u2Inst = (JTerm) svInst.getInstantiation(u2);
+        JTerm tInst = (JTerm) svInst.getInstantiation(commonFormula);
+        JTerm phiInst = (JTerm) svInst.getInstantiation(phi);
+        JTerm resultInst = (JTerm) svInst.getInstantiation(result);
 
         if (tInst == null || phiInst == null) {
             return mc;
@@ -170,11 +174,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         u1Inst = u1Inst == null ? services.getTermBuilder().skip() : u1Inst;
         u2Inst = u2Inst == null ? services.getTermBuilder().skip() : u2Inst;
 
-        Term properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
+        JTerm properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
         if (properResultInst == null) {
             return null;
         } else if (resultInst == null) {
-            svInst = svInst.add(result, properResultInst, services);
+            svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(result,
+                properResultInst, services);
             return mc.setInstantiations(svInst);
         } else if (resultInst.equals(properResultInst)) {
             return mc;

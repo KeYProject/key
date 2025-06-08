@@ -8,9 +8,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -19,32 +18,36 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.MissingInstantiationException;
 import de.uka.ilkd.key.proof.SVInstantiationParserException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
+public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInstantiation> {
 
     /**
      * generated UID
      */
     private static final long serialVersionUID = -5388696072469119661L;
 
-    private static final IfFormulaInstantiation manualTextIF = new IfFormulaInstantiation() {
+    private static final AssumesFormulaInstantiation manualTextIF =
+        new AssumesFormulaInstantiation() {
 
-        @Override
-        public String toString(Services services) {
-            return "Manual Input";
-        }
+            @Override
+            public String toString(LogicServices services) {
+                return "Manual Input";
+            }
 
-        @Override
-        public SequentFormula getConstrainedFormula() {
-            return null;
-        }
-    };
+            @Override
+            public SequentFormula getSequentFormula() {
+                return null;
+            }
+        };
 
     private String manualInput;
     private final Term ifFma;
@@ -55,7 +58,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     private final TacletApp app;
     private final Goal goal;
 
-    public TacletAssumesModel(Term ifFma, ImmutableList<IfFormulaInstantiation> candidates,
+    public TacletAssumesModel(Term ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
             TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
         super(createIfInsts(candidates));
 
@@ -78,10 +81,10 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         return ifFma;
     }
 
-    public static IfFormulaInstantiation[] createIfInsts(
-            ImmutableList<IfFormulaInstantiation> candidates) {
-        IfFormulaInstantiation[] res = new IfFormulaInstantiation[candidates.size()];
-        Iterator<IfFormulaInstantiation> it = candidates.iterator();
+    public static AssumesFormulaInstantiation[] createIfInsts(
+            ImmutableList<AssumesFormulaInstantiation> candidates) {
+        AssumesFormulaInstantiation[] res = new AssumesFormulaInstantiation[candidates.size()];
+        Iterator<AssumesFormulaInstantiation> it = candidates.iterator();
         int i = 0;
 
         while (it.hasNext()) {
@@ -99,7 +102,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @return the term encoded in 's'
      * @throws RecognitionException In case an exception occurs during parse.
      */
-    public Term parseFormula(String s) throws RecognitionException {
+    public JTerm parseFormula(String s) throws RecognitionException {
         return new KeyIO(services).parseExpression(s);
     }
 
@@ -109,10 +112,10 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @throws SVInstantiationParserException
      * @throws MissingInstantiationException
      */
-    public IfFormulaInstantiation getSelection(int pos)
+    public AssumesFormulaInstantiation getSelection(int pos)
             throws SVInstantiationParserException, MissingInstantiationException {
         if (!isManualInputSelected()) {
-            return (IfFormulaInstantiation) getSelectedItem();
+            return (AssumesFormulaInstantiation) getSelectedItem();
         }
         try {
             if (manualInput == null || manualInput.isEmpty()) {
@@ -122,12 +125,12 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
                     true);
             }
 
-            Term term = parseFormula(manualInput);
+            JTerm term = parseFormula(manualInput);
             term = services.getTermBuilder().addLabelToAllSubs(term,
                 new NodeOrigin(SpecType.USER_INTERACTION,
                     app.rule().displayName(), goal.node().serialNr()));
 
-            return new IfFormulaInstDirect(new SequentFormula(term));
+            return new AssumesFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput,
                 Position.fromOneZeroBased(pos, e.charPositionInLine),

@@ -295,6 +295,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
                         public boolean isStatic() {
                             return false;
                         }
+
+                        @Override
+                        public boolean isFinal() {
+                            return ((FieldDeclaration) old).getModifiers()
+                                    .contains(JMLModifier.FINAL);
+                        }
                     };
                     fieldDecl.setStartPosition(old.getStartPosition());
                     fieldDecl.setEndPosition(old.getEndPosition());
@@ -440,7 +446,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             doAttach(jmlAssert, astParent, childIndex);
         } catch (Throwable e) {
             throw new SLTranslationException(
-                String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
+                format("%s (%s)", e.getMessage(), e.getClass().getName()),
                 ctx.getStartLocation(), e);
         }
     }

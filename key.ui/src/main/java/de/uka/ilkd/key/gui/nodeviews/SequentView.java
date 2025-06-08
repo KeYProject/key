@@ -21,13 +21,17 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.utilities.Cached;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.DoNothingCaret;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.FormulaChangeInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -70,12 +74,10 @@ public abstract class SequentView extends JEditorPane {
     private static final HighlightPainter MOUSE_SELECTION_PAINTER =
         new DefaultHighlightPainter(MOUSE_SELECTION_COLOR.get());
 
-
     // maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
     public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
-
 
     private final MainWindow mainWindow;
 
@@ -187,7 +189,7 @@ public abstract class SequentView extends JEditorPane {
     public final void setFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
-            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+            putClientProperty(HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             setFont(myFont);
         } else {
             LOGGER.debug("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
@@ -210,7 +212,7 @@ public abstract class SequentView extends JEditorPane {
         String text = "";
 
         if (pis != null && !pis.isSequent()) {
-            Term term = pis.getPosInOccurrence().subTerm();
+            var term = pis.getPosInOccurrence().subTerm();
             text +=
                 "<b>Operator:</b> " + term.op().getClass().getSimpleName() + " (" + term.op() + ")";
             text += "<br><b>Sort</b>: " + term.sort();
@@ -806,18 +808,19 @@ public abstract class SequentView extends JEditorPane {
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
                 ImmutableList<SequentFormula> added_succ =
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
-                for (SequentFormula sf : added_ante) {
+                for (final SequentFormula sf : added_ante) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
                 }
-                for (SequentFormula sf : added_succ) {
+                for (final SequentFormula sf : added_succ) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
                 }
                 ImmutableList<FormulaChangeInfo> modified =
                     node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
                 for (FormulaChangeInfo fci : modified) {
-                    PosInOccurrence positionOfMod = fci.positionOfModification();
+                    PosInOccurrence positionOfMod =
+                        fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(fci.getOriginalFormula())) {
@@ -830,7 +833,8 @@ public abstract class SequentView extends JEditorPane {
                         }
                     }
                 }
-                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo()
+                for (SequentFormula sf : node.getNodeInfo()
+                        .getSequentChangeInfo()
                         .removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf)
@@ -839,7 +843,8 @@ public abstract class SequentView extends JEditorPane {
                         }
                     }
                 }
-                for (SequentFormula sf : node.getNodeInfo().getSequentChangeInfo()
+                for (SequentFormula sf : node.getNodeInfo()
+                        .getSequentChangeInfo()
                         .removedFormulas(false)) {
                     for (PIO_age pair : pio_age_list) {
                         if (pair.get_pio().sequentFormula().equals(sf)
@@ -926,7 +931,8 @@ public abstract class SequentView extends JEditorPane {
      * @param max_age the maximum age, specified in viewSettings
      * @return the sf's age
      */
-    private int computeSeqFormulaAge(Node node, SequentFormula form, int max_age) {
+    private int computeSeqFormulaAge(Node node, SequentFormula form,
+            int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
             age++;

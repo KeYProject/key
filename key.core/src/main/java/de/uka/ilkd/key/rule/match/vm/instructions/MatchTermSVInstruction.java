@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
+import org.key_project.logic.LogicServices;
 
 public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermSV> {
 
@@ -19,13 +20,13 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermS
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
+    public MatchConditions match(JTerm subst, MatchConditions mc, LogicServices services) {
         return addInstantiation(subst, mc, services);
     }
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+            LogicServices services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

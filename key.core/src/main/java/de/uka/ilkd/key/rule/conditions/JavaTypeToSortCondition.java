@@ -6,21 +6,22 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 
 /**
@@ -29,12 +30,12 @@ import org.key_project.logic.sort.Sort;
  */
 public final class JavaTypeToSortCondition implements VariableCondition {
 
-    private final OperatorSV exprOrTypeSV;
+    private final JOperatorSV exprOrTypeSV;
     private final GenericSort sort;
     private final boolean elemSort;
 
 
-    public JavaTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort,
+    public JavaTypeToSortCondition(final JOperatorSV exprOrTypeSV, final GenericSort sort,
             final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
@@ -46,7 +47,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     }
 
 
-    public static boolean checkSortedSV(final OperatorSV exprOrTypeSV) {
+    public static boolean checkSortedSV(final JOperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
@@ -56,23 +57,23 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, LogicServices services) {
         if (var != exprOrTypeSV) {
             return matchCond;
         }
 
         Debug.assertTrue(svSubst instanceof Expression || svSubst instanceof TypeReference
-                || svSubst instanceof Term);
+                || svSubst instanceof JTerm);
 
-        final SVInstantiations inst = matchCond.getInstantiations();
+        final var inst = (SVInstantiations) matchCond.getInstantiations();
         Sort type;
-        if (svSubst instanceof Term) {
-            type = ((Term) svSubst).sort();
+        if (svSubst instanceof JTerm) {
+            type = ((JTerm) svSubst).sort();
         } else if (svSubst instanceof TypeReference) {
             type = ((TypeReference) svSubst).getKeYJavaType().getSort();
         } else {
             final Expression expr = (Expression) svSubst;
-            type = expr.getKeYJavaType(services, inst.getExecutionContext()).getSort();
+            type = expr.getKeYJavaType((Services) services, inst.getExecutionContext()).getSort();
         }
         if (elemSort) {
             if (type instanceof ArraySort) {

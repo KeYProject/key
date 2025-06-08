@@ -7,24 +7,27 @@ import java.util.Set;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
@@ -62,12 +65,14 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+            PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         return !"andLeft".equals(ruleName)
@@ -83,7 +88,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
 
         if (proof == null) {
             return false;
@@ -107,7 +113,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      * This strategy accepts all rule apps for which the rule name is in the admitted set or has
      * INF_FLOW_UNFOLD_PREFIX as a prefix and rejects everything else.
      */
-    private class SelfCompExpansionStrategy implements Strategy {
+    private class SelfCompExpansionStrategy implements Strategy<Goal> {
 
         private final Name NAME = new Name(
             SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy.class.getSimpleName());
@@ -124,8 +130,9 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
-                MutableState mState) {
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal p_goal, MutableState mState) {
+            final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
@@ -143,7 +150,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             return true;
         }
 

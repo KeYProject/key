@@ -10,10 +10,8 @@ import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * This class is used to represent a dynamic logic modality like diamond and box for a target
- * language.
- */
+/// This class is used to represent a dynamic logic modality like diamond and box for a target
+/// language.
 public abstract class Modality extends AbstractSortedOperator {
     private final Kind kind;
 
@@ -22,22 +20,18 @@ public abstract class Modality extends AbstractSortedOperator {
         this.kind = kind;
     }
 
-    /**
-     * The kind of this modality, e.g., box, diamond.
-     *
-     * @return The kind of the modality.
-     * @param <K> Restricts the expected type of the kind.
-     */
+    /// The kind of this modality, e.g., box, diamond.
+    ///
+    /// @return The kind of the modality.
+    /// @param <K> Restricts the expected type of the kind.
     public final <K extends Kind> K kind() {
         return (K) kind;
     }
 
-    /**
-     * The program contained in this modality.
-     *
-     * @return the program.
-     */
-    public abstract Program program();
+    /// The program contained in this modality.
+    ///
+    /// @return the program.
+    public abstract Program programBlock();
 
     @Override
     public int getChildCount() {
@@ -48,19 +42,17 @@ public abstract class Modality extends AbstractSortedOperator {
     public SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> kind;
-        case 1 -> program();
+        case 1 -> programBlock();
         default -> throw new IndexOutOfBoundsException(
             "Modality " + name() + " has only two children");
         };
     }
 
-    /**
-     * Modality kinds like box and diamond.
-     */
+    /// Modality kinds like box and diamond.
     public abstract static class Kind implements Named, TerminalSyntaxElement {
         private final Name name;
 
-        public Kind(Name name) {
+        protected Kind(Name name) {
             this.name = name;
         }
 

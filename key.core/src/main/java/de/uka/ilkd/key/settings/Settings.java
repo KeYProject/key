@@ -62,7 +62,7 @@ public interface Settings {
      * Register a new listener which is triggered for changes on properties.
      *
      * @param listener a non-null reference
-     * @see java.beans.PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
+     * @see PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
      */
     void addPropertyChangeListener(@NonNull PropertyChangeListener listener);
 
@@ -70,7 +70,7 @@ public interface Settings {
      * Removes the given listener.
      *
      * @param listener a non-null reference
-     * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
+     * @see PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
      */
     void removePropertyChangeListener(PropertyChangeListener listener);
 

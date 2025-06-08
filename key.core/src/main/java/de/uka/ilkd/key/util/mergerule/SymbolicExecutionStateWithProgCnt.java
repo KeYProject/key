@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
  * parallel update, a path condition in form of a JavaDL formula, and a program counter in form of a
  * JavaDL formula with non-empty Java Block (and a possible post condition as first, and only, sub
  * term).
+ *
  * @param symbolicState The symbolic state (parallel update).
  * @param pathCondition The path condition (formula).
  * @param programCounter The program counter: Formula with non-empty Java block and post
@@ -22,35 +23,27 @@ import org.jspecify.annotations.Nullable;
  * @param correspondingNode The node corresponding to this SE state.
  * @author Dominic Scheurer
  */
-public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition, Term programCounter,
-                                                @Nullable Node correspondingNode) {
+public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathCondition,
+        JTerm programCounter, @Nullable Node correspondingNode) {
     /**
      * @return The symbolic state.
      */
-    public Term getSymbolicState() {
-        return symbolicState;
-    }
+    public JTerm getSymbolicState() { return symbolicState; }
 
     /**
      * @return The path condition.
      */
-    public Term getPathCondition() {
-        return pathCondition;
-    }
+    public JTerm getPathCondition() { return pathCondition; }
 
     /**
      * @return The program counter (and post condition).
      */
-    public Term getProgramCounter() {
-        return programCounter;
-    }
+    public JTerm getProgramCounter() { return programCounter; }
 
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() {
-        return correspondingNode;
-    }
+    public Node getCorrespondingNode() { return correspondingNode; }
 
     /**
      * @return The corresponding SE state (without the program counter).

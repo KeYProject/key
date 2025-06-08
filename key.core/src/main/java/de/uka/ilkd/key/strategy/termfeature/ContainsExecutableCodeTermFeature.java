@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Modality;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 
 /**
@@ -28,26 +30,29 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         new ContainsExecutableCodeTermFeature(true);
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(Term t, MutableState mState, LogicServices services) {
         return containsExec(t, mState, services);
     }
 
-    private boolean containsExec(Term t, MutableState mState, Services services) {
+    private boolean containsExec(Term t, MutableState mState, LogicServices services) {
         if (t.isRigid()) {
             return false;
         }
         // if ( t.isContainsJavaBlockRecursive() ) return true;
 
-        final Operator op = t.op();
-        if (op instanceof Quantifier) {
+        final var op = t.op();
+        switch (op) {
+        case Quantifier ignored -> {
             return false;
         }
-
-        if (op instanceof Modality) {
+        case Modality ignored -> {
             return true;
         }
-        if (considerQueries && op instanceof IProgramMethod) {
+        case IProgramMethod ignored when considerQueries -> {
             return true;
+        }
+        default -> {
+        }
         }
 
         for (int i = 0; i != op.arity(); ++i) {

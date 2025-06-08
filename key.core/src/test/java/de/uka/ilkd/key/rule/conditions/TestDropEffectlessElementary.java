@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +24,13 @@ public class TestDropEffectlessElementary {
     @Test
     public void testSelfAssignments() {
 
-        Term term = TacletForTests.parseTerm("{ i := i }(i=0)");
-        Term result = applyDrop(term);
+        JTerm term = TacletForTests.parseTerm("{ i := i }(i=0)");
+        JTerm result = applyDrop(term);
         assertEquals(term, result);
 
         term = TacletForTests.parseTerm("{ i := i || i := 0 }(i=0)");
         result = applyDrop(term);
-        Term expected = TacletForTests.parseTerm("{i:=0}(i=0)");
+        JTerm expected = TacletForTests.parseTerm("{i:=0}(i=0)");
         assertEquals(expected, result);
 
         term = TacletForTests.parseTerm("{ i := 0 || i := i }(i=0)");
@@ -42,9 +42,9 @@ public class TestDropEffectlessElementary {
     @Test
     public void testDoubleAssignment() {
 
-        Term term = TacletForTests.parseTerm("{ i := j || j := i }(i=0)");
-        Term result = applyDrop(term);
-        Term expected = TacletForTests.parseTerm("{i := j}(i=0)");
+        JTerm term = TacletForTests.parseTerm("{ i := j || j := i }(i=0)");
+        JTerm result = applyDrop(term);
+        JTerm expected = TacletForTests.parseTerm("{i := j}(i=0)");
         assertEquals(expected, result);
 
         term = TacletForTests.parseTerm("{ j := 5 || j := j }(i=0)");
@@ -64,21 +64,21 @@ public class TestDropEffectlessElementary {
         // The parser cannot parse this but this can appear as
         // result of the sequential to parallel of {i:=i+1}{i:=i}
 
-        Term term;
+        JTerm term;
         // Term term = TacletForTests.parseTerm("{ {i := i+1}i:=i }(i=0)");
         {
-            Term t0 = TacletForTests.parseTerm("{i := i+1}0").sub(0);
-            Term t1 = TacletForTests.parseTerm("{i := i}0").sub(0);
-            Term t2 = TacletForTests.parseTerm("i=0");
+            JTerm t0 = TacletForTests.parseTerm("{i := i+1}0").sub(0);
+            JTerm t1 = TacletForTests.parseTerm("{i := i}0").sub(0);
+            JTerm t2 = TacletForTests.parseTerm("i=0");
             TermBuilder tb = TacletForTests.services().getTermBuilder();
 
-            Term t3 = tb.apply(t0, t1, null);
+            JTerm t3 = tb.apply(t0, t1, null);
             term = tb.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)",
             LogicPrinter.quickPrintTerm(term, TacletForTests.services));
 
-        Term result = applyDrop(term);
+        JTerm result = applyDrop(term);
         assertEquals(term, result);
     }
 
@@ -95,10 +95,10 @@ public class TestDropEffectlessElementary {
     // assertEquals(expected, result);
     // }
 
-    private Term applyDrop(Term term) {
+    private JTerm applyDrop(JTerm term) {
 
-        Term update = term.sub(0);
-        Term arg = term.sub(1);
+        JTerm update = term.sub(0);
+        JTerm arg = term.sub(1);
 
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
         SchemaVariable x = SchemaVariableFactory.createFormulaSV(new Name("x"));
@@ -112,7 +112,7 @@ public class TestDropEffectlessElementary {
 
         MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         // first 2 args are not used in the following method, hence, can be null.
-        mc = cond.check(null, null, mc, TacletForTests.services());
+        mc = (MatchConditions) cond.check(null, null, mc, TacletForTests.services());
 
         if (mc == null) {
             return term;

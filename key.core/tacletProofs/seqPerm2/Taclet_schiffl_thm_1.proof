@@ -45,41 +45,41 @@
  }
 
 
-\proofScript "
-macro split-prop;
-rule schiffl_lemma_2 formula='seqPerm(f_s, f_t)';
-instantiate hide var=x with='f_x';
-instantiate hide var=y with='f_y';
+\proofScript {
+macro "split-prop";
+rule schiffl_lemma_2 formula=(seqPerm(f_s,f_t));
+instantiate hide var=x with=(f_x);
+instantiate hide var=y with=(f_y);
 rule impLeft;
 tryclose branch;
 rule exLeft;
-macro split-prop;
+macro "split-prop";
 rule seqPermDef occ=1;
 rule andRight;
 tryclose branch;
-instantiate hide var=s with='r_0';
+instantiate hide var=s with=(r_0);
 rule andRight;
 tryclose branch;
 rule allRight;
 rule impRight;
-instantiate hide var=iv with='iv_0';
+instantiate hide var=iv with=(iv_0);
 rule impLeft;
 tryclose branch;
 rule andLeft;
 rule seqNPermRange;
-instantiate hide var=iv with='iv_0';
-rule impLeft;
-tryclose branch;
-rule andLeft;
-rule andLeft;
-rule seqNPermRange;
-instantiate hide var=iv with='f_x';
+instantiate hide var=iv with=(iv_0);
 rule impLeft;
 tryclose branch;
 rule andLeft;
 rule andLeft;
 rule seqNPermRange;
-instantiate hide var=iv with='f_y';
+instantiate hide var=iv with=(f_x);
+rule impLeft;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+rule seqNPermRange;
+instantiate hide var=iv with=(f_y);
 rule impLeft;
 tryclose branch;
 rule andLeft;
@@ -106,20 +106,20 @@ rule ifthenelse_split occ=0;
 tryclose branch;
 rule ifthenelse_split occ=0;
 rule seqNPermInjective;
-instantiate hide var=iv with='iv_0';
-instantiate hide var=jv with='f_y';
+instantiate hide var=iv with=(iv_0);
+instantiate hide var=jv with=(f_y);
 rule impLeft;
 tryclose branch;
 tryclose branch;
 rule ifthenelse_split occ=0;
 rule seqNPermInjective;
-instantiate hide var=iv with='iv_0';
-instantiate hide var=jv with='f_x';
+instantiate hide var=iv with=(iv_0);
+instantiate hide var=jv with=(f_x);
 rule impLeft;
 tryclose branch;
 tryclose branch;
 tryclose branch;
 tryclose branch;
 tryclose branch;
-"
+}
 

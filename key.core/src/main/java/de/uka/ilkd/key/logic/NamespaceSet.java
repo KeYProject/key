@@ -5,31 +5,36 @@ package de.uka.ilkd.key.logic;
 
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.RuleSet;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
+
+import org.jspecify.annotations.NonNull;
 
 public class NamespaceSet {
 
-    private Namespace<QuantifiableVariable> varNS = new Namespace<>();
-    private Namespace<IProgramVariable> progVarNS = new Namespace<>();
+    private Namespace<@NonNull QuantifiableVariable> varNS = new Namespace<>();
+    private Namespace<@NonNull IProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
-    private Namespace<JFunction> funcNS = new Namespace<>();
-    private Namespace<RuleSet> ruleSetNS = new Namespace<>();
-    private Namespace<Sort> sortNS = new Namespace<>();
-    private Namespace<Choice> choiceNS = new Namespace<>();
+    private Namespace<@NonNull Function> funcNS = new Namespace<>();
+    private Namespace<@NonNull RuleSet> ruleSetNS = new Namespace<>();
+    private Namespace<@NonNull Sort> sortNS = new Namespace<>();
+    private Namespace<@NonNull Choice> choiceNS = new Namespace<>();
 
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> funcNS,
-            Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
-            Namespace<IProgramVariable> programVarNS) {
+    public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> funcNS,
+            Namespace<@NonNull Sort> sortNS, Namespace<@NonNull RuleSet> ruleSetNS,
+            Namespace<@NonNull Choice> choiceNS,
+            Namespace<@NonNull IProgramVariable> programVarNS) {
         this.varNS = varNS;
         this.progVarNS = programVarNS;
         this.funcNS = funcNS;
@@ -58,51 +63,51 @@ public class NamespaceSet {
             new Namespace<>(programVariables()));
     }
 
-    public Namespace<QuantifiableVariable> variables() {
+    public Namespace<@NonNull QuantifiableVariable> variables() {
         return varNS;
     }
 
-    public void setVariables(Namespace<QuantifiableVariable> varNS) {
+    public void setVariables(Namespace<@NonNull QuantifiableVariable> varNS) {
         this.varNS = varNS;
     }
 
-    public Namespace<IProgramVariable> programVariables() {
+    public Namespace<@NonNull IProgramVariable> programVariables() {
         return progVarNS;
     }
 
-    public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
+    public void setProgramVariables(Namespace<@NonNull IProgramVariable> progVarNS) {
         this.progVarNS = progVarNS;
     }
 
-    public Namespace<JFunction> functions() {
+    public Namespace<@NonNull Function> functions() {
         return funcNS;
     }
 
-    public void setFunctions(Namespace<JFunction> funcNS) {
+    public void setFunctions(Namespace<@NonNull Function> funcNS) {
         this.funcNS = funcNS;
     }
 
-    public Namespace<RuleSet> ruleSets() {
+    public Namespace<@NonNull RuleSet> ruleSets() {
         return ruleSetNS;
     }
 
-    public void setRuleSets(Namespace<RuleSet> ruleSetNS) {
+    public void setRuleSets(Namespace<@NonNull RuleSet> ruleSetNS) {
         this.ruleSetNS = ruleSetNS;
     }
 
-    public Namespace<Sort> sorts() {
+    public Namespace<@NonNull Sort> sorts() {
         return sortNS;
     }
 
-    public void setSorts(Namespace<Sort> sortNS) {
+    public void setSorts(Namespace<@NonNull Sort> sortNS) {
         this.sortNS = sortNS;
     }
 
-    public Namespace<Choice> choices() {
+    public Namespace<@NonNull Choice> choices() {
         return choiceNS;
     }
 
-    public void setChoices(Namespace<Choice> choiceNS) {
+    public void setChoices(Namespace<@NonNull Choice> choiceNS) {
         this.choiceNS = choiceNS;
     }
 
@@ -151,9 +156,13 @@ public class NamespaceSet {
     }
 
     /**
-     * @param name
-     * @param spaces
-     * @return the element with the given name if found in the given namespaces, otherwise
+     * retrieves an object of the given name from the namespaces; the first object found in order of
+     * the
+     * specified namespaces
+     *
+     * @param name the Name to look up
+     * @param spaces the Namespaces where to look for an object of the given name
+     * @return the first element with the given name if found in the given namespaces, otherwise
      *         <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace<?>[] spaces) {

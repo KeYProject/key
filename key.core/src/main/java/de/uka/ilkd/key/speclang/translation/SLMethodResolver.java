@@ -10,12 +10,12 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -61,7 +61,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             new SLParameters(ps).getSignature(javaInfo.getServices());
 
         IProgramMethod pm = null;
-        Term recTerm = receiver.getTerm();
+        JTerm recTerm = receiver.getTerm();
 
         while (true) {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
@@ -71,7 +71,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             if (et != null && pm == null) {
                 containingType = et.getKeYJavaType();
                 if (recTerm != null) {
-                    final JFunction fieldSymbol =
+                    final Function fieldSymbol =
                         services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(et, services);
                     recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
@@ -94,7 +94,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         }
         ImmutableList<SLExpression> params = parameters.parameters();
         int i = 0;
-        Term[] subs = new Term[params.size() - pm.getHeapCount(services)
+        JTerm[] subs = new JTerm[params.size() - pm.getHeapCount(services)
                 + pm.getStateCount() * pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1)];
         for (LocationVariable heap : heaps) {
             if (pm.getStateCount() >= 1) {
@@ -116,7 +116,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
 
         for (SLExpression slExpression : params) {
             // Remember: parameters.isLisOfTerm() is true!
-            final Term term = slExpression.getTerm();
+            final JTerm term = slExpression.getTerm();
             subs[i] = term.sort() == JavaDLTheory.FORMULA
                     ? services.getTermBuilder().convertToBoolean(term)
                     : term;

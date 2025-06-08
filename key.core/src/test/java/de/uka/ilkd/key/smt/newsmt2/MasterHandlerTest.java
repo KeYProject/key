@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,25 +13,25 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.SmtTestUtils;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.Streams;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -85,11 +81,11 @@ public class MasterHandlerTest {
         }
 
         Path directory = Paths.get(url.toURI());
-        Assertions.assertTrue(Files.isDirectory(directory));
+        assertTrue(Files.isDirectory(directory));
 
         List<Path> files;
         try (var s = Files.list(directory)) {
-            files = s.collect(Collectors.toList());
+            files = s.toList();
         }
         List<Arguments> result = new ArrayList<>(files.size());
         for (Path file : files) {
@@ -109,58 +105,59 @@ public class MasterHandlerTest {
 
     public record TestData(String name, Path path, LineProperties props, String translation) {
 
-            public static @Nullable TestData create(Path path) throws IOException, ProblemLoaderException {
-                var name = path.getFileName().toString();
-                var props = new LineProperties();
-                try (BufferedReader reader = Files.newBufferedReader(path)) {
-                    props.read(reader);
-                }
-
-                if ("ignore".equals(props.get("state"))) {
-                    LOGGER.info("Test case has been marked ignore");
-                    return null;
-                }
-
-                List<String> sources = props.getLines("sources");
-                List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-                if (!sources.isEmpty()) {
-                    Path srcDir = Files.createTempDirectory("SMT_key_" + name);
-                    Path tmpSrc = srcDir.resolve("src.java");
-                    Files.write(tmpSrc, sources);
-                    lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
-                }
-
-                Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-                Files.write(tmpKey, lines);
-
-                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
-
-                Proof proof = env.getLoadedProof();
-                Sequent sequent = proof.root().sequent();
-
-                SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        proof.getSettings().getNewSMTSettings(), proof);
-
-                String updates = props.get("smt-settings");
-                if (updates != null) {
-                    Properties map = new Properties();
-                    map.load(new StringReader(updates));
-                    settings.getNewSettings().readSettings(map);
-                }
-
-                ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-                var translation =
-                        translator.translateProblem(sequent, env.getServices(), settings).toString();
-                return new TestData(name, path, props, translation);
+        public static @Nullable TestData create(Path path)
+                throws IOException, ProblemLoaderException {
+            var name = path.getFileName().toString();
+            var props = new LineProperties();
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                props.read(reader);
             }
 
-            @Override
-            public String toString() {
-                return name;
+            if ("ignore".equals(props.get("state"))) {
+                LOGGER.info("Test case has been marked ignore");
+                return null;
             }
+
+            List<String> sources = props.getLines("sources");
+            List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+            if (!sources.isEmpty()) {
+                Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+                Path tmpSrc = srcDir.resolve("src.java");
+                Files.write(tmpSrc, sources);
+                lines.addFirst("\\javaSource \"" + srcDir + "\";\n");
+            }
+
+            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+            Files.write(tmpKey, lines);
+
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
+
+            Proof proof = env.getLoadedProof();
+            Sequent sequent = proof.root().sequent();
+
+            SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(), proof);
+
+            String updates = props.get("smt-settings");
+            if (updates != null) {
+                Properties map = new Properties();
+                map.load(new StringReader(updates));
+                settings.getNewSettings().readSettings(map);
+            }
+
+            ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
+            var translation =
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
+            return new TestData(name, path, props, translation);
         }
+
+        @Override
+        public @NonNull String toString() {
+            return name;
+        }
+    }
 
     @ParameterizedTest
     @MethodSource("data")
@@ -193,9 +190,9 @@ public class MasterHandlerTest {
     @ParameterizedTest
     @MethodSource("data")
     public void testZ3(TestData data) throws Exception {
+        SmtTestUtils.assumeZ3Installed();
+
         Assumptions.assumeTrue(Z3_SOLVER != null);
-        Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
-            "Z3 is not installed, this testcase is ignored.");
 
         String expectation = data.props.get("expected");
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");

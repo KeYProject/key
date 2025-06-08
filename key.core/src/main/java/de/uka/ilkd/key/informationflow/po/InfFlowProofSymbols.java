@@ -8,8 +8,7 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -20,8 +19,11 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -256,7 +258,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private void addFunc(JFunction f, boolean labeled) {
+    private void addFunc(Function f, boolean labeled) {
         if (isPredicate(f)) {
             addPredicate(f, labeled);
         } else {
@@ -300,15 +302,13 @@ public class InfFlowProofSymbols {
         assert symb != null;
         boolean l = false;
 
-        if (symb instanceof Sort) {
-            final Sort s = (Sort) symb;
+        if (symb instanceof Sort s) {
             addSort(s, l);
         }
-        if (symb instanceof SortedOperator) {
-            final SortedOperator s = (SortedOperator) symb;
+        if (symb instanceof SortedOperator s) {
             addSort(s.sort(), l);
         }
-        if (symb instanceof JFunction f) {
+        if (symb instanceof Function f) {
             addFunc(f, l);
         }
         if (symb instanceof ProgramVariable pv) {
@@ -332,7 +332,7 @@ public class InfFlowProofSymbols {
         if (symb instanceof SortedOperator op) {
             addSort(op.sort(), l);
         }
-        if (symb instanceof JFunction f) {
+        if (symb instanceof Function f) {
             addFunc(f, l);
         }
         if (symb instanceof ProgramVariable pv) {
@@ -346,12 +346,12 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void add(Term t) {
+    public void add(JTerm t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
         if (!isPredicate(t.op())) {
             if (t.arity() > 0) {
-                for (final Term s : t.subs()) {
+                for (final JTerm s : t.subs()) {
                     add(s);
                 }
             }
@@ -359,11 +359,11 @@ public class InfFlowProofSymbols {
         add(t.op());
     }
 
-    public void addLabeled(Term t) {
+    public void addLabeled(JTerm t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
-            for (final Term s : t.subs()) {
+            for (final JTerm s : t.subs()) {
                 addLabeled(s);
             }
         }
@@ -401,7 +401,7 @@ public class InfFlowProofSymbols {
         return result;
     }
 
-    public void addTotalTerm(Term t) {
+    public void addTotalTerm(JTerm t) {
         assert t != null;
         if (t.op() instanceof UpdateApplication) {
             addTotalTerm(UpdateApplication.getUpdate(t));
@@ -412,14 +412,14 @@ public class InfFlowProofSymbols {
         }
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
-            for (final Term s : t.subs()) {
+            for (final JTerm s : t.subs()) {
                 addTotalTerm(s);
             }
         }
         add(t.op());
     }
 
-    public void addLabeledTotalTerm(Term t) {
+    public void addLabeledTotalTerm(JTerm t) {
         assert t != null;
         if (t.op() instanceof UpdateApplication) {
             addLabeledTotalTerm(UpdateApplication.getUpdate(t));
@@ -430,7 +430,7 @@ public class InfFlowProofSymbols {
         }
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
-            for (final Term s : t.subs()) {
+            for (final JTerm s : t.subs()) {
                 addLabeledTotalTerm(s);
             }
         }
@@ -613,7 +613,7 @@ public class InfFlowProofSymbols {
 
         result.append("\\schemaVariables{\n");
         for (final SchemaVariable sv : getSchemaVariables()) {
-            if (!(sv instanceof OperatorSV asv))
+            if (!(sv instanceof JOperatorSV asv))
                 continue;
             final String prefix = asv instanceof FormulaSV ? "\\formula "
                     : asv instanceof TermSV ? "\\term " : "\\variables ";

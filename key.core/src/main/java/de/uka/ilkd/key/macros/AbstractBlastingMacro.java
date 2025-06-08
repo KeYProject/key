@@ -14,36 +14,39 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.SortCollector;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -55,7 +58,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            ProverTaskListener listener)
             throws InterruptedException {
         for (Goal goal : goals) {
             addInvariantFormula(goal);
@@ -74,7 +78,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         Set<Sort> sorts = sortCollector.getSorts();
         sorts.remove(nullSort);
-        List<SequentFormula> formulae = createFormulae(goal.proof().getServices(), sorts);
+        List<SequentFormula> formulae =
+            createFormulae(goal.proof().getServices(), sorts);
         for (SequentFormula sf : formulae) {
             Sequent s = goal.sequent();
             Semisequent antecedent = s.antecedent();
@@ -85,7 +90,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
 
@@ -98,7 +104,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
-    private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts) {
+    private List<SequentFormula> createFormulae(Services services,
+            Set<Sort> sorts) {
         List<SequentFormula> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
@@ -132,32 +139,32 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return result;
     }
 
-    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt, ClassAxiom c,
+    private static void addFormulas(List<SequentFormula> result,
+            KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+        JTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
 
         try {
-            Term t = ra.getAxiom(h, ra.getTarget().isStatic() ? null : o, services);
+            JTerm t = ra.getAxiom(h, ra.getTarget().isStatic() ? null : o, services);
             if (t.op().equals(Equality.EQV)) {
-                Term left = t.sub(0);
-                Term right = t.sub(1);
+                JTerm left = t.sub(0);
+                JTerm right = t.sub(1);
 
-                Term equivalence = t;
-                Term implication;
+                JTerm implication;
 
-                Term[] heaps = new Term[1];
+                JTerm[] heaps = new JTerm[1];
                 heaps[0] = tb.var(h);
 
-                Term inv = tb.inv(heaps, tb.var(o));
+                JTerm inv = tb.inv(heaps, tb.var(o));
 
                 if (left.op().name().equals(inv.op().name())) {
 
                     implication = tb.imp(left, right);
 
-                    Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
-                    Term instanceImpl = implication;
+                    JTerm exactInstanceEquiv = tb.imp(exactInstance, t);
+                    JTerm instanceImpl = implication;
 
                     exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                     instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -168,10 +175,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                         result.add(new SequentFormula(instanceImpl));
                     }
                 } else if (right.op().name().equals(inv.op().name())) {
-
-                    Term exactInstanceEquiv = tb.imp(exactInstance, equivalence);
                     implication = tb.imp(right, left);
-                    Term instanceImpl = implication;
+
+                    JTerm exactInstanceEquiv = tb.imp(exactInstance, t);
+                    JTerm instanceImpl = implication;
 
                     exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                     instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -183,12 +190,12 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                     }
 
                 } else {
-                    Term f = t;
+                    JTerm f = t;
                     f = tb.all(h, tb.all(o, f));
                     result.add(new SequentFormula(f));
                 }
             } else {
-                Term f = t;
+                JTerm f = t;
                 f = tb.all(h, tb.all(o, f));
                 result.add(new SequentFormula(f));
             }
@@ -196,15 +203,16 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
     }
 
-    private class SemanticsBlastingStrategy implements Strategy {
+    private class SemanticsBlastingStrategy implements Strategy<Goal> {
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return new Name("Semantics Blasting");
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
 
             if (app.rule() instanceof OneStepSimplifier) {
@@ -218,8 +226,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             } else if (getEqualityRuleFilter().filter(app.rule())) {
                 return NumberRuleAppCost.create(10);
             } else if (app.rule().name().toString().equals("pullOut")) {
-                Term t = pio.subTerm();
-                if (t.op() instanceof JFunction) {
+                var t = pio.subTerm();
+                if (t.op() instanceof Function) {
                     if (getAllowedPullOut().contains(t.op().name().toString())) {
                         return NumberRuleAppCost.create(1000);
                     }
@@ -231,7 +239,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
 
             if (app.rule() instanceof OneStepSimplifier) {
                 return true;

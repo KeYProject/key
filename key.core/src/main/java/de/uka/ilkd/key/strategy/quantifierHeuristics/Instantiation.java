@@ -8,18 +8,18 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -38,7 +38,7 @@ class Instantiation {
     /**
      * Literals occurring in the sequent at hand. This is used for branch prediction
      */
-    private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.nil();
+    private ImmutableSet<JTerm> assumedLiterals = DefaultImmutableSet.nil();
 
     /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
     private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<>();
@@ -50,7 +50,7 @@ class Instantiation {
         firstVar = allterm.varsBoundHere(0).get(0);
         matrix = TriggerUtils.discardQuantifiers(allterm);
         /* Terms bound in every formula on <code>goal</code> */
-        triggersSet = TriggersSet.create(allterm, services);
+        triggersSet = TriggersSet.create((JTerm) allterm, services);
         assumedLiterals = initAssertLiterals(seq, services);
         addInstances(sequentToTerms(seq), services);
     }
@@ -119,7 +119,8 @@ class Instantiation {
 
     private void addInstance(Substitution sub, Services services) {
         final long cost =
-            PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
+            PredictCostProver.computerInstanceCost(sub, (JTerm) getMatrix(),
+                assumedLiterals, services);
         if (cost != -1) {
             addInstance(sub, cost);
         }
@@ -134,7 +135,8 @@ class Instantiation {
      * @param cost
      */
     private void addInstance(Substitution sub, long cost) {
-        final Term inst = sub.getSubstitutedTerm(firstVar);
+        final Term inst =
+            sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
         if (oldCost == null || oldCost >= cost) {
             instancesWithCosts.put(inst, cost);
@@ -146,20 +148,22 @@ class Instantiation {
      * @param services TODO
      * @return all literals in antesequent, and all negation of literal in succedent
      */
-    private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
-        ImmutableList<Term> assertLits = ImmutableSLList.nil();
+    private ImmutableSet<JTerm> initAssertLiterals(Sequent seq,
+            TermServices services) {
+        ImmutableList<JTerm> assertLits = ImmutableSLList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
-            final Operator op = atom.op();
+            final var op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
-                assertLits = assertLits.prepend(atom);
+                assertLits = assertLits.prepend((JTerm) atom);
             }
         }
         for (final SequentFormula cf : seq.succedent()) {
             final Term atom = cf.formula();
-            final Operator op = atom.op();
+            final var op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
-                assertLits = assertLits.prepend(services.getTermBuilder().not(atom));
+                assertLits = assertLits
+                        .prepend(services.getTermBuilder().not((JTerm) atom));
             }
         }
         return DefaultImmutableSet.fromImmutableList(assertLits);
@@ -169,7 +173,7 @@ class Instantiation {
      * Try to find the cost of an instance(inst) according its quantified formula and current goal.
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services) {
-        return Instantiation.create(form, seq, services).computeCostHelp(inst);
+        return create(form, seq, services).computeCostHelp(inst);
     }
 
     private RuleAppCost computeCostHelp(Term inst) {

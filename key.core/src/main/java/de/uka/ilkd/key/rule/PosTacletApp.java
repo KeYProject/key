@@ -4,17 +4,18 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
-import java.util.Objects;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -24,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * the sequent the taclet is attached. The position information has been determined by matching the
  * find-part of the corresponding taclet against the term described by the position information. If
  * such a match has not been performed or a taclet is a no find taclet, a no position taclet object
- * ({@link de.uka.ilkd.key.rule.NoPosTacletApp}) is used to keep track of the (partial)
+ * ({@link NoPosTacletApp}) is used to keep track of the (partial)
  * instantiation information.
  */
 public class PosTacletApp extends TacletApp {
@@ -38,13 +39,13 @@ public class PosTacletApp extends TacletApp {
     /**
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
      * information and CHECKS variable conditions as well as it resolves collisions The
-     * ifInstantiations parameter is not matched against the if sequence, but only stored. For
-     * matching use the method "setIfFormulaInstantiations".
+     * ifInstantiations parameter is not matched against the assumes-sequence, but only stored. For
+     * matching use the method "setAssumesFormulaInstantiations".
      *
      * @param taclet the FindTaclet
      * @param instantiations the SVInstantiations
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
-     * @return new PosTacletApp or null if conditions (assertions) have been hurted
+     * @return new PosTacletApp or null if conditions (assertions) have been hurt
      */
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
             SVInstantiations instantiations, PosInOccurrence pos, Services services) {
@@ -52,7 +53,8 @@ public class PosTacletApp extends TacletApp {
     }
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+            SVInstantiations instantiations,
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
             PosInOccurrence pos, Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
             "If instantiations list has wrong size");
@@ -71,18 +73,6 @@ public class PosTacletApp extends TacletApp {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
     }
 
-
-    /**
-     * creates a PosTacletApp for the given taclet and a position information
-     *
-     * @param taclet the FindTaclet
-     * @param pos the PosInOccurrence storing the position where to apply the Taclet
-     */
-    private PosTacletApp(FindTaclet taclet, PosInOccurrence pos) {
-        super(taclet);
-        this.pos = pos;
-    }
-
     /**
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
      * information
@@ -92,7 +82,7 @@ public class PosTacletApp extends TacletApp {
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
         super(taclet, instantiations, ifInstantiations);
         this.pos = pos;
     }
@@ -145,8 +135,8 @@ public class PosTacletApp extends TacletApp {
             Iterator<SchemaVariable> it = allVariableSV(taclet);
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();
-                Term inst = (Term) insts.getInstantiation(varSV);
-                if (inst != null && k.contains((QuantifiableVariable) inst.op())) {
+                JTerm inst = (JTerm) insts.getInstantiation(varSV);
+                if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
             }
@@ -163,16 +153,16 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
             Services services) {
 
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
+                instantiations().addInteresting(sv, term, services), assumesFormulaInstantiations(),
                 posInOccurrence(), services);
         } else {
             return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().add(sv, term, services), ifFormulaInstantiations(),
+                instantiations().add(sv, term, services), assumesFormulaInstantiations(),
                 posInOccurrence(), services);
         }
     }
@@ -189,31 +179,13 @@ public class PosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addInteresting(sv, pe, services), ifFormulaInstantiations(),
+                instantiations().addInteresting(sv, pe, services), assumesFormulaInstantiations(),
                 posInOccurrence(), services);
         } else {
             return createPosTacletApp((FindTaclet) taclet(), instantiations().add(sv, pe, services),
-                ifFormulaInstantiations(), posInOccurrence(), services);
+                assumesFormulaInstantiations(), posInOccurrence(), services);
         }
     }
-
-
-
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Object[] list, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addInterestingList(sv, list, services), ifFormulaInstantiations(),
-                posInOccurrence(), services);
-        } else {
-            return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addList(sv, list, services), ifFormulaInstantiations(),
-                posInOccurrence(), services);
-        }
-    }
-
-
 
     /**
      * creates a new Taclet application containing all the instantiations given by the
@@ -225,7 +197,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), svi.union(instantiations(), services),
-            ifFormulaInstantiations(), posInOccurrence(), services);
+            assumesFormulaInstantiations(), posInOccurrence(), services);
     }
 
 
@@ -238,7 +210,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setInstantiation(SVInstantiations svi, Services services) {
-        return createPosTacletApp((FindTaclet) taclet(), svi, ifFormulaInstantiations(),
+        return createPosTacletApp((FindTaclet) taclet(), svi, assumesFormulaInstantiations(),
             posInOccurrence(), services);
     }
 
@@ -250,7 +222,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
-            ifFormulaInstantiations(), posInOccurrence(), services);
+            assumesFormulaInstantiations(), posInOccurrence(), services);
     }
 
 
@@ -260,20 +232,23 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
-        return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(), ifInstantiations,
+            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
+            Services services) {
+        return createPosTacletApp((FindTaclet) taclet(),
+            mc.getInstantiations(), assumesInstantiations,
             posInOccurrence(), services);
     }
 
 
     /**
-     * returns true iff all necessary informations are collected, so that the Taclet can be applied.
+     * returns true iff all necessary information is collected, so that the Taclet can be applied.
      *
-     * @return true iff all necessary informations are collected, so that the Taclet can be applied.
+     * @return true iff all necessary information is collected, so that the Taclet can be applied.
      */
     @Override
     public boolean complete() {
-        return posInOccurrence() != null && uninstantiatedVars().isEmpty() && ifInstsComplete();
+        return posInOccurrence() != null && uninstantiatedVars().isEmpty()
+                && assumesInstantionsComplete();
     }
 
     /**
@@ -298,29 +273,6 @@ public class PosTacletApp extends TacletApp {
     @Override
     public int hashCode() {
         return super.hashCode() + 13 * posInOccurrence().hashCode();
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object o) {
-        if (!super.equalsModProofIrrelevancy(o) || !(o instanceof PosTacletApp)) {
-            return false;
-        }
-        PosInOccurrence posA = ((PosTacletApp) o).pos;
-        PosInOccurrence posB = pos;
-        if (posA == null && posB == null) {
-            return true;
-        } else if (posA == null || posB == null) {
-            return false;
-        } else {
-            return posA.eqEquals(posB);
-        }
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(super.hashCodeModProofIrrelevancy(),
-            pos.sequentFormula().hashCodeModProofIrrelevancy(),
-            pos.posInTerm());
     }
 
     @Override

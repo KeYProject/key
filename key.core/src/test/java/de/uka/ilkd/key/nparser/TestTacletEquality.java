@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nparser;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,7 +43,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <h2>How to update {@code taclet.old.txt} efficiently.</h2>
  * <p>
  * You can generate a new oracle easily by invoking the disabled test-method
- * {@link #createNewOracle()}. This method generates the {@code taclet.new.txt} file. Then, you
+ * {@link #createNewOracle()}. This method generates the {@code taclets.new.txt} file. Then, you
  * should use a diff-tool to compare the changes or directly overwrite {@code taclets.old.txt} with
  * the new representations.
  *
@@ -91,7 +92,7 @@ public class TestTacletEquality {
 
     @BeforeAll
     static void setUp() throws Exception {
-        File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/gcd.closed.proof");
+        Path file = HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
             SingleThreadProblemLoader loader = new SingleThreadProblemLoader(file, null, null, null,

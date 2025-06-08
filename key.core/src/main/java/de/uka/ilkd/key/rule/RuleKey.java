@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.ChoiceExpr;
-
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
 
 import org.jspecify.annotations.NonNull;
-
 
 /**
  * Provides a unique key for taclets based on a taclet's name and its taclet options. This class is

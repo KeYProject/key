@@ -16,22 +16,30 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * visitor for <t> execPostOrder </t> of {@link de.uka.ilkd.key.logic.Term}. Called with that method
+ * visitor for method {@link JTerm#execPostOrder(Visitor)}. Called with that
+ * method
  * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
  * are given as a SVInstantiations object.
  */
@@ -39,9 +47,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
-    /** the termbuilder used to construct terms */
+    /** the term builder used to construct terms */
     protected final TermBuilder tb;
-    private Term computedResult = null;
+    private JTerm computedResult = null;
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
@@ -58,7 +66,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = Boolean.TRUE;
-    private final Deque<Term> tacletTermStack = new ArrayDeque<>();
+    private final Deque<JTerm> tacletTermStack = new ArrayDeque<>();
 
 
     /**
@@ -72,15 +80,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param goal the current goal
      * @param rule the applied rule
      * @param ruleApp the rule application
-     * @param services the Services
-     * @param termBuilder the TermBuilder to use (allows to use the non cached version)
+     * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-            Rule rule, RuleApp ruleApp, Services services, TermBuilder termBuilder) {
+            PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst, Goal goal,
+            Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
-        this.services = services;
-        this.tb = termBuilder;
+        this.services = goal.getOverlayServices();
+        this.tb = services.getTermBuilder(useTermCache);
         this.svInst = svInst;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
@@ -88,7 +96,40 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         this.labelHint = labelHint;
         this.goal = goal;
         subStack = new Stack<>(); // of Term
-        if (labelHint instanceof TacletLabelHint) {
+        if (labelHint != null) {
+            labelHint.setTacletTermStack(tacletTermStack);
+        }
+    }
+
+    /**
+     * ONLY TO BE USED BY ConstraintAwareSyntacticalReplaceVisitor (HACK)
+     * constructs a term visitor replacing any occurrence of a schemavariable found in
+     * {@code svInst} by its instantiation
+     *
+     * @param termLabelState the termlabel state
+     * @param labelHint hints about how to deal with labels
+     * @param applicationPosInOccurrence the application position
+     * @param services the services
+     * @param rule the applied rule
+     * @param ruleApp the rule application
+     * @param useTermCache the TermBuilder to use (allows to use the non cached version)
+     */
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence,
+            Services services,
+            Rule rule, RuleApp ruleApp, boolean useTermCache) {
+        this.termLabelState = termLabelState;
+        this.services = services;
+        this.tb = this.services.getTermBuilder(useTermCache);
+        this.svInst = ruleApp instanceof TacletApp tacletApp ? tacletApp.instantiations()
+                : SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        this.applicationPosInOccurrence = applicationPosInOccurrence;
+        this.rule = rule;
+        this.ruleApp = ruleApp;
+        this.labelHint = labelHint;
+        this.goal = null;
+        subStack = new Stack<>(); // of Term
+        if (labelHint != null) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
     }
@@ -104,31 +145,46 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param goal the current goal
      * @param rule the applied rule
      * @param ruleApp the rule application
-     * @param services the Services
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
-            Rule rule, RuleApp ruleApp, Services services) {
+            PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst, Goal goal,
+            Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
-            services, services.getTermBuilder());
+            true);
     }
 
-    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
-            Services services, TermBuilder termBuilder) {
-        this(termLabelState, labelHint, applicationPosInOccurrence,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, services);
+    /**
+     * ONLY used by {@link de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations}
+     *
+     * @param termLabelState the termlabel state
+     * @param svInst mapping of schemavariables to their instantiation
+     * @param services the Services with information about the logic signature, access to term
+     *        construction etc.
+     */
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState, SVInstantiations svInst,
+            Services services) {
+        this.termLabelState = termLabelState;
+        this.svInst = svInst;
+        this.services = services;
+        this.tb = services.getTermBuilder();
+        this.applicationPosInOccurrence = null;
+        this.rule = null;
+        this.goal = null;
+        this.ruleApp = null;
+        this.labelHint = null;
+        subStack = new Stack<>();
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
-        final ContextInstantiationEntry cie = svInst.getContextInstantiation();
+        final ContextStatementBlockInstantiation cie = svInst.getContextInstantiation();
         if (cie == null) {
             throw new IllegalStateException("Context should also be instantiated");
         }
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
-                (JavaNonTerminalProgramElement) cie.contextProgram(), pe, cie.getInstantiation());
+                (JavaNonTerminalProgramElement) cie.program(), pe, cie);
         }
 
         return pe;
@@ -140,7 +196,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         }
 
         ProgramReplaceVisitor trans;
-        ProgramElement result = null;
+        ProgramElement result;
 
         if (jb.program() instanceof ContextStatementBlock) {
             trans = new ProgramReplaceVisitor(
@@ -156,16 +212,16 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return (result == jb.program()) ? jb : JavaBlock.createJavaBlock((StatementBlock) result);
     }
 
-    private Term[] neededSubs(int n) {
+    private JTerm[] neededSubs(int n) {
         boolean newTerm = false;
-        Term[] result = new Term[n];
+        JTerm[] result = new JTerm[n];
         for (int i = n - 1; i >= 0; i--) {
             Object top = subStack.pop();
             if (top == newMarker) {
                 newTerm = true;
                 top = subStack.pop();
             }
-            result[i] = (Term) top;
+            result[i] = (JTerm) top;
         }
         if (newTerm && (subStack.empty() || subStack.peek() != newMarker)) {
             subStack.push(newMarker);
@@ -183,24 +239,26 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     /**
      * the method is only still invoked to allow the
-     * {@link ConstraintAwareSyntacticalReplaceVisitor} to recursively replace meta variables
+     * {@link de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor}
+     * to recursively
+     * replace meta variables
      */
-    protected Term toTerm(Term o) {
+    protected <T extends org.key_project.logic.Term> T toTerm(T o) {
         return o;
     }
 
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
         final UpdateableOperator originalLhs = op.lhs();
-        if (originalLhs instanceof SchemaVariable) {
-            Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
-            if (lhsInst instanceof Term) {
-                lhsInst = ((Term) lhsInst).op();
+        if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
+            Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
+            if (lhsInst instanceof JTerm lhsInstAsTerm) {
+                lhsInst = lhsInstAsTerm.op();
             }
 
             final UpdateableOperator newLhs;
-            if (lhsInst instanceof UpdateableOperator) {
-                newLhs = (UpdateableOperator) lhsInst;
+            if (lhsInst instanceof UpdateableOperator updateableLhs) {
+                newLhs = updateableLhs;
             } else {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
@@ -213,32 +271,28 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
 
-    private Operator instantiateModality(Modality op, JavaBlock jb) {
-        Modality.JavaModalityKind kind = op.kind();
+    private Operator instantiateModality(JModality op, JavaBlock jb) {
+        JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
-            kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
+            kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
-        if (jb != op.program() || kind != op.kind()) {
-            return Modality.getModality(kind, jb);
+        if (jb != op.programBlock() || kind != op.kind()) {
+            return JModality.getModality(kind, jb);
         }
         return op;
     }
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
-        if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
-            instantiatedOp =
-                handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
-        } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
-            instantiatedOp =
-                instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
-        } else if (p_operatorToBeInstantiated instanceof Modality mod) {
+        if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
+            instantiatedOp = handleSortDependingSymbol(sortDependingFunction);
+        } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
+            instantiatedOp = instantiateElementaryUpdate(elementaryUpdate);
+        } else if (p_operatorToBeInstantiated instanceof JModality mod) {
             instantiatedOp = instantiateModality(mod, jb);
-        } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
-            if (!(p_operatorToBeInstantiated instanceof ProgramSV)
-                    || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
-                instantiatedOp =
-                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
+            if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
+                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -246,7 +300,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return instantiatedOp;
     }
 
-    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
+    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
         ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
             final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
@@ -255,15 +309,13 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
-                    final Term instantiationForBoundSchemaVariable =
-                        (Term) svInst.getInstantiation(boundSchemaVariable);
+                    final JTerm instantiationForBoundSchemaVariable =
+                        (JTerm) svInst.getInstantiation(boundSchemaVariable);
+                    // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
-                    } else {
-                        // this case may happen for PO generation of taclets
-                        boundVar = (QuantifiableVariable) boundSchemaVariable;
+                        varsChanged = true;
                     }
-                    varsChanged = true;
                 }
                 newVars[j] = boundVar;
             }
@@ -279,15 +331,16 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final Term visited) {
+    public void visit(final Term p_visited) {
+        final JTerm visited = (JTerm) p_visited;
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
-        if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
-                && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
-            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
-                svInst.getExecutionContext(), services));
-            final Term labeledTerm = TermLabelManager.label(services, termLabelState,
+        if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
+                && svInst.isInstantiated(visitedSV)
+                && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
+            final JTerm newTerm = toTerm(
+                svInst.getTermInstantiation(visitedSV, svInst.getExecutionContext(), services));
+            final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);
         } else {
@@ -309,15 +362,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 instantiateBoundVariables(visited);
 
             // instantiate sub terms
-            final Term[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
+            final JTerm[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
                     new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
+                final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
-                Term t;
+                JTerm t;
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, visitedOp,
                     visited.subs(), visited.boundVars(), visited.getLabels());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
@@ -336,13 +389,13 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         }
     }
 
-    private ImmutableArray<TermLabel> instantiateLabels(Term tacletTerm, Operator newTermOp,
-            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
+    private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, Operator newTermOp,
+            ImmutableArray<JTerm> newTermSubs,
+            ImmutableArray<QuantifiableVariable> newTermBoundVars,
             ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
-            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars,
-                newTermOriginalLabels));
+            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
     }
 
     private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
@@ -358,9 +411,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return res;
     }
 
-    private Term resolveSubst(Term t) {
+    private JTerm resolveSubst(JTerm t) {
         if (t.op() instanceof SubstOp) {
-            Term resolved = ((SubstOp) t.op()).apply(t, tb);
+            JTerm resolved = ((SubstOp) t.op()).apply(t, tb);
             resolved = tb.label(resolved, t.sub(1).getLabels());
             if (t.hasLabels()) {
                 resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved,
@@ -375,22 +428,21 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     /**
      * delivers the new built term
      */
-    public Term getTerm() {
+    public JTerm getTerm() {
         if (computedResult == null) {
-            Object o = null;
+            Object o;
             do {
                 o = subStack.pop();
             } while (o == newMarker);
-            Term t = (Term) o;
+            // Term t = (Term) o;
             // CollisionDeletingSubstitutionTermApplier substVisit
             // = new CollisionDeletingSubstitutionTermApplier();
             // t.execPostOrder(substVisit);
             // t=substVisit.getTerm();
-            computedResult = t;
+            computedResult = (JTerm) o;
         }
         return computedResult;
     }
-
 
     public SVInstantiations getSVInstantiations() {
         return svInst;
@@ -401,13 +453,13 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      */
     @Override
     public void subtreeEntered(Term subtreeRoot) {
-        tacletTermStack.push(subtreeRoot);
+        tacletTermStack.push((JTerm) subtreeRoot);
     }
 
     /**
      * this method is called in execPreOrder and execPostOrder in class Term when leaving the
      * subtree rooted in the term subtreeRoot. Default implementation is to do nothing. Subclasses
-     * can override this method when the visitor behaviour depends on informations bound to
+     * can override this method when the visitor behaviour depends on information bound to
      * subtrees.
      *
      * @param subtreeRoot root of the subtree which the visitor leaves.
@@ -416,9 +468,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public void subtreeLeft(Term subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
-            final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
-            final Term labeledTerm = TermLabelManager.label(services, termLabelState,
-                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, subtreeRoot,
+            final JTerm newTerm = mop.transform((JTerm) subStack.pop(), svInst, services);
+            final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
+                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (JTerm) subtreeRoot,
                 newTerm);
             pushNew(labeledTerm);
         }

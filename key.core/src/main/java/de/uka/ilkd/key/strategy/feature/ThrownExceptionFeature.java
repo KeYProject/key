@@ -12,16 +12,21 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
@@ -61,13 +66,16 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
-            ((TacletApp) app).instantiations().getExecutionContext());
+    @Override
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
+        return app instanceof TacletApp tacletApp
+                && filter((JTerm) pos.subTerm(), (Services) goal.proof().getServices(),
+                    tacletApp.instantiations().getExecutionContext());
     }
 
-    protected boolean filter(Term term, Services services, ExecutionContext ec) {
-        if (term.op() instanceof Modality) {
+    protected boolean filter(JTerm term, Services services, ExecutionContext ec) {
+        if (term.op() instanceof JModality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(
                 fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
@@ -81,7 +89,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param term the Term with the program at top level
      * @return the first executable statement
      */
-    private ProgramElement getFirstExecutableStatement(Term term) {
+    private ProgramElement getFirstExecutableStatement(JTerm term) {
         if (term.javaBlock().isEmpty()) {
             return null;
         }
@@ -89,8 +97,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
         final ProgramElement jb = term.javaBlock().program();
         final ProgramElement fstActive;
 
-        if (jb instanceof ProgramPrefix) {
-            final ProgramPrefix pp = ((ProgramPrefix) jb).getLastPrefixElement();
+        if (jb instanceof ProgramPrefix prefix) {
+            final ProgramPrefix pp = prefix.getLastPrefixElement();
             fstActive = PosInProgram.getProgramAt(pp.getFirstActiveChildPos(), pp);
         } else {
             fstActive = jb;

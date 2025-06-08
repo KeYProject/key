@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import recoder.java.Identifier;
+
 /**
  * an extended identifier that accepts hash symbols in its name but not as first character
  */
-public class ExtendedIdentifier extends recoder.java.Identifier {
+public class ExtendedIdentifier extends Identifier {
     /**
      * generated serialVersionUID
      */

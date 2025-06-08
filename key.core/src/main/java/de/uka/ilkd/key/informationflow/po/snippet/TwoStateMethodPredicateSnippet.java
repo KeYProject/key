@@ -8,8 +8,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -18,6 +17,8 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -32,7 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
 
         IObserverFunction targetMethod =
@@ -41,21 +42,21 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         StatementBlock targetBlock = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         LoopSpecification loopInv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
-        final ImmutableList<Term> termList = extractTermListForPredicate(pm, poVars, d.hasMby);
+        final ImmutableList<JTerm> termList = extractTermListForPredicate(pm, poVars, d.hasMby);
         final Sort[] argSorts = generateContApplArgumentSorts(termList, pm);
-        final JFunction contApplPred =
+        final Function contApplPred =
             generateContApplPredicate(nameString, argSorts, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
-    protected Sort[] generateContApplArgumentSorts(ImmutableList<Term> termList,
+    protected Sort[] generateContApplArgumentSorts(ImmutableList<JTerm> termList,
             IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         // ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
-        for (final Term arg : termList) {
+        for (final JTerm arg : termList) {
             argSorts[i] = arg.sort();
             i++;
         }
@@ -64,11 +65,11 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private JFunction generateContApplPredicate(String nameString, Sort[] argSorts,
+    private Function generateContApplPredicate(String nameString, Sort[] argSorts,
             TermBuilder tb,
             Services services) {
         final Name name = new Name(nameString);
-        Namespace<JFunction> functionNS = services.getNamespaces().functions();
+        Namespace<Function> functionNS = services.getNamespaces().functions();
 
         /*
          * This predicate needs to present on all branches and, therefore, must be added to the
@@ -78,7 +79,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             functionNS = functionNS.parent();
         }
 
-        JFunction pred = functionNS.lookup(name);
+        Function pred = functionNS.lookup(name);
 
         if (pred == null) {
             pred = new JFunction(name, JavaDLTheory.FORMULA, argSorts);
@@ -88,14 +89,14 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Term instantiateContApplPredicate(JFunction pred, ImmutableList<Term> termList,
+    private JTerm instantiateContApplPredicate(Function pred, ImmutableList<JTerm> termList,
             TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
-        Term[] predArgs = new Term[predArgSorts.length];
+        JTerm[] predArgs = new JTerm[predArgSorts.length];
 
         int i = 0;
-        for (final Term arg : termList) {
+        for (final JTerm arg : termList) {
             predArgs[i] = arg;
             i++;
         }
@@ -115,10 +116,10 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @param poVars The proof obligation variables.
      * @return
      */
-    private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,
+    private ImmutableList<JTerm> extractTermListForPredicate(IProgramMethod pm,
             ProofObligationVars poVars, boolean hasMby) {
-        ImmutableList<Term> relevantPreVars = ImmutableSLList.nil();
-        ImmutableList<Term> relevantPostVars = ImmutableSLList.nil();
+        ImmutableList<JTerm> relevantPreVars = ImmutableSLList.nil();
+        ImmutableList<JTerm> relevantPostVars = ImmutableSLList.nil();
 
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors
@@ -130,9 +131,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         // local variables which are not changed during execution or whose
         // changes are not observable (like for parameters) are relevant only
         // in the pre state
-        Iterator<Term> localPostVarsIt = poVars.post.localVars.iterator();
-        for (Term localPreVar : poVars.pre.localVars) {
-            Term localPostVar = localPostVarsIt.next();
+        Iterator<JTerm> localPostVarsIt = poVars.post.localVars.iterator();
+        for (JTerm localPreVar : poVars.pre.localVars) {
+            JTerm localPostVar = localPostVarsIt.next();
             relevantPreVars = relevantPreVars.append(localPreVar);
             if (localPostVar != localPreVar) {
                 relevantPostVars = relevantPostVars.append(localPostVar);

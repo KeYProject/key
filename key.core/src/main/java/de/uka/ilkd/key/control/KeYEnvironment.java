@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -56,7 +56,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * An optional field denoting a script contained in the proof file.
      */
-    private final @Nullable ProofScriptEntry proofScript;
+    private final @Nullable ProofScript proofScript;
 
     /**
      * Indicates that this {@link KeYEnvironment} is disposed.
@@ -83,9 +83,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      *
      * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      * @param initConfig The loaded project.
+     * @param proofScript add an optional proof script
      */
     public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-            @Nullable ProofScriptEntry proofScript, ReplayResult replayResult) {
+            @Nullable ProofScript proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -191,8 +192,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-            List<File> classPaths, File bootClassPath, List<File> includes)
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes)
             throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, false);
     }
@@ -209,8 +210,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, null,
             ruleCompletionHandler, false);
@@ -232,8 +233,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
@@ -251,14 +252,16 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param poPropertiesToForce Some optional PO {@link Properties} to force.
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      * @param forceNewProfileOfNewProofs {@code} true
-     *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
-     *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
+     *        {@code AbstractProblemLoader.profileOfNewProofs} will
+     *        be used as {@link Profile} of
+     *        new proofs, {@code false} {@link Profile}
+     *        specified by problem file will be used for
      *        new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
@@ -286,11 +289,12 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             Consumer<Proof> callbackProofLoaded,
-            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+            boolean forceNewProfileOfNewProofs)
+            throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
         AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
             includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
@@ -300,7 +304,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             loader.getProofScript(), loader.getResult());
     }
 
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile)
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path keyFile)
             throws ProblemLoaderException {
         return load(keyFile, null, null, null);
     }
@@ -319,13 +323,13 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * Checks if this {@link KeYEnvironment} is disposed meaning that {@link #dispose()} was already
      * executed at least once.
      *
-     * @return {@code true} disposed, {@code false} not disposed and still functionable.
+     * @return {@code true} disposed, {@code false} not disposed and still functional.
      */
     public boolean isDisposed() {
         return disposed;
     }
 
-    public @Nullable ProofScriptEntry getProofScript() {
+    public @Nullable ProofScript getProofScript() {
         return proofScript;
     }
 

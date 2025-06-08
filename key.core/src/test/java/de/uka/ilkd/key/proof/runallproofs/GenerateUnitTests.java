@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class GenerateUnitTests {
     /**
      * Output folder. Set on command line.
      */
-    private static String outputFolder;
+    private static Path outputFolder;
 
     public static void main(String[] args) throws IOException {
         var collections = new ProofCollection[] { ProofCollections.automaticJavaDL(),
@@ -48,11 +48,10 @@ public class GenerateUnitTests {
             System.exit(1);
         }
 
-        outputFolder = args[0];
+        outputFolder = Paths.get(args[0]);
         LOGGER.info("Output folder {}", outputFolder);
 
-        File out = new File(outputFolder);
-        out.mkdirs();
+        Files.createDirectories(outputFolder);
 
         for (var col : collections) {
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
@@ -116,12 +115,15 @@ public class GenerateUnitTests {
         Map<String, String> vars = new TreeMap<>();
         vars.put("className", className);
         vars.put("packageName", packageName);
-        vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath());
+        vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath()
+                .replaceAll("\\\\", "/"));
         vars.put("statisticsFile",
-            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath());
+            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath()
+                    .replaceAll("\\\\", "/"));
         vars.put("name", name);
         vars.put("reloadEnabled", String.valueOf(settings.reloadEnabled()));
-        vars.put("tempDir", settings.getTempDir().getAbsolutePath());
+        vars.put("tempDir", settings.getTempDir().getAbsolutePath()
+                .replaceAll("\\\\", "/"));
 
         vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
         vars.put("localSettings",
@@ -143,8 +145,8 @@ public class GenerateUnitTests {
         int clashCounter = 0;
 
         for (TestFile file : unit.getTestFiles()) {
-            File keyFile = file.getKeYFile();
-            String testName = keyFile.getName()
+            Path keyFile = file.getKeYFile();
+            String testName = keyFile.getFileName().toString()
                     .replaceAll("\\.java", "")
                     .replaceAll("\\.key", "")
                     .replaceAll("[^a-zA-Z0-9]+", "_");
@@ -160,17 +162,21 @@ public class GenerateUnitTests {
             methods.append("@Test(").append(to).append(")")
                     // .append("@TestName(\"").append(keyFile.getName()).append("\")")
                     .append("void test").append(testName).append("() throws Exception {\n");
-            // "// This tests is based on").append(keyFile.getAbsolutePath()).append("\n");
+            // "// This tests is based on").append(keyFile.toAbsolutePath()).append("\n");
 
             switch (file.getTestProperty()) {
             case PROVABLE -> methods.append("assertProvability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                    .append("\");");
             case NOTPROVABLE -> methods.append("assertUnProvability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                    .append("\");");
             case LOADABLE -> methods.append("assertLoadability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                    .append("\");");
             case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                    .append("\");");
             }
             methods.append("}");
         }
@@ -184,9 +190,8 @@ public class GenerateUnitTests {
             m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/"));
         }
         m.appendTail(sb);
-        File folder = new File(outputFolder, packageName.replace('.', '/'));
-        folder.mkdirs();
-        Files.writeString(Paths.get(folder.getAbsolutePath(), className + ".java"),
-            sb.toString());
+        var folder = outputFolder.resolve(packageName.replace('.', '/'));
+        Files.createDirectories(folder);
+        Files.writeString(folder.resolve(className + ".java"), sb.toString());
     }
 }

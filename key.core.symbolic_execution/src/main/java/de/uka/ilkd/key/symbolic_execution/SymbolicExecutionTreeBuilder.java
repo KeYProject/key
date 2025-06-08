@@ -17,13 +17,12 @@ import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -37,6 +36,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.logic.Term;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -56,7 +59,8 @@ import org.key_project.util.java.ArrayUtil;
  * {@link IExecutionStart} which is available via {@link #getProof()}.
  * </p>
  * <p>
- * Some assumptions about how {@link Sequent}s in the proof tree looks like are required to extract
+ * Some assumptions about how {@link org.key_project.prover.sequent.Sequent}s in the proof tree
+ * looks like are required to extract
  * the symbolic execution tree. To make sure that they hold (otherwise exceptions are thrown) it is
  * required to execute the {@link SymbolicExecutionStrategy} in KeY's auto mode and not to apply
  * rules manually or to use other strategies.
@@ -234,29 +238,29 @@ public class SymbolicExecutionTreeBuilder {
 
     /**
      * <p>
-     * This method initializes {@link #getMethodCallStack} in case that the initial {@link Sequent}
+     * This method initializes {@link #getMethodCallStack} in case that the initial
+     * {@link org.key_project.prover.sequent.Sequent}
      * contains {@link MethodFrame}s in its modality.
      * </p>
      * <p>
      * This is required because if a block of statements is executed instead of a method the initial
-     * {@link Sequent} contains also a {@link MethodFrame}. This initial {@link MethodFrame} is
+     * {@link org.key_project.prover.sequent.Sequent} contains also a {@link MethodFrame}. This
+     * initial {@link MethodFrame} is
      * required to simulate an execution context which is required to access class members.
      * </p>
      *
-     * @param root The root {@link Node} with the initial {@link Sequent}.
+     * @param root The root {@link Node} with the initial
+     *        {@link org.key_project.prover.sequent.Sequent}.
      * @param services The {@link Services} to use.
      */
     protected void initMethodCallStack(final Node root, Services services) {
         // Find all modalities in the succedent
         final List<Term> modalityTerms = new LinkedList<>();
         for (SequentFormula sequentFormula : root.sequent().succedent()) {
-            sequentFormula.formula().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    if (visited.op() instanceof Modality
-                            && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
-                        modalityTerms.add(visited);
-                    }
+            sequentFormula.formula().execPreOrder((DefaultVisitor) visited -> {
+                if (visited.op() instanceof JModality
+                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
+                    modalityTerms.add(visited);
                 }
             });
         }
@@ -271,7 +275,7 @@ public class SymbolicExecutionTreeBuilder {
                 "Sequent contains multiple modalities with symbolic execution label.");
         }
         // Make sure that modality has symbolic execution label
-        Term modalityTerm = modalityTerms.get(0);
+        var modalityTerm = modalityTerms.get(0);
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
@@ -280,7 +284,8 @@ public class SymbolicExecutionTreeBuilder {
         }
         // Check if modality contains method frames
         if (!modalityTerms.isEmpty()) {
-            JavaBlock javaBlock = modalityTerm.javaBlock();
+            final JModality mod = (JModality) modalityTerm.op();
+            JavaBlock javaBlock = mod.programBlock();
             final ProgramElement program = javaBlock.program();
             final List<Node> initialStack = new LinkedList<>();
             new JavaASTVisitor(program, services) {
@@ -306,7 +311,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method {@link Node}s of method calls for which its return should be ignored. If
      * not already available an empty method {@link Set} is created.
      *
-     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a
+     * @param ruleApp The {@link RuleApp} which modifies a modality {@link JTerm} with a
      *        {@link SymbolicExecutionTermLabel}.
      * @return The {@link Set} of {@link Node}s to ignore its return.
      */
@@ -347,12 +352,13 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method call stack. If not already available an empty method call stack is
      * created.
      *
-     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a
+     * @param ruleApp The {@link RuleApp} which modifies a modality {@link JTerm} with a
      *        {@link SymbolicExecutionTermLabel}.
-     * @return The method call stack of the ID of the modified modality {@link Term} with a
+     * @return The method call stack of the ID of the modified modality {@link JTerm} with a
      *         {@link SymbolicExecutionTermLabel}.
      */
-    protected Map<Node, ImmutableList<Node>> getMethodCallStack(RuleApp ruleApp) {
+    protected Map<Node, ImmutableList<Node>> getMethodCallStack(
+            RuleApp ruleApp) {
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
         return getMethodCallStack(label);
     }
@@ -885,7 +891,8 @@ public class SymbolicExecutionTreeBuilder {
             // Update call stack
             updateCallStack(node, statement);
             // Update block map
-            RuleApp currentOrFutureRuleApplication = node.getAppliedRuleApp();
+            RuleApp currentOrFutureRuleApplication =
+                node.getAppliedRuleApp();
             if (currentOrFutureRuleApplication == null && node != proof.root()) { // Executing
                                                                                   // peekNext() on
                                                                                   // the root
@@ -1120,8 +1127,8 @@ public class SymbolicExecutionTreeBuilder {
                 } else if (SymbolicExecutionUtil.isTerminationNode(node,
                     node.getAppliedRuleApp())) {
                     if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                        Term modalityTerm = TermBuilder.goBelowUpdates(
-                            node.getAppliedRuleApp().posInOccurrence().subTerm());
+                        JTerm modalityTerm = TermBuilder.goBelowUpdates(
+                            (JTerm) node.getAppliedRuleApp().posInOccurrence().subTerm());
                         BlockContractValidityTermLabel bcLabel =
                             (BlockContractValidityTermLabel) modalityTerm
                                     .getLabel(BlockContractValidityTermLabel.NAME);
@@ -1286,7 +1293,8 @@ public class SymbolicExecutionTreeBuilder {
             if (seNodeFound) {
                 int currentStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
-                JavaBlock currentJavaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+                JTerm term = (JTerm) ruleApp.posInOccurrence().subTerm();
+                JavaBlock currentJavaBlock = term.javaBlock();
                 MethodFrame currentInnerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
                 return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
@@ -1371,7 +1379,8 @@ public class SymbolicExecutionTreeBuilder {
                 // Compute stack and active statement
                 int stackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-                JavaBlock javaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+                JTerm term = (JTerm) ruleApp.posInOccurrence().subTerm();
+                JavaBlock javaBlock = term.javaBlock();
                 MethodFrame innerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
                 // Create copy with values below level
@@ -1529,10 +1538,11 @@ public class SymbolicExecutionTreeBuilder {
      * @return {@code true} is not implicit, {@code false} is implicit
      */
     protected boolean isNotInImplicitMethod(Node node) {
-        Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-        term = TermBuilder.goBelowUpdates(term);
+        final JTerm term = (JTerm) node.getAppliedRuleApp().posInOccurrence().subTerm();
+        JTerm termNoUpdates = TermBuilder.goBelowUpdates(term);
         Services services = proof.getServices();
-        IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
+        IExecutionContext ec =
+            JavaTools.getInnermostExecutionContext(termNoUpdates.javaBlock(), services);
         IProgramMethod pm = ec.getMethodContext();
         return SymbolicExecutionUtil.isNotImplicit(services, pm);
     }
@@ -1570,8 +1580,10 @@ public class SymbolicExecutionTreeBuilder {
      * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution
      *        label counter.
      */
-    protected void initNewMethodCallStack(Node currentNode, PosInOccurrence childPIO) {
-        Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
+    protected void initNewMethodCallStack(Node currentNode,
+            PosInOccurrence childPIO) {
+        JTerm newModality =
+            childPIO != null ? TermBuilder.goBelowUpdates((JTerm) childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
@@ -1580,8 +1592,8 @@ public class SymbolicExecutionTreeBuilder {
         MethodFrameCounterJavaASTVisitor newCounter =
             new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
         int newCount = newCounter.run();
-        Term oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
-        oldModality = TermBuilder.goBelowUpdates(oldModality);
+        JTerm oldModalityTerm = (JTerm) currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
+        oldModalityTerm = TermBuilder.goBelowUpdates(oldModalityTerm);
         Map<Node, ImmutableList<Node>> currentMethodCallStackMap =
             getMethodCallStack(currentNode.getAppliedRuleApp());
         Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.id());
@@ -1699,7 +1711,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
      * @return The found call {@link Node} or {@code null} if no one was found.
      */
-    protected Node findMethodCallNode(Node currentNode, RuleApp ruleApp) {
+    protected Node findMethodCallNode(Node currentNode,
+            RuleApp ruleApp) {
         // Compute the stack frame size before the method is called
         int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
         // Return the method from the call stack

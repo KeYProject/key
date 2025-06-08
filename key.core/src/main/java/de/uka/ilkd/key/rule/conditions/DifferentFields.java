@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 
 /**
@@ -42,7 +42,7 @@ public final class DifferentFields extends VariableConditionAdapter {
     }
 
     public boolean checkHelp(Object o1, Object o2) {
-        if (o1 instanceof Term t1 && o2 instanceof Term t2) {
+        if (o1 instanceof JTerm t1 && o2 instanceof JTerm t2) {
 
             if (t1.op() == t2.op()) {
                 return false;

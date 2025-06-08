@@ -8,31 +8,18 @@ import org.key_project.logic.Name;
 import org.jspecify.annotations.Nullable;
 
 
-/**
- * Abstract base class for implementations of the Sort interface.
- */
+/// Abstract base class for implementations of the Sort interface.
 public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
 
-    /**
-     * Documentation for this sort given by the associated documentation comment.
-     * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
-     */
+    /// Documentation for this sort given by the associated documentation comment.
+    /// //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
     private @Nullable String documentation;
 
-    public AbstractSort(Name name, boolean isAbstract) {
+    protected AbstractSort(Name name, boolean isAbstract) {
         this.name = name;
         this.isAbstract = isAbstract;
-    }
-
-    public boolean equals(@Nullable Object o) {
-        if (o instanceof AbstractSort sort) {
-            // TODO: Potential bug should check for sort identity not name equality
-            return sort.name().equals(name());
-        } else {
-            return false;
-        }
     }
 
     @Override

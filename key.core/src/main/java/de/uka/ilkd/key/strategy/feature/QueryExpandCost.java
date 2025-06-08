@@ -5,22 +5,26 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,11 +79,14 @@ public class QueryExpandCost implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
+            Goal p_goal,
             MutableState mState) {
+        final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        final Term t = pos.subTerm();
+        final JTerm t = (JTerm) pos.subTerm();
 
         long cost = baseCost;
 
@@ -118,14 +125,14 @@ public class QueryExpandCost implements Feature {
      * @return Cost that is computed base on the integer literals occurring in the numerical
      *         arguments of the query t.
      */
-    private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
+    private static int maxIntliteralInArgumentsTimesTwo(JTerm t, IntegerLDT iLDT, Services serv) {
         final Namespace<Sort> sorts = serv.getNamespaces().sorts();
         final Sort intSort = sorts.lookup(IntegerLDT.NAME);
         int cost = 0;
         // The computation is limited to arguments that have an arithmetic type.
         // E.g., don't calculate int literals in the heap parameter.
         for (int i = 0; i < t.arity(); i++) {
-            Term arg = t.sub(i);
+            JTerm arg = t.sub(i);
             if (arg.sort() == intSort) {
                 cost = Math.max(cost, sumOfAbsLiteralsTimesTwo(arg, iLDT, serv));
             }
@@ -142,7 +149,7 @@ public class QueryExpandCost implements Feature {
      *         The sum is modified by extrapolating negative numbers from zero by one. The cost of a
      *         query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
-    private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
+    private static int sumOfAbsLiteralsTimesTwo(JTerm t, IntegerLDT iLDT, Services serv) {
         if (t.op() == iLDT.getNumberSymbol()) {
             String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
             int val = Integer.parseInt(strVal);
@@ -171,15 +178,18 @@ public class QueryExpandCost implements Feature {
      * @param goal The goal.
      * @return The number of repetitive rule applications.
      */
-    protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected int queryExpandAlreadyAppliedAtPos(RuleApp app,
+            PosInOccurrence pos, Goal goal) {
         int count = 0;
-        ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
+        ImmutableList<RuleApp> appliedRuleApps =
+            goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {
-                final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
+                final PosInOccurrence pio =
+                    appliedRuleApp.posInOccurrence();
                 if (pio != null) {
-                    final Term oldterm = pio.subTerm();
-                    final Term curterm = pos.subTerm();
+                    final JTerm oldterm = (JTerm) pio.subTerm();
+                    final JTerm curterm = (JTerm) pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
                             && oldterm.equalsModProperty(curterm,
                                 IRRELEVANT_TERM_LABELS_PROPERTY)) {

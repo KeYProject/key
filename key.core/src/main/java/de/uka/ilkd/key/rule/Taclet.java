@@ -8,22 +8,23 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.executor.javadl.TacletExecutor;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -32,7 +33,6 @@ import org.key_project.util.collection.ImmutableSet;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import static org.key_project.util.Strings.formatAsList;
 
 
 /**
@@ -52,7 +52,7 @@ import static org.key_project.util.Strings.formatAsList;
  * The find part of a taclet is used to attached the rule to a term in the sequent of the current
  * goal. Therefore the term of the sequent has to match the schema as found in the taclet's find
  * part. The taclet is then attached to this term, more precise not the taclet itself, but an
- * application object of this taclet (see {@link de.uka.ilkd.key.rule.TacletApp TacletApp}. When
+ * application object of this taclet (see {@link TacletApp TacletApp}. When
  * this attached taclet application object is applied, the new goals are constructed as described by
  * the goal descriptions. For example <br>
  * </br>
@@ -74,12 +74,77 @@ import static org.key_project.util.Strings.formatAsList;
  * looking where it can be applied, these tasks have to be done in advance. For example by one of
  * the following classes {@link de.uka.ilkd.key.proof.RuleAppIndex RuleAppIndex} or
  * {@link de.uka.ilkd.key.proof.TacletAppIndex TacletAppIndex} or
- * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
+ * {@link TacletApp TacletApp}
  * </p>
  */
-public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
+public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
+    /**
+     * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
+     */
+    private ImmutableMap<@NonNull SchemaVariable, SchemaVariable> svNameCorrespondences = null;
 
-    protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
+    /** Integer to cache the hashcode */
+    private int hashcode = 0;
+
+    /* TODO: find better solution */
+    private final boolean surviveSymbExec;
+
+
+    /**
+     * creates a Taclet (originally known as Schematic Theory Specific Rules)
+     *
+     * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
+     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     *        variable conditions
+     * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
+     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     *        or recursive use of the Taclet.
+     */
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, boolean surviveSmbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+            tacletAnnotations);
+        this.surviveSymbExec = surviveSmbExec;
+    }
+
+    /**
+     * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
+     *
+     * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
+     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     *        variable conditions
+     * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
+     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     *        or recursive use of the Taclet.
+     */
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
+            tacletAnnotations);
+    }
+
+    protected void createAndInitializeMatcher() {
+        this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
+    }
+
+    protected abstract void createAndInitializeExecutor();
 
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
@@ -89,180 +154,6 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
     }
 
-    /** unique name of the taclet */
-    private final Name name;
-
-    /** name displayed by the pretty printer */
-    private final String displayName;
-
-    /** the set of taclet options for this taclet */
-    protected final ChoiceExpr choices;
-
-    /**
-     * the <tt>if</tt> sequent of the taclet
-     */
-    private final Sequent ifSequent;
-
-    /**
-     * Variables that have to be created each time the taclet is applied. Those variables occur in
-     * the varcond part of a taclet description.
-     */
-    private final ImmutableList<NewVarcond> varsNew;
-    /**
-     * variables with a "x not free in y" variable condition. This means the instantiation of
-     * VariableSV x must not occur free in the instantiation of TermSV y.
-     */
-    private final ImmutableList<NotFreeIn> varsNotFreeIn;
-    /**
-     * variable conditions used to express that a termsv depends on the free variables of a given
-     * formula(SV) Used by skolemization rules.
-     */
-    @Deprecated
-    private final ImmutableList<NewDependingOn> varsNewDependingOn;
-
-    /** Additional generic conditions for schema variable instantiations. */
-    private final ImmutableList<VariableCondition> variableConditions;
-
-    /**
-     * the list of taclet goal descriptions
-     */
-    private final ImmutableList<TacletGoalTemplate> goalTemplates;
-
-    /**
-     * list of rulesets (formerly known as heuristics) the taclet belongs to
-     */
-    protected final ImmutableList<RuleSet> ruleSets;
-
-    /**
-     * map from a schemavariable to its prefix. The prefix is used to test correct instantiations of
-     * the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a list of
-     * all variables that may appear free in the instantiation of the schemavariable (a bit more
-     * complicated for rewrite taclets, see paper of M:Giese)
-     */
-    protected final ImmutableMap<SchemaVariable, TacletPrefix> prefixMap;
-
-    /** cache; contains set of all bound variables */
-    private ImmutableSet<QuantifiableVariable> boundVariables = null;
-
-    /** tracks state of pre-computation */
-    private boolean contextInfoComputed = false;
-    private boolean contextIsInPrefix = false;
-
-    protected String tacletAsString;
-
-    /** Set of schemavariables of the if part */
-    private ImmutableSet<SchemaVariable> ifVariables = null;
-
-    /**
-     * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
-     */
-    private ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
-
-    /** Integer to cache the hashcode */
-    private int hashcode = 0;
-    /** Integer to cache the hashcode */
-    private int hashcode2 = 0;
-
-    private final Trigger trigger;
-
-    /* TODO: find better solution */
-    private final boolean surviveSymbExec;
-
-
-    // The two rule engines for matching and execution (application) of taclets
-    // In the long run, we should think about keeping those somewhere else, e.g., in the services
-    // such that we gain more flexibility like combined matchers that do not just match one taclet
-    // but
-    // all at once for a given term.
-
-    /**
-     * The taclet matcher
-     */
-    private TacletMatcher matcher;
-
-    /**
-     * The taclet executor
-     */
-    protected TacletExecutor<? extends Taclet> executor;
-
-    /**
-     * creates a Taclet (originally known as Schematic Theory Specific Rules)
-     *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
-     *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
-     *        or recursive use of the Taclet.
-     */
-    protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ChoiceExpr choices, boolean surviveSmbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this.tacletAnnotations = tacletAnnotations;
-        this.name = name;
-        ifSequent = applPart.ifSequent();
-        varsNew = applPart.varsNew();
-        varsNotFreeIn = applPart.varsNotFreeIn();
-        varsNewDependingOn = applPart.varsNewDependingOn();
-        variableConditions = applPart.getVariableConditions();
-        this.goalTemplates = goalTemplates;
-        this.ruleSets = ruleSets;
-        this.choices = choices;
-        this.prefixMap = prefixMap;
-        this.displayName = attrs.displayName() == null ? name.toString() : attrs.displayName();
-        this.surviveSymbExec = surviveSmbExec;
-
-        this.trigger = attrs.getTrigger();
-    }
-
-    public boolean hasTrigger() {
-        return trigger != null;
-    }
-
-    public Trigger getTrigger() {
-        return trigger;
-    }
-
-    public final TacletMatcher getMatcher() {
-        return matcher;
-    }
-
-    /**
-     * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
-     *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
-     *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
-     *        or recursive use of the Taclet.
-     */
-    protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
-            tacletAnnotations);
-    }
-
-    /**
-     * creates and initializes the taclet matching and execution engines has to be called at the end
-     * of initialization
-     */
-    protected void createTacletServices() {
-        createAndInitializeMatcher();
-        createAndInitializeExecutor();
-    }
-
-    protected void createAndInitializeMatcher() {
-        this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
-    }
-
-    protected abstract void createAndInitializeExecutor();
 
     /**
      * computes and returns all variables that occur bound in the taclet including the taclets
@@ -280,7 +171,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             }
 
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
-            bvv.visit(ifSequent());
+            bvv.visit(assumesSequent());
             result = result.union(bvv.getBoundVariables()).union(getBoundVariablesHelper());
 
             boundVariables = result;
@@ -296,152 +187,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      */
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
-    /**
-     * returns true iff the taclet contains a "close goal"-statement
-     *
-     * @return true iff the taclet contains a "close goal"-statement
-     */
-    public boolean closeGoal() {
-        return goalTemplates.isEmpty();
-    }
-
-    /**
-     * looks if a variable is declared as new and returns its sort to match with or the schema
-     * variable it shares the match-sort with. Returns null if the SV is not declared to as new.
-     *
-     * @param var the SchemaVariable to look for
-     * @return the sort of the SV to match or the SV it shares the same match-sort with
-     */
-    public NewVarcond varDeclaredNew(SchemaVariable var) {
-        for (final NewVarcond nv : varsNew) {
-            if (nv.getSchemaVariable() == var) {
-                return nv;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @return the generic variable conditions of this taclet
-     */
-    public ImmutableList<VariableCondition> getVariableConditions() {
-        return variableConditions;
-    }
-
-    /**
-     * returns the name of the Taclet
-     */
     @Override
-    public Name name() {
-        return name;
-    }
-
-
-    /**
-     * returns the display name of the taclet, or, if not specified -- the canonical name
-     */
-    @Override
-    public String displayName() {
-        return displayName;
-    }
-
-    /**
-     * returns the if-sequence of the application part of the Taclet.
-     */
-    public Sequent ifSequent() {
-        return ifSequent;
-    }
-
-    /**
-     * returns an iterator over the variables that are new in the Taclet.
-     */
-    public ImmutableList<NewVarcond> varsNew() {
-        return varsNew;
-    }
-
-
-    /**
-     * returns an iterator over the variable pairs that indicate that are new in the Taclet.
-     */
-    public ImmutableList<NotFreeIn> varsNotFreeIn() {
-        return varsNotFreeIn;
-    }
-
-
-    public ImmutableList<NewDependingOn> varsNewDependingOn() {
-        return varsNewDependingOn;
-    }
-
-    /**
-     * returns an iterator over the goal descriptions.
-     */
-    public ImmutableList<TacletGoalTemplate> goalTemplates() {
-        return goalTemplates;
-    }
-
-    public ChoiceExpr getChoices() {
-        return choices;
-    }
-
-    /** returns an iterator over the rule sets. */
-    public Iterator<RuleSet> ruleSets() {
-        return ruleSets.iterator();
-    }
-
-    public ImmutableList<RuleSet> getRuleSets() {
-        return ruleSets;
-    }
-
-    public ImmutableMap<SchemaVariable, TacletPrefix> prefixMap() {
-        return prefixMap;
-    }
-
-    /**
-     * returns true if one of the goal templates is a replacewith. Already computed and cached by
-     * method cacheMatchInfo
-     */
-    public boolean hasReplaceWith() {
-        for (final TacletGoalTemplate goalDescr : goalTemplates) {
-            if (goalDescr.replaceWithExpressionAsObject() != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * returns the computed prefix for the given schemavariable. The prefix of a schemavariable is
-     * used to determine if an instantiation is correct, in more detail: it mainly contains all
-     * variables that can appear free in an instantiation of the schemvariable sv (rewrite taclets
-     * have some special handling, see paper of M. Giese and comment of method isContextInPrefix).
-     *
-     * @param sv the Schemavariable
-     * @return prefix of schema variable sv
-     */
-    public TacletPrefix getPrefix(SchemaVariable sv) {
-        return prefixMap.get(sv);
-    }
-
-    /**
-     * returns true iff a context flag is set in one of the entries in the prefix map. Is cached
-     * after having been called once. __OPTIMIZE__ is caching really necessary here?
-     *
-     * @return true iff a context flag is set in one of the entries in the prefix map.
-     */
-    public boolean isContextInPrefix() {
-        if (contextInfoComputed) {
-            return contextIsInPrefix;
-        }
-        contextInfoComputed = true;
-        Iterator<TacletPrefix> it = prefixMap().valueIterator();
-        while (it.hasNext()) {
-            if (it.next().context()) {
-                contextIsInPrefix = true;
-                return true;
-            }
-        }
-        contextIsInPrefix = false;
-        return false;
+    public @NonNull TacletExecutor getExecutor() {
+        return executor;
     }
 
     /**
@@ -463,10 +211,10 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             return false;
         }
 
-        if ((ifSequent == null && t2.ifSequent != null)
-                || (ifSequent != null && t2.ifSequent == null)) {
+        if ((assumesSequent == null && t2.assumesSequent != null)
+                || (assumesSequent != null && t2.assumesSequent == null)) {
             return false;
-        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) {
+        } else if (assumesSequent != null && !assumesSequent.equals(t2.assumesSequent)) {
             return false;
         }
 
@@ -477,43 +225,6 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         return goalTemplates.equals(t2.goalTemplates);
     }
 
-    @Override
-    public boolean equalsModProofIrrelevancy(Object o) {
-        if (o == this)
-            return true;
-
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
-
-        final Taclet t2 = (Taclet) o;
-
-        if ((ifSequent == null && t2.ifSequent != null)
-                || (ifSequent != null && t2.ifSequent == null)) {
-            return false;
-        } else {
-            ImmutableList<SequentFormula> if1 = ifSequent.asList();
-            ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
-            while (!if1.isEmpty() && !if2.isEmpty()
-                    && if1.head().equalsModProofIrrelevancy(if2.head())) {
-                if1 = if1.tail();
-                if2 = if2.tail();
-            }
-            if (!if1.isEmpty() || !if2.isEmpty()) {
-                return false;
-            }
-        }
-
-        if (!choices.equals(t2.choices)) {
-            return false;
-        }
-
-        if (!goalTemplates.equals(t2.goalTemplates)) {
-            return false;
-        }
-
-        return true;
-    }
 
     @Override
     public int hashCode() {
@@ -526,42 +237,25 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         return hashcode;
     }
 
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        if (hashcode2 == 0) {
-            hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
-            if (hashcode2 == 0) {
-                hashcode2 = -1;
-            }
-        }
-        return hashcode2;
-    }
-
     /**
      * returns the set of schemavariables of the taclet's if-part
      *
      * @return Set of schemavariables of the if part
      */
-    protected ImmutableSet<SchemaVariable> getIfVariables() {
+    protected ImmutableSet<SchemaVariable> getAssumesVariables() {
         // should be synchronized
-        if (ifVariables == null) {
+        if (assumesVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
-            svc.visit(ifSequent());
+            svc.visit(assumesSequent());
 
-            ifVariables = DefaultImmutableSet.nil();
+            assumesVariables = DefaultImmutableSet.nil();
             for (final SchemaVariable sv : svc.vars()) {
-                ifVariables = ifVariables.add(sv);
+                assumesVariables = assumesVariables.add(sv);
             }
         }
 
-        return ifVariables;
+        return assumesVariables;
     }
-
-    /**
-     * @return set of schemavariables of the if and the (optional) find part
-     */
-    public abstract ImmutableSet<SchemaVariable> getIfFindVariables();
-
 
     /**
      * Find a schema variable that could be used to choose a name for an instantiation (a new
@@ -582,167 +276,43 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         return svNameCorrespondences.get(p);
     }
 
-
-    StringBuffer toStringIf(StringBuffer sb) {
-        if (!ifSequent.isEmpty()) {
-            sb = sb.append("\\assumes (").append(ifSequent).append(") ");
-            sb = sb.append("\n");
-        }
-        return sb;
-    }
-
-    StringBuffer toStringVarCond(StringBuffer sb) {
-        if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
-            sb = sb.append("\\varcond(");
-
-            int countVarsNew = varsNew.size() - 1;
-            for (final NewVarcond nvc : varsNew) {
-                sb = sb.append(nvc);
-                if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
-                    sb = sb.append(", ");
-                }
-                --countVarsNew;
-            }
-
-            int countVarsNotFreeIn = varsNotFreeIn.size() - 1;
-            for (NotFreeIn pair : varsNotFreeIn) {
-                sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ")
-                        .append(pair.second()).append(")");
-                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) {
-                    sb = sb.append(", ");
-                }
-                --countVarsNotFreeIn;
-            }
-
-            sb.append(formatAsList(variableConditions, "", ", ", ""));
-
-            sb = sb.append(")\n");
-        }
-        return sb;
-    }
-
-    StringBuffer toStringGoalTemplates(StringBuffer sb) {
-        if (goalTemplates.isEmpty()) {
-            sb.append("\\closegoal");
-        } else {
-            sb.append(formatAsList(goalTemplates, "", ";\n", "\n"));
-        }
-        return sb;
-    }
-
-    StringBuffer toStringRuleSets(StringBuffer sb) {
-        if (!ruleSets.isEmpty()) {
-            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
-        }
-        return sb;
-    }
-
-    StringBuffer toStringAttribs(StringBuffer sb) {
-        // if (noninteractive()) sb = sb.append(" \\noninteractive");
-        sb.append("\nChoices: ").append(choices);
-        return sb;
-    }
-
-    StringBuffer toStringTriggers(StringBuffer sb) {
-        if (trigger != null) {
-            sb.append("\n\\trigger{");
-            sb.append(trigger.triggerVar());
-            sb.append("} ");
-            sb.append(trigger.getTerm());
-            if (trigger.hasAvoidConditions()) {
-                sb.append(" \\avoid ");
-                sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));
-            }
-        }
-        return sb;
-    }
-
-    /**
-     * returns a representation of the Taclet as String
-     *
-     * @return string representation
-     */
-    @Override
-    public String toString() {
-        if (tacletAsString == null) {
-            // FIXME this essentially reimplements PrettyPrinter::printTaclet
-            StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
-            sb = toStringIf(sb);
-            sb = toStringVarCond(sb);
-            sb = toStringGoalTemplates(sb);
-            sb = toStringRuleSets(sb);
-            sb = toStringAttribs(sb);
-            sb = toStringTriggers(sb);
-            tacletAsString = sb.append("}").toString();
-        }
-        return tacletAsString;
-    }
-
-    /**
-     * @return true iff <code>this</code> taclet may be applied for the given mode
-     *         (interactive/non-interactive, activated rule sets)
-     */
-    public boolean admissible(boolean interactive, ImmutableList<RuleSet> p_ruleSets) {
-        if (interactive) {
-            return admissibleInteractive(p_ruleSets);
-        } else {
-            return admissibleAutomatic(p_ruleSets);
-        }
-    }
-
-    protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
-        return true;
-    }
-
-    protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
-        for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean getSurviveSymbExec() {
-        return surviveSymbExec;
-    }
-
     public Set<SchemaVariable> collectSchemaVars() {
 
         Set<SchemaVariable> result = new LinkedHashSet<>();
         OpCollector oc = new OpCollector();
 
         // find, assumes
-        for (SchemaVariable sv : this.getIfFindVariables()) {
+        for (var sv : this.getAssumesAndFindVariables()) {
             result.add(sv);
         }
 
         // add, replacewith
-        for (TacletGoalTemplate tgt : this.goalTemplates()) {
+        for (var tgt : this.goalTemplates()) {
             collectSchemaVarsHelper(tgt.sequent(), oc);
-            if (tgt instanceof AntecSuccTacletGoalTemplate) {
-                collectSchemaVarsHelper(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), oc);
-            } else if (tgt instanceof RewriteTacletGoalTemplate) {
-                ((RewriteTacletGoalTemplate) tgt).replaceWith().execPostOrder(oc);
+            if (tgt instanceof AntecSuccTacletGoalTemplate antecSuccTemplate) {
+                collectSchemaVarsHelper(antecSuccTemplate.replaceWith(), oc);
+            } else if (tgt instanceof RewriteTacletGoalTemplate rwTemplate) {
+                rwTemplate.replaceWith().execPostOrder(oc);
             }
         }
 
-        for (Operator op : oc.ops()) {
-            if (op instanceof SchemaVariable) {
-                result.add((SchemaVariable) op);
+        for (final var op : oc.ops()) {
+            if (op instanceof SchemaVariable sv) {
+                result.add(sv);
             }
         }
 
         return result;
     }
 
-
-
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
         for (SequentFormula cf : s) {
             cf.formula().execPostOrder(oc);
         }
+    }
+
+    public boolean getSurviveSymbExec() {
+        return surviveSymbExec;
     }
 
     /**
@@ -767,14 +337,14 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         private final SequentFormula sequentFormula;
 
         /**
-         * The optional replace {@link Term} of the taclet.
+         * The optional replace {@link JTerm} of the taclet.
          */
-        private final Term term;
+        private final JTerm term;
 
         /**
-         * The stack maintained during application of a taclet {@link Term}.
+         * The stack maintained during application of a taclet {@link JTerm}.
          */
-        private Deque<Term> tacletTermStack;
+        private Deque<JTerm> tacletTermStack;
 
         /**
          * Constructor.
@@ -796,9 +366,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
          * Constructor creating a hint indicating
          * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param term The optional replace {@link Term} of the taclet.
+         * @param term The optional replace {@link JTerm} of the taclet.
          */
-        public TacletLabelHint(Term term) {
+        public TacletLabelHint(JTerm term) {
             assert term != null;
             this.tacletOperation = TacletOperation.REPLACE_TERM;
             this.sequent = null;
@@ -813,7 +383,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
          * @param sequentFormula The optional {@link SequentFormula} contained in
          *        {@link #getSequent()}.
          */
-        public TacletLabelHint(TacletLabelHint labelHint, SequentFormula sequentFormula) {
+        public TacletLabelHint(TacletLabelHint labelHint,
+                SequentFormula sequentFormula) {
             assert labelHint != null;
             assert !TacletOperation.REPLACE_TERM.equals(labelHint.getTacletOperation());
             assert sequentFormula != null;
@@ -851,29 +422,29 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
 
         /**
-         * Returns the stack maintained during application of a taclet {@link Term}.
+         * Returns the stack maintained during application of a taclet {@link JTerm}.
          *
-         * @return The stack maintained during application of a taclet {@link Term}.
+         * @return The stack maintained during application of a taclet {@link JTerm}.
          */
-        public Deque<Term> getTacletTermStack() {
+        public Deque<JTerm> getTacletTermStack() {
             return tacletTermStack;
         }
 
         /**
-         * Sets the stack maintained during application of a taclet {@link Term}.
+         * Sets the stack maintained during application of a taclet {@link JTerm}.
          *
-         * @param tacletTermStack The stack maintained during application of a taclet {@link Term}.
+         * @param tacletTermStack The stack maintained during application of a taclet {@link JTerm}.
          */
-        public void setTacletTermStack(Deque<Term> tacletTermStack) {
+        public void setTacletTermStack(Deque<JTerm> tacletTermStack) {
             this.tacletTermStack = tacletTermStack;
         }
 
         /**
-         * Returns the optional replace {@link Term} of the taclet.
+         * Returns the optional replace {@link JTerm} of the taclet.
          *
-         * @return The optional replace {@link Term} of the taclet.
+         * @return The optional replace {@link JTerm} of the taclet.
          */
-        public Term getTerm() {
+        public JTerm getTerm() {
             return term;
         }
 
@@ -935,7 +506,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             REPLACE_TO_SUCCEDENT,
 
             /**
-             * Replace clause of a {@link Taclet} provides a {@link Term} which is currently used to
+             * Replace clause of a {@link Taclet} provides a {@link JTerm} which is currently used
+             * to
              * modify the {@link PosInOccurrence}. Available information are
              * {@link TacletLabelHint#getTerm()}.
              */
@@ -943,27 +515,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         }
     }
 
-    /**
-     * applies the given rule application to the specified goal
-     *
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param tacletApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be proved. If this is a
-     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
-     *         goal that should be closed (with the constraint this taclet is applied under).
-     */
-    @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
-        return getExecutor().apply(goal, services, tacletApp);
-    }
-
-    public TacletExecutor<? extends Taclet> getExecutor() {
-        return executor;
-    }
-
-    public abstract Taclet setName(String s);
-
+    public abstract @NonNull Taclet setName(@NonNull String s);
 
     /**
      * Information about the origin of the taclet. Should be a location where the user can find the
@@ -980,5 +532,33 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     public void setOrigin(@Nullable String origin) {
         this.origin = origin;
+    }
+
+    StringBuffer toStringAttribs(StringBuffer sb) {
+        // if (noninteractive()) sb = sb.append(" \\noninteractive");
+        sb.append("\nChoices: ").append(choices);
+        return sb;
+    }
+
+    /**
+     * returns a representation of the Taclet as String
+     *
+     * @return string representation
+     */
+    @Override
+    public String toString() {
+        if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
+            StringBuffer sb = new StringBuffer();
+            sb.append(name()).append(" {\n");
+            sb = toStringAssumes(sb);
+            sb = toStringVarCond(sb);
+            sb = toStringGoalTemplates(sb);
+            sb = toStringRuleSets(sb);
+            sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
+            tacletAsString = sb.append("}").toString();
+        }
+        return tacletAsString;
     }
 }

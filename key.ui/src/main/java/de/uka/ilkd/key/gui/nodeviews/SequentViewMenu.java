@@ -13,7 +13,6 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 
@@ -42,7 +41,7 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * Creates an empty menu.
      */
-    public SequentViewMenu() {
+    protected SequentViewMenu() {
     }
 
     /**
@@ -123,7 +122,7 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Term t = pos.getPosInOccurrence().subTerm();
+            var t = pos.getPosInOccurrence().subTerm();
             ProgramVariable var = (ProgramVariable) t.op();
             ProgramElementName name = var.getProgramElementName();
             NameCreationInfo info = name.getCreationInfo();

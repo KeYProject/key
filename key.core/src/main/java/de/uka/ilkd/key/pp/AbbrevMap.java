@@ -8,7 +8,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.Pair;
 
@@ -49,7 +49,7 @@ public class AbbrevMap {
      * @param enabled true if the abbreviation should be used (e.g., when printing the term), false
      *        otherwise.
      */
-    public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
+    public void put(JTerm t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
 
         if (containsTerm(t)) {
@@ -69,7 +69,7 @@ public class AbbrevMap {
      *
      * @throws AbbrevException if the abbreviation is already in use.
      */
-    public void changeAbbrev(Term t, String abbreviation) throws AbbrevException {
+    public void changeAbbrev(JTerm t, String abbreviation) throws AbbrevException {
         if (containsTerm(t)) {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
@@ -92,7 +92,7 @@ public class AbbrevMap {
      *
      * @throws AbbrevException If an abbreviation for t already exists.
      */
-    public void changeAbbrev(String abbreviation, Term t, boolean enabled) throws AbbrevException {
+    public void changeAbbrev(String abbreviation, JTerm t, boolean enabled) throws AbbrevException {
         if (containsAbbreviation(abbreviation)) {
             if (containsTerm(t)) {
                 throw new AbbrevException("A abbreviation for " + t + " already exists", true);
@@ -119,7 +119,7 @@ public class AbbrevMap {
     /**
      * Returns true if the map contains the term t.
      */
-    public boolean containsTerm(Term t) {
+    public boolean containsTerm(JTerm t) {
         return term2String.containsKey(new AbbrevWrapper(t));
     }
 
@@ -127,7 +127,7 @@ public class AbbrevMap {
      * Returns the term which is mapped to the abbreviation s, null if no term is mapped to the
      * abbreviation.
      */
-    public Term getTerm(String s) {
+    public JTerm getTerm(String s) {
         var term = string2Term.get(s);
         return term == null ? null : term.term();
     }
@@ -136,14 +136,14 @@ public class AbbrevMap {
      * Returns the abbreviation mapped to the term t. Returns null if no abbreviation is mapped to
      * t.
      */
-    public String getAbbrev(Term t) {
+    public String getAbbrev(JTerm t) {
         return "@" + term2String.get(new AbbrevWrapper(t));
     }
 
     /**
      * Returns true if the mapping is enabled, which means that the abbreviation may be used.
      */
-    public boolean isEnabled(Term t) {
+    public boolean isEnabled(JTerm t) {
         return isTermEnabled.contains(new AbbrevWrapper(t));
     }
 
@@ -153,7 +153,7 @@ public class AbbrevMap {
      * @param t a Term
      * @param enabled true if the abbreviation of t may be used.
      */
-    public void setEnabled(Term t, boolean enabled) {
+    public void setEnabled(JTerm t, boolean enabled) {
         var oldEnabled = isEnabled(t);
         var scw = new AbbrevWrapper(t);
         if (enabled)
@@ -168,7 +168,7 @@ public class AbbrevMap {
      * abbreviation.
      * Note, this will allocate a new data structure each time.
      */
-    public Collection<Pair<Term, String>> export() {
+    public Collection<Pair<JTerm, String>> export() {
         return term2String.entrySet().stream().map(e -> new Pair<>(e.getKey().term, e.getValue()))
                 .collect(Collectors.toList());
 

@@ -3,21 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -53,7 +56,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new RemovePostStrategy(proof);
     }
 
@@ -73,18 +77,21 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return NAME;
         }
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
-                return applyTF("b", IsPostConditionTermFeature.INSTANCE).computeCost(ruleApp, pio,
-                    goal, mState);
+                return applyTF("b",
+                    hasLabel(ParameterlessTermLabel.POST_CONDITION_LABEL))
+                        .computeCost(ruleApp, pio,
+                            goal, mState);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
                         .computeCost(ruleApp, pio, goal, mState);
@@ -96,7 +103,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             String name = app.rule().name().toString();
             if (!name.equals("hide_right")) {
                 return true;

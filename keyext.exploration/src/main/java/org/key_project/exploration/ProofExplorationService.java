@@ -8,7 +8,6 @@ import java.util.Objects;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -102,13 +103,12 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull Term t, boolean antecedent) {
+    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull JTerm t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
-        Semisequent semisequent = new Semisequent(new SequentFormula(t));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
+        app = app.addCheckedInstantiation(sv, t, services, true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
         if (antecedent) {
             explorationNodeData.setExplorationAction("Added " + t + " ==>");
@@ -142,8 +142,9 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@NonNull Goal g, @NonNull PosInOccurrence pio,
-            @NonNull Term term, @NonNull Term newTerm) {
+    public Node applyChangeFormula(@NonNull Goal g,
+            @NonNull PosInOccurrence pio,
+            @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
@@ -166,7 +167,8 @@ public class ProofExplorationService {
         // region hide
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
-            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS, null),
+            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS,
+                null),
             pio, services);
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
@@ -183,17 +185,17 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(@NonNull PosInOccurrence pio, @NonNull Term term,
-            @NonNull Term newTerm) {
+    private TacletApp soundChange(@NonNull PosInOccurrence pio,
+            @NonNull JTerm term,
+            @NonNull JTerm newTerm) {
         Taclet cut = getCutTaclet();
-        Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
+        app = app.addCheckedInstantiation(sv, newTerm, services, true);
         return app;
     }
 
-    public void soundHide(Goal g, PosInOccurrence pio, Term term) {
+    public void soundHide(Goal g, PosInOccurrence pio, JTerm term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());
         explorationNodeData.setExplorationAction("Hide " + term);
@@ -203,8 +205,8 @@ public class ProofExplorationService {
 
     private TacletApp createHideTerm(PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
-        MatchConditions match = tap.getMatcher().matchFind(pio.subTerm(),
+        final var matchingConditions = tap.getMatcher().matchFind(pio.subTerm(),
             MatchConditions.EMPTY_MATCHCONDITIONS, services);
-        return PosTacletApp.createPosTacletApp(tap, match, pio, services);
+        return PosTacletApp.createPosTacletApp(tap, matchingConditions, pio, services);
     }
 }

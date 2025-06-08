@@ -5,29 +5,36 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public final class DependencyContractFeature extends BinaryFeature {
 
-    private void removePreviouslyUsedSteps(Term focus, Goal goal, List<PosInOccurrence> steps) {
+    private void removePreviouslyUsedSteps(JTerm focus, Goal goal,
+            List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
+            JTerm term = (JTerm) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
-                    && app.posInOccurrence().subTerm().equalsModProperty(focus,
-                        RENAMING_TERM_PROPERTY)) {
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, focus)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-                for (PosInOccurrence ifInst : bapp.ifInsts()) {
+                for (PosInOccurrence ifInst : bapp.assumesInsts()) {
                     steps.remove(ifInst);
                 }
             }
@@ -35,17 +42,20 @@ public final class DependencyContractFeature extends BinaryFeature {
     }
 
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos,
+            Goal p_goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-        final Term focus = pos.subTerm();
+        final JTerm focus = (JTerm) pos.subTerm();
 
         // determine possible steps
-
+        final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
+        final Services services = goal.proof().getServices();
         List<LocationVariable> heapContext = bapp.getHeapContext() != null ? bapp.getHeapContext()
-                : HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
+                : HeapContext.getModifiableHeaps(services, false);
 
-        final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext, pos,
-            goal.sequent(), goal.proof().getServices());
+        final List<PosInOccurrence> steps =
+            UseDependencyContractRule.getSteps(heapContext, pos, goal.sequent(), services);
         if (steps.isEmpty()) {
             return false;
         }
@@ -63,7 +73,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         }
 
         // instantiate with arbitrary remaining step
-        bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
+        bapp = bapp.setAssumesInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
         return true;
     }
 }

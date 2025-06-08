@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayDeque;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  * An iterator that walks in first-depth order through the term. It allows to jump to siblings.
@@ -35,7 +35,7 @@ public class TermNavigator {
      * @return a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently
      *         empty
      */
-    public static TermNavigator get(Term term) {
+    public static TermNavigator get(JTerm term) {
         TermNavigator tn = null;
         synchronized (TERM_NAVIGATOR_POOL) {
             if (!TERM_NAVIGATOR_POOL.isEmpty()) {
@@ -63,7 +63,7 @@ public class TermNavigator {
     private TermNavigator() {
     }
 
-    private TermNavigator(Term term) {
+    private TermNavigator(JTerm term) {
         stack.push(MutablePair.get(term, 0));
     }
 
@@ -75,8 +75,7 @@ public class TermNavigator {
         return stack.size() > 1;
     }
 
-
-    public Term getCurrentSubterm() {
+    public JTerm getCurrentSubterm() {
         return stack.peek().first;
     }
 
@@ -88,7 +87,7 @@ public class TermNavigator {
             MutablePair el = stack.peek();
             if (el.second < el.first.arity()) {
                 final int oldPos = el.second;
-                final Term oldTerm = el.first;
+                final JTerm oldTerm = el.first;
                 el.second += 1;
                 if (el.second >= oldTerm.arity()) {
                     // we visited all children of that term
@@ -151,7 +150,7 @@ public class TermNavigator {
          * @return a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently
          *         empty
          */
-        static MutablePair get(Term first, Integer second) {
+        static MutablePair get(JTerm first, Integer second) {
             MutablePair pair = null;
             synchronized (PAIR_POOL) {
                 if (!PAIR_POOL.isEmpty()) {
@@ -167,15 +166,15 @@ public class TermNavigator {
         }
 
 
-        Term first;
+        JTerm first;
         Integer second;
 
-        public MutablePair(Term first, Integer second) {
+        public MutablePair(JTerm first, Integer second) {
             this.first = first;
             this.second = second;
         }
 
-        public final void set(Term first, Integer second) {
+        public final void set(JTerm first, Integer second) {
             this.first = first;
             this.second = second;
         }

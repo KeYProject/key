@@ -159,7 +159,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
-        setFileSelectionMode(b ? JFileChooser.FILES_ONLY : JFileChooser.FILES_AND_DIRECTORIES);
+        setFileSelectionMode(b ? FILES_ONLY : FILES_AND_DIRECTORIES);
     }
 
     @Override
@@ -275,7 +275,7 @@ public final class KeYFileChooser extends JFileChooser {
         updateUI();
 
         int result = super.showOpenDialog(component);
-        if (result != JFileChooser.APPROVE_OPTION) {
+        if (result != APPROVE_OPTION) {
             resetPath();
         } else {
             resetFile = null;
@@ -301,7 +301,7 @@ public final class KeYFileChooser extends JFileChooser {
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir();
+            File initDir = Main.getWorkingDir().toFile();
             INSTANCE = new KeYFileChooser(initDir);
             // not the best design probably: this constructor has the side effect of connecting
             // the new bookmark panel to the file chooser.

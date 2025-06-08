@@ -3,23 +3,27 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proverules;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
@@ -45,15 +49,12 @@ public class ProveRulesTest {
     /*
      * File object pointing to directory key/key.core.test
      */
-    private static final File PROOF_DIRECTORY;
+    private static final Path PROOF_DIRECTORY =
+        Objects.requireNonNull(FindResources.getTacletProofsDirectory());
 
 
-    static {
-        PROOF_DIRECTORY = FindResources.getTacletProofsDirectory();
-    }
-
-
-    public void loadTacletProof(String tacletName, Taclet taclet, File proofFile) throws Exception {
+    public void loadTacletProof(String tacletName, Taclet taclet, @Nullable Path proofFile)
+            throws Exception {
         assertNotNull(proofFile,
             "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
         assertNotNull(taclet, "Proof file " + proofFile
@@ -66,9 +67,9 @@ public class ProveRulesTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
-        var script = env.getProofScript();
+        KeyAst.ProofScript script = env.getProofScript();
         if (script != null) {
-            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
+            ProofScriptEngine pse = new ProofScriptEngine(script);
             pse.execute(env.getUi(), proof);
         }
 
@@ -77,26 +78,24 @@ public class ProveRulesTest {
         env.dispose();
     }
 
-    private static List<File> getFilesRecursive(File directory) {
-        assert directory.isDirectory()
+    private static List<Path> getFilesRecursive(Path directory) throws IOException {
+        assert Files.isDirectory(directory)
                 : "Expecting a directory as input parameter but found: " + directory;
-        List<File> list = new LinkedList<>();
-        for (File file : Objects.requireNonNull(directory.listFiles())) {
-            if (file.isFile()) {
-                String fileName = file.getName();
+        List<Path> list = new LinkedList<>();
+        for (Path file : Files.walk(directory).toList()) {
+            if (Files.isRegularFile(file)) {
+                String fileName = file.getFileName().toString();
                 if (fileName.startsWith("Taclet_") && fileName.endsWith(".proof")) {
                     list.add(file);
                 }
-            } else {
-                list.addAll(getFilesRecursive(file));
             }
         }
         return list;
     }
 
     @TestFactory
-    public Stream<DynamicTest> data() throws ProblemLoaderException {
-        assertTrue(PROOF_DIRECTORY.exists(),
+    public Stream<DynamicTest> data() throws ProblemLoaderException, IOException {
+        assertTrue(Files.exists(PROOF_DIRECTORY),
             "Directory containing taclet proofs cannot be found at location: " + PROOF_DIRECTORY);
 
         /*
@@ -126,10 +125,10 @@ public class ProveRulesTest {
          * "Taclet_bsum_empty.proof"). Corresponding JUnit test will fail if a proof for a taclet is
          * present but taclet was not annotated with "\lemma".
          */
-        Map<String, File> proofFileByTacletName = new LinkedHashMap<>();
-        List<File> proofFiles = getFilesRecursive(PROOF_DIRECTORY);
-        for (File proofFile : proofFiles) {
-            String fileName = proofFile.getName();
+        Map<String, Path> proofFileByTacletName = new LinkedHashMap<>();
+        List<Path> proofFiles = getFilesRecursive(PROOF_DIRECTORY);
+        for (Path proofFile : proofFiles) {
+            String fileName = proofFile.getFileName().toString();
             // Remove Taclet_* beginning and *.proof ending from fileName.
             String tacletName = fileName.substring(7, fileName.length() - 6);
             proofFileByTacletName.put(tacletName, proofFile);
@@ -140,9 +139,11 @@ public class ProveRulesTest {
          * Create list of constructor parameters containig one entry for each taclet name. (that
          * means there will be one test case for each taclet)
          */
-        return tacletNames.stream().map(
-            tacletName -> DynamicTest.dynamicTest(tacletName, () -> loadTacletProof(tacletName,
-                tacletObjectByTacletName.get(tacletName), proofFileByTacletName.get(tacletName))));
+        return tacletNames.stream()
+                .map(tacletName -> DynamicTest.dynamicTest(tacletName,
+                    () -> loadTacletProof(tacletName,
+                        tacletObjectByTacletName.get(tacletName),
+                        proofFileByTacletName.get(tacletName))));
     }
 
 }

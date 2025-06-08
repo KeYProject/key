@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
@@ -26,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author <TT>AutoDoc</TT>
  */
 public class MethodReference extends JavaNonTerminalProgramElement
-        implements MethodOrConstructorReference, MemberReference, ReferencePrefix, ReferenceSuffix,
+        implements MethodOrConstructorReference, ReferenceSuffix,
         ExpressionStatement, TypeReferenceContainer, NameReference {
 
     /**
@@ -179,8 +178,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
+        if (prefix instanceof TypeReference prefixRef && index == 0) {
+            return prefixRef;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -212,9 +211,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression) {
+        if (prefix instanceof Expression prefixExpr) {
             if (index == 0) {
-                return (Expression) prefix;
+                return prefixExpr;
             }
             index -= 1;
         }
@@ -239,10 +238,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-        if (name instanceof ProgramElementName) {
-            return (ProgramElementName) name;
-        } else if (name instanceof SchemaVariable) {
-            return (((ProgramSV) name).getProgramElementName());
+        if (name instanceof ProgramElementName peName) {
+            return peName;
+        } else if (name instanceof ProgramSV sv) {
+            return sv.getProgramElementName();
         } else {
             return null;
         }

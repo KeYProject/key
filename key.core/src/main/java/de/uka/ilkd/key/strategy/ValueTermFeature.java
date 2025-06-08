@@ -5,7 +5,8 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 

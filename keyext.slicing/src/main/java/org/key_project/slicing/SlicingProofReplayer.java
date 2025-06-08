@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,10 +20,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.replay.AbstractProofReplayer;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -105,16 +104,16 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
                 "Preparing proof slicing", 2);
         }
         Path tmpFile = Files.createTempFile("proof", ".proof");
-        ProofSaver.saveProofObligationToFile(tmpFile.toFile(), originalProof);
+        ProofSaver.saveProofObligationToFile(tmpFile, originalProof);
         if (progressMonitor != null) {
             progressMonitor.setProgress(1);
         }
 
-        String bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
+        Path bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
-            tmpFile.toFile(),
-            originalProof.getEnv().getJavaModel().getClassPathEntries(),
-            bootClassPath != null ? new File(bootClassPath) : null,
+            tmpFile,
+            originalProof.getEnv().getJavaModel().getClassPath(),
+            bootClassPath,
             null,
             originalProof.getEnv().getInitConfigForEnvironment().getProfile(),
             false,
@@ -138,7 +137,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      *         error during slice construction
      * @throws IOException on error during proof saving
      */
-    public File slice()
+    public Path slice()
             throws IntermediateProofReplayer.BuiltInConstructionException, IOException {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {
@@ -220,11 +219,12 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * @return path to the saved proof slice
      * @throws IOException on I/O error
      */
-    private File saveProof(Proof currentProof, Proof proof) throws IOException {
+    private Path saveProof(Proof currentProof, Proof proof) throws IOException {
         Path tempDir = Files.createTempDirectory("KeYslice");
         String filename;
         if (currentProof.getProofFile() != null) {
-            filename = MiscTools.removeFileExtension(currentProof.getProofFile().getName());
+            filename =
+                MiscTools.removeFileExtension(currentProof.getProofFile().getFileName().toString());
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
             // make sure that no special chars are in name (e.g., "Taclet: seqPerm ..." for taclet
@@ -246,7 +246,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             filename = filename + sliceSuffix + "1";
         }
         filename = filename + ".proof";
-        File tempFile = tempDir.resolve(filename).toFile();
+        Path tempFile = tempDir.resolve(filename);
         ProofSaver.saveToFile(tempFile, proof);
         proof.dispose();
         return tempFile;

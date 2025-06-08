@@ -5,12 +5,15 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This variable condition checks if the instantiation of a schemavariable (of type Field) refers to
@@ -18,7 +21,7 @@ import org.key_project.logic.SyntaxElement;
  *
  * The negated condition is true if the instantiation refers to an instance (non-static) field.
  *
- * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
+ * Inspired by {@link FieldTypeToSortCondition}.
  *
  * @author Michael Kirsten
  */
@@ -36,11 +39,11 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
-        if (!(o instanceof Term f)) {
+        if (!(o instanceof JTerm f)) {
             return false;
         }
         final Operator op = f.op();
-        if (op instanceof JFunction) {
+        if (op instanceof Function) {
             HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
             if (split == null) {
                 return false;

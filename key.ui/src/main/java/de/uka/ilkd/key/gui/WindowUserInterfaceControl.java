@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -32,10 +33,6 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -47,6 +44,10 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
@@ -100,22 +101,22 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
-        mainWindow.addRecentFile(file.getAbsolutePath());
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
+        mainWindow.addRecentFile(file.toAbsolutePath().toString());
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
-    public void loadProblem(File file) {
+    public void loadProblem(Path file) {
         loadProblem(file, null, null, null);
     }
 
     @Override
-    public void loadProofFromBundle(File proofBundle, File proofFilename) {
-        mainWindow.addRecentFile(proofBundle.getAbsolutePath());
+    public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
+        mainWindow.addRecentFile(proofBundle.toAbsolutePath().toString());
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -134,7 +135,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(sender, input.name() + " failed");
+        IssueDialog.showExceptionDialog(mainWindow, e);
     }
 
     @Override
@@ -164,9 +165,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
-            ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+            ApplyStrategyInfo<Proof, Goal> result =
+                (ApplyStrategyInfo<Proof, Goal>) info.getResult();
 
-            Proof proof = info.getProof();
+            final Proof proof = (Proof) info.getProof();
             if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
@@ -174,7 +176,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     g = proof.openGoals().head();
                 }
                 mainWindow.getMediator().goalChosen(g);
-                if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                if (inStopAtFirstUncloseableGoalMode(proof)) {
                     // iff Stop on non-closeable Goal is selected a little
                     // popup is generated and proof is stopped
                     AutoDismissDialog dialog = new AutoDismissDialog(
@@ -190,12 +192,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
-                Proof proof = info.getProof();
+                final Proof proof = (Proof) info.getProof();
                 if (proof != null && !proof.closed()
                         && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
-                    if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                    if (inStopAtFirstUncloseableGoalMode(proof)) {
                         // iff Stop on non-closeable Goal is selected a little
                         // popup is generated and proof is stopped
                         AutoDismissDialog dialog = new AutoDismissDialog(
@@ -221,12 +223,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProofScriptEntry scriptAndLoc = problemLoader.getProofScript();
-                if (scriptAndLoc != null) {
-                    ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                        scriptAndLoc.script(), scriptAndLoc.location());
-                    psw.init();
-                    psw.execute();
+                if (problemLoader.hasProofScript()) {
+                    KeyAst.ProofScript scriptAndLoc = problemLoader.getProofScript();
+                    if (scriptAndLoc != null) {
+                        ProofScriptWorker psw =
+                            new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
+                        psw.init();
+                        psw.execute();
+                    }
                 } else if (macroChosen()) {
                     applyMacro();
                 }
@@ -345,12 +349,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
+    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
-            mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
+            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString());
         }
         try {
             getMediator().stopInterface(true);
@@ -363,7 +367,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     /**
      * Save proof in file. If autoSave is on, this will potentially overwrite already existing proof
-     * files with the same name. Otherwise the save dialog pops up. For loaded proofs both are
+     * files with the same name. Otherwise, the save dialog pops up. For loaded proofs both are
      * turned off by default, i.e. only manual saving is possible, and the save dialog never pops up
      * automatically (except for hitting the "Save ..." or "Save current proof" button).
      *
@@ -371,17 +375,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
-    public File saveProof(Proof proof, String fileExtension) {
+    public Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
-        Pair<File, String> f = fileName(proof, fileExtension);
-        final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
-        File file = null;
+        Pair<Path, String> f = fileName(proof, fileExtension);
+        final int result = fc.showSaveDialog(mainWindow, f.first.toFile(), f.second);
+        Path file = null;
         if (result == JFileChooser.APPROVE_OPTION) { // saved
-            file = fc.getSelectedFile();
-            final String filename = file.getAbsolutePath();
+            file = fc.getSelectedFile().toPath();
+            final String filename = file.toAbsolutePath().toString();
             ProofSaver saver;
             if (fc.useCompression()) {
                 saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
@@ -418,10 +422,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             KeYFileChooser.getFileChooser("Choose filename to save proof");
         fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
-        Pair<File, String> f = fileName(proof, ".zproof");
-        final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
+        Pair<Path, String> f = fileName(proof, ".zproof");
+        final int result = fileChooser.showSaveDialog(mainWindow, f.first.toFile(), f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            final File file = fileChooser.getSelectedFile();
+            final Path file = fileChooser.getSelectedFile().toPath();
             final ProofSaver saver = new ProofBundleSaver(proof, file);
             final String errorMsg = saver.save();
 
@@ -434,11 +438,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
     }
 
-    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
+    protected static Pair<Path, String> fileName(Proof proof, String fileExtension) {
         // TODO: why do we use GUI components here?
         final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
-        File selectedFile = null;
+        Path selectedFile = null;
         if (proof != null) {
             selectedFile = proof.getProofFile();
         }
@@ -452,9 +456,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 name = "Taclet:" + name.substring(prefix.length());
             }
             defaultName = MiscTools.toValidFileName(name) + fileExtension;
-            selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
-        } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
-            defaultName = selectedFile.getName();
+            selectedFile = new File(jFC.getCurrentDirectory(), defaultName).toPath();
+        } else if (selectedFile.toString().endsWith(".proof") && fileExtension.equals(".proof")) {
+            defaultName = selectedFile.getFileName().toString();
         } else {
             String proofName = proof.name().toString();
             if (proofName.endsWith(".key")) {
@@ -463,7 +467,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
             }
             defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
-            selectedFile = new File(selectedFile.getParentFile(), defaultName);
+            selectedFile = selectedFile.getParent().resolve(defaultName);
         }
         return new Pair<>(selectedFile, defaultName);
     }
@@ -513,8 +517,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         "Proof could only be loaded partially.\n" + "In summary "
                             + result.getErrorList().size()
                             + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().get(0).getMessage(),
-                        result.getErrorList().get(0));
+                            + "The first one:\n" + result.getErrorList().getFirst().getMessage(),
+                        result.getErrorList().getFirst());
                 }
             }
         }
@@ -567,7 +571,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
-            File location, List<File> classPaths, File bootClassPath, List<File> includes,
+            Path location, List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs, boolean makeMainWindowVisible)
             throws ProblemLoaderException {
         MainWindow main = MainWindow.getInstance();

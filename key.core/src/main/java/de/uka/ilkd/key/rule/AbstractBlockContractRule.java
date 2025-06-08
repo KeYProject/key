@@ -22,10 +22,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -43,6 +41,10 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -84,19 +86,19 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality.JavaModalityKind modalityKind, final Goal goal) {
+            final JModality.JavaModalityKind modalityKind, final Goal goal) {
         if (statement instanceof StatementBlock block) {
 
             ImmutableSet<BlockContract> collectedContracts =
                 specifications.getBlockContracts(block, modalityKind);
-            if (modalityKind == Modality.JavaModalityKind.BOX) {
+            if (modalityKind == JModality.JavaModalityKind.BOX) {
                 collectedContracts =
                     collectedContracts.union(
-                        specifications.getBlockContracts(block, Modality.JavaModalityKind.DIA));
-            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
+                        specifications.getBlockContracts(block, JModality.JavaModalityKind.DIA));
+            } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getBlockContracts(block,
-                            Modality.JavaModalityKind.DIA_TRANSACTION));
+                            JModality.JavaModalityKind.DIA_TRANSACTION));
             }
             return filterAppliedContracts(collectedContracts, goal);
         } else {
@@ -173,16 +175,16 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected static Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
+    protected static Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final BlockContract contract,
             final TermServices services) {
-        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiableClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
@@ -198,7 +200,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * be reused in other classes.
      */
 
-    protected static Term buildAfterVar(Term varTerm, String suffix, Services services) {
+    protected static JTerm buildAfterVar(JTerm varTerm, String suffix, Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -213,18 +215,18 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
-        Term varAtPost = tb.var(varAtPostVar);
+        JTerm varAtPost = tb.var(varAtPostVar);
         return varAtPost;
     }
 
-    protected static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
+    protected static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.nil();
-        for (Term varTerm : varTerms) {
+        ImmutableList<JTerm> renamedLocalOuts = ImmutableSLList.nil();
+        for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
@@ -233,20 +235,20 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
-            Term varAtPost = tb.var(varAtPostVar);
+            JTerm varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);
         }
         return renamedLocalOuts;
     }
 
-    protected static ImmutableList<Term> buildLocalOutsAtPost(ImmutableList<Term> varTerms,
+    protected static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.nil();
-        for (Term varTerm : varTerms) {
+        ImmutableList<JTerm> renamedLocalOuts = ImmutableSLList.nil();
+        for (JTerm varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
@@ -255,38 +257,38 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
-            Term varAtPost = tb.var(varAtPostVar);
+            JTerm varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);
         }
         return renamedLocalOuts;
     }
 
-    protected static Term buildInfFlowPreAssumption(ProofObligationVars instVars,
-            ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPre, Term baseHeap,
+    protected static JTerm buildInfFlowPreAssumption(ProofObligationVars instVars,
+            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre, JTerm baseHeap,
             final TermBuilder tb) {
-        Term beforeAssumptions = tb.equals(instVars.pre.heap, baseHeap);
-        Iterator<Term> outsAtPre = localOutsAtPre.iterator();
-        for (Term locOut : localOuts) {
+        JTerm beforeAssumptions = tb.equals(instVars.pre.heap, baseHeap);
+        Iterator<JTerm> outsAtPre = localOutsAtPre.iterator();
+        for (JTerm locOut : localOuts) {
             beforeAssumptions = tb.and(beforeAssumptions, tb.equals(outsAtPre.next(), locOut));
         }
         return beforeAssumptions;
     }
 
-    protected static Term buildInfFlowPostAssumption(ProofObligationVars instVars,
-            ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPost, Term baseHeap,
-            Term applPredTerm, final TermBuilder tb) {
-        Term resultEq =
+    protected static JTerm buildInfFlowPostAssumption(ProofObligationVars instVars,
+            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPost, JTerm baseHeap,
+            JTerm applPredTerm, final TermBuilder tb) {
+        JTerm resultEq =
             instVars.pre.result != null ? tb.equals(instVars.post.result, instVars.pre.result)
                     : tb.tt();
-        Term exceptionEq = instVars.pre.exception != null
+        JTerm exceptionEq = instVars.pre.exception != null
                 ? tb.equals(instVars.post.exception, instVars.pre.exception)
                 : tb.tt();
-        Term selfEq =
+        JTerm selfEq =
             instVars.pre.self != null ? tb.equals(instVars.post.self, instVars.pre.self) : tb.tt();
-        Term afterAssumptions =
+        JTerm afterAssumptions =
             tb.and(tb.equals(instVars.post.heap, baseHeap), selfEq, resultEq, exceptionEq);
-        Iterator<Term> outAtPost = localOutsAtPost.iterator();
-        for (Term locOut : localOuts) {
+        Iterator<JTerm> outAtPost = localOutsAtPost.iterator();
+        for (JTerm locOut : localOuts) {
             afterAssumptions = tb.and(afterAssumptions, tb.equals(outAtPost.next(), locOut));
         }
         afterAssumptions = tb.and(afterAssumptions, applPredTerm);
@@ -294,13 +296,14 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return afterAssumptions;
     }
 
-    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
-        Term selfComposedExec =
+    static SequentFormula buildBodyPreservesSequent(
+            InfFlowPOSnippetFactory f, InfFlowProof proof) {
+        JTerm selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        JTerm post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final TermBuilder tb = proof.getServices().getTermBuilder();
 
-        final Term finalTerm =
+        final JTerm finalTerm =
             tb.imp(tb.label(selfComposedExec, ParameterlessTermLabel.SELF_COMPOSITION_LABEL), post);
         proof.addLabeledIFSymbol(selfComposedExec);
 
@@ -309,24 +312,24 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     private static ProofObligationVars generateProofObligationVariables(
             final AuxiliaryContract.Variables variables, final ProgramVariable exceptionParameter,
-            final LocationVariable baseHeap, final ImmutableList<Term> localVarsAtPre,
-            final ImmutableList<Term> localVarsAtPost, final Services services,
+            final LocationVariable baseHeap, final ImmutableList<JTerm> localVarsAtPre,
+            final ImmutableList<JTerm> localVarsAtPost, final Services services,
             final TermBuilder tb) {
         final boolean hasSelf = variables.self != null;
         final boolean hasRes = variables.result != null;
         final boolean hasExc = variables.exception != null;
 
-        final Term heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
+        final JTerm heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
         final Name heapAtPostName = new Name(tb.newName("heap_After_BLOCK"));
-        final Term heapAtPost = tb.func(new JFunction(heapAtPostName, heapAtPre.sort(), true));
-        final Term selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
-        final Term selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
+        final JTerm heapAtPost = tb.func(new JFunction(heapAtPostName, heapAtPre.sort(), true));
+        final JTerm selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
+        final JTerm selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
 
-        Term resultAtPre = hasRes ? tb.var(variables.result) : tb.NULL();
-        final Term resultAtPost =
+        JTerm resultAtPre = hasRes ? tb.var(variables.result) : tb.NULL();
+        final JTerm resultAtPost =
             hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : tb.NULL();
-        final Term exceptionAtPre = hasExc ? tb.var(variables.exception) : tb.NULL();
-        final Term exceptionAtPost =
+        final JTerm exceptionAtPre = hasExc ? tb.var(variables.exception) : tb.NULL();
+        final JTerm exceptionAtPost =
             hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : tb.NULL();
 
         // generate proof obligation variables
@@ -347,7 +350,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         InfFlowPOSnippetFactory infFlowFactory =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
 
-        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
+        final SequentFormula poFormula =
+            buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
         infFlowGoal.addFormula(poFormula, false, true);
@@ -363,7 +367,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return false;
         }
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate((JTerm) occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }
@@ -373,17 +377,15 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     /**
-     *
      * @param formula the formula on which the rule is to be applied.
      * @param goal the current goal.
-     * @param services services.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public Instantiation instantiate(final JTerm formula, final Goal goal) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {
-            final Instantiation result = new Instantiator(formula, goal, services).instantiate();
+            final Instantiation result = new Instantiator(formula, goal).instantiate();
             setLastFocusTerm(formula);
             setLastInstantiation(result);
             return result;
@@ -391,12 +393,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected void setUpInfFlowPartOfUsageGoal(final Goal usageGoal,
-            InfFlowValidityData infFlowValitidyData, final Term contextUpdate,
-            final Term remembranceUpdate, final Term anonymisationUpdate, final TermBuilder tb) {
+            InfFlowValidityData infFlowValitidyData, final JTerm contextUpdate,
+            final JTerm remembranceUpdate, final JTerm anonymisationUpdate, final TermBuilder tb) {
         usageGoal.addTaclet(infFlowValitidyData.taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             true);
-        final Term uAssumptions =
-            tb.applySequential(new Term[] { contextUpdate, remembranceUpdate },
+        final JTerm uAssumptions =
+            tb.applySequential(new JTerm[] { contextUpdate, remembranceUpdate },
                 tb.and(infFlowValitidyData.preAssumption,
                     tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
         usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
@@ -404,7 +406,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
             final BlockContract contract,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
@@ -420,15 +422,15 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         assert infFlowGoal.proof() instanceof InfFlowProof;
         final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
 
-        final ImmutableList<Term> localIns = MiscTools.toTermList(localInVariables, tb);
-        final ImmutableList<Term> localOuts = MiscTools.toTermList(localOutVariables, tb);
-        final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
-        final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
-        final ImmutableList<Term> localInsWithoutOutDuplicates =
+        final ImmutableList<JTerm> localIns = MiscTools.toTermList(localInVariables, tb);
+        final ImmutableList<JTerm> localOuts = MiscTools.toTermList(localOutVariables, tb);
+        final ImmutableList<JTerm> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
+        final ImmutableList<JTerm> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
+        final ImmutableList<JTerm> localInsWithoutOutDuplicates =
             MiscTools.filterOutDuplicates(localIns, localOuts);
-        final ImmutableList<Term> localVarsAtPre =
+        final ImmutableList<JTerm> localVarsAtPre =
             localInsWithoutOutDuplicates.append(localOutsAtPre);
-        final ImmutableList<Term> localVarsAtPost =
+        final ImmutableList<JTerm> localVarsAtPost =
             localInsWithoutOutDuplicates.append(localOutsAtPost);
         final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
             exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
@@ -443,13 +445,13 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         ifContractBuilder.setExecutionContext(instantiation.context());
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
         ifContractBuilder.setProofObligationVars(instantiationVars);
-        final Term contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
+        final JTerm contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp = ifContractBuilder.buildTaclet(infFlowGoal);
 
         // get infFlowAssumptions
-        final Term infFlowPreAssumption = buildInfFlowPreAssumption(instantiationVars, localOuts,
+        final JTerm infFlowPreAssumption = buildInfFlowPreAssumption(instantiationVars, localOuts,
             localOutsAtPre, tb.var(baseHeap), tb);
-        final Term infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
+        final JTerm infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
             localOutsAtPost, tb.var(baseHeap), contractApplTerm, tb);
         addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context(), services);
 
@@ -461,11 +463,11 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected static class InfFlowValidityData {
-        final Term preAssumption;
-        final Term postAssumption;
+        final JTerm preAssumption;
+        final JTerm postAssumption;
         final Taclet taclet;
 
-        public InfFlowValidityData(final Term preAssumption, final Term postAssumption,
+        public InfFlowValidityData(final JTerm preAssumption, final JTerm postAssumption,
                 final Taclet taclet) {
             this.preAssumption = preAssumption;
             this.postAssumption = postAssumption;
@@ -482,15 +484,14 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
          *
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
-         * @param services services.
          */
-        public Instantiator(final Term formula, final Goal goal, final Services services) {
-            super(formula, goal, services);
+        public Instantiator(final JTerm formula, final Goal goal) {
+            super(formula, goal);
         }
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final JavaStatement statement, final Modality.JavaModalityKind modalityKind,
+                final JavaStatement statement, final JModality.JavaModalityKind modalityKind,
                 Goal goal) {
             ImmutableSet<BlockContract> contracts = getApplicableContracts(
                 services.getSpecificationRepository(), statement, modalityKind, goal);

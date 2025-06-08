@@ -5,6 +5,7 @@ package de.uka.ilkd.key.testgen;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -14,8 +15,7 @@ import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -31,8 +31,10 @@ import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.java.StringUtil;
 
 import org.slf4j.Logger;
@@ -87,8 +89,8 @@ public class TestCaseGenerator {
     private final boolean rflAsInternalClass;
     protected final boolean useRFL;
     protected final ReflectionClassCreator rflCreator;
-    private final String dontCopy;
-    protected final String modDir;
+    private final Path dontCopy;
+    protected final Path modDir;
     protected final String directory;
     private TestGenerationLog logger;
     private String fileName;
@@ -168,7 +170,7 @@ public class TestCaseGenerator {
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();
         modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
-        dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
+        dontCopy = modDir.resolve(DONT_COPY);
         directory = settings.getOutputFolderPath();
         sortDummyClass = new HashMap<>();
         info = new ProofInfo(proof);
@@ -192,17 +194,8 @@ public class TestCaseGenerator {
      * @param modelDir The path to the source files of the performed {@link Proof}.
      * @return The computed sub path.
      */
-    protected String computeProjectSubPath(String modelDir) {
-        if (modelDir.startsWith("/")) {
-            return modelDir;
-        } else {
-            int index = modelDir.indexOf(File.separator);
-            if (index >= 0) {
-                return modelDir.substring(index); // Remove drive letter, e.g. Microsoft Windows
-            } else {
-                return modelDir;
-            }
-        }
+    protected Path computeProjectSubPath(Path modelDir) {
+        return modelDir;
     }
 
     public String getMUTCall() {
@@ -251,7 +244,7 @@ public class TestCaseGenerator {
                 .append(sort.declarationString()).append("{").append(NEW_LINE);
         // TODO:extends or implements depending if it is a class or interface.
         sb.append(" public ").append(className).append("(){ };").append(NEW_LINE); // default
-                                                                                   // constructor
+        // constructor
 
         for (IProgramMethod m : jinfo.getAllProgramMethods(kjt)) {
             if (m.getFullName().indexOf('<') > -1) {
@@ -344,7 +337,7 @@ public class TestCaseGenerator {
         return className;
     }
 
-    private void copyFiles(final String srcName, final String targName) throws IOException {
+    private void copyFiles(final Path srcName, final String targName) throws IOException {
         // We don't want to copy the Folder with API Reference
         // Implementation
         if (srcName.equals(dontCopy)) {
@@ -352,7 +345,7 @@ public class TestCaseGenerator {
         }
         // Create the File with given filename and check if it exists and if
         // it's readable
-        final File srcFile = new File(srcName);
+        final File srcFile = srcName.toFile();
         if (!srcFile.exists()) {
             throw new IOException("FileCopy: " + "no such source file: " + srcName);
         }
@@ -367,7 +360,7 @@ public class TestCaseGenerator {
                 newTarget = targName + File.separator + srcFile.getName();
             }
             for (final String subName : srcFile.list()) {
-                copyFiles(srcName + File.separator + subName, newTarget);
+                copyFiles(srcName.resolve(subName), newTarget);
             }
         } else if (srcFile.isFile()) {
             final File targDir = new File(targName);
@@ -450,7 +443,7 @@ public class TestCaseGenerator {
     }
 
     protected String getOracleAssertion(List<OracleMethod> oracleMethods) {
-        Term postcondition = getPostCondition();
+        JTerm postcondition = getPostCondition();
 
         OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
 
@@ -466,7 +459,7 @@ public class TestCaseGenerator {
         return "assertTrue(" + oracleCall + ");";
     }
 
-    private Term getPostCondition() {
+    private JTerm getPostCondition() {
         return info.getPostCondition();
     }
 
@@ -489,12 +482,12 @@ public class TestCaseGenerator {
                 JAVA_FILE_EXTENSION_WITH_DOT);
         }
         createOpenJMLShellScript();
-        TestCaseGenerator.fileCounter++;
+        fileCounter++;
         return testSuite.toString();
     }
 
     public void initFileName() {
-        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+        fileName = "TestGeneric" + fileCounter;
         String mut = getMUTCall();
         if (mut == null) {
             mut = "<method under test> //Manually write a call to the method under test, "
@@ -523,7 +516,7 @@ public class TestCaseGenerator {
                 boolean success = false;
                 if (solver.getSocket().getQuery() != null) {
                     final Model m = solver.getSocket().getQuery().getModel();
-                    if (TestCaseGenerator.modelIsOK(m)) {
+                    if (modelIsOK(m)) {
                         logger.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap =
                             generateTypeInferenceMap(solver.getProblem().getGoal().node());
@@ -535,7 +528,7 @@ public class TestCaseGenerator {
                                 .append(generateTestCase(m, typeInfMap)).append(NEW_LINE)
                                 .append(NEW_LINE);
 
-                        Set<Term> vars = new HashSet<>();
+                        Set<JTerm> vars = new HashSet<>();
                         info.getProgramVariables(info.getPO(), vars);
                         testMethod.append(TAB + "//Other variables").append(NEW_LINE)
                                 .append(getRemainingConstants(m.getConstants().keySet(), vars))
@@ -602,15 +595,15 @@ public class TestCaseGenerator {
 
     protected Map<String, Sort> generateTypeInferenceMap(Node n) {
         HashMap<String, Sort> typeInfMap = new HashMap<>();
-        for (SequentFormula sequentFormula : n.sequent()) {
-            Term t = sequentFormula.formula();
-            generateTypeInferenceMapHelper(t, typeInfMap);
+        for (final SequentFormula sf : n.sequent()) {
+            generateTypeInferenceMapHelper(sf.formula(), typeInfMap);
         }
         return typeInfMap;
     }
 
-    private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map) {
-        Operator op = t.op();
+    private void generateTypeInferenceMapHelper(Term t,
+            Map<String, Sort> map) {
+        final var op = t.op();
         if (op instanceof ProgramVariable) {
             ProgramVariable pv = (ProgramVariable) t.op();
             final String name = pv.name().toString();
@@ -623,7 +616,7 @@ public class TestCaseGenerator {
                     pv.getKeYJavaType());
                 map.put(name, pv.sort());
             }
-        } else if (op instanceof JFunction && !(op instanceof ObserverFunction)) {
+        } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
             // This case collects fields of classes. The function itself has
             // sort "Field" because it is just the name of the field. To get
             // the actual class of the field
@@ -659,7 +652,7 @@ public class TestCaseGenerator {
     private ProgramVariable getProgramVariable(Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof JFunction function) {
+        if (locationTerm.op() instanceof Function function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -674,10 +667,10 @@ public class TestCaseGenerator {
     }
 
     private String getRemainingConstants(Collection<String> existingConstants,
-            Collection<Term> newConstants) {
+            Collection<JTerm> newConstants) {
         StringBuilder result = new StringBuilder();
 
-        for (Term c : newConstants) {
+        for (JTerm c : newConstants) {
 
             if (!existingConstants.contains(c.toString())) {
 

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
+import java.math.BigDecimal;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -43,7 +45,7 @@ public class RealLiteral extends Literal {
         this.value = String.valueOf(value);
     }
 
-    public RealLiteral(java.math.BigDecimal value) {
+    public RealLiteral(BigDecimal value) {
         this.value = String.valueOf(value);
     }
 

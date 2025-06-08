@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.sort.Sort;
 
 public class MatchSortDependingFunctionInstruction extends Instruction<SortDependingFunction> {
@@ -38,7 +39,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      *         {@link MatchConditions}
      */
     private MatchConditions matchSorts(Sort dependingSortToMatch, MatchConditions matchConditions,
-            Services services) {
+            LogicServices services) {
         // This restriction has been dropped for free generic sorts to prove taclets correct
         // assert !(s2 instanceof GenericSort)
         // : "Sort s2 is not allowed to be of type generic.";
@@ -67,14 +68,15 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * match is possible because the top level operator is not a sort depending function or the
      * resulting constraints on the sorts are unsatisfiable.
      *
-     * @param instantiationCandidate the {@link Term} to be matched
+     * @param instantiationCandidate the {@link JTerm} to be matched
      * @param matchConditions the {@link MatchConditions} specifying the constraints to be
      *        considered
      * @param services the {@link Services}
      */
     @Override
-    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
-            Services services) {
+    public final MatchConditions match(JTerm instantiationCandidate,
+            MatchConditions matchConditions,
+            LogicServices services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
             if (op.isSimilar(sdp)) {
@@ -90,7 +92,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+            LogicServices services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNext();

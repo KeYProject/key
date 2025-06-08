@@ -12,13 +12,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -44,10 +46,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Handler option. If provided, the translator will label translations of sequent formulas such
      * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
-     * This option is currently only enabled for Z3.
-     * Currently, this option only works with a CVC5 dev build.
-     * Once <a href="https://github.com/cvc5/cvc5/pull/9353">the fix</a> is included in a release,
-     * add this handler option to the .props file.
+     * This option is currently only enabled for Z3 and cvc5 (needs 1.0.4+).
      * </p>
      * Make sure to also send (get-unsat-core) in the respective socket class when adding this
      * option.
@@ -230,7 +229,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             res.add(sf.formula());
         }
         for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not(sf.formula()));
+            res.add(tb.not((JTerm) sf.formula()));
         }
         return res;
     }

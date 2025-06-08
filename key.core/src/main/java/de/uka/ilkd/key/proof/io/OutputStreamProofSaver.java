@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
@@ -15,9 +16,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -32,9 +31,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -48,9 +45,19 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,8 +179,9 @@ public class OutputStreamProofSaver {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                     StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
-                for (final SequentFormula s : proof.root().sequent().succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
+                for (final SequentFormula s : proof.root().sequent()
+                        .succedent().asList()) {
+                    ((InfFlowProof) proof).addLabeledTotalTerm((JTerm) s.formula());
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -200,7 +208,7 @@ public class OutputStreamProofSaver {
                             && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
                 var loadingConfig = ppo.createLoaderConfig();
                 ps.println("\\proofObligation ");
-                loadingConfig.save(ps, "Proof-Obligation settings");
+                loadingConfig.save(ps, "");
                 ps.println("\n");
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
@@ -231,10 +239,10 @@ public class OutputStreamProofSaver {
         }
     }
 
-    protected String getBasePath() throws IOException {
+    protected Path getBasePath() throws IOException {
         File javaSourceLocation = getJavaSourceLocation(proof);
         if (javaSourceLocation != null) {
-            return javaSourceLocation.getCanonicalPath();
+            return javaSourceLocation.toPath().toAbsolutePath();
         } else {
             return null;
         }
@@ -243,18 +251,21 @@ public class OutputStreamProofSaver {
     /**
      * Searches in the header for absolute paths to Java files and tries to replace them by paths
      * relative to the proof file to be saved.
+     *
+     * TODO weigl: if someone finds time, this function is a string manipulation mess.
+     * You should rather parse the header using the {@link de.uka.ilkd.key.nparser.ParsingFacade}
+     * and
+     * use the {@link de.uka.ilkd.key.nparser.builder.ProblemFinder} to extract the field.
+     *
+     * Better would be to get rid of the header, and using an AST.
      */
     private String makePathsRelative(String header) {
         final String[] search =
-            new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
+            { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
         String tmp = header;
         try {
-            basePath = getBasePath();
-            if (basePath == null) {
-                // if \javaSource has not been set, do not modify paths.
-                return header;
-            }
+            basePath = getBasePath().toString();
 
             // locate filenames in header
             for (final String s : search) {
@@ -272,7 +283,7 @@ public class OutputStreamProofSaver {
 
                 // there may be more than one path
                 while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
-                    if (relPathString.length() > 0) {
+                    if (!relPathString.isEmpty()) {
                         relPathString.append(", ");
                     }
 
@@ -346,9 +357,10 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
-        final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> l =
+            appliedRuleApp.assumesFormulaInstantiations();
         if (l != null) {
-            output.append(ifFormulaInsts(node, l));
+            output.append(assumesFormulaInsts(node, l));
         }
         output.append("");
         userInteraction2Proof(node, output);
@@ -540,7 +552,7 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
-        output.append(builtinRuleIfInsts(node, appliedRuleApp.ifInsts()));
+        output.append(builtinRuleAssumesInsts(node, appliedRuleApp.assumesInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
@@ -696,11 +708,13 @@ public class OutputStreamProofSaver {
         ps.append(")\n");
     }
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq,
+            PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
-        return " (formula \"" + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+        return " (formula \""
+            + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
@@ -726,13 +740,12 @@ public class OutputStreamProofSaver {
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
-        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
-                .interesting()) {
+        for (final var pair : inst.interesting()) {
             final SchemaVariable var = pair.key();
 
             final Object value = pair.value().getInstantiation();
 
-            if (!(value instanceof Term || value instanceof ProgramElement
+            if (!(value instanceof JTerm || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
                     + "FIXME: Unhandled instantiation type: " + value.getClass());
@@ -756,35 +769,38 @@ public class OutputStreamProofSaver {
         return s.toString();
     }
 
-    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
+    public String assumesFormulaInsts(Node node,
+            ImmutableList<AssumesFormulaInstantiation> instantiations) {
         StringBuilder s = new StringBuilder();
-        for (final IfFormulaInstantiation aL : l) {
-            if (aL instanceof IfFormulaInstSeq) {
-                final SequentFormula f = aL.getConstrainedFormula();
+        for (final AssumesFormulaInstantiation assumesFormulaInstantiation : instantiations) {
+            final SequentFormula sequentFormula = assumesFormulaInstantiation.getSequentFormula();
+            if (assumesFormulaInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInSequent) {
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
-                                .formulaNumberInSequent(((IfFormulaInstSeq) aL).inAntec(), f))
+                                .formulaNumberInSequent(assumesFormulaInSequent.inAntecedent(),
+                                    sequentFormula))
                         .append("\")");
-            } else if (aL instanceof IfFormulaInstDirect) {
+            } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices());
+                    printTerm((JTerm) sequentFormula.formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
             } else {
-                throw new IllegalArgumentException("Unknown If-Seq-Formula type");
+                throw new IllegalArgumentException("Unknown Assumes-Seq-Formula type");
             }
         }
 
         return s.toString();
     }
 
-    public String builtinRuleIfInsts(Node node, ImmutableList<PosInOccurrence> ifInsts) {
+    public String builtinRuleAssumesInsts(Node node,
+            ImmutableList<PosInOccurrence> assumesInstantiations) {
         StringBuilder s = new StringBuilder();
-        for (final PosInOccurrence ifInst : ifInsts) {
+        for (final PosInOccurrence posOfAssumesInstatiation : assumesInstantiations) {
             s.append(" (ifInst \"\" ");
-            s.append(posInOccurrence2Proof(node.sequent(), ifInst));
+            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation));
             s.append(")");
         }
         return s.toString();
@@ -814,11 +830,11 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(Term t, Services serv) {
+    public static String printTerm(JTerm t, Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(Term t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(JTerm t, Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
@@ -832,14 +848,14 @@ public class OutputStreamProofSaver {
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
-        } else if (val instanceof Term) {
-            return printTerm((Term) val, services, shortAttrNotation);
+        } else if (val instanceof JTerm) {
+            return printTerm((JTerm) val, services, shortAttrNotation);
         } else if (val instanceof Sequent) {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {
             return val.toString();
-        } else if (val instanceof TermInstantiation) {
-            return printTerm(((TermInstantiation) val).getInstantiation(), services);
+        } else if (val instanceof InstantiationEntry<?> entry) {
+            return printAnything(entry.getInstantiation(), services);
         } else if (val == null) {
             return null;
         } else {

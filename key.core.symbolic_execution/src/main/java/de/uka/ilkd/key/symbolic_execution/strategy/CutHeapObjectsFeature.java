@@ -5,19 +5,21 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.feature.BinaryFeature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -37,21 +39,23 @@ public class CutHeapObjectsFeature extends BinaryFeature {
      * {@inheritDoc}
      */
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        Term cutFormula =
-            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
+        JTerm cutFormula =
+            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos,
+                (de.uka.ilkd.key.proof.Goal) goal,
                 mState);
         if (cutFormula != null) {
             if (cutFormula.op() == Junctor.NOT) {
                 cutFormula = cutFormula.sub(0);
             }
             if (cutFormula.op() == Equality.EQUALS) {
-                Term cutFormulaC0 = cutFormula.sub(0);
-                Term cutFormulaC1 = cutFormula.sub(1);
+                JTerm cutFormulaC0 = cutFormula.sub(0);
+                JTerm cutFormulaC1 = cutFormula.sub(1);
                 boolean contains = false;
                 Iterator<SequentFormula> iter = goal.sequent().iterator();
                 while (!contains && iter.hasNext()) {
-                    Term formula = iter.next().formula();
+                    var formula = iter.next().formula();
                     if (formula.op() == Junctor.NOT) {
                         formula = formula.sub(0);
                     }

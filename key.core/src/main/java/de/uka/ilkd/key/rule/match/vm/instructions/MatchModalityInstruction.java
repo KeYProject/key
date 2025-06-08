@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
 
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
@@ -26,8 +27,8 @@ public class MatchModalityInstruction extends Instruction<Modality>
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(Term t, MatchConditions matchConditions,
-            Services services) {
+    public final MatchConditions match(JTerm t, MatchConditions matchConditions,
+            LogicServices services) {
         return match(t.op(), matchConditions, services);
     }
 
@@ -36,7 +37,7 @@ public class MatchModalityInstruction extends Instruction<Modality>
      */
     @Override
     public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            Services services) {
+            LogicServices services) {
         if (instantiationCandidate instanceof Modality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;
         } else {
@@ -49,7 +50,7 @@ public class MatchModalityInstruction extends Instruction<Modality>
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
+            LogicServices services) {
         return match(termPosition.getCurrentSubterm(), matchConditions, services);
     }
 

@@ -531,4 +531,27 @@ public final class StringUtil {
         return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
     }
 
+
+    /**
+     *
+     * @param text
+     * @param line
+     * @param charPositionInLine
+     * @return
+     */
+    public static String move(@NonNull String text, int line, int charPositionInLine) {
+        return repeat("\n", line) + repeat(" ", charPositionInLine) + text;
+    }
+
+    /// Returns the string until the first match of the given regex.
+    public static String takeUntil(String content, String regex) {
+        var array = content.split(regex, 1);
+        return array[0];
+    }
+
+    /// Returns the string after the first match of the given regex.
+    public static String takeAfter(String content, String regex) {
+        var array = content.split(regex, 1);
+        return array[0];
+    }
 }
