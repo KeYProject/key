@@ -4,6 +4,7 @@
 package org.key_project.prover.rules.instantiation;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofServices;
@@ -92,7 +93,7 @@ public class AssumesFormulaInstSeq
     }
 
     @Override
-    public boolean equals(Object p_obj) {
+    public boolean equals(@Nullable Object p_obj) {
         if (!(p_obj instanceof AssumesFormulaInstSeq other)) {
             return false;
         }

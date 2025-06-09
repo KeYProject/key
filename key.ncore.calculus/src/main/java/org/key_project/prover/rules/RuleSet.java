@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
@@ -34,7 +35,7 @@ public record RuleSet(Name name) implements Named {
     /// @param other the Object with which this instance is compared
     /// @return true it the `other` is a ruleset of the same name
     /// as this ruleset
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (other instanceof RuleSet(Name otherName)) {
             return this.name().equals(otherName);
         }

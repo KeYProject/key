@@ -1,4 +1,6 @@
 /**
  * This package contains classes implementing the proof search strategies of KeY.
  */
-package de.uka.ilkd.key.strategy;
+@NullMarked package de.uka.ilkd.key.strategy;
+
+import org.jspecify.annotations.NullMarked;

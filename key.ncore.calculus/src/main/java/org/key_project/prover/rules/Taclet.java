@@ -5,6 +5,7 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
@@ -39,7 +40,7 @@ public abstract class Taclet implements Rule {
     protected final String displayName;
 
     /// contains the find term
-    protected final SyntaxElement find;
+    protected final @Nullable SyntaxElement find;
 
     /// The restriction(s) for applying this update. [ApplicationRestriction].
     protected final ApplicationRestriction applicationRestriction;
@@ -141,9 +142,8 @@ public abstract class Taclet implements Rule {
     /// Throws an exception if the taclet is improperly constructed. This is the case if
     /// - There is no find part, but the application restriction does not match "in sequent state."
     /// - The find part is a sequent but contains no or more than one formula.
-    private void check() {
-        if (find == null
-                && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
+    private void check(@UnderInitialization(Taclet.class) Taclet this) {
+        if (find == null && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
             throw new IllegalStateException("NoFind taclets should imply \\inSequentState");
         }
         if (find instanceof Sequent seq && seq.size() != 1) {
@@ -429,8 +429,8 @@ public abstract class Taclet implements Rule {
         return tacletAsString;
     }
 
+    @SuppressWarnings("unchecked")
     public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
-        // noinspection unchecked
         return (TacletExecutor<@NonNull G, ?>) executor;
     }
 

@@ -4,6 +4,7 @@
 package org.key_project.prover.strategy.costbased.termProjection;
 
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -15,7 +16,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 /// <code>ForEachCP</code>.
 public class TermBuffer<Goal extends ProofGoal<Goal>> implements ProjectionToTerm<Goal> {
 
-    public Term getContent(MutableState mState) {
+    public @Nullable Term getContent(MutableState mState) {
         return mState.read(this);
     }
 
