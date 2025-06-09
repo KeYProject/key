@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.matcher.vm.instruction;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A {@link MatchInstruction} that verifies whether the current {@link SyntaxElement}
@@ -46,8 +47,9 @@ public final class CheckNodeKindInstruction implements MatchInstruction {
      *         fails
      */
     @Override
-    public @Nullable MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
-                                           LogicServices services) {
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo matchConditions,
+            LogicServices services) {
         if (nodeType.isInstance(actualElement)) {
             return matchConditions;
         }

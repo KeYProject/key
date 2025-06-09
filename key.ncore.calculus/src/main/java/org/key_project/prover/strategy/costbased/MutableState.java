@@ -5,15 +5,13 @@ package org.key_project.prover.strategy.costbased;
 
 import java.util.HashMap;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
-import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 ///
 /// Realizes a variable bank for strategy features such that each feature

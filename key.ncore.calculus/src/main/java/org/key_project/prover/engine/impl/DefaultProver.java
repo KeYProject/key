@@ -106,7 +106,8 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
                     applyAutomatic += System.nanoTime() - applyAutomaticTime;
                 }
                 if (!srInfo.isSuccess()) {
-                    return new ApplyStrategyInfo<>(srInfo.message(), Objects.requireNonNull(proof), null, srInfo.getGoal(),
+                    return new ApplyStrategyInfo<>(srInfo.message(), Objects.requireNonNull(proof),
+                        null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
                 }
                 countApplied++;
@@ -124,7 +125,8 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
                 closedGoals);
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo<>("Interrupted.", Objects.requireNonNull(proof), null, goalChooser.getNextGoal(),
+            return new ApplyStrategyInfo<>("Interrupted.", Objects.requireNonNull(proof), null,
+                goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             LOGGER.warn("doWork exception", t);

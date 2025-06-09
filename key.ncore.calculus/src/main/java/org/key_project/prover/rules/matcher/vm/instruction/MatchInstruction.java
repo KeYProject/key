@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.matcher.vm.instruction;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A specialized {@link VMInstruction} for match operations that do not navigate or
@@ -56,6 +57,7 @@ public interface MatchInstruction extends VMInstruction {
      * @param services logic services used for performing the match
      * @return the result of the match, or {@code null} if the match fails
      */
-    @Nullable MatchResultInfo match(SyntaxElement actualElement,
-                          MatchResultInfo matchConditions, LogicServices services);
+    @Nullable
+    MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo matchConditions, LogicServices services);
 }

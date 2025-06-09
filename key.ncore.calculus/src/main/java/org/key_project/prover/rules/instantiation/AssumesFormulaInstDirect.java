@@ -4,9 +4,10 @@
 package org.key_project.prover.rules.instantiation;
 
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.sequent.SequentFormula;
+
+import org.jspecify.annotations.Nullable;
 
 
 /// Instantiation of an assumes-formula that has to be proven by an explicit assumes-goal

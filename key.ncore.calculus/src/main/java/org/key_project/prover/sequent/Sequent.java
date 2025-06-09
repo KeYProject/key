@@ -6,12 +6,12 @@ package org.key_project.prover.sequent;
 import java.util.Iterator;
 import java.util.Objects;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /// The `Sequent` class represents a formal proof construct consisting of two components:

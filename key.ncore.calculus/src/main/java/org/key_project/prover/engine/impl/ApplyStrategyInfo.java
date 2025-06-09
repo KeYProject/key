@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.Nullable;
 
 /// A container class representing the final result of a proof strategy application.
@@ -141,7 +141,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
                  Error: %s\
                  Applied Rules: %s\
                  Time: %s\
-                 Closed Goals: %s""", message, error!=null ? error.getMessage() : null,
+                 Closed Goals: %s""", message, error != null ? error.getMessage() : null,
             appliedRuleAppsCount, timeInMillis, nrClosedGoals);
     }
 }

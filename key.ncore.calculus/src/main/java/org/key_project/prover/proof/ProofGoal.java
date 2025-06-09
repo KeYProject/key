@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.proof;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /// Interface for proof goals of a sequent proof.
 ///

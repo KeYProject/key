@@ -7,9 +7,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 
 /// Manager for the <code>ChoicePoint</code>s that can occur during the evaluation of a feature

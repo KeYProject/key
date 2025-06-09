@@ -5,7 +5,6 @@ package org.key_project.prover.proof;
 
 import org.key_project.logic.LogicServices;
 
-import org.jspecify.annotations.Nullable;
 
 /// A proof object provides an interface to the current proof status.
 /// It mainly manages the proof goals still to be proven.

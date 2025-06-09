@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import java.util.Objects;
+
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 
-import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Represents a position within a formula contained in a sequent. It enables navigation and
 /// analysis
@@ -225,8 +225,10 @@ public class PosInOccurrence {
     private final class PIOPathIteratorImpl implements PIOPathIterator {
         int child;
         int count = 0;
-        @Nullable IntIterator currentPathIt;
-        @Nullable Term currentSubTerm;
+        @Nullable
+        IntIterator currentPathIt;
+        @Nullable
+        Term currentSubTerm;
 
         private PIOPathIteratorImpl() {
             currentPathIt = posInTerm().iterator();

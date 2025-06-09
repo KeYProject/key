@@ -7,12 +7,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 // a simple cache for the results of the method <code>createList</code>
 public final class AssumesFormulaInstantiationCache {

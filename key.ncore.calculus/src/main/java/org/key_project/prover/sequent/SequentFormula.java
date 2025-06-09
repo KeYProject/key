@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
-import org.jspecify.annotations.Nullable;
+import java.util.Objects;
+
 import org.key_project.logic.Term;
 
-import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /// A sequent formula is a wrapper around a formula that occurs as top level formula in a sequent.
 /// SequentFormula instances have to be unique in the sequent as they are used by PosInOccurrence to
