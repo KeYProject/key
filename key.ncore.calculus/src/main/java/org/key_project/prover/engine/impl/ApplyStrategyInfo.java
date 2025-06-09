@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
 ///
 ///
 /// @see ProofSearchInformation
-public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
+public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends ProofGoal<Goal>>
         implements ProofSearchInformation<Proof, Goal> {
 
     /// The reason why the strategy stopped, for example, proof finished, maximal number of rule
@@ -68,7 +68,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
     /// @param timeInMillis the total execution time in milliseconds
     /// @param appliedRuleAppsCount the number of applied rule applications
     /// @param nrClosedGoals the number of successfully closed goals
-    public ApplyStrategyInfo(String message, Proof proof, Throwable error,
+    public ApplyStrategyInfo(String message, Proof proof, @Nullable Throwable error,
             @Nullable Goal nonCloseableGoal,
             long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
         this.message = message;
@@ -100,7 +100,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
 
     /// {@inheritDoc}
     @Override
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return error;
     }
 
@@ -140,7 +140,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
                  Error: %s\
                  Applied Rules: %s\
                  Time: %s\
-                 Closed Goals: %s""", message, isError() ? error.getMessage() : null,
+                 Closed Goals: %s""", message, error!=null ? error.getMessage() : null,
             appliedRuleAppsCount, timeInMillis, nrClosedGoals);
     }
 }

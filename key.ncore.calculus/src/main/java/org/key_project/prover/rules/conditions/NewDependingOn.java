@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.conditions;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 ///
@@ -31,7 +32,7 @@ public record NewDependingOn(SchemaVariable first, SchemaVariable second) {
 
     public String toString() { return "\\newDependingOn(" + first() + ", " + second() + ")"; }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof NewDependingOn(SchemaVariable first1, SchemaVariable second1))) {
             return false;
         }

@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 /// Interface for proof goals of a sequent proof.
 ///
 /// @param <G> the type of the concrete realization of the proof goal
-public interface ProofGoal<G extends ProofGoal<G>> {
+public interface ProofGoal<G extends @Nullable ProofGoal<G>> {
     /// The proof object to which this goal belongs.
     ///
     /// @return proof object with which this goal is associated

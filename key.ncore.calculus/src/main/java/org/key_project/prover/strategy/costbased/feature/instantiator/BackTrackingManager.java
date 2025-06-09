@@ -7,6 +7,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -72,7 +73,7 @@ public final class BackTrackingManager {
     /// Method that has to be called before a sequence of evaluation runs of a feature term.
     ///
     /// @param initialApp the original rule application in question
-    public void setup(RuleApp initialApp) {
+    public void setup(@Nullable RuleApp initialApp) {
         this.initialApp = initialApp;
         choices.clear();
         chosenBranches.clear();
@@ -91,14 +92,14 @@ public final class BackTrackingManager {
 
         while (!choices.isEmpty()) {
             final Iterator<CPBranch> chs = choices.pop();
-            chosenBranches.remove(chosenBranches.size() - 1);
+            chosenBranches.removeLast();
 
             if (chs.hasNext()) {
                 pushChoices(chs, chs.next());
                 return true;
             }
 
-            tickets.remove(tickets.size() - 1);
+            tickets.removeLast();
         }
 
         // make sure that no further choicepoints occur until <code>setup</code>
@@ -110,7 +111,7 @@ public final class BackTrackingManager {
 
     /// @return the resulting rule application when all choice points have applied their
     /// modifications
-    public RuleApp getResultingapp() {
+    public @Nullable RuleApp getResultingapp() {
         return getOldRuleApp();
     }
 
@@ -162,7 +163,7 @@ public final class BackTrackingManager {
         }
     }
 
-    private RuleApp getOldRuleApp() {
+    private @Nullable RuleApp getOldRuleApp() {
         if (chosenBranches.isEmpty()) {
             return initialApp;
         }

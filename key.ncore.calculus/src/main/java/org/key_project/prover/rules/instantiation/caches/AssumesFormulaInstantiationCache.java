@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.util.LRUCache;
@@ -25,7 +26,7 @@ public final class AssumesFormulaInstantiationCache {
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
 
-    public ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
+    public @Nullable ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
         try {
             readLock.lock();
             final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =

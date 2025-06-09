@@ -5,6 +5,7 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -38,7 +39,7 @@ public abstract class Taclet implements Rule {
     protected final String displayName;
 
     /// contains the find term
-    protected final @Nullable SyntaxElement find;
+    protected final SyntaxElement find;
 
     /// The restriction(s) for applying this update. [ApplicationRestriction].
     protected final ApplicationRestriction applicationRestriction;
@@ -98,10 +99,10 @@ public abstract class Taclet implements Rule {
     // but all at once for a given term.
 
     /// The taclet matcher
-    protected TacletMatcher matcher;
+    protected @MonotonicNonNull TacletMatcher matcher;
 
     /// The taclet executor
-    protected TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
+    protected @MonotonicNonNull TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
 
     /// creates a Taclet (originally known as Schematic Theory Specific Rules)
     ///

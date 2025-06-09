@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.instantiation;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofServices;
@@ -112,7 +113,7 @@ public class AssumesFormulaInstSeq
         return inAntecedent;
     }
 
-    private volatile PosInOccurrence pioCache = null;
+    private volatile @MonotonicNonNull PosInOccurrence pioCache = null;
 
     public PosInOccurrence toPosInOccurrence() {
         if (pioCache == null) {

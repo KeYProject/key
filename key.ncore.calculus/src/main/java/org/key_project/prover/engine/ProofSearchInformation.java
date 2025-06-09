@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
@@ -33,12 +34,11 @@ import org.jspecify.annotations.Nullable;
 /// resolving unresolved goals or handling errors.
 ///
 ///
-/// @param
-/// the type of the proof object, extending [ProofObject]
+/// @param <P> the type of the proof object, extending [ProofObject]
 /// @param <G> the type of the proof goal, extending [ProofGoal]
 ///
-/// @see org.key_project.prover.proof.ProofObject
-/// @see org.key_project.prover.proof.ProofGoal
+/// @see ProofObject
+/// @see ProofGoal
 public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G extends ProofGoal<@NonNull G>> {
 
     /// Retrieves the explanation or reason wjy the proof search (strategy execution) finished.
@@ -80,7 +80,8 @@ public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G ext
     ///
     ///
     /// @return `true` if an error occurred, otherwise `false`
-    boolean isError();
+   @EnsuresNonNull("getException()")
+   boolean isError();
 
     /// Retrieves the exception that occurred during strategy execution, if any.
     ///
@@ -89,7 +90,7 @@ public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G ext
     ///
     ///
     /// @return the exception encountered during execution, or `null` if no error occurred
-    Throwable getException();
+    @Nullable Throwable getException();
 
     /// Returns the total time taken for the strategy application, in milliseconds.
     ///

@@ -19,8 +19,8 @@ public interface PIOPathIterator extends IntIterator {
     PosInOccurrence getPosInOccurrence();
 
     /// @return the current subterm this object points to (i.e. corresponding to the latest
-    /// <code>next()</code>-call); this method satisfies
-    /// <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
+    /// `next()`-call); this method satisfies
+    /// `getPosInOccurrence().subTerm()==getSubTerm()`
     Term getSubTerm();
 
     /// @return the number of the next child on the path, or <code>-1</code> if no further child

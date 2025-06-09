@@ -4,6 +4,7 @@
 package org.key_project.prover.strategy.costbased;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Singleton implementation of the <code>RuleAppCost</code> interface, which denotes a maximum cost
 /// (rule applications with this cost can't be afforded at all)
@@ -18,7 +19,7 @@ public class TopRuleAppCost implements RuleAppCost {
         return 1;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }

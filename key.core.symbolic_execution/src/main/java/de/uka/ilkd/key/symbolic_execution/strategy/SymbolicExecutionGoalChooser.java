@@ -155,11 +155,11 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public void removeGoal(Goal p_goal) {
+    public void removeGoal(Goal goal) {
         // Update available goals in super class
-        super.removeGoal(p_goal);
+        super.removeGoal(goal);
         // Remove no longer relevant goal from preferred set
-        goalsToPrefer.remove(p_goal);
+        goalsToPrefer.remove(goal);
     }
 
     /**

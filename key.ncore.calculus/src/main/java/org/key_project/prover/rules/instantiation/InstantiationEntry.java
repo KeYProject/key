@@ -5,6 +5,7 @@ package org.key_project.prover.rules.instantiation;
 
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This is an abstract class that encapsulates an instantiation of a SchemaVariable. It is needed
 /// because SchemaVariables can be instantiated as ProgramElements and as Terms according to their
@@ -33,7 +34,7 @@ public class InstantiationEntry<E> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o != null && o.getClass() == getClass()) {
             return (instantiation.equals(((InstantiationEntry<E>) o).instantiation));
         }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.proof.ProofGoal;
@@ -35,8 +36,8 @@ public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal
 
     /// {@inheritDoc}
     @Override
-    public String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
-            long startTime, int countApplied) {
+    public @Nullable String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
+                                                     long startTime, int countApplied) {
         return null;
     }
 
