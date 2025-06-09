@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.proof.ProofGoal;
 
 ///
@@ -64,7 +65,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// computed via [#currentTimeMillis()]
     /// @param countApplied The number of already applied rules.
     /// @return description of the reason why automatic proof search has stopped
-    String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
+    @Nullable String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
             long startTime, int countApplied);
 
     /// Checks after each applied rule if more rules should be applied or if the strategy should
@@ -78,7 +79,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// @param singleRuleApplicationInfo An optional [SingleRuleApplicationInfo].
     /// @return `true` stop strategy, `false` continue strategy and apply next rule.
     boolean shouldStop(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo);
 
     /// Returns a human-readable message which explains why the previous
     /// [#shouldStop(int,long,long,int,SingleRuleApplicationInfo)]
@@ -92,5 +93,5 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// @param singleRuleApplicationInfo An optional [SingleRuleApplicationInfo].
     /// @return The human-readable message which explains the stop reason.
     String getStopMessage(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

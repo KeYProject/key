@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.key_project.prover.engine.AbstractProverCore;
@@ -38,7 +39,7 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
 
     /// The proof currently being constructed or manipulated by this prover.
-    protected Proof proof;
+    protected @Nullable Proof proof;
 
     /// The maximum number of rule applications allowed during the proof process.
     protected int maxApplications;
@@ -60,10 +61,10 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     protected boolean cancelled;
 
     /// A condition that determines whether the prover should stop its execution.
-    protected StopCondition<Goal> stopCondition;
+    protected @Nullable StopCondition<Goal> stopCondition;
 
     /// A strategy component that selects the next goal to be processed.
-    protected GoalChooser<Proof, Goal> goalChooser;
+    protected @Nullable GoalChooser<Proof, Goal> goalChooser;
 
     /// This is currently a hook method for the JavaDL prover as according to a
     /// comment the built-in-rule index is not updated when rules are applied.
@@ -105,7 +106,7 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
                     applyAutomatic += System.nanoTime() - applyAutomaticTime;
                 }
                 if (!srInfo.isSuccess()) {
-                    return new ApplyStrategyInfo<>(srInfo.message(), proof, null, srInfo.getGoal(),
+                    return new ApplyStrategyInfo<>(srInfo.message(), Objects.requireNonNull(proof), null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
                 }
                 countApplied++;
@@ -123,16 +124,16 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
                 closedGoals);
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo<>("Interrupted.", proof, null, goalChooser.getNextGoal(),
+            return new ApplyStrategyInfo<>("Interrupted.", Objects.requireNonNull(proof), null, goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             LOGGER.warn("doWork exception", t);
-            return new ApplyStrategyInfo<>("Error.", proof, t, null,
+            return new ApplyStrategyInfo<>("Error.", Objects.requireNonNull(proof), t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
             LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
-            LOGGER.trace("applyAutomaticRule: " + applyAutomatic);
+            LOGGER.trace("applyAutomaticRule: {} ", applyAutomatic);
         }
     }
 

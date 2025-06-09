@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.strategy.costbased.feature;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -161,9 +162,9 @@ public abstract class ScaleFeature implements Feature {
         }
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-                PosInOccurrence pos, Goal goal,
-                MutableState mState) {
+        public <Goal extends ProofGoal<@NonNull Goal>> @Nullable RuleAppCost computeCost(RuleApp app,
+                                                                                         PosInOccurrence pos, Goal goal,
+                                                                                         MutableState mState) {
             final RuleAppCost cost = getFeature().computeCost(app, pos, goal, mState);
             long costVal;
 

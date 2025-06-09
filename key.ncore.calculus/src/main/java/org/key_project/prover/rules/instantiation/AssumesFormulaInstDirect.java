@@ -4,6 +4,7 @@
 package org.key_project.prover.rules.instantiation;
 
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.sequent.SequentFormula;
 
@@ -38,7 +39,7 @@ public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
         return toString(null);
     }
 
-    public boolean equals(Object p_obj) {
+    public boolean equals(@Nullable Object p_obj) {
         if (!(p_obj instanceof AssumesFormulaInstDirect)) {
             return false;
         }

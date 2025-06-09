@@ -27,7 +27,7 @@ public abstract class TacletGoalTemplate {
     /// program variables added by this taclet to the namespace
     protected final ImmutableSet<SchemaVariable> addedProgVars;
 
-    private String name = null;
+    private @Nullable String name;
 
     /// Creates a new goal template for a taclet
     ///

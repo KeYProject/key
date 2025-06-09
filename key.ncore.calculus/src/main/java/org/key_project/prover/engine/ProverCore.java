@@ -12,8 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 /// of this interface provide mechanisms to start proof searches, manage listeners
 /// for proof tasks, and handle interruption or resource cleanup.
 ///
-/// @param
-/// The type of proof object, which extends [ProofObject].
+/// @param <P> type of proof object, which extends [ProofObject].
 /// @param <G> The type of proof goal, which extends [ProofGoal].
 public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
 

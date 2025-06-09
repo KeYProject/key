@@ -23,8 +23,8 @@ public interface GoalChooser<P extends @Nullable ProofObject<@NonNull G>, G exte
     @Nullable
     G getNextGoal();
 
-    /// Remove p_goal from selectedList (e.g. no taclet can be applied to p_goal)
-    void removeGoal(G p_goal);
+    /// Remove goal from selectedList (e.g. no taclet can be applied to goal)
+    void removeGoal(G goal);
 
     /// The given node has become an internal node of the proof tree, and the children of the node
     /// are the given goals

@@ -5,6 +5,7 @@ package org.key_project.prover.sequent;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -84,8 +85,7 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
     /// @return a semi sequent change information object with the new [Semisequent] and
     /// information, which formulas have been added or removed
     protected SemisequentChangeInfo insertAndRemoveRedundancyHelper(int idx,
-            @NonNull SequentFormula sequentFormula, SemisequentChangeInfo semiCI,
-            FormulaChangeInfo fci) {
+            SequentFormula sequentFormula, SemisequentChangeInfo semiCI, @Nullable FormulaChangeInfo fci) {
         // Search for equivalent formulas and weakest constraint
         ImmutableList<SequentFormula> searchList = semiCI.getFormulaList();
         final var newSeqList = new SequentFormula[searchList.size()];
@@ -219,7 +219,7 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
     /// @return true if and only if the `other` [Semisequent] contains the same
     /// formulas in the same order.
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (!(other instanceof Semisequent s)) {
             return false;
         }
