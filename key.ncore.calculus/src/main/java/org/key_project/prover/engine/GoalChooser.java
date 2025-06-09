@@ -21,7 +21,8 @@ public interface GoalChooser<P extends ProofObject<G>, G extends ProofGoal<G>> {
     void init(@Nullable P p_proof, @Nullable ImmutableList<G> p_goals);
 
     /// @return the next goal a taclet should be applied to
-    @Nullable G getNextGoal();
+    @Nullable
+    G getNextGoal();
 
     /// Remove goal from selectedList (e.g. no taclet can be applied to goal)
     void removeGoal(G goal);

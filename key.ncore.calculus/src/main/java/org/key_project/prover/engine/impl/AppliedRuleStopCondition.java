@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.proof.ProofGoal;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 ///
 /// Implementation of [StopCondition] which stops the strategy after a reached limit of rules
@@ -37,7 +37,7 @@ public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal
     /// {@inheritDoc}
     @Override
     public @Nullable String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
-                                                     long startTime, int countApplied) {
+            long startTime, int countApplied) {
         return null;
     }
 

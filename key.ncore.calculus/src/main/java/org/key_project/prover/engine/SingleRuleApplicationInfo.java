@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Represents information about the result of a single rule application in the KeY verification
 /// system.
@@ -59,7 +59,7 @@ public class SingleRuleApplicationInfo {
     /// @param nonCloseableGoal the proof goal that could not be closed by this rule application.
     /// @param appliedRuleApp the rule that was applied (if any).
     public SingleRuleApplicationInfo(String message, ProofGoal<?> nonCloseableGoal,
-           @Nullable RuleApp appliedRuleApp) {
+            @Nullable RuleApp appliedRuleApp) {
         this.message = message;
         this.goal = nonCloseableGoal;
         this.appliedRuleApp = appliedRuleApp;

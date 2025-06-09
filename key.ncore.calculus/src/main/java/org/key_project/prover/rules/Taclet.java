@@ -5,8 +5,6 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
-import org.checkerframework.checker.initialization.qual.UnderInitialization;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -22,6 +20,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -143,7 +143,8 @@ public abstract class Taclet implements Rule {
     /// - There is no find part, but the application restriction does not match "in sequent state."
     /// - The find part is a sequent but contains no or more than one formula.
     private void check(@UnderInitialization(Taclet.class) Taclet this) {
-        if (find == null && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
+        if (find == null
+                && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
             throw new IllegalStateException("NoFind taclets should imply \\inSequentState");
         }
         if (find instanceof Sequent seq && seq.size() != 1) {

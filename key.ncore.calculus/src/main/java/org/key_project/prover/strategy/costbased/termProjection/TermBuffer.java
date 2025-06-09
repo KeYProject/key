@@ -4,12 +4,13 @@
 package org.key_project.prover.strategy.costbased.termProjection;
 
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+
+import org.jspecify.annotations.Nullable;
 
 /// Projection that can store and returns an arbitrary term or formula. Objects of this class are
 /// mainly used like bound variables and together with features like <code>LetFeature</code> and

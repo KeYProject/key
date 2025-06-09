@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.proof.ProofGoal;
+
+import org.jspecify.annotations.Nullable;
 
 ///
 /// Implementation of this interface can be used by implementations of
@@ -65,7 +66,8 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// computed via [#currentTimeMillis()]
     /// @param countApplied The number of already applied rules.
     /// @return description of the reason why automatic proof search has stopped
-    @Nullable String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
+    @Nullable
+    String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
             long startTime, int countApplied);
 
     /// Checks after each applied rule if more rules should be applied or if the strategy should

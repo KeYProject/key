@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.conditions;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.op.sv.SchemaVariable;
+
+import org.jspecify.annotations.Nullable;
 
 ///
 /// class containing a pair of SchemaVariables, the first one being a TermSV, the second one a
