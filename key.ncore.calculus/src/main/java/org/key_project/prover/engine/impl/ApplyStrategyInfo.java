@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// A container class representing the final result of a proof strategy application.
@@ -88,12 +88,13 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
 
     /// {@inheritDoc}
     @Override
-    public Goal nonCloseableGoal() {
+    public @Nullable Goal nonCloseableGoal() {
         return nonCloseableGoal;
     }
 
     /// {@inheritDoc}
     @Override
+    @EnsuresNonNull("error")
     public boolean isError() {
         return error != null;
     }

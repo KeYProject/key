@@ -5,9 +5,12 @@ package org.key_project.prover.strategy.costbased;
 
 import java.util.HashMap;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
+import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 import org.jspecify.annotations.NonNull;
@@ -29,19 +32,16 @@ import org.jspecify.annotations.NonNull;
 public class MutableState {
 
     /// maps a term buffer to its value
-    private HashMap<TermBuffer<?>, Term> content;
+    private final HashMap<TermBuffer<?>, Term> content = HashMap.newHashMap(32);
 
     /// manages backtracking for features that create [ChoicePoint]s
-    private BackTrackingManager btManager;
+    private @Nullable BackTrackingManager btManager;
 
     /// assign the given [TermBuffer] the provided value
     ///
     /// @param v the [TermBuffer]
     /// @param value the Term which is assigned as the value
     public <Goal extends ProofGoal<@NonNull Goal>> void assign(TermBuffer<Goal> v, Term value) {
-        if (content == null) {
-            content = new HashMap<>();
-        }
         content.put(v, value);
     }
 
@@ -49,20 +49,14 @@ public class MutableState {
     ///
     /// @param v the TermBuffer whose value is asked for
     /// @return the current value of the [TermBuffer] or `null` if there is none
-    public <Goal extends ProofGoal<@NonNull Goal>> Term read(TermBuffer<Goal> v) {
-        if (content == null) {
-            return null;
-        }
+    public <Goal extends ProofGoal<@NonNull Goal>> @Nullable Term read(TermBuffer<Goal> v) {
         return content.get(v);
     }
 
     /// returns the backtracking manager to access [ChoicePoint]s
     ///
     /// @return the backtracking manager
-    public BackTrackingManager getBacktrackingManager() {
-        if (btManager == null) {
-            btManager = new BackTrackingManager();
-        }
+    public @Nullable BackTrackingManager getBacktrackingManager() {
         return btManager;
     }
 }

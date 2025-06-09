@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.Term;
 
@@ -21,7 +22,7 @@ public interface PIOPathIterator extends IntIterator {
     /// @return the current subterm this object points to (i.e. corresponding to the latest
     /// `next()`-call); this method satisfies
     /// `getPosInOccurrence().subTerm()==getSubTerm()`
-    Term getSubTerm();
+    @Nullable Term getSubTerm();
 
     /// @return the number of the next child on the path, or <code>-1</code> if no further child
     /// exists (this is the number that was also returned by the last call of

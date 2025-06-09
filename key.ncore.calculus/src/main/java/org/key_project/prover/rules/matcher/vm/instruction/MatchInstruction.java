@@ -41,7 +41,7 @@ public interface MatchInstruction extends VMInstruction {
      *         or {@code null} if it fails
      */
     @Override
-    default MatchResultInfo match(PoolSyntaxElementCursor cursor,
+    default @Nullable MatchResultInfo match(PoolSyntaxElementCursor cursor,
             MatchResultInfo matchResultInfo,
             LogicServices services) {
         return match(cursor.getCurrentElement(), matchResultInfo, services);

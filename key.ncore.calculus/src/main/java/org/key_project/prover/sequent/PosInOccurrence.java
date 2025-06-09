@@ -5,6 +5,7 @@ package org.key_project.prover.sequent;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
@@ -173,7 +174,7 @@ public class PosInOccurrence {
     /// @param obj The object to compare with.
     /// @return True if both refer to the same formula, otherwise false.
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof PosInOccurrence cmp)) {
             return false;
         }

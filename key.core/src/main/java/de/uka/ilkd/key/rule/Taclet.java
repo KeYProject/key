@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -140,6 +141,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             tacletAnnotations);
     }
 
+    @EnsuresNonNull("matcher")
     protected void createAndInitializeMatcher() {
         this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }

@@ -31,8 +31,8 @@ import org.jspecify.annotations.NonNull;
  */
 public class ForEachCP implements Feature {
 
-    private final TermBuffer var;
-    private final TermGenerator generator;
+    private final TermBuffer<?> var;
+    private final TermGenerator<?> generator;
     private final Feature body;
 
     /**

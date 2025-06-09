@@ -115,7 +115,7 @@ public final class BackTrackingManager {
         return getOldRuleApp();
     }
 
-    private void pushChoices(Iterator<CPBranch> remainingChoices, CPBranch chosen) {
+    private void pushChoices(Iterator<CPBranch> remainingChoices, @Nullable CPBranch chosen) {
         choices.push(remainingChoices);
         chosenBranches.add(chosen);
     }
