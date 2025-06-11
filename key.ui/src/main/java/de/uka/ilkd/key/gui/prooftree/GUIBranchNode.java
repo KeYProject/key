@@ -4,14 +4,20 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.Taclet;
 
 import org.jspecify.annotations.NonNull;
 
 /**
- * this class implements a TreeModel that can be displayed using the JTree class framework
+ * Branch node indicating the start of a new proof branch.
+ *
+ * @author early KeY team
+ * @see ProofTreeView
  */
 class GUIBranchNode extends GUIAbstractTreeNode {
 
@@ -25,46 +31,82 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         this.label = label;
     }
 
-    public TreeNode getChildAt(int childIndex) {
-        ensureChildrenCacheExists();
-        return childrenCache.get(childIndex);
-        /*
-         * int count = 0; Node n = subTree; while ( childIndex != count && n.childrenCount() == 1 )
-         * { count++; n = n.child(0); } if ( childIndex == count ) { return getProofTreeModel
-         * ().getProofTreeNode(n); } else { return findBranch ( n.child(childIndex-count-1) ); }
-         */
+    private void createChildrenCache() {
+        childrenCache = new ArrayList<>();
     }
 
-    private void ensureChildrenCacheExists() {
+    public TreeNode getChildAt(int childIndex) {
+        fillChildrenCache(false);
+        return childrenCache.get(childIndex);
+    }
+
+    /**
+     * Fill the {@link #childrenCache}.
+     *
+     * @param dryRun if true, only count the number of children that would be added
+     * @return number of children
+     */
+    private int fillChildrenCache(boolean dryRun) {
         if (childrenCache == null) {
-            childrenCache = new ArrayList<>();
-        } else {
-            return;
+            createChildrenCache();
+        }
+
+        if (!childrenCache.isEmpty()) {
+            return childrenCache.size();
         }
 
         int count = 0;
         Node n = getNode();
 
         if (n == null) {
-            return;
+            return 0;
         }
 
         while (true) {
-            childrenCache.add(count, getProofTreeModel().getProofTreeNode(n));
             count++;
-            final Node nextN = findChild(n);
-            if (nextN == null) {
+            if (!dryRun) {
+                var newNode = getProofTreeModel().getProofTreeNode(n);
+                newNode.setParent(this);
+                childrenCache.add(newNode);
+            }
+            List<Node> nextN = findChild(n);
+            if (nextN.isEmpty()) {
                 break;
             }
-            n = nextN;
+            if (nextN.size() > 1) {
+                // linearized mode: the main branch will be continued without a new BranchNode
+                if (getProofTreeModel().linearizedModeActive()
+                        && (n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                                .equals(taclet.goalTemplates().last().tag(), "main"))) {
+                    n = nextN.get(0);
+                    nextN.remove(0);
+                    for (var node : nextN) {
+                        count++;
+                        if (!dryRun) {
+                            var branchNode = findBranch(node);
+                            branchNode.setParent(this);
+                            childrenCache.add(branchNode);
+                        }
+                    }
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            n = nextN.get(0);
         }
 
         for (int i = 0; i != n.childrenCount(); ++i) {
             if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
-                childrenCache.add(count, findBranch(n.child(i)));
                 count++;
+                if (!dryRun) {
+                    var branchNode = findBranch(n.child(i));
+                    branchNode.setParent(this);
+                    childrenCache.add(branchNode);
+                }
             }
         }
+        return count;
     }
 
     @Override
@@ -77,30 +119,17 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         return toString();
     }
 
+    @Override
     public int getChildCount() {
-        if (childrenCache == null) {
-            ensureChildrenCacheExists();
-        }
-        return childrenCache.size();
+        return fillChildrenCache(true);
     }
 
-    public TreeNode getParent() {
-        Node self = getNode();
-        if (self == null) {
-            return null;
-        }
-        Node n = self.parent();
-        if (n == null) {
-            return null;
-        } else {
-            while (n.parent() != null && findChild(n.parent()) != null) {
-                n = n.parent();
-            }
-            return findBranch(n);
-        }
-    }
-
-    // signalled by GUIProofTreeModel when the user has altered the value
+    /**
+     * Set the label of this branch node.
+     * Signalled by GUIProofTreeModel when the user has altered the value.
+     *
+     * @param s new label
+     */
     public void setLabel(String s) {
         Node n = getNode();
         if (n != null) {
@@ -108,10 +137,12 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         }
     }
 
+    @Override
     public boolean isLeaf() {
         return false;
     }
 
+    @Override
     public String toString() {
         Node n = getNode();
         String res;
@@ -126,6 +157,10 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         return res;
     }
 
+    /**
+     * @return whether this branch is closed
+     * @see Node#isClosed()
+     */
     public boolean isClosed() {
         Node node = getNode();
         return node != null && node.isClosed();

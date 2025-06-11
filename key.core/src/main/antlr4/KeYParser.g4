@@ -754,7 +754,7 @@ option_expr
 
 goalspec
 :
-  (name=string_value COLON)?
+  (name=string_value (LBRACKET tag=simple_ident RBRACKET)? COLON)?
   ( rwObj=replacewith
     addSeq=add?
     addRList=addrules?

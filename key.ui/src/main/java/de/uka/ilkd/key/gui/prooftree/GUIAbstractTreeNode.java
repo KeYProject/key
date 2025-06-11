@@ -5,8 +5,10 @@ package de.uka.ilkd.key.gui.prooftree;
 
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
@@ -21,6 +23,8 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     // and ProofTreeView.delegateView.lastPathComponent
     private final WeakReference<Node> noderef;
 
+    protected TreeNode parent;
+
     protected GUIProofTreeModel getProofTreeModel() {
         return tree;
     }
@@ -34,7 +38,18 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     public abstract int getChildCount();
 
-    public abstract TreeNode getParent();
+    @Override
+    public TreeNode getParent() {
+        if (parent == null && this != tree.getRoot()
+                && !(getNode() != null && ProofTreeViewFilter.hiddenByGlobalFilters(getNode()))) {
+            Node n = getNode();
+            if (n != null && n.proof().root() == n) {
+                return null; // TODO: why can there be another instance of the root node?
+            }
+            throw new IllegalStateException("abstract tree node without parent: " + this);
+        }
+        return parent;
+    }
 
     public abstract boolean isLeaf();
 
@@ -70,8 +85,8 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return path.toArray(new TreeNode[0]);
     }
 
-    protected TreeNode findBranch(Node p_node) {
-        TreeNode res = getProofTreeModel().findBranch(p_node);
+    protected GUIAbstractTreeNode findBranch(Node p_node) {
+        GUIAbstractTreeNode res = getProofTreeModel().findBranch(p_node);
         if (res != null) {
             return res;
         }
@@ -119,25 +134,34 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return noderef.get();
     }
 
-    protected Node findChild(Node n) {
+    /**
+     * Get the children of the specified node whilst respecting the configured
+     * global view filters.
+     *
+     * @param n the nodes
+     * @return children nodes
+     */
+    protected List<Node> findChild(Node n) {
         if (n.childrenCount() == 1) {
-            return n.child(0);
+            return List.of(n.child(0));
         }
 
-        if (!getProofTreeModel().globalFilterActive()) {
-            return null;
+        if (!getProofTreeModel().globalFilterActive()
+                && !getProofTreeModel().linearizedModeActive()) {
+            return List.of();
         }
 
-        Node nextN = null;
+        List<Node> nextN = new ArrayList<>();
         for (int i = 0; i != n.childrenCount(); ++i) {
             if (!ProofTreeViewFilter.hiddenByGlobalFilters(n.child(i))) {
-                if (nextN != null) {
-                    return null;
-                }
-                nextN = n.child(i);
+                nextN.add(n.child(i));
             }
         }
 
         return nextN;
+    }
+
+    protected void setParent(TreeNode parent) {
+        this.parent = parent;
     }
 }

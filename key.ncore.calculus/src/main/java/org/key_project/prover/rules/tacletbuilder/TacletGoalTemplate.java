@@ -28,6 +28,7 @@ public abstract class TacletGoalTemplate {
     protected final ImmutableSet<SchemaVariable> addedProgVars;
 
     private String name = null;
+    private String tag = null;
 
     /// Creates a new goal template for a taclet
     ///
@@ -88,10 +89,17 @@ public abstract class TacletGoalTemplate {
         this.name = name;
     }
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public String name() {
         return name;
     }
 
+    public String tag() {
+        return tag;
+    }
 
     @Override
     public boolean equals(Object o) {
