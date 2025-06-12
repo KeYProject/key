@@ -268,7 +268,7 @@ public class PosInOccurrence {
         /// {@inheritDoc}
         @EnsuresNonNullIf(expression = "currentPathIt", result = true)
         public boolean hasNext() {
-            return currentPathIt != null;
+            return currentPathIt != null && currentPathIt.hasNext();
         }
 
         /// @return the number of the next child on the path, or <code>-1</code> if no further child

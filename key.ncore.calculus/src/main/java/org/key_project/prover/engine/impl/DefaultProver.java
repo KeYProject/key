@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine.impl;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.key_project.prover.engine.AbstractProverCore;
@@ -177,8 +176,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
         }
         if (app == null) {
             return new SingleRuleApplicationInfo(
-                "No more rules automatically applicable to any goal.", Objects.requireNonNull(g),
-                app);
+                "No more rules automatically applicable to any goal.", g, app);
         } else {
             try {
                 @SuppressWarnings({ "nullness", "unused" })

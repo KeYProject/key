@@ -10,6 +10,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -33,7 +34,7 @@ public class MutableState {
     private final HashMap<TermBuffer<?>, @Nullable Term> content = HashMap.newHashMap(32);
 
     /// manages backtracking for features that create [ChoicePoint]s
-    private @Nullable BackTrackingManager btManager;
+    private @MonotonicNonNull BackTrackingManager btManager;
 
     /// assign the given [TermBuffer] the provided value
     ///
@@ -56,6 +57,9 @@ public class MutableState {
     ///
     /// @return the backtracking manager
     public @Nullable BackTrackingManager getBacktrackingManager() {
+        if (btManager == null) {
+            btManager = new BackTrackingManager();
+        }
         return btManager;
     }
 }

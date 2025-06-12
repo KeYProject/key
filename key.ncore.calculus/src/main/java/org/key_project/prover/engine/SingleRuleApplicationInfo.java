@@ -37,7 +37,7 @@ public class SingleRuleApplicationInfo {
     /// This could be a success message or a reason for failure.
     private final String message;
     /// The proof goal associated with the rule application.
-    private final ProofGoal<?> goal;
+    private final @Nullable ProofGoal<?> goal;
     /// The rule that was applied.
     private final @Nullable RuleApp appliedRuleApp;
 
@@ -45,7 +45,7 @@ public class SingleRuleApplicationInfo {
     ///
     /// @param mayCloseableGoal the proof goal that may be closed by this rule application.
     /// @param appliedRuleApp the rule that was successfully applied.
-    public SingleRuleApplicationInfo(ProofGoal<?> mayCloseableGoal,
+    public SingleRuleApplicationInfo(@Nullable ProofGoal<?> mayCloseableGoal,
             @NonNull RuleApp appliedRuleApp) {
         this.message = "Rule applied successful";
         this.goal = mayCloseableGoal;
@@ -58,7 +58,7 @@ public class SingleRuleApplicationInfo {
     /// @param message a message explaining why the rule application failed.
     /// @param nonCloseableGoal the proof goal that could not be closed by this rule application.
     /// @param appliedRuleApp the rule that was applied (if any).
-    public SingleRuleApplicationInfo(String message, ProofGoal<?> nonCloseableGoal,
+    public SingleRuleApplicationInfo(String message, @Nullable ProofGoal<?> nonCloseableGoal,
             @Nullable RuleApp appliedRuleApp) {
         this.message = message;
         this.goal = nonCloseableGoal;
