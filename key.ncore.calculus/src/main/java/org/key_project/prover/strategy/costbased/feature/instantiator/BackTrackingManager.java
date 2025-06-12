@@ -27,7 +27,7 @@ public final class BackTrackingManager {
     /// The original rule application in question, i.e., the application without the changes that
     /// can
     /// possibly be applied by <code>ChoicePoint</code>s
-    private RuleApp initialApp = null;
+    private @Nullable RuleApp initialApp = null;
 
     /// Stack of <code>Iterator<CPBranch></code>: the branches of <code>ChoicePoint</code>s that
     /// have
@@ -35,7 +35,7 @@ public final class BackTrackingManager {
     private final ArrayDeque<Iterator<CPBranch>> choices = new ArrayDeque<>();
 
     /// List of <code>CPBranch</code>: the branches that are taken in the current evaluation run
-    private final ArrayList<CPBranch> chosenBranches = new ArrayList<>();
+    private final ArrayList<@Nullable CPBranch> chosenBranches = new ArrayList<>();
 
     /// The position within <code>choices</code> during the current evaluation run (the number of
     /// <code>ChoicePoint</code>s that occured so far during the current evaluation)
@@ -64,7 +64,9 @@ public final class BackTrackingManager {
             assert choices.size() > position;
             // phase where we have to "replay" choices that have already
             // been made
-            chosenBranches.get(position).choose();
+            final CPBranch branch = chosenBranches.get(position);
+            assert branch != null : "@AssumeAssertion(nullness): Branch not found";
+            branch.choose();
         }
 
         ++position;

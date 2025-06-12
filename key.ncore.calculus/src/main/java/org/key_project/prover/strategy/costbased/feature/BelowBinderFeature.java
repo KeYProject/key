@@ -35,9 +35,9 @@ public class BelowBinderFeature extends BinaryFeature {
     private boolean belowBinder(PosInOccurrence pos) {
         final PIOPathIterator it = pos.iterator();
 
-        while (it.next() != -1) {
+        while (it.hasNext()) {
             final Term t = it.getSubTerm();
-
+            assert t != null : "@AssumeAssertion(nullness) Term t is null";
             if (!t.varsBoundHere(it.getChild()).isEmpty()) {
                 return true;
             }

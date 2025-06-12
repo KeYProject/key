@@ -10,6 +10,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -227,7 +228,7 @@ public class PosInOccurrence {
         int count = 0;
         @Nullable
         IntIterator currentPathIt;
-        @Nullable
+        @MonotonicNonNull
         Term currentSubTerm;
 
         private PIOPathIteratorImpl() {
@@ -259,18 +260,20 @@ public class PosInOccurrence {
         }
 
         /// {@inheritDoc}
+
         public @Nullable Term getSubTerm() {
             return currentSubTerm;
         }
 
         /// {@inheritDoc}
-        @EnsuresNonNull("getSubTerm()")
+        @EnsuresNonNullIf(expression = "currentPathIt", result = true)
         public boolean hasNext() {
             return currentPathIt != null;
         }
 
         /// @return the number of the next child on the path, or <code>-1</code> if no further child
         /// exists
+        @EnsuresNonNull("currentSubTerm")
         public int next() {
             int res;
 
@@ -280,7 +283,9 @@ public class PosInOccurrence {
                 currentSubTerm = currentSubTerm.sub(child);
             }
 
-            if (currentPathIt.hasNext()) {
+            if (currentPathIt == null) {
+                return -1;
+            } else if (currentPathIt.hasNext()) {
                 res = currentPathIt.next();
             } else {
                 res = -1;

@@ -9,10 +9,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
+import org.jspecify.annotations.Nullable;
+
 /// Common class for provers which takes care of listener registration and task event propagation.
 ///
 /// @author Richard Bubel
-public abstract class AbstractProverCore<P extends ProofObject<G>, G extends ProofGoal<G>>
+public abstract class AbstractProverCore<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>>
         implements ProverCore<P, G> {
 
     /// number of rules automatically applied

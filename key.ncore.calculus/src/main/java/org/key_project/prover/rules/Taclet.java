@@ -20,8 +20,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.calledmethods.qual.RequiresCalledMethods;
 import org.checkerframework.checker.initialization.qual.UnderInitialization;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -43,7 +44,7 @@ public abstract class Taclet implements Rule {
     protected final @Nullable SyntaxElement find;
 
     /// The restriction(s) for applying this update. [ApplicationRestriction].
-    protected final ApplicationRestriction applicationRestriction;
+    protected final @NonNull ApplicationRestriction applicationRestriction;
 
     /// the <tt>assumes</tt> sequent of the taclet
     protected final Sequent assumesSequent;
@@ -100,10 +101,10 @@ public abstract class Taclet implements Rule {
     // but all at once for a given term.
 
     /// The taclet matcher
-    protected @MonotonicNonNull TacletMatcher matcher;
+    protected @NonNull TacletMatcher matcher;
 
     /// The taclet executor
-    protected @MonotonicNonNull TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
+    protected @NonNull TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
 
     /// creates a Taclet (originally known as Schematic Theory Specific Rules)
     ///
@@ -115,6 +116,7 @@ public abstract class Taclet implements Rule {
     /// @param goalTemplates a list of goal descriptions.
     /// @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
     /// or recursive use of the Taclet.
+    @EnsuresNonNull({ "matcher", "executor" })
     protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
@@ -136,15 +138,17 @@ public abstract class Taclet implements Rule {
         this.trigger = attrs.trigger();
         this.ruleSets = ruleSets;
         this.choices = choices;
+        createTacletServices();
         check();
     }
 
     /// Throws an exception if the taclet is improperly constructed. This is the case if
     /// - There is no find part, but the application restriction does not match "in sequent state."
     /// - The find part is a sequent but contains no or more than one formula.
-    private void check(@UnderInitialization(Taclet.class) Taclet this) {
+    private void check(@UnderInitialization Taclet this) {
         if (find == null
-                && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
+                && (applicationRestriction == null || // check to make checkerframework happy
+                        !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE))) {
             throw new IllegalStateException("NoFind taclets should imply \\inSequentState");
         }
         if (find instanceof Sequent seq && seq.size() != 1) {
@@ -162,6 +166,7 @@ public abstract class Taclet implements Rule {
         return trigger;
     }
 
+    @RequiresCalledMethods(value = "this", methods = "createAndInitializeMatcher")
     public final TacletMatcher getMatcher() {
         return matcher;
     }
@@ -169,16 +174,19 @@ public abstract class Taclet implements Rule {
     /// creates and initializes the taclet matching and execution engines has to be called at the
     /// end
     /// of initialization
-    protected void createTacletServices() {
+    @EnsuresNonNull({ "matcher", "executor" })
+    private void createTacletServices(@UnderInitialization Taclet this) {
         createAndInitializeMatcher();
         createAndInitializeExecutor();
     }
 
     /// A helper method for creating the appropriate taclet matcher.
-    protected abstract void createAndInitializeMatcher();
+    @EnsuresNonNull("matcher")
+    protected abstract void createAndInitializeMatcher(@UnderInitialization Taclet this);
 
     /// A helper method for creating the appropriate taclet executor.
-    protected abstract void createAndInitializeExecutor();
+    @EnsuresNonNull("executor")
+    protected abstract void createAndInitializeExecutor(@UnderInitialization Taclet this);
 
     /// computes and returns all variables that occur bound in the taclet including the taclets
     /// defined in `addrules` sections. The result is cached and therefore only computed once.

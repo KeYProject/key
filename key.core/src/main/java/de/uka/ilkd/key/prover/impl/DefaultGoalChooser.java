@@ -118,7 +118,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#getNextGoal()
      */
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         Goal result;
 
         if (allGoalsSatisfiable) {

@@ -1447,12 +1447,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public Term getContent(MutableState mState) {
+            public @NonNull Term getContent(MutableState mState) {
                 return tOne;
             }
 
             @Override
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
             }
@@ -1464,12 +1464,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public JTerm getContent(MutableState mState) {
+            public @NonNull Term getContent(MutableState mState) {
                 return tTwo;
             }
 
             @Override
-            public JTerm toTerm(RuleApp app, PosInOccurrence pos,
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;
             }

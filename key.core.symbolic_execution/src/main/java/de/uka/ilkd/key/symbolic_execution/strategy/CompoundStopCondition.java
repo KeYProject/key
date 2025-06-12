@@ -13,6 +13,9 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This {@link StopCondition} contains other {@link StopCondition} as children and stops the auto
  * mode if at least on of its children force it.
@@ -122,12 +125,12 @@ public class CompoundStopCondition implements StopCondition<Goal> {
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @NonNull String getStopMessage(int maxApplications, long timeout, long startTime,
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return lastShouldStopChild != null
                 ? lastShouldStopChild.getStopMessage(maxApplications, timeout, startTime,
                     countApplied, singleRuleApplicationInfo)
-                : null;
+                : "";
     }
 
     public List<StopCondition> getChildren() {
