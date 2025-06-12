@@ -75,17 +75,18 @@ public class PosInOccurrence {
         return posInTerm().depth();
     }
 
-    /// /**
     /// Moves up one level in the term structure and returns a new [PosInOccurrence]
     /// representing the new position.
     ///
     /// @return A new [PosInOccurrence] one level higher in the term structure.
     /// @throws IllegalStateException If the position is already at the top level.
-    public PosInOccurrence up() {
-        assert !isTopLevel() : "not possible to go up from top level position";
+    public @Nullable PosInOccurrence up() {
         final var up = posInTerm.up();
-        assert up != null : "@AssumeAssertion(nullness): Cannot be null as we are not at top";
-        return new PosInOccurrence(sequentFormula, up, inAntec);
+        if (up != null) {
+            return new PosInOccurrence(sequentFormula, up, inAntec);
+        } else {
+            throw new IllegalStateException("Already on top level. Cannot go further up.");
+        }
     }
 
     /// Moves down to the specified child in the term structure and returns a new
