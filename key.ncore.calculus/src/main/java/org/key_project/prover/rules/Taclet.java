@@ -4,6 +4,7 @@
 package org.key_project.prover.rules;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
@@ -134,7 +135,8 @@ public abstract class Taclet implements Rule {
         variableConditions = applPart.variableConditions();
         this.goalTemplates = goalTemplates;
         this.prefixMap = prefixMap;
-        this.displayName = attrs.displayName() == null ? name.toString() : attrs.displayName();
+        this.displayName = attrs.displayName() == null ? name.toString()
+                : Objects.requireNonNull(attrs.displayName());
         this.trigger = attrs.trigger();
         this.ruleSets = ruleSets;
         this.choices = choices;

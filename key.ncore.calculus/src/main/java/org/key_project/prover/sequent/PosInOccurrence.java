@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
-import java.util.Objects;
-
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -56,8 +54,8 @@ public class PosInOccurrence {
     public PosInOccurrence(SequentFormula sequentFormula, PosInTerm posInTerm,
             boolean inAntec) {
         this.inAntec = inAntec;
-        this.sequentFormula = Objects.requireNonNull(sequentFormula);
-        this.posInTerm = Objects.requireNonNull(posInTerm);
+        this.sequentFormula = sequentFormula;
+        this.posInTerm = posInTerm;
         this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
     }
 
@@ -85,7 +83,8 @@ public class PosInOccurrence {
     /// @throws IllegalStateException If the position is already at the top level.
     public PosInOccurrence up() {
         assert !isTopLevel() : "not possible to go up from top level position";
-        final var up = Objects.requireNonNull(posInTerm.up());
+        final var up = posInTerm.up();
+        assert up != null : "@AssumeAssertion(nullness): Cannot be null as we are not at top";
         return new PosInOccurrence(sequentFormula, up, inAntec);
     }
 
