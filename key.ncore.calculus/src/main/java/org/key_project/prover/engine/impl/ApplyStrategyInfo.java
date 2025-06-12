@@ -7,7 +7,7 @@ import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.jspecify.annotations.Nullable;
 
 /// A container class representing the final result of a proof strategy application.
@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
 ///
 ///
 /// @see ProofSearchInformation
-public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends ProofGoal<Goal>>
+public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends @Nullable ProofGoal<Goal>>
         implements ProofSearchInformation<Proof, Goal> {
 
     /// The reason why the strategy stopped, for example, proof finished, maximal number of rule
@@ -94,7 +94,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
 
     /// {@inheritDoc}
     @Override
-    @EnsuresNonNull("error")
+    @EnsuresNonNullIf(expression = "error", result = true)
     public boolean isError() {
         return error != null;
     }

@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 public class MutableState {
 
     /// maps a term buffer to its value
-    private final HashMap<TermBuffer<?>, Term> content = HashMap.newHashMap(32);
+    private final HashMap<TermBuffer<?>, @Nullable Term> content = HashMap.newHashMap(32);
 
     /// manages backtracking for features that create [ChoicePoint]s
     private @Nullable BackTrackingManager btManager;
@@ -39,7 +39,8 @@ public class MutableState {
     ///
     /// @param v the [TermBuffer]
     /// @param value the Term which is assigned as the value
-    public <Goal extends ProofGoal<@NonNull Goal>> void assign(TermBuffer<Goal> v, Term value) {
+    public <Goal extends ProofGoal<Goal>> void assign(@NonNull TermBuffer<Goal> v,
+            @Nullable Term value) {
         content.put(v, value);
     }
 
@@ -47,7 +48,7 @@ public class MutableState {
     ///
     /// @param v the TermBuffer whose value is asked for
     /// @return the current value of the [TermBuffer] or `null` if there is none
-    public <Goal extends ProofGoal<@NonNull Goal>> @Nullable Term read(TermBuffer<Goal> v) {
+    public <Goal extends @NonNull ProofGoal<Goal>> @Nullable Term read(TermBuffer<Goal> v) {
         return content.get(v);
     }
 

@@ -14,7 +14,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// @param <Proof> the type of [ProofObject] that the prover constructs
 /// @param <Goal> the type of [ProofGoal] instances manipulated by this prover
-public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
+public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extends @Nullable ProofGoal<Goal>>
         extends AbstractProverCore<Proof, Goal> {
 
     /// Logger for tracing and debugging the prover's execution.
@@ -39,7 +39,7 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
 
     /// The proof currently being constructed or manipulated by this prover.
-    protected @Nullable Proof proof;
+    protected @MonotonicNonNull Proof proof;
 
     /// The maximum number of rule applications allowed during the proof process.
     protected int maxApplications;
@@ -89,6 +89,7 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     protected final synchronized ApplyStrategyInfo<Proof, Goal> doWork(
             final GoalChooser<Proof, Goal> goalChooser,
             final StopCondition<Goal> stopCondition) {
+        assert proof != null : "@AssumeAssertion(nullness): proof cannot be null";
         long time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
 
@@ -106,7 +107,7 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
                     applyAutomatic += System.nanoTime() - applyAutomaticTime;
                 }
                 if (!srInfo.isSuccess()) {
-                    return new ApplyStrategyInfo<>(srInfo.message(), Objects.requireNonNull(proof),
+                    return new ApplyStrategyInfo<>(srInfo.message(), proof,
                         null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
                 }
@@ -125,12 +126,12 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
                 closedGoals);
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo<>("Interrupted.", Objects.requireNonNull(proof), null,
+            return new ApplyStrategyInfo<Proof, Goal>("Interrupted.", proof, null,
                 goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             LOGGER.warn("doWork exception", t);
-            return new ApplyStrategyInfo<>("Error.", Objects.requireNonNull(proof), t, null,
+            return new ApplyStrategyInfo<>("Error.", proof, t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
@@ -176,10 +177,12 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
         }
         if (app == null) {
             return new SingleRuleApplicationInfo(
-                "No more rules automatically applicable to any goal.", g, app);
+                "No more rules automatically applicable to any goal.", Objects.requireNonNull(g),
+                app);
         } else {
             try {
-                g.apply(app);
+                @SuppressWarnings({ "nullness", "unused" })
+                final var result = g.apply(app);
             } finally {
                 PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
             }

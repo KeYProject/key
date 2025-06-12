@@ -46,7 +46,7 @@ public class SingleRuleApplicationInfo {
     /// @param mayCloseableGoal the proof goal that may be closed by this rule application.
     /// @param appliedRuleApp the rule that was successfully applied.
     public SingleRuleApplicationInfo(ProofGoal<?> mayCloseableGoal,
-            RuleApp appliedRuleApp) {
+            @NonNull RuleApp appliedRuleApp) {
         this.message = "Rule applied successful";
         this.goal = mayCloseableGoal;
         this.appliedRuleApp = appliedRuleApp;
@@ -77,7 +77,7 @@ public class SingleRuleApplicationInfo {
     ///
     /// @param <G> the type of the proof goal.
     /// @return the proof goal associated with this rule application.
-    public <G extends ProofGoal<@NonNull G>> G getGoal() {
+    public <G extends @Nullable ProofGoal<G>> G getGoal() {
         // noinspection unchecked
         return (G) goal;
     }
@@ -96,7 +96,7 @@ public class SingleRuleApplicationInfo {
     /// Retrieves the rule that was applied.
     ///
     /// @return the applied rule, or `null` if no rule was applied.
-    public RuleApp getAppliedRuleApp() {
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 }

@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
 
 /// Interface to be implemented by classes in order to customize the goal selection strategy of the
 /// automatic prover environment.
-public interface GoalChooser<P extends ProofObject<G>, G extends ProofGoal<G>> {
+public interface GoalChooser<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>> {
 
     /// Initialise this GoalChooser for use with a given Proof and a list of goals.
     ///

@@ -5,6 +5,7 @@ package org.key_project.prover.engine;
 
 import org.key_project.prover.proof.ProofGoal;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 ///
@@ -31,7 +32,7 @@ import org.jspecify.annotations.Nullable;
 ///
 ///
 /// @author Martin Hentschel
-public interface StopCondition<G extends ProofGoal<G>> {
+public interface StopCondition<G extends @Nullable ProofGoal<G>> {
     /// Returns the maximal amount of work needed to complete the task, used to display a
     /// progress bar. Pass `0` to indicate unknown size.
     ///
@@ -66,7 +67,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// computed via [#currentTimeMillis()]
     /// @param countApplied The number of already applied rules.
     /// @return description of the reason why automatic proof search has stopped
-    @Nullable
+    @NonNull
     String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
             long startTime, int countApplied);
 
@@ -94,6 +95,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// @param countApplied The number of already applied rules.
     /// @param singleRuleApplicationInfo An optional [SingleRuleApplicationInfo].
     /// @return The human-readable message which explains the stop reason.
+    @NonNull
     String getStopMessage(int maxApplications, long timeout, long startTime,
             int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

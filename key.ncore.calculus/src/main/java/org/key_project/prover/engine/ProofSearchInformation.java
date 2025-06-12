@@ -6,7 +6,6 @@ package org.key_project.prover.engine;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Represents a contract for gathering and accessing information about the application
@@ -38,7 +37,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// @see ProofObject
 /// @see ProofGoal
-public interface ProofSearchInformation<P extends ProofObject<G>, G extends ProofGoal<G>> {
+public interface ProofSearchInformation<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>> {
 
     /// Retrieves the explanation or reason wjy the proof search (strategy execution) finished.
     ///
@@ -79,7 +78,6 @@ public interface ProofSearchInformation<P extends ProofObject<G>, G extends Proo
     ///
     ///
     /// @return `true` if an error occurred, otherwise `false`
-    @EnsuresNonNull("getException()")
     boolean isError();
 
     /// Retrieves the exception that occurred during strategy execution, if any.

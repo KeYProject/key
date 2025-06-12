@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.instantiation;
 
-import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofServices;
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
@@ -49,11 +48,6 @@ public class AssumesFormulaInstSeq
         return instantiation;
     }
 
-    @Override
-    public String toString(LogicServices services) {
-        return instantiation.formula().toString();
-    }
-
     /// Create a list with all formulas of a given semi-sequent
     private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
             Semisequent semi,
@@ -90,7 +84,7 @@ public class AssumesFormulaInstSeq
 
     @Override
     public String toString() {
-        return toString(null);
+        return instantiation.formula().toString();
     }
 
     @Override

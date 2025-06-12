@@ -176,7 +176,7 @@ public abstract class ScaleFeature implements Feature {
                 costVal = ((NumberRuleAppCost) cost).getValue();
             } else {
                 illegalCostError(cost);
-                return null;
+                return TopRuleAppCost.INSTANCE; // should never be reached
             }
 
             return NumberRuleAppCost.create((long) (coeff * costVal) + offset);

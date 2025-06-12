@@ -6,7 +6,8 @@ package org.key_project.prover.strategy;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /// This interface provides the next rule application to be applied to the
 /// main loop of the prover.
@@ -14,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 /// Rule application managers are associated with a specific proof goal.
 /// Each proof goal has its own copy of a manager (see [#copy()]).
 ///
-public interface RuleApplicationManager<G extends ProofGoal<@NonNull G>> extends NewRuleListener {
+public interface RuleApplicationManager<G extends @Nullable ProofGoal<G>> extends NewRuleListener {
 
     /// Clear existing caches of applicable rules
     void clearCache();

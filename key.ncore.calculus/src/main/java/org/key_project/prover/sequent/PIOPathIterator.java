@@ -9,6 +9,9 @@ import org.key_project.logic.Term;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface PIOPathIterator extends IntIterator {
+    /// @return boolean true iff collection has more unseen elements
+    boolean hasNext();
+
     /// @return the number of the next child on the path, or <code>-1</code> if no further child
     /// exists
     int next();

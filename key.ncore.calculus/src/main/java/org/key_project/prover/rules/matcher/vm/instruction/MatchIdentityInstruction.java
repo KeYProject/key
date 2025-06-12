@@ -7,6 +7,8 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link MatchInstruction} that checks for syntactic identity between the
  * current {@link SyntaxElement} and a predefined reference element.
@@ -46,7 +48,8 @@ public final class MatchIdentityInstruction implements MatchInstruction {
      *         same identity (reference-equal), or {@code null} if they are not
      */
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo matchConditions,
             LogicServices services) {
         if (syntaxElement == actualElement) {
             return matchConditions;

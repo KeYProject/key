@@ -7,6 +7,8 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a single instruction in the matching virtual machine used by the KeY system.
  * <p>
@@ -36,6 +38,7 @@ public interface VMInstruction {
      * @param services logic services providing utility functions needed for matching
      * @return the updated {@link MatchResultInfo} on success, or {@code null} if the match fails
      */
+    @Nullable
     MatchResultInfo match(PoolSyntaxElementCursor cursor, MatchResultInfo matchResultInfo,
             LogicServices services);
 }

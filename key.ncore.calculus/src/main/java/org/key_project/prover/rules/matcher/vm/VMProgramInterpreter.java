@@ -9,6 +9,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.Nullable;
+
+
 /**
  * Interpreter for executing a sequence of instructions in a virtual machine
  * designed for matching logical syntax elements.
@@ -52,15 +55,16 @@ public class VMProgramInterpreter {
      * @return a {@link MatchResultInfo} containing the result of the match,
      *         or {@code null} if no match was possible
      */
-    public MatchResultInfo match(SyntaxElement toMatch, MatchResultInfo mc,
+    public @Nullable MatchResultInfo match(SyntaxElement toMatch, MatchResultInfo mc,
             LogicServices services) {
+        MatchResultInfo result = mc;
         final PoolSyntaxElementCursor navi = PoolSyntaxElementCursor.get(toMatch);
         int instrPtr = 0;
-        while (mc != null && instrPtr < instruction.length) {
-            mc = instruction[instrPtr].match(navi, mc, services);
+        while (result != null && instrPtr < instruction.length) {
+            result = instruction[instrPtr].match(navi, result, services);
             instrPtr++;
         }
         navi.release();
-        return mc;
+        return result;
     }
 }

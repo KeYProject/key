@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -15,7 +15,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm<Goal> {
 
     @Override
-    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();
 

@@ -19,6 +19,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp>
         implements RuleExecutor<Goal> {
@@ -82,6 +83,9 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                         }
                         assumesObl = assumesPart;
                     } else {
+                        // noinspection unchecked
+                        assert assumesObl != null
+                                : "@AssumeAssertion(nullness): assumesObl should not be null";
                         assumesObl = and(assumesObl, assumesPart, p_goal);
                     }
 
@@ -114,14 +118,14 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             while (itNewGoalSequents.hasNext()) {
                 seq = itNewGoalSequents.next();
             }
-
+            assert assumesObl != null : "@AssumeAssertion(nullness): assumesObl should not be null";
             addToPosWithoutInst(createSequentFormula(assumesObl), seq, null, false);
         }
 
         return res;
     }
 
-    protected SequentFormula createSequentFormula(Term form) {
+    protected @NonNull SequentFormula createSequentFormula(@NonNull Term form) {
         return new SequentFormula(form);
     }
 
@@ -139,8 +143,8 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     /// @param pos the [PosInOccurrence] describing the place in the sequent
     /// @param addToAntecedent boolean true(false) if elements have to be added to the
     /// antecedent(succedent) (only looked at if `pos == null`)
-    private void addToPosWithoutInst(SequentFormula frm, SequentChangeInfo currentSequent,
-            PosInOccurrence pos, boolean addToAntecedent) {
+    private void addToPosWithoutInst(@NonNull SequentFormula frm, SequentChangeInfo currentSequent,
+            @Nullable PosInOccurrence pos, boolean addToAntecedent) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
         } else {

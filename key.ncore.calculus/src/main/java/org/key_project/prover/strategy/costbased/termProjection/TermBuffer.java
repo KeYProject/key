@@ -21,11 +21,11 @@ public class TermBuffer<Goal extends ProofGoal<Goal>> implements ProjectionToTer
         return mState.read(this);
     }
 
-    public void setContent(Term t, MutableState mState) {
+    public void setContent(@Nullable Term t, MutableState mState) {
         mState.assign(this, t);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return getContent(mState);
     }
 }
