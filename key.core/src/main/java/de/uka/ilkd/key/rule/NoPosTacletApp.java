@@ -164,7 +164,6 @@ public class NoPosTacletApp extends TacletApp {
         }
     }
 
-
     /**
      * creates a new Taclet application containing all the instantiations given by the
      * SVInstantiations and hold the old ones
@@ -191,7 +190,6 @@ public class NoPosTacletApp extends TacletApp {
         return new NoPosTacletApp(taclet(), svi, assumesFormulaInstantiations());
     }
 
-
     /**
      * creates a new Taclet application containing all the instantiations, constraints and new
      * metavariables given by the mc object and forget the old ones
@@ -203,7 +201,6 @@ public class NoPosTacletApp extends TacletApp {
             (Services) services);
     }
 
-
     /**
      * creates a new Taclet application containing all the instantiations, constraints, new
      * metavariables and if formula instantiations given and forget the old ones
@@ -214,7 +211,6 @@ public class NoPosTacletApp extends TacletApp {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesInstantiations,
             services);
     }
-
 
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
