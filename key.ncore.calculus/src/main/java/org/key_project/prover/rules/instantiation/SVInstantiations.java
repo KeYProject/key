@@ -21,6 +21,7 @@ public interface SVInstantiations {
     ///
     /// @param name Name of the schema variable
     /// @return the SchemaVariable
+    @Nullable
     SchemaVariable lookupVar(Name name);
 
     /// checks whether a schema variable of the specified name has been instantiated and
@@ -30,6 +31,7 @@ public interface SVInstantiations {
     /// @return the instantiation of the schema variable, `null` if no instantiation for a
     /// schema variable of the
     /// specified name is available
+    @Nullable
     <T> T lookupValue(Name name);
 
     /// checks whether the given schema variable has been instantiated and
@@ -40,20 +42,21 @@ public interface SVInstantiations {
     /// schema variable is
     /// available
     @Nullable
-    <T> T getInstantiation(SchemaVariable sv);
+    <T> T getInstantiation(@NonNull SchemaVariable sv);
 
 
     /// checks whether the given schema variable has been instantiated
     ///
     /// @param sv the [SchemaVariable]
     /// @return true if and only if an instantiation of the schema variable is available
-    boolean isInstantiated(SchemaVariable sv);
+    boolean isInstantiated(@NonNull SchemaVariable sv);
 
     /// returns a map that contains all instantiated schema variables and their respective
     /// instantiation
     ///
     /// @return a map that contains all instantiated schema variables and their respective
     /// instantiation
+    @NonNull
     ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> getInstantiationMap();
 
     ///

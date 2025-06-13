@@ -23,6 +23,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
@@ -716,30 +717,20 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * adds a new instantiation to this TacletApp
-     *
-     * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
-     * @return the new TacletApp
-     */
-    public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
-            Services services);
-
-    /**
      * adds a new instantiation to this TacletApp. This method does not check (beside some very
      * rudimentary tests) if the instantiation is possible. If you cannot guarantee that adding the
-     * entry <code>(sv, pe)</code> will result in a valid taclet instantiation, you have to use
+     * entry <code>(sv, se)</code> will result in a valid taclet instantiation, you have to use
      * {@link #addCheckedInstantiation(SchemaVariable, ProgramElement, Services, boolean)} instead
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
+     * @param se the SyntaxElement the SV is instantiated with
      * @param interesting a boolean marking if the instantiation of this sv needs to be saved for
      *        later proof loading (<code>interesting==true</code>) or if it can be derived
      *        deterministically (e.g. by matching) ( <code>interesting==false</code>)
      * @return a new taclet application equal to this one but including the newly added
-     *         instantiation entry <code>(sv, pe)</code>
+     *         instantiation entry <code>(sv, se)</code>
      */
-    public abstract TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe,
+    public abstract TacletApp addInstantiation(SchemaVariable sv, SyntaxElement se,
             boolean interesting, Services services);
 
     /**
