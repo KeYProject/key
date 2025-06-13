@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -63,7 +64,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
      */
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
-            RuleFilter p_filter, PosInOccurrence pos, Services services) {
+            RuleFilter p_filter, PosInOccurrence pos, LogicServices services) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (tacletApps == null) {
             return result;
