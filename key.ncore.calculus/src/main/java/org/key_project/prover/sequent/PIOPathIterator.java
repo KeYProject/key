@@ -6,7 +6,12 @@ package org.key_project.prover.sequent;
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.Term;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public interface PIOPathIterator extends IntIterator {
+    /// @return boolean true iff collection has more unseen elements
+    boolean hasNext();
+
     /// @return the number of the next child on the path, or <code>-1</code> if no further child
     /// exists
     int next();
@@ -19,8 +24,9 @@ public interface PIOPathIterator extends IntIterator {
     PosInOccurrence getPosInOccurrence();
 
     /// @return the current subterm this object points to (i.e. corresponding to the latest
-    /// <code>next()</code>-call); this method satisfies
-    /// <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
+    /// `next()`-call); this method satisfies
+    /// `getPosInOccurrence().subTerm()==getSubTerm()`
+    @Nullable
     Term getSubTerm();
 
     /// @return the number of the next child on the path, or <code>-1</code> if no further child

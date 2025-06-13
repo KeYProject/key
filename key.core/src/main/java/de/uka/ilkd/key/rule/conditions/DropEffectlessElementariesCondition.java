@@ -20,7 +20,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
@@ -89,8 +89,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo mc,
             LogicServices services) {
         SVInstantiations svInst =
             (SVInstantiations) mc.getInstantiations();

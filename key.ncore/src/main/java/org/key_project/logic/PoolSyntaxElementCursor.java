@@ -1,70 +1,73 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule.match.vm;
+package org.key_project.logic;
 
 import java.util.ArrayDeque;
 
-import de.uka.ilkd.key.logic.JTerm;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
- * An iterator that walks in first-depth order through the term. It allows to jump to siblings.
+ * An iterator that walks in first-depth order through the syntax element. It allows to jump to
+ * siblings.
  */
-public class TermNavigator {
-
-
+public class PoolSyntaxElementCursor {
     private static final int POOL_SIZE = 100;
     /**
-     * TERM_NAVIGATOR_POOL of TermNavigator as these are created very often and short-living we
+     * A pool of {@link PoolSyntaxElementCursor} as these are created very often and short-living we
      * reuse them as far as possible
-     *
-     * The used TermNavigator have to be explicitly released by the user via {@link #release()}
+     * <br>
+     * The used PoolSyntaxElementCursor have to be explicitly released by the user via
+     * {@link #release()}
      */
-    private static final ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
+    private static final ArrayDeque<PoolSyntaxElementCursor> CURSOR_POOL = new ArrayDeque<>();
     static {
         for (int i = 0; i < POOL_SIZE; i++) {
-            TERM_NAVIGATOR_POOL.push(new TermNavigator());
+            CURSOR_POOL.push(new PoolSyntaxElementCursor());
         }
     }
 
     /**
-     * returns a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently
-     * empty The used TermNavigator have to be explicitly released by the user via
+     * returns a pooled {@link PoolSyntaxElementCursor} or a new one if the {@link #CURSOR_POOL} is
+     * currently
+     * empty The used cursor have to be explicitly released by the user via
      * {@link #release()}
      *
-     * @return a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently
+     * @return a pooled {@link PoolSyntaxElementCursor} or a new one if the {@link #CURSOR_POOL} is
+     *         currently
      *         empty
      */
-    public static TermNavigator get(JTerm term) {
-        TermNavigator tn = null;
-        synchronized (TERM_NAVIGATOR_POOL) {
-            if (!TERM_NAVIGATOR_POOL.isEmpty()) {
-                tn = TERM_NAVIGATOR_POOL.pop();
+    public static PoolSyntaxElementCursor get(SyntaxElement se) {
+        PoolSyntaxElementCursor c = null;
+        synchronized (CURSOR_POOL) {
+            if (!CURSOR_POOL.isEmpty()) {
+                c = CURSOR_POOL.pop();
             }
         }
-        if (tn != null) {
-            tn.stack.push(MutablePair.get(term, 0));
+        if (c != null) {
+            c.stack.push(MutablePair.get(se, 0));
         } else {
-            tn = new TermNavigator(term);
+            c = new PoolSyntaxElementCursor(se);
         }
-        return tn;
+        return c;
     }
-
 
     /**
      * top element on stack contains always the pair whose first component is the element to be
      * returned by {@link #gotoNext()} while the second points to the child to be visited next (or
      * equals the arity of the first component if no such child exists) For all elements on the
-     * stack that are not the top element the second component is less than the arity of the term in
+     * stack that are not the top element the second component is less than the arity of the syntax
+     * element in
      * the first component
      */
     private final ArrayDeque<MutablePair> stack = new ArrayDeque<>();
 
-    private TermNavigator() {
+    private PoolSyntaxElementCursor() {
     }
 
-    private TermNavigator(JTerm term) {
-        stack.push(MutablePair.get(term, 0));
+    private PoolSyntaxElementCursor(SyntaxElement se) {
+        stack.push(MutablePair.get(se, 0));
     }
 
     public boolean hasNext() {
@@ -75,35 +78,36 @@ public class TermNavigator {
         return stack.size() > 1;
     }
 
-    public JTerm getCurrentSubterm() {
-        return stack.peek().first;
+    public SyntaxElement getCurrentElement() {
+        @SuppressWarnings("nullness")
+        @NonNull
+        SyntaxElement element = stack.peek().first;
+        return element;
     }
 
     private /* @ helper @ */ void gotoNextHelper() {
         if (stack.isEmpty()) {
             return;
         }
+        MutablePair el = stack.peek();
         do {
-            MutablePair el = stack.peek();
-            if (el.second < el.first.arity()) {
+            @SuppressWarnings("nullness")
+            final int firstChildCount = el.first.getChildCount();
+            if (el.second < firstChildCount) {
                 final int oldPos = el.second;
-                final JTerm oldTerm = el.first;
-                el.second += 1;
-                if (el.second >= oldTerm.arity()) {
-                    // we visited all children of that term
+                final SyntaxElement oldSE = el.first;
+                if (oldPos + 1 >= firstChildCount) {
+                    // we visited all children of that element
                     // so it can be removed from the stack
                     stack.pop().release(); // el's components are set to null
                 }
-                el = MutablePair.get(oldTerm.sub(oldPos), 0);
+                el.second += 1;
+                el = MutablePair.get(oldSE.getChild(oldPos), 0);
                 stack.push(el);
             } else {
                 stack.pop().release();
             }
-        } while (!stack.isEmpty() && stack.peek().second != 0);
-    }
-
-    public void gotoNext() {
-        gotoNextHelper();
+        } while (!stack.isEmpty() && (el = stack.peek()).second != 0);
     }
 
     public void gotoNextSibling() {
@@ -114,43 +118,45 @@ public class TermNavigator {
     public void release() {
         stack.forEach(MutablePair::release);
         stack.clear();
-        if (TERM_NAVIGATOR_POOL.size() < POOL_SIZE) {
-            synchronized (TERM_NAVIGATOR_POOL) {
-                TERM_NAVIGATOR_POOL.push(this);
+        if (CURSOR_POOL.size() < POOL_SIZE) {
+            synchronized (CURSOR_POOL) {
+                CURSOR_POOL.push(this);
             }
         }
     }
 
+    public void gotoNext() {
+        gotoNextHelper();
+    }
 
     /**
      * A mutable tuple of two types
      */
     private static class MutablePair {
-
         private static final int PAIR_POOL_SIZE = 1000;
 
         /**
-         * TERM_NAVIGATOR_POOL of TermNavigator.MutablePair as these are created very often and
+         * {@link #CURSOR_POOL} of {@link MutablePair} as these are created very often and
          * short-living we reuse them as far as possible
-         *
-         * The used TermNavigator have to be explicitly released by the user via {@link #release()}
+         * <br>
+         * The used cursor have to be explicitly released by the user via {@link #release()}
          */
         private static final ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
         static {
             for (int i = 0; i < PAIR_POOL_SIZE; i++) {
-                PAIR_POOL.push(new MutablePair(null, null));
+                PAIR_POOL.push(new MutablePair(null, 0));
             }
         }
 
         /**
-         * returns a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently
+         * returns a pooled {@link MutablePair} or a new one if the {@link #PAIR_POOL} is currently
          * empty The used MutablePair have to be explicitly released by the user via
          * {@link #release()}
          *
-         * @return a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently
+         * @return a pooled {@link MutablePair} or a new one if the {@link #PAIR_POOL} is currently
          *         empty
          */
-        static MutablePair get(JTerm first, Integer second) {
+        static MutablePair get(SyntaxElement first, int second) {
             MutablePair pair = null;
             synchronized (PAIR_POOL) {
                 if (!PAIR_POOL.isEmpty()) {
@@ -166,22 +172,23 @@ public class TermNavigator {
         }
 
 
-        JTerm first;
-        Integer second;
+        @Nullable
+        SyntaxElement first;
+        int second;
 
-        public MutablePair(JTerm first, Integer second) {
+        public MutablePair(@Nullable SyntaxElement first, int second) {
             this.first = first;
             this.second = second;
         }
 
-        public final void set(JTerm first, Integer second) {
+        public final void set(SyntaxElement first, int second) {
             this.first = first;
             this.second = second;
         }
 
         public final void release() {
             first = null;
-            second = null;
+            second = 0;
             if (PAIR_POOL.size() < PAIR_POOL_SIZE) {
                 synchronized (PAIR_POOL) {
                     PAIR_POOL.push(this);
@@ -194,5 +201,4 @@ public class TermNavigator {
             return "MutablePair [first=" + first + ", second=" + second + "]";
         }
     }
-
 }

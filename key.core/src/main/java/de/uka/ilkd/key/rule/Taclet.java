@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -140,6 +141,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             tacletAnnotations);
     }
 
+    @EnsuresNonNull("matcher")
     protected void createAndInitializeMatcher() {
         this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }

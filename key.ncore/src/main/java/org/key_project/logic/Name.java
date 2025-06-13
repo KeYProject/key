@@ -4,6 +4,8 @@
 package org.key_project.logic;
 
 
+import org.jspecify.annotations.NonNull;
+
 /// A Name object is created to represent the name of an object which usually implements the
 /// interface [Named].
 ///
@@ -14,7 +16,7 @@ public class Name implements Comparable<Name> {
 
     private static final String NONAME = "_noname_";
 
-    private final /* Interned */ String nameString;
+    private final /* Interned */ @NonNull String nameString;
 
     /// creates a name object
     public Name(String n) {
@@ -22,7 +24,7 @@ public class Name implements Comparable<Name> {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return nameString;
     }
 

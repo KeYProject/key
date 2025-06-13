@@ -15,7 +15,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApplyUpdateOnRigidCondition {
 
-    private static MatchConditions EMPTY_MATCHCONDITIONS =
+    private static MatchResultInfo EMPTY_MATCHCONDITIONS =
         de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
 
     @Test
@@ -152,7 +152,7 @@ public class TestApplyUpdateOnRigidCondition {
         SchemaVariable result = SchemaVariableFactory.createFormulaSV(new Name("result"));
 
         SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
-        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchResultInfo mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         // u uninstantiated
@@ -184,7 +184,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(phi, term.sub(1), TacletForTests.services());
         svInst = svInst.add(result, preInstResult, TacletForTests.services());
 
-        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchResultInfo mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
@@ -206,7 +206,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(phi, term.sub(1), TacletForTests.services());
         svInst = svInst.add(result, preInstWrongResult, TacletForTests.services());
 
-        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchResultInfo mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
@@ -257,7 +257,7 @@ public class TestApplyUpdateOnRigidCondition {
      * @param tOrPhi the {@link SchemaVariable} that is instantiated with the term or formula in
      *        <code>term</code>
      * @param result the {@link SchemaVariable} that is instantiated with the result of a
-     *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SyntaxElement, MatchConditions, Services)}
+     *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SyntaxElement, MatchResultInfo, Services)}
      *        call
      *
      * @return the original formula or term if the update cannot be applied; else, the updated
@@ -273,7 +273,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(tOrPhi, arg, TacletForTests.services());
 
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, tOrPhi, result);
-        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchResultInfo mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         // First two arguments are not used by this check
         mc = cond.check(null, null, mc, TacletForTests.services());
 

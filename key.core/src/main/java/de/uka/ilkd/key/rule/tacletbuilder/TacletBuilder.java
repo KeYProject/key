@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -51,7 +52,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals =
         ImmutableSLList.nil();
     protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
-    protected TacletAttributes attrs = new TacletAttributes(null, null);
+    protected TacletAttributes attrs = new TacletAttributes(NONAME.toString(), null);
 
     /**
      * List of additional generic conditions on the instantiations of schema variables.
@@ -110,22 +111,24 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * returns the name of the Taclet to be built
      */
-    public Name getName() {
+    public @NonNull Name getName() {
         return this.name;
     }
-
 
     /**
      * sets the name of the Taclet to be built
      */
-    public void setName(Name name) {
+    public void setName(@NonNull Name name) {
         this.name = name;
+        if (NONAME.toString().equals(attrs.displayName())) {
+            this.attrs = new TacletAttributes(name.toString(), attrs.trigger());
+        }
     }
 
     /**
      * sets an optional display name (presented to the user)
      */
-    public void setDisplayName(String s) {
+    public void setDisplayName(@NonNull String s) {
         attrs = new TacletAttributes(s, attrs.trigger());
     }
 

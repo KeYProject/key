@@ -6,6 +6,7 @@ package org.key_project.prover.strategy.costbased;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
@@ -78,7 +79,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
 
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }
@@ -95,9 +96,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         } else if (cost2 instanceof TopRuleAppCost) {
             return TopRuleAppCost.INSTANCE;
         } else {
-            assert false : "Can't add costs of class " + cost2.getClass();
-            // Should not be reached
-            return null;
+            throw new AssertionError("Can't add costs of class " + cost2.getClass());
         }
     }
 

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.instantiation;
 
-import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofServices;
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
@@ -12,6 +11,9 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /// Instantiation of an assumes-formula that is present as a formula of the proof goal's sequent.
 ///
@@ -44,11 +46,6 @@ public class AssumesFormulaInstSeq
     @Override
     public SequentFormula getSequentFormula() {
         return instantiation;
-    }
-
-    @Override
-    public String toString(LogicServices services) {
-        return instantiation.formula().toString();
     }
 
     /// Create a list with all formulas of a given semi-sequent
@@ -87,11 +84,11 @@ public class AssumesFormulaInstSeq
 
     @Override
     public String toString() {
-        return toString(null);
+        return instantiation.formula().toString();
     }
 
     @Override
-    public boolean equals(Object p_obj) {
+    public boolean equals(@Nullable Object p_obj) {
         if (!(p_obj instanceof AssumesFormulaInstSeq other)) {
             return false;
         }
@@ -112,7 +109,7 @@ public class AssumesFormulaInstSeq
         return inAntecedent;
     }
 
-    private volatile PosInOccurrence pioCache = null;
+    private volatile @MonotonicNonNull PosInOccurrence pioCache = null;
 
     public PosInOccurrence toPosInOccurrence() {
         if (pioCache == null) {

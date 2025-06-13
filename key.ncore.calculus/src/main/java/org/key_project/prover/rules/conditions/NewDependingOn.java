@@ -5,6 +5,8 @@ package org.key_project.prover.rules.conditions;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.Nullable;
+
 ///
 /// class containing a pair of SchemaVariables, the first one being a TermSV, the second one a
 /// FormulaSV, representing a "c new depending on phi" statement within a varcond of a taclet
@@ -31,7 +33,7 @@ public record NewDependingOn(SchemaVariable first, SchemaVariable second) {
 
     public String toString() { return "\\newDependingOn(" + first() + ", " + second() + ")"; }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof NewDependingOn(SchemaVariable first1, SchemaVariable second1))) {
             return false;
         }

@@ -5,6 +5,9 @@ package org.key_project.prover.engine;
 
 import org.key_project.prover.proof.ProofGoal;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 ///
 /// Implementation of this interface can be used by implementations of
 /// [ProverCore]
@@ -29,7 +32,7 @@ import org.key_project.prover.proof.ProofGoal;
 ///
 ///
 /// @author Martin Hentschel
-public interface StopCondition<G extends ProofGoal<G>> {
+public interface StopCondition<G extends @Nullable ProofGoal<G>> {
     /// Returns the maximal amount of work needed to complete the task, used to display a
     /// progress bar. Pass `0` to indicate unknown size.
     ///
@@ -64,6 +67,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// computed via [#currentTimeMillis()]
     /// @param countApplied The number of already applied rules.
     /// @return description of the reason why automatic proof search has stopped
+    @NonNull
     String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
             long startTime, int countApplied);
 
@@ -78,7 +82,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// @param singleRuleApplicationInfo An optional [SingleRuleApplicationInfo].
     /// @return `true` stop strategy, `false` continue strategy and apply next rule.
     boolean shouldStop(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo);
 
     /// Returns a human-readable message which explains why the previous
     /// [#shouldStop(int,long,long,int,SingleRuleApplicationInfo)]
@@ -91,6 +95,7 @@ public interface StopCondition<G extends ProofGoal<G>> {
     /// @param countApplied The number of already applied rules.
     /// @param singleRuleApplicationInfo An optional [SingleRuleApplicationInfo].
     /// @return The human-readable message which explains the stop reason.
+    @NonNull
     String getStopMessage(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

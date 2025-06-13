@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
@@ -128,13 +129,13 @@ public class SVInstantiations
      * already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param subst the Term the SchemaVariable is instantiated with
+     * @param matchedElement the SyntaxElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, JTerm subst, LogicServices services) {
-        return add(sv, new InstantiationEntry<>(subst), services);
+    public SVInstantiations add(SchemaVariable sv, SyntaxElement matchedElement,
+            LogicServices services) throws SortException {
+        return add(sv, new InstantiationEntry<>(matchedElement), services);
     }
-
 
     public SVInstantiations addInteresting(SchemaVariable sv, JTerm subst, LogicServices services) {
         return addInteresting(sv, new InstantiationEntry<>(subst), services);
@@ -144,27 +145,6 @@ public class SVInstantiations
             LogicServices services) {
         return add(sv, new ListInstantiation(pes, type), services);
     }
-
-    /**
-     * Add the given additional condition for the generic sort instantiations
-     */
-    public SVInstantiations add(SchemaVariable sv, JModality.JavaModalityKind kind,
-            LogicServices services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind), services);
-    }
-
-    /**
-     * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
-     * already, the new pair is taken without a warning.
-     *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
-     * @return SVInstantiations the new SVInstantiations containing the given pair
-     */
-    public SVInstantiations add(SchemaVariable sv, ProgramElement pe, LogicServices services) {
-        return add(sv, new InstantiationEntry<>(pe), services);
-    }
-
 
     public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
             LogicServices services) {
@@ -389,7 +369,7 @@ public class SVInstantiations
      *         stored
      */
     @Override
-    public <T> T getInstantiation(SchemaVariable sv) {
+    public <T> @Nullable T getInstantiation(SchemaVariable sv) {
         final InstantiationEntry<T> entry = getInstantiationEntry(sv);
         return entry == null ? null : entry.getInstantiation();
     }

@@ -63,7 +63,9 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
     }
 
     protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return completeTerm.toTerm(app, pos, goal, mState);
+        final Term completeTermInst = completeTerm.toTerm(app, pos, goal, mState);
+        assert completeTermInst != null : "@AssumeAssertion(nullness): Term should not be null";
+        return completeTermInst;
     }
 
     private boolean descendFurther(Term t, MutableState mState, LogicServices services) {

@@ -5,8 +5,10 @@ package org.key_project.prover.rules.conditions;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.Nullable;
+
 /// Class contains a pair of SchemaVariables.
-/// The first part has to match a [QuantifiableVariable],
+/// The first part has to match a [org.key_project.logic.op.QuantifiableVariable],
 /// the second one has to match a Term in order to model a pair of the not-free-in relation of a
 /// Taclet.
 public record NotFreeIn(SchemaVariable first, SchemaVariable second) {
@@ -31,7 +33,7 @@ public record NotFreeIn(SchemaVariable first, SchemaVariable second) {
 
     public String toString() { return "\\notFreeIn(" + first() + "," + second() + ")"; }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof NotFreeIn(SchemaVariable first1, SchemaVariable second1))) {
             return false;
         }

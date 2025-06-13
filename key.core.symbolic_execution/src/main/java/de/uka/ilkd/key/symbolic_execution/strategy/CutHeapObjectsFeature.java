@@ -5,12 +5,12 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -41,7 +41,7 @@ public class CutHeapObjectsFeature extends BinaryFeature {
     @Override
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {
-        JTerm cutFormula =
+        Term cutFormula =
             SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos,
                 (de.uka.ilkd.key.proof.Goal) goal,
                 mState);
@@ -50,8 +50,8 @@ public class CutHeapObjectsFeature extends BinaryFeature {
                 cutFormula = cutFormula.sub(0);
             }
             if (cutFormula.op() == Equality.EQUALS) {
-                JTerm cutFormulaC0 = cutFormula.sub(0);
-                JTerm cutFormulaC1 = cutFormula.sub(1);
+                Term cutFormulaC0 = cutFormula.sub(0);
+                Term cutFormulaC1 = cutFormula.sub(1);
                 boolean contains = false;
                 Iterator<SequentFormula> iter = goal.sequent().iterator();
                 while (!contains && iter.hasNext()) {

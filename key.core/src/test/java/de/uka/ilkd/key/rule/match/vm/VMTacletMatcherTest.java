@@ -10,11 +10,12 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class VMTacletMatcherTest {
 
     private static final int NR_TACLETS = 6;
-    public static final MatchConditions EMPTY_MATCHCONDITIONS =
-        de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+    public static final MatchResultInfo EMPTY_MATCHCONDITIONS =
+        MatchConditions.EMPTY_MATCHCONDITIONS;
 
     private static Services services;
     private static final Taclet[] taclet = new Taclet[NR_TACLETS];
@@ -62,7 +63,7 @@ public class VMTacletMatcherTest {
         for (String fml : matchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
 
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[0].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNotNull(mc,
@@ -75,7 +76,7 @@ public class VMTacletMatcherTest {
         final String[] notMatchingFormulas = { "A | (B & A)", "A", "\\forall int x;(x>=0 & A)" };
         for (String fml : notMatchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[0].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNull(mc,
@@ -93,7 +94,7 @@ public class VMTacletMatcherTest {
         for (String fml : matchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
 
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[1].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNotNull(mc,
@@ -104,7 +105,7 @@ public class VMTacletMatcherTest {
             "h(1,2)", "c", "z(1,1,1,1)", "f(c,d,c)" };
         for (String fml : notMatchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[1].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNull(mc,
@@ -120,7 +121,7 @@ public class VMTacletMatcherTest {
 
         JTerm toMatch = services.getTermBuilder().parseTerm("\\forall int x; x + 1 > 0");
 
-        MatchConditions mc =
+        MatchResultInfo mc =
             matcher[2].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc, "Expected that " + findTerm + " matches " + toMatch + " but did not.");
 
@@ -140,7 +141,7 @@ public class VMTacletMatcherTest {
         for (String fml : matchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
 
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[3].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNotNull(mc,
@@ -151,7 +152,7 @@ public class VMTacletMatcherTest {
             "\\forall int x; \\forall int x; x + x > 0" };
         for (String fml : notMatchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[3].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNull(mc,
@@ -170,7 +171,7 @@ public class VMTacletMatcherTest {
         for (String fml : matchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
 
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[4].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNotNull(mc,
@@ -181,7 +182,7 @@ public class VMTacletMatcherTest {
             { "\\forall int x; (x > 0  & \\forall int y; y + x > 0)", };
         for (String fml : notMatchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[4].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNull(mc,
@@ -200,7 +201,7 @@ public class VMTacletMatcherTest {
         for (String fml : matchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
 
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[5].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNotNull(mc,
@@ -212,7 +213,7 @@ public class VMTacletMatcherTest {
                 "\\forall int x; (x > 0  & \\forall int y; y + x > 0)", };
         for (String fml : notMatchingFormulas) {
             JTerm toMatch = services.getTermBuilder().parseTerm(fml);
-            MatchConditions mc =
+            MatchResultInfo mc =
                 matcher[5].matchFind(toMatch, EMPTY_MATCHCONDITIONS, services);
 
             assertNull(mc,

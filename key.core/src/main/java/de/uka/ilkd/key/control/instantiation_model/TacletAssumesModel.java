@@ -21,7 +21,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
-import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -39,7 +38,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
         new AssumesFormulaInstantiation() {
 
             @Override
-            public String toString(LogicServices services) {
+            public String toString() {
                 return "Manual Input";
             }
 
