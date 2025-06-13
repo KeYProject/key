@@ -20,8 +20,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
- * A multi-threaded taclet index implementation. It executes method
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)}
+ * A multithreaded taclet index implementation. It executes method
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, LogicServices)}
  * using multiple
  * threads (depending on the number of taclets being matched and number of available processors).
  *
