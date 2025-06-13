@@ -47,9 +47,11 @@ public interface TacletMatcher {
      * @return the match conditions resulting from matching <code>var</code> with
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
-    MatchResultInfo checkVariableConditions(org.key_project.logic.op.sv.SchemaVariable var,
-            SyntaxElement instantiationCandidate, MatchResultInfo matchCond,
-            LogicServices services);
+    @Nullable
+    MatchResultInfo checkVariableConditions(
+            org.key_project.logic.op.sv.@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instantiationCandidate, @Nullable MatchResultInfo matchCond,
+            @NonNull LogicServices services);
 
     /**
      * checks the provided matches against the variable conditions of this taclet It returns the
@@ -62,7 +64,9 @@ public interface TacletMatcher {
      * @return the resulting match conditions or <code>null</code> if given matches do not satisfy
      *         the taclet's variable conditions
      */
-    MatchResultInfo checkConditions(MatchResultInfo matchResultInfo, LogicServices services);
+    @Nullable
+    MatchResultInfo checkConditions(@Nullable MatchResultInfo matchResultInfo,
+            @NonNull LogicServices services);
 
     /**
      * Match the given template (which is probably a formula of the assumes-sequent) against a list
@@ -80,8 +84,10 @@ public interface TacletMatcher {
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
-            MatchResultInfo matchCond, LogicServices services);
+    @NonNull
+    AssumesMatchResult matchAssumes(@NonNull Iterable<@NonNull AssumesFormulaInstantiation> toMatch,
+            @NonNull Term template, @NonNull MatchResultInfo matchCond,
+            @NonNull LogicServices services);
 
     /**
      * Match the whole if sequent using the given list of instantiations of all assumes-sequent

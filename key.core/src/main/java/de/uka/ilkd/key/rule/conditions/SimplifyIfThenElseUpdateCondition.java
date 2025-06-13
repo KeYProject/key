@@ -156,16 +156,15 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     @Override
     public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchResultInfo mc,
-            LogicServices p_services) {
+            MatchResultInfo mc, LogicServices p_services) {
         final Services services = (Services) p_services;
         SVInstantiations svInst = mc.getInstantiations();
 
-        JTerm u1Inst = (JTerm) svInst.getInstantiation(u1);
-        JTerm u2Inst = (JTerm) svInst.getInstantiation(u2);
-        JTerm tInst = (JTerm) svInst.getInstantiation(commonFormula);
-        JTerm phiInst = (JTerm) svInst.getInstantiation(phi);
-        JTerm resultInst = (JTerm) svInst.getInstantiation(result);
+        JTerm u1Inst = svInst.getInstantiation(u1);
+        JTerm u2Inst = svInst.getInstantiation(u2);
+        JTerm tInst = svInst.getInstantiation(commonFormula);
+        JTerm phiInst = svInst.getInstantiation(phi);
+        JTerm resultInst = svInst.getInstantiation(result);
 
         if (tInst == null || phiInst == null) {
             return mc;

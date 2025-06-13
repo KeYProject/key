@@ -121,10 +121,11 @@ public class VMTacletMatcher implements TacletMatcher {
      *      LogicServices)
      */
     @Override
-    public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> p_toMatch,
-            Term p_template,
-            MatchResultInfo p_matchCond,
-            LogicServices p_services) {
+    public final @NonNull AssumesMatchResult matchAssumes(
+            @NonNull Iterable<@NonNull AssumesFormulaInstantiation> p_toMatch,
+            @NonNull Term p_template,
+            @NonNull MatchResultInfo p_matchCond,
+            @NonNull LogicServices p_services) {
         VMProgramInterpreter interpreter = assumesMatchPrograms.get(p_template);
         final var mc = (MatchConditions) p_matchCond;
 
@@ -240,15 +241,18 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchResultInfo checkConditions(
-            MatchResultInfo cond,
-            LogicServices services) {
+    public final @Nullable MatchResultInfo checkConditions(
+            @Nullable MatchResultInfo cond,
+            @NonNull LogicServices services) {
         var result = (MatchConditions) cond;
         if (result != null) {
 
             final var svIterator = result.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {
+                // for example SimplifyIfThenElseUpdateCondition
+                // rewrite these conditions and avoid null; conditions that do not involve matched
+                // variables
                 return checkVariableConditions(null, null, cond, services);// XXX
             }
 
@@ -256,8 +260,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 final SchemaVariable sv = svIterator.next();
                 final Object o = result.getInstantiations().getInstantiation(sv);
                 if (o instanceof SyntaxElement se) {
-                    result = (MatchConditions) checkVariableConditions(sv, se,
-                        result, services);
+                    result = (MatchConditions) checkVariableConditions(sv, se, result, services);
                 }
             }
         }
@@ -295,17 +298,16 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchResultInfo checkVariableConditions(SchemaVariable var,
-            SyntaxElement instantiationCandidate,
-            MatchResultInfo matchCond,
-            LogicServices services) {
+    public final @Nullable MatchResultInfo checkVariableConditions(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instantiationCandidate,
+            @Nullable MatchResultInfo matchCond,
+            @NonNull LogicServices services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof JTerm term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
                     if (varIsBound(var) || varDeclaredNotFree(var)) {
                         // match(x) is not a variable, but the corresponding template variable is
-                        // bound
-                        // or declared non free (so it has to be matched to a variable)
+                        // bound or declared non free (so it has to be matched to a variable)
                         return null; // FAILED
                     }
                 }
@@ -371,19 +373,18 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public MatchResultInfo matchSV(SchemaVariable sv,
-            SyntaxElement syntaxElement,
-            MatchResultInfo matchCond,
-            LogicServices services) {
+    public @Nullable MatchResultInfo matchSV(@NonNull SchemaVariable sv,
+            @NonNull SyntaxElement syntaxElement,
+            @NonNull MatchResultInfo matchCond,
+            @NonNull LogicServices services) {
 
         final MatchSchemaVariableInstruction instr =
             JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);
 
-        if (syntaxElement instanceof JTerm term) {
-            matchCond = instr.match(term, matchCond, services);
+        matchCond = instr.match(syntaxElement, matchCond, services);
+        if (syntaxElement instanceof JTerm) {
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
-        } else if (syntaxElement instanceof ProgramElement pe) {
-            matchCond = instr.match(pe, (MatchConditions) matchCond, services);
+        } else if (syntaxElement instanceof ProgramElement) {
             matchCond = checkConditions(matchCond, services);
         }
         return matchCond;
