@@ -8,6 +8,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableMap;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Implementations of this interface know which schema variables have been matched and their
@@ -53,7 +54,7 @@ public interface SVInstantiations {
     ///
     /// @return a map that contains all instantiated schema variables and their respective
     /// instantiation
-    ImmutableMap<SchemaVariable, InstantiationEntry<?>> getInstantiationMap();
+    ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> getInstantiationMap();
 
     ///
     /// returns a new [SVInstantiations] object that contains all instantiations contained in

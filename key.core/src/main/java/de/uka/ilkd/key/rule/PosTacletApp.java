@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -54,15 +55,15 @@ public class PosTacletApp extends TacletApp {
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
             SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
+            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             PosInOccurrence pos, Services services) {
-        Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
+        Debug.assertTrue(ifInstsCorrectSize(taclet, assumesInstantiations),
             "If instantiations list has wrong size");
 
         instantiations = resolveCollisionWithContext(taclet,
             resolveCollisionVarSV(taclet, instantiations, services), pos, services);
         if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
-            return new PosTacletApp(taclet, instantiations, ifInstantiations, pos);
+            return new PosTacletApp(taclet, instantiations, assumesInstantiations, pos);
         }
 
         return null;
@@ -220,9 +221,9 @@ public class PosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchResultInfo mc, Services services) {
+    public TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
-            assumesFormulaInstantiations(), posInOccurrence(), services);
+            assumesFormulaInstantiations(), posInOccurrence(), (Services) services);
     }
 
 

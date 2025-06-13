@@ -8,10 +8,10 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -74,7 +74,7 @@ public class NoPosTacletApp extends TacletApp {
             "If instantiations list has wrong size");
 
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
-        if (checkVarCondNotFreeIn(taclet, inst)) {
+        if (checkVarCondNotFreeIn(taclet, inst, null)) {
             return new NoPosTacletApp(taclet, inst, assumesInstantiations);
         }
         return null;
@@ -123,44 +123,6 @@ public class NoPosTacletApp extends TacletApp {
             ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
-
-
-    /**
-     * checks if the variable conditions of type 'x not free in y' are hold by the found
-     * instantiations. The variable conditions is used implicit in the prefix. (Used to calculate
-     * the prefix)
-     *
-     * @param taclet the Taclet that is tried to be instantiated. A match for the find (or/and if)
-     *        has been found.
-     * @param instantiations the SVInstantiations so that the find(if) matches
-     * @return true iff all variable conditions x not free in y are hold
-     */
-    protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
-            SVInstantiations instantiations) {
-        for (var pair : instantiations.getInstantiationMap()) {
-            final var sv = pair.key();
-
-            if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
-                    || sv instanceof SkolemTermSV) {
-                continue;
-            }
-
-            final var prefix = taclet.getPrefix(sv);
-            if (prefix.context()) {
-                continue;
-            }
-
-            final ImmutableSet<QuantifiableVariable> boundVarSet =
-                boundAtOccurrenceSet((TacletPrefix) prefix, instantiations);
-            final JTerm inst = (JTerm) instantiations.getInstantiation(sv);
-            if (!inst.freeVars().subset(boundVarSet)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 
     /**
      * adds a new instantiation to this TacletApp
@@ -234,10 +196,10 @@ public class NoPosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchResultInfo mc, Services services) {
+    public TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(),
             assumesFormulaInstantiations(),
-            services);
+            (Services) services);
     }
 
 
@@ -294,10 +256,9 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @return TacletApp with the resulting instantiations or null
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos, Services services) {
+    public NoPosTacletApp matchFind(PosInOccurrence pos, LogicServices services) {
         return matchFind(pos, services, null);
     }
-
 
     /*
      * This is a short-circuit version of matchFind(). It helps eliminate numerous calls to the
@@ -305,12 +266,12 @@ public class NoPosTacletApp extends TacletApp {
      * current subterm is known anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-            Services services, JTerm t) {
+            LogicServices services, JTerm t) {
         if ((t == null) && (pos != null)) {
             t = (JTerm) pos.subTerm();
         }
 
-        MatchResultInfo mc = setupMatchConditions(pos, services);
+        MatchResultInfo mc = setupMatchConditions(pos);
 
         if (mc == null) {
             return null;
@@ -328,7 +289,7 @@ public class NoPosTacletApp extends TacletApp {
         } else {
             res = mc;
         }
-        return evalCheckRes(res, services);
+        return evalCheckRes(res, (Services) services);
     }
 
     private NoPosTacletApp evalCheckRes(MatchResultInfo res, Services services) {
@@ -349,8 +310,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    protected MatchResultInfo setupMatchConditions(
-            PosInOccurrence pos, TermServices services) {
+    protected MatchResultInfo setupMatchConditions(PosInOccurrence pos) {
         var svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 

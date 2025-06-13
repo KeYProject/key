@@ -19,9 +19,11 @@ import de.uka.ilkd.key.rule.inst.GenericSortException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -103,27 +105,16 @@ public abstract class TacletApp implements RuleApp {
      *
      * @param prefix the TacletPrefix of the schemavariable
      * @param instantiations the SVInstantiations so that the find(if)-expression matches
-     * @return set of the bound variables
-     */
-    protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations) {
-        return collectPrefixInstantiations(prefix, instantiations);
-    }
-
-    /**
-     * collects all bound variables above the occurrence of the schemavariable whose prefix is given
-     *
-     * @param prefix the TacletPrefix of the schemavariable
-     * @param instantiations the SVInstantiations so that the find(if)-expression matches
      * @param pos the posInOccurrence describing the position of the schemavariable
      * @return set of the bound variables
      */
     protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-            SVInstantiations instantiations, PosInOccurrence pos) {
+            SVInstantiations instantiations, @Nullable PosInOccurrence pos) {
 
-        ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
+        ImmutableSet<QuantifiableVariable> result =
+            collectPrefixInstantiations(prefix, instantiations);
 
-        if (prefix.context()) {
+        if (pos != null && prefix.context()) {
             result = result.union(collectBoundVarsAbove(pos));
         }
 
@@ -149,6 +140,8 @@ public abstract class TacletApp implements RuleApp {
         }
         return instanceSet;
     }
+
+
 
     /**
      * returns the taclet the application information is collected for
@@ -204,7 +197,7 @@ public abstract class TacletApp implements RuleApp {
 
         for (var pair : insts.getInstantiationMap()) {
             if (pair.key() instanceof VariableSV varSV) {
-                JTerm value = (JTerm) pair.value().getInstantiation();
+                final Term value = (Term) pair.value().getInstantiation();
                 if (!collMap.containsKey(value.op())) {
                     collMap.put((LogicVariable) value.op(), varSV);
                 } else {
@@ -312,7 +305,7 @@ public abstract class TacletApp implements RuleApp {
             if (!(t.op() instanceof VariableSV)) {
                 ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
                 result =
-                    result.replace(sv, cfSubst.apply((JTerm) insts.getInstantiation(sv)), services);
+                    result.replace(sv, cfSubst.apply(insts.getInstantiation(sv)), services);
             }
         } else {
             for (int i = 0; i < t.arity(); i++) {
@@ -803,7 +796,7 @@ public abstract class TacletApp implements RuleApp {
      * creates a new Taclet application containing all the instantiations, constraints and new
      * metavariables given by the mc object and forget the old ones
      */
-    public abstract TacletApp setMatchConditions(MatchResultInfo mc, Services services);
+    public abstract TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services);
 
     /**
      * creates a new Taclet application containing all the instantiations, constraints, new
@@ -943,7 +936,7 @@ public abstract class TacletApp implements RuleApp {
      *
      * <p>
      * <b>CAUTION:</b> If you call this method, consider to call
-     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Services)}
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence, LogicServices)}
      * first (if applicable) as
      * otherwise the TacletApp may become invalid. (This happened sometimes during interactive
      * proofs).
@@ -1173,27 +1166,40 @@ public abstract class TacletApp implements RuleApp {
      * instantiations. The variable conditions is used implicit in the prefix. (Used to calculate
      * the prefix)
      *
-     * @param taclet the Taclet that is tried to be instantiated. A match for the find (or/and if)
+     * @param taclet the Taclet that is tried to be instantiated. A match for the find (or/and
+     *        assumes)
      *        has been found.
-     * @param instantiations the SVInstantiations so that the find(if) expression matches
-     * @param pos the PosInOccurrence where the Taclet is applied
+     * @param instantiations the SVInstantiations so that the find expression or assumes sequent
+     *        matches
+     * @param pos the PosInOccurrence where the Taclet is applied or null if the taclet has no find
      * @return true iff all variable conditions x not free in y are hold
      */
-    public static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
+    protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
-            PosInOccurrence pos) {
-        final var it = ((de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations).svIterator();
-        while (it.hasNext()) {
-            var sv = it.next();
-            if (sv instanceof TermSV || sv instanceof FormulaSV) {
-                if (!((JTerm) instantiations.getInstantiation(sv)).freeVars()
-                        .subset(boundAtOccurrenceSet((TacletPrefix) taclet.getPrefix(sv),
-                            instantiations, pos))) {
+            @Nullable PosInOccurrence pos) {
 
-                    return false;
-                }
+        for (var pair : instantiations.getInstantiationMap()) {
+            final var sv = pair.key();
+
+            if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
+                    || sv instanceof SkolemTermSV) {
+                continue;
+            }
+
+            final var prefix = taclet.getPrefix(sv);
+
+            if (pos == null && prefix.context()) {
+                continue;
+            }
+
+            final ImmutableSet<QuantifiableVariable> boundVarSet =
+                boundAtOccurrenceSet((TacletPrefix) prefix, instantiations, pos);
+            final Term inst = instantiations.getInstantiation(sv);
+            if (!inst.freeVars().subset(boundVarSet)) {
+                return false;
             }
         }
+
         return true;
     }
 

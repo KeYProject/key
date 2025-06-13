@@ -544,10 +544,11 @@ public class SVInstantiations
 
     public int hashCode() {
         int result = 37 * getUpdateContext().hashCode() + size();
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
+        final Iterator<ImmutableMapEntry<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>>> it =
             pairIterator();
         while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+            final ImmutableMapEntry<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> e =
+                it.next();
             if (e.value().getInstantiation() instanceof TermLabel termLabel) {
                 if (!termLabel.isProofRelevant()) {
                     continue;
@@ -559,10 +560,10 @@ public class SVInstantiations
     }
 
     public SVInstantiations union(
-            org.key_project.prover.rules.instantiation.SVInstantiations p_other,
-            LogicServices services) {
+            org.key_project.prover.rules.instantiation.@NonNull SVInstantiations p_other,
+            @NonNull LogicServices services) {
         final var other = (SVInstantiations) p_other;
-        ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
+        ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> result = map;
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : other.map) {
             result = result.put(entry.key(), entry.value());
@@ -584,7 +585,7 @@ public class SVInstantiations
                 .rebuildSorts(services);
     }
 
-    public ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting() {
+    public ImmutableMap<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> interesting() {
         return interesting;
     }
 
