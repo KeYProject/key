@@ -5,13 +5,12 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.Term;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.TacletPrefix;
@@ -160,7 +159,7 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, SyntaxElement term, boolean interesting,
             Services services) {
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
@@ -170,26 +169,6 @@ public class PosTacletApp extends TacletApp {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().add(sv, term, services), assumesFormulaInstantiations(),
                 posInOccurrence(), services);
-        }
-    }
-
-    /**
-     * adds a new instantiation to this TacletApp
-     *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
-     * @return the new TacletApp
-     */
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addInteresting(sv, pe, services), assumesFormulaInstantiations(),
-                posInOccurrence(), services);
-        } else {
-            return createPosTacletApp((FindTaclet) taclet(), instantiations().add(sv, pe, services),
-                assumesFormulaInstantiations(), posInOccurrence(), services);
         }
     }
 

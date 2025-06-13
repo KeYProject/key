@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -129,37 +130,22 @@ public class NoPosTacletApp extends TacletApp {
      * adds a new instantiation to this TacletApp
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param se the SyntaxElement (usually a {@link Term} or {@link ProgramElement})
+     *        with which the SV is instantiated
+     * @param interesting a marker whether the instantiation needs to be stored explicitly when
+     *        saving a proof; this is usually needed for new names as their creation
+     *        is not always deterministic
+     * @param services the Services for access to the logic signature and more
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, SyntaxElement se, boolean interesting,
             Services services) {
         if (interesting) {
-            return createNoPosTacletApp(taclet(),
-                instantiations().addInteresting(sv, term, services), assumesFormulaInstantiations(),
-                services);
-        } else {
-            return createNoPosTacletApp(taclet(), instantiations().add(sv, term, services),
-                assumesFormulaInstantiations(), services);
-        }
-    }
-
-    /**
-     * adds a new instantiation to this TacletApp
-     *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement with which the SV is instantiated
-     * @return the new TacletApp
-     */
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createNoPosTacletApp(taclet(), instantiations().addInteresting(sv, pe, services),
+            return createNoPosTacletApp(taclet(), instantiations().addInteresting(sv, se, services),
                 assumesFormulaInstantiations(), services);
         } else {
-            return createNoPosTacletApp(taclet(), instantiations().add(sv, pe, services),
+            return createNoPosTacletApp(taclet(), instantiations().add(sv, se, services),
                 assumesFormulaInstantiations(), services);
         }
     }
@@ -176,7 +162,6 @@ public class NoPosTacletApp extends TacletApp {
         return new NoPosTacletApp(taclet(), svi.union(instantiations(), services),
             assumesFormulaInstantiations());
     }
-
 
     /**
      * creates a new Taclet application containing all the instantiations given by the
@@ -241,7 +226,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return TacletApp with the resulting instantiations or null
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos, LogicServices services) {
-        return matchFind(pos, services, null);
+        return matchFind(null, pos, services);
     }
 
     /*
@@ -249,10 +234,10 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos,
-            LogicServices services, JTerm t) {
-        if ((t == null) && (pos != null)) {
-            t = (JTerm) pos.subTerm();
+    private NoPosTacletApp matchFind(@Nullable JTerm termToBeMatched, PosInOccurrence pos,
+            LogicServices services) {
+        if ((termToBeMatched == null) && (pos != null)) {
+            termToBeMatched = (JTerm) pos.subTerm();
         }
 
         MatchResultInfo mc = setupMatchConditions(pos);
@@ -263,7 +248,7 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchResultInfo res;
         if (taclet() instanceof FindTaclet) {
-            res = taclet().getMatcher().matchFind(t, mc, services);
+            res = taclet().getMatcher().matchFind(termToBeMatched, mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
             if (res == null || !checkVarCondNotFreeIn(taclet(),
@@ -282,7 +267,7 @@ public class NoPosTacletApp extends TacletApp {
         }
 
         if (updateContextFixed
-                && !updateContextCompatible((de.uka.ilkd.key.rule.MatchConditions) res)) {
+                && !updateContextCompatible((MatchConditions) res)) {
             /*
              * LOGGER.debug("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext
              * (), res.matchConditions().getInstantiations().getUpdateContext());
@@ -298,22 +283,22 @@ public class NoPosTacletApp extends TacletApp {
         var svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 
-        de.uka.ilkd.key.rule.MatchConditions mc;
+        MatchConditions mc;
         if (svInst.isEmpty()) {
-            mc = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+            mc = MatchConditions.EMPTY_MATCHCONDITIONS;
         } else {
-            mc = new de.uka.ilkd.key.rule.MatchConditions(svInst, RenameTable.EMPTY_TABLE);
+            mc = new MatchConditions(svInst, RenameTable.EMPTY_TABLE);
         }
 
-        if (taclet() instanceof RewriteTaclet) {
-            mc = ((RewriteTaclet) taclet()).checkPrefix(pos, mc);
+        if (taclet() instanceof RewriteTaclet rewriteTaclet) {
+            mc = rewriteTaclet.checkPrefix(pos, mc);
         }
 
         return mc;
     }
 
 
-    private boolean updateContextCompatible(de.uka.ilkd.key.rule.MatchConditions p_mc) {
+    private boolean updateContextCompatible(MatchConditions p_mc) {
         return instantiations.getUpdateContext()
                 .equals(p_mc.getInstantiations().getUpdateContext());
     }
