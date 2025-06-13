@@ -704,13 +704,25 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
+     * returns true iff all necessary information is collected, so that the Taclet can be applied.
+     *
+     * @return true iff all necessary information is collected, so that the Taclet can be applied.
+     */
+    @Override
+    public final boolean complete() {
+        return (posInOccurrence() != null || taclet instanceof NoFindTaclet)
+                && uninstantiatedVars().isEmpty()
+                && assumesInstantionsComplete();
+    }
+
+    /**
      * adds a new instantiation to this TacletApp
      *
      * @param sv the SchemaVariable to be instantiated
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
-    public abstract TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
+    public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services);
 
     /**

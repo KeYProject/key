@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
@@ -137,7 +138,7 @@ public class SVInstantiations
         return add(sv, new InstantiationEntry<>(matchedElement), services);
     }
 
-    public SVInstantiations addInteresting(SchemaVariable sv, JTerm subst, LogicServices services) {
+    public SVInstantiations addInteresting(SchemaVariable sv, Term subst, LogicServices services) {
         return addInteresting(sv, new InstantiationEntry<>(subst), services);
     }
 

@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -285,7 +286,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * sequent
      */
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(
-            ImmutableList<NoPosTacletApp> tacletApps, final RuleFilter p_filter,
+            @NonNull ImmutableList<NoPosTacletApp> tacletApps, final RuleFilter p_filter,
             final PosInOccurrence pos, final LogicServices services);
 
     /**

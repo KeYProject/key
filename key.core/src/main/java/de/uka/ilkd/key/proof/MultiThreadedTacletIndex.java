@@ -19,6 +19,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A multithreaded taclet index implementation. It executes method
  * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, LogicServices)}
@@ -70,13 +72,10 @@ final class MultiThreadedTacletIndex extends TacletIndex {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
+    protected ImmutableList<NoPosTacletApp> matchTaclets(
+            @NonNull ImmutableList<NoPosTacletApp> tacletApps,
             RuleFilter p_filter, PosInOccurrence pos, LogicServices services) {
-
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        if (tacletApps == null) {
-            return result;
-        }
 
         if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);

@@ -11,8 +11,10 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.TacletPrefix;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
@@ -20,6 +22,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * A position taclet application object, contains already the information to which term/formula of
@@ -35,7 +39,7 @@ public class PosTacletApp extends TacletApp {
      * stores the information where the Taclet is to be applied. This means where the find section
      * of the taclet matches
      */
-    private final PosInOccurrence pos;
+    private final @MonotonicNonNull PosInOccurrence pos;
 
     /**
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
@@ -115,7 +119,9 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        if (!taclet().getPrefix(sv).context()) {
+        final TacletPrefix prefix = taclet().getPrefix(sv);
+        assert prefix != null : "prefix should not be null for taclets with a find";
+        if (!prefix.context()) {
             return DefaultImmutableSet.nil();
         }
         return varsBoundAboveFindPos(taclet(), posInOccurrence());
@@ -136,7 +142,7 @@ public class PosTacletApp extends TacletApp {
             Iterator<SchemaVariable> it = allVariableSV(taclet);
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();
-                JTerm inst = (JTerm) insts.getInstantiation(varSV);
+                JTerm inst = insts.getInstantiation(varSV);
                 if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
@@ -154,9 +160,8 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services) {
-
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().addInteresting(sv, term, services), assumesFormulaInstantiations(),
@@ -240,18 +245,6 @@ public class PosTacletApp extends TacletApp {
             posInOccurrence(), services);
     }
 
-
-    /**
-     * returns true iff all necessary information is collected, so that the Taclet can be applied.
-     *
-     * @return true iff all necessary information is collected, so that the Taclet can be applied.
-     */
-    @Override
-    public boolean complete() {
-        return posInOccurrence() != null && uninstantiatedVars().isEmpty()
-                && assumesInstantionsComplete();
-    }
-
     /**
      * returns the PositionInOccurrence (representing a SequentFormula and a position in the
      * corresponding formula)
@@ -259,7 +252,7 @@ public class PosTacletApp extends TacletApp {
      * @return the PosInOccurrence
      */
     @Override
-    public PosInOccurrence posInOccurrence() {
+    public @MonotonicNonNull PosInOccurrence posInOccurrence() {
         return pos;
     }
 
