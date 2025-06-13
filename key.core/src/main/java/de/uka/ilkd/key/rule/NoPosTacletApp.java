@@ -247,11 +247,11 @@ public class NoPosTacletApp extends TacletApp {
         }
 
         MatchResultInfo res;
-        if (taclet() instanceof FindTaclet) {
-            res = taclet().getMatcher().matchFind(termToBeMatched, mc, services);
+        if (taclet() instanceof final FindTaclet findTaclet) {
+            res = findTaclet.getMatcher().matchFind(termToBeMatched, mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
-            if (res == null || !checkVarCondNotFreeIn(taclet(),
+            if (res == null || !checkVarCondNotFreeIn(findTaclet,
                 res.getInstantiations(), pos)) {
                 return null;
             }
@@ -268,10 +268,6 @@ public class NoPosTacletApp extends TacletApp {
 
         if (updateContextFixed
                 && !updateContextCompatible((MatchConditions) res)) {
-            /*
-             * LOGGER.debug("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext
-             * (), res.matchConditions().getInstantiations().getUpdateContext());
-             */
             return null;
         }
 
@@ -299,7 +295,7 @@ public class NoPosTacletApp extends TacletApp {
 
 
     private boolean updateContextCompatible(MatchConditions p_mc) {
-        return instantiations.getUpdateContext()
+        return instantiations().getUpdateContext()
                 .equals(p_mc.getInstantiations().getUpdateContext());
     }
 }

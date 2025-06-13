@@ -11,6 +11,9 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public interface TacletMatcher {
     /**
      * matches the given term against the taclet's find term if the taclet has no find term or the
@@ -28,8 +31,10 @@ public interface TacletMatcher {
      * @param services the Services
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
-    MatchResultInfo matchFind(Term term, MatchResultInfo matchCond,
-            LogicServices services);
+    @Nullable
+    MatchResultInfo matchFind(@NonNull Term term,
+            @NonNull MatchResultInfo matchCond,
+            @Nullable LogicServices services);
 
     /**
      * checks if the conditions for a correct instantiation are satisfied

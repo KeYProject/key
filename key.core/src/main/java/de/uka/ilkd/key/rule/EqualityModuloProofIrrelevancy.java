@@ -499,7 +499,6 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(TacletApp app) {
-        MatchConditions matchConditions = app.matchConditions();
         return Objects.hash(
             EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.assumesFormulaInstantiations(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
@@ -567,7 +566,7 @@ public class EqualityModuloProofIrrelevancy {
                 }
             } else if (inst instanceof ProgramElement instAsProgramElement) {
                 if (!equalsModProofIrrelevancy(instAsProgramElement,
-                    (ProgramElement) that.getInstantiation(e.key()))) {
+                    that.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(that.getInstantiation(e.key()))) {

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
-import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -37,6 +36,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -324,36 +326,31 @@ public class VMTacletMatcher implements TacletMatcher {
      * and the find expression does not start with an update application operator
      *
      * @param source the term to be matched
-     * @param matchCond the accumulated match conditions for a successful match
+     * @param matchResult the accumulated match conditions for a successful match
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates
      *         (Which have been added to the update context in the match conditions)
      */
     private Pair<JTerm, MatchResultInfo> matchAndIgnoreUpdatePrefix(
-            final JTerm source,
-            final MatchResultInfo matchCond) {
-        final Operator sourceOp = source.op();
-
-        if (sourceOp instanceof UpdateApplication) {
-            // updates can be ignored
-            JTerm update = UpdateApplication.getUpdate(source);
-            final var svInstantiations =
-                ((MatchConditions) matchCond).getInstantiations();
-            final var resultingConditions =
-                matchCond.setInstantiations(svInstantiations.addUpdate(update, source.getLabels()));
-            return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(source),
-                resultingConditions);
-        } else {
-            return new Pair<>(source, matchCond);
+            JTerm source, final MatchResultInfo matchResult) {
+        final MatchConditions matchCond = (MatchConditions) matchResult;
+        final var instantiations = matchCond.getInstantiations();
+        ImmutableList<UpdateLabelPair> updateLabel = instantiations.getUpdateContext();
+        while (source.op() instanceof UpdateApplication) {
+            final JTerm update = UpdateApplication.getUpdate(source);
+            updateLabel = updateLabel.append(new UpdateLabelPair(update, source.getLabels()));
+            source = UpdateApplication.getTarget(source);
         }
+        return new Pair<>(source,
+            matchCond.setInstantiations(instantiations.addUpdateList(updateLabel)));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final MatchResultInfo matchFind(
-            Term term,
-            MatchResultInfo p_matchCond,
+    public final @Nullable MatchResultInfo matchFind(
+            @NonNull Term term,
+            @NonNull MatchResultInfo p_matchCond,
             LogicServices services) {
         if (findMatchProgram == null) {
             return null;
@@ -365,9 +362,8 @@ public class VMTacletMatcher implements TacletMatcher {
             source = resultUpdateMatch.first;
             p_matchCond = resultUpdateMatch.second;
         }
-        return checkConditions(
-            findMatchProgram.match(source, p_matchCond, services),
-            services);
+        final MatchResultInfo matchResult = findMatchProgram.match(source, p_matchCond, services);
+        return matchResult == null ? null : checkConditions(matchResult, services);
     }
 
 
