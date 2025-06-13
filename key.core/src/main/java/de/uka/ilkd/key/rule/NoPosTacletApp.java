@@ -8,10 +8,10 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -22,6 +22,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +133,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(),
@@ -215,23 +216,10 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    /**
-     * returns true iff all necessary information is collected, so that the Taclet can be applied.
-     *
-     * @return true iff all necessary information is collected, so that the Taclet can be applied.
-     */
-    @Override
-    public boolean complete() {
-        return (uninstantiatedVars().isEmpty() && taclet() instanceof NoFindTaclet
-                && assumesInstantionsComplete());
-
-    }
-
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
         return DefaultImmutableSet.nil();
     }
-
 
     /**
      * returns the PositionInOccurrence (representing a SequentFormula and a position in the
@@ -240,7 +228,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return the PosInOccurrence
      */
     @Override
-    public PosInOccurrence posInOccurrence() {
+    public @Nullable PosInOccurrence posInOccurrence() {
         return null;
     }
 
