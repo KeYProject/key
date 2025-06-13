@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
@@ -61,13 +60,13 @@ public class SVInstantiations
 
 
     /** the map with the instantiations to logic terms */
-    private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> map;
+    private final ImmutableMap<@NonNull SchemaVariable, InstantiationEntry<?>> map;
 
     /**
      * just a list of "interesting" instantiations: these instantiations are not 100% predetermined
      * and worth saving in a proof
      */
-    private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting;
+    private final ImmutableMap<@NonNull SchemaVariable, InstantiationEntry<?>> interesting;
 
     /**
      * updates may be ignored when matching, therefore they need to be added after the application
@@ -82,7 +81,7 @@ public class SVInstantiations
     /** additional conditions for the generic sorts */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
 
-    /** creates a new SVInstantions object with an empty map */
+    /** creates a new SVInstantiations object with an empty map */
     private SVInstantiations() {
         genericSortConditions = ImmutableSLList.nil();
         updateContext = ImmutableSLList.nil();
@@ -244,8 +243,8 @@ public class SVInstantiations
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv, Name name, LogicServices services) {
-        SchemaVariable existingSV = lookupVar(sv.name());
-        Name oldValue = (Name) getInstantiation(existingSV);
+        final SchemaVariable existingSV = lookupVar(sv.name());
+        final Name oldValue = getInstantiation(existingSV);
         if (name.equals(oldValue)) {
             return this; // already have it
         } else if (oldValue != null) {
@@ -570,17 +569,13 @@ public class SVInstantiations
             result = result.put(entry.key(), entry.value());
         }
 
-        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.nil();
+        ImmutableList<UpdateLabelPair> updates = updateContext;
 
-        if (other.getUpdateContext().isEmpty()) {
-            updates = getUpdateContext();
-        } else if (getUpdateContext().isEmpty()) {
-            updates = other.getUpdateContext();
-        } else if (!getUpdateContext().equals(other.getUpdateContext())) {
-            Debug.fail(
-                "The update context of one of" + " the instantiations has to be empty or equal.");
-        } else {
-            updates = other.getUpdateContext();
+        if (updates.isEmpty()) {
+            updates = other.updateContext;
+        } else if (!updateContext.equals(other.updateContext)) {
+            throw new IllegalArgumentException(
+                "The update context of one of the instantiations has to be empty or equal.");
         }
         return new SVInstantiations(result, interesting(), updates, getGenericSortConditions())
                 .rebuildSorts(services);
