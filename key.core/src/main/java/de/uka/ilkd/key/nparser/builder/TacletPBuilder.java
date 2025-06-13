@@ -517,8 +517,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             rs.forEach(b::addRuleSet);
         }
 
-        if (ctx.DISPLAYNAME() != null) {// last entry
-            b.setDisplayName(accept(ctx.dname));
+        if (ctx.DISPLAYNAME() != null && !ctx.DISPLAYNAME().isEmpty()) {// last entry
+            b.setDisplayName(Objects.requireNonNull(accept(ctx.dname)));
         }
 
         if (ctx.HELPTEXT() != null) { // last entry

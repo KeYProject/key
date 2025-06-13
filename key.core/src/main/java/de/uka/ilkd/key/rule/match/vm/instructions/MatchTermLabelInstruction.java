@@ -6,11 +6,12 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -24,12 +25,11 @@ public class MatchTermLabelInstruction implements MatchInstruction {
         this.labels = labels;
     }
 
-    private MatchConditions match(TermLabelSV sv, JTerm instantiationCandidate,
-            MatchConditions matchCond, LogicServices services) {
+    private MatchResultInfo match(TermLabelSV sv, JTerm instantiationCandidate,
+            MatchResultInfo matchCond, LogicServices services) {
 
-        final SVInstantiations svInsts = matchCond.getInstantiations();
-        final ImmutableArray<TermLabel> inst =
-            (ImmutableArray<TermLabel>) svInsts.getInstantiation(sv);
+        final SVInstantiations svInsts = (SVInstantiations) matchCond.getInstantiations();
+        final ImmutableArray<TermLabel> inst = svInsts.getInstantiation(sv);
 
         if (inst == null) {
             return matchCond.setInstantiations(
@@ -48,10 +48,10 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
             LogicServices services) {
-        final JTerm term = termPosition.getCurrentSubterm();
-        MatchConditions result = matchConditions;
+        final JTerm term = (JTerm) actualElement;
+        MatchResultInfo result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels
         // at the moment any termlabbel SV matches on all labels (or no label) (i.e., t<l1,l2> will
         // match l1 and l2 against all labels and both will have
@@ -61,8 +61,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
             // ignore all labels which are not schema variables
             // if intended to match concrete label, match against schema label
             // and use an appropriate variable condition
-            if (templateLabel instanceof TermLabelSV) {
-                result = match((TermLabelSV) templateLabel, term, result, services);
+            if (templateLabel instanceof TermLabelSV labelSV) {
+                result = match(labelSV, term, result, services);
             }
         }
         return result;

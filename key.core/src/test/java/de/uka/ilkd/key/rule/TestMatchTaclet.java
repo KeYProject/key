@@ -25,7 +25,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.rulefilter.IHTacletFilter;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestMatchTaclet {
 
-    public static final MatchConditions EMPTY_MATCHCONDITIONS =
+    public static final MatchResultInfo EMPTY_MATCHCONDITIONS =
         de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
     private static TermBuilder TB;
 
@@ -117,7 +117,7 @@ public class TestMatchTaclet {
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_while0").taclet();
 
-        MatchConditions mc =
+        MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc);
     }
@@ -304,7 +304,7 @@ public class TestMatchTaclet {
     public void testProgramMatchEmptyBlock() {
         JTerm match = TacletForTests.parseTerm("\\<{ }\\>true ");
         FindTaclet taclet = (FindTaclet) TacletForTests.getTaclet("empty_diamond").taclet();
-        MatchConditions mc =
+        MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
 
         assertNotNull(mc);
@@ -338,7 +338,7 @@ public class TestMatchTaclet {
         JTerm match = TB.tf().createTerm(v4);
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_subsort_termSV").taclet();
-        MatchConditions mc =
+        MatchResultInfo mc =
             taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
     }
@@ -357,7 +357,7 @@ public class TestMatchTaclet {
         JTerm match = TB.all(new LogicVariable(new Name("lv"), osort4), sub);
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_subsort_variableSV").taclet();
-        MatchConditions mc =
+        MatchResultInfo mc =
             taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services);
         assertNull(mc);
     }
@@ -367,7 +367,7 @@ public class TestMatchTaclet {
         JTerm match = TacletForTests.parseTerm("\\<{{ int i = 0;}}\\>true ");
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_nocontext").taclet();
-        MatchConditions mc =
+        MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "No context matching corrupt.");
     }
@@ -384,7 +384,7 @@ public class TestMatchTaclet {
         match = TB.dia(JavaBlock.createJavaBlock(new StatementBlock(mframe)), match.sub(0));
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_methodframe").taclet();
-        MatchConditions mc =
+        MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "Method-Frame should match");
 
@@ -407,7 +407,7 @@ public class TestMatchTaclet {
         JTerm match = TacletForTests.parseTerm("\\<{ int i = 0; }\\>true ");
         FindTaclet taclet = (FindTaclet) TacletForTests
                 .getTaclet("TestMatchTaclet_eliminate_variable_declaration").taclet();
-        MatchConditions mc =
+        MatchResultInfo mc =
             (taclet.getMatcher().matchFind(match, EMPTY_MATCHCONDITIONS, services));
 
         assertNull(mc,
@@ -469,7 +469,7 @@ public class TestMatchTaclet {
             (FindTaclet) TacletForTests.getTaclet("testInsequentState_2").taclet();
 
         JTerm match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
-        MatchConditions mc = (restrictedTaclet.getMatcher().matchFind(match,
+        MatchResultInfo mc = (restrictedTaclet.getMatcher().matchFind(match,
             EMPTY_MATCHCONDITIONS, services));
         assertNull(mc, "Test inSequentState failed: matched on term with update prefix");
 

@@ -4,12 +4,14 @@
 package org.key_project.prover.sequent;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /// The `Sequent` class represents a formal proof construct consisting of two components:
@@ -470,14 +472,14 @@ public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
         if (!(o instanceof Sequent o1)) {
             return false;
         }
-        return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
+        return Objects.equals(antecedent, o1.antecedent) && Objects.equals(succedent, o1.succedent);
     }
 
     /// used to check whether this sequent contains a given sequent formula.

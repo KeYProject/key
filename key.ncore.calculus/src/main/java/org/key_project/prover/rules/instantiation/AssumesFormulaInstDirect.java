@@ -4,8 +4,9 @@
 package org.key_project.prover.rules.instantiation;
 
 
-import org.key_project.logic.LogicServices;
 import org.key_project.prover.sequent.SequentFormula;
+
+import org.jspecify.annotations.Nullable;
 
 
 /// Instantiation of an assumes-formula that has to be proven by an explicit assumes-goal
@@ -34,11 +35,7 @@ public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
         return cf;
     }
 
-    public String toString() {
-        return toString(null);
-    }
-
-    public boolean equals(Object p_obj) {
+    public boolean equals(@Nullable Object p_obj) {
         if (!(p_obj instanceof AssumesFormulaInstDirect)) {
             return false;
         }
@@ -51,7 +48,7 @@ public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
         return result;
     }
 
-    public String toString(LogicServices services) {
+    public String toString() {
         return cf.toString();
     }
 }

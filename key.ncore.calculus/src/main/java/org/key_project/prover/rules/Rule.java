@@ -22,8 +22,7 @@ public interface Rule extends Named {
 
     /// returns the display name of the rule
     /// by default the name is the same as the rules unique name
-    @NonNull
-    default String displayName() {
+    default @NonNull String displayName() {
         return name().toString();
     }
 

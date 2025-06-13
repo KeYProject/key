@@ -12,7 +12,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Stores the given {@link JTerm}, after substitution of {@link SchemaVariable}s, into the given
@@ -30,8 +30,8 @@ public class StoreTermInCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices services) {
+    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices services) {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();
 

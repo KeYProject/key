@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -37,7 +37,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
     private JTerm replace(JTerm term, JTerm with, TermLabelState termLabelState,
             TacletLabelHint labelHint, PosInOccurrence posOfFind,
             IntIterator it,
-            MatchConditions mc,
+            MatchResultInfo mc,
             Sort maxSort, Goal goal, Services services, TacletApp ruleApp) {
         if (it.hasNext()) {
             final int indexOfNextSubTerm = it.next();
@@ -68,7 +68,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             TermLabelState termLabelState,
             RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind,
             Services services,
-            MatchConditions matchCond,
+            MatchResultInfo matchCond,
             TacletApp ruleApp) {
         final JTerm term = (JTerm) posOfFind.sequentFormula().formula();
         final IntIterator it = posOfFind.posInTerm().iterator();
@@ -107,7 +107,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
-            PosInOccurrence posOfFind, MatchConditions matchCond,
+            PosInOccurrence posOfFind, MatchResultInfo matchCond,
             Goal goal, TacletApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
             final SequentFormula cf =
@@ -147,7 +147,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-            MatchConditions matchCond, Goal goal, TacletApp ruleApp, Services services) {
+            MatchResultInfo matchCond, Goal goal, TacletApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
             addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
                 ruleApp, services, termLabelState,

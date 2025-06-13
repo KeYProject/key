@@ -13,7 +13,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -68,7 +68,7 @@ public class PosTacletApp extends TacletApp {
         return null;
     }
 
-    public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchConditions matchCond,
+    public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchResultInfo matchCond,
             PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
     }
@@ -220,7 +220,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchConditions mc, Services services) {
+    public TacletApp setMatchConditions(MatchResultInfo mc, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
             assumesFormulaInstantiations(), posInOccurrence(), services);
     }
@@ -231,7 +231,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(MatchConditions mc,
+    protected TacletApp setAllInstantiations(MatchResultInfo mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         return createPosTacletApp((FindTaclet) taclet(),

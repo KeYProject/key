@@ -12,19 +12,20 @@ import org.jspecify.annotations.Nullable;
 
 /// Interface to be implemented by classes in order to customize the goal selection strategy of the
 /// automatic prover environment.
-public interface GoalChooser<P extends @Nullable ProofObject<@NonNull G>, G extends @Nullable ProofGoal<@NonNull G>> {
+public interface GoalChooser<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>> {
 
     /// Initialise this GoalChooser for use with a given Proof and a list of goals.
     ///
-    /// @param p_proof *param p_goals the initial list of goals
+    /// @param p_proof
+    /// @param p_goals the initial list of goals
     void init(@Nullable P p_proof, @Nullable ImmutableList<G> p_goals);
 
     /// @return the next goal a taclet should be applied to
     @Nullable
     G getNextGoal();
 
-    /// Remove p_goal from selectedList (e.g. no taclet can be applied to p_goal)
-    void removeGoal(G p_goal);
+    /// Remove goal from selectedList (e.g. no taclet can be applied to goal)
+    void removeGoal(G goal);
 
     /// The given node has become an internal node of the proof tree, and the children of the node
     /// are the given goals

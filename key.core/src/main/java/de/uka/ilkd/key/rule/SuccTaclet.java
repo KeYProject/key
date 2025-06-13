@@ -50,7 +50,6 @@ public class SuccTaclet extends FindTaclet {
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
             tacletAnnotations);
-        createTacletServices();
     }
 
     @Override
