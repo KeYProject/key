@@ -72,7 +72,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * chosen instantiations for the assumes-sequent formulas
      */
-    protected final ImmutableList<AssumesFormulaInstantiation> ifInstantiations;
+    protected final ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations;
 
     /**
      * set of schema variables that appear in the Taclet and need to be instantiated but are not
@@ -93,10 +93,10 @@ public abstract class TacletApp implements RuleApp {
     }
 
     TacletApp(org.key_project.prover.rules.Taclet taclet, SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
+            ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations) {
         this.taclet = taclet;
         this.instantiations = (de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations;
-        this.ifInstantiations = ifInstantiations;
+        this.assumesFormulaInstantiations = assumesFormulaInstantiations;
         this.matchConditions =
             new de.uka.ilkd.key.rule.MatchConditions(this.instantiations, RenameTable.EMPTY_TABLE);
     }
@@ -177,7 +177,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     public ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations() {
-        return ifInstantiations;
+        return assumesFormulaInstantiations;
     }
 
     public boolean isUpdateContextFixed() {
@@ -823,7 +823,7 @@ public abstract class TacletApp implements RuleApp {
             // So we replace null with nil() here as a bugfix.
             p_list = ImmutableSLList.nil();
         }
-        assert ifInstsCorrectSize(p_list) && ifInstantiations == null
+        assert ifInstsCorrectSize(p_list) && assumesFormulaInstantiations == null
                 : "If instantiations list has wrong size "
                     + "or the if formulas have already been instantiated";
 
@@ -847,7 +847,7 @@ public abstract class TacletApp implements RuleApp {
     public ImmutableList<TacletApp> findIfFormulaInstantiations(Sequent seq, Services services) {
         // TODO Why not return just the list of IfFormulaInstantiations?
 
-        Debug.assertTrue(ifInstantiations == null,
+        Debug.assertTrue(assumesFormulaInstantiations == null,
             "The if formulas have already been instantiated");
 
         if (taclet().assumesSequent().isEmpty()) {
@@ -960,7 +960,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the if-instantiation list is not null or no if sequent is needed
      */
     public boolean assumesInstantionsComplete() {
-        return ifInstantiations != null || taclet().assumesSequent().isEmpty();
+        return assumesFormulaInstantiations != null || taclet().assumesSequent().isEmpty();
     }
 
     /**
@@ -977,7 +977,7 @@ public abstract class TacletApp implements RuleApp {
         }
         final TacletApp s = (TacletApp) o;
         return (s.taclet.equals(taclet) && s.instantiations.equals(instantiations))
-                && (Objects.equals(ifInstantiations, s.ifInstantiations));
+                && (Objects.equals(assumesFormulaInstantiations, s.assumesFormulaInstantiations));
     }
 
     @Override
@@ -985,7 +985,8 @@ public abstract class TacletApp implements RuleApp {
         int result = 17;
         result = 37 * result + taclet.hashCode();
         result = 37 * result + instantiations.hashCode();
-        result = 37 * result + (ifInstantiations == null ? 0 : ifInstantiations.hashCode());
+        result = 37 * result + (assumesFormulaInstantiations == null ? 0
+                : assumesFormulaInstantiations.hashCode());
         return result;
     }
 
