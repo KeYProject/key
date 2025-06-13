@@ -479,12 +479,7 @@ public class EqualityModuloProofIrrelevancy {
             EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
             return false;
         }
-        if (!equalsModProofIrrelevancy(_this.instantiations, that.instantiations)) {
-            return false;
-        }
-        final MatchConditions matchConditions = _this.matchConditions();
-        if (!equalsModProofIrrelevancy(matchConditions,
-            that.matchConditions())) {
+        if (!equalsModProofIrrelevancy(_this.instantiations(), that.instantiations())) {
             return false;
         }
         final var missingVars = _this.uninstantiatedVars();
@@ -509,7 +504,6 @@ public class EqualityModuloProofIrrelevancy {
             EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.assumesFormulaInstantiations(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
             app.instantiations(),
-            hashCodeModProofIrrelevancy(matchConditions),
             app.uninstantiatedVars(),
             app.isUpdateContextFixed(),
             app.rule());
