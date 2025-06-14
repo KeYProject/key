@@ -8,7 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -25,6 +25,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -76,7 +79,7 @@ public class RewriteCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
             EngineState state)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state.getValueInjector().inject(new Parameters(), arguments);
 
         Proof proof = state.getProof();
         assert proof != null;
@@ -250,16 +253,18 @@ public class RewriteCommand extends AbstractCommand {
          * Term, which should be replaced
          */
         @Option(value = "find")
-        public JTerm find;
+        public @MonotonicNonNull JTerm find;
+
         /**
          * Substitutent
          */
         @Option(value = "replace")
-        public JTerm replace;
+        public @MonotonicNonNull JTerm replace;
+
         /**
          * Formula, where to find {@see find}.
          */
-        @Option(value = "formula", required = false)
-        public JTerm formula;
+        @Option(value = "formula")
+        public @Nullable JTerm formula;
     }
 }

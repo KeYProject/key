@@ -11,9 +11,11 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.prover.sequent.Sequent;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class JavascriptCommand extends AbstractCommand {
 
@@ -28,7 +30,7 @@ public class JavascriptCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), params);
+        var args = state().getValueInjector().inject(new Parameters(), params);
 
         ScriptEngineManager factory = new ScriptEngineManager();
         // create JavaScript engine
@@ -51,8 +53,8 @@ public class JavascriptCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public String script;
+        @Argument
+        public @MonotonicNonNull String script;
     }
 
     public static class JavascriptInterface {

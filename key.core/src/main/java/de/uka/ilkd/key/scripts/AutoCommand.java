@@ -13,11 +13,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.scripts.meta.Documentation;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
@@ -55,7 +55,7 @@ public class AutoCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
-        var arguments = state().getValueInjector().inject(this, new AutoCommand.Parameters(), args);
+        var arguments = state().getValueInjector().inject(new AutoCommand.Parameters(), args);
         final Services services = state().getProof().getServices();
         final Profile profile = services.getProfile();
 
@@ -178,50 +178,47 @@ public class AutoCommand extends AbstractCommand {
             changes.""")
     public static class Parameters {
         // @ TODO Deprecated with the higher order proof commands?
-        @Option(value = "all", required = false,
-            help = "Apply the strategy on all open goals. There is a better syntax for that now.")
+        @Flag(value = "all")
+        @Documentation("Apply the strategy on all open goals. There is a better syntax for that now.")
         public boolean onAllOpenGoals = false;
 
-        @Option(value = "steps", required = false,
-            help = "The maximum number of steps to be performed.")
+        @Option(value = "steps")
+        @Documentation("The maximum number of steps to be performed.")
         public int maxSteps = -1;
 
         /**
          * Run on formula matching the given regex
          */
-        @Option(value = "matches", required = false,
-            help = "Run on formula matching the given regex.")
+        @Option(value = "matches")
+        @Documentation("Run on formula matching the given regex.")
         public @Nullable String matches = null;
 
         /**
          * Run on formula matching the given regex
          */
-        @Option(value = "breakpoint", required = false,
-            help = "Run on formula matching the given regex.")
+        @Option(value = "breakpoint")
+        @Documentation("Run on formula matching the given regex.")
         public @Nullable String breakpoint = null;
 
-        @Option(value = "modelsearch", required = false,
-            help = "Enable model search. Better for some types of arithmetic problems. Sometimes a lot worse")
-        @Nullable
-        public Boolean modelSearch;
+        @Flag(value = "modelsearch")
+        @Documentation("Enable model search. Better for some types of arithmetic problems. Sometimes a lot worse")
+        public boolean modelSearch;
 
-        @Option(value = "expandQueries", required = false, help = "Expand queries by modalities.")
-        @Nullable
-        public Boolean expandQueries;
+        @Flag(value = "expandQueries")
+        @Documentation("Expand queries by modalities.")
+        public boolean expandQueries;
 
-        @Option(value = "classAxioms", required = false,
-            help = "Enable class axioms. This expands model methods and fields and invariants quite eagerly. "
-                +
-                "May lead to divergence.")
-        @Nullable
-        public Boolean classAxioms;
+        @Flag(value = "classAxioms")
+        @Documentation("""
+                Enable class axioms. This expands model methods and fields and invariants quite eagerly. \
+                May lead to divergence.""")
+        public boolean classAxioms;
 
-        @Option(value = "dependencies", required = false,
-            help = "Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, "
-                +
-                "without that its definition is known. May be an enabler, may be a showstopper.")
-        @Nullable
-        public Boolean dependencies;
+        @Flag(value = "dependencies")
+        @Documentation("""
+                Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, \
+                without that its definition is known. May be an enabler, may be a showstopper.""")
+        public boolean dependencies;
 
         public int getSteps() {
             return maxSteps;

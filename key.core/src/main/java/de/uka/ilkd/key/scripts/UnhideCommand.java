@@ -9,7 +9,7 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -17,6 +17,8 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * Proof script command to insert a formula hidden earlier in the proof.
@@ -48,7 +50,7 @@ public class UnhideCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
         Goal goal = state().getFirstOpenAutomaticGoal();
 
         Set<Term> antes = new HashSet<>();
@@ -82,8 +84,8 @@ public class UnhideCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public Sequent sequent;
+        @Argument
+        public @MonotonicNonNull Sequent sequent;
     }
 
 }

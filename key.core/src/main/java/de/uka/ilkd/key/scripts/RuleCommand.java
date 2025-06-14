@@ -14,8 +14,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.scripts.meta.Varargs;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -28,6 +29,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -76,7 +80,7 @@ public class RuleCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst params,
             EngineState state)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new Parameters(), params);
+        var args = state.getValueInjector().inject(new Parameters(), params);
 
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
@@ -405,21 +409,26 @@ public class RuleCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option(value = "#2")
-        public String rulename;
-        @Option(value = "on", required = false)
-        public JTerm on;
-        @Option(value = "formula", required = false)
-        public JTerm formula;
-        @Option(value = "occ", required = false)
-        public int occ = -1;
+        @Argument
+        public @MonotonicNonNull String rulename;
+
+        @Option(value = "on")
+        public @Nullable JTerm on;
+
+        @Option(value = "formula")
+        public @Nullable JTerm formula;
+
+        @Option(value = "occ")
+        public @Nullable int occ = -1;
+
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
-        @Option(value = "matches", required = false)
-        public String matches = null;
-        @Varargs(as = JTerm.class, prefix = "inst_")
+        @Option(value = "matches")
+        public @Nullable String matches = null;
+
+        @OptionalVarargs(as = JTerm.class, prefix = "inst_")
         public Map<String, JTerm> instantiations = new HashMap<>();
     }
 

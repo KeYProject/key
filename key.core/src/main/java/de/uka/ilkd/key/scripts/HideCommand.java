@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -19,6 +19,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
@@ -47,7 +49,7 @@ public class HideCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
         Goal goal = state().getFirstOpenAutomaticGoal();
 
@@ -98,7 +100,8 @@ public class HideCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option("#2")
+        @Argument
+        @MonotonicNonNull
         public Sequent sequent;
     }
 

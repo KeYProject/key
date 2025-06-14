@@ -7,7 +7,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -45,7 +46,7 @@ public class AssumeCommand extends AbstractCommand {
 
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var parameter = state().getValueInjector()
-                .inject(this, new FormulaParameter(), arguments);
+                .inject(new FormulaParameter(), arguments);
         Taclet cut =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
@@ -57,8 +58,8 @@ public class AssumeCommand extends AbstractCommand {
     }
 
     public static class FormulaParameter {
-        @Option(value = "#2", help = "The formula to be assumed.")
-        @MonotonicNonNull
-        public JTerm formula;
+        @Argument
+        @Documentation("The formula to be assumed.")
+        public @MonotonicNonNull JTerm formula;
     }
 }

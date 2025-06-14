@@ -88,9 +88,10 @@ public class TestProofScriptCommand {
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.
             String msg = ex.getMessage().trim().replaceAll("\r\n", "\n");
-            Assertions.assertTrue(msg.startsWith(data.exception.trim()),
-                "Unexpected exception: " + ex.getMessage() + "\n expected: "
-                    + data.exception.trim());
+            assertThat(msg)
+                    .containsIgnoringWhitespaces(data.exception.trim())
+                    .as("Unexpected exception: %s\n expected: %s",
+                        ex.getMessage(), data.exception.trim());
             return;
         }
 

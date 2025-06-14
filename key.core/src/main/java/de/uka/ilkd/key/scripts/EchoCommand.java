@@ -5,7 +5,9 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * A simple "echo" command for giving feedback to human observers during lengthy executions.
@@ -24,7 +26,7 @@ public class EchoCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState state)
             throws ScriptException, InterruptedException {
-        var params = state.getValueInjector().inject(this, new Parameters(), args);
+        var params = state.getValueInjector().inject(new Parameters(), args);
 
         var obs = state.getObserver();
         if (obs != null) {
@@ -36,8 +38,8 @@ public class EchoCommand extends AbstractCommand {
         /**
          * The message to show.
          */
-        @Option("#2")
-        public String message;
+        @Argument
+        public @MonotonicNonNull String message;
     }
 
 }

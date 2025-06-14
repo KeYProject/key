@@ -56,7 +56,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         if (parameterClazz == null) {
             return new ArrayList<>();
         }
-        return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
+        return ArgumentsLifter.inferScriptArguments(parameterClazz);
     }
 
 
@@ -89,10 +89,11 @@ public abstract class AbstractCommand implements ProofScriptCommand {
 
     @Override
     public String getDocumentation() {
-        if (documentation == null) {
-            documentation = ArgumentsLifter.extractDocumentation(parameterClazz);
+        if (documentation == null && parameterClazz != null) {
+            documentation =
+                ArgumentsLifter.extractDocumentation(getName(), getClass(), parameterClazz);
         }
-        return documentation;
+        return Objects.requireNonNullElse(documentation, "");
     }
 
 }
