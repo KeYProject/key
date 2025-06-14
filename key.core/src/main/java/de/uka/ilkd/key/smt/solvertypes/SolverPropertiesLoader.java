@@ -273,7 +273,7 @@ public class SolverPropertiesLoader {
 
         // the message DELIMITERS used by the created solver in its stdout
         String[] delimiters =
-            props.getStringArray(SolverPropertiesLoader.DELIMITERS, new String[0]);
+            props.getStringArray(SolverPropertiesLoader.DELIMITERS, new String[] { "\n", "\r" });
 
         // the smt translator (class SMTTranslator) used by the created solver
         String translatorClassName = props.getString(TRANSLATOR_CLASS, DEFAULT_TRANSLATOR);
