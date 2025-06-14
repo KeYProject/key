@@ -59,7 +59,8 @@ public class VMTacletMatcher implements TacletMatcher {
     /** the matcher for the find expression of the taclet */
     private final VMProgramInterpreter findMatchProgram;
     /** the matcher for the taclet's assumes formulas */
-    private final HashMap<JTerm, VMProgramInterpreter> assumesMatchPrograms = new HashMap<>();
+    private final HashMap<Term, @NonNull VMProgramInterpreter> assumesMatchPrograms =
+        new HashMap<>();
 
     /**
      * the variable conditions of the taclet that need to be satisfied by found schema variable
@@ -94,8 +95,8 @@ public class VMTacletMatcher implements TacletMatcher {
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
 
-        if (taclet instanceof FindTaclet) {
-            findExp = ((FindTaclet) taclet).find();
+        if (taclet instanceof final FindTaclet findTaclet) {
+            findExp = findTaclet.find();
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
             findMatchProgram =
@@ -107,8 +108,8 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = null;
         }
 
-        for (SequentFormula sf : assumesSequent) {
-            assumesMatchPrograms.put((JTerm) sf.formula(),
+        for (final SequentFormula sf : assumesSequent) {
+            assumesMatchPrograms.put(sf.formula(),
                 new VMProgramInterpreter(
                     SyntaxElementMatchProgramGenerator.createProgram((JTerm) sf.formula())));
         }
@@ -194,10 +195,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * @see TacletMatcher#matchAssumes(Iterable, MatchResultInfo, LogicServices)
      */
     @Override
-    public final MatchResultInfo matchAssumes(
-            Iterable<AssumesFormulaInstantiation> p_toMatch,
-            MatchResultInfo p_matchCond,
-            LogicServices p_services) {
+    public final @Nullable MatchResultInfo matchAssumes(
+            @NonNull Iterable<AssumesFormulaInstantiation> p_toMatch,
+            @NonNull MatchResultInfo p_matchCond,
+            @NonNull LogicServices p_services) {
 
         final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
         final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
@@ -207,8 +208,8 @@ public class VMTacletMatcher implements TacletMatcher {
         for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
             boolean candidateInAntec =
-                (candidateInst instanceof AssumesFormulaInstSeq candidateInSeq)
-                        // Only IfFormulaInstSeq has inAntec() property ...
+                (candidateInst instanceof final AssumesFormulaInstSeq candidateInSeq)
+                        // Only if AssumesFormulaInstSeq has inAntec() property ...
                         && (candidateInSeq.inAntecedent())
                         || !(candidateInst instanceof AssumesFormulaInstSeq)
                                 // ... and it seems we don't need the check for other
@@ -353,7 +354,7 @@ public class VMTacletMatcher implements TacletMatcher {
     public final @Nullable MatchResultInfo matchFind(
             @NonNull Term term,
             @NonNull MatchResultInfo p_matchCond,
-            LogicServices services) {
+            @NonNull LogicServices services) {
         if (findMatchProgram == null) {
             return null;
         }

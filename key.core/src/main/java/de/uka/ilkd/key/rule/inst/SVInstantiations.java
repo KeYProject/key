@@ -614,6 +614,7 @@ public class SVInstantiations
         return e == null ? null : (T) e.value().getInstantiation();
     }
 
-    public record UpdateLabelPair(JTerm update, ImmutableArray<TermLabel> updateApplicationlabels) {
+    public record UpdateLabelPair(@NonNull JTerm update,
+            ImmutableArray<TermLabel> updateApplicationlabels) {
     }
 }
