@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
@@ -30,21 +29,15 @@ import org.key_project.logic.op.Function;
  *
  * @author Dominic Steinhoefel
  */
-public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Parameters> {
+public class SaveNewNameCommand extends AbstractCommand {
     public SaveNewNameCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
             EngineState stateMap) throws ScriptException, InterruptedException {
-
+        var params = state().getValueInjector().inject(new Parameters(), arguments);
         if (!params.abbreviation.startsWith("@")) {
             throw new ScriptException(
                 "Unexpected parameter to saveNewName, only @var allowed: " + params.abbreviation);
@@ -67,7 +60,8 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
                         matches.size(), stringToMatch));
             }
 
-            final Named lookupResult = goal.getLocalNamespaces().lookup(new Name(matches.get(0)));
+            final Named lookupResult =
+                goal.getLocalNamespaces().lookup(new Name(matches.getFirst()));
 
             assert lookupResult != null;
 
@@ -96,9 +90,9 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
     }
 
     public static class Parameters {
-        @Option(value = "#2", required = true)
+        @Option(value = "#2")
         public String abbreviation;
-        @Option(value = "matches", required = true)
+        @Option(value = "matches")
         public String matches;
     }
 
