@@ -115,7 +115,7 @@
       "de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler",
       "de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler"
     ],
-    "handlerOptions": "getUnsatCore"
+    "handlerOptions": ["getUnsatCore"]
   },
   "Z3_QF": {
     "params": "-in -smt2",

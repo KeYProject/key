@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +46,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
     private static final float SIZE_ICON_DOCK = 12f;
-    private static final Path LAYOUT_FILE = PathConfig.getKeyConfigDir().resolve( "layout.xml");
+    private static final Path LAYOUT_FILE = PathConfig.getKeyConfigDir().resolve("layout.xml");
     private static final String[] LAYOUT_NAMES = { "Default", "Slot 1", "Slot 2" };
     private static final int[] LAYOUT_KEYS =
         { KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12 };

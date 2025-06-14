@@ -28,7 +28,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
      * the file where settings are stored
      */
     protected static final Path SETTINGS_FILE_NEW =
-            PathConfig.getKeyConfigDir().resolve("isabelleSettings.json");
+        PathConfig.getKeyConfigDir().resolve("isabelleSettings.json");
     /**
      * The settings instance
      */
@@ -69,7 +69,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
      * The default path for translations
      */
     private static final Path DEFAULT_TRANSLATION_PATH =
-            PathConfig.getKeyConfigDir().resolve("IsabelleTranslations");
+        PathConfig.getKeyConfigDir().resolve("IsabelleTranslations");
     /**
      * default timeout setting
      */

@@ -41,7 +41,7 @@ public class ProofSettings {
         PathConfig.getKeyConfigDir().resolve("proof-settings.props");
 
     public static final Path PROVER_CONFIG_FILE_NEW =
-            PathConfig.getKeyConfigDir().resolve("proof-settings.json");
+        PathConfig.getKeyConfigDir().resolve("proof-settings.json");
 
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
@@ -149,7 +149,8 @@ public class ProofSettings {
             if (!Files.exists(PROVER_CONFIG_FILE_NEW)) {
                 Files.createDirectories(PROVER_CONFIG_FILE.getParent());
             }
-            try (Writer out = Files.newBufferedWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8)) {
+            try (Writer out =
+                Files.newBufferedWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8)) {
                 settingsToStream(out);
             }
         } catch (IOException e) {

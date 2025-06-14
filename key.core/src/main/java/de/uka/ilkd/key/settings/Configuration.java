@@ -417,7 +417,7 @@ public class Configuration {
 
     @Override
     public String toString() {
-        try(StringWriter sw = new StringWriter()) {
+        try (StringWriter sw = new StringWriter()) {
             save(sw, "");
             return sw.toString();
         } catch (IOException e) {

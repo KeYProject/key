@@ -3,19 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.Z3Socket;
-import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
-import org.antlr.v4.runtime.CharStreams;
-import org.key_project.util.Streams;
-import org.key_project.util.reflection.ClassLoaderUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,14 +13,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.StreamSupport;
 
-/// This class provides [SolverType] instances based on the current SMT solver definitions in various configuration files.
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+
+import org.key_project.util.Streams;
+import org.key_project.util.reflection.ClassLoaderUtil;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// This class provides [SolverType] instances based on the current SMT solver definitions in
+/// various configuration files.
 ///
 /// The configuration are in loaded from
-/// 1. The current working directiory:    `./smt-solvers.json`
-/// 2. The KeY user configuration folder: `~/.key/smt-solvers.json`
-/// 3. All resources with the name `de/uka/ilkd/key/smt/solvertypes/solvers.key.json` in the classpath.
+/// 1. The current working directory: `./smt-solvers.json`
+/// 2. Path from system property : `-P key.smt_solvers=<path>`
+/// 3. The KeY user configuration folder: `~/.key/smt-solvers.json`
+/// 4. All resources with the name `de/uka/ilkd/key/smt/solvertypes/solvers.key.json` in the
+/// classpath.
 ///
 /// Local configuration overwrites user configuration overwrites classpath configuration.
 /// All configuration is overwritten using the {@link ProofIndependentSettings#getSMTSettings()}.
@@ -45,14 +49,14 @@ import java.util.stream.StreamSupport;
 public class SolverPropertiesLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverPropertiesLoader.class);
 
-    /**
-     * Name of the file containing the names of the SMT properties files to be loaded.
-     */
-    private static final String SOLVER_LIST_FILE = "solvers.key.json";
-    /**
-     * Package path of the solvers.txt file.
-     */
-    private static final String PACKAGE_PATH = "de/uka/ilkd/key/smt/solvertypes/";
+    /// Name of the file containing the names of the SMT properties files to be loaded.
+    public static final String SOLVER_LIST_FILE = "smt-solvers.json";
+
+    /// Package path of the solvers.txt file.
+    public static final String PACKAGE_PATH = "de/uka/ilkd/key/smt/solvertypes/";
+
+    /// Java system property key denoting a path for further definitions of SMT solvers.
+    public static final String SYSTEM_PROPERTY_KEY_SMT_SOLVERS = "key.smt_solvers";
 
     /**
      * The solvers loaded by this loader.
@@ -92,17 +96,13 @@ public class SolverPropertiesLoader {
      * {@link ModularSMTLib2Translator}.
      */
     private static final String DEFAULT_TRANSLATOR =
-            "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
+        "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
      * in the .props file: {@link Z3Socket}.
      */
     private static final String DEFAULT_SOLVER_SOCKET =
-            "de.uka.ilkd.key.smt.communication.Z3Socket";
-    /**
-     * The default message DELIMITERS, if none are given in the .props file.
-     */
-    private static final String[] DEFAULT_DELIMITERS = {"\n", "\r"};
+        "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default solver TIMEOUT, if none is given in the .props file.
      */
@@ -175,9 +175,9 @@ public class SolverPropertiesLoader {
     /**
      * All supported keys for solver props files.
      */
-    private static final String[] SUPPORTED_KEYS = {NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
-            INFO, MIN_VERSION, EXPERIMENTAL, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
-            HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE};
+    private static final String[] SUPPORTED_KEYS = { NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
+        INFO, MIN_VERSION, EXPERIMENTAL, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
+        HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE };
 
     /**
      * If a props file does not contain a solver NAME or two files have the same NAME, unique names
@@ -195,8 +195,8 @@ public class SolverPropertiesLoader {
         }
         // if NAME was already used, use <NAME>_<counter> as NAME and increase counter afterwards
         String nameBuilder = name +
-                "_" +
-                counter;
+            "_" +
+            counter;
         counter++;
         NAME_COUNTERS.put(name, counter);
         // <NAME>_<counter> is now also a NAME that has been used and must be unique
@@ -264,21 +264,24 @@ public class SolverPropertiesLoader {
         try {
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Could not find solver socket class {}. Fallback to Z3Socket.class ", socketClassName, e);
+            LOGGER.error("Could not find solver socket class {}. Fallback to Z3Socket.class ",
+                socketClassName, e);
             solverSocketClass = Z3Socket.class;
         }
 
 
         // the message DELIMITERS used by the created solver in its stdout
         String[] delimiters =
-                props.getStringArray(SolverPropertiesLoader.DELIMITERS, new String[0]);
+            props.getStringArray(SolverPropertiesLoader.DELIMITERS, new String[] { "\n", "\r" });
 
         // the smt translator (class SMTTranslator) used by the created solver
         String translatorClassName = props.getString(TRANSLATOR_CLASS, DEFAULT_TRANSLATOR);
         try {
             translatorClass = ClassLoaderUtil.getClassforName(translatorClassName);
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Could not find translator class {}; using ModularSMTLib2Translator.class.", translatorClassName, e);
+            LOGGER.error(
+                "Could not find translator class {}; using ModularSMTLib2Translator.class.",
+                translatorClassName, e);
             translatorClass = ModularSMTLib2Translator.class;
         }
 
@@ -302,8 +305,8 @@ public class SolverPropertiesLoader {
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
-                timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
-                preamble);
+            timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
+            preamble);
     }
 
     /**
@@ -313,8 +316,8 @@ public class SolverPropertiesLoader {
     static Configuration loadSolvers() {
         try { // load single solvers.txt files from the same location everywhere in the classpath
             var filesInClasspath =
-                    Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
-                            .getResources(PACKAGE_PATH + SOLVER_LIST_FILE)).toList();
+                Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
+                        .getResources(PACKAGE_PATH + SOLVER_LIST_FILE)).toList();
             var solverFiles = new ArrayList<>(filesInClasspath);
 
             Path user = getUserSmtSolverPath();
@@ -323,10 +326,16 @@ public class SolverPropertiesLoader {
                 solverFiles.add(user.toUri().toURL());
             }
 
+            Path sysProp = getSystemPropertySmtSolverPath();
+            if (sysProp != null && Files.exists(sysProp)) {
+                LOGGER.info("Loading a SMT solver definitions from {}", sysProp);
+                solverFiles.add(sysProp.toUri().toURL());
+            }
+
             Path local = getLocalSmtSolverPath();
             if (Files.exists(user)) {
                 LOGGER.info("Loading a SMT solver definitions from {}", local);
-                solverFiles.add(user.toUri().toURL());
+                solverFiles.add(local.toUri().toURL());
             }
 
             final Configuration solverConfiguration = new Configuration();
@@ -334,7 +343,7 @@ public class SolverPropertiesLoader {
             for (var res : solverFiles) {
                 try (InputStream stream = res.openStream()) {
                     var config = ParsingFacade.readConfigurationFile(
-                            CharStreams.fromStream(stream, StandardCharsets.UTF_8));
+                        CharStreams.fromStream(stream, StandardCharsets.UTF_8));
 
                     // Create a warning if unsupported keys occur in the loaded file.
                     Collection<String> unsupportedKeys = SettingsConverter
@@ -355,15 +364,26 @@ public class SolverPropertiesLoader {
     }
 
 
-    /// Path for local smt solver definitions. Precedence over user and classpath smt solver configs.
+    /// Path for local smt solver definitions. Precedence over user and classpath smt solver
+    /// configs.
     public static Path getLocalSmtSolverPath() {
-        return Paths.get("smt-solvers.json");
+        return Paths.get(SOLVER_LIST_FILE);
     }
 
 
     /// Path for user-wide smt solver definitions. Precedence over classpath smt solver configs,
     /// overwritten by local configs.
     public static Path getUserSmtSolverPath() {
-        return PathConfig.getKeyConfigDir().resolve("smt-solvers.json");
+        return PathConfig.getKeyConfigDir().resolve(SOLVER_LIST_FILE);
+    }
+
+
+    /// Path for smt solver definitions given per Java system properties.
+    public static @Nullable Path getSystemPropertySmtSolverPath() {
+        var path = System.getProperty(SYSTEM_PROPERTY_KEY_SMT_SOLVERS);
+        if (path != null) {
+            return Paths.get(path);
+        }
+        return null;
     }
 }
