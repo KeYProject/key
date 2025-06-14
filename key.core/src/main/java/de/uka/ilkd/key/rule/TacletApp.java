@@ -64,7 +64,7 @@ public abstract class TacletApp implements RuleApp {
      * schemavariable to instantiations map
      *
      */
-    private final MatchConditions matchConditions;
+    private final @NonNull MatchConditions matchConditions;
 
     /**
      * chosen instantiations for the assumes-sequent formulas
@@ -156,7 +156,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the Rule the application information is collected for
      */
     @Override
-    public Taclet rule() {
+    public @NonNull Taclet rule() {
         return (Taclet) taclet;
     }
 
@@ -169,7 +169,7 @@ public abstract class TacletApp implements RuleApp {
         return matchConditions.getInstantiations();
     }
 
-    public MatchConditions matchConditions() {
+    public @NonNull MatchConditions matchConditions() {
         return matchConditions;
     }
 

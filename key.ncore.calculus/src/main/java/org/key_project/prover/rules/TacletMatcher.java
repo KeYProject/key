@@ -34,7 +34,7 @@ public interface TacletMatcher {
     @Nullable
     MatchResultInfo matchFind(@NonNull Term term,
             @NonNull MatchResultInfo matchCond,
-            @Nullable LogicServices services);
+            @NonNull LogicServices services);
 
     /**
      * checks if the conditions for a correct instantiation are satisfied
@@ -99,9 +99,11 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
-    MatchResultInfo matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
-            MatchResultInfo matchCond, LogicServices services);
+    @Nullable
+    MatchResultInfo matchAssumes(@NonNull Iterable<AssumesFormulaInstantiation> toMatch,
+            @NonNull MatchResultInfo matchCond, @NonNull LogicServices services);
 
+    @Nullable
     MatchResultInfo matchSV(SchemaVariable sv, SyntaxElement se, MatchResultInfo matchResultInfo,
             LogicServices services);
 }
