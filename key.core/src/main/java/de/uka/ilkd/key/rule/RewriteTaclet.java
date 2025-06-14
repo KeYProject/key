@@ -126,8 +126,7 @@ public class RewriteTaclet extends FindTaclet {
                         || veto(t)) {
                     return null;
                 } else {
-                    JTerm update = UpdateApplication.getUpdate(t);
-                    svi = svi.addUpdate(update, t.getLabels());
+                    svi = svi.addUpdate(UpdateApplication.getUpdate(t), t.getLabels());
                 }
             } else if (!applicationRestriction().equals(ApplicationRestriction.NONE)
                     && (op instanceof JModality)) {

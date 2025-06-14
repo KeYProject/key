@@ -5,6 +5,8 @@ package org.key_project.prover.rules.instantiation;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 ///
 /// There can be several candidates for matching a formula of an assumes clause of a taclet. This
 /// record
@@ -29,6 +31,6 @@ import org.key_project.util.collection.ImmutableList;
 ///
 /// @param candidates the list of candidate instantiations
 /// @param matchConditions the list of match conditions
-public record AssumesMatchResult(ImmutableList<AssumesFormulaInstantiation> candidates,
-        ImmutableList<MatchResultInfo> matchConditions) {
+public record AssumesMatchResult(ImmutableList<@NonNull AssumesFormulaInstantiation> candidates,
+        ImmutableList<@NonNull MatchResultInfo> matchConditions) {
 }
