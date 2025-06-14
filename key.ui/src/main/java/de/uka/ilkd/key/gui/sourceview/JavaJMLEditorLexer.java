@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +16,8 @@ import javax.swing.text.*;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
+import static de.uka.ilkd.key.gui.sourceview.JavaDocument.*;
+
 /**
  * This lexer splits a text into tokens with coloured attributes.
  * <p>
@@ -26,34 +27,6 @@ import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
  * @author Wolfram Pfeifer, Mattias Ulbrich
  */
 public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
-
-    @Serial
-    private static final long serialVersionUID = -1856296532743892931L;
-
-    // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
-
-    /** highight color for Java keywords (dark red/violet) */
-    private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
-        ColorSettings.define("[java]keyword", "", new Color(0x7f0055));
-
-    // private static final Color JAVA_STRING_COLOR = new Color(0x000000);
-
-    /** highight color for comments (dull green) */
-    private static final ColorSettings.ColorProperty COMMENT_COLOR =
-        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f));
-
-    /** highight color for JavaDoc (dull green) */
-    private static final ColorSettings.ColorProperty JAVADOC_COLOR =
-        ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f));
-
-    /** highight color for JML (dark blue) */
-    private static final ColorSettings.ColorProperty JML_COLOR =
-        ColorSettings.define("[java]jml", "", new Color(0x0000c0));
-
-    /** highight color for JML keywords (blue) */
-    private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
-        ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0));
-
     /**
      * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),
      * COMMENT (&#47;&#42; ... &#42;&#47;), JML (&#47;&#42;&#64; ... &#42;&#47; ), ...
