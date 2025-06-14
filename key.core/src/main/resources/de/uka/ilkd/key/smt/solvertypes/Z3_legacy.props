@@ -1,9 +1,0 @@
-experimental=true
-params=-in -smt2
-timeout=-1
-name=Z3 (Legacy Translation)
-info=Z3 solver by Microsoft, using the old SMT translation.
-command=z3
-version=--version
-translatorClass=de.uka.ilkd.key.smt.SmtLib2Translator
-

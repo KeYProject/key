@@ -3,13 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.*;
 import java.io.IOException;
 import java.io.Writer;
@@ -19,6 +12,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configurable colors for KeY.
@@ -30,7 +31,7 @@ import java.util.stream.Stream;
  */
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final Path SETTINGS_FILE_NEW =
-            PathConfig.getKeyConfigDir().resolve("colors.json");
+        PathConfig.getKeyConfigDir().resolve("colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
