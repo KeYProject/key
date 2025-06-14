@@ -7,9 +7,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,7 +30,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.DoNothingCaret;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -36,6 +38,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,26 +49,25 @@ public abstract class SequentView extends JEditorPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
     public static final ColorSettings.ColorProperty PERMANENT_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]permaHighlight",
-                    "",
-                    new Color(110, 85, 181, 76),
-                    new Color(210, 185, 201, 200));
+        ColorSettings.define("[currentGoal]permaHighlight",
+            "",
+            new Color(110, 85, 181, 76),
+            new Color(210, 185, 201, 200));
 
     public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
         ColorSettings.define("[currentGoal]defaultHighlight", "",
-                new Color(70, 100, 170, 76),
-                new Color(140, 200, 255, 180));
+            new Color(70, 100, 170, 76),
+            new Color(140, 200, 255, 180));
 
     public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
         ColorSettings.define("[currentGoal]addtionalHighlight", "",
-                new Color(0, 0, 0, 38),
-                new Color(240, 220, 255, 180));
+            new Color(0, 0, 0, 38),
+            new Color(240, 220, 255, 180));
 
     public static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
         ColorSettings.define("[currentGoal]updateHighlight", "",
-                new Color(0, 150, 130, 38),
-                new Color(0, 150, 130, 255)
-                );
+            new Color(0, 150, 130, 38),
+            new Color(0, 150, 130, 255));
 
     public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
         ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 255));
@@ -161,7 +163,7 @@ public abstract class SequentView extends JEditorPane {
                 mainWindow.getMediator().getServices(), getVisibleTermLabels());
 
         setContentType("text/html");
-        HTMLSyntaxHighlighter.addCSSRulesTo((HTMLDocument) getDocument());
+        updateUI();
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -697,6 +699,10 @@ public abstract class SequentView extends JEditorPane {
     @Override
     public void updateUI() {
         super.updateUI();
+        try {
+            HTMLSyntaxHighlighter.addCSSRulesTo((HTMLDocument) getDocument());
+        } catch (ClassCastException ignore) {
+        }
         setFont();
         INACTIVE_BACKGROUND_COLOR = UIManager.getColor("Panel.background");
     }

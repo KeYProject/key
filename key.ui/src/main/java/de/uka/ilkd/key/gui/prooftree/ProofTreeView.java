@@ -39,13 +39,13 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,22 +66,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
         ColorSettings.define("[proofTree]darkGreen", "",
-                new Color(0, 128, 51),
-                new Color(100, 255, 102));
+            new Color(0, 128, 51),
+            new Color(100, 255, 102));
 
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
-        ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0),
-                new Color(191, 120, 120));
+        ColorSettings.define("[proofTree]darkRed", "",
+            new Color(191, 0, 0),
+            new Color(191, 120, 120));
     /**
      * Color used for linked goals.
      */
     public static final ColorSettings.ColorProperty PINK_COLOR =
         ColorSettings.define("[proofTree]pink", "",
-                new Color(255, 0, 240));
+            new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
         ColorSettings.define("[proofTree]orange", "",
-                new Color(255, 140, 0),
-                new Color(255, 180, 40));
+            new Color(255, 140, 0),
+            new Color(255, 180, 40));
 
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
@@ -1071,7 +1072,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
-            stylers.add(0, guiAbstractTreeNodeStyler);
+            stylers.addFirst(guiAbstractTreeNodeStyler);
         }
 
         private void render(Style style, GUIAbstractTreeNode node) {
@@ -1176,7 +1177,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderNonLeaf(Style style, GUIAbstractTreeNode treeNode) {
             Node node = treeNode.getNode();
-            style.foreground = Color.black;
 
             style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
@@ -1249,7 +1249,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 if (node.getNodeInfo().getActiveStatement() != null) {
                     style.background = LIGHT_BLUE_COLOR.get();
                 } else {
-                    style.background = Color.white;
+                    // style.background = Color.white;
                 }
             }
         }
@@ -1287,7 +1287,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 setBorder(BorderFactory.createLineBorder(style.border));
             } else {
                 // set default
-                setBorder(BorderFactory.createLineBorder(Color.WHITE));
+                setBorder(BorderFactory.createLineBorder(UIManager.getColor("Panel.background")));
             }
 
             setFont(getFont().deriveFont(Font.PLAIN));
@@ -1316,7 +1316,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.tooltip = new Style.Tooltip();
             style.icon = null;
 
-            stylers.forEach(it -> it.style(style, node));
+            for (Styler<GUIAbstractTreeNode> it : stylers) {
+                it.style(style, node);
+            }
             return style;
         }
     }

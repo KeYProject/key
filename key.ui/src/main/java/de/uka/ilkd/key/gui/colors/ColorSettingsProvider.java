@@ -43,7 +43,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     @Override
     public JPanel getPanel(MainWindow window) {
         List<ColorPropertyData> properties = ColorSettings.getInstance().getProperties()
-                .map(it -> new ColorPropertyData(it, it.getLightValue(), it.getDarkValue())).collect(Collectors.toList());
+                .map(it -> new ColorPropertyData(it, it.getLightValue(), it.getDarkValue()))
+                .collect(Collectors.toList());
 
         modelColor = new ColorSettingsTableModel(properties);
         tblColors.setModel(modelColor);
@@ -97,7 +98,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     private static class ColorSettingsTableModel extends AbstractTableModel {
-        private static final String[] COLUMNS = { "Key", "Description", "Light Color", "Dark Color" };
+        private static final String[] COLUMNS =
+            { "Key", "Description", "Light Color", "Dark Color" };
         private final List<ColorPropertyData> colorData;
 
         public ColorSettingsTableModel(List<ColorPropertyData> properties) {
@@ -124,8 +126,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
             return switch (columnIndex) {
             case 0 -> colorData.get(rowIndex).property.getKey();
             case 1 -> colorData.get(rowIndex).property.getDescription();
-                case 2 -> colorData.get(rowIndex).lightColor;
-                case 3 -> colorData.get(rowIndex).darkColor;
+            case 2 -> colorData.get(rowIndex).lightColor;
+            case 3 -> colorData.get(rowIndex).darkColor;
             default -> "";
             };
         }
@@ -158,7 +160,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         Color darkColor;
         Color lightColor;
 
-        public ColorPropertyData(ColorSettings.ColorProperty property, Color lightColor, Color darkColor) {
+        public ColorPropertyData(ColorSettings.ColorProperty property, Color lightColor,
+                Color darkColor) {
             this.property = property;
             this.lightColor = lightColor;
             this.darkColor = darkColor;

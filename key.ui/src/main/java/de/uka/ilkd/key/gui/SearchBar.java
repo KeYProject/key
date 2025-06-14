@@ -29,9 +29,8 @@ public abstract class SearchBar extends JPanel {
     private final JButton close;
     private final ColorSettings.ColorProperty ALERT_COLOR =
         ColorSettings.define("[searchBar]alert", "",
-                new Color(255, 178, 178),
-                new Color(85, 40,40)
-        );
+            new Color(255, 178, 178),
+            new Color(85, 40, 40));
 
     protected SearchBar() {
         prev = new JButton(IconFactory.previous(16));

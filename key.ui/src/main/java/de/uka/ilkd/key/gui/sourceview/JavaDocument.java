@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.sourceview;
 
-import java.awt.Color;
+import java.awt.*;
 import java.beans.PropertyChangeListener;
-import java.io.Serial;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.swing.text.*;
 
@@ -24,32 +25,27 @@ import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
  * @author Wolfram Pfeifer
  */
 public class JavaDocument extends DefaultStyledDocument {
-
-    @Serial
-    private static final long serialVersionUID = -1856296532743892931L;
-
     // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
-
-    /** highight color for Java keywords (dark red/violet) */
-    private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
+    /** highlight color for Java keywords (dark red/violet) */
+    public static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
         ColorSettings.define("[java]keyword", "", new Color(0x7f0055), new Color(0xCf50A5));
 
-    /** highight color for comments (dull green) */
-    private static final ColorSettings.ColorProperty COMMENT_COLOR =
-        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f),new Color(0x9fBf9f));
+    /** highlight color for comments (dull green) */
+    public static final ColorSettings.ColorProperty COMMENT_COLOR =
+        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f), new Color(0x9fBf9f));
 
-    /** highight color for JavaDoc (dull green) */
-    private static final ColorSettings.ColorProperty JAVADOC_COLOR =
+    /** highlight color for JavaDoc (dull green) */
+    public static final ColorSettings.ColorProperty JAVADOC_COLOR =
         ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f), new Color(0x9fBf9f));
 
-    /** highight color for JML (dark blue) */
-    private static final ColorSettings.ColorProperty JML_COLOR =
+    /** highlight color for JML (dark blue) */
+    public static final ColorSettings.ColorProperty JML_COLOR =
         ColorSettings.define("[java]jml", "",
-                new Color(0x0000c0),
-                new Color(0x8888cf));
+            new Color(0x0000c0),
+            new Color(0x8888cf));
 
-    /** highight color for JML keywords (blue) */
-    private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
+    /** highlight color for JML keywords (blue) */
+    public static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
         ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0), new Color(0x8888cf));
 
     /**

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,17 +11,22 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.gui.sourceview.JavaDocument.JML_COLOR;
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 /**
@@ -135,21 +141,83 @@ public class HTMLSyntaxHighlighter {
         "<span class=\"sequent_arrow_highlight\">$1</span>";
 
 
+    private static final StyleSheet light = new StyleSheet();
+    private static final StyleSheet dark = new StyleSheet();
+
+    private static final ColorSettings.ColorProperty PROP_LOGIC_COLOR =
+        ColorSettings.define("[sequentView]prop_logic_color", "",
+            Color.black, Color.white);
+
+    private static final ColorSettings.ColorProperty DYN_LOGIC_COLOR =
+        ColorSettings.define("[sequentView]dyn_logic_color", "",
+            new Color(0, 0, 16 * 13),
+            new Color(150, 150, 250));
+
+    private static final ColorSettings.ColorProperty JAVA_COLOR = JavaDocument.JAVA_KEYWORD_COLOR;
+    private static final ColorSettings.ColorProperty COMMENT_COLOR = JavaDocument.COMMENT_COLOR;
+    private static final ColorSettings.ColorProperty JML_COLOR = JavaDocument.JML_KEYWORD_COLOR;
+
+    private static final ColorSettings.ColorProperty PROG_VAR_COLOR =
+        ColorSettings.define("[sequentView]prog_var_color", "",
+            new Color(0x6A, 0x3E, 0x3E),
+            new Color(100, 100, 250));
+
+    private static final ColorSettings.ColorProperty SEQUENT_ARROW_COLOR =
+        ColorSettings.define("[sequentView]sequent_arrow_color", "",
+            new Color(0x6A, 0x3E, 0x3E),
+            new Color(100, 100, 250));
+
+
+    static {
+        light.addRule("""
+                .prop_logic_highlight { color: #%6X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%6X; font-weight: bold; }
+                .java_highlight { color: #%6X; font-weight: bold; }
+                .progvar_highlight { color: #%6X; }
+                .comment_highlight { color: #%6X; }
+                .jml_highlight { color: #%6X; }
+                .sequent_arrow_highlight { color: #%6X; font-size: 1.7em }
+                """.formatted(
+            PROP_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            DYN_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            JAVA_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            PROG_VAR_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            COMMENT_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            JML_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            SEQUENT_ARROW_COLOR.getLightValue().getRGB() & 0xFFFFFF));
+
+        dark.addRule("""
+                .prop_logic_highlight { color: %6X; font-weight: bold; }
+                .dynamic_logic_highlight { color: %6X; font-weight: bold; }
+                .java_highlight { color: %6X; font-weight: bold; }
+                .progvar_highlight { color: %6X; }
+                .comment_highlight { color: %6X; }
+                .jml_highlight { color: %6X; }
+                .sequent_arrow_highlight { color: %6X; font-size: 1.7em }
+                """.formatted(
+            PROP_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            DYN_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            JAVA_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            PROG_VAR_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            COMMENT_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            JML_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            SEQUENT_ARROW_COLOR.getDarkValue().getRGB() & 0xFFFFFF));
+    }
+
+
     /**
      * Adds CSS rules to the given document.
      *
      * @param document The {@link HTMLDocument}
      */
     public static void addCSSRulesTo(HTMLDocument document) {
-        document.getStyleSheet().addRule("""
-                .prop_logic_highlight { color: #000000; font-weight: bold; }
-                .dynamic_logic_highlight { color: #0000C0; font-weight: bold; }
-                .java_highlight { color: #7F0055; font-weight: bold; }
-                .progvar_highlight { color: #6A3E3E; }
-                .comment_highlight { color: #3F7F5F; }
-                .jml_highlight { color: #5553c2; }
-                .sequent_arrow_highlight { color: #000000; font-size: 1.7em }
-                """);
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()) {
+            document.getStyleSheet().removeStyleSheet(light);
+            document.getStyleSheet().addStyleSheet(dark);
+        } else {
+            document.getStyleSheet().removeStyleSheet(dark);
+            document.getStyleSheet().addStyleSheet(light);
+        }
     }
 
     /**

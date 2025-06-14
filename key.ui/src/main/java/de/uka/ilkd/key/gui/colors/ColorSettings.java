@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
-
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ColorSettings {
     public static final File SETTINGS_FILE_NEW =
-            new File(PathConfig.getKeyConfigDir(), "colors.json");
+        new File(PathConfig.getKeyConfigDir(), "colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
 
     private static ColorSettings INSTANCE;
@@ -41,8 +41,7 @@ public class ColorSettings {
 
     public ColorSettings(Configuration load) {
         // props.forEach((k, v) -> this.properties.put(k.toString(), v));
-        load.getEntries().forEach(entry ->
-                properties.put(entry.getKey(), entry.getValue()));
+        load.getEntries().forEach(entry -> properties.put(entry.getKey(), entry.getValue()));
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
@@ -82,7 +81,7 @@ public class ColorSettings {
     public static Color fromHex(String s) {
         long i = Long.decode(s);
         return new Color((int) ((i >> 16) & 0xFF), (int) ((i >> 8) & 0xFF), (int) (i & 0xFF),
-                (int) ((i >> 24) & 0xFF));
+            (int) ((i >> 24) & 0xFF));
     }
 
     public static Color invert(Color c) {
@@ -106,9 +105,9 @@ public class ColorSettings {
     }
 
     private ColorProperty createColorProperty(String key, String description,
-                                              Color defaultLight, Color defaultDark) {
+            Color defaultLight, Color defaultDark) {
         Optional<ColorProperty> item =
-                getProperties().filter(it -> it.getKey().equals(key)).findFirst();
+            getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {
             return item.get();
         }
@@ -169,7 +168,8 @@ public class ColorSettings {
             this(key, description, defaultValue, defaultValue);
         }
 
-        public ColorProperty(String key, String description, Color defaultLightValue, Color defaultDarkValue) {
+        public ColorProperty(String key, String description, Color defaultLightValue,
+                Color defaultDarkValue) {
             this.key = key;
             this.description = description;
             if (!properties.containsKey(key)) {
@@ -231,7 +231,8 @@ public class ColorSettings {
                 setLightValue(fromHex(seq.get(0).toString()));
                 setDarkValue(fromHex(seq.get(1).toString()));
             } else {
-                throw new IllegalArgumentException("Unexpected types for color " + key + " with value " + v);
+                throw new IllegalArgumentException(
+                    "Unexpected types for color " + key + " with value " + v);
             }
         }
 
