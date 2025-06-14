@@ -5,13 +5,10 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -152,8 +148,8 @@ public class MasterHandlerTest {
             if (javaSrc != null && !javaSrc.isEmpty()) {
                 Path srcDir = Files.createTempDirectory("SMT_key_" + name);
                 Path tmpSrc = srcDir.resolve("src.java");
-                Files.write(tmpSrc, sources);
-                lines.addFirst("\\javaSource \"" + srcDir + "\";\n");
+                Files.writeString(tmpSrc, javaSrc);
+                keySrc += "\\javaSource \"" + srcDir + "\";\n";
             }
 
             Path tmpKey = Files.createTempFile("SMT_key_%s".formatted(name), ".key");

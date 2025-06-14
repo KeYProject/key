@@ -15,8 +15,6 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
@@ -25,6 +23,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -37,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public record TestInstance(String key, String script, String exception,
+    public record TestInstance(String key, String script, @Nullable String exception,
             String[] goals, Integer selectedGoal) {
     }
 
@@ -83,13 +82,13 @@ public class TestProofScriptCommand {
         try {
             pse.execute(env.getUi(), proof);
         } catch (ScriptException ex) {
-            assertTrue(props.containsKey("exception"),
+            assertTrue(data.exception != null && !data.exception.isEmpty(),
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.
             String msg = ex.getMessage().trim().replaceAll("\r\n", "\n");
-            Assertions.assertTrue(msg.startsWith(props.get("exception").trim()),
+            Assertions.assertTrue(msg.startsWith(data.exception.trim()),
                 "Unexpected exception: " + ex.getMessage() + "\n expected: "
-                    + props.get("exception").trim());
+                    + data.exception.trim());
             return;
         }
 
