@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -143,17 +144,16 @@ public class JavacExtension
                 return;
             }
 
-            var bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
-            var classpath = jm.getClassPathEntries();
-            var javaPath = jm.getModelDir();
+            Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
+            List<Path> classpath = jm.getClassPath();
+            Path javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
             lblStatus.setText("Javac runs");
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(),
-                    bootClassPath, classpath, javaPath);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");
@@ -169,8 +169,7 @@ public class JavacExtension
     /**
      * Set the label text, icon and enabled status based on the provided data.
      *
-     * @param data
-     *        data to use
+     * @param data data to use
      */
     private void updateLabel(JavacData data) {
         if (data == null || data.issues == null) {

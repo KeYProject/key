@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -23,14 +23,14 @@ import org.junit.jupiter.api.Test;
  * Tests for the unsat core saving infrastructure.
  */
 class TestUnsatCore {
-    private static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void testUnsatCore() throws ProblemLoaderException {
         SmtTestUtils.assumeZ3Installed();
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory, "smt/unsatCore.proof").toPath());
+            KeYEnvironment.load(testCaseDirectory.resolve("smt/unsatCore.proof").toPath());
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
         // find the SMT rule app

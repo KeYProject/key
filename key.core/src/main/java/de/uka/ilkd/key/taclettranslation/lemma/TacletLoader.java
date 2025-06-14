@@ -72,11 +72,9 @@ public abstract class TacletLoader {
      * Taclets are stored in ImmutableSets which fortunately enough still have a fixed order due to
      * their implementation using immutable lists.
      *
-     * @param initConfig
-     *        the initial config from which the taclet to prove and all following taclets
+     * @param initConfig the initial config from which the taclet to prove and all following taclets
      *        have been removed.
-     * @param tacletToProve
-     *        the taclet for which PO will be generated. Remove all taclets after this
+     * @param tacletToProve the taclet for which PO will be generated. Remove all taclets after this
      *        taclet.
      *
      */
@@ -119,13 +117,13 @@ public abstract class TacletLoader {
 
     public static class TacletFromFileLoader extends TacletLoader {
         private InitConfig initConfig;
-        private final File fileForTaclets;
-        private final Collection<File> filesForAxioms;
+        private final Path fileForTaclets;
+        private final Collection<Path> filesForAxioms;
         private final ProblemInitializer problemInitializer;
 
         public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
-                ProblemInitializer problemInitializer, File fileForTaclets,
-                Collection<File> filesForAxioms, InitConfig initConfig) {
+                ProblemInitializer problemInitializer, Path fileForTaclets,
+                Collection<Path> filesForAxioms, InitConfig initConfig) {
             super(pm, listener, initConfig.getProfile());
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -134,8 +132,8 @@ public abstract class TacletLoader {
         }
 
         public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
-                ProblemInitializer problemInitializer, Profile profile, File fileForTaclets,
-                Collection<File> filesForAxioms) {
+                ProblemInitializer problemInitializer, Profile profile, Path fileForTaclets,
+                Collection<Path> filesForAxioms) {
             super(pm, listener, profile);
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -175,7 +173,7 @@ public abstract class TacletLoader {
 
             int sizeBefore = initConfig.getTaclets().size();
 
-            prepareKeYFile(fileForTaclets.toPath());
+            prepareKeYFile(fileForTaclets);
 
             ImmutableList<Taclet> listAfter = initConfig.getTaclets();
 
@@ -185,8 +183,8 @@ public abstract class TacletLoader {
         @Override
         public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
-            for (File f : filesForAxioms) {
-                prepareKeYFile(f.toPath());
+            for (Path f : filesForAxioms) {
+                prepareKeYFile(f);
             }
 
             return axioms;

@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.test;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
@@ -27,9 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Tag("slow")
 public abstract class SMTTestCommons {
-    protected static final String FOLDER =
-        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
-            + File.separator + "tacletTranslation" + File.separator;
+    protected static final Path FOLDER = HelperClassForTests.TESTCASE_DIRECTORY
+            .resolve("smt")
+            .resolve("tacletTranslation");
     protected static ProblemInitializer initializer = null;
     protected static final Profile profile = new JavaProfile();
 
@@ -94,20 +96,20 @@ public abstract class SMTTestCommons {
     }
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-        return KeYEnvironment.load(new File(filepath).toPath(), null, null, null);
+        return KeYEnvironment.load(Paths.get(filepath).toPath(), null, null, null);
     }
 
     /**
      * Use this method if you only need taclets for testing.
      */
     protected ProofAggregate parse() {
-        return parse(new File(FOLDER + "dummyFile.key"));
+        return parse(FOLDER.resolve("dummyFile.key"));
     }
 
     /**
      * Calls <code>parse(File file, Profile profile)</code> with the standard profile for testing.
      */
-    protected ProofAggregate parse(File file) {
+    protected ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
@@ -121,12 +123,12 @@ public abstract class SMTTestCommons {
      * @return ProofAggregate of the problem file.
      * @profile determines the profile that should be used.
      */
-    protected ProofAggregate parse(File file, Profile pro) {
-        assertTrue(file.exists());
+    protected ProofAggregate parse(Path file, Profile pro) {
+        assertTrue(Files.exists(file));
         ProofAggregate result = null;
         try {
             KeYUserProblemFile po =
-                new KeYUserProblemFile(file.getName(), file.toPath(), null, pro);
+                new KeYUserProblemFile(file.getFileName().toString(), file.toPath(), null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }

@@ -3,18 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.Choice;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -57,7 +53,7 @@ public class FinalPrinterTest {
     public void testPPWithFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
                 .updateWith(List.of(PrettyPrinterRoundtripTest.WITH_FINAL));
-        Term term = io.parseExpression(termString);
+        JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTerm(term);
@@ -76,7 +72,7 @@ public class FinalPrinterTest {
     public void testPPWithoutFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
                 .updateWith(List.of(PrettyPrinterRoundtripTest.WITHOUT_FINAL));
-        Term term = io.parseExpression(termString);
+        JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTerm(term);
@@ -85,7 +81,7 @@ public class FinalPrinterTest {
     }
 
 
-    private void assertEqualModAlpha(Term expected, Term actual) {
+    private void assertEqualModAlpha(JTerm expected, JTerm actual) {
         var value =
             RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
@@ -96,14 +92,6 @@ public class FinalPrinterTest {
     }
 
     private static Services getServices() {
-        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
-        assert url != null : "Could not find roundTripTest.key";
-        assert "file".equals(url.getProtocol()) : "URL is not a file URL";
-        try {
-            Path keyFile = Paths.get(url.toURI());
-            return HelperClassForTests.createServices(keyFile);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return PrettyPrinterRoundtripTest.getServices();
     }
 }

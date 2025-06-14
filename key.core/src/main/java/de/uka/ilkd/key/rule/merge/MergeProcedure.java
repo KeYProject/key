@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.merge;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
@@ -54,26 +54,19 @@ public abstract class MergeProcedure {
      * Merges two values valueInState1 and valueInState2 of corresponding SE states state1 and
      * state2 to a new value of a merge state.
      *
-     * @param v
-     *        The variable for which the values should be merged
-     * @param state1
-     *        First SE state.
-     * @param valueInState1
-     *        Value in state1.
-     * @param state2
-     *        Second SE state.
-     * @param valueInState2
-     *        Value in state2.
-     * @param distinguishingFormula
-     *        The user-specified distinguishing formula. May be null (for
+     * @param v The variable for which the values should be merged
+     * @param state1 First SE state.
+     * @param valueInState1 Value in state1.
+     * @param state2 Second SE state.
+     * @param valueInState2 Value in state2.
+     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
      *        automatic generation).
-     * @param services
-     *        The services object.
+     * @param services The services object.
      * @return The merge result.
      */
-    public abstract ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services);
+    public abstract ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services);
 
     /**
      * Similar to {@link AbstractBuiltInRuleApp#complete()}. Method was introduced for predicate
@@ -93,8 +86,7 @@ public abstract class MergeProcedure {
     /**
      * Returns the merge procedure for the given name.
      *
-     * @param procName
-     *        Name of the merge procedure.
+     * @param procName Name of the merge procedure.
      * @return The merge procedure of the given name; null if there is no such procedure.
      */
     public static MergeProcedure getProcedureByName(String procName) {
@@ -121,10 +113,9 @@ public abstract class MergeProcedure {
      *
      * @author Dominic Scheurer
      */
-    public record ValuesMergeResult(
-            ImmutableSet<Term> newConstraints, Term mergeVal,
+    public record ValuesMergeResult(ImmutableSet<JTerm> newConstraints, JTerm mergeVal,
             LinkedHashSet<Name> newNames,
-            LinkedHashSet<Term> sideConditions) {
+            LinkedHashSet<JTerm> sideConditions) {
     }
 
 }

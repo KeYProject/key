@@ -13,9 +13,9 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
@@ -64,10 +64,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param initConfig
-     *        the initial proof configuration.
-     * @param contract
-     *        the contract from which this PO is generated.
+     * @param initConfig the initial proof configuration.
+     * @param contract the contract from which this PO is generated.
      */
     public FunctionalLoopContractPO(InitConfig initConfig, FunctionalLoopContract contract) {
         super(initConfig, contract.getName());
@@ -135,7 +133,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
         final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);
-        final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
+        final JTerm selfTerm = selfVar == null ? null : tb.var(selfVar);
 
         final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         final Map<LocationVariable, Function> anonOutHeaps =
@@ -152,27 +150,27 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, variables,
                 selfTerm, services);
 
-        final Term wellFormedHeapsCondition =
+        final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
-        final Term[] assumptions = createAssumptions(selfVar, heaps, wellFormedHeapsCondition,
+        final JTerm[] assumptions = createAssumptions(selfVar, heaps, wellFormedHeapsCondition,
             services, conditionsAndClausesBuilder);
-        final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
-        final Map<LocationVariable, Term> modifiableClauses =
+        final JTerm freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
+        final Map<LocationVariable, JTerm> modifiableClauses =
             conditionsAndClausesBuilder.buildModifiableClauses();
-        final Map<LocationVariable, Term> freeModifiableClauses =
+        final Map<LocationVariable, JTerm> freeModifiableClauses =
             conditionsAndClausesBuilder.buildFreeModifiableClauses();
-        final Term[] postconditionsNext =
+        final JTerm[] postconditionsNext =
             createPostconditionsNext(
                 selfTerm, heaps, nextVariables, modifiableClauses, freeModifiableClauses, services);
-        final Term[] postconditions =
+        final JTerm[] postconditions =
             createPostconditions(modifiableClauses, freeModifiableClauses,
                 conditionsAndClausesBuilder);
-        final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
+        final JTerm decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
 
         final GoalsConfigurator configurator =
             createGoalConfigurator(selfVar, selfTerm, variables, services, tb);
 
-        Term validity = setUpValidityGoal(selfTerm, heaps, anonOutHeaps, variables, nextVariables,
+        JTerm validity = setUpValidityGoal(selfTerm, heaps, anonOutHeaps, variables, nextVariables,
             modifiableClauses, freeModifiableClauses, ArrayUtil.add(assumptions, freePrecondition),
             decreasesCheck, postconditions, postconditionsNext, wellFormedHeapsCondition,
             configurator, conditionsAndClausesBuilder, services, tb);
@@ -215,7 +213,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public Term getMbyAtPre() {
+    public JTerm getMbyAtPre() {
         throw new UnsupportedOperationException();
     }
 
@@ -239,97 +237,80 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * Creates postconditions for the current loop iteration.
      *
-     * @param modifiableClauses
-     *        the contract's modifiable clauses.
-     * @param freeModifiableClauses
-     *        the loop's free modifiable clauses.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder
+     * @param modifiableClauses the contract's modifiable clauses.
+     * @param freeModifiableClauses the loop's free modifiable clauses.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
      * @return the postconditions for the current loop iteration.
      */
-    private Term[] createPostconditions(
-            final Map<LocationVariable, Term> modifiableClauses,
-            final Map<LocationVariable, Term> freeModifiableClauses,
+    private JTerm[] createPostconditions(
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term frameCondition =
+        final JTerm postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final JTerm frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
                 modifiableClauses, freeModifiableClauses);
-        return new Term[] { postcondition, frameCondition };
+        return new JTerm[] { postcondition, frameCondition };
     }
 
     /**
      * Creates postconditions for the next loop iteration.
      *
-     * @param selfTerm
-     *        the self term.
-     * @param heaps
-     *        the heaps.
-     * @param nextVariables
-     *        the variables for the next loop iteration.
-     * @param modifiableClauses
-     *        the modifiable clauses.
-     * @param freeModifiableClauses
-     *        the free modifiable clauses.
-     * @param services
-     *        services.
+     * @param selfTerm the self term.
+     * @param heaps the heaps.
+     * @param nextVariables the variables for the next loop iteration.
+     * @param modifiableClauses the modifiable clauses.
+     * @param freeModifiableClauses the free modifiable clauses.
+     * @param services services.
      * @return the postconditions for the next loop iteration.
      */
-    private Term[] createPostconditionsNext(
-            final Term selfTerm,
+    private JTerm[] createPostconditionsNext(
+            final JTerm selfTerm,
             final List<LocationVariable> heaps,
             final LoopContract.Variables nextVariables,
-            final Map<LocationVariable, Term> modifiableClauses,
-            final Map<LocationVariable, Term> freeModifiableClauses,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
             final Services services) {
-        final Term nextPostcondition =
+        final JTerm nextPostcondition =
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, nextVariables,
                 selfTerm, services).buildPostcondition();
-        final Term nextFrameCondition =
+        final JTerm nextFrameCondition =
             new ConditionsAndClausesBuilder(contract.getAuxiliaryContract(), heaps, nextVariables,
                 selfTerm, services).buildFrameCondition(modifiableClauses, freeModifiableClauses);
-        return new Term[] { nextPostcondition, nextFrameCondition };
+        return new JTerm[] { nextPostcondition, nextFrameCondition };
     }
 
     /**
      *
-     * @param selfVar
-     *        the self variable.
-     * @param heaps
-     *        the heaps.
-     * @param wellFormedHeapsCondition
-     *        the condition that all heaps are well-formed.
-     * @param services
-     *        services.
-     * @param conditionsAndClausesBuilder
-     *        a conditions and clauses builder.
+     * @param selfVar the self variable.
+     * @param heaps the heaps.
+     * @param wellFormedHeapsCondition the condition that all heaps are well-formed.
+     * @param services services.
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
      * @return the preconditions.
      */
-    private Term[] createAssumptions(final ProgramVariable selfVar,
-            final List<LocationVariable> heaps, final Term wellFormedHeapsCondition,
+    private JTerm[] createAssumptions(final ProgramVariable selfVar,
+            final List<LocationVariable> heaps, final JTerm wellFormedHeapsCondition,
             final Services services,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final IProgramMethod pm = getProgramMethod();
         final StatementBlock block = getBlock();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(block, services);
-        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term reachableInCondition =
+        final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
+        final JTerm reachableInCondition =
             conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
 
-        return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
+        return new JTerm[] { precondition, wellFormedHeapsCondition, reachableInCondition,
             generateSelfNotNull(pm, selfVar), generateSelfCreated(heaps, pm, selfVar, services),
             generateSelfExactType(pm, selfVar, getCalleeKeYJavaType()) };
     }
 
     /**
      *
-     * @param heaps
-     *        heaps.
-     * @param services
-     *        services.
-     * @param tb
-     *        a term builder.
+     * @param heaps heaps.
+     * @param services services.
+     * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
     private static Map<LocationVariable, Function> createAnonInHeaps(
@@ -350,12 +331,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param heaps
-     *        heaps.
-     * @param services
-     *        services.
-     * @param tb
-     *        a term builder.
+     * @param heaps heaps.
+     * @param services services.
+     * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
     private Map<LocationVariable, Function> createAnonOutHeaps(
@@ -378,20 +356,15 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param selfVar
-     *        the self variable.
-     * @param selfTerm
-     *        the self term.
-     * @param variables
-     *        the contract's variables.
-     * @param services
-     *        services.
-     * @param tb
-     *        a term builder.
+     * @param selfVar the self variable.
+     * @param selfTerm the self term.
+     * @param variables the contract's variables.
+     * @param services services.
+     * @param tb a term builder.
      * @return a goal configurator.
      */
     private GoalsConfigurator createGoalConfigurator(final ProgramVariable selfVar,
-            final Term selfTerm, final BlockContract.Variables variables, final Services services,
+            final JTerm selfTerm, final BlockContract.Variables variables, final Services services,
             final TermBuilder tb) {
         final TermLabelState termLabelState = new TermLabelState();
         final KeYJavaType kjt = getCalleeKeYJavaType();
@@ -399,10 +372,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final ExecutionContext ec = new ExecutionContext(ref, getProgramMethod(), selfVar);
 
         // TODO (DD): HACK
-        Modality.JavaModalityKind kind = contract.getModalityKind();
+        JModality.JavaModalityKind kind = contract.getModalityKind();
         JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock());
         final Instantiation inst =
-            new Instantiation(tb.skip(), tb.tt(), Modality.getModality(kind, jb),
+            new Instantiation(tb.skip(), tb.tt(), JModality.getModality(kind, jb),
                 selfTerm, getBlock(), ec);
 
         return new GoalsConfigurator(null, termLabelState, inst,
@@ -411,45 +384,31 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param selfTerm
-     *        the self term
-     * @param heaps
-     *        the heaps.
-     * @param anonOutHeaps
-     *        the heaps used in the anonOut update.
-     * @param variables
-     *        the contract's variables.
-     * @param nextVariables
-     *        the variables for the next loop iteration.
-     * @param modifiableClauses
-     *        the modifiable clauses.
-     * @param assumptions
-     *        the preconditions.
-     * @param decreasesCheck
-     *        the decreases check.
-     * @param postconditions
-     *        the postconditions for the current loop iteration.
-     * @param postconditionsNext
-     *        the postconditions for the next loop iteration.
-     * @param wellFormedHeapsCondition
-     *        the condition that all heaps are well-formed.
-     * @param configurator
-     *        a goal configurator.
-     * @param conditionsAndClausesBuilder
-     *        a conditions and clauses builder.
-     * @param services
-     *        services.
-     * @param tb
-     *        a term builder.
+     * @param selfTerm the self term
+     * @param heaps the heaps.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param variables the contract's variables.
+     * @param nextVariables the variables for the next loop iteration.
+     * @param modifiableClauses the modifiable clauses.
+     * @param assumptions the preconditions.
+     * @param decreasesCheck the decreases check.
+     * @param postconditions the postconditions for the current loop iteration.
+     * @param postconditionsNext the postconditions for the next loop iteration.
+     * @param wellFormedHeapsCondition the condition that all heaps are well-formed.
+     * @param configurator a goal configurator.
+     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @param services services.
+     * @param tb a term builder.
      * @return the validity formula for the contract.
      */
-    private Term setUpValidityGoal(final Term selfTerm, final List<LocationVariable> heaps,
+    private JTerm setUpValidityGoal(final JTerm selfTerm, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
-            final Map<LocationVariable, Term> modifiableClauses,
-            final Map<LocationVariable, Term> freeModifiableClauses, final Term[] assumptions,
-            final Term decreasesCheck, final Term[] postconditions, final Term[] postconditionsNext,
-            final Term wellFormedHeapsCondition, final GoalsConfigurator configurator,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses, final JTerm[] assumptions,
+            final JTerm decreasesCheck, final JTerm[] postconditions,
+            final JTerm[] postconditionsNext,
+            final JTerm wellFormedHeapsCondition, final GoalsConfigurator configurator,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
             final TermBuilder tb) {
         final LocationVariable exceptionParameter = KeYJavaASTFactory.localVariable(
@@ -457,22 +416,22 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             variables.exception.getKeYJavaType());
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
-        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
-        final Term nextRemembranceUpdate =
+        final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final JTerm outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
+        final JTerm nextRemembranceUpdate =
             new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
 
         Map<LocationVariable, Function> anonInHeaps = createAnonInHeaps(heaps, services, tb);
 
-        final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
-        final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);
+        final JTerm anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
+        final JTerm context = tb.sequential(outerRemembranceUpdate, anonInUpdate);
 
-        Term validity = configurator.setUpLoopValidityGoal(null, contract.getAuxiliaryContract(),
+        JTerm validity = configurator.setUpLoopValidityGoal(null, contract.getAuxiliaryContract(),
             context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps, modifiableClauses,
             freeModifiableClauses, assumptions, decreasesCheck, postconditions, postconditionsNext,
             exceptionParameter, variables.termify(selfTerm), nextVariables);
 
-        Term wellFormedAnonymisationHeapsCondition =
+        JTerm wellFormedAnonymisationHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonInHeaps);
         return tb.imp(tb.and(wellFormedHeapsCondition, wellFormedAnonymisationHeapsCondition),
             validity);

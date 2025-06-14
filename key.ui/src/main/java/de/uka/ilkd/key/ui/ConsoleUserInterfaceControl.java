@@ -7,7 +7,6 @@ package de.uka.ilkd.key.ui;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -80,7 +79,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
-     * System.exit() after all files have been loaded with {@link #loadProblem(java.nio.file.Path)}.
+     * System.exit() after all files have been loaded with
+     * {@link AbstractMediatorUserInterfaceControl#loadProblem(Path)}.
      * Program return value depends on whether there has been a proof attempt that was not
      * successful.
      */
@@ -211,14 +211,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file
-     *        the File with the problem description or the proof
-     * @param classPath
-     *        the class path entries to use.
-     * @param bootClassPath
-     *        the boot class path to use.
-     * @param includes
-     *        the included files to use
+     * @param file the File with the problem description or the proof
+     * @param classPath the class path entries to use.
+     * @param bootClassPath the boot class path to use.
+     * @param includes the included files to use
      */
     public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
             List<Path> includes) {
@@ -262,7 +258,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     public final void reportException(Object sender, ProofOblInput input, Exception e) {
-        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{},{})", sender, input, e);
+        LOGGER.debug("ConsoleUserInterfaceControl.reportException({},{})", sender, input, e);
     }
 
     @Override
@@ -369,12 +365,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Save proof.
      *
-     * @param result
-     *        the result
-     * @param proof
-     *        the proof
-     * @param keyProblemFile
-     *        the key problem file
+     * @param result the result
+     * @param proof the proof
+     * @param keyProblemFile the key problem file
      * @return true, if successful
      */
     public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
@@ -399,9 +392,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
         try {
             // a copy with running number to compare different runs
-            ProofSaver.saveToFile(f.toPath().toAbsolutePath(), proof);
+            ProofSaver.saveToFile(new File(f.getAbsolutePath()), proof);
             // save current proof under common name as well
-            ProofSaver.saveToFile(Paths.get(baseName + ".auto.proof"), proof);
+            ProofSaver.saveToFile(new File(baseName + ".auto.proof"), proof);
 
             // save proof statistics
             ShowProofStatistics.getCSVStatisticsMessage(proof);

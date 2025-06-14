@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.jspecify.annotations.Nullable;
 
@@ -45,11 +45,9 @@ public interface SpecificationElement {
     /**
      * Applies a unary operator to every term in this specification element.
      *
-     * @param op
-     *        the operator to apply.
-     * @param services
-     *        services.
+     * @param op the operator to apply.
+     * @param services services.
      * @return this specification element with the operator applied.
      */
-    SpecificationElement map(UnaryOperator<Term> op, Services services);
+    SpecificationElement map(UnaryOperator<JTerm> op, Services services);
 }

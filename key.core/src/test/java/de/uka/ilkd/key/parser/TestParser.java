@@ -97,10 +97,10 @@ public class TestParser {
         var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
             KeYEnvironment.load(file, null, null, null);
         });
-        var error = (HasLocation) problemLoaderException.getCause();
-        var location = error.getLocation();
-        assertEquals(4, location.getPosition().line());
-        assertEquals(9, location.getPosition().column());
-        assertEquals(Optional.of(file.toUri()), location.getFileURI());
+        var error = (PosConvertException) problemLoaderException.getCause();
+        assertEquals(4, error.getPosition().line());
+        assertEquals(9, error.getPosition().column());
+        assertEquals(file.toUri(), error.getLocation().getFileURI().orElseThrow());
+
     }
 }

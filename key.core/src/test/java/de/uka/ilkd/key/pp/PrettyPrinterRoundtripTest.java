@@ -5,16 +5,18 @@ package de.uka.ilkd.key.pp;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.Choice;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Pretty printer roundtrip test.
@@ -84,35 +86,35 @@ public class PrettyPrinterRoundtripTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getCases")
-    public void roundtrip(String termString) throws Exception {
+    public void roundtrip(String termString) {
         services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITH_FINAL));
-        Term term = io.parseExpression(termString);
+        JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTerm(term);
         var string = lp.result();
         System.out.println("Pretty printed: " + string);
-        Term term2 = io.parseExpression(string);
+        JTerm term2 = io.parseExpression(string);
         System.out.println("Reparsed: " + term2);
         assertEqualModAlpha(term, term2);
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getHeapCases")
-    void roundtripWithoutFinal(String termString) throws Exception {
+    void roundtripWithoutFinal(String termString) {
         services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITHOUT_FINAL));
-        Term term = io.parseExpression(termString);
+        JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTerm(term);
         var string = lp.result();
         System.out.println("Pretty printed: " + string);
-        Term term2 = io.parseExpression(string);
+        JTerm term2 = io.parseExpression(string);
         System.out.println("Reparsed: " + term2);
         assertEqualModAlpha(term, term2);
     }
 
-    private void assertEqualModAlpha(Term expected, Term actual) {
+    private void assertEqualModAlpha(JTerm expected, JTerm actual) {
         var value =
             RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
@@ -122,12 +124,10 @@ public class PrettyPrinterRoundtripTest {
         assertTrue(value, "Expected: " + expected + " but was: " + actual);
     }
 
-    private static Services getServices() {
-        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
-        assert url != null : "Could not find roundTripTest.key";
-        assert "file".equals(url.getProtocol()) : "URL is not a file URL";
+    static Services getServices() {
         try {
-            var keyFile = Paths.get(url.toURI());
+            URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
+            Path keyFile = Paths.get(url.toURI());
             return HelperClassForTests.createServices(keyFile);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

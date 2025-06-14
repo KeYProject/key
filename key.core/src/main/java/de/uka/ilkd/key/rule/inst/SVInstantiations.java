@@ -9,9 +9,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
@@ -29,6 +30,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -88,8 +92,7 @@ public class SVInstantiations
     /**
      * creates a new SVInstantions object using the given map
      *
-     * @param map
-     *        the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
+     * @param map the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
      */
     private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
@@ -125,18 +128,16 @@ public class SVInstantiations
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param subst
-     *        the Term the SchemaVariable is instantiated with
+     * @param sv the SchemaVariable to be instantiated
+     * @param matchedElement the SyntaxElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, Term subst, LogicServices services) {
-        return add(sv, new InstantiationEntry<>(subst), services);
+    public SVInstantiations add(SchemaVariable sv, SyntaxElement matchedElement,
+            LogicServices services) throws SortException {
+        return add(sv, new InstantiationEntry<>(matchedElement), services);
     }
 
-
-    public SVInstantiations addInteresting(SchemaVariable sv, Term subst, LogicServices services) {
+    public SVInstantiations addInteresting(SchemaVariable sv, JTerm subst, LogicServices services) {
         return addInteresting(sv, new InstantiationEntry<>(subst), services);
     }
 
@@ -144,29 +145,6 @@ public class SVInstantiations
             LogicServices services) {
         return add(sv, new ListInstantiation(pes, type), services);
     }
-
-    /**
-     * Add the given additional condition for the generic sort instantiations
-     */
-    public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
-            LogicServices services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind), services);
-    }
-
-    /**
-     * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
-     * already, the new pair is taken without a warning.
-     *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param pe
-     *        the ProgramElement the SchemaVariable is instantiated with
-     * @return SVInstantiations the new SVInstantiations containing the given pair
-     */
-    public SVInstantiations add(SchemaVariable sv, ProgramElement pe, LogicServices services) {
-        return add(sv, new InstantiationEntry<>(pe), services);
-    }
-
 
     public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
             LogicServices services) {
@@ -177,14 +155,10 @@ public class SVInstantiations
      * adds the given pair to the instantiations for the context.If the context has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param prefix
-     *        the PosInProgram describing the prefix
-     * @param postfix
-     *        the PosInProgram describing the postfix
-     * @param activeStatementContext
-     *        the ExecutionContext of the first active statement
-     * @param pe
-     *        the ProgramElement the context positions are related to
+     * @param prefix the PosInProgram describing the prefix
+     * @param postfix the PosInProgram describing the postfix
+     * @param activeStatementContext the ExecutionContext of the first active statement
+     * @param pe the ProgramElement the context positions are related to
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
@@ -210,7 +184,7 @@ public class SVInstantiations
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
             boolean p_forceRebuild, LogicServices services) {
-        if (p_sv instanceof OperatorSV asv) {
+        if (p_sv instanceof JOperatorSV asv) {
             Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
             if (b == null) {
@@ -250,10 +224,8 @@ public class SVInstantiations
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param entry
-     *        the InstantiationEntry
+     * @param sv the SchemaVariable to be instantiated
+     * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry,
@@ -288,10 +260,8 @@ public class SVInstantiations
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param entry
-     *        the InstantiationEntry the SchemaVariable is instantiated with
+     * @param sv the SchemaVariable to be instantiated
+     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
             Services services) {
@@ -302,8 +272,7 @@ public class SVInstantiations
     /**
      * adds the schemvariable to the set of interesting ones
      *
-     * @throws IllegalInstantiationException,
-     *         if sv has not yet been instantiated
+     * @throws IllegalInstantiationException, if sv has not yet been instantiated
      */
     public SVInstantiations makeInteresting(SchemaVariable sv, LogicServices services) {
         final InstantiationEntry<?> entry = getInstantiationEntry(sv);
@@ -323,12 +292,10 @@ public class SVInstantiations
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param term
-     *        the Term the SchemaVariable is instantiated with
+     * @param sv the SchemaVariable to be instantiated
+     * @param term the Term the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
+    public SVInstantiations replace(SchemaVariable sv, JTerm term, Services services) {
         return replace(sv, new InstantiationEntry<>(term), services);
     }
 
@@ -336,10 +303,8 @@ public class SVInstantiations
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param pe
-     *        the ProgramElement the SchemaVariable is instantiated with
+     * @param sv the SchemaVariable to be instantiated
+     * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ProgramElement pe, Services services) {
         return replace(sv, new InstantiationEntry<>(pe), services);
@@ -349,10 +314,8 @@ public class SVInstantiations
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv
-     *        the SchemaVariable to be instantiated
-     * @param pes
-     *        the ArrayOf<t> the SchemaVariable is instantiated with
+     * @param sv the SchemaVariable to be instantiated
+     * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
@@ -363,16 +326,12 @@ public class SVInstantiations
      * replaces the given pair in the instantiations. If the context has been instantiated already,
      * the new pair is taken without a warning.
      *
-     * @param prefix
-     *        the PosInProgram describing the position of the first statement after the
+     * @param prefix the PosInProgram describing the position of the first statement after the
      *        prefix
-     * @param postfix
-     *        the PosInProgram describing the position of the statement just before the
+     * @param postfix the PosInProgram describing the position of the statement just before the
      *        postfix
-     * @param activeStatementContext
-     *        the ExecutionContext of the first active statement
-     * @param pe
-     *        the ProgramElement the context positions are related to
+     * @param activeStatementContext the ExecutionContext of the first active statement
+     * @param pe the ProgramElement the context positions are related to
      */
     public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
@@ -410,33 +369,10 @@ public class SVInstantiations
      *         stored
      */
     @Override
-    public Object getInstantiation(SchemaVariable sv) {
-        final InstantiationEntry<?> entry = getInstantiationEntry(sv);
+    public <T> @Nullable T getInstantiation(SchemaVariable sv) {
+        final InstantiationEntry<T> entry = getInstantiationEntry(sv);
         return entry == null ? null : entry.getInstantiation();
     }
-
-    /**
-     * returns the instantiation of the given SchemaVariable
-     *
-     * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
-     *         stored
-     */
-    public Term getInstantiation(SkolemTermSV sv) {
-        final InstantiationEntry<Term> entry = getInstantiationEntry(sv);
-        return entry == null ? null : entry.getInstantiation();
-    }
-
-    /**
-     * returns the instantiation of the given SchemaVariable
-     *
-     * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
-     *         stored
-     */
-    public Term getInstantiation(TermSV sv) {
-        final InstantiationEntry<Term> entry = getInstantiationEntry(sv);
-        return entry == null ? null : entry.getInstantiation();
-    }
-
 
     /**
      * returns the instantiation of the given SchemaVariable as Term. If the instantiation is a
@@ -445,13 +381,13 @@ public class SVInstantiations
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Term getTermInstantiation(SchemaVariable sv, ExecutionContext ec,
+    public JTerm getTermInstantiation(SchemaVariable sv, ExecutionContext ec,
             LogicServices services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
-        } else if (inst instanceof Term) {
-            return (Term) inst;
+        } else if (inst instanceof JTerm) {
+            return (JTerm) inst;
         } else if (inst instanceof ProgramElement) {
             return ((Services) services).getTypeConverter()
                     .convertToLogicElement((ProgramElement) inst, ec);
@@ -463,10 +399,9 @@ public class SVInstantiations
     /**
      * adds an update to the update context
      *
-     * @param updateApplicationlabels
-     *        the TermLabels attached to the application operator term
+     * @param updateApplicationlabels the TermLabels attached to the application operator term
      */
-    public SVInstantiations addUpdate(Term update,
+    public SVInstantiations addUpdate(JTerm update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
         assert update.sort() == JavaDLTheory.UPDATE;
         return new SVInstantiations(map, interesting(),
@@ -474,7 +409,7 @@ public class SVInstantiations
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
+    public record UpdateLabelPair(JTerm update, ImmutableArray<TermLabel> updateApplicationlabels) {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof UpdateLabelPair) {
@@ -594,7 +529,7 @@ public class SVInstantiations
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (inst instanceof Term instAsTerm) {
+            if (inst instanceof JTerm instAsTerm) {
                 if (!instAsTerm.equalsModProperty(cmp.getInstantiation(e.key()),
                     IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
@@ -689,15 +624,15 @@ public class SVInstantiations
     }
 
     @Override
-    public SchemaVariable lookupVar(Name name) {
+    public @Nullable SchemaVariable lookupVar(@NonNull Name name) {
         final var e = lookupEntryForSV(name);
         return e == null ? null : e.key(); // handle this better!
     }
 
     @Override
-    public Object lookupValue(Name name) {
+    public <T> @Nullable T lookupValue(@NonNull Name name) {
         final var e = lookupEntryForSV(name);
         // e.value() cannot be null here as null instantiations are not allowed
-        return e == null ? null : e.value().getInstantiation();
+        return e == null ? null : (T) e.value().getInstantiation();
     }
 }

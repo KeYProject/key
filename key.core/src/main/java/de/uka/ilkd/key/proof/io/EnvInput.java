@@ -14,6 +14,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -21,6 +22,7 @@ import org.jspecify.annotations.Nullable;
  * Represents an entity read to produce an environment to read a proof obligation. Environment means
  * the initial configuration of a prover containing namespaces and Java model.
  */
+@NullMarked
 public interface EnvInput {
 
     /**
@@ -55,14 +57,14 @@ public interface EnvInput {
      *
      * @see #isIgnoreOtherJavaFiles()
      */
-    default @Nullable Path getJavaFile() {
+    default @Nullable Path getJavaFile() throws ProofInputException {
         return null;
     }
 
     /**
      * gets the classpath elements to be considered here.
      */
-    List<Path> readClassPath();
+    List<Path> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.
@@ -106,7 +108,5 @@ public interface EnvInput {
      *
      * @see de.uka.ilkd.key.proof.init.ProblemInitializer
      */
-    default boolean isIgnoreOtherJavaFiles() {
-        return false;
-    }
+    default boolean isIgnoreOtherJavaFiles() { return false; }
 }

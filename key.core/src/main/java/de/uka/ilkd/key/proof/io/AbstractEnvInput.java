@@ -20,9 +20,9 @@ import org.jspecify.annotations.Nullable;
 public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
-    protected final Path javaPath;
+    protected final @Nullable Path javaPath;
     protected final List<Path> classPath;
-    protected final Path bootClassPath;
+    protected final @Nullable Path bootClassPath;
     protected final Includes includes;
     protected final Profile profile;
 
@@ -35,9 +35,11 @@ public abstract class AbstractEnvInput implements EnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected AbstractEnvInput(String name, Path javaPath, List<Path> classPath,
-            Path bootClassPath,
-            Profile profile, List<Path> includes) {
+    protected AbstractEnvInput(String name, @Nullable Path javaPath,
+            List<Path> classPath,
+            @Nullable Path bootClassPath,
+            Profile profile,
+            List<Path> includes) {
         assert profile != null;
         this.name = name;
         this.javaPath = javaPath;
@@ -46,7 +48,7 @@ public abstract class AbstractEnvInput implements EnvInput {
         this.profile = profile;
         this.includes = new Includes();
         if (includes != null) {
-            for (var path : includes) {
+            for (Path path : includes) {
                 this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
             }
         }
@@ -83,19 +85,19 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final @Nullable Path readJavaPath() throws ProofInputException {
+    public final Path readJavaPath() throws ProofInputException {
         return javaPath;
     }
 
 
     @Override
-    public final List<Path> readClassPath() {
+    public final List<Path> readClassPath() throws ProofInputException {
         return classPath;
     }
 
 
     @Override
-    public @Nullable Path readBootClassPath() {
+    public Path readBootClassPath() {
         return bootClassPath;
     }
 
@@ -114,7 +116,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
 
     @Override
-    public @Nullable Path getJavaFile() {
+    public Path getJavaFile() {
         return javaFile;
     }
 

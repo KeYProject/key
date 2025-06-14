@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -42,6 +43,10 @@ class DataRecordingTestFile extends TestFile {
         }
     }
 
+    @Override
+    protected void reload(boolean verbose, Path proofFile, Proof loadedProof, boolean success) {
+        // we skip reloading for these test cases
+    }
 
     private static ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
         proof.setActiveStrategy(strategy);

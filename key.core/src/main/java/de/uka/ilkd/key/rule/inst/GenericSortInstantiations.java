@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -114,7 +114,7 @@ public final class GenericSortInstantiations {
      *         choosing the right generic sort instantiations
      */
     public Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
-        if (sv instanceof ProgramSV || !(p_entry.getInstantiation() instanceof Term term)) {
+        if (sv instanceof ProgramSV || !(p_entry.getInstantiation() instanceof JTerm term)) {
             return Boolean.TRUE;
         }
 

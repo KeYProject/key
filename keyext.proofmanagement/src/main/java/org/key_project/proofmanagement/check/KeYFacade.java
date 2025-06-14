@@ -5,10 +5,7 @@ package org.key_project.proofmanagement.check;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -427,11 +424,10 @@ public final class KeYFacade {
         try {
             // load all contracts from source files
             ProofBundleHandler pbh = data.getPbh();
-            var src = pbh.getPath("src");
+            Path src = pbh.getPath("src");
             List<Path> cp = null;
             if (!pbh.getClasspathFiles().isEmpty()) {
-                cp = pbh.getClasspathFiles().stream()
-                        .toList();
+                cp = new ArrayList<>(pbh.getClasspathFiles());
             }
             Path bcp = null;
             if (pbh.getBootclasspath() != null) {

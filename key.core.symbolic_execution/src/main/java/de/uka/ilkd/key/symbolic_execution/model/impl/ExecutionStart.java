@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -98,7 +98,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      */
     @Override
     public SourceElement getActiveStatement() {
-        Term modalityTerm = (Term) getModalityPIO().subTerm();
+        JTerm modalityTerm = (JTerm) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }

@@ -50,8 +50,8 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
     @Override
     public void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            JTerm applicationTerm, JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
             Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
@@ -80,7 +80,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                     new LinkedHashMap<>();
                 for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
-                        ((Term) ifInst.getSequentFormula().formula()).getLabels());
+                        ((JTerm) ifInst.getSequentFormula().formula()).getLabels());
                     if (ifLabel != null) {
                         ifLabels.put(ifInst.getSequentFormula(), ifLabel);
                     }

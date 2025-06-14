@@ -102,25 +102,23 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     /**
      * loads the problem or proof from the given file
      *
-     * @param file
-     *        the File with the problem description or the proof
+     * @param file the File with the problem description or the proof
      */
     public abstract void loadProblem(Path file);
 
     /**
      * Loads the proof with the given filename from the proof bundle with the given path.
      *
-     * @param proofBundle
-     *        the File with the problem description or the proof
-     * @param proofFilename
-     *        the filename of the proof in the bundle
+     * @param proofBundle the File with the problem description or the proof
+     * @param proofFilename the filename of the proof in the bundle
      */
     public abstract void loadProofFromBundle(Path proofBundle, Path proofFilename);
 
     public ProblemLoader getProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
             List<Path> includes, KeYMediator mediator) {
-        return new ProblemLoader(file, classPath, bootClassPath, includes,
+        final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
+        return pl;
     }
 
     public boolean applyMacro() {
@@ -214,10 +212,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         } else { // happens when a Java file is loaded
             proofFolder = Main.getWorkingDir();
         }
-        final var toSave = proofFolder.resolve(filename);
+        final Path toSave = proofFolder.resolve(filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
-        final ProofSaver ps =
-            new ProofSaver(proof, toSave.toAbsolutePath().toString(), krm.getSHA1());
+        final ProofSaver ps = new ProofSaver(proof, toSave.toAbsolutePath(), krm.getSHA1());
         final String errorMsg = ps.save();
         if (errorMsg != null) {
             reportException(this, null, new IOException(errorMsg));
@@ -247,13 +244,15 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * these methods are called immediately before automode is started to ensure that the GUI can
      * respond in a reasonable way, e.g., change the cursor to a waiting cursor
      */
-    public void notifyAutoModeBeingStarted() {}
+    public void notifyAutoModeBeingStarted() {
+    }
 
     /**
      * these methods are called when automode has been stopped to ensure that the GUI can respond in
      * a reasonable way, e.g., change the cursor to the default
      */
-    public void notifyAutomodeStopped() {}
+    public void notifyAutomodeStopped() {
+    }
 
     public abstract void notify(NotificationEvent event);
 
@@ -261,8 +260,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * asks if removal of a task is completed. This is useful to display a dialog to the user and
      * asking her or if on command line to allow it always.
      *
-     * @param message
-     *        to be displayed asking for confirmation
+     * @param message to be displayed asking for confirmation
      * @return true if removal has been granted
      */
     public boolean confirmTaskRemoval(String message) {

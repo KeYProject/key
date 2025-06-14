@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.Services;
@@ -18,7 +18,8 @@ import org.key_project.prover.sequent.Sequent;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ProofSaverTest {
 
@@ -29,9 +30,8 @@ class ProofSaverTest {
         Sequent seq = loader.parseFile().loadProblem().getProblem();
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
-        Proof proof = new Proof("test", seq, "", initConfig, (Path) null);
-        File file = File.createTempFile("proofSaveTest", ".key");
-        file.deleteOnExit();
+        Proof proof = new Proof("test", seq, "", initConfig, null);
+        Path file = Files.createTempFile("proofSaveTest", ".key");
         String status = new ProofSaver(proof, file).save();
         assertNull(status);
 
@@ -40,6 +40,8 @@ class ProofSaverTest {
         Sequent seq2 = loader2.parseFile().loadProblem().getProblem();
 
         assertEquals(seq, seq2);
+
+        Files.deleteIfExists(file);
     }
 
     @Test

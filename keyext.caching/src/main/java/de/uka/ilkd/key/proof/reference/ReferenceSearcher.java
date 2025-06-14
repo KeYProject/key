@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof.reference;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
@@ -179,7 +179,7 @@ public final class ReferenceSearcher {
         ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
-            Term term = (Term) seq.getFormulaByNr(i).formula();
+            JTerm term = (JTerm) seq.getFormulaByNr(i).formula();
             // first, check for a java block
             if (term.containsJavaBlockRecursive()) {
                 // not suitable for caching

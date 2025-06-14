@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -53,7 +54,7 @@ public class HeapGenerator implements TermGenerator<Goal> {
             heaps.add(term);
         } else {
             if (!includeUpdates && term.op() instanceof UpdateApplication) {
-                collectHeaps(UpdateApplication.getTarget((de.uka.ilkd.key.logic.Term) term), heaps,
+                collectHeaps(UpdateApplication.getTarget((JTerm) term), heaps,
                     services);
             } else {
                 for (int i = 0; i < term.arity(); i++) {

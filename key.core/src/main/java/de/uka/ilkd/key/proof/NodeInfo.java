@@ -13,8 +13,8 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -102,8 +102,7 @@ public class NodeInfo {
      * Copies {@link #interactiveApplication}, {@link #scriptingApplication},
      * {@link #uselessApplication} and {@link #notes}.
      *
-     * @param node
-     *        a proof node
+     * @param node a proof node
      */
     public void copyFrom(Node node) {
         interactiveApplication = node.getNodeInfo().interactiveApplication;
@@ -138,8 +137,7 @@ public class NodeInfo {
      * the symbolic execution tree extraction.
      * </p>
      *
-     * @param ruleApp
-     *        The given {@link RuleApp}.
+     * @param ruleApp The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(
@@ -157,8 +155,7 @@ public class NodeInfo {
      * the symbolic execution tree extraction.
      * </p>
      *
-     * @param ruleApp
-     *        The given {@link RuleApp}.
+     * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
      */
     public static SourceElement computeFirstStatement(
@@ -169,7 +166,7 @@ public class NodeInfo {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
-            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+            JTerm t = TermBuilder.goBelowUpdates((JTerm) pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
@@ -187,8 +184,7 @@ public class NodeInfo {
      * the symbolic execution tree extraction.
      * </p>
      *
-     * @param firstStatement
-     *        The given {@link SourceElement}.
+     * @param firstStatement The given {@link SourceElement}.
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(SourceElement firstStatement) {
@@ -215,8 +211,7 @@ public class NodeInfo {
     /**
      * Checks if a rule is applied on the given {@link Node} which performs symbolic execution.
      *
-     * @param node
-     *        The {@link Node} to check.
+     * @param node The {@link Node} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(Node node) {
@@ -230,8 +225,7 @@ public class NodeInfo {
     /**
      * Checks if the given {@link RuleApp} performs symbolic execution.
      *
-     * @param app
-     *        The {@link RuleApp} to check.
+     * @param app The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
@@ -306,8 +300,7 @@ public class NodeInfo {
      * sets the branch label of a node. Schema variables occurring in string <tt>s</tt> are replaced
      * by their instantiations if possible
      *
-     * @param s
-     *        the String to be set
+     * @param s the String to be set
      */
     public void setBranchLabel(String s) {
         determineFirstAndActiveStatement();
@@ -337,8 +330,8 @@ public class NodeInfo {
                         tacletApp.rule().name());
                     res = arg; // use sv name instead
                 } else {
-                    if (val instanceof Term) {
-                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
+                    if (val instanceof JTerm) {
+                        val = TermLabelManager.removeIrrelevantLabels((JTerm) val,
                             node.proof().getServices());
                     } else if (val instanceof LocationVariable locVar) {
                         var originTracker = node.proof().lookup(LocationVariableTracker.class);
@@ -370,8 +363,7 @@ public class NodeInfo {
     /**
      * parameter indicated if the rule has been applied interactively or not
      *
-     * @param b
-     *        a boolean indicating interactive application
+     * @param b a boolean indicating interactive application
      */
     public void setInteractiveRuleApplication(boolean b) {
         interactiveApplication = b;
@@ -380,8 +372,7 @@ public class NodeInfo {
     /**
      * parameter indicated if the rule has been applied by a proof script or not
      *
-     * @param b
-     *        a boolean indicating scripting application
+     * @param b a boolean indicating scripting application
      */
     public void setScriptRuleApplication(boolean b) {
         scriptingApplication = b;
@@ -409,8 +400,7 @@ public class NodeInfo {
     /**
      * Add user-provided plain-text annotations.
      *
-     * @param newNotes
-     *        annotations as described above
+     * @param newNotes annotations as described above
      */
     public void setNotes(String newNotes) {
         String oldNotes = notes;
@@ -447,8 +437,7 @@ public class NodeInfo {
     /**
      * Mark this node as useless or useful.
      *
-     * @param uselessApplication
-     *        whether this node should be marked as useless
+     * @param uselessApplication whether this node should be marked as useless
      */
     public void setUselessApplication(boolean uselessApplication) {
         this.uselessApplication = uselessApplication;

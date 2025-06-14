@@ -170,13 +170,10 @@ public final class KeYFileChooser extends JFileChooser {
     /**
      * Show a file dialog for saving a file. The dialog will provide a naming suggestion.
      *
-     * @param parent
-     *        the main window
-     * @param originalFile
-     *        the original file to be saved, if it exists and is a proof, this will be
+     * @param parent the main window
+     * @param originalFile the original file to be saved, if it exists and is a proof, this will be
      *        the suggestion
-     * @param extension
-     *        the desired file name extension (usually ".proof")
+     * @param extension the desired file name extension (usually ".proof")
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
     public int showSaveDialog(Component parent, File originalFile, String extension) {
@@ -224,10 +221,8 @@ public final class KeYFileChooser extends JFileChooser {
     /**
      * Shows the dialog with the given file/directory as currently selected.
      *
-     * @param parent
-     *        the Component the dialog is over
-     * @param selectedFile
-     *        the file or directory that shall be currently selected
+     * @param parent the Component the dialog is over
+     * @param selectedFile the file or directory that shall be currently selected
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
     public int showSaveDialog(Component parent, File selectedFile) {
@@ -300,15 +295,14 @@ public final class KeYFileChooser extends JFileChooser {
      * The chooser is created lazily when first requested. It points to the directory of the command
      * line argument (if present), otherwise to the user's home directory.
      *
-     * @param title
-     *        the title of the key file chooser
+     * @param title the title of the key file chooser
      *
      * @return the key file chooser
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (INSTANCE == null) {
-            var initDir = Main.getWorkingDir();
-            INSTANCE = new KeYFileChooser(initDir.toFile());
+            File initDir = Main.getWorkingDir().toFile();
+            INSTANCE = new KeYFileChooser(initDir);
             // not the best design probably: this constructor has the side effect of connecting
             // the new bookmark panel to the file chooser.
             new KeYFileChooserBookmarkPanel(INSTANCE);

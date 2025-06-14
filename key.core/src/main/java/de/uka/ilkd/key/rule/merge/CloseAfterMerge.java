@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -148,7 +148,7 @@ public class CloseAfterMerge implements BuiltInRule {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(MERGED_NODE_IS_WEAKENING_TITLE);
             var services = goal.getOverlayServices();
-            Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
+            JTerm isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
             isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null,
                 isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
             // Delete previous sequents
@@ -174,7 +174,7 @@ public class CloseAfterMerge implements BuiltInRule {
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    private Term getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
+    private JTerm getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
             Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
@@ -189,7 +189,7 @@ public class CloseAfterMerge implements BuiltInRule {
         allLocs = allLocs
                 .union(getLocationVariables(closeApp.getMergeState().getPathCondition(), services));
 
-        final LinkedList<Term> origQfdVarTerms = new LinkedList<>();
+        final LinkedList<JTerm> origQfdVarTerms = new LinkedList<>();
 
         // Collect sorts and create logical variables for
         // closing over program variables.
@@ -214,7 +214,7 @@ public class CloseAfterMerge implements BuiltInRule {
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces().getParent());
 
         // Create the predicate term
-        final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
+        final JTerm predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new JTerm[] {}));
 
         // Obtain set of new Skolem constants in merge state
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
@@ -224,7 +224,7 @@ public class CloseAfterMerge implements BuiltInRule {
         //@formatter:off
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
         //@formatter:on
-        Term result = tb.imp(
+        JTerm result = tb.imp(
             allClosure(
                 tb.imp(closeApp.getMergeState().getPathCondition(),
                     tb.apply(closeApp.getMergeState().getSymbolicState(), predTerm)),
@@ -250,11 +250,11 @@ public class CloseAfterMerge implements BuiltInRule {
      *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
      *         before.
      */
-    private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
+    private JTerm allClosure(final JTerm term, final HashSet<Function> constsToReplace,
             Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
+        JTerm termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
             new HashMap<>(), services);
 
         return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
@@ -301,7 +301,7 @@ public class CloseAfterMerge implements BuiltInRule {
      */
     public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,
             Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-            SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
+            SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
             correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
     }

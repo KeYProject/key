@@ -7,13 +7,13 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -68,7 +68,7 @@ public class PosTacletApp extends TacletApp {
         return null;
     }
 
-    public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchConditions matchCond,
+    public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchResultInfo matchCond,
             PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
     }
@@ -135,7 +135,7 @@ public class PosTacletApp extends TacletApp {
             Iterator<SchemaVariable> it = allVariableSV(taclet);
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();
-                Term inst = (Term) insts.getInstantiation(varSV);
+                JTerm inst = (JTerm) insts.getInstantiation(varSV);
                 if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
@@ -153,7 +153,7 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
             Services services) {
 
         if (interesting) {
@@ -220,7 +220,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchConditions mc, Services services) {
+    public TacletApp setMatchConditions(MatchResultInfo mc, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
             assumesFormulaInstantiations(), posInOccurrence(), services);
     }
@@ -231,7 +231,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(MatchConditions mc,
+    protected TacletApp setAllInstantiations(MatchResultInfo mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         return createPosTacletApp((FindTaclet) taclet(),

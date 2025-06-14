@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
 
@@ -15,13 +15,13 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 /**
  * Stores the given {@link Statement}, after substitution of {@link SchemaVariable}s, into the given
  * {@link ProgramSV} for later use in other conditions and transformers. The arguments are a
- * {@link ProgramSV} and a {@link Term}, where the {@link Term} must contain a {@link JavaBlock}
+ * {@link ProgramSV} and a {@link JTerm}, where the {@link JTerm} must contain a {@link JavaBlock}
  * with a {@link StatementBlock} containing <emph>a single statement</emph> (that works, e.g., when
  * passing an expression like
  * <code>\modality{#allmodal}{ while (#e) #body }\endmodality(post)</code>); this statement is then
@@ -31,16 +31,16 @@ import org.key_project.prover.rules.instantiation.SVInstantiations;
  */
 public class StoreStmtInCondition implements VariableCondition {
     private final ProgramSV storeInSV;
-    private final Term term;
+    private final JTerm term;
 
-    public StoreStmtInCondition(ProgramSV resultVarSV, Term term) {
+    public StoreStmtInCondition(ProgramSV resultVarSV, JTerm term) {
         this.storeInSV = resultVarSV;
         this.term = term;
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices services) {
+    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
@@ -51,7 +51,7 @@ public class StoreStmtInCondition implements VariableCondition {
             new LightweightSyntacticalReplaceVisitor(
                 (de.uka.ilkd.key.rule.inst.SVInstantiations) svInst, (Services) services);
         term.execPostOrder(replVisitor);
-        final Term instantiatedTerm = replVisitor.getTerm();
+        final JTerm instantiatedTerm = replVisitor.getTerm();
 
         // We assume that the term has a JavaBlock and that consists of a StatementBlock
         // containing exactly one statement; see JavaDoc.

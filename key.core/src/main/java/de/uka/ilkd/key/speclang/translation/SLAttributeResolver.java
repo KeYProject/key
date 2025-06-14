@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.TermCreationException;
@@ -77,7 +77,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        Term recTerm = receiver.getTerm();
+        JTerm recTerm = receiver.getTerm();
 
         // <inv> and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
@@ -132,7 +132,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 try {
                     final Function fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
-                    Term attributeTerm;
+                    JTerm attributeTerm;
                     if (attribute.isStatic()) {
                         attributeTerm =
                             services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);

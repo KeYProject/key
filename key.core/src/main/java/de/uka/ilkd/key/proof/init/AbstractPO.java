@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -47,7 +47,7 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
-    protected Term[] poTerms;
+    protected JTerm[] poTerms;
     protected String[] poNames;
     private String header;
     private ProofAggregate proofAggregate;
@@ -60,7 +60,9 @@ public abstract class AbstractPO implements IPersistablePO {
     private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
 
 
-    /** number of currently visited nodes */
+    /**
+     * number of currently visited nodes
+     */
     private int index = 0;
 
 
@@ -96,8 +98,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * Generate well-definedness taclets to resolve formulas as WD(pv.{@literal <inv>}) or
      * WD(pv.m(...)).
      *
-     * @param proofConfig
-     *        the proof configuration
+     * @param proofConfig the proof configuration
      */
     void generateWdTaclets(InitConfig proofConfig) {
         if (!WellDefinednessCheck.isOn()) {
@@ -181,13 +182,11 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Generates the general assumption that self is not null.
      *
-     * @param pm
-     *        The {@link IProgramMethod} to execute.
-     * @param selfVar
-     *        The self variable.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
+    protected JTerm generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
     }
@@ -195,27 +194,23 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Generates the general assumption that self is created.
      *
-     * @param heaps
-     *        The heap context
-     * @param pm
-     *        The {@link IProgramMethod} to execute.
-     * @param selfVar
-     *        The self variable.
-     * @param services
-     *        The services instance.
+     * @param heaps The heap context
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @param services The services instance.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
+    protected JTerm generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
             ProgramVariable selfVar, Services services) {
         if (selfVar == null || pm.isConstructor()) {
             return tb.tt();
         }
-        Term created = null;
+        JTerm created = null;
         for (LocationVariable heap : heaps) {
             if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
                 continue;
             }
-            final Term cr = tb.created(tb.var(heap), tb.var(selfVar));
+            final JTerm cr = tb.created(tb.var(heap), tb.var(selfVar));
             if (created == null) {
                 created = cr;
             } else {
@@ -229,15 +224,12 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Generates the general assumption which defines the type of self.
      *
-     * @param pm
-     *        The {@link IProgramMethod} to execute.
-     * @param selfVar
-     *        The self variable.
-     * @param selfKJT
-     *        The {@link KeYJavaType} of the self variable.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
+    protected JTerm generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
             KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
@@ -246,15 +238,12 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Generates the general assumption which defines the type of self.
      *
-     * @param pm
-     *        The {@link IProgramMethod} to execute.
-     * @param selfVar
-     *        The self variable.
-     * @param selfKJT
-     *        The {@link KeYJavaType} of the self variable.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param selfVar The self variable.
+     * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfExactType(IProgramMethod pm, Term selfVar, KeYJavaType selfKJT) {
+    protected JTerm generateSelfExactType(IProgramMethod pm, JTerm selfVar, KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
     }
@@ -269,13 +258,19 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     static class Vertex {
 
-        /** to avoid linear lookup in the stack */
+        /**
+         * to avoid linear lookup in the stack
+         */
         boolean onStack;
 
-        /** the index (number of already visited nodes) and -1 if not yet visited */
+        /**
+         * the index (number of already visited nodes) and -1 if not yet visited
+         */
         int index;
 
-        /** an SCC is identified by the node that was visited first */
+        /**
+         * an SCC is identified by the node that was visited first
+         */
         int lowLink;
 
         private final ClassAxiom axiom;
@@ -330,10 +325,8 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * adds all taclets for the class axioms accessible and needed by this PO
      *
-     * @param selfKJT
-     *        the {@link KeYJavaType} for which to collect all accessible class axioms
-     * @param proofConfig
-     *        the {@link InitConfig} of the proof for this PO
+     * @param selfKJT the {@link KeYJavaType} for which to collect all accessible class axioms
+     * @param proofConfig the {@link InitConfig} of the proof for this PO
      */
     private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
@@ -366,12 +359,9 @@ public abstract class AbstractPO implements IPersistablePO {
      * computes all strongly connected components reachable by the given node and adds them to
      * {@link AbstractPO#allSCCs}
      *
-     * @param node
-     *        the starting {@link Vertex}
-     * @param axioms
-     *        set of {@link ClassAxiom} used to compute the outgoing edges of the nodes
-     * @param proofConfig
-     *        the {@link InitConfig} of the proof for this PO
+     * @param node the starting {@link Vertex}
+     * @param axioms set of {@link ClassAxiom} used to compute the outgoing edges of the nodes
+     * @param proofConfig the {@link InitConfig} of the proof for this PO
      */
     private void getSCCForNode(final Vertex node, ImmutableSet<ClassAxiom> axioms,
             InitConfig proofConfig) {
@@ -414,7 +404,6 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
@@ -427,30 +416,14 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Creates declarations necessary to save/load proof in textual form (helper for createProof()).
      */
-    private void createProofHeader(String javaPath, String classPath, String bootClassPath,
-            String includedFiles, Services services) {
+    private void createProofHeader(
+            JavaModel model, Services services) {
+
         if (header != null) {
             return;
         }
-        final StringBuilder sb = new StringBuilder();
 
-        // bootclasspath
-        if (bootClassPath != null && !bootClassPath.isEmpty()) {
-            sb.append("\\bootclasspath \"").append(bootClassPath).append("\";\n\n");
-        }
-
-        // classpath
-        if (classPath != null && !classPath.isEmpty()) {
-            sb.append("\\classpath ").append(classPath).append(";\n\n");
-        }
-
-        // javaSource
-        sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
-
-        // include
-        if (includedFiles != null && !includedFiles.isEmpty()) {
-            sb.append("\\include ").append(includedFiles).append(";\n\n");
-        }
+        final StringBuilder sb = new StringBuilder(model.asKeyString());
 
         // contracts
         ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
@@ -474,22 +447,17 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Creates a Proof (helper for getPO()).
      *
-     * @param proofName
-     *        name of the proof
-     * @param poTerm
-     *        term of the proof obligation
-     * @param proofConfig
-     *        the proof configuration
+     * @param proofName name of the proof
+     * @param poTerm term of the proof obligation
+     * @param proofConfig the proof configuration
      * @return the created proof
      */
-    protected Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
+    protected Proof createProof(String proofName, JTerm poTerm, InitConfig proofConfig) {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
-        createProofHeader(javaModel.getModelDir().toString(), javaModel.getClassPath(),
-            javaModel.getBootClassPath().toString(), javaModel.getIncludedFiles(),
-            proofConfig.getServices());
+        createProofHeader(javaModel, proofConfig.getServices());
 
         final Proof proof = createProofObject(proofName, header, poTerm, proofConfig);
 
@@ -498,7 +466,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
+    protected Proof createProofObject(String proofName, String proofHeader, JTerm poTerm,
             InitConfig proofConfig) {
         return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }
@@ -539,7 +507,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected void assignPOTerms(Term... poTerms) {
+    protected void assignPOTerms(JTerm... poTerms) {
         this.poTerms = poTerms;
     }
 
@@ -559,8 +527,7 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Returns the name value from the given properties.
      *
-     * @param properties
-     *        The properties to read from.
+     * @param properties The properties to read from.
      * @return The name value.
      */
     public static String getName(Configuration properties) {

@@ -34,12 +34,16 @@ public class OpenFileAction extends MainWindowAction {
         int result = fc.showOpenDialog(mainWindow);
 
         if (result == JFileChooser.APPROVE_OPTION) {
-            var file = fc.getSelectedFile().toPath();
+            Path file = fc.getSelectedFile().toPath();
 
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file)) {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
-                mainWindow.loadProofFromBundle(file, proofPath);
+                if (proofPath == null) {
+                    // canceled by user!
+                } else {
+                    mainWindow.loadProofFromBundle(file, proofPath);
+                }
                 return;
             }
 

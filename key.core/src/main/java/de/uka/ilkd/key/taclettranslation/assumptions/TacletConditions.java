@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
@@ -72,7 +72,7 @@ class TacletConditions {
 
     }
 
-    public boolean containsIsReferenceArray(Term t) {
+    public boolean containsIsReferenceArray(JTerm t) {
 
         for (ArrayComponentTypeCondition cond : arrayComponentCondition) {
 

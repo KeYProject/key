@@ -248,10 +248,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     /**
      * Show a notification, if enabled by the settings.
      *
-     * @param title
-     *        header
-     * @param text
-     *        body
+     * @param title header
+     * @param text body
      */
     private void showNotification(String title, String text) {
         var mode =
@@ -373,19 +371,17 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * turned off by default, i.e. only manual saving is possible, and the save dialog never pops up
      * automatically (except for hitting the "Save ..." or "Save current proof" button).
      *
-     * @param proof
-     *        the proof to be saved
-     * @param fileExtension
-     *        the respective file extension
+     * @param proof the proof to be saved
+     * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
-    public File saveProof(Proof proof, String fileExtension) {
+    public Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
-        Pair<File, String> f = fileName(proof, fileExtension);
-        final int result = fc.showSaveDialog(mainWindow, f.first, f.second);
+        Pair<Path, String> f = fileName(proof, fileExtension);
+        final int result = fc.showSaveDialog(mainWindow, f.first.toFile(), f.second);
         Path file = null;
         if (result == JFileChooser.APPROVE_OPTION) { // saved
             file = fc.getSelectedFile().toPath();
@@ -410,7 +406,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 proof.setProofFile(file);
             }
         }
-        return file.toFile();
+        return file;
     }
 
     /**
@@ -418,8 +414,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * sources, classpath and bootclasspath if present, other included key files, e.g., user-defined
      * taclets).
      *
-     * @param proof
-     *        the proof to save
+     * @param proof the proof to save
      */
     public void saveProofBundle(Proof proof) {
         final MainWindow mainWindow = MainWindow.getInstance();
@@ -427,10 +422,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             KeYFileChooser.getFileChooser("Choose filename to save proof");
         fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
-        Pair<File, String> f = fileName(proof, ".zproof");
-        final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
+        Pair<Path, String> f = fileName(proof, ".zproof");
+        final int result = fileChooser.showSaveDialog(mainWindow, f.first.toFile(), f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            final File file = fileChooser.getSelectedFile();
+            final Path file = fileChooser.getSelectedFile().toPath();
             final ProofSaver saver = new ProofBundleSaver(proof, file);
             final String errorMsg = saver.save();
 
@@ -438,18 +433,18 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 mainWindow.notify(
                     new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
             } else {
-                proof.setProofFile(file.toPath());
+                proof.setProofFile(file);
             }
         }
     }
 
-    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
+    protected static Pair<Path, String> fileName(Proof proof, String fileExtension) {
         // TODO: why do we use GUI components here?
         final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
-        File selectedFile = null;
+        Path selectedFile = null;
         if (proof != null) {
-            selectedFile = proof.getProofFile().toFile();
+            selectedFile = proof.getProofFile();
         }
         // Suggest default file name if required
         final String defaultName;
@@ -461,9 +456,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 name = "Taclet:" + name.substring(prefix.length());
             }
             defaultName = MiscTools.toValidFileName(name) + fileExtension;
-            selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
-        } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
-            defaultName = selectedFile.getName();
+            selectedFile = new File(jFC.getCurrentDirectory(), defaultName).toPath();
+        } else if (selectedFile.toString().endsWith(".proof") && fileExtension.equals(".proof")) {
+            defaultName = selectedFile.getFileName().toString();
         } else {
             String proofName = proof.name().toString();
             if (proofName.endsWith(".key")) {
@@ -472,7 +467,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
             }
             defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
-            selectedFile = new File(selectedFile.getParentFile(), defaultName);
+            selectedFile = selectedFile.getParent().resolve(defaultName);
         }
         return new Pair<>(selectedFile, defaultName);
     }
@@ -539,20 +534,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
      * KeY's {@link MainWindow}.
      *
-     * @param location
-     *        The location to load.
-     * @param classPaths
-     *        The class path entries to use.
-     * @param bootClassPath
-     *        The boot class path to use.
-     * @param includes
-     *        Optional includes to consider.
-     * @param makeMainWindowVisible
-     *        Make KeY's {@link MainWindow} visible if it is not already
+     * @param location The location to load.
+     * @param classPaths The class path entries to use.
+     * @param bootClassPath The boot class path to use.
+     * @param includes Optional includes to consider.
+     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException
-     *         Occurred Exception
+     * @throws ProblemLoaderException Occurred Exception
      */
     // public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
     // List<File> classPaths,
@@ -567,27 +556,19 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
      * KeY's {@link MainWindow}.
      *
-     * @param profile
-     *        The {@link Profile} to use.
-     * @param location
-     *        The location to load.
-     * @param classPaths
-     *        The class path entries to use.
-     * @param bootClassPath
-     *        The boot class path to use.
-     * @param includes
-     *        Optional includes to consider.
-     * @param makeMainWindowVisible
-     *        Make KeY's {@link MainWindow} visible if it is not already
+     * @param profile The {@link Profile} to use.
+     * @param location The location to load.
+     * @param classPaths The class path entries to use.
+     * @param bootClassPath The boot class path to use.
+     * @param includes Optional includes to consider.
+     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
-     * @param forceNewProfileOfNewProofs
-     *        {@code} true {@code AbstractProfile.profileOfNewProofs}
+     * @param forceNewProfileOfNewProofs {@code} true {@code AbstractProfile.profileOfNewProofs}
      *        will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException
-     *         Occurred Exception
+     * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
             Path location, List<Path> classPaths, Path bootClassPath, List<Path> includes,

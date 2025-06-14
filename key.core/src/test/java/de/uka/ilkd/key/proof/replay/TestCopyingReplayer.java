@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
-import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -23,21 +22,20 @@ import org.junit.jupiter.api.Test;
  * @author Arne Keller
  */
 class TestCopyingReplayer {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void testJavaProof() throws Exception {
         GeneralSettings.noPruningClosed = false;
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(Paths.get(testCaseDirectory.toString(),
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-            KeYEnvironment.load(new File(testCaseDirectory,
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
-                    .toPath());
+            KeYEnvironment.load(testCaseDirectory.resolve(
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Assertions.assertNotNull(env2.getLoadedProof());
         Assertions.assertTrue(env2.getLoadedProof().closed());
 

@@ -27,8 +27,8 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
@@ -95,18 +95,12 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates a new menu that displays all applicable actions and rules at the given position
      *
-     * @param sequentView
-     *        the SequentView that is the parent of this menu
-     * @param findList
-     *        with all applicable FindTaclets
-     * @param rewriteList
-     *        with all applicable RewriteTaclets
-     * @param noFindList
-     *        with all applicable noFindTaclets
-     * @param builtInList
-     *        with all applicable BuiltInRules
-     * @param pos
-     *        the PosInSequent
+     * @param sequentView the SequentView that is the parent of this menu
+     * @param findList with all applicable FindTaclets
+     * @param rewriteList with all applicable RewriteTaclets
+     * @param noFindList with all applicable noFindTaclets
+     * @param builtInList with all applicable BuiltInRules
+     * @param pos the PosInSequent
      */
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
@@ -125,8 +119,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Removes the unsound "introduceAxiom" taclet from the list of displayed taclets.
      *
-     * @param list
-     *        The list from which to filter.
+     * @param list The list from which to filter.
      * @return The original list, without the "introduceAxiom" taclet.
      */
     private static ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
@@ -139,8 +132,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * removes RewriteTaclet from list
      *
-     * @param list
-     *        from where the RewriteTaclet are removed
+     * @param list from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
@@ -166,8 +158,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates the menu by adding all sub-menus and items.
      *
-     * @param control
-     *        the action listener.
+     * @param control the action listener.
      */
     private void createMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
             ImmutableList<BuiltInRule> builtInList, MenuControl control) {
@@ -206,7 +197,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         if (getPos() != null) {
             PosInOccurrence occ = getPos().getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
-                Term t = (Term) occ.subTerm();
+                JTerm t = (JTerm) occ.subTerm();
                 createAbbrevSection(t, control);
 
                 if (t.op() instanceof ProgramVariable var) {
@@ -359,7 +350,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         return result;
     }
 
-    private void createAbbrevSection(Term t, MenuControl control) {
+    private void createAbbrevSection(JTerm t, MenuControl control) {
         AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
         JMenuItem sc = null;
         if (scm.containsTerm(t)) {
@@ -382,10 +373,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * adds a TacletMenuItem for each taclet in the list and sets the given MenuControl as the
      * ActionListener
      *
-     * @param taclets
-     *        {@link ImmutableList<Taclet>} with the Taclets the items represent
-     * @param control
-     *        the ActionListener
+     * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
+     * @param control the ActionListener
      */
     private void addToMenu(ImmutableList<TacletApp> taclets, MenuControl control) {
 
@@ -554,14 +543,14 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 switch (((JMenuItem) e.getSource()).getText()) {
                 case DISABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled((Term) occ.subTerm(),
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled((JTerm) occ.subTerm(),
                             false);
                         getSequentView().printSequent();
                     }
                 }
                 case ENABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled((Term) occ.subTerm(),
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled((JTerm) occ.subTerm(),
                             true);
                         getSequentView().printSequent();
                     }
@@ -584,7 +573,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap().put(
-                                        (Term) occ.subTerm(),
+                                        (JTerm) occ.subTerm(),
                                         abbreviation, true);
                                     getSequentView().printSequent();
                                 }
@@ -601,7 +590,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                             "Enter abbreviation for term: \n" + occ.subTerm().toString(),
                             "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
                             mediator.getNotationInfo().getAbbrevMap()
-                                    .getAbbrev((Term) occ.subTerm())
+                                    .getAbbrev((JTerm) occ.subTerm())
                                     .substring(1));
                         try {
                             if (abbreviation != null) {
@@ -612,7 +601,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap()
-                                            .changeAbbrev((Term) occ.subTerm(), abbreviation);
+                                            .changeAbbrev((JTerm) occ.subTerm(), abbreviation);
                                     getSequentView().printSequent();
                                 }
                             }
@@ -759,7 +748,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             if (taclet1 instanceof FindTaclet) {
                 map.put("has_find", -1);
 
-                final Term find1 = ((FindTaclet) taclet1).find();
+                final JTerm find1 = ((FindTaclet) taclet1).find();
                 int findComplexity1 = find1.depth();
                 findComplexity1 += programComplexity(find1.javaBlock());
                 map.put("find_complexity", -findComplexity1);

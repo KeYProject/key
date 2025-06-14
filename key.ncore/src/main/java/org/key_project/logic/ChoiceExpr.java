@@ -1,28 +1,28 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic;
+package org.key_project.logic;
 
 import java.util.Objects;
 import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-/**
- * A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
- * activated. {@link ChoiceExpr} are built over and, or, or not. Its atoms are choices
- * ({@code category:option}).
- * <p>
- * This class provides factory methods for constructing an AST.
- *
- * @author Alexander Weigl
- * @version 1 (09.10.22)
- */
+/// A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
+/// activated. [ChoiceExpr] are built over and, or, or not. Its atoms are choices
+/// (`category:option`).
+///
+/// This class provides factory methods for constructing an AST.
+///
+/// @author Alexander Weigl
+/// @version 1 (09.10.22)
 public abstract class ChoiceExpr {
     public static final ChoiceExpr TRUE = new True();
 
 
-    protected ChoiceExpr() {}
+    protected ChoiceExpr() {
+    }
 
     public static ChoiceExpr and(ChoiceExpr left, ChoiceExpr right) {
         return new And(left, right);
@@ -40,13 +40,10 @@ public abstract class ChoiceExpr {
         return new Not(sub);
     }
 
-    /**
-     * Evaluate the expression to a boolean value given the current activated choices.
-     *
-     * @param current
-     *        activated choices
-     * @return true if the expr is true given the assignment in {@code current}
-     */
+    /// Evaluate the expression to a boolean value given the current activated choices.
+    ///
+    /// @param current activated choices
+    /// @return true if the expr is true given the assignment in `current`
     public abstract boolean eval(@NonNull Set<Choice> current);
 
     @Override
@@ -62,7 +59,6 @@ public abstract class ChoiceExpr {
         public String toString() {
             return "true";
         }
-
     }
 
 
@@ -84,7 +80,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
@@ -120,7 +116,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
@@ -156,7 +152,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
@@ -190,7 +186,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }

@@ -10,9 +10,8 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -44,27 +43,28 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
-            Services services, ExecutionContext ec) {
-        return op instanceof Subtype;
-    }
-
-    @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services,
             ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
+            Services services,
+            ExecutionContext ec) {
+        return op instanceof Subtype;
+    }
+
+    @Override
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services,
             ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert false;
         return null;
     }
@@ -81,12 +81,12 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return f instanceof SortDependingFunction sf && sf.isSimilar(ssort);
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof SortDependingFunction sf && sf.isSimilar(ssort)) {
             // TODO
         }
@@ -96,7 +96,7 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }

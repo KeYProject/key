@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -35,12 +35,12 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     /**
      * The index in the parent array.
      */
-    private final Term arrayIndex;
+    private final JTerm arrayIndex;
 
     /**
      * An optional additional condition to consider.
      */
-    private final Term additionalCondition;
+    private final JTerm additionalCondition;
 
     /**
      * The {@link PosInOccurrence} of the modality of interest.
@@ -67,8 +67,8 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      *        The {@link PosInOccurrence} of the modality of interest.
      */
     protected AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
-            IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
-            Term additionalCondition, PosInOccurrence modalityPIO) {
+            IProgramVariable programVariable, IExecutionValue parentValue, JTerm arrayIndex,
+            JTerm additionalCondition, PosInOccurrence modalityPIO) {
         super(settings, proofNode);
         this.programVariable = programVariable;
         this.parentValue = parentValue;
@@ -81,7 +81,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public Term getAdditionalCondition() {
+    public JTerm getAdditionalCondition() {
         return additionalCondition;
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public Term getArrayIndex() {
+    public JTerm getArrayIndex() {
         return arrayIndex;
     }
 

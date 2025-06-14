@@ -44,6 +44,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -206,12 +207,17 @@ public final class ProblemInitializer {
      * get a vector of Strings containing all .java file names in the cfile directory. Helper for
      * readJava().
      */
-    private List<Path> getClasses(Path folder) throws ProofInputException {
-        try (var files = Files.walk(folder)) {
-            return files.filter(f -> !f.toFile().isDirectory() && f.toString().endsWith(".java"))
-                    .toList();
-        } catch (IOException e) {
-            throw new ProofInputException("Failed to list classes folder", e);
+    private Collection<Path> getClasses(Path javaRoot) throws ProofInputException {
+        if (Files.isDirectory(javaRoot)) {
+            try (var walker = Files.walk(javaRoot)) {
+                return walker.filter(it -> it.getFileName().toString().endsWith(".java")).toList();
+            } catch (IOException e) {
+                throw new ProofInputException(
+                    "Reading java model path " + javaRoot + " resulted into an error.", e);
+        }
+        } else {
+            throw new ProofInputException(
+                "Java model path " + javaRoot + " not found or is not a directory.");
         }
     }
 
@@ -222,11 +228,10 @@ public final class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
-        final JavaService javaService = initConfig.getServices().getJavaService();
-
         final Path javaPath = envInput.readJavaPath();
         final List<Path> classPath = envInput.readClassPath();
-        final Path bootClassPath = javaService.getBootClassPath();
+        final Path bootClassPath = envInput.readBootClassPath();
+        final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
             // set the paths in the FileRepo (all three methods can deal with null parameters)
@@ -250,14 +255,22 @@ public final class ProblemInitializer {
         javaService.parseSpecialClasses(fileRepo);
         if (javaPath != null) {
             reportStatus("Reading Java source");
-            LOGGER.debug("Reading Java source");
-            List<Path> classes = getClasses(javaPath);
+            final ProjectSettings settings = initConfig.getServices().getJavaInfo()
+                    .getKeYProgModelInfo().getServConf().getProjectSettings();
+            final PathList searchPathList = settings.getSearchPathList();
+            if (searchPathList.find(javaPath.toString()) == null) {
+                searchPathList.add(javaPath.toString());
+            }
+            Collection<Path> var = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 Path file = envInput.getJavaFile();
                 if (classes.contains(file)) {
                     classes = Collections.singletonList(file);
                 }
             }
+            // support for single file loading
+            final String[] cus = var.stream().map(Objects::toString).toList()
+                    .toArray(String[]::new);
             try {
                 javaService.readCompilationUnits(javaPath, classes, fileRepo,
                     (ex, p) -> new ProofInputException("Failed to parse file " + p, ex));
@@ -265,7 +278,7 @@ public final class ProblemInitializer {
                 throw new ProofInputException("Failed to read file", e);
             }
         }
-        Path initialFile = envInput.getInitialFile();
+        var initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
             JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes,
                 initialFile));
@@ -332,8 +345,8 @@ public final class ProblemInitializer {
             if (namespaces.programVariables().lookup(pv.name()) == null) {
                 rootGoal.addProgramVariable(pv);
             }
-        } else if (term.op() instanceof Modality mod) {
-            final ProgramElement pe = mod.program().program();
+        } else if (term.op() instanceof JModality mod) {
+            final ProgramElement pe = mod.programBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =
                 MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
@@ -698,6 +711,7 @@ public final class ProblemInitializer {
 
         void reportException(Object sender, ProofOblInput input, Exception e);
 
-        default void showIssueDialog(Collection<PositionedString> issues) {}
+        default void showIssueDialog(Collection<PositionedString> issues) {
+        }
     }
 }

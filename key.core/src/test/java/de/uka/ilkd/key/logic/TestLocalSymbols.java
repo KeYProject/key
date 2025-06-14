@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author mulbrich
  * @since 2017-03
  */
-
 public class TestLocalSymbols {
     private static final Path TEST_RESOURCES_DIR_PREFIX =
         HelperClassForTests.TESTCASE_DIRECTORY.resolve("localSymbols/");
@@ -87,7 +86,7 @@ public class TestLocalSymbols {
     @Test
     public void testSkolemization() throws Exception {
 
-        Term target = TacletForTests
+        JTerm target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                     + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
@@ -125,7 +124,7 @@ public class TestLocalSymbols {
     // there was a bug.
     @Test
     public void testDoubleInstantiation() throws Exception {
-        var proofFile = TEST_RESOURCES_DIR_PREFIX.resolve("doubleSkolem.key");
+        Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve("doubleSkolem.key");
         Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
 
         KeYEnvironment<?> env = KeYEnvironment.load(
@@ -176,11 +175,15 @@ public class TestLocalSymbols {
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
-        var proofFile = TEST_RESOURCES_DIR_PREFIX.resolve(proofFileName);
+        Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve(proofFileName);
         Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
 
-        return Assertions
-                .assertDoesNotThrow(() -> KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                    proofFile, null, null, null, true), "Proof could not be loaded.");
+        try {
+            return KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                proofFile, null, null, null, true);
+        } catch (ProblemLoaderException e) {
+            Assertions.fail("Proof could not be loaded.");
+            return null;
+        }
     }
 }

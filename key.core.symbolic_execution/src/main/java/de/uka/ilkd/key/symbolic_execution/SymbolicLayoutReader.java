@@ -16,7 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
@@ -646,7 +646,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                boolean isArrayIndex, Term arrayIndex, Term condition) {
+                boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
             return null;
         }
 
@@ -655,7 +655,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                Term arrayIndex, Term condition) {
+                JTerm arrayIndex, JTerm condition) {
             return null;
         }
     }
@@ -704,7 +704,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getName() {
+        public JTerm getName() {
             return null;
         }
 
@@ -737,7 +737,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                boolean isArrayIndex, Term arrayIndex, Term condition) {
+                boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
             return null;
         }
 
@@ -746,7 +746,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                Term arrayIndex, Term condition) {
+                JTerm arrayIndex, JTerm condition) {
             return null;
         }
     }
@@ -852,7 +852,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getValue() {
+        public JTerm getValue() {
             return null;
         }
 
@@ -900,7 +900,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public JTerm getArrayIndex() {
             return null;
         }
 
@@ -916,7 +916,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() {
+        public JTerm getCondition() {
             return null;
         }
 
@@ -1076,7 +1076,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public JTerm getArrayIndex() {
             return null;
         }
 
@@ -1092,7 +1092,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() {
+        public JTerm getCondition() {
             return null;
         }
 
@@ -1151,7 +1151,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<Term> getTerms() {
+        public ImmutableList<JTerm> getTerms() {
             return null;
         }
 
@@ -1177,7 +1177,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getRepresentative() {
+        public JTerm getRepresentative() {
             return null;
         }
 
@@ -1193,7 +1193,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public boolean containsTerm(Term term) {
+        public boolean containsTerm(JTerm term) {
             return false;
         }
     }

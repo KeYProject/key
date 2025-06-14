@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 import org.key_project.logic.Term;
@@ -86,7 +87,7 @@ class TwoSidedMatching {
             allsubs = allsubs.add(sub);
         }
         final var op = target.op();
-        if (!(op instanceof Modality || op instanceof UpdateApplication)) {
+        if (!(op instanceof JModality || op instanceof UpdateApplication)) {
             for (int i = 0; i < target.arity(); i++) {
                 allsubs = allsubs.union(getAllSubstitutions(target.sub(i), services));
             }
@@ -96,8 +97,8 @@ class TwoSidedMatching {
 
     /** find a substitution in a allterm by using unification */
     private Substitution match(Term triggerTerm, Term targetTerm, Services services) {
-        final Constraint c = Constraint.BOTTOM.unify((de.uka.ilkd.key.logic.Term) targetTerm,
-            (de.uka.ilkd.key.logic.Term) triggerTerm, services);
+        final Constraint c = Constraint.BOTTOM.unify((JTerm) targetTerm,
+            (JTerm) triggerTerm, services);
         if (c.isSatisfiable()) {
             ImmutableMap<QuantifiableVariable, Term> sub =
                 DefaultImmutableMap.nilMap();

@@ -10,7 +10,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
@@ -34,14 +34,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     private final Contract contract;
 
-    private Term globalDefs;
-    private Term axiom;
+    private JTerm globalDefs;
+    private JTerm axiom;
     private final boolean modelField;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
-            Term accessible, Condition ensures, Term mby, Term rep, Contract contract,
-            Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, Contract contract,
+            JTerm globalDefs, JTerm axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.contract = contract;
@@ -101,10 +101,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
                 rep.getTarget(), rep.getTarget().getContainerType()),
             0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
-        Map<LocationVariable, Term> pres = new LinkedHashMap<>();
+        Map<LocationVariable, JTerm> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
-        Map<LocationVariable, Term> deps = new LinkedHashMap<>();
+        Map<LocationVariable, JTerm> deps = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
@@ -136,19 +136,15 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Gets the argument list for the operator of the method
      *
-     * @param sv
-     *        schema variable for self
-     * @param heap
-     *        schema variable for the heap
-     * @param isStatic
-     *        information whether this is a static method
-     * @param params
-     *        schema variables for the parameters
+     * @param sv schema variable for self
+     * @param heap schema variable for the heap
+     * @param isStatic information whether this is a static method
+     * @param params schema variables for the parameters
      * @return the term array of arguments used to construct the method term
      */
-    private Term[] getArgs(OperatorSV sv, OperatorSV heap, OperatorSV heapAtPre,
-            boolean isStatic, boolean twoState, ImmutableList<OperatorSV> params) {
-        Term[] args = new Term[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
+    private JTerm[] getArgs(JOperatorSV sv, JOperatorSV heap, JOperatorSV heapAtPre,
+            boolean isStatic, boolean twoState, ImmutableList<JOperatorSV> params) {
+        JTerm[] args = new JTerm[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
         if (twoState) {
@@ -166,13 +162,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Finds an -on top level- conjuncted term of the form (exc = null) in the given term.
      *
-     * @param t
-     *        the term to be searched in
-     * @param exc
-     *        the exception variable
+     * @param t the term to be searched in
+     * @param exc the exception variable
      * @return true if the term guarantees exc to be equal to null
      */
-    private boolean findExcNull(Term t, ProgramVariable exc) {
+    private boolean findExcNull(JTerm t, ProgramVariable exc) {
         assert t != null;
         if (t.op().equals(Junctor.AND)) {
             assert t.arity() == 2;
@@ -189,8 +183,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      *
      * @return a list of schema variables
      */
-    private ImmutableList<OperatorSV> paramsSV() {
-        ImmutableList<OperatorSV> paramsSV = ImmutableSLList.nil();
+    private ImmutableList<JOperatorSV> paramsSV() {
+        ImmutableList<JOperatorSV> paramsSV = ImmutableSLList.nil();
         for (var pv : getOrigVars().params) {
             paramsSV = paramsSV.append(
                 SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
@@ -209,26 +203,23 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Generates a term of the form (mbyAtPre = mby) if mby is specified.
      *
-     * @param self
-     *        the self variable
-     * @param params
-     *        the list of parameters
-     * @param mbyAtPreFunc
-     *        the measured-by function
+     * @param self the self variable
+     * @param params the list of parameters
+     * @param mbyAtPreFunc the measured-by function
      * @param services
      * @return the measured by at pre equation for the precondition
      */
-    Term generateMbyAtPreDef(LocationVariable self, ImmutableList<LocationVariable> params,
+    JTerm generateMbyAtPreDef(LocationVariable self, ImmutableList<LocationVariable> params,
             Function mbyAtPreFunc, Services services) {
-        final Term mbyAtPreDef;
+        final JTerm mbyAtPreDef;
         if (hasMby()) {
-            final Term mbyAtPre = TB.func(mbyAtPreFunc);
+            final JTerm mbyAtPre = TB.func(mbyAtPreFunc);
             assert params != null;
             ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
             for (var pv : params) {
                 paramVars = paramVars.append(pv);
             }
-            final Term mby = contract.getMby(self, paramVars, services);
+            final JTerm mby = contract.getMby(self, paramVars, services);
             mbyAtPreDef = TB.equals(mbyAtPre, mby);
         } else {
             mbyAtPreDef = TB.tt();
@@ -237,13 +228,13 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    ImmutableList<Term> getRest() {
-        ImmutableList<Term> rest = super.getRest();
-        final Term globalDefs = getGlobalDefs();
+    ImmutableList<JTerm> getRest() {
+        ImmutableList<JTerm> rest = super.getRest();
+        final JTerm globalDefs = getGlobalDefs();
         if (globalDefs != null) {
             rest = rest.append(globalDefs);
         }
-        final Term axiom = getAxiom();
+        final JTerm axiom = getAxiom();
         if (axiom != null) {
             rest = rest.append(axiom);
         }
@@ -255,7 +246,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     // -------------------------------------------------------------------------
 
     @Override
-    public MethodWellDefinedness map(UnaryOperator<Term> op, Services services) {
+    public MethodWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
         // TODO Auto-generated method stub
         return new MethodWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
@@ -294,20 +285,20 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
         final var selfSV =
             SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
-        final ImmutableList<OperatorSV> paramsSV = paramsSV();
+        final ImmutableList<JOperatorSV> paramsSV = paramsSV();
         StringBuilder ps = new StringBuilder();
         for (ProgramVariable pv : getOrigVars().params) {
             ps.append(" ").append(pv.getKeYJavaType().getFullName());
         }
-        final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
+        final JTerm[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
             prefix = OP_TACLET;
             final boolean isConstructor =
                 target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
-            final Term pre =
+            final JTerm pre =
                 getPreForTaclet(replaceSV(getRequires(), selfSV, paramsSV), selfSV, heapSV,
                     paramsSV, services).term();
-            final Term wdArgs = TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV,
+            final JTerm wdArgs = TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV,
                 isStatic || isConstructor, twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps, TB.var(selfSV),
                 TB.func(target, args), TB.and(wdArgs, pre), isStatic || isConstructor, services);
@@ -321,18 +312,16 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     /**
      * Combines two well-definedness taclets for (pure) method invocations.
      *
-     * @param t1
-     *        taclet one
-     * @param t2
-     *        taclet two
+     * @param t1 taclet one
+     * @param t2 taclet two
      * @param services
      * @return the combined taclet
      */
     public RewriteTaclet combineTaclets(RewriteTaclet t1, RewriteTaclet t2, TermServices services) {
         assert t1.goalTemplates().size() == 1;
         assert t2.goalTemplates().size() == 1;
-        final Term rw1 = ((RewriteTacletGoalTemplate) t1.goalTemplates().head()).replaceWith();
-        final Term rw2 = ((RewriteTacletGoalTemplate) t2.goalTemplates().head()).replaceWith();
+        final JTerm rw1 = ((RewriteTacletGoalTemplate) t1.goalTemplates().head()).replaceWith();
+        final JTerm rw2 = ((RewriteTacletGoalTemplate) t2.goalTemplates().head()).replaceWith();
         final String n1 = t1.name().toString();
         final String n2 = t2.name().toString();
         final String n;
@@ -375,7 +364,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         if (modelField() || isModel()) {
             return true;
         }
-        final Term post =
+        final JTerm post =
             getEnsures().implicit().equals(TB.tt()) ? getEnsures().explicit()
                     : getEnsures().implicit();
         final ProgramVariable exc = getOrigVars().exception;
@@ -426,29 +415,29 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
         super.combine(mwd, services);
         if (this.getGlobalDefs() != null && mwd.getGlobalDefs() != null) {
-            final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+            final JTerm defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
             this.globalDefs = TB.andSC(defs, this.getGlobalDefs());
         } else if (mwd.getGlobalDefs() != null) {
-            final Term defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+            final JTerm defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
             this.globalDefs = defs;
         }
         if (this.getAxiom() != null && mwd.getAxiom() != null) {
-            final Term ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+            final JTerm ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
             this.axiom = TB.andSC(ax, this.getAxiom());
         } else if (mwd.getGlobalDefs() != null) {
-            final Term ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+            final JTerm ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
             this.axiom = ax;
         }
         return this;
     }
 
     @Override
-    public Term getGlobalDefs() {
+    public JTerm getGlobalDefs() {
         return this.globalDefs;
     }
 
     @Override
-    public Term getAxiom() {
+    public JTerm getAxiom() {
         return this.axiom;
     }
 

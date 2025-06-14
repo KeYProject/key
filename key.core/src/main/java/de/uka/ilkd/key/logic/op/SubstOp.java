@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -44,8 +45,7 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
      * subsort of the variable to be substituted and the term's arity is 2 and the number of
      * variables bound there is 0 for the 0th subterm and 1 for the 1st subterm.
      *
-     * @throws TermCreationException
-     *         if the check fails
+     * @throws TermCreationException if the check fails
      */
     @Override
     public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
@@ -65,12 +65,10 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
      * Apply this substitution operator to <code>term</code>, which has this operator as top-level
      * operator
      *
-     * @param term
-     *        the {@link Term} on which to apply the substitution
-     * @param tb
-     *        the {@link TermBuilder} to use for term construction
+     * @param term the {@link JTerm} on which to apply the substitution
+     * @param tb the {@link TermBuilder} to use for term construction
      */
-    public abstract Term apply(Term term, TermBuilder tb);// {
+    public abstract JTerm apply(JTerm term, TermBuilder tb);// {
     // QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
     // Term res = cfSubst.apply(term.sub(1));

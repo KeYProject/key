@@ -14,12 +14,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.reference.MethodReference;
-import de.uka.ilkd.key.java.ast.statement.*;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -1342,7 +1339,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getPathCondition() throws ProofInputException {
+        public JTerm getPathCondition() throws ProofInputException {
             return null;
         }
 
@@ -1434,7 +1431,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getVariables(Term condition) {
+        public IExecutionVariable[] getVariables(JTerm condition) {
             return null;
         }
 
@@ -1491,7 +1488,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+        public JTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
                 throws ProofInputException {
             return null;
         }
@@ -1695,7 +1692,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getBranchCondition() {
+        public JTerm getBranchCondition() {
             return null;
         }
 
@@ -1727,7 +1724,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term[] getMergedBranchCondtions() throws ProofInputException {
+        public JTerm[] getMergedBranchCondtions() throws ProofInputException {
             return null;
         }
 
@@ -2177,7 +2174,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getMethodReturnCondition() throws ProofInputException {
+        public JTerm getMethodReturnCondition() throws ProofInputException {
             return null;
         }
 
@@ -2379,7 +2376,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getReturnValue() throws ProofInputException {
+        public JTerm getReturnValue() throws ProofInputException {
             return null;
         }
 
@@ -2403,7 +2400,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() throws ProofInputException {
+        public JTerm getCondition() throws ProofInputException {
             return null;
         }
 
@@ -2632,7 +2629,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getResultTerm() throws ProofInputException {
+        public JTerm getResultTerm() throws ProofInputException {
             return null;
         }
 
@@ -2640,7 +2637,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getExceptionTerm() throws ProofInputException {
+        public JTerm getExceptionTerm() throws ProofInputException {
             return null;
         }
 
@@ -2664,7 +2661,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getSelfTerm() throws ProofInputException {
+        public JTerm getSelfTerm() throws ProofInputException {
             return null;
         }
 
@@ -2672,7 +2669,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<Term> getContractParams() throws ProofInputException {
+        public ImmutableList<JTerm> getContractParams() throws ProofInputException {
             return null;
         }
 
@@ -2846,7 +2843,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getTerm() {
+        public JTerm getTerm() {
             return null;
         }
 
@@ -2932,7 +2929,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public JTerm getArrayIndex() {
             return null;
         }
 
@@ -2972,7 +2969,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getAdditionalCondition() {
+        public JTerm getAdditionalCondition() {
             return null;
         }
 
@@ -2988,7 +2985,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term createSelectTerm() {
+        public JTerm createSelectTerm() {
             return null;
         }
     }
@@ -3186,7 +3183,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getValue() throws ProofInputException {
+        public JTerm getValue() throws ProofInputException {
             return null;
         }
 
@@ -3202,7 +3199,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() throws ProofInputException {
+        public JTerm getCondition() throws ProofInputException {
             return null;
         }
 

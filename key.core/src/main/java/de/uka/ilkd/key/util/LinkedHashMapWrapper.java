@@ -5,7 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 
 import org.key_project.logic.Property;
@@ -40,7 +40,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /**
      * Constructs a new empty {@link LinkedHashMapWrapper}.
      *
-     * @param property the {@link Property<Term>} that is used internally for equality checks and
+     * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
      */
     public LinkedHashMapWrapper(Property<? super K> property) {
@@ -53,7 +53,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      *
      * @param key the key to be inserted
      * @param value the value corresponding to {@code key}
-     * @param property the {@link Property<Term>} that is used internally for equality checks and
+     * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
      */
     public LinkedHashMapWrapper(K key, V value, Property<? super K> property) {
@@ -70,7 +70,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      *
      * @param keys the array of keys to be inserted
      * @param values the array of values corresponding to the keys
-     * @param property the {@link Property<Term>} that is used internally for equality checks and
+     * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
      */
     public LinkedHashMapWrapper(K[] keys, V[] values, Property<? super K> property) {
@@ -87,7 +87,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      *
      * @param keys the iterable of keys to be inserted
      * @param values the iterable of values corresponding to the keys
-     * @param property the {@link Property<Term>} that is used internally for equality checks and
+     * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
      */
     public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values,

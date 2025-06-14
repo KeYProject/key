@@ -6,7 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -29,8 +29,7 @@ public class Location {
     /**
      * Constructor.
      *
-     * @param accesses
-     *        The {@link Access} path.
+     * @param accesses The {@link Access} path.
      */
     public Location(ImmutableList<Access> accesses) {
         assert accesses != null;
@@ -40,8 +39,7 @@ public class Location {
     /**
      * Constructor.
      *
-     * @param accesses
-     *        The {@link Access} path.
+     * @param accesses The {@link Access} path.
      */
     public Location(Access... accesses) {
         assert accesses != null;
@@ -109,8 +107,7 @@ public class Location {
     /**
      * Creates a new {@link Location} in which the sub is appended.
      *
-     * @param sub
-     *        The {@link Location} to append.
+     * @param sub The {@link Location} to append.
      * @return The new {@link Location}.
      */
     public Location append(Location sub) {
@@ -120,8 +117,7 @@ public class Location {
     /**
      * Creates a new {@link Location} in which the sub is appended.
      *
-     * @param sub
-     *        The {@link Access} to append.
+     * @param sub The {@link Access} to append.
      * @return The new {@link Location}.
      */
     public Location append(Access sub) {
@@ -129,14 +125,13 @@ public class Location {
     }
 
     /**
-     * Converts this {@link Location} into a {@link Term}.
+     * Converts this {@link Location} into a {@link JTerm}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @return The created {@link Term}.
+     * @param services The {@link Services} to use.
+     * @return The created {@link JTerm}.
      */
-    public Term toTerm(Services services) {
-        Term parent = null;
+    public JTerm toTerm(Services services) {
+        JTerm parent = null;
         for (Access access : accesses) {
             if (access.isArrayIndex()) {
                 // Special handling for array indices.

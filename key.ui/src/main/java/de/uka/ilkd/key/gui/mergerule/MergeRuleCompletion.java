@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui.mergerule;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
@@ -43,8 +43,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
         ImmutableList<MergePartner> chosenCandidates = null;
         final MergeProcedure chosenRule;
-        Term chosenDistForm = null; // null is admissible standard ==> auto
-                                    // generation
+        JTerm chosenDistForm = null; // null is admissible standard ==> auto
+                                     // generation
 
         if (forced) {
             chosenCandidates = candidates;

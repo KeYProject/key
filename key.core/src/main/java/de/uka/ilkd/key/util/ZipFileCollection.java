@@ -17,6 +17,10 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.io.DataLocation;
 
 
 /**
@@ -26,23 +30,23 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
  */
 
 
-public class ZipFileCollection implements FileCollection {
-    final Path path;
-    ZipFile zipFile;
+public class ZipFileCollection implements FileCollection, AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
-    public ZipFileCollection(Path path) {
-        this.path = path;
+    private final File file;
+    private ZipFile zipFile;
+
+    public ZipFileCollection(Path file) throws IOException {
+        this.file = file.toFile();
+        try {
+            zipFile = new ZipFile(this.file);
+        } catch (ZipException ex) {
+            throw new IOException("can't open " + path + ": " + ex.getMessage(), ex);
+        }
     }
 
 
     public Walker createWalker(String[] extensions) throws IOException {
-        if (zipFile == null) {
-            try {
-                zipFile = new ZipFile(path.toFile());
-            } catch (ZipException ex) {
-                throw new IOException("can't open " + path + ": " + ex.getMessage(), ex);
-            }
-        }
         return new Walker(extensions);
     }
 
@@ -50,10 +54,15 @@ public class ZipFileCollection implements FileCollection {
         return createWalker(new String[] { extension });
     }
 
-    class Walker implements FileCollection.Walker {
+    @Override
+    public void close() throws Exception {
+        zipFile.close();
+    }
+
+    public class Walker implements FileCollection.Walker {
 
         private final Enumeration<? extends ZipEntry> enumeration;
-        private ZipEntry currentEntry;
+        private @Nullable ZipEntry currentEntry;
         private final List<String> extensions;
 
         public Walker(String[] extensions) {

@@ -47,7 +47,7 @@ public class TestProofBundleIO {
      */
     @BeforeAll
     public static void prepare() {
-        testDir = HelperClassForTests.TESTCASE_DIRECTORY.toAbsolutePath().resolve("proofBundle");
+        testDir = HelperClassForTests.TESTCASE_DIRECTORY.resolve("proofBundle");
 
         // remember settings to be able to reset after the test
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
@@ -222,7 +222,7 @@ public class TestProofBundleIO {
 
         // save (closed) proof as a bundle
         Path target = testDir.resolve(dirName).resolve("test.zproof");
-        ProofBundleSaver saver = new ProofBundleSaver(proof, target.toFile());
+        ProofBundleSaver saver = new ProofBundleSaver(proof, target);
         saver.save();
 
         // check if target file exists and has minimum size

@@ -3,28 +3,28 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
-        extends Instruction<SV> {
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
+public abstract class MatchSchemaVariableInstruction implements MatchInstruction {
 
-    protected MatchSchemaVariableInstruction(SV op) {
-        super(op);
+    protected final @NonNull OperatorSV op;
+
+    protected MatchSchemaVariableInstruction(@NonNull OperatorSV op) {
+        this.op = op;
     }
 
     /**
@@ -33,16 +33,17 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
+    protected final MatchConditions addInstantiation(JTerm term, MatchResultInfo matchResultInfo,
             LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;
         }
 
+        final MatchConditions matchCond = (MatchConditions) matchResultInfo;
         final SVInstantiations inst = matchCond.getInstantiations();
 
-        final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
+        final JTerm t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
             if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                 return null;
@@ -61,20 +62,18 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     /**
      * tries to match the schema variable of this instruction with the specified
      * {@link ProgramElement} {@code instantiationCandidate} w.r.t. the given constraints by
-     * {@link MatchConditions}
+     * {@link MatchResultInfo}
      *
      * @param instantiationCandidate the {@link ProgramElement} to be matched
-     * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of
+     * @param mc the {@link MatchResultInfo} with additional constraints (e.g. previous matches of
      *        this instructions {@link org.key_project.logic.op.sv.SchemaVariable})
      * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
+     * @return {@code null} if no matches have been found or the new {@link MatchResultInfo} with
      *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
      *         added
      */
-    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
+    public MatchResultInfo match(ProgramElement instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
         return null;
     }
-
-
 }

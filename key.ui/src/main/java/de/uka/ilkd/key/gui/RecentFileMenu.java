@@ -67,14 +67,13 @@ public class RecentFileMenu {
     /**
      * Create a new RecentFiles list.
      *
-     * @param mediator
-     *        Key mediator
+     * @param mediator Key mediator
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
         this.lissy = e -> {
             String absPath = getAbsolutePath((JMenuItem) e.getSource());
-            var file = Paths.get(absPath);
+            Path file = Paths.get(absPath);
 
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file)) {
@@ -170,8 +169,7 @@ public class RecentFileMenu {
      * maximum number of names will be allowed in the list, and additional names will be removed at
      * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
      *
-     * @param path
-     *        the path of the file.
+     * @param path the path of the file.
      */
     public void addRecentFile(final String path) {
         addRecentFileNoSave(path);

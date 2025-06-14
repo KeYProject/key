@@ -10,11 +10,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -24,7 +24,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Extracts the free loop invariants for the given loop term. Free invariants are only assumed, but
@@ -45,8 +45,8 @@ public class LoopFreeInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices p_services) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();
@@ -68,19 +68,19 @@ public class LoopFreeInvariantCondition implements VariableCondition {
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);
-        final Term selfTerm = Optional.ofNullable(mf)
+        final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
         // TODO: Handle exception?!
-        final Modality.JavaModalityKind modalityKind =
-            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind =
+            (JModality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
-        Term freeInvInst = tb.tt();
+        JTerm freeInvInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
             services)) {
-            final Term currentFreeInvInst = freeInvInst;
+            final JTerm currentFreeInvInst = freeInvInst;
 
-            final Optional<Term> maybeFreeInvInst = Optional.ofNullable(
+            final Optional<JTerm> maybeFreeInvInst = Optional.ofNullable(
                 loopSpec.getFreeInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
             freeInvInst =

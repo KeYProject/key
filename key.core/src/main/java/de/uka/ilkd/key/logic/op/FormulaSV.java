@@ -12,7 +12,7 @@ import org.key_project.logic.TerminalSyntaxElement;
 /**
  * A schema variable that is used as placeholder for formulas.
  */
-public final class FormulaSV extends OperatorSV implements TerminalSyntaxElement {
+public final class FormulaSV extends JOperatorSV implements TerminalSyntaxElement {
 
     /**
      * @param name

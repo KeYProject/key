@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -33,7 +34,8 @@ public class TestSMTMod {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSMTMod.class);
 
-    private static final Path testCaseDirectory = FindResources.getTestCasesDirectory().toPath();
+    private static final Path testCaseDirectory =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)

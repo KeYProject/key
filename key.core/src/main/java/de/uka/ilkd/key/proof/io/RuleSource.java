@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStream;
@@ -23,13 +24,12 @@ public abstract class RuleSource {
      * "jar:file:///...").
      *
      * @return the location of the RuleSource as url
-     * @throws IOException
-     *         on I/O errors
+     * @throws IOException on I/O errors
      */
     public abstract URL url() throws IOException;
 
     public boolean isDirectory() {
-        return file().toFile().isDirectory();
+        return Files.isDirectory(file());
     }
 
     public abstract int getNumberOfBytes();

@@ -7,7 +7,8 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -32,10 +33,8 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
      * creates an instance of this condition checking if an instantiation of a schema variable is an
      * array or not
      *
-     * @param var
-     *        the SchemaVariable to be checked
-     * @param negated
-     *        if the result is to be negated upon finding
+     * @param var the SchemaVariable to be checked
+     * @param negated if the result is to be negated upon finding
      */
     public ArrayTypeCondition(SchemaVariable var, boolean negated) {
         this.var = var;
@@ -50,13 +49,13 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
             return true;
         }
         Sort s = null;
-        if (candidate instanceof Term) {
-            s = ((Term) candidate).sort();
-        } else if (candidate instanceof Expression) {
-            s = ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext())
+        if (candidate instanceof JTerm termCandidate) {
+            s = termCandidate.sort();
+        } else if (candidate instanceof Expression candidateExpression) {
+            s = candidateExpression.getKeYJavaType(services, svInst.getExecutionContext())
                     .getSort();
-        } else if (candidate instanceof TypeReference) {
-            s = ((TypeReference) candidate).getKeYJavaType().getSort();
+        } else if (candidate instanceof TypeReference candidateTypeReference) {
+            s = candidateTypeReference.getKeYJavaType().getSort();
         }
 
         if (s == null) {

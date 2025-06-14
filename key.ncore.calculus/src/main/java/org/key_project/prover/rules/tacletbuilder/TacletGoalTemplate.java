@@ -12,33 +12,30 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-/**
- * This class contains the goal of a taclet. There are new
- * sequents that have to be added, new rules and rule variables.
- * The replacewith-goal is implemented in subclasses
- */
+/// This class contains the goal of a taclet. There are new
+/// sequents that have to be added, new rules and rule variables.
+/// The replacewith-goal is implemented in subclasses
 public abstract class TacletGoalTemplate {
-    /** stores sequent that is one of the new goals */
+    /// stores sequent that is one of the new goals
     protected final Sequent addedSeq;
 
-    /** stores list of Taclet which are introduced */
+    /// stores list of Taclet which are introduced
     protected final ImmutableList<? extends Taclet> addedRules;
 
-    /** program variables added by this taclet to the namespace */
+    /// program variables added by this taclet to the namespace
     protected final ImmutableSet<SchemaVariable> addedProgVars;
 
-    private String name = null;
+    private @Nullable String name;
 
-    /**
-     * Creates a new goal template for a taclet
-     *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with an application
-     *        time unused (new) program variables that are introduced by an application of this
-     *        template
-     */
+    /// Creates a new goal template for a taclet
+    ///
+    /// @param addedSeq new Sequent to be added
+    /// @param addedRules IList<Taclet> contains the new allowed rules at this branch
+    /// @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with an application
+    /// time unused (new) program variables that are introduced by an application of this
+    /// template
     protected TacletGoalTemplate(Sequent addedSeq,
             @NonNull ImmutableList<? extends Taclet> addedRules,
             @NonNull ImmutableSet<SchemaVariable> addedProgVars) {
@@ -49,33 +46,27 @@ public abstract class TacletGoalTemplate {
         this.addedProgVars = addedProgVars;
     }
 
-    /**
-     * creates new Goaldescription same effect as <code>new TacletGoalTemplate(addedSeq,
-     *                                             addedRules,
-     *                                             SetAsListOf.<SchemaVariable>nil())
-     *                                             </code>
-     *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     */
+    /// creates new Goaldescription same effect as <code>new TacletGoalTemplate(addedSeq,
+    /// addedRules,
+    /// SetAsListOf.<SchemaVariable>nil())
+    /// </code>
+    ///
+    /// @param addedSeq new Sequent to be added
+    /// @param addedRules IList<Taclet> contains the new allowed rules at this branch
     protected TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
-    /**
-     * a Taclet may add a new Sequent as Goal. Use this method to get this Sequent
-     *
-     * @return Sequent to be added as Goal or Sequent.EMPTY_SEQUENT if no such Sequent exists
-     */
+    /// a Taclet may add a new Sequent as Goal. Use this method to get this Sequent
+    ///
+    /// @return Sequent to be added as Goal or Sequent.EMPTY_SEQUENT if no such Sequent exists
     public Sequent sequent() {
         return addedSeq;
     }
 
-    /**
-     * the goal of a Taclet may introduce new rules. Call this method to get them
-     *
-     * @return IList<Taclet> contains new introduced rules
-     */
+    /// the goal of a Taclet may introduce new rules. Call this method to get them
+    ///
+    /// @return IList<Taclet> contains new introduced rules
     public ImmutableList<? extends Taclet> rules() {
         return addedRules;
     }
@@ -84,28 +75,26 @@ public abstract class TacletGoalTemplate {
         return addedProgVars;
     }
 
-    public Object replaceWithExpressionAsObject() {
+    public @Nullable Object replaceWithExpressionAsObject() {
         return null;
     }
 
-    /**
-     * retrieves and returns all variables that are bound in the goal template
-     *
-     * @return all variables that occur bound in this goal template
-     */
+    /// retrieves and returns all variables that are bound in the goal template
+    ///
+    /// @return all variables that occur bound in this goal template
     public abstract ImmutableSet<QuantifiableVariable> getBoundVariables();
 
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         this.name = name;
     }
 
-    public String name() {
+    public @Nullable String name() {
         return name;
     }
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
 
         if (o == null) {
             return false;

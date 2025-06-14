@@ -72,7 +72,7 @@ public class TestVariableNamer {
         StatementBlock statementBlock = new StatementBlock(statement);
         JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-        Term term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
+        JTerm term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
 
         return new SequentFormula(term);
     }
@@ -107,7 +107,7 @@ public class TestVariableNamer {
     }
 
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-        Term findTerm = services.getTermBuilder().tt();
+        JTerm findTerm = services.getTermBuilder().tt();
         AntecTacletBuilder builder = new AntecTacletBuilder();
         builder.setFind(findTerm);
         AntecTaclet taclet = builder.getAntecTaclet();

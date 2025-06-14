@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -90,7 +90,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModifiableWOLabels(contract);
+        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
 
@@ -117,7 +117,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModifiableWOLabels(contract);
+        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
 
@@ -144,7 +144,7 @@ public class ContractFactoryTest {
                 @  signals (RuntimeException e) true;
                 @  signals_only RuntimeException;
                 @*/""";
-        Term woLabels = calculateCombinedModifiableWOLabels(contract);
+        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
             + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
             + "allLocs))",
@@ -162,7 +162,7 @@ public class ContractFactoryTest {
      * @throws SLTranslationException
      *         should not be thrown
      */
-    private Term calculateCombinedModifiableWOLabels(String contractStr)
+    private JTerm calculateCombinedModifiableWOLabels(String contractStr)
             throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
@@ -191,7 +191,7 @@ public class ContractFactoryTest {
         FunctionalOperationContract singleContract = cf.union(cs);
 
         // remove origin labels
-        Term combinedModifiable = singleContract.getModifiable();
+        JTerm combinedModifiable = singleContract.getModifiable();
         return TermLabelManager.removeIrrelevantLabels(combinedModifiable, services);
     }
 }

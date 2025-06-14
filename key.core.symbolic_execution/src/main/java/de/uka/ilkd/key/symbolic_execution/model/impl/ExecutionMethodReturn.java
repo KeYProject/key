@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.reference.MethodReference;
-import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -65,13 +65,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param methodCall
-     *        The {@link IExecutionMethodCall} which is now returned.
+     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {
@@ -231,8 +228,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * Computes the return value lazily when {@link #getReturnValues()} is called the first time.
      *
      * @return The return value.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
@@ -274,7 +270,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                     try {
                         if (info.getProof().openGoals().size() == 1) {
                             Goal goal = info.getProof().openGoals().head();
-                            Term returnValue = SymbolicExecutionSideProofUtil
+                            JTerm returnValue = SymbolicExecutionSideProofUtil
                                     .extractOperatorValue(goal, input.getOperator());
                             assert returnValue != null;
                             returnValue = SymbolicExecutionUtil
@@ -284,10 +280,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                     getModalityPIO(), returnValue, null) };
                         } else {
                             // Group equal values of different branches
-                            Map<Term, List<Node>> valueNodeMap =
+                            Map<JTerm, List<Node>> valueNodeMap =
                                 new LinkedHashMap<>();
                             for (Goal goal : info.getProof().openGoals()) {
-                                Term returnValue = SymbolicExecutionSideProofUtil
+                                JTerm returnValue = SymbolicExecutionSideProofUtil
                                         .extractOperatorValue(goal, input.getOperator());
                                 assert returnValue != null;
                                 returnValue = SymbolicExecutionUtil.replaceSkolemConstants(
@@ -298,7 +294,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             }
                             // Create result
                             if (valueNodeMap.size() == 1) {
-                                Term returnValue = valueNodeMap.keySet().iterator().next();
+                                JTerm returnValue = valueNodeMap.keySet().iterator().next();
                                 return new IExecutionMethodReturnValue[] {
                                     new ExecutionMethodReturnValue(getSettings(), getProofNode(),
                                         getModalityPIO(), returnValue, null) };
@@ -306,14 +302,15 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                 IExecutionMethodReturnValue[] result =
                                     new IExecutionMethodReturnValue[valueNodeMap.size()];
                                 int i = 0;
-                                for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
-                                    List<Term> conditions = new LinkedList<>();
+                                for (Entry<JTerm, List<Node>> entry : valueNodeMap.entrySet()) {
+                                    List<JTerm> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
-                                        Term condition = SymbolicExecutionUtil.computePathCondition(
-                                            node, getSettings().simplifyConditions(), false);
+                                        JTerm condition =
+                                            SymbolicExecutionUtil.computePathCondition(
+                                                node, getSettings().simplifyConditions(), false);
                                         conditions.add(condition);
                                     }
-                                    Term condition = services.getTermBuilder().or(conditions);
+                                    JTerm condition = services.getTermBuilder().or(conditions);
                                     if (conditions.size() >= 2) {
                                         if (getSettings().simplifyConditions()) {
                                             condition = SymbolicExecutionUtil.simplify(initConfig,
@@ -333,8 +330,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                     } finally {
                         SymbolicExecutionSideProofUtil
                                 .disposeOrStore("Return value computation on method return node "
-                                    + methodReturnNode.serialNr() + ".",
-                                    info);
+                                    + methodReturnNode.serialNr() + ".", info);
                     }
                 } else {
                     return new IExecutionMethodReturnValue[0];
@@ -351,8 +347,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * Searches from the given {@link Node} the parent which applies the rule "methodCallReturn" in
      * the same modality.
      *
-     * @param node
-     *        The {@link Node} to start search from.
+     * @param node The {@link Node} to start search from.
      * @return The found {@link Node} with rule "methodCallReturn" or {@code null} if no node was
      *         found.
      */
@@ -378,10 +373,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     /**
      * Creates the human readable name which is shown in {@link IExecutionMethodReturn} instances.
      *
-     * @param returnValue
-     *        The return value.
-     * @param methodName
-     *        The name of the method that is completely executed.
+     * @param returnValue The return value.
+     * @param methodName The name of the method that is completely executed.
      * @return The created human readable name.
      */
     public static String createMethodReturnName(Object returnValue, String methodName) {

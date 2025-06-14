@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,14 +59,10 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
     /**
      * Construct a new slicing proof replayer.
      *
-     * @param originalProof
-     *        proof to slice
-     * @param proof
-     *        resulting proof slice
-     * @param results
-     *        analysis results
-     * @param progressMonitor
-     *        progress monitor (may be null)
+     * @param originalProof proof to slice
+     * @param proof resulting proof slice
+     * @param results analysis results
+     * @param progressMonitor progress monitor (may be null)
      */
     private SlicingProofReplayer(Proof originalProof,
             Proof proof, AnalysisResults results, ProgressMonitor progressMonitor) {
@@ -89,21 +84,14 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * Call {@link #slice()} on the result to compute the sliced proof and save it into a temporary
      * file.
      *
-     * @param control
-     *        the problem loader control (used to reload the initial proof obligation)
-     * @param originalProof
-     *        the proof to slice
-     * @param results
-     *        the analysis results used to determine the proof slice
-     * @param progressMonitor
-     *        monitor for slicing progress
+     * @param control the problem loader control (used to reload the initial proof obligation)
+     * @param originalProof the proof to slice
+     * @param results the analysis results used to determine the proof slice
+     * @param progressMonitor monitor for slicing progress
      * @return a slicing proof replayer for the provided parameters
-     * @throws IOException
-     *         if the original proof obligation could not be saved in a temporary file
-     * @throws ProofInputException
-     *         if there was an issue loading the original proof obligation
-     * @throws ProblemLoaderException
-     *         if there was an issue loading the original proof obligation
+     * @throws IOException if the original proof obligation could not be saved in a temporary file
+     * @throws ProofInputException if there was an issue loading the original proof obligation
+     * @throws ProblemLoaderException if there was an issue loading the original proof obligation
      */
     public static SlicingProofReplayer constructSlicer(ProblemLoaderControl control,
             Proof originalProof,
@@ -116,15 +104,15 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
                 "Preparing proof slicing", 2);
         }
         Path tmpFile = Files.createTempFile("proof", ".proof");
-        ProofSaver.saveProofObligationToFile(tmpFile.toFile(), originalProof);
+        ProofSaver.saveProofObligationToFile(tmpFile, originalProof);
         if (progressMonitor != null) {
             progressMonitor.setProgress(1);
         }
 
-        var bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
+        Path bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
             tmpFile,
-            originalProof.getEnv().getJavaModel().getClassPathEntries(),
+            originalProof.getEnv().getJavaModel().getClassPath(),
             bootClassPath,
             null,
             originalProof.getEnv().getInitConfigForEnvironment().getProfile(),
@@ -145,13 +133,11 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * Slice the previously provided proof and save the result in a new temporary file.
      *
      * @return path to temporary proof file
-     * @throws de.uka.ilkd.key.proof.io.IntermediateProofReplayer.BuiltInConstructionException
-     *         on
+     * @throws de.uka.ilkd.key.proof.io.IntermediateProofReplayer.BuiltInConstructionException on
      *         error during slice construction
-     * @throws IOException
-     *         on error during proof saving
+     * @throws IOException on error during proof saving
      */
-    public File slice()
+    public Path slice()
             throws IntermediateProofReplayer.BuiltInConstructionException, IOException {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {
@@ -228,19 +214,17 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * Save <code>proof</code> in a temporary directory with a reasonable filename.
      * Disposes the saved proof.
      *
-     * @param currentProof
-     *        the sliced proof
-     * @param proof
-     *        the proof slice
+     * @param currentProof the sliced proof
+     * @param proof the proof slice
      * @return path to the saved proof slice
-     * @throws IOException
-     *         on I/O error
+     * @throws IOException on I/O error
      */
-    private File saveProof(Proof currentProof, Proof proof) throws IOException {
+    private Path saveProof(Proof currentProof, Proof proof) throws IOException {
         Path tempDir = Files.createTempDirectory("KeYslice");
         String filename;
         if (currentProof.getProofFile() != null) {
-            filename = MiscTools.removeFileExtension(currentProof.getProofFile().toString());
+            filename =
+                MiscTools.removeFileExtension(currentProof.getProofFile().getFileName().toString());
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
             // make sure that no special chars are in name (e.g., "Taclet: seqPerm ..." for taclet
@@ -265,6 +249,6 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
         Path tempFile = tempDir.resolve(filename);
         ProofSaver.saveToFile(tempFile, proof);
         proof.dispose();
-        return tempFile.toFile();
+        return tempFile;
     }
 }

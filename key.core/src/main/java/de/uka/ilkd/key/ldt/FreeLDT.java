@@ -9,9 +9,8 @@ import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -40,24 +39,27 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
-            Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
+            ExecutionContext ec) {
+        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+            ExecutionContext ec) {
+        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         return services.getTermBuilder().func(atom);
     }
 
@@ -68,13 +70,13 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return "atom".equals(f.name().toString());
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() instanceof Function && hasLiteralFunction((JFunction) t.op())) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+        if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         assert false;
@@ -82,7 +84,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }

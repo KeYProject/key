@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the conditional values provided by
- * {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.Term)}.
+ * {@link IExecutionNode#getVariables(JTerm)}.
  *
  * @author Martin Hentschel
  */
@@ -26,8 +26,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     /**
      * Compares the conditional values on the {@code Number} example.
      *
-     * @throws Exception
-     *         Occurred Exception.
+     * @throws Exception Occurred Exception.
      */
     @Test
     public void testVariablesUnderMethodReturnCondition() throws Exception {
@@ -66,26 +65,19 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     }
 
     /**
-     * Ensures that the result of {@link IExecutionNode#getVariables(Term)} is correct.
+     * Ensures that the result of {@link IExecutionNode#getVariables(JTerm)} is correct.
      *
-     * @param expected
-     *        The expected {@link IExecutionVariable}s.
-     * @param node
-     *        The current {@link IExecutionNode} to call
-     *        {@link IExecutionNode#getVariables(Term)} on.
-     * @param condition
-     *        The condition to use.
-     * @param compareParent
-     *        Compare parents?
-     * @param compareChildren
-     *        Compare children?
-     * @param compareConstraints
-     *        Compare constraints?
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @param expected The expected {@link IExecutionVariable}s.
+     * @param node The current {@link IExecutionNode} to call
+     *        {@link IExecutionNode#getVariables(JTerm)} on.
+     * @param condition The condition to use.
+     * @param compareParent Compare parents?
+     * @param compareChildren Compare children?
+     * @param compareConstraints Compare constraints?
+     * @throws ProofInputException Occurred Exception.
      */
     protected static void assertConditionalVariables(IExecutionVariable[] expected,
-            IExecutionNode<?> node, Term condition, boolean compareParent, boolean compareChildren,
+            IExecutionNode<?> node, JTerm condition, boolean compareParent, boolean compareChildren,
             boolean compareConstraints) throws ProofInputException {
         IExecutionVariable[] current = node.getVariables(condition);
         assertVariables(expected, current, true, true, false);

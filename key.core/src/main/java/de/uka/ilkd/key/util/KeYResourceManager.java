@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,12 +202,10 @@ public class KeYResourceManager {
      *        the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Class<?> cl, String resourcename) {
+    public @Nullable URL getResourceFile(Class<?> cl, String resourcename) {
         URL resourceURL = cl.getResource(resourcename);
         if (resourceURL == null && cl.getSuperclass() != null) {
             return getResourceFile(cl.getSuperclass(), resourcename);
-        } else if (resourceURL == null && cl.getSuperclass() == null) {
-            return null;
         }
         return resourceURL;
     }
@@ -220,7 +219,7 @@ public class KeYResourceManager {
      *        the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Object o, String resourcename) {
+    public @Nullable URL getResourceFile(Object o, String resourcename) {
         return getResourceFile(o.getClass(), resourcename);
     }
 

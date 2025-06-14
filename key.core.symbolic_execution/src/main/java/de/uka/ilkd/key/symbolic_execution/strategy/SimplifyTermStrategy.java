@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -26,7 +26,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.jspecify.annotations.NonNull;
 
 /**
- * {@link Strategy} used to simplify {@link Term}s in side proofs.
+ * {@link Strategy} used to simplify {@link JTerm}s in side proofs.
  *
  * @author Martin Hentschel
  */
@@ -68,7 +68,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
                     PosInOccurrence pos, Goal goal, MutableState mState) {
                 boolean hasLabel = false;
                 if (pos != null && app instanceof TacletApp) {
-                    Term findTerm = (Term) pos.subTerm();
+                    JTerm findTerm = (JTerm) pos.subTerm();
                     if (!findTerm.containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                         // Term with result label is not used in find term and thus is not allowed
                         // to be used in an assumes clause
@@ -76,7 +76,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
                         if (ta.assumesFormulaInstantiations() != null) {
                             for (AssumesFormulaInstantiation ifi : ta
                                     .assumesFormulaInstantiations()) {
-                                if (((Term) ifi.getSequentFormula().formula())
+                                if (((JTerm) ifi.getSequentFormula().formula())
                                         .containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                                     hasLabel = true;
                                 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.rules.RuleApp;
@@ -32,7 +32,7 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;
@@ -40,7 +40,7 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
             pos = pos.up();
         }
 
-        return (Term) pos.subTerm();
+        return (JTerm) pos.subTerm();
     }
 
 }

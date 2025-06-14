@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
@@ -27,8 +27,7 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
 
     /**
      *
-     * @param contract
-     *        a loop contract.
+     * @param contract a loop contract.
      */
     FunctionalLoopContract(LoopContract contract) {
         super(contract);
@@ -36,17 +35,15 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
 
     /**
      *
-     * @param contract
-     *        a loop contract.
-     * @param id
-     *        an ID.
+     * @param contract a loop contract.
+     * @param id an ID.
      */
     FunctionalLoopContract(LoopContract contract, int id) {
         super(contract, id);
     }
 
     @Override
-    public FunctionalLoopContract map(UnaryOperator<Term> op, Services services) {
+    public FunctionalLoopContract map(UnaryOperator<JTerm> op, Services services) {
         return new FunctionalLoopContract(getAuxiliaryContract().map(op, services), id());
     }
 
@@ -81,10 +78,9 @@ public class FunctionalLoopContract extends FunctionalAuxiliaryContract<LoopCont
      * Replaces {@code \index} and {@code \values} with the proper variables in all terms of this
      * contract.
      *
-     * @param services
-     *        services.
+     * @param services services.
      *
-     * @see LoopContract#replaceEnhancedForVariables(StatementBlock, Services)
+     * @see LoopContract#replaceEnhancedForVariables(de.uka.ilkd.key.java.StatementBlock, Services)
      */
     public void replaceEnhancedForVariables(Services services) {
         setAuxiliaryContract(getAuxiliaryContract()

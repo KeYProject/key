@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -244,7 +245,7 @@ public class Proof implements ProofObject<Goal>, Named {
         this.proofFile = proofFile;
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig) {
+    public Proof(String name, JTerm problem, String header, InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
                     .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
@@ -1239,7 +1240,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return The {@link Path} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
-    public Path getProofFile() {
+    public @Nullable Path getProofFile() {
         return proofFile;
     }
 
@@ -1248,7 +1249,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param proofFile The {@link Path} under which the {@link Proof} was saved the last time.
      */
-    public void setProofFile(Path proofFile) {
+    public void setProofFile(@Nullable Path proofFile) {
         this.proofFile = proofFile;
     }
 
@@ -1333,8 +1334,9 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param callbackTotal callback that gets the total number of branches to complete
      * @param callbackBranch callback notified every time a branch has been copied
      */
-    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
-            Runnable callbackBranch) {
+    public void copyCachedGoals(Proof referencedFrom,
+            @Nullable Consumer<Integer> callbackTotal,
+            @Nullable Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
         List<Goal> goals = closedGoals().toList();
         List<Goal> todo = new ArrayList<>();

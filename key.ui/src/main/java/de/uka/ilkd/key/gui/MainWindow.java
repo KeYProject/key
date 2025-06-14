@@ -10,7 +10,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -479,8 +478,7 @@ public final class MainWindow extends JFrame {
     /**
      * Returns the MainWindow KeyMediator.
      *
-     * @param userInterface
-     *        The UserInterfaceControl.
+     * @param userInterface The UserInterfaceControl.
      */
     private KeYMediator getMainWindowMediator(AbstractMediatorUserInterfaceControl userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
@@ -628,8 +626,7 @@ public final class MainWindow extends JFrame {
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
             + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-            + " See About | License.",
-            getFont());
+            + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
 
         // load preferred sizes from system preferences
@@ -970,8 +967,7 @@ public final class MainWindow extends JFrame {
     /**
      * Create the proof menu.
      *
-     * @param selected
-     *        a specific proof that the menu should work on, may be null
+     * @param selected a specific proof that the menu should work on, may be null
      * @return the menu
      */
     public JMenu createProofMenu(Proof selected) {
@@ -995,10 +991,12 @@ public final class MainWindow extends JFrame {
                 }
 
                 @Override
-                public void menuDeselected(MenuEvent e) {}
+                public void menuDeselected(MenuEvent e) {
+                }
 
                 @Override
-                public void menuCanceled(MenuEvent e) {}
+                public void menuCanceled(MenuEvent e) {
+                }
             });
             proof.add(goalBack);
             proof.add(new PruneProofAction(this));
@@ -1255,8 +1253,7 @@ public final class MainWindow extends JFrame {
     /**
      * Scroll the sequent view to the specified y coordinate.
      *
-     * @param y
-     *        coordinate in pixels
+     * @param y coordinate in pixels
      */
     public void scrollTo(int y) {
         mainFrame.scrollTo(y);
@@ -1279,8 +1276,7 @@ public final class MainWindow extends JFrame {
     /**
      * informs the NotificationManager about an event
      *
-     * @param event
-     *        the NotificationEvent
+     * @param event the NotificationEvent
      */
     public void notify(NotificationEvent event) {
         if (notificationManager != null) {
@@ -1328,8 +1324,7 @@ public final class MainWindow extends JFrame {
      * explicitly synchronised; this happens at application end using {@link #syncPreferences()}.
      * All components which are in the component tree are queried.
      *
-     * @param component
-     *        the non-null component whose preferences are to be saved
+     * @param component the non-null component whose preferences are to be saved
      * @see PreferenceSaver
      */
     public void savePreferences(Component component) {
@@ -1343,8 +1338,7 @@ public final class MainWindow extends JFrame {
      * This uses the {@link Preferences} class to access the system preferences. All components
      * which are in the component tree are queried.
      *
-     * @param component
-     *        the non-null component whose preferences are to be set
+     * @param component the non-null component whose preferences are to be set
      * @see PreferenceSaver
      */
     public void loadPreferences(Component component) {
@@ -1411,10 +1405,6 @@ public final class MainWindow extends JFrame {
         openExampleAction.actionPerformed(null);
     }
 
-    public void loadProblem(File file) {
-        loadProblem(file.toPath());
-    }
-
     public void loadProblem(Path file) {
         getUserInterface().loadProblem(file);
     }
@@ -1427,10 +1417,8 @@ public final class MainWindow extends JFrame {
     /**
      * Loads the proof with the given path from the proof bundle.
      *
-     * @param proofBundle
-     *        the path of the proof bundle
-     * @param proofPath
-     *        the path of the proof to load (relative to the root of the bundle ->
+     * @param proofBundle the path of the proof bundle
+     * @param proofPath the path of the proof to load (relative to the root of the bundle ->
      *        filename only)
      */
     public void loadProofFromBundle(Path proofBundle, Path proofPath) {
@@ -1462,8 +1450,7 @@ public final class MainWindow extends JFrame {
     /**
      * Defines if taclet infos are shown or not.
      *
-     * @param show
-     *        {@code true} show taclet infos, {@code false} hide taclet infos.
+     * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
      */
     public void setShowTacletInfo(boolean show) {
         mainFrame.setShowTacletInfo(show);
@@ -1838,8 +1825,7 @@ public final class MainWindow extends JFrame {
     /**
      * Update other UI components based on the new sequent view.
      *
-     * @param sequentView
-     *        the sequent view to show
+     * @param sequentView the sequent view to show
      */
     public void setSequentView(SequentView sequentView) {
         sequentViewSearchBar.setSequentView(sequentView);

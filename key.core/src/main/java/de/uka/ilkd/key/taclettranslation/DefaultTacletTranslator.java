@@ -6,7 +6,7 @@ package de.uka.ilkd.key.taclettranslation;
 
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -38,7 +39,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     private enum TacletSections {
         REPLACE, ADD, ASSUM, FIND;
 
-        public Term getDefaultValue(TermServices services) {
+        public JTerm getDefaultValue(TermServices services) {
             return services.getTermBuilder().ff();
         }
     }
@@ -56,14 +57,14 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      *        TODO
      * @return translation
      */
-    private Term translateReplaceAndAddTerm(TacletGoalTemplate template, Term find,
+    private JTerm translateReplaceAndAddTerm(TacletGoalTemplate template, JTerm find,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
-        Term replace = find;
+        JTerm replace = find;
         if (template instanceof RewriteTacletGoalTemplate) {
             replace = ((RewriteTacletGoalTemplate) template).replaceWith();
         }
-        Term add = template.sequent() != null ? translate(template.sequent(), services)
+        JTerm add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
         if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
@@ -90,16 +91,17 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      *        TODO
      * @return translation
      */
-    private Term translateReplaceAndAddFormula(TacletGoalTemplate template, Term find, int polarity,
+    private JTerm translateReplaceAndAddFormula(TacletGoalTemplate template, JTerm find,
+            int polarity,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
 
-        Term replace = find;
+        JTerm replace = find;
         if (template instanceof RewriteTacletGoalTemplate) {
             replace = ((RewriteTacletGoalTemplate) template).replaceWith();
         }
 
-        Term add = template.sequent() != null ? translate(template.sequent(), services)
+        JTerm add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
         if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
@@ -116,7 +118,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
     }
 
-    private Term translateEquivalence(Term find, Term replace, int polarity,
+    private JTerm translateEquivalence(JTerm find, JTerm replace, int polarity,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         return switch (polarity) {
@@ -127,7 +129,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         };
     }
 
-    private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type,
+    private JTerm translateReplaceAndAddSequent(TacletGoalTemplate template, int type,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         Sequent replace = null;
@@ -135,9 +137,9 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             replace = ((AntecSuccTacletGoalTemplate) template).replaceWith();
         }
 
-        Term add = template.sequent() != null ? translate(template.sequent(), services)
+        JTerm add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        Term rep = replace == null ? TacletSections.REPLACE.getDefaultValue(services)
+        JTerm rep = replace == null ? TacletSections.REPLACE.getDefaultValue(services)
                 : translate(replace, services);
         if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
@@ -152,14 +154,14 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * Translates a RewriteTaclet to a formula.
      */
     @Override
-    public Term translate(Taclet taclet, TermServices services) throws IllegalTacletException {
+    public JTerm translate(Taclet taclet, TermServices services) throws IllegalTacletException {
 
 
         TermBuilder tb = services.getTermBuilder();
 
         // the standard translation of the patterns.
 
-        Term find = TacletSections.FIND.getDefaultValue(services),
+        JTerm find = TacletSections.FIND.getDefaultValue(services),
                 assum = TacletSections.ASSUM.getDefaultValue(services);
 
         // translate the find pattern.
@@ -170,7 +172,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         }
 
         // translate the replace and add patterns of the taclet.
-        ImmutableList<Term> list = ImmutableSLList.nil();
+        ImmutableList<JTerm> list = ImmutableSLList.nil();
 
         for (TacletGoalTemplate template : taclet.goalTemplates()) {
 
@@ -223,15 +225,15 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      *        a non-null taclet instance
      * @return the find clause of the argument
      */
-    protected Term getFindFromTaclet(FindTaclet findTaclet) {
+    protected JTerm getFindFromTaclet(FindTaclet findTaclet) {
         return findTaclet.find();
     }
 
     private int getPolarity(RewriteTaclet rwTaclet) {
-        int restr = rwTaclet.getApplicationRestriction();
-        if ((restr & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+        var restr = rwTaclet.applicationRestriction();
+        if (restr.matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             return -1;
-        } else if ((restr & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+        } else if (restr.matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {
             return +1;
         } else {
             return 0;

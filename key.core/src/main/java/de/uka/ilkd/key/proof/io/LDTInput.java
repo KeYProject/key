@@ -17,7 +17,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
  * function and predicate declarations and third the rules. This procedure makes it possible to use
  * all declared sorts in all rules.
  */
+@NullMarked
 public class LDTInput implements EnvInput {
     public interface LDTInputListener {
         void reportStatus(String status, int progress);
@@ -43,12 +44,9 @@ public class LDTInput implements EnvInput {
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
-     * @param keyFiles
-     *        an array containing the LDT .key files
-     * @param listener
-     *        an LDTInputListener for stsus reports while loading
-     * @param profile
-     *        the Profile for which the LDTs are load
+     * @param keyFiles an array containing the LDT .key files
+     * @param listener an LDTInputListener for stsus reports while loading
+     * @param profile the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -101,8 +99,8 @@ public class LDTInput implements EnvInput {
 
     // no class path elements here
     @Override
-    public @NonNull List<Path> readClassPath() {
-        return Collections.emptyList();
+    public List<Path> readClassPath() {
+        return new ArrayList<>();
     }
 
 

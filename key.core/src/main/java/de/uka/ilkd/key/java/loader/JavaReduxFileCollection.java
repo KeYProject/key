@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +21,9 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.jspecify.annotations.Nullable;
+import recoder.io.DataLocation;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot
@@ -42,12 +46,12 @@ public class JavaReduxFileCollection implements FileCollection {
      * The location where the libraries to be parsed can be found. It will be used as a resource
      * path relative to the path of the package.
      */
-    public static final String JAVA_SRC_DIR = "JavaRedux";
+    public static final Path JAVA_SRC_DIR = Paths.get("JavaRedux");
 
     /**
      * The resource location
      */
-    private String resourceLocation;
+    private Path resourceLocation;
 
     /**
      * This list stores all resources to be retrieved. It is fed by the constructor.
@@ -69,7 +73,7 @@ public class JavaReduxFileCollection implements FileCollection {
         resourceLocation = JAVA_SRC_DIR;
 
         if (!profile.getInternalClassDirectory().isEmpty()) {
-            resourceLocation += "/" + profile.getInternalClassDirectory();
+            resourceLocation = resourceLocation.resolve(profile.getInternalClassDirectory());
         }
         String resourceString = resourceLocation + "/" + profile.getInternalClasslistFilename();
 
@@ -84,7 +88,7 @@ public class JavaReduxFileCollection implements FileCollection {
             new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
-                if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
+                if ((jl.isEmpty()) || (jl.charAt(0) == '#')) {
                     continue;
                 }
                 resources.add(jl);
@@ -133,11 +137,11 @@ public class JavaReduxFileCollection implements FileCollection {
                 });
     }
 
-    /*
+    /**
      * The Class Walker wraps a string iterator and creates URL, streams and DataLocation elements
      * on demand.
      */
-    private class Walker implements FileCollection.Walker {
+    public class Walker implements FileCollection.Walker {
 
         /**
          * The iterator to wrap, it iterates the resources to open.
@@ -176,7 +180,7 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         @Override
-        public InputStream openCurrent(FileRepo fileRepo)
+        public InputStream openCurrent(@Nullable FileRepo fileRepo)
                 throws IOException, NoSuchElementException {
             if (fileRepo != null) {
                 return fileRepo.getInputStream(currentURL);

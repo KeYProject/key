@@ -6,12 +6,13 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
 /**
  * Schema variable that is instantiated with logical variables.
  */
-public final class VariableSV extends OperatorSV
+public final class VariableSV extends JOperatorSV
         implements QuantifiableVariable, TerminalSyntaxElement {
 
     /**

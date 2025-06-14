@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
@@ -264,7 +263,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(@Nullable Consumer<Proof> callbackProofLoaded)
+    public final void load(Consumer<Proof> callbackProofLoaded)
             throws Exception {
         control.loadingStarted(this);
 
@@ -297,17 +296,17 @@ public abstract class AbstractProblemLoader {
         FileRepo fileRepo = createFileRepo();
 
         var timeBeforeEnv = System.nanoTime();
-        LOGGER.info("Loading environment from " + file);
+        LOGGER.info("Loading environment from {}", file);
         envInput = createEnvInput(fileRepo);
-        LOGGER.debug(
-            "Environment load took " + PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
+        LOGGER.debug("Environment load took {}",
+            PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
         problemInitializer = createProblemInitializer(fileRepo);
         var beforeInitConfig = System.nanoTime();
         LOGGER.info("Creating init config");
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
-        LOGGER.debug(
-            "Init config took " + PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
+        LOGGER.debug("Init config took {}",
+            PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
         if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
@@ -333,7 +332,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            @Nullable Consumer<Proof> callbackProofLoaded) {
+            Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -365,10 +364,10 @@ public abstract class AbstractProblemLoader {
     protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
         final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException re) {
-            final org.antlr.runtime.Token occurrence = re.token; // may be null
-            if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
-                if (c0 instanceof org.antlr.runtime.MissingTokenException mte) {
+        if (c0 instanceof RecognitionException re) {
+            final Token occurrence = re.token; // may be null
+            if (c0 instanceof MismatchedTokenException) {
+                if (c0 instanceof MissingTokenException mte) {
                     // TODO: other commonly missed tokens
                     final String readable = missedErrors.get(mte.expecting);
                     final String token = readable == null ? "token id " + mte.expecting : readable;
@@ -378,7 +377,7 @@ public abstract class AbstractProblemLoader {
                     return new ProblemLoaderException(this, msg, mte);
                     // TODO other ANTLR exceptions
                 } else {
-                    final org.antlr.runtime.MismatchedTokenException mte =
+                    final MismatchedTokenException mte =
                         (MismatchedTokenException) c0;
                     final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
                     final String readable =
@@ -420,7 +419,8 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      */
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
-        final var filename = file.getFileName().toString();
+
+        final String filename = file.getFileName().toString();
 
         // set the root directory of the FileRepo (used for resolving paths)
         fileRepo.setBaseDir(file);
@@ -429,8 +429,8 @@ public abstract class AbstractProblemLoader {
             // java file, probably enriched by specifications
             SLEnvInput ret;
             if (file.getParent() == null) {
-                ret = new SLEnvInput(new File(".").getAbsoluteFile().toPath(), classPath,
-                    bootClassPath, profileOfNewProofs, includes);
+                ret = new SLEnvInput(Paths.get("."), classPath, bootClassPath, profileOfNewProofs,
+                    includes);
             } else {
                 ret = new SLEnvInput(file.getParent().toAbsolutePath(), classPath,
                     bootClassPath, profileOfNewProofs, includes);
@@ -449,18 +449,18 @@ public abstract class AbstractProblemLoader {
              */
             if (proofFilename == null) { // no proof to load given -> try to determine one
                 // create a list of all *.proof files (only top level in bundle)
-                List<Path> proofs;
+                List<Path> proofs = new ArrayList<>();
                 try (ZipFile bundle = new ZipFile(file.toFile())) {
                     proofs = bundle.stream().filter(e -> !e.isDirectory())
                             .filter(e -> e.getName().endsWith(".proof"))
                             .map(e -> Paths.get(e.getName())).toList();
-                }
-                if (!proofs.isEmpty()) {
-                    // load first proof found in file
-                    proofFilename = proofs.getFirst();
-                } else {
-                    // no proof found in bundle!
-                    throw new IOException("The bundle contains no proof to load!");
+                    if (!proofs.isEmpty()) {
+                        // load first proof found in file
+                        proofFilename = proofs.get(0);
+                    } else {
+                        // no proof found in bundle!
+                        throw new IOException("The bundle contains no proof to load!");
+                    }
                 }
             }
 
@@ -475,8 +475,13 @@ public abstract class AbstractProblemLoader {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try (Stream<Path> s = Files.walk(tmpDir)) {
                     // delete the temporary directory with all contained files
-                    s.sorted(Comparator.reverseOrder()).map(Path::toFile)
-                            .forEach(File::delete);
+                    s.sorted(Comparator.reverseOrder())
+                            .forEach(it -> {
+                                try {
+                                    Files.delete(it);
+                                } catch (IOException ignored) {
+                                }
+                            });
                 } catch (IOException e) {
                     // this is called at program exist, so we only print a console message
                     LOGGER.warn("Failed to clean up temp dir", e);
@@ -497,19 +502,16 @@ public abstract class AbstractProblemLoader {
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, fileRepo, control,
-                profileOfNewProofs,
+            return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
                 filename.endsWith(".proof.gz"));
-        } else if (file.toFile().isDirectory()) {
+        } else if (Files.isDirectory(file)) {
             // directory containing java sources, probably enriched
             // by specifications
-            return new SLEnvInput(file, classPath, bootClassPath, profileOfNewProofs,
-                includes);
+            return new SLEnvInput(file, classPath, bootClassPath, profileOfNewProofs, includes);
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension '"
-                    + filename.substring(filename.lastIndexOf('.'))
-                    + "' of read-in file "
+                    + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
                     + filename + ". Allowed extensions are: .key, .proof, .java or "
                     + "complete directories.");
             } else {
@@ -549,7 +551,7 @@ public abstract class AbstractProblemLoader {
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected @Nullable LoadedPOContainer createProofObligationContainer() throws Exception {
+    protected LoadedPOContainer createProofObligationContainer() throws Exception {
         final String chooseContract;
         final Configuration proofObligation;
 
@@ -577,7 +579,7 @@ public abstract class AbstractProblemLoader {
     private LoadedPOContainer loadByProofObligation(Configuration proofObligation)
             throws Exception {
         // Load proof obligation settings
-        proofObligation.set(IPersistablePO.PROPERTY_FILENAME, file.toString());
+        proofObligation.set(IPersistablePO.PROPERTY_FILENAME, file.toAbsolutePath().toString());
 
         if (poPropertiesToForce != null) {
             proofObligation.overwriteWith(proofObligation);
@@ -672,7 +674,6 @@ public abstract class AbstractProblemLoader {
     }
 
     private ReplayResult replayProof(Proof proof) {
-        LOGGER.info("Replaying proof {}", proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();

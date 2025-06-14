@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
@@ -26,7 +26,7 @@ public interface SkeletonGenerator {
      *        TODO
      * @return returns the translation of the taclet.
      */
-    Term translate(Taclet t, TermServices services) throws IllegalTacletException;
+    JTerm translate(Taclet t, TermServices services) throws IllegalTacletException;
 }
 
 
@@ -48,11 +48,11 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      * @return the resulting term of the translation or <code>null</code> if both antecedent and
      *         succendent are empty.
      */
-    protected Term translate(Sequent s, TermServices services) {
+    protected JTerm translate(Sequent s, TermServices services) {
         TermBuilder builder = services.getTermBuilder();
 
-        ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
-        ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());
+        ImmutableList<JTerm> ante = getFormulaeOfSemisequent(s.antecedent());
+        ImmutableList<JTerm> succ = getFormulaeOfSemisequent(s.succedent());
 
         if (ante.size() == 0 && succ.size() == 0) {
             return null;
@@ -75,10 +75,10 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      *        Semisequent.
      * @return A list of all formulae of the semisequent <code>s </code>.
      */
-    private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
-        ImmutableList<Term> terms = ImmutableSLList.nil();
+    private ImmutableList<JTerm> getFormulaeOfSemisequent(Semisequent s) {
+        ImmutableList<JTerm> terms = ImmutableSLList.nil();
         for (SequentFormula cf : s) {
-            terms = terms.append((Term) cf.formula());
+            terms = terms.append((JTerm) cf.formula());
         }
         return terms;
 

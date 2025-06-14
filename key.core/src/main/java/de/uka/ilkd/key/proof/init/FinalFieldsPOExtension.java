@@ -10,11 +10,11 @@ import de.uka.ilkd.key.java.ast.abstraction.ClassType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.op.Function;
 
 /**
@@ -50,9 +50,9 @@ public class FinalFieldsPOExtension implements POExtension {
     }
 
     @Override
-    public Term modifyPostTerm(AbstractOperationPO abstractPO, InitConfig proofConfig,
+    public JTerm modifyPostTerm(AbstractOperationPO abstractPO, InitConfig proofConfig,
             Services services, ProgramVariable selfVar,
-            Term postTerm) {
+            JTerm postTerm) {
 
         if (!FinalHeapResolution.isFinalEnabled(proofConfig)) {
             return postTerm;
@@ -74,12 +74,12 @@ public class FinalFieldsPOExtension implements POExtension {
         FinalFieldCodeValidator.validateFinalFields(constructor, proofConfig);
 
         TermBuilder tb = services.getTermBuilder();
-        Term self = tb.var(selfVar);
+        JTerm self = tb.var(selfVar);
         for (Function finalField : finalFields) {
-            Term fieldRef = tb.tf().createTerm((Operator) finalField);
-            Term sel = tb.dot(JavaDLTheory.ANY, self, fieldRef);
-            Term fsel = tb.finalDot(JavaDLTheory.ANY, self, fieldRef);
-            Term eq = tb.equals(sel, fsel);
+            JTerm fieldRef = tb.tf().createTerm(finalField);
+            JTerm sel = tb.dot(JavaDLTheory.ANY, self, fieldRef);
+            JTerm fsel = tb.finalDot(JavaDLTheory.ANY, self, fieldRef);
+            JTerm eq = tb.equals(sel, fsel);
             postTerm = tb.imp(eq, postTerm);
         }
         return postTerm;

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.instantiation;
 
-import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofServices;
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
@@ -13,22 +12,21 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 
-/**
- * Instantiation of an assumes-formula that is present as a formula of the proof goal's sequent.
- * <p>
- * This instantiation kind is used if the formula used as an instantiation for one of the
- * assumes-formulas
- * is syntactically present in the sequent. In that case the instantiation has not to be proven
- * to be valid as part of a separate proof goal.
- * </p>
- *
- * @see AssumesFormulaInstantiation,AssumesFormulaInstDirect
- */
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/// Instantiation of an assumes-formula that is present as a formula of the proof goal's sequent.
+///
+/// This instantiation kind is used if the formula used as an instantiation for one of the
+/// assumes-formulas
+/// is syntactically present in the sequent. In that case the instantiation has not to be proven
+/// to be valid as part of a separate proof goal.
+///
+///
+/// @see AssumesFormulaInstantiation,AssumesFormulaInstDirect
 public class AssumesFormulaInstSeq
         implements AssumesFormulaInstantiation {
-    /**
-     * Sequent and formula
-     */
+    /// Sequent and formula
     private final Sequent seq;
     private final boolean inAntecedent; // formula is in antecedent?
     private final SequentFormula instantiation;
@@ -44,22 +42,13 @@ public class AssumesFormulaInstSeq
             instantiation.getFormulaByNr(indexPositionInSequent));
     }
 
-    /**
-     * @return the cf this is pointing to
-     */
+    /// @return the cf this is pointing to
     @Override
     public SequentFormula getSequentFormula() {
         return instantiation;
     }
 
-    @Override
-    public String toString(LogicServices services) {
-        return instantiation.formula().toString();
-    }
-
-    /**
-     * Create a list with all formulas of a given semi-sequent
-     */
+    /// Create a list with all formulas of a given semi-sequent
     private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
             Semisequent semi,
             boolean inAntecedent) {
@@ -75,9 +64,7 @@ public class AssumesFormulaInstSeq
         return new ImmutableArray<>(assumesInstFromSeq);
     }
 
-    /**
-     * Retrieves a list with all formulas of a given semi-sequent
-     */
+    /// Retrieves a list with all formulas of a given semi-sequent
     public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s,
             boolean inAntecedent,
             ProofServices services) {
@@ -97,11 +84,11 @@ public class AssumesFormulaInstSeq
 
     @Override
     public String toString() {
-        return toString(null);
+        return instantiation.formula().toString();
     }
 
     @Override
-    public boolean equals(Object p_obj) {
+    public boolean equals(@Nullable Object p_obj) {
         if (!(p_obj instanceof AssumesFormulaInstSeq other)) {
             return false;
         }
@@ -122,7 +109,7 @@ public class AssumesFormulaInstSeq
         return inAntecedent;
     }
 
-    private volatile PosInOccurrence pioCache = null;
+    private volatile @MonotonicNonNull PosInOccurrence pioCache = null;
 
     public PosInOccurrence toPosInOccurrence() {
         if (pioCache == null) {

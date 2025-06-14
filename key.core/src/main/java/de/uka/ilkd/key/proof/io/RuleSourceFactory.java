@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -23,7 +24,7 @@ public class RuleSourceFactory {
         if (stdTacletDir == null) {
             return fromBuiltInRule(ruleFileName);
         } else {
-            return initRuleFile(Path.of(stdTacletDir, ruleFileName));
+            return initRuleFile(Paths.get(stdTacletDir, ruleFileName));
         }
     }
 
@@ -48,10 +49,8 @@ public class RuleSourceFactory {
     /**
      * Initialise this object from a file
      *
-     * @param file
-     *        the non-<code>null</code> file reference
-     * @param compressed
-     *        <code>true</code> iff the file is gzip-compressed
+     * @param file the non-<code>null</code> file reference
+     * @param compressed <code>true</code> iff the file is gzip-compressed
      * @return the rule source read from the file.
      */
     public static RuleSource initRuleFile(final Path file, boolean compressed) {

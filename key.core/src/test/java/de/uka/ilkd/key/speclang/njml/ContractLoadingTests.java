@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ContractLoadingTests {
+    // TODO weigl: should use FindResources
     public static final File EXAMPLES_DIR = new File("../key.ui/examples/");
 
     @Test
@@ -46,7 +47,7 @@ public class ContractLoadingTests {
 
     @Test
     void issues1717() throws ProblemLoaderException, ProofInputException {
-        var javaFile =
+        Path javaFile =
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1717/UnderscoreZero.java");
         Assumptions.assumeTrue(Files.exists(javaFile));
         KeYEnvironment<?> file = KeYEnvironment.load(javaFile);

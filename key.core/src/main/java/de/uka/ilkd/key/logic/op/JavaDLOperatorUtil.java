@@ -3,15 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
 
-
-/**
- * All symbols acting as members of a term e.g. logical operators, predicates, functions, variables
- * etc. have to implement this interface.
- */
-public interface Operator
-        extends org.key_project.logic.op.Operator {
-
+public class JavaDLOperatorUtil {
     /**
      * comparator to compare operators; for modalities only their kind is compared
      *
@@ -22,8 +17,8 @@ public interface Operator
      * @return true iff both operators have same identity and for modalities if both are of the same
      *         kind
      */
-    static boolean opEquals(org.key_project.logic.op.Operator fst,
-            org.key_project.logic.op.Operator snd) {
+    public static boolean opEquals(Operator fst,
+            Operator snd) {
         return fst == snd ||
                 (fst instanceof Modality mod1 && snd instanceof Modality mod2
                         && mod1.kind() == mod2.kind());

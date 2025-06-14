@@ -40,7 +40,7 @@ public class TestTermBuilder {
     /**
      * Test number conversion
      */
-    private void checkDigits(Term number, int[] expected, IntegerLDT intLDT,
+    private void checkDigits(JTerm number, int[] expected, IntegerLDT intLDT,
             boolean isNonNegative) {
         assertSame(intLDT.getNumberSymbol(), number.op());
         number = number.sub(0);
@@ -105,7 +105,7 @@ public class TestTermBuilder {
 
     private void testDoubleLongPatterns(String number) {
         double doubleVal = Double.parseDouble(number);
-        Term doubleTerm = tb.dfpTerm(doubleVal);
+        JTerm doubleTerm = tb.dfpTerm(doubleVal);
         DoubleLiteral literal =
             services.getTypeConverter().getDoubleLDT().translateTerm(doubleTerm, null, services);
         assertEquals(doubleVal, Double.parseDouble(literal.getValue()),
@@ -126,7 +126,7 @@ public class TestTermBuilder {
 
     private void testFloatPatterns(String number) {
         float floatval = Float.parseFloat(number);
-        Term floatTerm = tb.fpTerm(floatval);
+        JTerm floatTerm = tb.fpTerm(floatval);
         FloatLiteral literal =
             services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services);
         assertEquals(floatval, Float.parseFloat(literal.getValue()), "for double value " + number);

@@ -9,7 +9,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -63,175 +63,134 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      *
-     * @param heap
-     *        heap variable
-     * @param selfVar
-     *        self variable
-     * @param paramVars
-     *        parameter variables
-     * @param atPreVars
-     *        variables at previous heap
-     * @param services
-     *        services object
+     * @param heap heap variable
+     * @param selfVar self variable
+     * @param paramVars parameter variables
+     * @param atPreVars variables at previous heap
+     * @param services services object
      * @return precondition
      */
-    Term getPre(LocationVariable heap, LocationVariable selfVar,
+    JTerm getPre(LocationVariable heap, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
      *
-     * @param heapContext
-     *        heap context
-     * @param selfVar
-     *        self variable
-     * @param paramVars
-     *        parameter variables
-     * @param atPreVars
-     *        variables at previous heap
-     * @param services
-     *        services object
+     * @param heapContext heap context
+     * @param selfVar self variable
+     * @param paramVars parameter variables
+     * @param atPreVars variables at previous heap
+     * @param services services object
      * @return precondition
      */
-    Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
      *
-     * @param heap
-     *        heap variable
-     * @param heapTerm
-     *        heap term
-     * @param selfTerm
-     *        self term
-     * @param paramTerms
-     *        parameter terms
-     * @param atPres
-     *        terms of variables at previous heap
-     * @param services
-     *        services object
+     * @param heap heap variable
+     * @param heapTerm heap term
+     * @param selfTerm self term
+     * @param paramTerms parameter terms
+     * @param atPres terms of variables at previous heap
+     * @param services services object
      * @return the precondition
      */
-    Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
+    JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the precondition of the contract.
      *
-     * @param heapContext
-     *        heap context
-     * @param heapTerms
-     *        heap terms
-     * @param selfTerm
-     *        term of self variable
-     * @param paramTerms
-     *        terms of parameter variables
-     * @param atPres
-     *        terms of variables at previous heap
-     * @param services
-     *        services object
+     * @param heapContext heap context
+     * @param heapTerms heap terms
+     * @param selfTerm term of self variable
+     * @param paramTerms terms of parameter variables
+     * @param atPres terms of variables at previous heap
+     * @param services services object
      * @return the precondition
      */
-    Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
-            Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+    JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
 
     /**
      * Returns the dependency set of the contract.
      *
-     * @param heap
-     *        the heap variable
-     * @param atPre
-     *        boolean whether old heap should be used
-     * @param selfVar
-     *        self variable
-     * @param paramVars
-     *        parameter variables
-     * @param atPreVars
-     *        variables at previous heap
-     * @param services
-     *        services object
+     * @param heap the heap variable
+     * @param atPre boolean whether old heap should be used
+     * @param selfVar self variable
+     * @param paramVars parameter variables
+     * @param atPreVars variables at previous heap
+     * @param services services object
      * @return the dependency set
      */
-    Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+    JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the dependency set of the contract.
      *
-     * @param heap
-     *        the heap variable
-     * @param atPre
-     *        boolean whether old heap should be used
-     * @param heapTerm
-     *        the heap variable term
-     * @param selfTerm
-     *        term of self variable
-     * @param paramTerms
-     *        terms of parameter variables
-     * @param atPres
-     *        terms of variables at previous heap
-     * @param services
-     *        services object
+     * @param heap the heap variable
+     * @param atPre boolean whether old heap should be used
+     * @param heapTerm the heap variable term
+     * @param selfTerm term of self variable
+     * @param paramTerms terms of parameter variables
+     * @param atPres terms of variables at previous heap
+     * @param services services object
      * @return the dependency set
      */
-    Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
+    JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
-    Term getRequires(LocationVariable heap);
+    JTerm getRequires(LocationVariable heap);
 
-    Term getModifiable(LocationVariable heap);
+    JTerm getModifiable(LocationVariable heap);
 
-    Term getAccessible(LocationVariable heap);
+    JTerm getAccessible(LocationVariable heap);
 
-    Term getGlobalDefs();
+    JTerm getGlobalDefs();
 
-    Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services);
+    JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services);
 
-    Term getMby();
+    JTerm getMby();
 
     /**
      * Returns the measured_by clause of the contract.
      *
-     * @param selfVar
-     *        the self variable
-     * @param paramVars
-     *        the parameter variables
-     * @param services
-     *        services object
+     * @param selfVar the self variable
+     * @param paramVars the parameter variables
+     * @param services services object
      * @return the measured-by term
      */
-    Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services);
 
     /**
      * Returns the measured_by clause of the contract.
      *
-     * @param heapTerms
-     *        terms for the heap context
-     * @param selfTerm
-     *        term of self variable
-     * @param paramTerms
-     *        terms of parameter variables
-     * @param atPres
-     *        terms of variables at previous heap
-     * @param services
-     *        services object
+     * @param heapTerms terms for the heap context
+     * @param selfTerm term of self variable
+     * @param paramTerms terms of parameter variables
+     * @param atPres terms of variables at previous heap
+     * @param services services object
      * @return the measured-by term
      */
-    Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
+    JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the contract in pretty HTML format.
      *
-     * @param services
-     *        services instance
+     * @param services services instance
      * @return the html representation
      */
     String getHTMLText(Services services);
@@ -239,8 +198,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the contract in pretty plain text format.
      *
-     * @param services
-     *        services instance
+     * @param services services instance
      * @return the plain text representation
      */
     String getPlainText(Services services);
@@ -260,8 +218,7 @@ public interface Contract extends SpecificationElement {
      * Returns a parseable String representation of the contract. Precondition: toBeSaved() must be
      * true.
      *
-     * @param services
-     *        the services instance
+     * @param services the services instance
      * @return the (parseable) String representation
      */
     String proofToString(Services services);
@@ -269,8 +226,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a proof obligation to the passed initConfig.
      *
-     * @param initConfig
-     *        the initial configuration
+     * @param initConfig the initial configuration
      * @return the proof obligation
      */
     ContractPO createProofObl(InitConfig initConfig);
@@ -278,8 +234,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Lookup the proof obligation belonging to the contract in the specification repository.
      *
-     * @param services
-     *        the services instance
+     * @param services the services instance
      * @return the proof obligation according to the specification repository
      */
     ProofOblInput getProofObl(Services services);
@@ -287,10 +242,8 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a proof obligation to the passed contract and initConfig.
      *
-     * @param initConfig
-     *        the initial configuration
-     * @param contract
-     *        the contract
+     * @param initConfig the initial configuration
+     * @param contract the contract
      * @return the proof obligation
      */
     ProofOblInput createProofObl(InitConfig initConfig, Contract contract);
@@ -298,12 +251,9 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a proof obligation to the passed contract and initConfig.
      *
-     * @param initConfig
-     *        the initial configuration
-     * @param contract
-     *        the contract
-     * @param supportSymbolicExecutionAPI
-     *        boolean saying whether symbolic execution api is supported
+     * @param initConfig the initial configuration
+     * @param contract the contract
+     * @param supportSymbolicExecutionAPI boolean saying whether symbolic execution api is supported
      * @return the proof obligation
      */
     ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
@@ -312,8 +262,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns a contract which is identical this contract except that the id is set to the new id.
      *
-     * @param newId
-     *        the new id value
+     * @param newId the new id value
      * @return an identical contract with the new id
      */
     Contract setID(int newId);
@@ -322,10 +271,8 @@ public interface Contract extends SpecificationElement {
      * Returns a contract which is identical to this contract except that the KeYJavaType and
      * IObserverFunction are set to the new values.
      *
-     * @param newKJT
-     *        the new KeYJavaType
-     * @param newPM
-     *        the new observer function
+     * @param newKJT the new KeYJavaType
+     * @param newPM the new observer function
      * @return an identical contract with the new KJT and PM (see above)
      */
     Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
@@ -346,7 +293,7 @@ public interface Contract extends SpecificationElement {
     boolean hasSelfVar();
 
     @Override
-    Contract map(UnaryOperator<Term> op, Services services);
+    Contract map(UnaryOperator<JTerm> op, Services services);
 
     /**
      * Class for storing the original variables without always distinguishing several different
@@ -367,16 +314,11 @@ public interface Contract extends SpecificationElement {
         /**
          * Create new instance of original variables
          *
-         * @param selfVar
-         *        the original self variable
-         * @param resVar
-         *        the original result variable
-         * @param excVar
-         *        the original exception variable
-         * @param atPreVars
-         *        the original atPreVars
-         * @param paramVars
-         *        the original parameter variables
+         * @param selfVar the original self variable
+         * @param resVar the original result variable
+         * @param excVar the original exception variable
+         * @param atPreVars the original atPreVars
+         * @param paramVars the original parameter variables
          */
         @SuppressWarnings("unchecked")
         public OriginalVariables(LocationVariable selfVar, LocationVariable resVar,

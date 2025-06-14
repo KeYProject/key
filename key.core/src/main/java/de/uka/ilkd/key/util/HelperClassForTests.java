@@ -52,10 +52,21 @@ public class HelperClassForTests {
     };
 
     public static ProofAggregate parse(Path file) {
+        return parse(file.toPath(), profile);
+    }
+
+    public ProofAggregate parse(File file, Profile profile) {
+        return parse(file.toPath(), profile);
+    }
+
+    public ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
-    public static ProofAggregate parse(Path file, Profile profile) {
+    public ProofAggregate parse(Path file, Profile profile) {
+        ProblemInitializer pi = null;
+        ProofAggregate result = null;
+
         try {
             return parseThrowException(file, profile);
         } catch (ProofInputException e) {
@@ -132,12 +143,13 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+    public static Map<String, String> setDefaultTacletOptions(Path baseDir,
             String javaPathInBaseDir)
             throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Make sure that required files exists
-            File javaFile = new File(baseDir, javaPathInBaseDir);
+            Path javaFile = baseDir.resolve(javaPathInBaseDir);
+
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
@@ -169,7 +181,7 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+    public static Map<String, String> setDefaultTacletOptionsForTarget(Path javaFile,
             String containerTypeName,
             final String targetName) throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {

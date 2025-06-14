@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 
 /**

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
@@ -1127,7 +1128,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a quantified variable.
      */
-    private SMTTermVariable translateVariable(org.key_project.logic.op.QuantifiableVariable q)
+    private SMTTermVariable translateVariable(QuantifiableVariable q)
             throws IllegalFormulaException {
         SMTSort s = translateSort(q.sort());
         return new SMTTermVariable(q.name().toString(), s);

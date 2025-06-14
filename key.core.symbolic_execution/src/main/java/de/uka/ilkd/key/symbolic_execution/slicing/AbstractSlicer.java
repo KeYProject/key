@@ -5,12 +5,12 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.*;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
-import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -51,15 +52,12 @@ public abstract class AbstractSlicer {
     /**
      * Computes the slice.
      *
-     * @param seedNode
-     *        The seed {@link Node} to start slicing at.
-     * @param term
-     *        The seed {@link Term}.
-     * @param sec
-     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode The seed {@link Node} to start slicing at.
+     * @param term The seed {@link JTerm}.
+     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
-    public ImmutableArray<Node> slice(Node seedNode, Term term,
+    public ImmutableArray<Node> slice(Node seedNode, JTerm term,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         return slice(seedNode, toLocation(seedNode.proof().getServices(), term), sec);
     }
@@ -67,12 +65,9 @@ public abstract class AbstractSlicer {
     /**
      * Computes the slice.
      *
-     * @param seedNode
-     *        The seed {@link Node} to start slicing at.
-     * @param seedLocation
-     *        The seed {@link ReferencePrefix}.
-     * @param sec
-     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode The seed {@link Node} to start slicing at.
+     * @param seedLocation The seed {@link ReferencePrefix}.
+     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation,
@@ -80,8 +75,8 @@ public abstract class AbstractSlicer {
         // Solve this reference
         PosInOccurrence pio =
             seedNode.getAppliedRuleApp().posInOccurrence();
-        var topLevel = pio.sequentFormula().formula();
-        Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
+        final JTerm topLevel = (JTerm) pio.sequentFormula().formula();
+        JTerm modalityTerm = TermBuilder.goBelowUpdates(topLevel);
         Services services = seedNode.proof().getServices();
         ExecutionContext ec =
             JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
@@ -93,12 +88,9 @@ public abstract class AbstractSlicer {
     /**
      * Computes the slice.
      *
-     * @param seedNode
-     *        The seed {@link Node} to start slicing at.
-     * @param seedLocation
-     *        The seed {@link ReferencePrefix}.
-     * @param sec
-     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode The seed {@link Node} to start slicing at.
+     * @param seedLocation The seed {@link ReferencePrefix}.
+     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     public ImmutableArray<Node> slice(Node seedNode, Location seedLocation,
@@ -110,9 +102,9 @@ public abstract class AbstractSlicer {
         }
         PosInOccurrence pio =
             seedNode.getAppliedRuleApp().posInOccurrence();
-        Term applicationTerm = (Term) pio.subTerm();
-        Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(applicationTerm);
-        Term modalityTerm = pair.second;
+        JTerm applicationTerm = (JTerm) pio.subTerm();
+        Pair<ImmutableList<JTerm>, JTerm> pair = TermBuilder.goBelowUpdates2(applicationTerm);
+        JTerm modalityTerm = pair.second;
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
@@ -126,12 +118,9 @@ public abstract class AbstractSlicer {
     /**
      * Performs the slicing.
      *
-     * @param seedNode
-     *        The seed {@link Node} to start slicing at.
-     * @param seedLocation
-     *        The seed {@link Location}.
-     * @param sec
-     *        The optional {@link ISymbolicEquivalenceClass}es to consider.
+     * @param seedNode The seed {@link Node} to start slicing at.
+     * @param seedLocation The seed {@link Location}.
+     * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
     protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation,
@@ -151,7 +140,7 @@ public abstract class AbstractSlicer {
         /**
          * The local values.
          */
-        private final Map<ProgramVariable, Term> localValues;
+        private final Map<ProgramVariable, JTerm> localValues;
 
         /**
          * The current {@link ExecutionContext}.
@@ -166,13 +155,11 @@ public abstract class AbstractSlicer {
         /**
          * Constructor.
          *
-         * @param aliases
-         *        The found aliases.
-         * @param thisReference
-         *        The this-reference if available.
+         * @param aliases The found aliases.
+         * @param thisReference The this-reference if available.
          */
         public SequentInfo(Map<Location, SortedSet<Location>> aliases,
-                Map<ProgramVariable, Term> localValues, ExecutionContext executionContext,
+                Map<ProgramVariable, JTerm> localValues, ExecutionContext executionContext,
                 ReferencePrefix thisReference) {
             assert aliases != null;
             assert localValues != null;
@@ -196,7 +183,7 @@ public abstract class AbstractSlicer {
          *
          * @return The local values.
          */
-        public Map<ProgramVariable, Term> getLocalValues() {
+        public Map<ProgramVariable, JTerm> getLocalValues() {
             return localValues;
         }
 
@@ -223,17 +210,16 @@ public abstract class AbstractSlicer {
      * Computes the aliases specified by the updates of the current {@link Node} at the application
      * {@link PosInOccurrence} and computes the current {@code this} reference.
      *
-     * @param node
-     *        The {@link Node} to analyze.
+     * @param node The {@link Node} to analyze.
      * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not
      *         supported.
      */
     protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
         PosInOccurrence pio =
             node.getAppliedRuleApp().posInOccurrence();
-        Term topLevel = (Term) pio.sequentFormula().formula();
-        Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(topLevel);
-        Term modalityTerm = pair.second;
+        JTerm topLevel = (JTerm) pio.sequentFormula().formula();
+        Pair<ImmutableList<JTerm>, JTerm> pair = TermBuilder.goBelowUpdates2(topLevel);
+        JTerm modalityTerm = pair.second;
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         Services services = node.proof().getServices();
@@ -246,7 +232,7 @@ public abstract class AbstractSlicer {
             // Compute aliases
             Map<Location, SortedSet<Location>> aliases =
                 new HashMap<>();
-            Map<ProgramVariable, Term> localValues = new HashMap<>();
+            Map<ProgramVariable, JTerm> localValues = new HashMap<>();
             analyzeEquivalenceClasses(services, sec, aliases, thisReference);
             analyzeSequent(services, node.sequent(), aliases, thisReference);
             analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, ec, thisReference);
@@ -259,14 +245,10 @@ public abstract class AbstractSlicer {
     /**
      * Analyzes the given {@link ISymbolicEquivalenceClass}es.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param sec
-     *        The {@link ISymbolicEquivalenceClass} to analyze.
-     * @param aliases
-     *        The alias {@link Map} to fill.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services The {@link Services} to use.
+     * @param sec The {@link ISymbolicEquivalenceClass} to analyze.
+     * @param aliases The alias {@link Map} to fill.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeEquivalenceClasses(Services services,
@@ -274,9 +256,9 @@ public abstract class AbstractSlicer {
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         if (sec != null) {
             for (ISymbolicEquivalenceClass eq : sec) {
-                ImmutableList<Term> terms = eq.getTerms();
+                ImmutableList<JTerm> terms = eq.getTerms();
                 List<Location> locations = new ArrayList<>(terms.size());
-                for (Term term : terms) {
+                for (JTerm term : terms) {
                     if (SymbolicExecutionUtil.hasReferenceSort(services, term)) {
                         Location location = toLocation(services, term);
                         if (location != null) {
@@ -301,28 +283,24 @@ public abstract class AbstractSlicer {
     /**
      * Analyzes the given {@link Sequent} for equalities specified by top level formulas.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param sequent
-     *        The {@link Sequent} to analyze.
-     * @param aliases
-     *        The alias {@link Map} to fill.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services The {@link Services} to use.
+     * @param sequent The {@link Sequent} to analyze.
+     * @param aliases The alias {@link Map} to fill.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void analyzeSequent(Services services, Sequent sequent,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         for (SequentFormula sf : sequent.antecedent()) {
-            Term term = (Term) sf.formula();
+            JTerm term = (JTerm) sf.formula();
             if (Equality.EQUALS == term.op()) {
                 analyzeEquality(services, term, aliases, thisReference);
             }
         }
         for (SequentFormula sf : sequent.succedent()) {
-            Term term = (Term) sf.formula();
+            JTerm term = (JTerm) sf.formula();
             if (Junctor.NOT == term.op()) {
-                Term negatedTerm = term.sub(0);
+                JTerm negatedTerm = term.sub(0);
                 if (Equality.EQUALS == negatedTerm.op()) {
                     analyzeEquality(services, negatedTerm, aliases, thisReference);
                 }
@@ -331,22 +309,18 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Analyzes the given equality {@link Term} for aliased locations.
+     * Analyzes the given equality {@link JTerm} for aliased locations.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param equality
-     *        The equality {@link Term} to analyze.
-     * @param aliases
-     *        The alias {@link Map} to fill.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services The {@link Services} to use.
+     * @param equality The equality {@link JTerm} to analyze.
+     * @param aliases The alias {@link Map} to fill.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeEquality(Services services, Term equality,
+    protected void analyzeEquality(Services services, JTerm equality,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
-        Term firstSub = equality.sub(0);
-        Term secondSub = equality.sub(1);
+        JTerm firstSub = equality.sub(0);
+        JTerm secondSub = equality.sub(1);
         if (SymbolicExecutionUtil.hasReferenceSort(services, firstSub)
                 && SymbolicExecutionUtil.hasReferenceSort(services, secondSub)) {
             Location first = toLocation(services, firstSub);
@@ -360,26 +334,19 @@ public abstract class AbstractSlicer {
     /**
      * Utility method used by {@link #analyzeSequent} to analyze the given updates.
      *
-     * @param updates
-     *        The update {@link Term}s to analyze.
-     * @param services
-     *        The {@link Services} to use.
-     * @param heapLDT
-     *        The {@link HeapLDT} of the {@link Services}.
-     * @param aliases
-     *        The alias {@link Map} to fill.
-     * @param localValues
-     *        The local values to fill.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param updates The update {@link JTerm}s to analyze.
+     * @param services The {@link Services} to use.
+     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+     * @param aliases The alias {@link Map} to fill.
+     * @param localValues The local values to fill.
+     * @param ec The current {@link ExecutionContext}.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeUpdates(ImmutableList<Term> updates, Services services, HeapLDT heapLDT,
-            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, Term> localValues,
+    protected void analyzeUpdates(ImmutableList<JTerm> updates, Services services, HeapLDT heapLDT,
+            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, JTerm> localValues,
             ExecutionContext ec, ReferencePrefix thisReference) {
-        for (Term update : updates) {
+        for (JTerm update : updates) {
             analyzeUpdate(update, services, heapLDT, aliases, localValues, ec, thisReference);
         }
     }
@@ -388,24 +355,17 @@ public abstract class AbstractSlicer {
      * Recursive utility method used by
      * {@link #analyzeUpdates} to analyze a given update.
      *
-     * @param term
-     *        The update {@link Term} to analyze.
-     * @param services
-     *        The {@link Services} to use.
-     * @param heapLDT
-     *        The {@link HeapLDT} of the {@link Services}.
-     * @param aliases
-     *        The alias {@link Map} to fill.
-     * @param localValues
-     *        The local values to fill.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term The update {@link JTerm} to analyze.
+     * @param services The {@link Services} to use.
+     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+     * @param aliases The alias {@link Map} to fill.
+     * @param localValues The local values to fill.
+     * @param ec The current {@link ExecutionContext}.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeUpdate(Term term, Services services, HeapLDT heapLDT,
-            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, Term> localValues,
+    protected void analyzeUpdate(JTerm term, Services services, HeapLDT heapLDT,
+            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, JTerm> localValues,
             ExecutionContext ec, ReferencePrefix thisReference) {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE
                 || term.op() == UpdateApplication.UPDATE_APPLICATION) {
@@ -437,19 +397,14 @@ public abstract class AbstractSlicer {
      * Recursive utility method used by {@link #analyzeUpdate} to
      * analyze a given update.
      *
-     * @param term
-     *        The heap update {@link Term} to analyze.
-     * @param services
-     *        The {@link Services} to use.
-     * @param heapLDT
-     *        The {@link HeapLDT} of the {@link Services}.
-     * @param aliases
-     *        The alias {@link Map} to fill.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term The heap update {@link JTerm} to analyze.
+     * @param services The {@link Services} to use.
+     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+     * @param aliases The alias {@link Map} to fill.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeHeapUpdate(Term term, Services services, HeapLDT heapLDT,
+    protected void analyzeHeapUpdate(JTerm term, Services services, HeapLDT heapLDT,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         final Function store = heapLDT.getStore();
         final Function create = heapLDT.getCreate();
@@ -480,23 +435,17 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Recursive method to list all modified {@link Location}s in the given {@link Term}.
+     * Recursive method to list all modified {@link Location}s in the given {@link JTerm}.
      *
-     * @param term
-     *        The update {@link Term} to analyze.
-     * @param services
-     *        The {@link Services} to use.
-     * @param heapLDT
-     *        The {@link HeapLDT} of the {@link Services}.
-     * @param listToFill
-     *        The result {@link List} with {@link Location}s to fill.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term The update {@link JTerm} to analyze.
+     * @param services The {@link Services} to use.
+     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+     * @param listToFill The result {@link List} with {@link Location}s to fill.
+     * @param ec The current {@link ExecutionContext}.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void listModifiedLocations(Term term, Services services, HeapLDT heapLDT,
+    protected void listModifiedLocations(JTerm term, Services services, HeapLDT heapLDT,
             List<Location> listToFill, ExecutionContext ec, ReferencePrefix thisReference,
             Set<Location> relevantLocations, Node node) throws ProofInputException {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE
@@ -526,19 +475,14 @@ public abstract class AbstractSlicer {
      * {@link #listModifiedLocations} to analyze a
      * given update.
      *
-     * @param term
-     *        The heap update {@link Term} to analyze.
-     * @param services
-     *        The {@link Services} to use.
-     * @param heapLDT
-     *        The {@link HeapLDT} of the {@link Services}.
-     * @param listToFill
-     *        The result {@link List} with {@link Location}s to fill.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param term The heap update {@link JTerm} to analyze.
+     * @param services The {@link Services} to use.
+     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+     * @param listToFill The result {@link List} with {@link Location}s to fill.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void listModifiedHeapLocations(Term term, Services services, HeapLDT heapLDT,
+    protected void listModifiedHeapLocations(JTerm term, Services services, HeapLDT heapLDT,
             List<Location> listToFill, ReferencePrefix thisReference,
             Set<Location> relevantLocations, Node node) throws ProofInputException {
         if (term.op() == heapLDT.getStore()) {
@@ -561,7 +505,7 @@ public abstract class AbstractSlicer {
             // Nothing to do, root of heap reached.
         } else if (term.op() == heapLDT.getAnon()) {
             if (!relevantLocations.isEmpty()) { // Nothing to do if relevant locations are empty
-                Term anonHeap = term.sub(2);
+                JTerm anonHeap = term.sub(2);
                 // Idea: Compute all values of relevant locations in a side proof. Modified
                 // locations are anonymized.
                 // New OneStepSimplifier is required because it has an internal state and the
@@ -573,10 +517,10 @@ public abstract class AbstractSlicer {
                     // Create location terms
                     List<Location> resultLocations =
                         new ArrayList<>(relevantLocations.size());
-                    List<Term> resultTerms = new ArrayList<>(relevantLocations.size());
+                    List<JTerm> resultTerms = new ArrayList<>(relevantLocations.size());
                     List<Sort> resultSorts = new ArrayList<>(relevantLocations.size());
                     for (Location location : relevantLocations) {
-                        Term locationTerm =
+                        JTerm locationTerm =
                             location.toTerm(sideProofEnv.getServicesForEnvironment());
                         if (!(locationTerm.op() instanceof IProgramVariable)) { // Ignore local
                                                                                 // variables.
@@ -588,14 +532,14 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        JFunction newPredicate = new JFunction(
+                        Function newPredicate = new JFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
                             JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
-                        Term newTerm =
+                        JTerm newTerm =
                             sideProofEnv.getServicesForEnvironment().getTermBuilder().func(
-                                newPredicate, resultTerms.toArray(new Term[0]));
+                                newPredicate, resultTerms.toArray(new JTerm[0]));
 
                         Sequent sequentToProve =
                             SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
@@ -608,14 +552,14 @@ public abstract class AbstractSlicer {
                         // Check for anonymized values in the side proof goals
                         assert !info.getProof().closed();
                         for (Goal goal : info.getProof().openGoals()) {
-                            Term operatorTerm = SymbolicExecutionSideProofUtil
+                            JTerm operatorTerm = SymbolicExecutionSideProofUtil
                                     .extractOperatorTerm(goal, newPredicate);
                             assert operatorTerm != null;
                             for (int i = 0; i < operatorTerm.arity(); i++) {
-                                Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(
+                                JTerm valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(
                                     goal.sequent(), operatorTerm.sub(i), services);
                                 if (valueTerm.arity() >= 1) {
-                                    Term heap = valueTerm.sub(0);
+                                    JTerm heap = valueTerm.sub(0);
                                     if (anonHeap.equals(heap)) {
                                         listToFill.add(resultLocations.get(i));
                                     }
@@ -640,10 +584,10 @@ public abstract class AbstractSlicer {
                     // Create location terms
                     List<Location> resultLocations =
                         new ArrayList<>(relevantLocations.size());
-                    List<Term> resultTerms = new ArrayList<>(relevantLocations.size());
+                    List<JTerm> resultTerms = new ArrayList<>(relevantLocations.size());
                     List<Sort> resultSorts = new ArrayList<>(relevantLocations.size());
                     for (Location location : relevantLocations) {
-                        Term locationTerm =
+                        JTerm locationTerm =
                             location.toTerm(sideProofEnv.getServicesForEnvironment());
                         if (!(locationTerm.op() instanceof IProgramVariable)) { // Ignore local
                                                                                 // variables.
@@ -655,14 +599,14 @@ public abstract class AbstractSlicer {
                     if (!resultTerms.isEmpty()) {
                         // Create predicate which will be used in formulas to store the value
                         // interested in.
-                        JFunction newPredicate = new JFunction(
+                        Function newPredicate = new JFunction(
                             new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder()
                                     .newName("ResultPredicate")),
                             JavaDLTheory.FORMULA, new ImmutableArray<>(resultSorts));
                         // Create formula which contains the value interested in.
                         TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
-                        Term newTerm = tb.func(newPredicate,
-                            resultTerms.toArray(new Term[0]));
+                        JTerm newTerm = tb.func(newPredicate,
+                            resultTerms.toArray(new JTerm[0]));
                         newTerm = tb.apply(
                             tb.elementary(heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME), term),
                             newTerm);
@@ -676,14 +620,14 @@ public abstract class AbstractSlicer {
                         // Check for anonymized values in the side proof goals
                         assert !info.getProof().closed();
                         for (Goal goal : info.getProof().openGoals()) {
-                            Term operatorTerm = SymbolicExecutionSideProofUtil
+                            JTerm operatorTerm = SymbolicExecutionSideProofUtil
                                     .extractOperatorTerm(goal, newPredicate);
                             assert operatorTerm != null;
                             for (int i = 0; i < operatorTerm.arity(); i++) {
-                                Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(
+                                JTerm valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(
                                     goal.sequent(), operatorTerm.sub(i), services);
                                 if (valueTerm.arity() >= 1) {
-                                    Term heap = valueTerm.sub(0);
+                                    JTerm heap = valueTerm.sub(0);
                                     if (heap.containsLabel(
                                         ParameterlessTermLabel.ANON_HEAP_LABEL)) {
                                         listToFill.add(resultLocations.get(i));
@@ -706,16 +650,11 @@ public abstract class AbstractSlicer {
      * {@link Map}. If required, all participating entries in the {@link Map} are updated to ensure
      * consistency.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param first
-     *        The first alias.
-     * @param second
-     *        The second alias.
-     * @param aliases
-     *        The alias {@link Map} to update.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services The {@link Services} to use.
+     * @param first The first alias.
+     * @param second The second alias.
+     * @param aliases The alias {@link Map} to update.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
     protected void updateAliases(Services services, Location first, Location second,
@@ -776,12 +715,9 @@ public abstract class AbstractSlicer {
     /**
      * Returns the representative alias for the given {@link ReferencePrefix}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param referencePrefix
-     *        The {@link ReferencePrefix}.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
+     * @param services The {@link Services} to use.
+     * @param referencePrefix The {@link ReferencePrefix}.
+     * @param info The {@link SequentInfo} with the aliases and so on.
      * @return The representative alias.
      */
     protected Location normalizeAlias(Services services, ReferencePrefix referencePrefix,
@@ -794,12 +730,9 @@ public abstract class AbstractSlicer {
     /**
      * Returns the representative alias for the given {@link Location}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param location
-     *        The {@link Location}.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
+     * @param services The {@link Services} to use.
+     * @param location The {@link Location}.
+     * @param info The {@link SequentInfo} with the aliases and so on.
      * @return The representative alias.
      */
     protected Location normalizeAlias(Services services, Location location, SequentInfo info) {
@@ -821,19 +754,17 @@ public abstract class AbstractSlicer {
     /**
      * Normalizes the given array index.
      *
-     * @param access
-     *        The {@link Access} representing an array index.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
+     * @param access The {@link Access} representing an array index.
+     * @param info The {@link SequentInfo} with the aliases and so on.
      * @return The normalized array access.
      */
     protected Access normalizeArrayIndex(Access access, SequentInfo info) {
-        ImmutableArray<Term> oldTerms = access.getDimensionExpressions();
-        Term[] newTerms = new Term[oldTerms.size()];
+        ImmutableArray<JTerm> oldTerms = access.getDimensionExpressions();
+        JTerm[] newTerms = new JTerm[oldTerms.size()];
         for (int i = 0; i < newTerms.length; i++) {
-            Term oldTerm = oldTerms.get(i);
+            JTerm oldTerm = oldTerms.get(i);
             if (oldTerm.op() instanceof ProgramVariable) {
-                Term value = info.getLocalValues().get((ProgramVariable) oldTerm.op());
+                JTerm value = info.getLocalValues().get((ProgramVariable) oldTerm.op());
                 if (value != null) {
                     oldTerm = value;
                 }
@@ -846,10 +777,8 @@ public abstract class AbstractSlicer {
     /**
      * Computes the representative alias of the given {@link Location}.
      *
-     * @param location
-     *        The given {@link Location}.
-     * @param aliases
-     *        The available aliases.
+     * @param location The given {@link Location}.
+     * @param aliases The available aliases.
      * @return The representative alias.
      */
     protected Location computeRepresentativeAlias(Location location,
@@ -865,8 +794,7 @@ public abstract class AbstractSlicer {
     /**
      * Computes the {@link ReferencePrefix} of the given {@link SourceElement}.
      *
-     * @param sourceElement
-     *        The {@link SourceElement} to work with.
+     * @param sourceElement The {@link SourceElement} to work with.
      * @return The {@link ReferencePrefix} or {@code null} if the {@link SourceElement} can't be
      *         represented as {@link ReferencePrefix}.
      */
@@ -893,14 +821,10 @@ public abstract class AbstractSlicer {
      * Checks if the given {@link SourceElement} is directly or indirectly contained (aliased) in
      * the {@link Set} of relevant locations. If it is contained, the element will be removed.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param sourceElement
-     *        The {@link SourceElement} to check.
-     * @param relevantLocations
-     *        The {@link Set} with locations of interest.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
+     * @param services The {@link Services} to use.
+     * @param sourceElement The {@link SourceElement} to check.
+     * @param relevantLocations The {@link Set} with locations of interest.
+     * @param info The {@link SequentInfo} with the aliases and so on.
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
@@ -914,14 +838,10 @@ public abstract class AbstractSlicer {
      * Checks if the given {@link Location} is directly or indirectly contained (aliased) in the
      * {@link Set} of relevant locations. If it is contained, the element will be removed.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param location
-     *        The {@link Location} to check.
-     * @param relevantLocations
-     *        The {@link Set} with locations of interest.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
+     * @param services The {@link Services} to use.
+     * @param location The {@link Location} to check.
+     * @param relevantLocations The {@link Set} with locations of interest.
+     * @param info The {@link SequentInfo} with the aliases and so on.
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
@@ -935,14 +855,10 @@ public abstract class AbstractSlicer {
      * Checks if the given {@link Location} is directly or indirectly contained (aliased) in the
      * {@link Set} of relevant locations. If it is contained, the element will be removed.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param normalized
-     *        The {@link Location} to check.
-     * @param relevantLocations
-     *        The {@link Set} with locations of interest.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
+     * @param services The {@link Services} to use.
+     * @param normalized The {@link Location} to check.
+     * @param relevantLocations The {@link Set} with locations of interest.
+     * @param info The {@link SequentInfo} with the aliases and so on.
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
@@ -964,14 +880,10 @@ public abstract class AbstractSlicer {
     /**
      * Converts the given {@link ReferencePrefix} into a {@link Location}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param prefix
-     *        The {@link ReferencePrefix} to convert.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services The {@link Services} to use.
+     * @param prefix The {@link ReferencePrefix} to convert.
+     * @param ec The current {@link ExecutionContext}.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      * @return The {@link Location} representing the given {@link ReferencePrefix}.
      */
@@ -986,17 +898,12 @@ public abstract class AbstractSlicer {
      * Utility method used by {@link #toLocation} to
      * recursively extract the {@link Access} instances.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param prefix
-     *        The {@link ReferencePrefix} to work with.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @param thisReference
-     *        The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services The {@link Services} to use.
+     * @param prefix The {@link ReferencePrefix} to work with.
+     * @param ec The current {@link ExecutionContext}.
+     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
-     * @param children
-     *        The already known child {@link Access}s.
+     * @param children The already known child {@link Access}s.
      * @return An {@link ImmutableList} containing all {@link Access}s of the
      *         {@link ReferencePrefix} in the order of access.
      */
@@ -1032,19 +939,16 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Converts the given {@link Expression}s into {@link Term}s.
+     * Converts the given {@link Expression}s into {@link JTerm}s.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param expressions
-     *        The {@link Expression}s to convert.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @return The created {@link Term}s.
+     * @param services The {@link Services} to use.
+     * @param expressions The {@link Expression}s to convert.
+     * @param ec The current {@link ExecutionContext}.
+     * @return The created {@link JTerm}s.
      */
-    public static ImmutableArray<Term> toTerm(Services services,
+    public static ImmutableArray<JTerm> toTerm(Services services,
             ImmutableArray<Expression> expressions, ExecutionContext ec) {
-        Term[] terms = new Term[expressions.size()];
+        JTerm[] terms = new JTerm[expressions.size()];
         int i = 0;
         for (Expression expression : expressions) {
             terms[i] = toTerm(services, expression, ec);
@@ -1054,31 +958,26 @@ public abstract class AbstractSlicer {
     }
 
     /**
-     * Converts the given {@link Expression} into a {@link Term}.
+     * Converts the given {@link Expression} into a {@link JTerm}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param expression
-     *        The {@link Expression} to convert.
-     * @param ec
-     *        The current {@link ExecutionContext}.
-     * @return The created {@link Term}.
+     * @param services The {@link Services} to use.
+     * @param expression The {@link Expression} to convert.
+     * @param ec The current {@link ExecutionContext}.
+     * @return The created {@link JTerm}.
      */
-    public static Term toTerm(Services services, Expression expression, ExecutionContext ec) {
+    public static JTerm toTerm(Services services, Expression expression, ExecutionContext ec) {
         return services.getTypeConverter().convertToLogicElement(expression, ec);
     }
 
     /**
-     * Converts the given {@link Term} into a {@link Location}.
+     * Converts the given {@link JTerm} into a {@link Location}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param term
-     *        The {@link Term} to convert.
-     * @return The {@link Location} or {@code null} if the {@link Term} could not be represented as
+     * @param services The {@link Services} to use.
+     * @param term The {@link JTerm} to convert.
+     * @return The {@link Location} or {@code null} if the {@link JTerm} could not be represented as
      *         {@link Location}.
      */
-    public static Location toLocation(Services services, Term term) {
+    public static Location toLocation(Services services, JTerm term) {
         if (term.op() instanceof ProgramVariable) {
             return new Location(new Access((ProgramVariable) term.op()));
         } else if (SymbolicExecutionUtil.isNullSort(term.sort(), services)) {
@@ -1087,7 +986,7 @@ public abstract class AbstractSlicer {
             HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             if (term.op() == heapLDT.getSelect(term.sort(), services)) {
                 Location prefix = toLocation(services, term.sub(1));
-                Term arrayIndex =
+                JTerm arrayIndex =
                     SymbolicExecutionUtil.getArrayIndex(services, heapLDT, term.sub(2));
                 if (arrayIndex != null) {
                     return prefix.append(new Access(arrayIndex));
@@ -1116,10 +1015,8 @@ public abstract class AbstractSlicer {
     /**
      * Returns the first found alternative which is still valid.
      *
-     * @param oldAlternatives
-     *        The old alternatives.
-     * @param newAlternatives
-     *        The new alternatives.
+     * @param oldAlternatives The old alternatives.
+     * @param newAlternatives The new alternatives.
      * @return The found alternative or {@code null} if not available.
      */
     protected Location findNewAlternative(final SortedSet<Location> oldAlternatives,
@@ -1131,10 +1028,8 @@ public abstract class AbstractSlicer {
     /**
      * Computes the length of a common prefix.
      *
-     * @param candidates
-     *        The possible candidates.
-     * @param toCheck
-     *        The {@link ImmutableList} to check.
+     * @param candidates The possible candidates.
+     * @param toCheck The {@link ImmutableList} to check.
      * @return The common prefix length which is {@code 0} if no elements are common.
      */
     public static <T> int computeFirstCommonPrefixLength(ImmutableList<ImmutableList<T>> candidates,
@@ -1153,10 +1048,8 @@ public abstract class AbstractSlicer {
     /**
      * Checks if the given {@link ImmutableList} starts with the given prefix.
      *
-     * @param list
-     *        The {@link List} to check.
-     * @param prefix
-     *        The prefix to check.
+     * @param list The {@link List} to check.
+     * @param prefix The prefix to check.
      * @return {@code true} the first elements in the {@link ImmutableList} are the prefix,
      *         {@code false} if the first elements are not equal to the prefix.
      */

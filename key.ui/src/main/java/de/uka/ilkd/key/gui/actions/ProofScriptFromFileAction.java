@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -29,13 +31,12 @@ public class ProofScriptFromFileAction extends AbstractAction {
 
     private final KeYMediator mediator;
 
-    private static File lastDirectory;
+    private static Path lastDirectory;
 
     /**
      * Instantiates a new proof script from file action.
      *
-     * @param mediator
-     *        the mediator
+     * @param mediator the mediator
      */
     public ProofScriptFromFileAction(KeYMediator mediator) {
         super("Run proof script from file...");
@@ -44,19 +45,16 @@ public class ProofScriptFromFileAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        File dir = null;
+        Path dir = Paths.get(".");
         if (lastDirectory != null) {
             dir = lastDirectory;
         } else {
             Proof currentProof = mediator.getSelectedProof();
             if (currentProof != null) {
-                var currentFile = currentProof.getProofFile();
+                Path currentFile = currentProof.getProofFile();
                 if (currentFile != null) {
-                    dir = currentFile.getParent().toFile();
+                    dir = currentFile.getParent();
                 }
-            } else {
-                dir = new File(".");
             }
         }
 
@@ -65,11 +63,11 @@ public class ProofScriptFromFileAction extends AbstractAction {
 
             KeYFileChooser fc = KeYFileChooser.getFileChooser("Select file to load");
             fc.setFileFilter(fc.getAcceptAllFileFilter());
-            fc.setCurrentDirectory(dir);
+            fc.setCurrentDirectory(dir.toFile());
             int res = fc.showOpenDialog(mainWindow);
             if (res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
-                lastDirectory = selectedFile.getParentFile();
+                lastDirectory = selectedFile.getParentFile().toPath();
                 var script = ParsingFacade.parseScript(selectedFile.toPath());
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, script);
                 psw.init();

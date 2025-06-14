@@ -22,11 +22,11 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.nparser.KeYParser;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.ParsableVariable;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
@@ -147,9 +147,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
+            { (JOperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                (Operator) functions().lookup(name),
+                functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
 
             };
@@ -164,10 +164,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Name fqName =
                 new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
+                new Operator[] { (JOperatorSV) schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    (Operator) functions().lookup(fqName),
+                    functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
             for (Operator op : operators) {

@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -133,7 +133,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
-                LogicPrinter.quickPrintTerm((Term) sequent.getFormulaByNr(i).formula(), services))
+                LogicPrinter.quickPrintTerm((JTerm) sequent.getFormulaByNr(i).formula(), services))
                     .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {

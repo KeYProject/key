@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project;
 
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -54,7 +55,7 @@ public class Main {
     /**
      * sets up the environment with the Java project described by its location
      *
-     * @param location the File with the path to the source directory of the Java project
+     * @param location the Path with the path to the source directory of the Java project
      *        to be verified
      * @return the {@KeYEnvironment} that provides the context for all following verification tasks
      * @throws ProblemLoaderException if the setup fails

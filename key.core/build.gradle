@@ -2,7 +2,7 @@ plugins {
     id 'antlr'
 }
 
-description "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
+description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
@@ -111,23 +111,23 @@ tasks.withType(Test) {
 
 
 tasks.register('testProveRules', Test) {
-    description 'Proves KeY taclet rules tagged as lemma'
-    group "verification"
+    description = 'Proves KeY taclet rules tagged as lemma'
+    group = "verification"
     filter { includeTestsMatching "ProveRulesTest" }
     //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
 tasks.register('testRunAllFunProofs', Test) {
-    description 'Prove/reload all keyfiles tagged for regression testing'
-    group "verification"
+    description = 'Prove/reload all keyfiles tagged for regression testing'
+    group = "verification"
     filter {
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
 
 tasks.register('testRunAllInfProofs', Test) {
-    description 'Prove/reload all keyfiles tagged for regression testing'
-    group "verification"
+    description = 'Prove/reload all keyfiles tagged for regression testing'
+    group = "verification"
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
     }
@@ -135,8 +135,8 @@ tasks.register('testRunAllInfProofs', Test) {
 
 
 tasks.register('testProveSMTLemmas', Test) {
-    description 'Prove (or load proofs for) lemmas used in the SMT translation'
-    group "verification"
+    description = 'Prove (or load proofs for) lemmas used in the SMT translation'
+    group = "verification"
     filter {
         includeTestsMatching "ProveSMTLemmasTest"
     }
@@ -145,8 +145,8 @@ tasks.register('testProveSMTLemmas', Test) {
 // Run the tests for the new smt translation in strict mode
 // where "unknown" is less accepted
 tasks.register('testStrictSMT', Test) {
-    description 'Run the tests for the new smt translation in strict mode'
-    group 'verification'
+    description = 'Run the tests for the new smt translation in strict mode'
+    group = 'verification'
     systemProperty("key.newsmt2.stricttests", "true")
     filter {
         includeTestsMatching "MasterHandlerTest"
@@ -237,7 +237,7 @@ tasks.register('debugJmlLexer', JavaExec) {
     standardInput = System.in
 }
 
-tasks.register('ptest', Test) { group "verification" }
+tasks.register('ptest', Test) { group = "verification" }
 
 tasks.register('generateRAPUnitTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath

@@ -25,13 +25,14 @@ public class FileRuleSource extends RuleSource {
 
     FileRuleSource(Path ruleFile) {
         this.ruleFile = Objects.requireNonNull(ruleFile);
-        long size;
+
+        long l;
         try {
-            size = Files.size(ruleFile);
+            l = Files.size(ruleFile);
         } catch (IOException e) {
-            size = 0;
+            l = -1;
         }
-        numberOfChars = size;
+        numberOfChars = l;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class FileRuleSource extends RuleSource {
     }
 
     @Override
-    public @NonNull Path file() {
+    public Path file() {
         return ruleFile;
     }
 
@@ -62,8 +63,8 @@ public class FileRuleSource extends RuleSource {
     @Override
     public InputStream getNewStream() {
         try {
-            return new BufferedInputStream(new FileInputStream(ruleFile.toFile()));
-        } catch (final FileNotFoundException exception) {
+            return new BufferedInputStream(Files.newInputStream(ruleFile));
+        } catch (final IOException exception) {
             throw new RuntimeException("Error while opening a file stream to " + ruleFile,
                 exception);
         }
@@ -76,6 +77,6 @@ public class FileRuleSource extends RuleSource {
 
     @Override
     public CharStream getCharStream() throws IOException {
-        return CharStreams.fromPath(ruleFile.toAbsolutePath());
+        return CharStreams.fromPath(ruleFile);
     }
 }

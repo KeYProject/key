@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
@@ -95,7 +95,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         instantiation =
-            new AbstractLoopContractRule.Instantiator((Term) pio.subTerm(), goal).instantiate();
+            new AbstractLoopContractRule.Instantiator((JTerm) pio.subTerm(), goal).instantiate();
 
         Services services = goal.proof().getServices();
 

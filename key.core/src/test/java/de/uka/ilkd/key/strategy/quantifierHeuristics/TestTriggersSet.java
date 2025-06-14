@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -199,7 +199,7 @@ public class TestTriggersSet {
 
     }
 
-    private Term parseTerm(String termstr) {
+    private JTerm parseTerm(String termstr) {
         return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
             new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
@@ -207,8 +207,8 @@ public class TestTriggersSet {
     @Test
     public void testTrigger1() {
         String term1 = "\\forall s x;(ps(x))";
-        Term allterm = parseTerm(term1);
-        Term trigger1 = allterm.sub(0);
+        JTerm allterm = parseTerm(term1);
+        JTerm trigger1 = allterm.sub(0);
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
@@ -220,8 +220,8 @@ public class TestTriggersSet {
     @Disabled("See Issues #1499")
     public void testTrigger2() {
         String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
-        Term allterm = parseTerm(term1);
-        Term trigger1 = allterm.sub(0).sub(1);
+        JTerm allterm = parseTerm(term1);
+        JTerm trigger1 = allterm.sub(0).sub(1);
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);

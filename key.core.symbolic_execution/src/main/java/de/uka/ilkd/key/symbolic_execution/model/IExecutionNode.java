@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -71,11 +71,11 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     boolean isPathConditionChanged();
 
     /**
-     * Returns the path condition to reach this node as {@link Term}.
+     * Returns the path condition to reach this node as {@link JTerm}.
      *
-     * @return The path condition to reach this node as {@link Term}.
+     * @return The path condition to reach this node as {@link JTerm}.
      */
-    Term getPathCondition() throws ProofInputException;
+    JTerm getPathCondition() throws ProofInputException;
 
     /**
      * Returns the human readable path condition to reach this node as string.
@@ -116,37 +116,32 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * Returns the variable value pairs of the current state.
      *
      * @return The variable value pairs.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     IExecutionVariable[] getVariables() throws ProofInputException;
 
     /**
      * Returns the variable value pairs of the current state under the given condition.
      *
-     * @param condition
-     *        A {@link Term} specifying some additional constraints to consider.
+     * @param condition A {@link JTerm} specifying some additional constraints to consider.
      * @return The variable value pairs.
      */
-    IExecutionVariable[] getVariables(Term condition) throws ProofInputException;
+    IExecutionVariable[] getVariables(JTerm condition) throws ProofInputException;
 
     /**
      * Returns the number of memory layouts.
      *
      * @return The number of memory layouts.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     int getLayoutsCount() throws ProofInputException;
 
     /**
      * Returns the equivalence classes of the memory layout with the given index.
      *
-     * @param layoutIndex
-     *        The index of the memory layout.
+     * @param layoutIndex The index of the memory layout.
      * @return The equivalence classes of the memory layout at the given index.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex)
             throws ProofInputException;
@@ -154,11 +149,9 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     /**
      * Returns the initial memory layout before the method was executed.
      *
-     * @param layoutIndex
-     *        The index of the memory layout.
+     * @param layoutIndex The index of the memory layout.
      * @return The initial memory layout at the given index.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException;
 
@@ -166,11 +159,9 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * Returns the current memory layout which shows the memory structure before the current node in
      * the symbolic execution tree is executed.
      *
-     * @param layoutIndex
-     *        The index of the memory layout.
+     * @param layoutIndex The index of the memory layout.
      * @return The current memory layout at the given index.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
 
@@ -185,21 +176,19 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * Returns the condition under which this node completes the code block of the given
      * {@link IExecutionBlockStartNode}.
      *
-     * @param completedNode
-     *        The completed {@link IExecutionBlockStartNode} for which the condition
+     * @param completedNode The completed {@link IExecutionBlockStartNode} for which the condition
      *        is requested.
      * @return The condition under which this node completes the code block of the given
      *         {@link IExecutionBlockStartNode}.
      */
-    Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+    JTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException;
 
     /**
      * Returns the human readable condition under which this node completes the code block of the
      * given {@link IExecutionBlockStartNode}.
      *
-     * @param completedNode
-     *        The completed {@link IExecutionBlockStartNode} for which the condition
+     * @param completedNode The completed {@link IExecutionBlockStartNode} for which the condition
      *        is requested.
      * @return The human readable condition under which this node completes the code block of the
      *         given {@link IExecutionBlockStartNode}.
@@ -210,8 +199,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     /**
      * Returns the outgoing {@link IExecutionLink}.
      *
-     * @param target
-     *        The target {@link IExecutionNode}.
+     * @param target The target {@link IExecutionNode}.
      * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
      */
     IExecutionLink getOutgoingLink(IExecutionNode<?> target);
@@ -226,8 +214,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     /**
      * Returns the incoming {@link IExecutionLink}.
      *
-     * @param source
-     *        The source {@link IExecutionNode}.
+     * @param source The source {@link IExecutionNode}.
      * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
      */
     IExecutionLink getIncomingLink(IExecutionNode<?> source);

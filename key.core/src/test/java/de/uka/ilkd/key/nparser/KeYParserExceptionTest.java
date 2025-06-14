@@ -40,6 +40,7 @@ public class KeYParserExceptionTest extends ParserExceptionTest {
      */
     private static final String FIX_FILE = null; // "conflict.java";
 
+    /// FIXME weigl: this seems to be broken and should always result into NPE.
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = KeYParserExceptionTest.class.getResource("exceptional");
         return getFiles(FIX_FILE, fileURL, ".key");

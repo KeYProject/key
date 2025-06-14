@@ -8,25 +8,30 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.WeakValueLinkedHashMap;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
-public class Modality extends org.key_project.logic.op.Modality implements Operator {
+public class JModality extends Modality implements Operator {
     /**
      * keeps track of created modalities
      */
-    private static final WeakValueLinkedHashMap<Pair<JavaModalityKind, JavaProgramElement>, Modality> modalities =
+    private static final WeakValueLinkedHashMap<Pair<JavaModalityKind, JavaProgramElement>, JModality> modalities =
         new WeakValueLinkedHashMap<>();
 
     /**
@@ -38,11 +43,11 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      *        the program of this modality
      * @return the modality of the given kind and program.
      */
-    public static synchronized Modality getModality(JavaModalityKind kind, JavaBlock jb) {
+    public static synchronized JModality getModality(JavaModalityKind kind, JavaBlock jb) {
         var pair = new Pair<>(kind, jb.program());
-        Modality mod = modalities.get(pair);
+        JModality mod = modalities.get(pair);
         if (mod == null) {
-            mod = new Modality(jb, kind);
+            mod = new JModality(jb, kind);
             modalities.put(pair, mod);
         }
         return mod;
@@ -55,13 +60,14 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      * <strong>Creation must only be done by {@link de.uka.ilkd.key.logic.TermServices}!</strong>
      *
      */
-    private Modality(JavaBlock prg, JavaModalityKind kind) {
+    private JModality(JavaBlock prg, JavaModalityKind kind) {
         super(kind.name(), JavaDLTheory.FORMULA, kind);
         this.javaBlock = prg;
     }
 
     @Override
-    public JavaBlock program() {
+    @NonNull
+    public JavaBlock programBlock() {
         return javaBlock;
     }
 
@@ -82,7 +88,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      *        the subterm to be checked.
      * @return true iff the given term can be subterm at the indicated position
      */
-    private boolean possibleSub(int at, Term possibleSub) {
+    private boolean possibleSub(int at, JTerm possibleSub) {
         final Sort s = possibleSub.sort();
 
         return s == AbstractTermTransformer.METASORT || s instanceof ProgramSVSort
@@ -91,7 +97,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     }
 
     protected <T extends org.key_project.logic.Term> void additionalValidTopLevel(T p_term) {
-        final Term term = (Term) p_term;
+        final JTerm term = (JTerm) p_term;
         for (int i = 0, n = arity(); i < n; i++) {
             if (!possibleSub(i, term.sub(i))) {
                 throw new TermCreationException(this, term);
@@ -100,7 +106,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     }
 
     @Override
-    public void validTopLevelException(org.key_project.logic.Term term)
+    public void validTopLevelException(Term term)
             throws TermCreationException {
         if (1 != term.arity()) {
             throw new TermCreationException(this, term);

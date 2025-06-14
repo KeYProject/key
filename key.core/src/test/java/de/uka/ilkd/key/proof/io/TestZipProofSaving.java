@@ -33,7 +33,7 @@ public class TestZipProofSaving {
     }
 
     private void proveAndSaveZip(Path file, Path fileTarget)
-            throws ProblemLoaderException, IOException {
+            throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
         env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
         GZipProofSaver proofSaver =

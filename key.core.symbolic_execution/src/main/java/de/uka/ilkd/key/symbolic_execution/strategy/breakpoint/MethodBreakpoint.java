@@ -6,13 +6,10 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.StatementBlock;
-import de.uka.ilkd.key.java.ast.StatementContainer;
-import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.ast.statement.MethodFrame;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
@@ -55,33 +52,20 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * Creates a new {@link LineBreakpoint}.
      *
-     * @param classPath
-     *        the path of the class the associated Breakpoint lies within
-     * @param lineNumber
-     *        the line where the associated Breakpoint is located in the class
-     * @param hitCount
-     *        the number of hits after which the execution should hold at this breakpoint
-     * @param pm
-     *        the {@link IProgramMethod} representing the Method which the Breakpoint is located
+     * @param classPath the path of the class the associated Breakpoint lies within
+     * @param lineNumber the line where the associated Breakpoint is located in the class
+     * @param hitCount the number of hits after which the execution should hold at this breakpoint
+     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located
      *        at
-     * @param proof
-     *        the {@link Proof} that will be executed and should stop
-     * @param condition
-     *        the condition as given by the user
-     * @param enabled
-     *        flag if the Breakpoint is enabled
-     * @param conditionEnabled
-     *        flag if the condition is enabled
-     * @param methodStart
-     *        the line the containing method of this breakpoint starts at
-     * @param methodEnd
-     *        the line the containing method of this breakpoint ends at
-     * @param isEntry
-     *        flag to tell whether to stop on method entry
-     * @param isExit
-     *        flag to tell whether to stop on method exit
-     * @throws SLTranslationException
-     *         if the condition could not be parsed to a valid Term
+     * @param proof the {@link Proof} that will be executed and should stop
+     * @param condition the condition as given by the user
+     * @param enabled flag if the Breakpoint is enabled
+     * @param conditionEnabled flag if the condition is enabled
+     * @param methodStart the line the containing method of this breakpoint starts at
+     * @param methodEnd the line the containing method of this breakpoint ends at
+     * @param isEntry flag to tell whether to stop on method entry
+     * @param isExit flag to tell whether to stop on method exit
+     * @throws SLTranslationException if the condition could not be parsed to a valid Term
      */
     public MethodBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm,
             Proof proof, String condition, boolean enabled, boolean conditionEnabled,
@@ -108,10 +92,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param node
-     *        to check
-     * @param ruleApp
-     *        the applied rule app
+     * @param node to check
+     * @param ruleApp the applied rule app
      * @return true if the node represents a method call
      */
     private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
@@ -133,10 +115,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param node
-     *        to check
-     * @param ruleApp
-     *        the applied rule app
+     * @param node to check
+     * @param ruleApp the applied rule app
      * @return true if the node represents a method return
      */
     private boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
@@ -154,8 +134,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp) {
-        var t = ruleApp.posInOccurrence().subTerm();
-        Term term = TermBuilder.goBelowUpdates(t);
+        final JTerm term = TermBuilder.goBelowUpdates((JTerm) ruleApp.posInOccurrence().subTerm());
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
         return Objects.equals(getPm(), mf.getProgramMethod());
@@ -229,8 +208,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param classPath
-     *        the classPath to set
+     * @param classPath the classPath to set
      */
     public void setClassPath(String classPath) {
         this.classPath = classPath;

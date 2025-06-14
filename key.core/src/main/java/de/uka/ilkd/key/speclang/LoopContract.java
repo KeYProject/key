@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -41,29 +41,24 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return this loop contract's decreases clause.
      */
-    Term getDecreases();
+    JTerm getDecreases();
 
     /**
      *
-     * @param heap
-     *        the heap to use.
-     * @param self
-     *        the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
-     *        services.
+     * @param heap the heap to use.
+     * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
      * @return this loop contract's decreases clause on the specified heap.
      */
-    Term getDecreases(Term heap, Term self, Services services);
+    JTerm getDecreases(JTerm heap, JTerm self, Services services);
 
     /**
      *
-     * @param variables
-     *        the variables to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
-     *        services.
+     * @param variables the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services services.
      * @return this loop contract's decreases clause.
      */
-    Term getDecreases(Variables variables, Services services);
+    JTerm getDecreases(Variables variables, Services services);
 
     /**
      * <p>
@@ -112,65 +107,47 @@ public interface LoopContract extends AuxiliaryContract {
 
     /**
      *
-     * @param newBlock
-     *        the new block.
-     * @param newPreconditions
-     *        the new preconditions.
-     * @param newPostconditions
-     *        the new postconditions.
-     * @param newModifiableClauses
-     *        the new modifiable clauses.
-     * @param newFreeModifiableClauses
-     *        the new free modifiable clauses.
-     * @param newinfFlowSpecs
-     *        the new information flow specifications.
-     * @param newVariables
-     *        the new variables.
-     * @param newMeasuredBy
-     *        the new measured-by clause.
-     * @param newDecreases
-     *        the new decreases clause.
+     * @param newBlock the new block.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiableClauses the new modifiable clauses.
+     * @param newFreeModifiableClauses the new free modifiable clauses.
+     * @param newinfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
-    LoopContract update(StatementBlock newBlock, Map<LocationVariable, Term> newPreconditions,
-            Map<LocationVariable, Term> newFreePreconditions,
-            Map<LocationVariable, Term> newPostconditions,
-            Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiableClauses,
-            Map<LocationVariable, Term> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
-            Term newDecreases);
+    LoopContract update(StatementBlock newBlock, Map<LocationVariable, JTerm> newPreconditions,
+            Map<LocationVariable, JTerm> newFreePreconditions,
+            Map<LocationVariable, JTerm> newPostconditions,
+            Map<LocationVariable, JTerm> newFreePostconditions,
+            Map<LocationVariable, JTerm> newModifiableClauses,
+            Map<LocationVariable, JTerm> newFreeModifiableClauses,
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
+            JTerm newDecreases);
 
     /**
      *
-     * @param newLoop
-     *        the new loop.
-     * @param newPreconditions
-     *        the new preconditions.
-     * @param newPostconditions
-     *        the new postconditions.
-     * @param newModifiableClauses
-     *        the new modifiable clauses.
-     * @param newFreeModifiableClauses
-     *        the new free modifiable clauses.
-     * @param newinfFlowSpecs
-     *        the new information flow specifications.
-     * @param newVariables
-     *        the new variables.
-     * @param newMeasuredBy
-     *        the new measured-by clause.
-     * @param newDecreases
-     *        the new decreases clause.
+     * @param newLoop the new loop.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiableClauses the new modifiable clauses.
+     * @param newFreeModifiableClauses the new free modifiable clauses.
+     * @param newinfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
+     * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
-    LoopContract update(LoopStatement newLoop, Map<LocationVariable, Term> newPreconditions,
-            Map<LocationVariable, Term> newFreePreconditions,
-            Map<LocationVariable, Term> newPostconditions,
-            Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiableClauses,
-            Map<LocationVariable, Term> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
-            Term newDecreases);
+    LoopContract update(LoopStatement newLoop, Map<LocationVariable, JTerm> newPreconditions,
+            Map<LocationVariable, JTerm> newFreePreconditions,
+            Map<LocationVariable, JTerm> newPostconditions,
+            Map<LocationVariable, JTerm> newFreePostconditions,
+            Map<LocationVariable, JTerm> newModifiableClauses,
+            Map<LocationVariable, JTerm> newFreeModifiableClauses,
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
+            JTerm newDecreases);
 
     /**
      *
@@ -189,29 +166,25 @@ public interface LoopContract extends AuxiliaryContract {
     ProgramVariable getValuesVariable();
 
     /**
-     * @param newKJT
-     *        the type containing the new target method.
-     * @param newPM
-     *        the new target method.
+     * @param newKJT the type containing the new target method.
+     * @param newPM the new target method.
      * @return a new loop contract equal to this one except that it belongs to a different target.
      */
     @Override
     LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
-     * @param newBlock
-     *        the new block.
+     * @param newBlock the new block.
      * @return a new loop contract equal to this one except that it belongs to a different block.
      */
     @Override
     LoopContract setBlock(StatementBlock newBlock);
 
     @Override
-    LoopContract map(UnaryOperator<Term> op, Services services);
+    LoopContract map(UnaryOperator<JTerm> op, Services services);
 
     /**
-     * @param newLoop
-     *        the new loop.
+     * @param newLoop the new loop.
      * @return a new loop contract equal to this one except that it belongs to a different loop.
      */
     LoopContract setLoop(LoopStatement newLoop);
@@ -220,10 +193,8 @@ public interface LoopContract extends AuxiliaryContract {
      * Replaces {@code \index} and {@code \values} with the proper variables in all terms of this
      * contract.
      *
-     * @param newBlock
-     *        a new block.
-     * @param services
-     *        services.
+     * @param newBlock a new block.
+     * @param services services.
      * @return a new loop contract equal to this one except that it belongs to the new block, and
      *         {@code \index} and {@code \values} are replaced by proper variables in all terms.
      */

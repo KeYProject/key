@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
@@ -30,7 +30,7 @@ import org.key_project.util.java.CollectionUtil;
  * term structures modulo
  * renaming are compared whilst ignoring annotations. *
  *
- * @see Term
+ * @see JTerm
  * @see TermImpl
  */
 class LabeledTermImpl extends TermImpl {
@@ -54,7 +54,7 @@ class LabeledTermImpl extends TermImpl {
      * @param origin
      *        a String with origin information
      */
-    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
+    public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
         super(op, subs, boundVars, origin);
@@ -75,7 +75,7 @@ class LabeledTermImpl extends TermImpl {
      * @param labels
      *        the terms labels (must not be null or empty)
      */
-    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
+    public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         super(op, subs, boundVars, "");

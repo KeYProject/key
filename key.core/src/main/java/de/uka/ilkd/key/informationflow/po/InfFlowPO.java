@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 import org.key_project.logic.Named;
@@ -21,11 +21,11 @@ public interface InfFlowPO extends ProofOblInput {
 
     InfFlowProofSymbols getIFSymbols();
 
-    void addIFSymbol(Term t);
+    void addIFSymbol(JTerm t);
 
     void addIFSymbol(Named n);
 
-    void addLabeledIFSymbol(Term t);
+    void addLabeledIFSymbol(JTerm t);
 
     void addLabeledIFSymbol(Named n);
 

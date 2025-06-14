@@ -66,7 +66,7 @@ public class ProblemFinder extends ExpressionBuilder {
      *         if the
      */
     @Override
-    public @Nullable Term visitProblem(KeYParser.ProblemContext ctx) {
+    public @Nullable JTerm visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null) {
                 chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
@@ -110,7 +110,7 @@ public class ProblemFinder extends ExpressionBuilder {
         var obj = super.visitTermorseq(ctx);
         if (obj instanceof Sequent s)
             return s;
-        if (obj instanceof Term t)
+        if (obj instanceof JTerm t)
             return JavaDLSequentKit
                     .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t)));
         return null;

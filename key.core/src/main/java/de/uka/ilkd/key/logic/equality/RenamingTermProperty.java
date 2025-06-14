@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic.equality;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Property;
@@ -47,16 +47,12 @@ public class RenamingTermProperty implements Property<Term> {
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1} modulo bound renaming.
      *
-     * @param term1
-     *        a term
-     * @param term2
-     *        the term compared to {@code term1}
-     * @param v
-     *        should not be used for this equality check
+     * @param term1 a term
+     * @param term2 the term compared to {@code term1}
+     * @param v should not be used for this equality check
      * @return {@code true} iff {@code term2} has the same values in operator, sort, arity,
      *         varsBoundHere and javaBlock as {@code term1} modulo bound renaming
-     * @param <V>
-     *        is not needed for this equality check
+     * @param <V> is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
@@ -70,8 +66,7 @@ public class RenamingTermProperty implements Property<Term> {
     /**
      * Computes the hash code of {@code term} modulo bound renaming.
      *
-     * @param term
-     *        the term to compute the hash code for
+     * @param term the term to compute the hash code for
      * @return the hash code
      */
     @Override
@@ -85,14 +80,10 @@ public class RenamingTermProperty implements Property<Term> {
     /**
      * Compare two quantifiable variables if they are equal modulo renaming.
      *
-     * @param ownVar
-     *        first QuantifiableVariable to be compared
-     * @param cmpVar
-     *        second QuantifiableVariable to be compared
-     * @param ownBoundVars
-     *        variables bound above the current position
-     * @param cmpBoundVars
-     *        variables bound above the current position
+     * @param ownVar first QuantifiableVariable to be compared
+     * @param cmpVar second QuantifiableVariable to be compared
+     * @param ownBoundVars variables bound above the current position
+     * @param cmpBoundVars variables bound above the current position
      */
     private static boolean compareBoundVariables(QuantifiableVariable ownVar,
             QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
@@ -131,14 +122,10 @@ public class RenamingTermProperty implements Property<Term> {
     /**
      * Compares two terms modulo bound renaming.
      *
-     * @param t0
-     *        the first term
-     * @param t1
-     *        the second term
-     * @param ownBoundVars
-     *        variables bound above the current position
-     * @param cmpBoundVars
-     *        variables bound above the current position
+     * @param t0 the first term
+     * @param t1 the second term
+     * @param ownBoundVars variables bound above the current position
+     * @param cmpBoundVars variables bound above the current position
      * @return <code>true</code> is returned iff the terms are equal modulo bound renaming
      */
     private boolean unifyHelp(Term t0, Term t1, ImmutableList<QuantifiableVariable> ownBoundVars,
@@ -160,11 +147,11 @@ public class RenamingTermProperty implements Property<Term> {
 
         final Operator op1 = t1.op();
 
-        if (op0 instanceof Modality mod0 && op1 instanceof Modality mod1) {
+        if (op0 instanceof JModality mod0 && op1 instanceof JModality mod1) {
             if (mod0.kind() != mod1.kind()) {
                 return false;
             }
-            nat = handleJava(mod0.program(), mod1.program(), nat);
+            nat = handleJava(mod0.programBlock(), mod1.programBlock(), nat);
             if (nat == FAILED) {
                 return false;
             }
@@ -189,14 +176,10 @@ public class RenamingTermProperty implements Property<Term> {
     /**
      * Handles the case where the first term is a quantifiable variable.
      *
-     * @param t0
-     *        the first term
-     * @param t1
-     *        the second term
-     * @param ownBoundVars
-     *        variables bound above the current position in {@code t0}
-     * @param cmpBoundVars
-     *        variables bound above the current position in {@code t1}
+     * @param t0 the first term
+     * @param t1 the second term
+     * @param ownBoundVars variables bound above the current position in {@code t0}
+     * @param cmpBoundVars variables bound above the current position in {@code t1}
      * @return <code>true</code> iff the quantifiable variables are equal modulo renaming
      */
     private boolean handleQuantifiableVariable(Term t0, Term t1,
@@ -217,12 +200,9 @@ public class RenamingTermProperty implements Property<Term> {
      * Checks whether the given {@link JavaBlock}s are equal modulo renaming and returns the updated
      * {@link NameAbstractionTable} or {@link #FAILED} if the {@link JavaBlock}s are not equal.
      *
-     * @param jb0
-     *        the first {@link JavaBlock} to compare
-     * @param jb1
-     *        the second {@link JavaBlock} to compare
-     * @param nat
-     *        the {@link NameAbstractionTable} used for the comparison
+     * @param jb0 the first {@link JavaBlock} to compare
+     * @param jb1 the second {@link JavaBlock} to compare
+     * @param nat the {@link NameAbstractionTable} used for the comparison
      * @return the updated {@link NameAbstractionTable} if the {@link JavaBlock}s are equal modulo
      *         renaming or {@link #FAILED} if they are not
      */
@@ -246,12 +226,9 @@ public class RenamingTermProperty implements Property<Term> {
      * and the deprecated class de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint,
      * it is now only a helper method in {@link RenamingTermProperty}.
      *
-     * @param jb1
-     *        the first {@link JavaBlock}
-     * @param jb2
-     *        the second {@link JavaBlock}
-     * @param nat
-     *        the {@link NameAbstractionTable} used for the comparison
+     * @param jb1 the first {@link JavaBlock}
+     * @param jb2 the second {@link JavaBlock}
+     * @param nat the {@link NameAbstractionTable} used for the comparison
      * @return true if the given {@link JavaBlock}s are NOT equal modulo renaming
      */
     public static boolean javaBlocksNotEqualModRenaming(JavaBlock jb1, JavaBlock jb2,
@@ -270,16 +247,11 @@ public class RenamingTermProperty implements Property<Term> {
      * Recursively descends into the subterms of the given terms and checks if they are equal modulo
      * renaming.
      *
-     * @param t0
-     *        the first term
-     * @param t1
-     *        the second term
-     * @param ownBoundVars
-     *        variables bound above the current position in {@code t0}
-     * @param cmpBoundVars
-     *        variables bound above the current position in {@code t1}
-     * @param nat
-     *        the {@link NameAbstractionTable} used for the comparison
+     * @param t0 the first term
+     * @param t1 the second term
+     * @param ownBoundVars variables bound above the current position in {@code t0}
+     * @param cmpBoundVars variables bound above the current position in {@code t1}
+     * @param nat the {@link NameAbstractionTable} used for the comparison
      * @return <code>true</code> iff the subterms are equal modulo renaming
      */
     private boolean descendRecursively(Term t0, Term t1,
@@ -320,8 +292,7 @@ public class RenamingTermProperty implements Property<Term> {
      * Checks if the given {@link NameAbstractionTable} is not null. If it is null, a new
      * {@link NameAbstractionTable} is created and returned.
      *
-     * @param nat
-     *        the {@link NameAbstractionTable} to check
+     * @param nat the {@link NameAbstractionTable} to check
      * @return the given {@code nat} if it is not null, a new {@link NameAbstractionTable} otherwise
      */
     private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
@@ -341,13 +312,10 @@ public class RenamingTermProperty implements Property<Term> {
      * This method takes care of the top level of the term and calls the recursive helper method
      * {@link #recursiveHelper(Term, ImmutableList, int)} to take care of the subterms.
      *
-     * @param term
-     *        the term to compute the hash code for
-     * @param nameAbstractionList
-     *        the list of bound variables that is used to abstract from the
+     * @param term the term to compute the hash code for
+     * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
-     * @param hashCode
-     *        the accumulated hash code (should be 1 for the first call)
+     * @param hashCode the accumulated hash code (should be 1 for the first call)
      * @return the hash code
      */
     private int hashTermHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
@@ -359,7 +327,7 @@ public class RenamingTermProperty implements Property<Term> {
         final Operator op = term.op();
         if (op instanceof QuantifiableVariable qv) {
             hashCode = 17 * hashCode + hashQuantifiableVariable(qv, nameAbstractionList);
-        } else if (op instanceof Modality mod) {
+        } else if (op instanceof JModality mod) {
             hashCode = 17 * hashCode + mod.kind().hashCode();
             hashCode = 17 * hashCode + hashJavaBlock(mod);
         } else if (op instanceof ProgramVariable pv) {
@@ -376,10 +344,8 @@ public class RenamingTermProperty implements Property<Term> {
      * list of bound variables.
      * If the variable is not bound, the hash code is computed based on the variable itself.
      *
-     * @param qv
-     *        the {@link QuantifiableVariable} to compute the hash code for
-     * @param nameAbstractionList
-     *        the list of bound variables that is used to abstract from the
+     * @param qv the {@link QuantifiableVariable} to compute the hash code for
+     * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
      * @return the hash code
      */
@@ -396,12 +362,11 @@ public class RenamingTermProperty implements Property<Term> {
      * <p>
      * The hash code is computed based on the hash code of the program element of the Java block.
      *
-     * @param mod
-     *        the {@link Modality} to compute the hash code for
+     * @param mod the {@link JModality} to compute the hash code for
      * @return the hash code
      */
-    private int hashJavaBlock(Modality mod) {
-        final JavaBlock jb = mod.program();
+    private int hashJavaBlock(JModality mod) {
+        final JavaBlock jb = mod.programBlock();
         if (!jb.isEmpty()) {
             final JavaProgramElement jpe = jb.program();
             return jpe != null ? jpe.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY) : 0;
@@ -416,13 +381,10 @@ public class RenamingTermProperty implements Property<Term> {
      * This method iterates over the subterms of the given term and calls
      * {@link #hashTermHelper(Term, ImmutableList, int)} for each subterm.
      *
-     * @param term
-     *        the term to compute the hash code for
-     * @param nameAbstractionList
-     *        the list of bound variables that is used to abstract from the
+     * @param term the term to compute the hash code for
+     * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
-     * @param hashCode
-     *        the accumulated hash code
+     * @param hashCode the accumulated hash code
      * @return the hash code
      */
     private int recursiveHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,

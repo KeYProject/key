@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
@@ -18,12 +19,13 @@ import org.key_project.logic.op.sv.SchemaVariable;
 public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
 
     /**
-     * visits term t in post order ({@link Term#execPostOrder(Visitor)}) and
+     * visits term t in post order ({@link JTerm#execPostOrder(Visitor)}) and
      * collects all bound schema variables
      *
      * @param visited
      *        the Term to be visited (<code>t</code> must not be <code>null</code>
      */
+    @Override
     public void visit(Term visited) {
         for (int j = 0; j < visited.arity(); j++) {
             for (int i = 0; i < visited.varsBoundHere(j).size(); i++) {

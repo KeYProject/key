@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.abstraction.ClassType;
-import de.uka.ilkd.key.java.ast.abstraction.Field;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -62,27 +62,19 @@ public class ExecutionValue extends AbstractExecutionValue {
     /**
      * Constructor.
      *
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param variable
-     *        The parent {@link ExecutionVariable} which contains this value.
-     * @param valueUnknown
-     *        Is the value unknown?
-     * @param value
-     *        The value.
-     * @param valueString
-     *        The value as human-readable string.
-     * @param typeString
-     *        The type of the value.
-     * @param condition
-     *        The condition under which the variable has this value
-     * @param conditionString
-     *        the condition under which the variable has this value as
+     * @param variable The parent {@link ExecutionVariable} which contains this value.
+     * @param valueUnknown Is the value unknown?
+     * @param value The value.
+     * @param valueString The value as human-readable string.
+     * @param typeString The type of the value.
+     * @param condition The condition under which the variable has this value
+     * @param conditionString the condition under which the variable has this value as
      *        human-readable {@link String}
      */
     public ExecutionValue(Node proofNode, ExecutionVariable variable, boolean valueUnknown,
-            Term value, String valueString, String typeString, Term condition,
+            JTerm value, String valueString, String typeString, JTerm condition,
             String conditionString) {
         super(variable.getSettings(), proofNode, variable, condition, value);
         this.valueUnknown = valueUnknown;
@@ -133,14 +125,13 @@ public class ExecutionValue extends AbstractExecutionValue {
      * first time.
      *
      * @return The contained child {@link IExecutionVariable}s.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
         List<IExecutionVariable> children = new LinkedList<>();
         if (!isDisposed()) {
             final Services services = getServices();
-            Term value = getValue();
+            JTerm value = getValue();
             if (value != null && !isValueUnknown()) { // Don't show children of unknown values
                 Sort valueSort = value.sort();
                 if (valueSort != services.getJavaInfo().getNullType().getSort()) {
@@ -167,7 +158,8 @@ public class ExecutionValue extends AbstractExecutionValue {
                                                             .formatTerm(lengthValue.getValue(),
                                                                 services, false, true));
                                             for (int i = 0; i < length; i++) {
-                                                Term indexTerm = services.getTermBuilder().zTerm(i);
+                                                JTerm indexTerm =
+                                                    services.getTermBuilder().zTerm(i);
                                                 ExecutionVariable childI = new ExecutionVariable(
                                                     getVariable().getParentNode(),
                                                     getVariable().getProofNode(),

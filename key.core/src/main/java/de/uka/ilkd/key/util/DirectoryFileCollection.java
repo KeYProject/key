@@ -17,28 +17,44 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 /**
  * This class is used to describe a directory structure as a repository for files to read in. A
  * directory is read recursively.
- *
+ * <p>
  * All files are enumerated when the walker is created. Any file added afterwards will not looked at
  * when iterating.
- *
+ * <p>
  * For more info see {@link FileCollection}
  *
  * @author MU
  */
 public class DirectoryFileCollection implements FileCollection {
 
-    /** directory under inspection */
+    /**
+     * directory under inspection
+     */
     private final Path directory;
 
     /**
      * create a new File collection for a given directory The argument may be a single file also. A
      * directory is read recursively.
      *
-     * @param directory
-     *        directory to iterate through,
+     * @param directory directory to iterate through,
      */
     public DirectoryFileCollection(Path directory) {
         this.directory = directory;
+    }
+
+    /**
+     * add all files in or under dir to a file list. Extension is tested
+     */
+    private static void addAllFiles(Path dir, String extension, List<File> files) {
+        try (var walker = Files.walk(dir)) {
+            List<File> listFiles = walker
+                    .filter(it -> it.getFileName().toString().toLowerCase().endsWith(extension))
+                    .map(Path::toFile)
+                    .toList();
+            files.addAll(listFiles);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(dir + " is not a directory or cannot be read!", e);
+        }
     }
 
     /**

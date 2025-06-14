@@ -37,8 +37,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private final KeYMediator mediator;
 
-    public ProblemLoader(
-            Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
+    public ProblemLoader(Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
             Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce, ProverTaskListener ptl) {

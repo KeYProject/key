@@ -766,25 +766,6 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Retrieves a user-defined data.
-     *
-     * @param service the class for which the data were registered
-     * @param <T> any class
-     * @return null or the previous data
-     * @see #register(Object, Class)
-     */
-    public <T> T lookup(Class<T> service) {
-        try {
-            if (userData == null) {
-                return null;
-            }
-            return userData.get(service);
-        } catch (IllegalStateException ignored) {
-            return null;
-        }
-    }
-
-    /**
      * Register a user-defined data in this node info.
      *
      * @param obj an object to be registered
@@ -805,6 +786,25 @@ public class Node implements Iterable<Node> {
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
             userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * Retrieves a user-defined data.
+     *
+     * @param service the class for which the data were registered
+     * @param <T> any class
+     * @return null or the previous data
+     * @see #register(Object, Class)
+     */
+    public <T> @Nullable T lookup(Class<T> service) {
+        try {
+            if (userData == null) {
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
         }
     }
 

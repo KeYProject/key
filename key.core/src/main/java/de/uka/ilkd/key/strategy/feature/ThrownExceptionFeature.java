@@ -12,10 +12,10 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.Throw;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.sort.Sort;
@@ -70,12 +70,12 @@ public class ThrownExceptionFeature extends BinaryFeature {
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {
         return app instanceof TacletApp tacletApp
-                && filter((Term) pos.subTerm(), (Services) goal.proof().getServices(),
+                && filter((JTerm) pos.subTerm(), (Services) goal.proof().getServices(),
                     tacletApp.instantiations().getExecutionContext());
     }
 
-    protected boolean filter(Term term, Services services, ExecutionContext ec) {
-        if (term.op() instanceof Modality) {
+    protected boolean filter(JTerm term, Services services, ExecutionContext ec) {
+        if (term.op() instanceof JModality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(
                 fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
@@ -89,7 +89,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param term the Term with the program at top level
      * @return the first executable statement
      */
-    private ProgramElement getFirstExecutableStatement(Term term) {
+    private ProgramElement getFirstExecutableStatement(JTerm term) {
         if (term.javaBlock().isEmpty()) {
             return null;
         }

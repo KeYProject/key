@@ -76,7 +76,7 @@ public class ProveTest {
     }
 
     private void runKey(String file, TestProperty testProperty) throws Exception {
-        var keyFile = Paths.get(file);
+        var keyFile = new File(file).toPath();
 
         // a name for this run. helps to find it in the mass of logger
         final var caseId = "%s|%d".formatted(keyFile.getFileName(), keyFile.hashCode());
@@ -137,7 +137,7 @@ public class ProveTest {
                     success = (testProperty == TestProperty.PROVABLE) == closed;
                     LOGGER.info("({}) Finished proof: {}", caseId,
                         (closed ? "closed." : "open goal(s)"));
-                    appendStatistics(loadedProof, keyFile);
+                    appendStatistics(loadedProof, keyFile.toFile());
                     if (success) {
                         reload(proofFile, loadedProof);
                     }
@@ -206,7 +206,7 @@ public class ProveTest {
 
     /**
      * Reload proof that was previously saved at the location corresponding to the given
-     * {@link Path} object.
+     * {@link File} object.
      *
      * @param proofFile File that contains the proof that will be (re-)loaded.
      */
@@ -226,7 +226,7 @@ public class ProveTest {
                 for (Throwable ex : errorList) {
                     LOGGER.error("Error", ex);
                 }
-                throw errorList.get(0);
+                throw errorList.getFirst();
             }
 
             reloadedProof = proofLoadEnvironment.getLoadedProof();
@@ -255,7 +255,7 @@ public class ProveTest {
         return null;
     }
 
-    private void appendStatistics(Proof loadedProof, Path keyFile) {
+    private void appendStatistics(Proof loadedProof, File keyFile) {
         // Write statistics.
         try {
             StatisticsFile statisticsFile = getStatisticsFile();
