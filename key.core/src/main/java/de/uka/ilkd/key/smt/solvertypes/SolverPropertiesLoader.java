@@ -310,7 +310,7 @@ public class SolverPropertiesLoader {
      * Loads the solvers that are specified in .props files in resource packages named
      * "de/uka/ilkd/key/smt/solvertypes".
      */
-    private static Configuration loadSolvers() {
+    static Configuration loadSolvers() {
         try { // load single solvers.txt files from the same location everywhere in the classpath
             var filesInClasspath =
                     Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
