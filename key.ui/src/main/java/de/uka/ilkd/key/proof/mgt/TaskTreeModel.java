@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -87,5 +88,12 @@ public class TaskTreeModel extends DefaultTreeModel {
         }
         addTask(bp);
         return bp;
+    }
+
+    /**
+     * Gives a collection of current loaded proofs.
+     */
+    public Collection<Proof> getLoadedProofs() {
+        return proofToTask.keySet();
     }
 }
