@@ -6,6 +6,8 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.util.collection.ImmutableList;
@@ -28,7 +30,7 @@ public class TryCloseCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new TryCloseArguments(), params);
+        var args = state().getValueInjector().inject(new TryCloseArguments(), params);
 
         TryCloseMacro macro =
             args.steps == null ? new TryCloseMacro() : new TryCloseMacro(args.steps);
@@ -68,13 +70,13 @@ public class TryCloseCommand extends AbstractCommand {
     }
 
     public static class TryCloseArguments {
-        @Option(value = "steps", required = false)
-        @Nullable
-        public Integer steps;
-        @Option(value = "#2", required = false)
-        @Nullable
-        public String branch;
-        @Option(value = "assertClosed", required = false)
+        @Option(value = "steps")
+        public @Nullable Integer steps;
+        @Argument
+
+        public @Nullable String branch;
+
+        @Flag(value = "assertClosed")
         public Boolean assertClosed = false;
     }
 }

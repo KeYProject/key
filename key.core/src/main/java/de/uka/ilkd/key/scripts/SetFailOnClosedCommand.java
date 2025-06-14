@@ -5,7 +5,9 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * Sets the behavior if an already closed proof is encountered: Either throw an exception (default
@@ -31,7 +33,7 @@ public class SetFailOnClosedCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
             EngineState state)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state.getValueInjector().inject(new Parameters(), arguments);
         state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
@@ -39,8 +41,8 @@ public class SetFailOnClosedCommand extends AbstractCommand {
         /**
          * The command: "on" or "off". Anything else defaults to "on".
          */
-        @Option("#2")
-        public String command;
+        @Argument
+        public @MonotonicNonNull String command;
     }
 
 }

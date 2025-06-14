@@ -25,7 +25,7 @@ public class AssertCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
         if (args.goals == null) {
             throw new ScriptException("No parameter specified!");

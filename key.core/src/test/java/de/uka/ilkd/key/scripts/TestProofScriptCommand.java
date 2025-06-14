@@ -30,6 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -81,9 +82,10 @@ public class TestProofScriptCommand {
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.
             String msg = ex.getMessage().trim().replaceAll("\r\n", "\n");
-            Assertions.assertTrue(msg.startsWith(props.get("exception").trim()),
-                "Unexpected exception: " + ex.getMessage() + "\n expected: "
-                    + props.get("exception").trim());
+            assertThat(msg)
+                    .containsIgnoringWhitespaces(props.get("exception").trim())
+                    .as("Unexpected exception: %s\n expected: %s",
+                        ex.getMessage(), props.get("exception"));
             return;
         }
 

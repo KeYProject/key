@@ -134,10 +134,7 @@ public class ProofScriptEngine {
 
             String name = ast.commandName();
 
-            String cmd = ast.toString();
-            if (cmd.length() > MAX_CHARS_PER_COMMAND) {
-                cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
-            }
+            String cmd = ast.asCommandLine();
 
             final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
             if (commandMonitor != null && stateMap.isEchoOn()) {
@@ -168,7 +165,7 @@ public class ProofScriptEngine {
                                 Command: %s
                                 Position: %s
                                 """,
-                            ast, ast.location()));
+                            ast.asCommandLine(), ast.location()));
                 } else {
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line {}, terminating",
@@ -182,7 +179,8 @@ public class ProofScriptEngine {
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
                     String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
-                        e.getMessage(), ast, ast.location(), e));
+                        e.getMessage(), ast.asCommandLine(), ast.location()),
+                    e);
             }
         }
     }

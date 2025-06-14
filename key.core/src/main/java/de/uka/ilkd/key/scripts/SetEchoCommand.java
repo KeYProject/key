@@ -5,7 +5,9 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * A simple "echo" command for giving feedback to human observers during lengthy executions.
@@ -24,7 +26,7 @@ public class SetEchoCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState state)
             throws ScriptException, InterruptedException {
-        Parameters parameters = state.getValueInjector().inject(this, new Parameters(), args);
+        Parameters parameters = state.getValueInjector().inject(new Parameters(), args);
         state.setEchoOn("on".equalsIgnoreCase(parameters.command));
     }
 
@@ -32,8 +34,8 @@ public class SetEchoCommand extends AbstractCommand {
         /**
          * The command: "on" or "off". Anything else defaults to "off".
          */
-        @Option("#2")
-        public String command;
+        @Argument
+        public @MonotonicNonNull String command;
     }
 
 }

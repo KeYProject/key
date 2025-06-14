@@ -37,7 +37,7 @@ public class SaveNewNameCommand extends AbstractCommand {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
             EngineState stateMap) throws ScriptException, InterruptedException {
-        var params = state().getValueInjector().inject(this, new Parameters(), arguments);
+        var params = state().getValueInjector().inject(new Parameters(), arguments);
         if (!params.abbreviation.startsWith("@")) {
             throw new ScriptException(
                 "Unexpected parameter to saveNewName, only @var allowed: " + params.abbreviation);

@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +50,7 @@ public class SMTCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new SMTCommandArguments(), params);
+        var args = state.getValueInjector().inject(new SMTCommandArguments(), params);
 
         SolverTypeCollection su = computeSolvers(args.solver);
 
@@ -110,11 +112,11 @@ public class SMTCommand extends AbstractCommand {
         @Option("solver")
         public String solver = "Z3";
 
-        @Option(value = "all", required = false)
+        @Flag(value = "all")
         public boolean all = false;
 
-        @Option(value = "timeout", required = false)
-        public int timeout = -1;
+        @Option(value = "timeout")
+        public @Nullable int timeout = -1;
     }
 
     private static class TimerListener implements SolverLauncherListener {

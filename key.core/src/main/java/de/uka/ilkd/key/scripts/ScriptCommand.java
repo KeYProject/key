@@ -7,8 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +22,13 @@ public class ScriptCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public String filename;
+        @Argument
+        public @MonotonicNonNull String filename;
     }
 
     @Override
     public void execute(ScriptCommandAst ast) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), ast);
+        var args = state().getValueInjector().inject(new Parameters(), ast);
         Path root = state().getBaseFileName();
         if (!Files.isDirectory(root)) {
             root = root.getParent();

@@ -8,10 +8,12 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
@@ -42,7 +44,7 @@ public class CutCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
             EngineState state)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state.getValueInjector().inject(new Parameters(), arguments);
         execute(state, args);
     }
 
@@ -58,8 +60,8 @@ public class CutCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public JTerm formula;
+        @Argument
+        public @MonotonicNonNull JTerm formula;
     }
 
 }

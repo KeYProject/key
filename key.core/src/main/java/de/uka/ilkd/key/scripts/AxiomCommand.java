@@ -8,10 +8,12 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * The axiom command takes one argument: a formula to which the command is applied.
@@ -33,7 +35,7 @@ public class AxiomCommand extends AssumeCommand {
 
     @Override
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
-        var parameter = state().getValueInjector().inject(this, new FormulaParameter(), args);
+        var parameter = state().getValueInjector().inject(new FormulaParameter(), args);
 
         Taclet cut = state().getProof().getEnv()
                 .getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
@@ -46,7 +48,7 @@ public class AxiomCommand extends AssumeCommand {
     }
 
     public static class FormulaParameter {
-        @Option("#2")
-        public JTerm formula;
+        @Argument
+        public @MonotonicNonNull JTerm formula;
     }
 }
