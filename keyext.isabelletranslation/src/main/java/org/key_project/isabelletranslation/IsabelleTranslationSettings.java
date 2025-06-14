@@ -27,8 +27,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     /**
      * the file where settings are stored
      */
-    protected static final File SETTINGS_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "isabelleSettings.json");
+    protected static final Path SETTINGS_FILE_NEW =
+            PathConfig.getKeyConfigDir().resolve("isabelleSettings.json");
     /**
      * The settings instance
      */
@@ -69,7 +69,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
      * The default path for translations
      */
     private static final Path DEFAULT_TRANSLATION_PATH =
-        Path.of(PathConfig.getKeyConfigDir(), "IsabelleTranslations");
+            PathConfig.getKeyConfigDir().resolve("IsabelleTranslations");
     /**
      * default timeout setting
      */
@@ -96,7 +96,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
      */
     public static IsabelleTranslationSettings getInstance() {
         if (INSTANCE == null) {
-            if (SETTINGS_FILE_NEW.exists()) {
+            if (Files.exists(SETTINGS_FILE_NEW)) {
                 try {
                     LOGGER.info("Load Isabelle settings at {}", SETTINGS_FILE_NEW);
                     return INSTANCE =
@@ -141,8 +141,8 @@ public class IsabelleTranslationSettings extends AbstractSettings {
      * Writes the settings to the JSON file
      */
     public void save() {
-        LOGGER.info("Save Isabelle settings to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+        LOGGER.info("Save Isabelle settings to: {}", SETTINGS_FILE_NEW.toAbsolutePath());
+        try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration();
             writeSettings(config);
             config.save(writer, "Isabelle settings");
