@@ -13,19 +13,11 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class Streams {
-    private Streams() {
-        throw new Error("do not instantiate");
-    }
-
+public abstract class Streams {
     public static String toString(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[2048];
-        int count;
-        while ((count = is.read(buf)) >= 0) {
-            baos.write(buf, 0, count);
-        }
-        return baos.toString();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        is.transferTo(out);
+        return out.toString();
     }
 
     /// Translates the enumeration into stream.
