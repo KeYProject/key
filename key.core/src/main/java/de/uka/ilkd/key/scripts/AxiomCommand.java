@@ -5,7 +5,6 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+
 /**
  * The axiom command takes one argument: a formula to which the command is applied.
  *
@@ -24,6 +24,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
  */
 @Deprecated(forRemoval = true)
 public class AxiomCommand extends AssumeCommand {
+    private static final Name TACLET_NAME = new Name("cut");
+
     @Override
     public String getName() {
         return "axiom";
