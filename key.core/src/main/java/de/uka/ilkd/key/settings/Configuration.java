@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -45,11 +43,11 @@ public class Configuration {
     /**
      * Loads a configuration using the given file.
      *
-     * @param file existsing file path
+     * @param file existing file path
      * @return a configuration based on the file contents
-     * @throws IOException if file does not exists or i/o error
+     * @throws IOException if file does not exist or i/o error
      */
-    public static Configuration load(File file) throws IOException {
+    public static Configuration load(Path file) throws IOException {
         return ParsingFacade.readConfigurationFile(file);
     }
 
@@ -415,6 +413,16 @@ public class Configuration {
      */
     public void save(Writer writer, String comment) {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
+    }
+
+    @Override
+    public String toString() {
+        try(StringWriter sw = new StringWriter()) {
+            save(sw, "");
+            return sw.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void overwriteWith(Configuration other) {
