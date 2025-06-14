@@ -3,16 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import de.uka.ilkd.key.gui.actions.*;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.macros.*;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -23,6 +13,17 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.macros.*;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.MULTI_KEY_MASK;
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
@@ -50,7 +51,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     public static final Path SETTINGS_FILE =
         PathConfig.getKeyConfigDir().resolve(SETTINGS_FILENAME);
     private static final Path SETTINGS_FILE_NEW =
-        PathConfig.getKeyConfigDir().resolve( "keystrokes.json");
+        PathConfig.getKeyConfigDir().resolve("keystrokes.json");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
@@ -207,7 +208,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
     public void save() {
         LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
-        try{
+        try {
             Files.createDirectories(SETTINGS_FILE.getParent());
             try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
                 Properties props = new Properties();
