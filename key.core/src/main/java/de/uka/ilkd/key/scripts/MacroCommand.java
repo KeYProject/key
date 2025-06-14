@@ -17,12 +17,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Varargs;
-import org.jspecify.annotations.Nullable;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+
+import org.jspecify.annotations.Nullable;
 
 public class MacroCommand extends AbstractCommand {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
