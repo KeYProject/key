@@ -52,12 +52,16 @@ class CheckConfigDialog extends JDialog {
                 }
             }
 
-            Main.check(missingProofsCheck.isSelected(),
-                settingsCheck.isSelected(),
-                replayCheck.isSelected(),
-                dependencyCheck.isSelected(),
-                Paths.get(bundleFileField.getText()),
-                reportPath);
+
+            var c = new Main.CheckCommand();
+            c.missing = missingProofsCheck.isSelected();
+            c.settings = settingsCheck.isSelected();
+            c.replay = replayCheck.isSelected();
+            c.dependency = dependencyCheck.isSelected();
+            c.bundlePath = Paths.get(bundleFileField.getText());
+            c.reportPath = reportPath;
+            c.call();
+
             if (reportPath != null) {
                 // automatically open the report in browser
                 Desktop.getDesktop().open(reportPath.toFile());
