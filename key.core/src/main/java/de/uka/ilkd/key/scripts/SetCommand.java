@@ -4,14 +4,20 @@
 package de.uka.ilkd.key.scripts;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SetCommand extends AbstractCommand {
     public SetCommand() {
@@ -20,12 +26,10 @@ public class SetCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state.getValueInjector().inject(new Parameters(), arguments);
 
-        if (args.key == null ^ args.value == null) {
-            throw new IllegalArgumentException(
-                "When using key or value in a set command, you have to use both.");
-        }
+        args.settings.remove("oss");
+        args.settings.remove("steps");
 
         final Proof proof = state.getProof();
 
@@ -38,17 +42,22 @@ public class SetCommand extends AbstractCommand {
                         : StrategyProperties.OSS_OFF);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
-        } else if (args.proofSteps != null) {
-            state.setMaxAutomaticSteps(args.proofSteps);
-        } else if (args.key != null) {
-            if (!newProps.containsKey(args.key)) {
-                throw new ScriptException("Unknown setting key: " + args.key);
-            }
-            newProps.setProperty(args.key, args.value);
-            updateStrategySettings(state, newProps);
-        } else {
-            throw new IllegalArgumentException("You have to set oss, steps, or key and value.");
         }
+        if (args.proofSteps != null) {
+            state.setMaxAutomaticSteps(args.proofSteps);
+        }
+
+        for (var entry : args.settings.entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
+
+            if (!newProps.containsKey(key)) {
+                throw new ScriptException("Unknown setting key: " + key);
+            }
+            newProps.setProperty(key, value);
+        }
+
+        updateStrategySettings(state, newProps);
     }
 
     /*
@@ -94,20 +103,20 @@ public class SetCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        /** One Step Simplification parameter */
-        @Option(value = "oss", required = false)
-        public Boolean oneStepSimplification;
+        /**
+         * One Step Simplification parameter
+         */
+        @Option(value = "oss")
+        public @Nullable Boolean oneStepSimplification;
 
-        /** Maximum number of proof steps parameter */
-        @Option(value = "steps", required = false)
-        public Integer proofSteps;
+        /**
+         * Maximum number of proof steps parameter
+         */
+        @Option(value = "steps")
+        public @Nullable Integer proofSteps;
 
-        /** Normal key-value setting -- key */
-        @Option(value = "key", required = false)
-        public String key;
-
-        /** Normal key-value setting -- value */
-        @Option(value = "value", required = false)
-        public String value;
+        /***/
+        @OptionalVarargs
+        public Map<String, String> settings = HashMap.newHashMap(0);
     }
 }

@@ -15,8 +15,10 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.scripts.meta.Varargs;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.engine.TaskStartedInfo;
@@ -55,7 +57,7 @@ public class MacroCommand extends AbstractCommand {
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
             EngineState state)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state.getValueInjector().inject(new Parameters(), arguments);
 
         final Services services = state.getProof().getServices();
         // look up macro name
@@ -165,17 +167,21 @@ public class MacroCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        /** Macro name parameter */
-        @Option("#2")
+        @Argument
+        @Documentation("Macro name")
         public String macroName;
-        /** Run on formula number "occ" parameter */
-        @Option(value = "occ", required = false)
-        public Integer occ = -1;
+
+        @Documentation("Run on formula number \"occ\" parameter")
+        @Option(value = "occ")
+        public @Nullable Integer occ = -1;
+
         /** Run on formula matching the given regex */
-        @Option(value = "matches", required = false)
+        @Option(value = "matches")
+        @Documentation("Run on formula matching the given regex")
         public @Nullable String matches = null;
+
         /** Variable macro parameters */
-        @Varargs(as = String.class, prefix = "arg_")
+        @OptionalVarargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
     }
 

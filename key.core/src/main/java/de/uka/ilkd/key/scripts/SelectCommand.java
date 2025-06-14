@@ -32,7 +32,7 @@ public class SelectCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), params);
+        var args = state().getValueInjector().inject(new Parameters(), params);
 
         Goal g;
         if (args.number != null && args.formula == null && args.branch == null) {
@@ -149,16 +149,16 @@ public class SelectCommand extends AbstractCommand {
 
     public static class Parameters {
         /** A formula defining the goal to select */
-        @Option(value = "formula", required = false)
+        @Option(value = "formula")
         public @Nullable JTerm formula;
         /**
          * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
          * the last goal, -2 the second-to-last, etc.
          */
-        @Option(value = "number", required = false)
+        @Option(value = "number")
         public @Nullable Integer number;
         /** The name of the branch to select */
-        @Option(value = "branch", required = false)
+        @Option(value = "branch")
         public @Nullable String branch;
     }
 

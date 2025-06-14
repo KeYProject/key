@@ -5,22 +5,24 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.parser.Location;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import static java.util.stream.Collectors.joining;
 
 /// This class represents is the AST of a proof script command.
 ///
 /// It is an abstraction to the commands of following structure:
-///
 /// ```
 /// <commandName> key_1=value_1 ... key_m=value_m positionalArgs_1 ... positionalArgs_n {
 /// commands_0; ...; commands_k;
 /// }
 /// ```
-///
 ///
 /// @param commandName the name of the command, e.g., "macro" for `macro auto;`
 /// @param namedArgs a map of the given named arguments and values.
@@ -40,4 +42,25 @@ public record ScriptCommandAst(
         List<Object> positionalArgs,
         @Nullable List<ScriptCommandAst> commands,
         @Nullable Location location) {
+
+    public String asCommandLine() {
+        return commandName + ' ' +
+                namedArgs.entrySet().stream().map(it -> it.getKey() + ": " + it.getValue())
+                        .collect(joining(" "))
+                + ' '
+                + positionalArgs.stream().map(ScriptCommandAst::humanString).collect(joining(" "))
+                + (commands != null
+                        ? " {"
+                            + commands.stream().map(ScriptCommandAst::asCommandLine)
+                                    .collect(joining("\n"))
+                            + "\n}"
+                        : ";");
+    }
+
+    public static String humanString(Object value) {
+        if (value instanceof ParserRuleContext ctx) {
+            return ctx.getText();
+        }
+        return Objects.toString(value);
+    }
 }

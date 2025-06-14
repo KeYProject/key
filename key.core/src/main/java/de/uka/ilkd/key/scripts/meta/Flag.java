@@ -51,12 +51,4 @@ public @interface Flag {
      * @return true iff this field is required (not null)
      */
     boolean defValue() default false;
-
-    /**
-     * A help message for this argument.
-     *
-     * @return a non-null string
-     */
-    String help() default "";
-
 }

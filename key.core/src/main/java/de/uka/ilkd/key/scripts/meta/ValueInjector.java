@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
@@ -49,7 +46,7 @@ public class ValueInjector {
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
-     * {@link #inject(ProofScriptCommand, Object, ScriptCommandAst)}
+     * {@link #inject(Object, ScriptCommandAst)}
      *
      * @param command a proof script command
      * @param obj a parameter class with annotation
@@ -64,7 +61,7 @@ public class ValueInjector {
     public static <T> T injection(ProofScriptCommand command, @NonNull T obj,
             ScriptCommandAst arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
-        return getInstance().inject(command, obj, arguments);
+        return getInstance().inject(obj, arguments);
     }
 
     /**
@@ -112,7 +109,6 @@ public class ValueInjector {
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
      * @param <T> type safety
-     * @param command a proof script command
      * @param obj a non-null instance of a parameter class (with annotation)
      * @param arguments a non-null string map
      * @return the same object as {@code obj}
@@ -123,37 +119,13 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand command, T obj, ScriptCommandAst arguments)
+    public <T> T inject(T obj, ScriptCommandAst arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument> meta =
-            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
-        List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
-
-        List<String> usedKeys = new ArrayList<>();
+        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass());
 
         for (ProofScriptArgument arg : meta) {
-            if (arg.hasVariableArguments()) {
-                varArgs.add(arg);
-            } else {
-                injectIntoField(arg, arguments, obj);
-                usedKeys.add(arg.getName());
-            }
-        }
-
-        for (ProofScriptArgument vararg : varArgs) {
-            final Map<String, Object> map = getStringMap(obj, vararg);
-            final int prefixLength = vararg.getName().length();
-            /*
-             * TODO weigl repair for (Map.Entry<String, Object> e : arguments.positionalArgs()) {
-             * var k = e.getKey();
-             * var v = e.getValue();
-             * if (!usedKeys.contains(k) && k.startsWith(vararg.getName())) {
-             * map.put(k.substring(prefixLength), convert(vararg, v));
-             * usedKeys.add(k);
-             * }
-             * }
-             */
+            injectIntoField(arg, arguments, obj);
         }
 
         return obj;
@@ -179,38 +151,73 @@ public class ValueInjector {
             throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
             NoSpecifiedConverterException {
         Object val = null;
-        if (meta.getName().startsWith("#")) {
-            val = args.positionalArgs().get(
-                Integer.parseInt(meta.getName().substring(1)));
-        } else {
+        if (meta.isPositional()) {
+            final var idx = meta.getArgumentPosition();
+            if (idx < args.positionalArgs().size()) {
+                val = args.positionalArgs().get(idx);
+            }
+        }
+
+        if (meta.isPositionalVarArgs()) {
+            val = args.positionalArgs();
+        }
+
+        if (meta.isOption()) {
             val = args.namedArgs().get(meta.getName());
         }
 
-        if (val == null) {
-            if (meta.isRequired()) {
-                throw new ArgumentRequiredException(String.format(
-                    "Argument %s:%s is required, but %s was given. For command class: '%s'",
-                    meta.getName(), meta.getField().getType(), null, meta.getCommand().getClass()));
-            }
-        } else {
-            Object value = convert(meta, val);
-            try {
-                // if (meta.getType() != value.getClass())
-                // throw new ConversionException("The typed returned '" + val.getClass()
-                // + "' from the converter mismatched with the
-                // type of the field " + meta.getType(), meta);
-                // FIXME: I had to add this, otherwise I would receive an illegal access exception.
-                meta.getField().setAccessible(true);
-                meta.getField().set(obj, value);
-            } catch (IllegalAccessException e) {
-                throw new InjectionReflectionException("Could not inject values via reflection", e);
+        if (meta.isFlag()) {
+            val = args.namedArgs().get(meta.getName());
+            if (val == null) {
+                // can also be given w/o colon or equal sign.
+                // command hide;
+                val = args.positionalArgs().stream()
+                        .anyMatch(it -> it.toString().equals(meta.getName()));
             }
         }
+
+        try {
+            meta.getField().setAccessible(true);
+            if (val == null) {
+                if (meta.isRequired() && meta.getField().get(obj) == null) {
+                    throw new ArgumentRequiredException(String.format(
+                        "Argument %s:%s is required, but %s was given. For command class: '%s'",
+                        meta.getName(), meta.getField().getType(), null,
+                        meta.getField().getDeclaringClass()));
+                }
+            } else {
+                Object value = convert(meta, val);
+                meta.getField().set(obj, value);
+            }
+        } catch (IllegalAccessException e) {
+            throw new InjectionReflectionException("Could not inject values via reflection", e);
+        }
+
     }
 
     private Object convert(ProofScriptArgument meta, Object val)
             throws NoSpecifiedConverterException, ConversionException {
-        var targetType = meta.getType();
+        if (meta.isPositionalVarArgs()) {
+            var source = (List<?>) val;
+            var seq = new ArrayList<Object>();
+            var targetType = meta.getPositionalVarargs().as();
+            for (var o : source) {
+                seq.add(convert(o, targetType));
+            }
+            return seq;
+        }
+
+        if (meta.isPositionalVarArgs()) {
+            var source = (Map<String, ?>) val;
+            var seq = new TreeMap<String, Object>();
+            var targetType = meta.getOptionalVarArgs().as();
+            for (var o : source.entrySet()) {
+                seq.put(o.getKey(), convert(o.getValue(), targetType));
+            }
+            return seq;
+        }
+
+        var targetType = meta.getField().getType();
         return convert(targetType, val);
     }
 

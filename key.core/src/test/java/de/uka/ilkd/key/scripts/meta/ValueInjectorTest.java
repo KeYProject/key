@@ -15,6 +15,7 @@ import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.meta.*;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,7 +57,7 @@ public class ValueInjectorTest {
 
     @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
-        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
+        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class);
         assertEquals(3, meta.size());
 
         {
@@ -90,7 +91,8 @@ public class ValueInjectorTest {
         boolean b;
         @Option(value = "i")
         int i;
-        @Option(value = "s", required = false)
+        @Option(value = "s")
+        @Nullable
         String s;
     }
 

@@ -8,10 +8,12 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  *
@@ -25,7 +27,7 @@ public class SchemaVarCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
-        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
 
         if (args.type == null || args.var == null) {
@@ -64,10 +66,10 @@ public class SchemaVarCommand extends AbstractCommand {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public String type;
-        @Option("#3")
-        public String var;
+        @Argument(0)
+        public @MonotonicNonNull String type;
+        @Argument(1)
+        public @MonotonicNonNull String var;
     }
 
 }
