@@ -8,21 +8,16 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.scripts.meta.Documentation;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProverCore;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -49,6 +44,11 @@ public class AutoCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "auto";
+    }
+
+    @Override
+    public String getDocumentation() {
+        return "The AutoCommand invokes the automatic strategy \"Auto\"";
     }
 
     @Override
@@ -151,14 +151,13 @@ public class AutoCommand extends AbstractCommand {
     private void setupFocussedBreakpointStrategy(final String maybeMatchesRegEx,
             final String breakpointArg, final Goal goal, final ProverCore proverCore,
             final Services services) throws ScriptException {
-        final PosInOccurrence focus =
+        final var focus =
             MacroCommand.extractMatchingPio(goal.node().sequent(), maybeMatchesRegEx, services);
 
-        final RuleApplicationManager realManager = //
-            goal.getRuleAppManager();
+        var realManager = goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
-        final RuleApplicationManager focusManager = //
+        var focusManager =
             new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 
@@ -200,21 +199,25 @@ public class AutoCommand extends AbstractCommand {
 
         @Option(value = "modelsearch", required = false,
             help = "Enable model search. Better for some types of arithmetic problems. Sometimes a lot worse")
+        @Nullable
         public Boolean modelSearch;
 
         @Option(value = "expandQueries", required = false, help = "Expand queries by modalities.")
+        @Nullable
         public Boolean expandQueries;
 
         @Option(value = "classAxioms", required = false,
             help = "Enable class axioms. This expands model methods and fields and invariants quite eagerly. "
                 +
                 "May lead to divergence.")
+        @Nullable
         public Boolean classAxioms;
 
         @Option(value = "dependencies", required = false,
             help = "Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, "
                 +
                 "without that its definition is known. May be an enabler, may be a showstopper.")
+        @Nullable
         public Boolean dependencies;
 
         public int getSteps() {
