@@ -180,9 +180,12 @@ public class ProofExplorationServiceTest {
         // set all goals to interactive
         justificationBranch.setEnabled(true);
         // perform proof, it has to close
-        env.getProofControl().startAndWaitForAutoMode(currentProof, newCreatedGoals);
-        assertTrue(currentProof.closed(), "Proof is closed");
-
+        try {
+            env.getProofControl().startAndWaitForAutoMode(currentProof, newCreatedGoals);
+            assertTrue(currentProof.closed(), "Proof is closed");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
