@@ -3,39 +3,46 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.antlr.v4.runtime.CharStreams;
+import org.key_project.util.Streams;
+import org.key_project.util.reflection.ClassLoaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.Z3Socket;
-import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
-
-import org.key_project.util.Streams;
-import org.key_project.util.reflection.ClassLoaderUtil;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * Provides static SolverType objects to be reused and saves the properties to .props files. Used to
- * create {@link SolverType} (in the form of {@link SolverTypeImplementation}) objects from .props
- * files.
- *
- * @author Alicia Appelhagen
- */
+/// This class provides [SolverType] instances based on the current SMT solver definitions in various configuration files.
+///
+/// The configuration are in loaded from
+/// 1. The current working directiory:    `./smt-solvers.json`
+/// 2. The KeY user configuration folder: `~/.key/smt-solvers.json`
+/// 3. All resources with the name `de/uka/ilkd/key/smt/solvertypes/solvers.key.json` in the classpath.
+///
+/// Local configuration overwrites user configuration overwrites classpath configuration.
+/// All configuration is overwritten using the {@link ProofIndependentSettings#getSMTSettings()}.
+///
+/// Use (1) and (2) rather to add new SMT solvers to KeY.
+///
+/// @author Alicia Appelhagen
+/// @author Alexander Weigl
 public class SolverPropertiesLoader {
-
-    /**
-     * Logger.
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverPropertiesLoader.class);
 
     /**
@@ -85,17 +92,17 @@ public class SolverPropertiesLoader {
      * {@link ModularSMTLib2Translator}.
      */
     private static final String DEFAULT_TRANSLATOR =
-        "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
+            "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
      * in the .props file: {@link Z3Socket}.
      */
     private static final String DEFAULT_SOLVER_SOCKET =
-        "de.uka.ilkd.key.smt.communication.Z3Socket";
+            "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
      */
-    private static final String[] DEFAULT_DELIMITERS = { "\n", "\r" };
+    private static final String[] DEFAULT_DELIMITERS = {"\n", "\r"};
     /**
      * The default solver TIMEOUT, if none is given in the .props file.
      */
@@ -168,9 +175,9 @@ public class SolverPropertiesLoader {
     /**
      * All supported keys for solver props files.
      */
-    private static final String[] SUPPORTED_KEYS = { NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
-        INFO, MIN_VERSION, EXPERIMENTAL, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
-        HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE };
+    private static final String[] SUPPORTED_KEYS = {NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
+            INFO, MIN_VERSION, EXPERIMENTAL, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
+            HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE};
 
     /**
      * If a props file does not contain a solver NAME or two files have the same NAME, unique names
@@ -188,8 +195,8 @@ public class SolverPropertiesLoader {
         }
         // if NAME was already used, use <NAME>_<counter> as NAME and increase counter afterwards
         String nameBuilder = name +
-            "_" +
-            counter;
+                "_" +
+                counter;
         counter++;
         NAME_COUNTERS.put(name, counter);
         // <NAME>_<counter> is now also a NAME that has been used and must be unique
@@ -241,47 +248,44 @@ public class SolverPropertiesLoader {
         // Read props file to create a SolverTypeImplementation object:
 
         // the solver's NAME has to be unique
-        String name = uniqueName(props.getString(SolverPropertiesLoader.NAME, DEFAULT_NAME));
+        String name = uniqueName(props.getString(NAME, DEFAULT_NAME));
 
         // default solver COMMAND, TIMEOUT, parameters, VERSION parameter, solver INFO (some string)
-        String command = props.getString(SolverPropertiesLoader.COMMAND, DEFAULT_COMMAND);
-        long timeout = Math.max(-1, props.getLong(SolverPropertiesLoader.TIMEOUT, DEFAULT_TIMEOUT));
+        String command = props.getString(COMMAND, DEFAULT_COMMAND);
+        long timeout = Math.max(-1, props.getLong(TIMEOUT, DEFAULT_TIMEOUT));
 
-        String params = props.getString(SolverPropertiesLoader.PARAMS, DEFAULT_PARAMS);
-        String version = props.getString(SolverPropertiesLoader.VERSION, DEFAULT_VERSION);
-        String minVersion =
-            props.getString(SolverPropertiesLoader.MIN_VERSION, DEFAULT_MINIMUM_VERSION);
-        String info = props.getString(SolverPropertiesLoader.INFO, DEFAULT_INFO);
+        String params = props.getString(PARAMS, DEFAULT_PARAMS);
+        String version = props.getString(VERSION, DEFAULT_VERSION);
+        String minVersion = props.getString(MIN_VERSION, DEFAULT_MINIMUM_VERSION);
+        String info = props.getString(INFO, DEFAULT_INFO);
 
         // the solver socket used for communication with the created solver
         String socketClassName = props.getString(SOLVER_SOCKET_CLASS, DEFAULT_SOLVER_SOCKET);
         try {
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Could not find solver socket class {}", socketClassName, e);
+            LOGGER.error("Could not find solver socket class {}. Fallback to Z3Socket.class ", socketClassName, e);
             solverSocketClass = Z3Socket.class;
         }
 
 
         // the message DELIMITERS used by the created solver in its stdout
         String[] delimiters =
-            props.getStringArray(SolverPropertiesLoader.DELIMITERS, new String[0]);
+                props.getStringArray(SolverPropertiesLoader.DELIMITERS, new String[0]);
 
         // the smt translator (class SMTTranslator) used by the created solver
         String translatorClassName = props.getString(TRANSLATOR_CLASS, DEFAULT_TRANSLATOR);
         try {
             translatorClass = ClassLoaderUtil.getClassforName(translatorClassName);
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Could not find translator class {}", translatorClassName, e);
+            LOGGER.error("Could not find translator class {}; using ModularSMTLib2Translator.class.", translatorClassName, e);
             translatorClass = ModularSMTLib2Translator.class;
         }
 
         // the SMTHandlers used by the created solver
         // note that this will only take effect when using ModularSMTLib2Translator ...
-        String[] handlerNames =
-            props.getStringArray(SolverPropertiesLoader.HANDLER_NAMES, new String[0]);
-        String[] handlerOptions =
-            props.getStringArray(SolverPropertiesLoader.HANDLER_OPTIONS, new String[0]);
+        String[] handlerNames = props.getStringArray(HANDLER_NAMES, new String[0]);
+        String[] handlerOptions = props.getStringArray(HANDLER_OPTIONS, new String[0]);
 
         // the solver specific preamble, may be null
         String preambleFile = props.getString(PREAMBLE_FILE);
@@ -298,8 +302,8 @@ public class SolverPropertiesLoader {
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
-            timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
-            preamble);
+                timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
+                preamble);
     }
 
     /**
@@ -308,16 +312,29 @@ public class SolverPropertiesLoader {
      */
     private static Configuration loadSolvers() {
         try { // load single solvers.txt files from the same location everywhere in the classpath
-            final var solverTxts =
-                Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
-                        .getResources(PACKAGE_PATH + SOLVER_LIST_FILE)).toList();
+            var filesInClasspath =
+                    Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
+                            .getResources(PACKAGE_PATH + SOLVER_LIST_FILE)).toList();
+            var solverFiles = new ArrayList<>(filesInClasspath);
+
+            Path user = getUserSmtSolverPath();
+            if (Files.exists(user)) {
+                LOGGER.info("Loading a SMT solver definitions from {}", user);
+                solverFiles.add(user.toUri().toURL());
+            }
+
+            Path local = getLocalSmtSolverPath();
+            if (Files.exists(user)) {
+                LOGGER.info("Loading a SMT solver definitions from {}", local);
+                solverFiles.add(user.toUri().toURL());
+            }
 
             final Configuration solverConfiguration = new Configuration();
 
-            for (var res : solverTxts) {
+            for (var res : solverFiles) {
                 try (InputStream stream = res.openStream()) {
                     var config = ParsingFacade.readConfigurationFile(
-                        CharStreams.fromStream(stream, StandardCharsets.UTF_8));
+                            CharStreams.fromStream(stream, StandardCharsets.UTF_8));
 
                     // Create a warning if unsupported keys occur in the loaded file.
                     Collection<String> unsupportedKeys = SettingsConverter
@@ -335,5 +352,18 @@ public class SolverPropertiesLoader {
         } catch (IOException e) {
             throw new RuntimeException("Could not load " + PACKAGE_PATH + SOLVER_LIST_FILE, e);
         }
+    }
+
+
+    /// Path for local smt solver definitions. Precedence over user and classpath smt solver configs.
+    public static Path getLocalSmtSolverPath() {
+        return Paths.get("smt-solvers.json");
+    }
+
+
+    /// Path for user-wide smt solver definitions. Precedence over classpath smt solver configs,
+    /// overwritten by local configs.
+    public static Path getUserSmtSolverPath() {
+        return PathConfig.getKeyConfigDir().resolve("smt-solvers.json");
     }
 }
