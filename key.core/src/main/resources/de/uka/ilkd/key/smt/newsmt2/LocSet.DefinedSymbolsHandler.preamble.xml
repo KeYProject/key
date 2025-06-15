@@ -14,7 +14,7 @@
 <entry key="freshLocs.dl">
   \forall Heap h; \forall Object o; \forall Field f;
      ( elementOf(o,f,freshLocs(h))&lt;&lt;Trigger&gt;&gt; &lt;-&gt;
-        o != null &amp; !boolean::select(h,o,java.lang.Object::&lt;created&gt;)=TRUE )
+        o != null &amp; !boolean::select(h,o,java.lang.Object::#$created)=TRUE )
 </entry>
 
 <entry key="singleton.dl">

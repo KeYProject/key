@@ -42,13 +42,19 @@ public class Strings {
      * outputs the collection represented by the iterator in the format
      * <code> open element1 sep element2 sep element3 close</code>
      *
-     * @param it the Iterable to be printed
-     * @param open the String used to open the list
-     * @param sep the String separating the different elements
-     * @param close the String used to close the list
-     * @param mapper a Function that maps the elements of type S to their String representation
+     * @param it
+     *        the Iterable to be printed
+     * @param open
+     *        the String used to open the list
+     * @param sep
+     *        the String separating the different elements
+     * @param close
+     *        the String used to close the list
+     * @param mapper
+     *        a Function that maps the elements of type S to their String representation
      * @return the CharSequence in the described format
-     * @param <S> the type of the elements of the iterated collection
+     * @param <S>
+     *        the type of the elements of the iterated collection
      */
     public static <S extends @Nullable Object, T extends @Nullable Object> String formatAsList(
             Iterable<S> it,
@@ -63,12 +69,17 @@ public class Strings {
      * outputs the collection represented by the iterator in the format
      * <code> open element1 sep element2 sep element3 close</code>
      *
-     * @param it the Iterable to be printed
-     * @param open the String used to open the list
-     * @param sep the String separating the different elements
-     * @param close the String used to close the list
+     * @param it
+     *        the Iterable to be printed
+     * @param open
+     *        the String used to open the list
+     * @param sep
+     *        the String separating the different elements
+     * @param close
+     *        the String used to close the list
      * @return the CharSequence in the described format
-     * @param <S> the type of the elements of the iterated collection
+     * @param <S>
+     *        the type of the elements of the iterated collection
      */
     public static <S extends @Nullable Object> String formatAsList(Iterable<S> it,
             CharSequence open, CharSequence sep, CharSequence close) {

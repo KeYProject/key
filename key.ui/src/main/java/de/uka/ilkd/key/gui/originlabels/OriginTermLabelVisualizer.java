@@ -188,10 +188,13 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Creates a new {@link OriginTermLabelVisualizer}.
      *
-     * @param pos the position of the term whose origin shall be visualized.
-     * @param node the node representing the proof state for which the term's origins shall be
+     * @param pos
+     *        the position of the term whose origin shall be visualized.
+     * @param node
+     *        the node representing the proof state for which the term's origins shall be
      *        visualized.
-     * @param services services.
+     * @param services
+     *        services.
      */
     public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
         super(node,
@@ -407,7 +410,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Convert a pio on the sequent to a pio on {@code this.termPio.subTerm()}.
      *
-     * @param pio a pio on the sequent.
+     * @param pio
+     *        a pio on the sequent.
      * @return a pio on {@code this.termPio.subTerm()}.
      */
     private PosInOccurrence convertPio(PosInOccurrence pio) {

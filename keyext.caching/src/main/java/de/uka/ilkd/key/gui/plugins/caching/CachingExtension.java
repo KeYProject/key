@@ -92,7 +92,8 @@ public class CachingExtension
     /**
      * Update the GUI state of the status line button.
      *
-     * @param proof the currently open proof
+     * @param proof
+     *        the currently open proof
      */
     public void updateGUIState(Proof proof) {
         referenceSearchButton.updateState(proof);
@@ -286,9 +287,12 @@ public class CachingExtension
         /**
          * Construct new listener.
          *
-         * @param mediator the mediator
-         * @param referencedProof referenced proof
-         * @param newProof new proof
+         * @param mediator
+         *        the mediator
+         * @param referencedProof
+         *        referenced proof
+         * @param newProof
+         *        new proof
          */
         public CopyBeforeDispose(KeYMediator mediator, Proof referencedProof, Proof newProof) {
             this.mediator = mediator;

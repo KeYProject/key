@@ -23,7 +23,8 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
     /**
      *
-     * @param sequentFormula the formula to filter
+     * @param sequentFormula
+     *        the formula to filter
      * @return the FilterEntry from the formula
      */
     protected SequentPrintFilterEntry filterFormula(
@@ -65,7 +66,8 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
         /**
          * constructor
          *
-         * @param originalFormula the original formula to be filtered
+         * @param originalFormula
+         *        the original formula to be filtered
          */
         IdentityFilterEntry(SequentFormula originalFormula) {
             this.originalFormula = originalFormula;

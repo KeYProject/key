@@ -44,13 +44,19 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                 Integer.getInteger("key.autopilot.closesteps", 1000);
 
             @Override
-            public String getName() { return ""; }
+            public String getName() {
+                return "";
+            }
 
             @Override
-            public String getCategory() { return null; }
+            public String getCategory() {
+                return null;
+            }
 
             @Override
-            public String getDescription() { return "Anonymous Macro"; }
+            public String getDescription() {
+                return "Anonymous Macro";
+            }
 
             @Override
             protected ProofMacro[] createProofMacroArray() {
@@ -65,13 +71,19 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     }
 
                     @Override
-                    public String getName() { return ""; }
+                    public String getName() {
+                        return "";
+                    }
 
                     @Override
-                    public String getCategory() { return null; }
+                    public String getCategory() {
+                        return null;
+                    }
 
                     @Override
-                    public String getDescription() { return "Anonymous Macro"; }
+                    public String getDescription() {
+                        return "Anonymous Macro";
+                    }
                 };
 
                 return new ProofMacro[] { new StartAuxiliaryComputationMacro(),

@@ -123,7 +123,8 @@ public class TermLabelMenu extends JMenu {
      * <p>
      * <b>Attention:</b> This can happen in an Eclipse context outside of the checkbox items!
      *
-     * @param e The event object.
+     * @param e
+     *        The event object.
      */
     protected void handleVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
         if (displayLabelsCheckBox != null) {

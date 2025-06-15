@@ -39,10 +39,14 @@ public abstract class AbstractStrategyPropertyDefinition {
     /**
      * Constructor.
      *
-     * @param apiKey The key used in KeY's API.
-     * @param name The human readable name of the property.
-     * @param tooltip The optional tooltip text which describes this property.
-     * @param subProperties Optional children which edits related properties to this.
+     * @param apiKey
+     *        The key used in KeY's API.
+     * @param name
+     *        The human readable name of the property.
+     * @param tooltip
+     *        The optional tooltip text which describes this property.
+     * @param subProperties
+     *        Optional children which edits related properties to this.
      */
     protected AbstractStrategyPropertyDefinition(String apiKey, String name, String tooltip,
             AbstractStrategyPropertyDefinition... subProperties) {

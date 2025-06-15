@@ -21,17 +21,22 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
     private Node correspondingNode = null;
 
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
+     * @param symbolicState
+     *        The symbolic state (parallel update).
+     * @param pathCondition
+     *        The path condition (formula).
      */
     public SymbolicExecutionState(JTerm symbolicState, JTerm pathCondition) {
         super(symbolicState, pathCondition);
     }
 
     /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param correspondingNode The node corresponding to this SE state.
+     * @param symbolicState
+     *        The symbolic state (parallel update).
+     * @param pathCondition
+     *        The path condition (formula).
+     * @param correspondingNode
+     *        The node corresponding to this SE state.
      */
     public SymbolicExecutionState(JTerm symbolicState, JTerm pathCondition,
             Node correspondingNode) {
@@ -61,7 +66,8 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
     }
 
     /**
-     * @param correspondingNode The node corresponding to this SE state.
+     * @param correspondingNode
+     *        The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;
@@ -79,7 +85,8 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
     /**
      * Removes a trailing newline (\n) char from the given string.
      *
-     * @param str The string to remove the newline char from.
+     * @param str
+     *        The string to remove the newline char from.
      * @return The given string with the removed trailing \n char, or the original string if it does
      *         not end with an \n.
      */

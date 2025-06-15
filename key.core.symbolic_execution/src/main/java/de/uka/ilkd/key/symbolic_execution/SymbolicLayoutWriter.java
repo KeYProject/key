@@ -120,10 +120,14 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     /**
      * Writes the given {@link ISymbolicLayout} as XML file.
      *
-     * @param model The {@link ISymbolicLayout} to save.
-     * @param encoding The encoding to use.
-     * @param file The {@link File} to save to.
-     * @throws IOException Occurred Exception.
+     * @param model
+     *        The {@link ISymbolicLayout} to save.
+     * @param encoding
+     *        The encoding to use.
+     * @param file
+     *        The {@link File} to save to.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public void write(ISymbolicLayout model, String encoding, File file) throws IOException {
         write(model, encoding, new FileOutputStream(file));
@@ -132,11 +136,15 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     /**
      * Writes the given {@link ISymbolicLayout} into the {@link OutputStream}.
      *
-     * @param model The {@link ISymbolicLayout} to save.
-     * @param encoding The encoding to use.
-     * @param out The {@link OutputStream} to save to. The {@link OutputStream} will be closed by
+     * @param model
+     *        The {@link ISymbolicLayout} to save.
+     * @param encoding
+     *        The encoding to use.
+     * @param out
+     *        The {@link OutputStream} to save to. The {@link OutputStream} will be closed by
      *        this method.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     public void write(ISymbolicLayout model, String encoding, OutputStream out) throws IOException {
         if (out != null) {
@@ -152,8 +160,10 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     /**
      * Converts the given {@link ISymbolicLayout} into XML.
      *
-     * @param model The {@link ISymbolicLayout} to convert.
-     * @param encoding The encoding to use.
+     * @param model
+     *        The {@link ISymbolicLayout} to convert.
+     * @param encoding
+     *        The encoding to use.
      * @return The created XML content.
      */
     public String toXML(ISymbolicLayout model, String encoding) {
@@ -167,9 +177,12 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * Appends the given {@link ISymbolicLayout} with its children to the given
      * {@link StringBuilder}.
      *
-     * @param level The level to use.
-     * @param model The {@link ISymbolicLayout} to append.
-     * @param sb The {@link StringBuilder} to append to.
+     * @param level
+     *        The level to use.
+     * @param model
+     *        The {@link ISymbolicLayout} to append.
+     * @param sb
+     *        The {@link StringBuilder} to append to.
      */
     protected void appendModel(int level, ISymbolicLayout model, StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
@@ -188,9 +201,12 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * Appends the given {@link ISymbolicEquivalenceClass} with its children to the given
      * {@link StringBuilder}.
      *
-     * @param level The level to use.
-     * @param ec The {@link ISymbolicEquivalenceClass} to append.
-     * @param sb The {@link StringBuilder} to append to.
+     * @param level
+     *        The level to use.
+     * @param ec
+     *        The {@link ISymbolicEquivalenceClass} to append.
+     * @param sb
+     *        The {@link StringBuilder} to append to.
      */
     protected void appendEquivalenceClass(int level, ISymbolicEquivalenceClass ec,
             StringBuilder sb) {
@@ -209,10 +225,14 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * Appends the given {@link ISymbolicState} with its children to the
      * given {@link StringBuilder}.
      *
-     * @param level The level to use.
-     * @param model The {@link ISymbolicLayout} which provides all objects.
-     * @param state The {@link ISymbolicState} to append.
-     * @param sb The {@link StringBuilder} to append to.
+     * @param level
+     *        The level to use.
+     * @param model
+     *        The {@link ISymbolicLayout} which provides all objects.
+     * @param state
+     *        The {@link ISymbolicState} to append.
+     * @param sb
+     *        The {@link StringBuilder} to append to.
      */
     protected void appendState(int level, ISymbolicLayout model, ISymbolicState state,
             StringBuilder sb) {
@@ -232,10 +252,14 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * Appends the given {@link ISymbolicObject} with its children to the given
      * {@link StringBuilder}.
      *
-     * @param level The level to use.
-     * @param model The {@link ISymbolicLayout} which provides all objects.
-     * @param object The {@link ISymbolicObject} to append.
-     * @param sb The {@link StringBuilder} to append to.
+     * @param level
+     *        The level to use.
+     * @param model
+     *        The {@link ISymbolicLayout} which provides all objects.
+     * @param object
+     *        The {@link ISymbolicObject} to append.
+     * @param sb
+     *        The {@link StringBuilder} to append to.
      */
     protected void appendObject(int level, ISymbolicLayout model, ISymbolicObject object,
             StringBuilder sb) {
@@ -257,9 +281,12 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * Appends the given {@link ISymbolicValue} with its children to the
      * given {@link StringBuilder}.
      *
-     * @param level The level to use.
-     * @param value The {@link ISymbolicValue} to append.
-     * @param sb The {@link StringBuilder} to append to.
+     * @param level
+     *        The level to use.
+     * @param value
+     *        The {@link ISymbolicValue} to append.
+     * @param sb
+     *        The {@link StringBuilder} to append to.
      */
     protected void appendValue(int level, ISymbolicValue value, StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
@@ -279,10 +306,14 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * Appends the given {@link ISymbolicAssociation} with its children to the given
      * {@link StringBuilder}.
      *
-     * @param level The level to use.
-     * @param model The {@link ISymbolicLayout} which provides all objects.
-     * @param association The {@link ISymbolicAssociation} to append.
-     * @param sb The {@link StringBuilder} to append to.
+     * @param level
+     *        The level to use.
+     * @param model
+     *        The {@link ISymbolicLayout} which provides all objects.
+     * @param association
+     *        The {@link ISymbolicAssociation} to append.
+     * @param sb
+     *        The {@link StringBuilder} to append to.
      */
     protected void appendAssociation(int level, ISymbolicLayout model,
             ISymbolicAssociation association, StringBuilder sb) {
@@ -301,8 +332,10 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     /**
      * Computes a unique ID for the given object in the given model.
      *
-     * @param model The {@link ISymbolicLayout} which provides all objects.
-     * @param object The {@link ISymbolicObject} to compute its unique ID.
+     * @param model
+     *        The {@link ISymbolicLayout} which provides all objects.
+     * @param object
+     *        The {@link ISymbolicObject} to compute its unique ID.
      * @return The unique ID.
      */
     protected String computeObjectId(ISymbolicLayout model, ISymbolicObject object) {

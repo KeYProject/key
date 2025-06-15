@@ -26,9 +26,12 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
     /**
      * Construct a new user action.
      *
-     * @param mediator the mediator
-     * @param proof the proof
-     * @param invokedNode the node to start auto mode on
+     * @param mediator
+     *        the mediator
+     * @param proof
+     *        the proof
+     * @param invokedNode
+     *        the node to start auto mode on
      */
     public RunStrategyOnNodeUserAction(KeYMediator mediator, Proof proof, Node invokedNode) {
         super(mediator, proof);
