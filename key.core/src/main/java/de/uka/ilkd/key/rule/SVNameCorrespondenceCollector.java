@@ -5,11 +5,12 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.Semisequent;
@@ -46,7 +47,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
      * @param t the Term if the toplevel operator of this term is a substitution of schema
      *        variables, then this pair is added to the map "nameCorrespondences"
      */
-    public void visit(org.key_project.logic.Term t) {
+    public void visit(Term t) {
 
         final var top = t.op();
 
@@ -108,7 +109,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
         SchemaVariable findSV = null;
         visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
-            final org.key_project.logic.Term findTerm = ((FindTaclet) taclet).find();
+            final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);
             if (findTerm.op() instanceof SchemaVariable) {
                 findSV = (SchemaVariable) findTerm.op();
@@ -120,7 +121,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
         for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {
-                final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
+                final JTerm replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
                 replaceWithTerm.execPostOrder(this);
                 if (findSV != null && replaceWithTerm.op() instanceof SchemaVariable) {
                     addNameCorrespondence((SchemaVariable) replaceWithTerm.op(), findSV);

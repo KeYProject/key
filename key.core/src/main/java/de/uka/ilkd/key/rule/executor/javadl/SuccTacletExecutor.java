@@ -12,7 +12,7 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -31,7 +31,7 @@ public class SuccTacletExecutor extends FindTacletExecutor {
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind,
-            MatchConditions matchCond,
+            MatchResultInfo matchCond,
             Goal goal, TacletApp ruleApp, Services services) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
             final Sequent replWith = ((AntecSuccTacletGoalTemplate) gt).replaceWith();
@@ -54,7 +54,7 @@ public class SuccTacletExecutor extends FindTacletExecutor {
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-            MatchConditions matchCond, Goal goal, TacletApp ruleApp, Services services) {
+            MatchResultInfo matchCond, Goal goal, TacletApp ruleApp, Services services) {
         addToAntec(add.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp,
             services, termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));

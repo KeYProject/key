@@ -15,7 +15,7 @@ import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.logic.Name;
@@ -86,7 +86,7 @@ public class TermLabelMenu extends JMenu {
             public Set<Name> getOccuringTermLabels(Sequent seq) {
                 final Set<Name> result = new HashSet<>();
                 for (final SequentFormula sf : seq) {
-                    result.addAll(getLabelsForTermRecursively((Term) sf.formula()));
+                    result.addAll(getLabelsForTermRecursively((JTerm) sf.formula()));
                 }
                 return result;
             }
@@ -94,7 +94,7 @@ public class TermLabelMenu extends JMenu {
             /*
              * Returns names of TermLabels, that occur in term or one of its subterms.
              */
-            private static Set<Name> getLabelsForTermRecursively(Term term) {
+            private static Set<Name> getLabelsForTermRecursively(JTerm term) {
                 Set<Name> result = new HashSet<>();
 
                 if (term.hasLabels()) {
@@ -103,7 +103,7 @@ public class TermLabelMenu extends JMenu {
                     }
                 }
 
-                for (final Term subTerm : term.subs()) {
+                for (final JTerm subTerm : term.subs()) {
                     result.addAll(getLabelsForTermRecursively(subTerm));
                 }
 

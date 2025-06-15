@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 
 import org.key_project.logic.LogicServices;
@@ -13,25 +14,23 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
-
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
 
     private final HeapLDT heapLDT;
-    private final @NonNull PrimitiveHeapTermFeature primitiveHeapTermFeature;
+    private final PrimitiveHeapTermFeature primitiveHeapTermFeature;
 
     private SimplifiedSelectTermFeature(HeapLDT heapLDT) {
         this.heapLDT = heapLDT;
         this.primitiveHeapTermFeature = PrimitiveHeapTermFeature.create(heapLDT);
     }
 
-    public static @NonNull TermFeature create(HeapLDT heapLDT) {
+    public static TermFeature create(HeapLDT heapLDT) {
         return new SimplifiedSelectTermFeature(heapLDT);
     }
 
     @Override
-    protected boolean filter(@NonNull Term term, MutableState mState, LogicServices services) {
-        var t = (de.uka.ilkd.key.logic.Term) term;
+    protected boolean filter(Term term, MutableState mState, LogicServices services) {
+        var t = (JTerm) term;
         boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
         return // either the operator is not a select operator
         !isSelectOp ||

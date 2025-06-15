@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -20,7 +20,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
@@ -35,7 +35,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static Term dropEffectlessElementariesHelper(Term update,
+    private static JTerm dropEffectlessElementariesHelper(JTerm update,
             Set<LocationVariable> relevantVars, TermServices services) {
         if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
@@ -51,12 +51,12 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                 return services.getTermBuilder().skip();
             }
         } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
+            JTerm sub0 = update.sub(0);
+            JTerm sub1 = update.sub(1);
             // first descend to the second sub-update to keep relevantVars in
             // good order
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
-            Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
+            JTerm newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+            JTerm newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
             if (newSub0 == null && newSub1 == null) {
                 return null;
             } else {
@@ -65,9 +65,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                 return services.getTermBuilder().parallel(newSub0, newSub1);
             }
         } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
-            Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+            JTerm sub0 = update.sub(0);
+            JTerm sub1 = update.sub(1);
+            JTerm newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
             return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
         } else {
             return null;
@@ -75,13 +75,13 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static Term dropEffectlessElementaries(Term update, Term target,
+    private static JTerm dropEffectlessElementaries(JTerm update, JTerm target,
             LogicServices p_services) {
         final Services services = (Services) p_services;
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
         Set<LocationVariable> varsInTarget = collector.result();
-        Term simplifiedUpdate = dropEffectlessElementariesHelper(update, varsInTarget, services);
+        JTerm simplifiedUpdate = dropEffectlessElementariesHelper(update, varsInTarget, services);
         return simplifiedUpdate == null ? null
                 : services.getTermBuilder().apply(simplifiedUpdate, target, null);
     }
@@ -89,19 +89,19 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo mc,
             LogicServices services) {
         SVInstantiations svInst =
             (SVInstantiations) mc.getInstantiations();
-        Term uInst = (Term) svInst.getInstantiation(u);
-        Term xInst = (Term) svInst.getInstantiation(x);
-        Term resultInst = (Term) svInst.getInstantiation(result);
+        JTerm uInst = (JTerm) svInst.getInstantiation(u);
+        JTerm xInst = (JTerm) svInst.getInstantiation(x);
+        JTerm resultInst = (JTerm) svInst.getInstantiation(result);
         if (uInst == null || xInst == null) {
             return mc;
         }
 
-        Term properResultInst = dropEffectlessElementaries(uInst, xInst, services);
+        JTerm properResultInst = dropEffectlessElementaries(uInst, xInst, services);
         if (properResultInst == null) {
             return null;
         } else if (resultInst == null) {

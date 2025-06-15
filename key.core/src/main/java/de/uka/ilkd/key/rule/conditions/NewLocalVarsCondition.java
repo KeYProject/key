@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
@@ -25,7 +25,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.ListInstantiation;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.*;
 
 /**
@@ -68,8 +68,8 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices lServices) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices lServices) {
         var services = (Services) lServices;
         var svInst = matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {
@@ -82,8 +82,8 @@ public class NewLocalVarsCondition implements VariableCondition {
 
         var vars = MiscTools.getLocalOuts(body, services);
         List<VariableDeclaration> decls = new ArrayList<>(vars.size());
-        ImmutableList<Term> updatesBefore = ImmutableSLList.nil();
-        ImmutableList<Term> updatesFrame = ImmutableSLList.nil();
+        ImmutableList<JTerm> updatesBefore = ImmutableSLList.nil();
+        ImmutableList<JTerm> updatesFrame = ImmutableSLList.nil();
         var tb = services.getTermBuilder();
         for (var v : vars) {
             final var newName =

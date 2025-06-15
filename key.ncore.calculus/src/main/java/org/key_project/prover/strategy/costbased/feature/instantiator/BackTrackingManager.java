@@ -10,6 +10,8 @@ import java.util.Iterator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 
 /// Manager for the <code>ChoicePoint</code>s that can occur during the evaluation of a feature
 /// term,
@@ -25,7 +27,7 @@ public final class BackTrackingManager {
     /// The original rule application in question, i.e., the application without the changes that
     /// can
     /// possibly be applied by <code>ChoicePoint</code>s
-    private RuleApp initialApp = null;
+    private @Nullable RuleApp initialApp = null;
 
     /// Stack of <code>Iterator<CPBranch></code>: the branches of <code>ChoicePoint</code>s that
     /// have
@@ -33,7 +35,7 @@ public final class BackTrackingManager {
     private final ArrayDeque<Iterator<CPBranch>> choices = new ArrayDeque<>();
 
     /// List of <code>CPBranch</code>: the branches that are taken in the current evaluation run
-    private final ArrayList<CPBranch> chosenBranches = new ArrayList<>();
+    private final ArrayList<@Nullable CPBranch> chosenBranches = new ArrayList<>();
 
     /// The position within <code>choices</code> during the current evaluation run (the number of
     /// <code>ChoicePoint</code>s that occured so far during the current evaluation)
@@ -62,7 +64,9 @@ public final class BackTrackingManager {
             assert choices.size() > position;
             // phase where we have to "replay" choices that have already
             // been made
-            chosenBranches.get(position).choose();
+            final CPBranch branch = chosenBranches.get(position);
+            assert branch != null : "@AssumeAssertion(nullness): Branch not found";
+            branch.choose();
         }
 
         ++position;
@@ -72,7 +76,7 @@ public final class BackTrackingManager {
     /// Method that has to be called before a sequence of evaluation runs of a feature term.
     ///
     /// @param initialApp the original rule application in question
-    public void setup(RuleApp initialApp) {
+    public void setup(@Nullable RuleApp initialApp) {
         this.initialApp = initialApp;
         choices.clear();
         chosenBranches.clear();
@@ -91,14 +95,14 @@ public final class BackTrackingManager {
 
         while (!choices.isEmpty()) {
             final Iterator<CPBranch> chs = choices.pop();
-            chosenBranches.remove(chosenBranches.size() - 1);
+            chosenBranches.removeLast();
 
             if (chs.hasNext()) {
                 pushChoices(chs, chs.next());
                 return true;
             }
 
-            tickets.remove(tickets.size() - 1);
+            tickets.removeLast();
         }
 
         // make sure that no further choicepoints occur until <code>setup</code>
@@ -110,11 +114,11 @@ public final class BackTrackingManager {
 
     /// @return the resulting rule application when all choice points have applied their
     /// modifications
-    public RuleApp getResultingapp() {
+    public @Nullable RuleApp getResultingapp() {
         return getOldRuleApp();
     }
 
-    private void pushChoices(Iterator<CPBranch> remainingChoices, CPBranch chosen) {
+    private void pushChoices(Iterator<CPBranch> remainingChoices, @Nullable CPBranch chosen) {
         choices.push(remainingChoices);
         chosenBranches.add(chosen);
     }
@@ -162,7 +166,7 @@ public final class BackTrackingManager {
         }
     }
 
-    private RuleApp getOldRuleApp() {
+    private @Nullable RuleApp getOldRuleApp() {
         if (chosenBranches.isEmpty()) {
             return initialApp;
         }

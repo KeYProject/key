@@ -5,7 +5,8 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.logic.Term;
 
 public class ModifiesSetTranslator {
 

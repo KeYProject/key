@@ -18,6 +18,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -119,7 +120,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
         if (pio == null) {
             label = null;
         } else {
-            var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();
+            var term = (JTerm) pio.subTerm();
             label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
         }
 

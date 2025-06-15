@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -20,9 +20,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
@@ -45,13 +42,12 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
      * @return The abstract domain lattice suitable for the given sort. Return null if there is no
      *         abstract domain for that sort; in this case, an if-then-else merge will be performed.
      */
-    protected abstract @Nullable AbstractDomainLattice getAbstractDomainForSort(Sort s,
-            Services services);
+    protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s, Services services);
 
     /**
      * @return Manually chosen lattice elements for program variables.
      */
-    public abstract @Nullable LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
+    public abstract LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
 
     /*
      * (non-Javadoc)
@@ -64,22 +60,20 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(@NonNull Term v,
-            @NonNull SymbolicExecutionState state1,
-            @NonNull Term valueInState1, @NonNull SymbolicExecutionState state2,
-            @NonNull Term valueInState2,
-            Term distinguishingFormula, @NonNull Services services) {
+    public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
-        ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+        ImmutableSet<JTerm> newConstraints = DefaultImmutableSet.nil();
 
         AbstractDomainLattice lattice = getAbstractDomainForSort(valueInState1.sort(), services);
 
         if (lattice != null) {
 
-            AbstractDomainElement mergeElem = null;
-            LinkedHashSet<Term> sideConditions = new LinkedHashSet<>();
+            AbstractDomainElement mergeElem;
+            LinkedHashSet<JTerm> sideConditions = new LinkedHashSet<>();
 
             assert v.op() instanceof ProgramVariable;
 

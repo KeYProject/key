@@ -7,6 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This class represents a heuristic. Taclets can belong to different rulesets and are executed
 /// automatic if these are selected. A ruleset is just a name.
@@ -34,7 +35,7 @@ public record RuleSet(Name name) implements Named {
     /// @param other the Object with which this instance is compared
     /// @return true it the `other` is a ruleset of the same name
     /// as this ruleset
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (other instanceof RuleSet(Name otherName)) {
             return this.name().equals(otherName);
         }

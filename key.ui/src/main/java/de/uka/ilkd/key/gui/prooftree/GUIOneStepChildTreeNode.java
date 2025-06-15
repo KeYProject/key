@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui.prooftree;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 
 import org.key_project.prover.rules.RuleApp;
@@ -59,7 +59,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         // For prettyprinting
         Services services = parent.getNode().proof().getServices();
         String prettySubTerm =
-            LogicPrinter.quickPrintTerm((Term) app.posInOccurrence().subTerm(), services);
+            LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
         return app.rule().name() + " ON " + prettySubTerm;
     }
 

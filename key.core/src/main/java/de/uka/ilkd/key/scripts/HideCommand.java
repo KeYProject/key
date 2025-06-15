@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
-import java.util.Objects;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -20,8 +20,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-
-import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
@@ -48,15 +46,15 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
 
-        Goal goal = Objects.requireNonNull(state).getFirstOpenAutomaticGoal();
+        Goal goal = state.getFirstOpenAutomaticGoal();
 
         Taclet hideLeft =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
@@ -64,31 +62,29 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
-                Objects.requireNonNull(service),
-                true);
+            app = app.addCheckedInstantiation(sv, (JTerm) s2.formula(),
+                service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
-                Objects.requireNonNull(service));
+                service);
             goal.apply(app);
         }
 
         Taclet hideRight =
-            Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment()
-                    .lookupActiveTaclet(HIDE_RIGHT);
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
         for (SequentFormula s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
-                Objects.requireNonNull(service),
-                true);
+            app = app.addCheckedInstantiation(sv, (JTerm) s2.formula(),
+                service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
-                Objects.requireNonNull(service));
+                service);
             goal.apply(app);
         }
     }
 
-    private @NonNull SequentFormula find(@NonNull SequentFormula sf, @NonNull Semisequent semiseq)
+    private SequentFormula find(
+            SequentFormula sf, Semisequent semiseq)
             throws ScriptException {
         for (SequentFormula s : semiseq) {
             Term term = s.formula();
@@ -101,11 +97,10 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "hide";
     }
 
-    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public Sequent sequent;

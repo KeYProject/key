@@ -64,9 +64,9 @@ public class TestEqualsModProperty {
     @Test
     public void renaming() {
         // ------------ differing terms to begin with
-        Term term1 =
+        JTerm term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
-        Term term2 =
+        JTerm term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
         assertFalse(RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, term2),
             "Terms are different to begin with, so they shouldn't be equal");
@@ -115,9 +115,9 @@ public class TestEqualsModProperty {
     @Test
     public void irrelevantTermLabels() {
         // ------------ different terms to begin with
-        Term term1 =
+        JTerm term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
-        Term term2 =
+        JTerm term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
         assertFalse(term1.equalsModProperty(term2, IRRELEVANT_TERM_LABELS_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
@@ -182,9 +182,9 @@ public class TestEqualsModProperty {
     @Test
     public void allTermLabels() {
         // ------------ different terms to begin with
-        Term term1 =
+        JTerm term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
-        Term term2 =
+        JTerm term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
         assertFalse(TERM_LABELS_PROPERTY.equalsModThisProperty(term1, term2),
             "Terms are different to begin with, so they shouldn't be equal");
@@ -241,9 +241,9 @@ public class TestEqualsModProperty {
     @Test
     public void proofIrrelevancy() {
         // ------------ different terms to begin with
-        Term term1 =
+        JTerm term1 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
-        Term term2 =
+        JTerm term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
         assertFalse(term1.equalsModProperty(term2, PROOF_IRRELEVANCY_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");

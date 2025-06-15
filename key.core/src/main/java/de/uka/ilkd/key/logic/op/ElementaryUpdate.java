@@ -10,6 +10,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -18,7 +19,7 @@ import org.key_project.logic.sort.Sort;
  * operator for every left hand side "x". Each of these operator is unary, accepting a single
  * argument "t".
  */
-public final class ElementaryUpdate extends AbstractSortedOperator {
+public final class ElementaryUpdate extends JAbstractSortedOperator {
 
     private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
         new WeakHashMap<>();

@@ -60,7 +60,7 @@ import org.jspecify.annotations.Nullable;
  * methods for setting back several proof steps. The sequent has to be changed using the methods of
  * Goal.
  */
-public final class Goal implements ProofGoal<@NonNull Goal> {
+public final class Goal implements ProofGoal<Goal> {
 
     public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();

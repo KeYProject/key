@@ -12,8 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -28,9 +28,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public final class DefaultTacletSetTranslation
         implements TacletSetTranslation, TranslationListener {
@@ -45,12 +42,12 @@ public final class DefaultTacletSetTranslation
      * Translation of the taclets stored in <code>taclets</code>.
      *
      */
-    private @NonNull ImmutableList<TacletFormula> translation = ImmutableSLList.nil();
+    private ImmutableList<TacletFormula> translation = ImmutableSLList.nil();
 
     /**
      * Taclets can not be translated because checking the taclet failed.
      */
-    private @NonNull ImmutableList<TacletFormula> notTranslated = ImmutableSLList.nil();
+    private ImmutableList<TacletFormula> notTranslated = ImmutableSLList.nil();
 
     /**
      * If a instantiation failure occurs the returned information is stored in a String.
@@ -58,7 +55,7 @@ public final class DefaultTacletSetTranslation
     private final ImmutableList<String> instantiationFailures = ImmutableSLList.nil();
 
 
-    private @NonNull ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
+    private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
 
     /**
      * Sorts that have been used while translating the set of taclets.
@@ -90,8 +87,7 @@ public final class DefaultTacletSetTranslation
 
 
     @Override
-    public @NonNull ImmutableList<TacletFormula> getTranslation(
-            @Nullable ImmutableSet<Sort> sorts) {
+    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
 
         // only translate once.
         if (!translate) {
@@ -127,7 +123,7 @@ public final class DefaultTacletSetTranslation
 
 
 
-    public @NonNull ImmutableList<TacletFormula> getNotTranslated() {
+    public ImmutableList<TacletFormula> getNotTranslated() {
         return notTranslated;
     }
 
@@ -157,7 +153,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public @NonNull String toString() {
+    public String toString() {
         ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts);
         StringBuilder toStore = new StringBuilder();
         toStore = new StringBuilder("//" + Calendar.getInstance().getTime() + "\n");
@@ -227,7 +223,7 @@ public final class DefaultTacletSetTranslation
         return toStore.toString();
     }
 
-    private @NonNull String convertTerm(@NonNull Term term) {
+    private String convertTerm(JTerm term) {
         String ret = LogicPrinter.quickPrintTerm(term, null);
         ret = "(" + ret + ")";
         return ret;
@@ -247,7 +243,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term) {
+    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, JTerm term) {
         /*
          * String s = ""; s += "taclet: " + t.name()+"\n"; s += "term: " + term +"\n"; s +=
          * "generic sort: " + dest + "\n"; s += "sort: "+ sort +"\n"; instantiationFailures =

@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -33,7 +31,6 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The {@link IProgramVariable} which contains the represented value.
      */
-    @Nullable
     IProgramVariable getProgramVariable();
 
     /**
@@ -41,8 +38,7 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The index in the parent array or {@code null} if no array cell value is represented.
      */
-    @Nullable
-    Term getArrayIndex();
+    JTerm getArrayIndex();
 
     /**
      * Returns the human readable index in the parent array if an array cell value is represented.
@@ -64,8 +60,7 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The optional additional condition considered during value computation.
      */
-    @Nullable
-    Term getAdditionalCondition();
+    JTerm getAdditionalCondition();
 
     /**
      * Returns the parent {@link IExecutionValue} if available.
@@ -87,6 +82,5 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The created term.
      */
-    @Nullable
-    Term createSelectTerm();
+    JTerm createSelectTerm();
 }

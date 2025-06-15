@@ -6,7 +6,7 @@ package de.uka.ilkd.key.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -69,8 +69,8 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
                     if (ruleApp instanceof TacletApp tacletApp) {
                         final Object inst = tacletApp.matchConditions().getInstantiations()
                                 .lookupValue(new Name(value.toString()));
-                        if (inst != null && ((Term) inst).op() instanceof Function) {
-                            abbrMap.put((Term) inst, key, true);
+                        if (inst != null && ((JTerm) inst).op() instanceof Function) {
+                            abbrMap.put((JTerm) inst, key, true);
                         } else {
                             throw new ScriptException(String.format(
                                 "Tried to remember instantiation of schema variable %s "

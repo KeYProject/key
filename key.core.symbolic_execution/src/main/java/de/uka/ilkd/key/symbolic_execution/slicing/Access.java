@@ -5,31 +5,28 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableArray;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public class Access {
     /**
      * The {@link ProgramVariable} or {@code null} if an array index is accessed.
      */
-    private final @Nullable ProgramVariable programVariable;
+    private final ProgramVariable programVariable;
 
     /**
      * The accessed array index or {@code null} if it is not an array access.
      */
-    private final @Nullable ImmutableArray<Term> dimensionExpressions;
+    private final ImmutableArray<JTerm> dimensionExpressions;
 
     /**
      * Constructor.
      *
      * @param programVariable The accessed {@link ProgramVariable}.
      */
-    public Access(@NonNull ProgramVariable programVariable) {
+    public Access(ProgramVariable programVariable) {
         assert programVariable != null;
         this.programVariable = programVariable;
         this.dimensionExpressions = null;
@@ -40,7 +37,7 @@ public class Access {
      *
      * @param dimensionExpressions The accessed array index.
      */
-    public Access(@NonNull ImmutableArray<Term> dimensionExpressions) {
+    public Access(ImmutableArray<JTerm> dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
         this.dimensionExpressions = dimensionExpressions;
@@ -51,7 +48,7 @@ public class Access {
      *
      * @param dimensionExpressions The accessed array index.
      */
-    public Access(Term @NonNull... dimensionExpressions) {
+    public Access(JTerm... dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
         this.dimensionExpressions = new ImmutableArray<>(dimensionExpressions);
@@ -62,7 +59,7 @@ public class Access {
      *
      * @return The {@link ProgramVariable} or {@code null} if an array index is accessed.
      */
-    public @Nullable ProgramVariable getProgramVariable() {
+    public ProgramVariable getProgramVariable() {
         return programVariable;
     }
 
@@ -71,7 +68,7 @@ public class Access {
      *
      * @return The accessed array index or {@code null} if it is not an array access.
      */
-    public @Nullable ImmutableArray<Term> getDimensionExpressions() {
+    public ImmutableArray<JTerm> getDimensionExpressions() {
         return dimensionExpressions;
     }
 
@@ -100,7 +97,7 @@ public class Access {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (obj instanceof Access other) {
             return Objects.equals(programVariable, other.getProgramVariable())
                     && Objects.equals(dimensionExpressions, other.getDimensionExpressions());
@@ -113,7 +110,7 @@ public class Access {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         if (programVariable != null) {
             return programVariable.toString();
         } else if (dimensionExpressions != null) {

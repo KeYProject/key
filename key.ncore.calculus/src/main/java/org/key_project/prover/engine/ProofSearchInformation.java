@@ -6,7 +6,6 @@ package org.key_project.prover.engine;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Represents a contract for gathering and accessing information about the application
@@ -33,13 +32,12 @@ import org.jspecify.annotations.Nullable;
 /// resolving unresolved goals or handling errors.
 ///
 ///
-/// @param
-/// the type of the proof object, extending [ProofObject]
+/// @param <P> the type of the proof object, extending [ProofObject]
 /// @param <G> the type of the proof goal, extending [ProofGoal]
 ///
-/// @see org.key_project.prover.proof.ProofObject
-/// @see org.key_project.prover.proof.ProofGoal
-public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G extends ProofGoal<@NonNull G>> {
+/// @see ProofObject
+/// @see ProofGoal
+public interface ProofSearchInformation<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>> {
 
     /// Retrieves the explanation or reason wjy the proof search (strategy execution) finished.
     ///
@@ -89,6 +87,7 @@ public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G ext
     ///
     ///
     /// @return the exception encountered during execution, or `null` if no error occurred
+    @Nullable
     Throwable getException();
 
     /// Returns the total time taken for the strategy application, in milliseconds.

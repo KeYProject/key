@@ -69,7 +69,7 @@ public final class QueryAxiom extends ClassAxiom {
     }
 
     @Override
-    public QueryAxiom map(UnaryOperator<Term> op, Services services) {
+    public QueryAxiom map(UnaryOperator<JTerm> op, Services services) {
         return this;
     }
 
@@ -149,13 +149,13 @@ public final class QueryAxiom extends ClassAxiom {
 
         // create update and postcondition linking schema variables and
         // program variables
-        Term update = null;
+        JTerm update = null;
         int hc = 0;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (hc >= target.getHeapCount(services)) {
                 break;
             }
-            Term u = tb.elementary(heap, tb.var(heapSVs.get(hc++)));
+            JTerm u = tb.elementary(heap, tb.var(heapSVs.get(hc++)));
             if (update == null) {
                 update = u;
             } else {
@@ -167,7 +167,7 @@ public final class QueryAxiom extends ClassAxiom {
         for (int i = 0; i < paramSVs.length; i++) {
             update = tb.parallel(update, tb.elementary(paramProgSVs[i], tb.var(paramSVs[i])));
         }
-        final Term post = tb.imp(tb.reachableValue(tb.var(resultProgSV), target.getReturnType()),
+        final JTerm post = tb.imp(tb.reachableValue(tb.var(resultProgSV), target.getReturnType()),
             tb.equals(tb.var(skolemSV), tb.var(resultProgSV)));
 
         // create java block
@@ -186,7 +186,7 @@ public final class QueryAxiom extends ClassAxiom {
         if (target.isStatic()) {
             ifSeq = null;
         } else {
-            final Term ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
+            final JTerm ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
             final ImmutableList<SequentFormula> antecedent =
                 ImmutableSLList.singleton(ifCf);
@@ -194,7 +194,7 @@ public final class QueryAxiom extends ClassAxiom {
         }
 
         // create find
-        final Term[] subs = new Term[target.arity()];
+        final JTerm[] subs = new JTerm[target.arity()];
         int offset = 0;
         for (var heapSV : heapSVs) {
             subs[offset] = tb.var(heapSV);
@@ -208,14 +208,14 @@ public final class QueryAxiom extends ClassAxiom {
             subs[offset] = tb.var(paramSV);
             offset++;
         }
-        final Term find = tb.func(target, subs);
+        final JTerm find = tb.func(target, subs);
 
         // create replacewith
-        final Term replacewith = tb.var(skolemSV);
+        final JTerm replacewith = tb.var(skolemSV);
 
         // create added sequent
-        final Term addedFormula =
-            tb.apply(update, tb.prog(Modality.JavaModalityKind.BOX, jb, post), null);
+        final JTerm addedFormula =
+            tb.apply(update, tb.prog(JModality.JavaModalityKind.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
         final Sequent addedSeq =
             JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(addedCf));

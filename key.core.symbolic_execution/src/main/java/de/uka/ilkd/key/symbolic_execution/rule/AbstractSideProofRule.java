@@ -9,7 +9,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,8 +28,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.Pair;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Provides the basic functionality of {@link BuiltInRule} which computes something in a side proof.
@@ -66,14 +64,14 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created result {@link JFunction}.
      */
-    protected @NonNull JFunction createResultFunction(@NonNull Services services, Sort sort) {
+    protected Function createResultFunction(Services services, Sort sort) {
         return new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
             JavaDLTheory.FORMULA, sort);
     }
 
     /**
      * <p>
-     * Starts the side proof and extracts the result {@link Term} and conditions.
+     * Starts the side proof and extracts the result {@link JTerm} and conditions.
      * </p>
      * <p>
      * New used names are automatically added to the {@link Namespace} of the {@link Services}.
@@ -83,12 +81,12 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
      * @param sequentToProve The {@link Sequent} to prove in a side proof.
      * @param newPredicate The {@link JFunction} which is used to compute the result.
-     * @return The found result {@link Term} and the conditions.
+     * @return The found result {@link JTerm} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
     protected List<ResultsAndCondition> computeResultsAndConditions(Goal goal,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
-            JFunction newPredicate) throws ProofInputException {
+            Function newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(),
             goal.proof(),
             sideProofEnvironment, sequentToProve, newPredicate,
@@ -98,19 +96,18 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     }
 
     /**
-     * Replaces the {@link Term} defined by the given {@link PosInOccurrence} with the given new
-     * {@link Term}.
+     * Replaces the {@link JTerm} defined by the given {@link PosInOccurrence} with the given new
+     * {@link JTerm}.
      *
-     * @param pio The {@link PosInOccurrence} which defines the {@link Term} to replace.
-     * @param newTerm The new {@link Term}.
-     * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
+     * @param pio The {@link PosInOccurrence} which defines the {@link JTerm} to replace.
+     * @param newTerm The new {@link JTerm}.
+     * @return The created {@link SequentFormula} in which the {@link JTerm} is replaced.
      */
-    protected static @NonNull SequentFormula replace(@NonNull PosInOccurrence pio,
-            Term newTerm,
-            @NonNull Services services) {
+    protected static SequentFormula replace(PosInOccurrence pio,
+            JTerm newTerm, Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
-        Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();
-        Term root = (Term) pio.sequentFormula().formula();
+        Deque<Pair<Integer, JTerm>> indexAndParents = new LinkedList<>();
+        JTerm root = (JTerm) pio.sequentFormula().formula();
         final PosInTerm pit = pio.posInTerm();
         for (int i = 0, sz = pit.depth(); i < sz; i++) {
             int next = pit.getIndexAt(i);
@@ -119,9 +116,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
         }
         // Iterate over the collected parents and replace terms
         root = newTerm;
-        for (Pair<Integer, Term> pair : indexAndParents) {
-            Term parent = pair.second;
-            Term[] newSubs = parent.subs().toArray(new Term[parent.arity()]);
+        for (Pair<Integer, JTerm> pair : indexAndParents) {
+            JTerm parent = pair.second;
+            JTerm[] newSubs = parent.subs().toArray(new JTerm[parent.arity()]);
             newSubs[pair.first] = root;
             root = services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(),
                 parent.getLabels());

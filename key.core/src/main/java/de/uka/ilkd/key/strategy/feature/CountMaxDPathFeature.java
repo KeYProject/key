@@ -4,14 +4,12 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -25,8 +23,7 @@ public class CountMaxDPathFeature extends AbstractBetaFeature {
     private CountMaxDPathFeature() {}
 
     @Override
-    protected @NonNull RuleAppCost doComputation(@NonNull PosInOccurrence pos,
-            @NonNull Term findTerm, @NonNull ServiceCaches caches) {
+    protected RuleAppCost doComputation(PosInOccurrence pos, JTerm findTerm, ServiceCaches caches) {
         return NumberRuleAppCost.create(maxDPath(findTerm, !pos.isInAntec(), caches));
     }
 

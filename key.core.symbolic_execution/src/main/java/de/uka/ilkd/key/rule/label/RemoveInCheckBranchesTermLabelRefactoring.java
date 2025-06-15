@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -23,9 +23,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel} in check branches.
  * These are:
@@ -42,14 +39,14 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     /**
      * The {@link Name} of the supported {@link TermLabel}.
      */
-    private final @NonNull Name termLabelNameToRemove;
+    private final Name termLabelNameToRemove;
 
     /**
      * Constructor.
      *
      * @param termLabelNameToRemove The {@link Name} of the supported {@link TermLabel}.
      */
-    public RemoveInCheckBranchesTermLabelRefactoring(@NonNull Name termLabelNameToRemove) {
+    public RemoveInCheckBranchesTermLabelRefactoring(Name termLabelNameToRemove) {
         assert termLabelNameToRemove != null;
         this.termLabelNameToRemove = termLabelNameToRemove;
     }
@@ -71,11 +68,10 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      * {@inheritDoc}
      */
     @Override
-    public @NonNull RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm, Rule rule,
-            @Nullable Goal goal,
-            Object hint, Term tacletTerm) {
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm) {
         if (goal != null) {
             final String branchLabel = goal.node().getNodeInfo().getBranchLabel();
             return switch (rule) {
@@ -100,8 +96,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, @NonNull LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
         labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

@@ -9,9 +9,12 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
+import org.jspecify.annotations.Nullable;
+
 /// Interface for mappings from rule applications to terms. This is used, for instance, for
 /// determining the instantiation of a schema variable. We also allow projections to be partial,
 /// which is signalled by <code>toTerm</code> returning <code>null</code>
 public interface ProjectionToTerm<Goal extends ProofGoal<Goal>> {
+    @Nullable
     Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState);
 }

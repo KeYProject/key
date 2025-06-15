@@ -151,7 +151,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         for (SequentFormula formula : succedent.asList()) {
             if (blockElems.contains(JavaTools
                     .getActiveStatement(
-                        MergeRuleUtils.getJavaBlockRecursive((Term) formula.formula())))) {
+                        MergeRuleUtils.getJavaBlockRecursive((JTerm) formula.formula())))) {
                 return true;
             }
         }
@@ -194,7 +194,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive((Term) pio.subTerm());
+                JavaBlock theJavaBlock =
+                    MergeRuleUtils.getJavaBlockRecursive((JTerm) pio.subTerm());
                 SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
 
                 if (!(theJavaBlock.program() instanceof StatementBlock)

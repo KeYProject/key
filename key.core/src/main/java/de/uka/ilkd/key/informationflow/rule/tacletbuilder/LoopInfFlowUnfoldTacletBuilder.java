@@ -8,7 +8,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -23,7 +23,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
 
     private LoopSpecification loopInv;
     private ExecutionContext executionContext;
-    private Term guard;
+    private JTerm guard;
 
 
     public LoopInfFlowUnfoldTacletBuilder(Services services) {
@@ -41,7 +41,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
     }
 
 
-    public void setGuard(Term guard) {
+    public void setGuard(JTerm guard) {
         this.guard = guard;
     }
 
@@ -54,7 +54,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
 
 
     @Override
-    Term createFindTerm(IFProofObligationVars ifVars) {
+    JTerm createFindTerm(IFProofObligationVars ifVars) {
         InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
             ifVars.c2, executionContext, guard, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);

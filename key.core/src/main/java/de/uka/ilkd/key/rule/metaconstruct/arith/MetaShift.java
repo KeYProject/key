@@ -6,13 +6,11 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
-
-import org.jspecify.annotations.NonNull;
 
 
 public abstract class MetaShift extends AbstractTermTransformer {
@@ -21,14 +19,14 @@ public abstract class MetaShift extends AbstractTermTransformer {
     public final static BigInteger INT_MAX_VALUE = BigInteger.valueOf(Integer.MAX_VALUE);
 
 
-    protected MetaShift(@NonNull Name name) {
+    protected MetaShift(Name name) {
         super(name, 2);
     }
 
 
-    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
-        Term arg1 = term.sub(0);
-        Term arg2 = term.sub(1);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        JTerm arg1 = term.sub(0);
+        JTerm arg2 = term.sub(1);
         BigInteger left;
         BigInteger right;
 

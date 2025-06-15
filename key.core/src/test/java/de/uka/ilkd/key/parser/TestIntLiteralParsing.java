@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -160,7 +160,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
 
     @Override
-    public Term parseTerm(String s) throws RecognitionException {
+    public JTerm parseTerm(String s) throws RecognitionException {
         PositionedString p = new PositionedString(s);
         /*
          * containerType and self variable are not relevant for the tests currently and can be

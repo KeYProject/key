@@ -19,6 +19,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * This variable condition ensures that no other label of the same name exists in the context
@@ -41,7 +42,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var,
             SyntaxElement instCandidate,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond,
+            MatchResultInfo matchCond,
             LogicServices services) {
         SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
         if (var != labelSV && instantiations.isInstantiated(labelSV)) {

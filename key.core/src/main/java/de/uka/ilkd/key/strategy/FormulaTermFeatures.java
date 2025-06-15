@@ -47,7 +47,7 @@ class FormulaTermFeatures extends StaticFeatureCollection {
 
         elemUpdate = OperatorClassTF.create(ElementaryUpdate.class);
         update = OperatorClassTF.create(UpdateApplication.class);
-        program = OperatorClassTF.create(Modality.class);
+        program = OperatorClassTF.create(JModality.class);
         modalOperator = or(update, program);
 
         // directCutAllowed = add ( atom, not ( modalOperator ) );

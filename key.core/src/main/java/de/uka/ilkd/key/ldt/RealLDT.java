@@ -10,15 +10,13 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * Complete this class if you want to add support for the JML \real type.
@@ -38,28 +36,28 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         // return skolem term
         final Function sk =
             new JFunction(new Name(String.valueOf(NAME) + lit), targetSort());
@@ -85,24 +83,25 @@ public final class RealLDT extends LDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        throw new RuntimeException("Not Implemented");
-    }
-
-
-    @Override
-    public boolean hasLiteralFunction(JFunction f) {
-        return false;
-    }
-
-
-    @Override
-    public @Nullable Expression translateTerm(Term t, ExtList children, Services services) {
+        assert false;
         return null;
     }
 
 
     @Override
-    public @Nullable Type getType(Term t) {
+    public boolean hasLiteralFunction(Function f) {
+        return false;
+    }
+
+
+    @Override
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+        return null;
+    }
+
+
+    @Override
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

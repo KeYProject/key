@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 
 import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -43,8 +41,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The represented array index or {@code null} if a program variable is represented..
      */
-    @Nullable
-    Term getArrayIndex();
+    JTerm getArrayIndex();
 
     /**
      * Returns the human readable array index or {@code null} if a program variable is represented..
@@ -60,7 +57,6 @@ public interface ISymbolicValue extends ISymbolicElement {
      * @return The represented {@link IProgramVariable} or {@code null} if an array index is
      *         represented.
      */
-    @Nullable
     IProgramVariable getProgramVariable();
 
     /**
@@ -77,8 +73,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The value of the represented variable.
      */
-    @Nullable
-    Term getValue();
+    JTerm getValue();
 
     /**
      * Returns the value of the represented variable as human readable {@link String}.
@@ -92,7 +87,6 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The type of the value.
      */
-    @Nullable
     Sort getType();
 
     /**
@@ -113,8 +107,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The optional condition under which this value is valid.
      */
-    @Nullable
-    Term getCondition();
+    JTerm getCondition();
 
     /**
      * <p>

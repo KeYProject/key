@@ -28,9 +28,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * <p>
  * The JoinProcessor is responsible for executing the joining. Let N1 and N2 be the nodes which
@@ -59,8 +56,8 @@ import org.jspecify.annotations.Nullable;
  */
 public class JoinProcessor implements Runnable {
     private boolean used = false;
-    private final @NonNull Proof proof;
-    private final @NonNull Services services;
+    private final Proof proof;
+    private final Services services;
     private final ProspectivePartner partner;
     private final LinkedList<Listener> listeners = new LinkedList<>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
@@ -74,7 +71,7 @@ public class JoinProcessor implements Runnable {
         void endOfJoining(ImmutableList<Goal> goals);
     }
 
-    public JoinProcessor(ProspectivePartner partner, @NonNull Proof proof) {
+    public JoinProcessor(ProspectivePartner partner, Proof proof) {
         super();
         this.proof = proof;
         this.services = proof.getServices();
@@ -96,7 +93,7 @@ public class JoinProcessor implements Runnable {
 
     private void processJoin() {
 
-        Term cutFormula = createCutFormula();
+        JTerm cutFormula = createCutFormula();
 
         DelayedCutProcessor cutProcessor = new DelayedCutProcessor(proof, partner.getCommonParent(),
             cutFormula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
@@ -122,7 +119,7 @@ public class JoinProcessor implements Runnable {
         }
     }
 
-    private void orRight(@NonNull Goal goal) {
+    private void orRight(Goal goal) {
         SequentFormula sf = goal.sequent().succedent().get(0);
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
@@ -130,7 +127,7 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private @Nullable SequentFormula findFormula(@NonNull Sequent sequent, Term content,
+    private SequentFormula findFormula(Sequent sequent, JTerm content,
             boolean antecedent) {
         for (SequentFormula sf : (antecedent ? sequent.antecedent()
                 : sequent.succedent())) {
@@ -141,7 +138,7 @@ public class JoinProcessor implements Runnable {
         return null;
     }
 
-    private @NonNull Goal simplifyUpdate(@NonNull Goal goal, @NonNull DelayedCut cut) {
+    private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
         SequentFormula sf =
             findFormula(goal.sequent(), cut.getFormula(), false);
@@ -156,13 +153,13 @@ public class JoinProcessor implements Runnable {
     /**
      * Applies one of the given taclets if this possible otherwise an exception is thrown.
      */
-    private @Nullable ImmutableList<Goal> apply(final String @NonNull [] tacletNames,
-            @NonNull Goal goal, @NonNull PosInOccurrence pio) {
+    private ImmutableList<Goal> apply(final String[] tacletNames, Goal goal,
+            PosInOccurrence pio) {
 
         TacletFilter filter = new TacletFilter() {
 
             @Override
-            protected boolean filter(@NonNull Taclet taclet) {
+            protected boolean filter(Taclet taclet) {
                 for (String tacletName : tacletNames) {
                     if (taclet.name().toString().equals(tacletName)) {
                         return true;
@@ -185,7 +182,7 @@ public class JoinProcessor implements Runnable {
         return goal.apply(app2);
     }
 
-    private @Nullable Goal hide(@NonNull Goal goal) {
+    private Goal hide(Goal goal) {
         if (partner.getFormulaForHiding() == null) {
             return goal;
         }
@@ -197,48 +194,48 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private @NonNull Term createCutFormula() {
-        Term ifElseTerm = buildIfElseTerm();
-        Term phi = createPhi();
+    private JTerm createCutFormula() {
+        JTerm ifElseTerm = buildIfElseTerm();
+        JTerm phi = createPhi();
         return services.getTermBuilder().or(ifElseTerm, phi);
     }
 
-    private @NonNull Term buildIfElseTerm() {
-        Term thenTerm =
+    private JTerm buildIfElseTerm() {
+        JTerm thenTerm =
             services.getTermBuilder().apply(partner.getUpdate(0), partner.getCommonFormula(), null);
-        Term elseTerm =
+        JTerm elseTerm =
             services.getTermBuilder().apply(partner.getUpdate(1), partner.getCommonFormula(), null);
 
         return services.getTermBuilder().ife(partner.getCommonPredicate(), thenTerm, elseTerm);
 
     }
 
-    private Term createPhi() {
-        Collection<Term> commonDelta = computeCommonFormulas(partner.getSequent(0).succedent(),
+    private JTerm createPhi() {
+        Collection<JTerm> commonDelta = computeCommonFormulas(partner.getSequent(0).succedent(),
             partner.getSequent(1).succedent(), partner.getCommonFormula());
-        Collection<Term> commonGamma = computeCommonFormulas(partner.getSequent(0).antecedent(),
+        Collection<JTerm> commonGamma = computeCommonFormulas(partner.getSequent(0).antecedent(),
             partner.getSequent(1).antecedent(), partner.getCommonFormula());
-        Collection<Term> delta1 = computeDifference(partner.getSequent(0).succedent(), commonDelta,
-            (Term) partner.getFormula(0).formula());
-        Collection<Term> delta2 = computeDifference(partner.getSequent(1).succedent(), commonDelta,
-            (Term) partner.getFormula(1).formula());
+        Collection<JTerm> delta1 = computeDifference(partner.getSequent(0).succedent(), commonDelta,
+            (JTerm) partner.getFormula(0).formula());
+        Collection<JTerm> delta2 = computeDifference(partner.getSequent(1).succedent(), commonDelta,
+            (JTerm) partner.getFormula(1).formula());
 
-        Collection<Term> gamma1 =
+        Collection<JTerm> gamma1 =
             computeDifference(partner.getSequent(0).antecedent(), commonGamma, null);
-        Collection<Term> gamma2 =
+        Collection<JTerm> gamma2 =
             computeDifference(partner.getSequent(1).antecedent(), commonGamma, null);
 
-        Collection<Term> constrainedGamma1 =
+        Collection<JTerm> constrainedGamma1 =
             createConstrainedTerms(gamma1, partner.getCommonPredicate(), true);
-        Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2,
+        Collection<JTerm> constrainedGamma2 = createConstrainedTerms(gamma2,
             services.getTermBuilder().not(partner.getCommonPredicate()), true);
 
-        Collection<Term> constrainedDelta1 =
+        Collection<JTerm> constrainedDelta1 =
             createConstrainedTerms(delta1, partner.getCommonPredicate(), false);
-        Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2,
+        Collection<JTerm> constrainedDelta2 = createConstrainedTerms(delta2,
             services.getTermBuilder().not(partner.getCommonPredicate()), false);
 
-        Term phi = services.getTermBuilder().ff();
+        JTerm phi = services.getTermBuilder().ff();
         phi = createDisjunction(phi, commonGamma, true);
         phi = createDisjunction(phi, constrainedGamma1, true);
         phi = createDisjunction(phi, constrainedGamma2, true);
@@ -250,8 +247,8 @@ public class JoinProcessor implements Runnable {
         return phi;
     }
 
-    private Term createDisjunction(Term seed, @NonNull Collection<Term> formulas, boolean needNot) {
-        for (Term formula : formulas) {
+    private JTerm createDisjunction(JTerm seed, Collection<JTerm> formulas, boolean needNot) {
+        for (JTerm formula : formulas) {
             if (needNot) {
                 seed = services.getTermBuilder().or(seed, services.getTermBuilder().not(formula));
             } else {
@@ -261,11 +258,10 @@ public class JoinProcessor implements Runnable {
         return seed;
     }
 
-    private @NonNull Collection<Term> createConstrainedTerms(@NonNull Collection<Term> terms,
-            @NonNull Term predicate,
+    private Collection<JTerm> createConstrainedTerms(Collection<JTerm> terms, JTerm predicate,
             boolean gamma) {
-        Collection<Term> result = new LinkedList<>();
-        for (Term term : terms) {
+        Collection<JTerm> result = new LinkedList<>();
+        for (JTerm term : terms) {
             if (gamma) {
                 result.add(services.getTermBuilder().imp(predicate, term));
             } else {
@@ -275,42 +271,40 @@ public class JoinProcessor implements Runnable {
         return result;
     }
 
-    private @NonNull Collection<Term> computeCommonFormulas(@NonNull Semisequent s1,
-            @NonNull Semisequent s2, Term exclude) {
-        TreeSet<Term> formulas1 = createTree(s1, exclude);
-        TreeSet<Term> result = createTree();
+    private Collection<JTerm> computeCommonFormulas(Semisequent s1, Semisequent s2, JTerm exclude) {
+        TreeSet<JTerm> formulas1 = createTree(s1, exclude);
+        TreeSet<JTerm> result = createTree();
         for (SequentFormula sf : s2) {
             if (formulas1.contains(sf.formula())) {
-                result.add((Term) sf.formula());
+                result.add((JTerm) sf.formula());
             }
         }
         return result;
     }
 
-    private @NonNull Collection<Term> computeDifference(@NonNull Semisequent s,
-            @NonNull Collection<Term> excludeSet,
-            Term exclude) {
-        LinkedList<Term> result = new LinkedList<>();
+    private Collection<JTerm> computeDifference(Semisequent s, Collection<JTerm> excludeSet,
+            JTerm exclude) {
+        LinkedList<JTerm> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
-                result.add((Term) sf.formula());
+                result.add((JTerm) sf.formula());
             }
         }
         return result;
     }
 
-    private @NonNull TreeSet<Term> createTree(@NonNull Semisequent semisequent, Term exclude) {
-        TreeSet<Term> set = createTree();
+    private TreeSet<JTerm> createTree(Semisequent semisequent, JTerm exclude) {
+        TreeSet<JTerm> set = createTree();
         for (SequentFormula sf : semisequent) {
             if (sf.formula() != exclude) {
-                set.add((Term) sf.formula());
+                set.add((JTerm) sf.formula());
             }
         }
         return set;
     }
 
-    private @NonNull TreeSet<Term> createTree() {
-        return new TreeSet<>(Comparator.comparingInt(Term::serialNumber));
+    private TreeSet<JTerm> createTree() {
+        return new TreeSet<>(Comparator.comparingInt(JTerm::serialNumber));
     }
 
     @Override

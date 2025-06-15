@@ -27,7 +27,7 @@ public abstract class TacletGoalTemplate {
     /// program variables added by this taclet to the namespace
     protected final ImmutableSet<SchemaVariable> addedProgVars;
 
-    private String name = null;
+    private @Nullable String name;
 
     /// Creates a new goal template for a taclet
     ///
@@ -84,17 +84,17 @@ public abstract class TacletGoalTemplate {
     /// @return all variables that occur bound in this goal template
     public abstract ImmutableSet<QuantifiableVariable> getBoundVariables();
 
-    public void setName(String name) {
+    public void setName(@Nullable String name) {
         this.name = name;
     }
 
-    public String name() {
+    public @Nullable String name() {
         return name;
     }
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
 
         if (o == null) {
             return false;

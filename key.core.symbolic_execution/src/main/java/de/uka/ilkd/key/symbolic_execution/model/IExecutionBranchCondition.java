@@ -4,13 +4,11 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -43,17 +41,16 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
 
     /**
      * <p>
-     * Returns the branch condition as {@link Term}.
+     * Returns the branch condition as {@link JTerm}.
      * </p>
      * <p>
-     * If this branch conditions merged proof nodes this {@link Term} is the overall branch
+     * If this branch conditions merged proof nodes this {@link JTerm} is the overall branch
      * condition.
      * </p>
      *
-     * @return The branch condition as {@link Term}.
+     * @return The branch condition as {@link JTerm}.
      */
-    @Nullable
-    Term getBranchCondition() throws ProofInputException;
+    JTerm getBranchCondition() throws ProofInputException;
 
     /**
      * Returns the human readable branch condition as string.
@@ -80,12 +77,12 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      *
      * @return The merged proof nodes.
      */
-    Node @Nullable [] getMergedProofNodes();
+    Node[] getMergedProofNodes();
 
     /**
-     * Returns the branch condition {@link Term}s.
+     * Returns the branch condition {@link JTerm}s.
      *
-     * @return The branch condition {@link Term}s.
+     * @return The branch condition {@link JTerm}s.
      */
-    Term @Nullable [] getMergedBranchCondtions() throws ProofInputException;
+    JTerm[] getMergedBranchCondtions() throws ProofInputException;
 }

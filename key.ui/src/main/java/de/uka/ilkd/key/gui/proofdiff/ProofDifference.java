@@ -8,10 +8,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 
 import org.jspecify.annotations.NonNull;
@@ -34,11 +35,11 @@ public class ProofDifference {
     public static @NonNull ProofDifference create(@NonNull Services services, @NonNull Node left,
             @NonNull Node right) {
         return create(left, right,
-            (org.key_project.logic.Term t) -> LogicPrinter.quickPrintTerm((Term) t, services));
+            (Term t) -> LogicPrinter.quickPrintTerm((JTerm) t, services));
     }
 
     public static @NonNull ProofDifference create(@NonNull Node left, @NonNull Node right,
-            @NonNull Function<org.key_project.logic.Term, String> printer) {
+            @NonNull Function<Term, String> printer) {
         ProofDifference pd = new ProofDifference();
         assert left != null && right != null;
         pd.leftAntec = initialise(printer, left.sequent().antecedent());
@@ -50,7 +51,7 @@ public class ProofDifference {
     }
 
     private static @NonNull List<String> initialise(
-            @NonNull Function<org.key_project.logic.Term, String> printer,
+            @NonNull Function<Term, String> printer,
             @NonNull Semisequent semisequent) {
         return semisequent.asList().stream().map(it -> printer.apply(it.formula()))
                 .collect(Collectors.toList());

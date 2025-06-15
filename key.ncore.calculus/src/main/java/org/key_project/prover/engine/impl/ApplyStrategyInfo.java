@@ -7,7 +7,7 @@ import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.jspecify.annotations.Nullable;
 
 /// A container class representing the final result of a proof strategy application.
@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
 ///
 ///
 /// @see ProofSearchInformation
-public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
+public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends @Nullable ProofGoal<Goal>>
         implements ProofSearchInformation<Proof, Goal> {
 
     /// The reason why the strategy stopped, for example, proof finished, maximal number of rule
@@ -68,7 +68,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
     /// @param timeInMillis the total execution time in milliseconds
     /// @param appliedRuleAppsCount the number of applied rule applications
     /// @param nrClosedGoals the number of successfully closed goals
-    public ApplyStrategyInfo(String message, Proof proof, Throwable error,
+    public ApplyStrategyInfo(String message, Proof proof, @Nullable Throwable error,
             @Nullable Goal nonCloseableGoal,
             long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
         this.message = message;
@@ -88,19 +88,20 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
 
     /// {@inheritDoc}
     @Override
-    public Goal nonCloseableGoal() {
+    public @Nullable Goal nonCloseableGoal() {
         return nonCloseableGoal;
     }
 
     /// {@inheritDoc}
     @Override
+    @EnsuresNonNullIf(expression = "error", result = true)
     public boolean isError() {
         return error != null;
     }
 
     /// {@inheritDoc}
     @Override
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return error;
     }
 
@@ -140,7 +141,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
                  Error: %s\
                  Applied Rules: %s\
                  Time: %s\
-                 Closed Goals: %s""", message, isError() ? error.getMessage() : null,
+                 Closed Goals: %s""", message, error != null ? error.getMessage() : null,
             appliedRuleAppsCount, timeInMillis, nrClosedGoals);
     }
 }

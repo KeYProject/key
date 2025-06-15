@@ -12,10 +12,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,16 +28,13 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
-    private final @NonNull LoopSpecification loopInvariant;
+    private final LoopSpecification loopInvariant;
 
     private final ProofObligationVars symbExecVars;
 
-    private final Term guardTerm;
+    private final JTerm guardTerm;
 
     private final Goal initiatingGoal;
 
@@ -53,17 +50,17 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
      * To be used only for auxiliary proofs where the services object of the actual proof has to be
      * used instead of the initial services form the InitConfig.
      */
-    public LoopInvExecutionPO(InitConfig initConfig, @NonNull LoopSpecification loopInv,
+    public LoopInvExecutionPO(InitConfig initConfig, LoopSpecification loopInv,
             ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-            Term guardTerm, Services services) {
+            JTerm guardTerm, Services services) {
         this(initConfig, loopInv, symbExecVars, initiatingGoal, context, guardTerm);
         this.environmentServices = services;
     }
 
 
-    public LoopInvExecutionPO(InitConfig initConfig, @NonNull LoopSpecification loopInv,
+    public LoopInvExecutionPO(InitConfig initConfig, LoopSpecification loopInv,
             ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-            Term guardTerm) {
+            JTerm guardTerm) {
         super(initConfig,
             ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
                 loopInv.getTarget(), loopInv.getTarget().getContainerType(),
@@ -100,10 +97,10 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
             symbExecVars, context, guardTerm, environmentServices);
 
         // symbolic execution
-        Term symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);
+        JTerm symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);
 
         // final symbolic execution term
-        Term finalTerm = tb.applyElementary(symbExecVars.pre.heap, tb.not(symExec));
+        JTerm finalTerm = tb.applyElementary(symbExecVars.pre.heap, tb.not(symExec));
 
         // register final term
         assignPOTerms(finalTerm);
@@ -138,12 +135,12 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         return context;
     }
 
-    public Term getGuard() {
+    public JTerm getGuard() {
         return guardTerm;
     }
 
     @Override
-    protected @NonNull IProgramMethod getProgramMethod() {
+    protected IProgramMethod getProgramMethod() {
         return loopInvariant.getTarget();
     }
 
@@ -159,12 +156,12 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     @Override
-    protected Modality.@NonNull JavaModalityKind getTerminationMarker() {
-        return Modality.JavaModalityKind.BOX;
+    protected JModality.JavaModalityKind getTerminationMarker() {
+        return JModality.JavaModalityKind.BOX;
     }
 
     @Override
-    protected @NonNull String buildPOName(boolean transactionFlag) {
+    protected String buildPOName(boolean transactionFlag) {
         return loopInvariant.getName();
     }
 
@@ -174,7 +171,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
      * @return
      */
     @Override
-    public @NonNull Configuration createLoaderConfig() {
+    public Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("Non-interference contract", loopInvariant.getUniqueName());
         return c;
@@ -182,44 +179,44 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
 
     @Override
-    public @NonNull InfFlowProofSymbols getIFSymbols() {
+    public InfFlowProofSymbols getIFSymbols() {
         assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     @Override
-    public void addIFSymbol(@NonNull Term t) {
+    public void addIFSymbol(JTerm t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
 
     @Override
-    public void addIFSymbol(@NonNull Named n) {
+    public void addIFSymbol(Named n) {
         assert n != null;
         infFlowSymbols.add(n);
     }
 
     @Override
-    public void addLabeledIFSymbol(@NonNull Term t) {
+    public void addLabeledIFSymbol(JTerm t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
 
     @Override
-    public void addLabeledIFSymbol(@NonNull Named n) {
+    public void addLabeledIFSymbol(Named n) {
         assert n != null;
         infFlowSymbols.addLabeled(n);
     }
 
     @Override
-    public void unionLabeledIFSymbols(@NonNull InfFlowProofSymbols symbols) {
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
     @Override
-    protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -227,7 +224,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
 
     @Override
-    public @NonNull AbstractInfFlowPO getChildPO() {
+    public AbstractInfFlowPO getChildPO() {
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
@@ -256,7 +253,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     @Deprecated
-    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+    protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -264,7 +261,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     @Deprecated
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
@@ -273,7 +270,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     @Deprecated
-    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+    protected JTerm getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
@@ -283,7 +280,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     @Deprecated
-    protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
+    protected JTerm buildFrameClause(List<LocationVariable> modHeaps, Map<JTerm, JTerm> heapToAtPre,
             LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         throw new UnsupportedOperationException(

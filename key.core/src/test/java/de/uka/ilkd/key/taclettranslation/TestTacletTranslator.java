@@ -6,8 +6,8 @@ package de.uka.ilkd.key.taclettranslation;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -56,12 +56,12 @@ public class TestTacletTranslator {
         io = new KeyIO(services, nss);
     }
 
-    private @NonNull Term parseTerm(@NonNull String s) {
+    private JTerm parseTerm(String s) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
-        return (Term) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
+        return (JTerm) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
     }
 
-    private Taclet parseTaclet(@NonNull String s) {
+    private Taclet parseTaclet(String s) {
         try {
             KeyIO.Loader load = io.load(s);
             List<Taclet> taclets =
@@ -73,12 +73,12 @@ public class TestTacletTranslator {
         }
     }
 
-    private void testTaclet(String tacletString, @NonNull String termString) {
+    private void testTaclet(String tacletString, String termString) {
         tacletString = DECLS + "\n\\rules { " + tacletString + "; }";
 
         Taclet taclet = parseTaclet(tacletString);
-        Term expected = parseTerm(termString);
-        Term translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
+        JTerm expected = parseTerm(termString);
+        JTerm translation = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
 
         Assertions.assertEquals(expected, translation,
             "Taclet " + taclet.name() + " not translated as expected");

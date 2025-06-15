@@ -9,7 +9,7 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.BlockInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -23,9 +23,6 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -51,9 +48,8 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
     }
 
     @Override
-    public @NonNull ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-            @Nullable ProverTaskListener listener) {
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
         assert canApplyTo(proof, goals, posInOcc);
 
         final ProofOblInput poForProof =
@@ -80,7 +76,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
         mergeNamespaces(initiatingProof, proof);
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final JTerm result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet =
             buildBlockInfFlowUnfoldTaclet(services, blockRuleApp, contract, ifVars, result);
 
@@ -111,9 +107,8 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
      * @return the created taclet
      */
     private Taclet buildBlockInfFlowUnfoldTaclet(final Services services,
-            final @NonNull BlockContractInternalBuiltInRuleApp blockRuleApp,
-            final BlockContract contract,
-            @NonNull IFProofObligationVars ifVars, final Term result) {
+            final BlockContractInternalBuiltInRuleApp blockRuleApp, final BlockContract contract,
+            IFProofObligationVars ifVars, final JTerm result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
             new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);

@@ -8,13 +8,12 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Interface for proof goals of a sequent proof.
 ///
 /// @param <G> the type of the concrete realization of the proof goal
-public interface ProofGoal<G extends ProofGoal<G>> {
+public interface ProofGoal<G extends @Nullable ProofGoal<G>> {
     /// The proof object to which this goal belongs.
     ///
     /// @return proof object with which this goal is associated
@@ -32,7 +31,7 @@ public interface ProofGoal<G extends ProofGoal<G>> {
     /// @param ruleApp the [RuleApp] to be applied
     /// @return new goal(s)
     @Nullable
-    ImmutableList<G> apply(@NonNull final RuleApp ruleApp);
+    ImmutableList<G> apply(final RuleApp ruleApp);
 
     /// returns the prover component responsible for providing the next
     /// rule application to be applied on this goal

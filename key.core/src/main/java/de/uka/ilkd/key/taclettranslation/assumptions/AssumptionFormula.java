@@ -5,27 +5,24 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 public class AssumptionFormula implements TacletFormula {
 
     final Taclet taclet;
-    final Collection<Term> formula;
+    final Collection<JTerm> formula;
     final String status;
-    final @Nullable TacletConditions conditions;
+    final TacletConditions conditions;
 
-    public @Nullable TacletConditions getConditions() {
+    public TacletConditions getConditions() {
         return conditions;
     }
 
-    public AssumptionFormula(Taclet taclet, Collection<Term> formula, String status) {
+    public AssumptionFormula(Taclet taclet, Collection<JTerm> formula, String status) {
         this.taclet = taclet;
         this.formula = formula;
         this.status = status;
@@ -34,8 +31,8 @@ public class AssumptionFormula implements TacletFormula {
 
 
 
-    public AssumptionFormula(@NonNull Taclet taclet, Collection<Term> formula, String status,
-            @Nullable TacletConditions conditions) throws IllegalTacletException {
+    public AssumptionFormula(Taclet taclet, Collection<JTerm> formula, String status,
+            TacletConditions conditions) throws IllegalTacletException {
         super();
         this.taclet = taclet;
         this.formula = formula;
@@ -44,8 +41,8 @@ public class AssumptionFormula implements TacletFormula {
 
     }
 
-    public @NonNull Term getFormula(@NonNull TermServices services) {
-        return services.getTermBuilder().and(formula.toArray(new Term[0]));
+    public JTerm getFormula(TermServices services) {
+        return services.getTermBuilder().and(formula.toArray(new JTerm[0]));
         // return formula;
     }
 
@@ -57,7 +54,7 @@ public class AssumptionFormula implements TacletFormula {
         return status;
     }
 
-    public Collection<Term> getInstantiations() {
+    public Collection<JTerm> getInstantiations() {
 
         return formula;
     }

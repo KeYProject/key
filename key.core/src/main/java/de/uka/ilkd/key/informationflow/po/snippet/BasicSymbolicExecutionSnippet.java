@@ -21,22 +21,19 @@ import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -45,72 +42,69 @@ import org.jspecify.annotations.Nullable;
 class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         assert poVars.exceptionParameter.op() instanceof LocationVariable
                 : "Something is wrong with the catch variable";
 
-        ImmutableList<Term> posts = ImmutableSLList.nil();
+        ImmutableList<JTerm> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
-        if (poVars.post.resultTerm != null) {
-            posts = posts.append(d.tb.equals(poVars.post.resultTerm, poVars.pre.resultTerm));
+        if (poVars.post.result != null) {
+            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
         }
         posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
-        final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
+        final JTerm prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
 
-    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d,
-            @NonNull ProofObligationVars vs, @NonNull Term postTerm,
-            @NonNull TermBuilder tb) {
+    private JTerm buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, JTerm postTerm,
+            TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a contract without modality.");
         }
-        assert Modality.JavaModalityKind.class.equals(BasicSnippetData.Key.MODALITY.getType());
-        Modality.JavaModalityKind kind =
-            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        assert JModality.JavaModalityKind.class.equals(BasicSnippetData.Key.MODALITY.getType());
+        JModality.JavaModalityKind kind =
+            (JModality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
 
 
         // create java block
         final JavaBlock jb = buildJavaBlock(d, vs.formalParams,
             vs.pre.self != null ? vs.pre.self.op(ProgramVariable.class) : null,
-            vs.pre.resultTerm != null ? vs.pre.resultTerm.op(ProgramVariable.class) : null,
+            vs.pre.result != null ? vs.pre.result.op(ProgramVariable.class) : null,
             vs.pre.exception != null ? vs.pre.exception.op(ProgramVariable.class) : null,
             vs.exceptionParameter.op(LocationVariable.class));
 
         // create program term
-        final Modality.JavaModalityKind symbExecMod;
-        if (kind == Modality.JavaModalityKind.BOX) {
-            symbExecMod = Modality.JavaModalityKind.DIA;
+        final JModality.JavaModalityKind symbExecMod;
+        if (kind == JModality.JavaModalityKind.BOX) {
+            symbExecMod = JModality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.JavaModalityKind.BOX;
+            symbExecMod = JModality.JavaModalityKind.BOX;
         }
-        final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
+        final JTerm programTerm = tb.prog(symbExecMod, jb, postTerm);
         // final Term programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));
 
         // create update
-        Term update = tb.skip();
-        Iterator<Term> formalParamIt = vs.formalParams.iterator();
-        Iterator<Term> paramIt = vs.pre.localVars.iterator();
+        JTerm update = tb.skip();
+        Iterator<JTerm> formalParamIt = vs.formalParams.iterator();
+        Iterator<JTerm> paramIt = vs.pre.localVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term formalParam = formalParamIt.next();
+            JTerm formalParam = formalParamIt.next();
             LocationVariable formalParamVar = formalParam.op(LocationVariable.class);
-            Term paramUpdate = tb.elementary(formalParamVar, paramIt.next());
+            JTerm paramUpdate = tb.elementary(formalParamVar, paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
 
         return tb.apply(update, programTerm);
     }
 
-    private @NonNull JavaBlock buildJavaBlock(@NonNull BasicSnippetData d,
-            @NonNull ImmutableList<Term> formalPars,
-            @NonNull ProgramVariable selfVar, @Nullable ProgramVariable resultVar,
-            @NonNull ProgramVariable exceptionVar,
-            @NonNull LocationVariable eVar) {
+    private JavaBlock buildJavaBlock(BasicSnippetData d, ImmutableList<JTerm> formalPars,
+            ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
+            LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod pm)) {
@@ -160,12 +154,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
     }
 
 
-    private ProgramVariable @NonNull [] extractProgramVariables(
-            @NonNull ImmutableList<Term> formalPars)
+    private ProgramVariable[] extractProgramVariables(ImmutableList<JTerm> formalPars)
             throws IllegalArgumentException {
         ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
         int i = 0;
-        for (Term formalPar : formalPars) {
+        for (JTerm formalPar : formalPars) {
             formalParVars[i++] = formalPar.op(ProgramVariable.class);
         }
         return formalParVars;

@@ -8,7 +8,7 @@ import java.util.Collections;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -23,8 +23,6 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -87,9 +85,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * @return a non-null Term of sort FORMULA
      * @throws IllegalArgumentException if the term argument is not as expected
      */
-    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
-        Term termExt = term.sub(0);
-        Term termBase = term.sub(1);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        JTerm termExt = term.sub(0);
+        JTerm termBase = term.sub(1);
 
         if (!(termExt.op() instanceof IObserverFunction obs1)
                 || !(termBase.op() instanceof IObserverFunction obs2)) {
@@ -108,7 +106,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
         DependencyContract contract = (DependencyContract) contracts.iterator().next();
 
-        Term result = services.getTermBuilder().and(
+        JTerm result = services.getTermBuilder().and(
             buildConditionMonotonicHeap(termExt.sub(0), termBase.sub(0), services),
             buildConditionPrecondition(termBase, contract, services),
             buildConditionSameParams(contract, termExt, termBase, services),
@@ -121,9 +119,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build the term forall o,f. o,f in dep@h' ==>
      * o.f@h' == o.f@h
      */
-    private @NonNull Term buildConditionDependency(@NonNull Term larger, @NonNull Term smaller,
-            @NonNull DependencyContract contract,
-            @NonNull Services services) {
+    private JTerm buildConditionDependency(JTerm larger, JTerm smaller, DependencyContract contract,
+            Services services) {
 
 
         TermBuilder tb = services.getTermBuilder();
@@ -134,17 +131,17 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         LogicVariable varFld = new LogicVariable(new Name("_fv"),
             services.getTypeConverter().getHeapLDT().getFieldSort());
 
-        Term ov = tb.var(varObj);
-        Term fv = tb.var(varFld);
+        JTerm ov = tb.var(varObj);
+        JTerm fv = tb.var(varFld);
 
         // static methods do not a self var ==> one argument less to ignore (#1672)
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
-        ImmutableList<Term> params = smaller.subs().toImmutableList().take(paramOffset);
+        ImmutableList<JTerm> params = smaller.subs().toImmutableList().take(paramOffset);
 
-        Term mod = contract.getDep(baseHeap, false, smaller.sub(0), smaller.sub(1), params,
+        JTerm mod = contract.getDep(baseHeap, false, smaller.sub(0), smaller.sub(1), params,
             Collections.emptyMap(), services);
 
-        Term result = tb.all(varObj,
+        JTerm result = tb.all(varObj,
             tb.all(varFld,
                 tb.imp(tb.elementOf(ov, fv, mod),
                     tb.equals(tb.select(JavaDLTheory.ANY, smaller.sub(0), ov, fv),
@@ -156,11 +153,10 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     /*
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build a1=a1' /\ ... /\ an=an'
      */
-    private @NonNull Term buildConditionSameParams(@NonNull DependencyContract contract,
-            @NonNull Term term1, @NonNull Term term2,
-            @NonNull Services services) {
+    private JTerm buildConditionSameParams(DependencyContract contract, JTerm term1, JTerm term2,
+            Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Term result = tb.tt();
+        JTerm result = tb.tt();
 
         // static methods do not a self var ==> one argument less to ignore (#1672)
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
@@ -176,14 +172,13 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build depContract_f_pre(h, a1, ..., an) by
      * instantiating that part of the contract.
      */
-    private @NonNull Term buildConditionPrecondition(@NonNull Term app,
-            @NonNull DependencyContract contract,
-            @NonNull Services services) {
+    private JTerm buildConditionPrecondition(JTerm app, DependencyContract contract,
+            Services services) {
 
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         // static methods do not a self var ==> one argument less to ignore (#1672)
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
-        ImmutableList<Term> params = app.subs().toImmutableList().take(paramOffset);
+        ImmutableList<JTerm> params = app.subs().toImmutableList().take(paramOffset);
 
         return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(),
             services);
@@ -192,15 +187,15 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     /*
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build forall o, o.created@h' ==> o.created@h
      */
-    private @NonNull Term buildConditionMonotonicHeap(@NonNull Term largerHeap,
-            @NonNull Term smallerHeap, @NonNull Services services) {
+    private JTerm buildConditionMonotonicHeap(JTerm largerHeap, JTerm smallerHeap,
+            Services services) {
 
         LogicVariable var = new LogicVariable(new Name("_ov"),
             services.getJavaInfo().getJavaLangObject().getSort());
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term ov = tb.var(var);
+        JTerm ov = tb.var(var);
 
         return tb.all(var, tb.imp(tb.created(smallerHeap, ov), tb.created(largerHeap, ov)));
     }

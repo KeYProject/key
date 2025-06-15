@@ -6,10 +6,10 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;

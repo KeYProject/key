@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.profile;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.jspecify.annotations.NonNull;
 
 /**
- * An extended {@link JavaProfile} used in side proofs to simplify a {@link Term}.
+ * An extended {@link JavaProfile} used in side proofs to simplify a {@link JTerm}.
  *
  * @author Martin Hentschel
  */

@@ -7,6 +7,7 @@ import org.key_project.logic.LogicServices;
 
 import org.jspecify.annotations.Nullable;
 
+
 /// A proof object provides an interface to the current proof status.
 /// It mainly manages the proof goals still to be proven.
 ///
@@ -15,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 /// proof tree for a sequent calculus or just opt to a (non-proof generating) set of
 /// goals.
 ///
-public interface ProofObject<G extends ProofGoal<@Nullable G>> {
+public interface ProofObject<G extends @Nullable ProofGoal<G>> {
     /// returns an iterable collection of open goals
     ///
     /// @return collection of [ProofGoal]s still to be proven

@@ -27,8 +27,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * <p>
  * The proof obligation for well-definedness checks.
@@ -52,9 +50,9 @@ import org.jspecify.annotations.Nullable;
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private final WellDefinednessCheck check;
-    private @Nullable Term mbyAtPre;
-    private @Nullable InitConfig proofConfig;
-    private @Nullable TermBuilder tb;
+    private JTerm mbyAtPre;
+    private InitConfig proofConfig;
+    private TermBuilder tb;
 
     /**
      * Constructor
@@ -79,7 +77,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return anonHeap;
     }
 
-    private static LocationVariable createSelf(@Nullable IProgramMethod pm, KeYJavaType selfKJT,
+    private static LocationVariable createSelf(IProgramMethod pm, KeYJavaType selfKJT,
             TermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
@@ -88,8 +86,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static @Nullable LocationVariable createResult(@Nullable IProgramMethod pm,
-            TermServices services) {
+    private static LocationVariable createResult(IProgramMethod pm, TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -97,8 +94,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static @Nullable LocationVariable createException(@Nullable IProgramMethod pm,
-            TermServices services) {
+    private static LocationVariable createException(IProgramMethod pm, TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -241,21 +237,21 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
             check.getPre(po.pre(), vars.self, vars.heap, vars.params, proofServices);
-        final Term wdPre = tb.wd(preCond.term());
-        final Term wdModifiable = tb.wd(po.modifiable());
-        final Term wdRest = tb.and(tb.wd(po.rest()));
+        final JTerm wdPre = tb.wd(preCond.term());
+        final JTerm wdModifiable = tb.wd(po.modifiable());
+        final JTerm wdRest = tb.and(tb.wd(po.rest()));
         register(preCond.func(), proofServices);
         mbyAtPre = preCond.func() != null ? check.replace(tb.func(preCond.func()), vars) : null;
-        final Term post = check.getPost(po.post(), vars.result, proofServices);
-        final Term pre = preCond.term();
-        final Term updates =
+        final JTerm post = check.getPost(po.post(), vars.result, proofServices);
+        final JTerm pre = preCond.term();
+        final JTerm updates =
             check.getUpdates(po.modifiable(), vars.heap, vars.heapAtPre, vars.anonHeap,
                 proofServices);
-        final Term wfAnon = tb.wellFormed(vars.anonHeap);
-        final Term uPost =
+        final JTerm wfAnon = tb.wellFormed(vars.anonHeap);
+        final JTerm uPost =
             check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));
-        final Term imp = tb.imp(tb.and(pre, wfAnon), tb.and(wdModifiable, wdRest, uPost));
-        final Term poTerms = tb.and(wdPre, imp);
+        final JTerm imp = tb.imp(tb.and(pre, wfAnon), tb.and(wdModifiable, wdRest, uPost));
+        final JTerm poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms
         collectClassAxioms(getKJT(), proofConfig);
@@ -285,7 +281,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public Term getMbyAtPre() {
+    public JTerm getMbyAtPre() {
         return this.mbyAtPre;
     }
 
@@ -317,13 +313,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         public final ImmutableList<LocationVariable> params;
         public final LocationVariable heap;
         public final LocationVariable heapAtPre;
-        public final Term anonHeap;
+        public final JTerm anonHeap;
 
         public Variables(final LocationVariable self, final LocationVariable result,
                 final LocationVariable exception,
                 final Map<LocationVariable, LocationVariable> atPres,
                 final ImmutableList<LocationVariable> params, final LocationVariable heap,
-                final Term anonHeap) {
+                final JTerm anonHeap) {
             this.self = self;
             this.result = result;
             this.exception = exception;

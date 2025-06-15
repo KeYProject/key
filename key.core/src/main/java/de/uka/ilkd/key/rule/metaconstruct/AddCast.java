@@ -4,14 +4,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.NonNull;
 
 
 public final class AddCast extends AbstractTermTransformer {
@@ -22,8 +20,8 @@ public final class AddCast extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
-        Term sub = term.sub(0);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        JTerm sub = term.sub(0);
         Sort sort = term.sub(1).sort();
 
         return sub.sort().extendsTrans(sort) ? sub : services.getTermBuilder().cast(sort, sub);

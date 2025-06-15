@@ -12,7 +12,7 @@ import org.key_project.logic.TerminalSyntaxElement;
 /**
  * A schema variable that is used as placeholder for updates.
  */
-public final class UpdateSV extends OperatorSV implements TerminalSyntaxElement {
+public final class UpdateSV extends JOperatorSV implements TerminalSyntaxElement {
 
 
     UpdateSV(Name name) {

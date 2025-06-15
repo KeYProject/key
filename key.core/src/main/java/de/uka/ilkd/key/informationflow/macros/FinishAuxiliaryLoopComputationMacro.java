@@ -9,7 +9,7 @@ import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -70,7 +70,7 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
         mergeNamespaces(initiatingProof, proof);
 
         // create and register resulting taclets
-        final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final JTerm result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
             new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);

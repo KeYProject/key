@@ -10,7 +10,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * The variable condition adapter can be used by variable conditions which can either fail or be
@@ -32,9 +32,9 @@ public abstract class VariableConditionAdapter implements VariableCondition {
 
 
 
-    public final MatchConditions check(SchemaVariable var,
+    public final MatchResultInfo check(SchemaVariable var,
             SyntaxElement instCandidate,
-            MatchConditions mc, LogicServices services) {
+            MatchResultInfo mc, LogicServices services) {
         return check(var, instCandidate, (SVInstantiations) mc.getInstantiations(),
             (Services) services) ? mc : null;
     }

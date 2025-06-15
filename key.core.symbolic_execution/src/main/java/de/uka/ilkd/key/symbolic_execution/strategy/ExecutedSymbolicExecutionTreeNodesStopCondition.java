@@ -18,6 +18,9 @@ import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * This {@link StopCondition} stops the auto mode ({@link ApplyStrategy}) if a given number
@@ -230,9 +233,9 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
-        return null;
+    public @NonNull String getStopMessage(int maxApplications, long timeout, long startTime,
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
+        return "";
     }
 
     /**

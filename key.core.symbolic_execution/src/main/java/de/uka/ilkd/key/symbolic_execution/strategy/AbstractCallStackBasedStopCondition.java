@@ -15,6 +15,9 @@ import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides the basic functionality for {@link StopCondition}s which stops the auto mode when the
  * call stack size of the starting set node has a special difference to the call stack size of the
@@ -146,9 +149,9 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
-        return null;
+    public @NonNull String getStopMessage(int maxApplications, long timeout, long startTime,
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
+        return "";
     }
 
     /**

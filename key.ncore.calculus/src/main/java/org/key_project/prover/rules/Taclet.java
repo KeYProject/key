@@ -20,6 +20,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.calledmethods.qual.RequiresCalledMethods;
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -41,7 +44,7 @@ public abstract class Taclet implements Rule {
     protected final @Nullable SyntaxElement find;
 
     /// The restriction(s) for applying this update. [ApplicationRestriction].
-    protected final ApplicationRestriction applicationRestriction;
+    protected final @NonNull ApplicationRestriction applicationRestriction;
 
     /// the <tt>assumes</tt> sequent of the taclet
     protected final Sequent assumesSequent;
@@ -68,10 +71,9 @@ public abstract class Taclet implements Rule {
     protected final ChoiceExpr choices;
 
     /// map from a schemavariable to its prefix. The prefix is used to test correct instantiations
-    /// of
-    /// the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a list
-    /// of
-    /// all variables that may appear free in the instantiation of the schemavariable (a bit more
+    /// of the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a
+    /// list
+    /// of all variables that may appear free in the instantiation of the schemavariable (a bit more
     /// complicated for rewrite taclets, see paper of M:Giese)
     protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
 
@@ -99,23 +101,22 @@ public abstract class Taclet implements Rule {
     // but all at once for a given term.
 
     /// The taclet matcher
-    protected TacletMatcher matcher;
+    protected @NonNull TacletMatcher matcher;
 
     /// The taclet executor
-    protected TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
+    protected @NonNull TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
 
     /// creates a Taclet (originally known as Schematic Theory Specific Rules)
     ///
     /// @param name the name of the Taclet
     /// @param find the Term or Sequent that is the pattern that has to be found in a sequent and
-    /// the
-    /// places
-    /// where it matches the Taclet can be applied
+    /// the places where it matches the Taclet can be applied
     /// @param applPart contains the application part of a Taclet that is the if-sequence, the
     /// variable conditions
     /// @param goalTemplates a list of goal descriptions.
     /// @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
     /// or recursive use of the Taclet.
+    @EnsuresNonNull({ "matcher", "executor" })
     protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
@@ -133,19 +134,21 @@ public abstract class Taclet implements Rule {
         variableConditions = applPart.variableConditions();
         this.goalTemplates = goalTemplates;
         this.prefixMap = prefixMap;
-        this.displayName = attrs.displayName() == null ? name.toString() : attrs.displayName();
+        this.displayName = attrs.displayName();
         this.trigger = attrs.trigger();
         this.ruleSets = ruleSets;
         this.choices = choices;
+        createTacletServices();
         check();
     }
 
     /// Throws an exception if the taclet is improperly constructed. This is the case if
     /// - There is no find part, but the application restriction does not match "in sequent state."
     /// - The find part is a sequent but contains no or more than one formula.
-    private void check() {
+    private void check(@UnderInitialization Taclet this) {
         if (find == null
-                && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
+                && (applicationRestriction == null || // check to make checkerframework happy
+                        !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE))) {
             throw new IllegalStateException("NoFind taclets should imply \\inSequentState");
         }
         if (find instanceof Sequent seq && seq.size() != 1) {
@@ -163,6 +166,7 @@ public abstract class Taclet implements Rule {
         return trigger;
     }
 
+    @RequiresCalledMethods(value = "this", methods = "createAndInitializeMatcher")
     public final TacletMatcher getMatcher() {
         return matcher;
     }
@@ -170,16 +174,19 @@ public abstract class Taclet implements Rule {
     /// creates and initializes the taclet matching and execution engines has to be called at the
     /// end
     /// of initialization
-    protected void createTacletServices() {
+    @EnsuresNonNull({ "matcher", "executor" })
+    private void createTacletServices(@UnderInitialization Taclet this) {
         createAndInitializeMatcher();
         createAndInitializeExecutor();
     }
 
     /// A helper method for creating the appropriate taclet matcher.
-    protected abstract void createAndInitializeMatcher();
+    @EnsuresNonNull("matcher")
+    protected abstract void createAndInitializeMatcher(@UnderInitialization Taclet this);
 
     /// A helper method for creating the appropriate taclet executor.
-    protected abstract void createAndInitializeExecutor();
+    @EnsuresNonNull("executor")
+    protected abstract void createAndInitializeExecutor(@UnderInitialization Taclet this);
 
     /// computes and returns all variables that occur bound in the taclet including the taclets
     /// defined in `addrules` sections. The result is cached and therefore only computed once.
@@ -431,8 +438,8 @@ public abstract class Taclet implements Rule {
         return tacletAsString;
     }
 
+    @SuppressWarnings("unchecked")
     public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
-        // noinspection unchecked
         return (TacletExecutor<@NonNull G, ?>) executor;
     }
 

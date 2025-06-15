@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
@@ -20,7 +20,7 @@ public interface OperationContract extends Contract {
     IProgramMethod getTarget();
 
     @Override
-    OperationContract map(UnaryOperator<Term> op, Services services);
+    OperationContract map(UnaryOperator<JTerm> op, Services services);
 
     /**
      * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
@@ -47,7 +47,7 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the modifiable clause.
      */
-    Term getModifiable(LocationVariable heapVar, LocationVariable selfVar,
+    JTerm getModifiable(LocationVariable heapVar, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
@@ -60,8 +60,8 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the modifiable clause.
      */
-    Term getModifiable(LocationVariable heapVar, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services);
+    JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services);
 
     /**
      * Returns the free modifiable clause of the contract.
@@ -72,7 +72,7 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the free modifiable clause.
      */
-    Term getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
+    JTerm getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Services services);
 
@@ -86,19 +86,20 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the free modifiable clause.
      */
-    Term getFreeModifiable(LocationVariable heapVar, Term heapTerm,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
+    JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,
+            JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms,
             Services services);
 
-    Term getFreePre(LocationVariable heap, LocationVariable selfVar,
+    JTerm getFreePre(LocationVariable heap, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    Term getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    JTerm getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    Term getFreePre(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
+    JTerm getFreePre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 }

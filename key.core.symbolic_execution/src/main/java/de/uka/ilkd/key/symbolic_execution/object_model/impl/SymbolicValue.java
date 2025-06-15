@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
@@ -12,9 +12,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation of {@link ISymbolicValue}.
@@ -25,49 +22,48 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     /**
      * The {@link Services} to use.
      */
-    private final @NonNull Services services;
+    private final Services services;
 
     /**
      * The array index.
      */
-    private final @Nullable Term arrayIndex;
+    private final JTerm arrayIndex;
 
     /**
      * The array start index or {@code null} if not used.
      */
-    private final @Nullable Term arrayStartIndex;
+    private final JTerm arrayStartIndex;
 
     /**
      * The array end index or {@code null} if not used.
      */
-    private final @Nullable Term arrayEndIndex;
+    private final JTerm arrayEndIndex;
 
     /**
      * The {@link IProgramVariable}.
      */
-    private final @Nullable IProgramVariable programVariable;
+    private final IProgramVariable programVariable;
 
     /**
-     * The value {@link Term}.
+     * The value {@link JTerm}.
      */
-    private final Term value;
+    private final JTerm value;
 
     /**
      * The optional condition under which this value is valid.
      */
-    private final Term condition;
+    private final JTerm condition;
 
     /**
      * Constructor.
      *
      * @param services The {@link Services} to use.
      * @param arrayIndex The array index.
-     * @param value The value {@link Term}.
+     * @param value The value {@link JTerm}.
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(@NonNull Services services, @NonNull Term arrayIndex, Term value,
-            Term condition,
+    public SymbolicValue(Services services, JTerm arrayIndex, JTerm value, JTerm condition,
             IModelSettings settings) {
         super(settings);
         assert services != null;
@@ -88,12 +84,12 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param arrayIndex The array index.
      * @param arrayStartIndex The array start index or {@code null} if not used.
      * @param arrayEndIndex The array end index or {@code null} if not used.
-     * @param value The value {@link Term}.
+     * @param value The value {@link JTerm}.
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(@NonNull Services services, @NonNull Term arrayIndex, Term arrayStartIndex,
-            Term arrayEndIndex, Term value, Term condition, IModelSettings settings) {
+    public SymbolicValue(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
+            JTerm arrayEndIndex, JTerm value, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert arrayIndex != null;
@@ -111,13 +107,12 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @param services The {@link Services} to use.
      * @param programVariable The {@link IProgramVariable}.
-     * @param value The value {@link Term}.
+     * @param value The value {@link JTerm}.
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(@NonNull Services services, @NonNull IProgramVariable programVariable,
-            Term value,
-            Term condition, IModelSettings settings) {
+    public SymbolicValue(Services services, IProgramVariable programVariable, JTerm value,
+            JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;
@@ -134,7 +129,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         StringBuilder sb = new StringBuilder();
         if (isArrayRange()) {
             sb.append("[");
@@ -189,7 +184,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable Term getArrayIndex() {
+    public JTerm getArrayIndex() {
         return arrayIndex;
     }
 
@@ -197,7 +192,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable IProgramVariable getProgramVariable() {
+    public IProgramVariable getProgramVariable() {
         return programVariable;
     }
 
@@ -205,7 +200,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getProgramVariableString() {
+    public String getProgramVariableString() {
         return SymbolicExecutionUtil.getDisplayString(programVariable);
     }
 
@@ -213,7 +208,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public Term getValue() {
+    public JTerm getValue() {
         return value;
     }
 
@@ -229,7 +224,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable Sort getType() {
+    public Sort getType() {
         return value != null ? value.sort() : null;
     }
 
@@ -237,7 +232,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getTypeString() {
+    public String getTypeString() {
         Sort sort = getType();
         return sort != null ? sort.toString() : null;
     }
@@ -246,7 +241,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "Value of " + getName() + " is " + getValueString();
     }
 
@@ -254,7 +249,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 
@@ -262,7 +257,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getConditionString() {
+    public String getConditionString() {
         return condition != null ? formatTerm(condition, services) : null;
     }
 
@@ -270,7 +265,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getArrayIndexString() {
+    public String getArrayIndexString() {
         return arrayIndex != null ? formatTerm(arrayIndex, services) : null;
     }
 
@@ -279,7 +274,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @return The array start index.
      */
-    public @Nullable Term getArrayStartIndex() {
+    public JTerm getArrayStartIndex() {
         return arrayStartIndex;
     }
 
@@ -288,7 +283,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @return The human readable array start index.
      */
-    public @Nullable String getArrayStartIndexString() {
+    public String getArrayStartIndexString() {
         return arrayStartIndex != null ? formatTerm(arrayStartIndex, services) : null;
     }
 
@@ -297,7 +292,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @return The array end index.
      */
-    public @Nullable Term getArrayEndIndex() {
+    public JTerm getArrayEndIndex() {
         return arrayEndIndex;
     }
 
@@ -306,7 +301,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @return The human readable array end index.
      */
-    public @Nullable String getArrayEndIndexString() {
+    public String getArrayEndIndexString() {
         return arrayEndIndex != null ? formatTerm(arrayEndIndex, services) : null;
     }
 }

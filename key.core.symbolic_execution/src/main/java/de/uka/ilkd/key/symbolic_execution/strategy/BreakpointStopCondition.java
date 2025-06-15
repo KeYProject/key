@@ -18,6 +18,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.rules.RuleApp;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An {@link IBreakpointStopCondition} which can be used during proof.
  *
@@ -116,8 +119,8 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @NonNull String getStopMessage(int maxApplications, long timeout, long startTime,
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return "Breakpoint hit!";
     }
 

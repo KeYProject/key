@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,13 +30,13 @@ public class DelayedCut {
     private final Node node;
     private final ImmutableList<Node> subtrees;
     private final int cutMode;
-    private final Term decisionPredicate;
+    private final JTerm decisionPredicate;
     private final RuleApp firstAppliedRuleApp;
     private @Nullable NoPosTacletApp hideApp = null;
     private @Nullable ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
     private @Nullable Goal remainingGoal = null;
 
-    public DelayedCut(Proof proof, Node node, Term formula, ImmutableList<Node> subtrees,
+    public DelayedCut(Proof proof, Node node, JTerm formula, ImmutableList<Node> subtrees,
             int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
         super();
         assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT
@@ -50,7 +50,7 @@ public class DelayedCut {
 
     }
 
-    public Term getFormula() {
+    public JTerm getFormula() {
         return decisionPredicate;
     }
 

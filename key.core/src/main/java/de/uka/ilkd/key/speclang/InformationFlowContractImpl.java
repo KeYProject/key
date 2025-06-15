@@ -12,11 +12,11 @@ import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -38,19 +38,19 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final KeYJavaType specifiedIn;
     private final String baseName;
     private final String name;
-    private final Term origPre;
+    private final JTerm origPre;
     /** The original free precondition. */
-    private final Term origFreePre;
-    private final Term origMby;
-    private final Term origModifiable;
-    private final Modality.JavaModalityKind modality;
-    private final Term origSelf;
-    private final ImmutableList<Term> origParams;
-    private final Term origResult;
-    private final Term origExc;
-    private final Term origAtPre;
+    private final JTerm origFreePre;
+    private final JTerm origMby;
+    private final JTerm origModifiable;
+    private final JModality.JavaModalityKind modality;
+    private final JTerm origSelf;
+    private final ImmutableList<JTerm> origParams;
+    private final JTerm origResult;
+    private final JTerm origExc;
+    private final JTerm origAtPre;
     private final boolean toBeSaved;
-    private final Term origDep;
+    private final JTerm origDep;
     private final ImmutableList<InfFlowSpec> origInfFlowSpecs;
 
     /**
@@ -67,11 +67,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     private InformationFlowContractImpl(
             String baseName, String name, KeYJavaType forClass,
-            IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
-            Term pre, Term freePre,
-            Term mby, Term modifiable, boolean hasRealModifiable, Term self,
-            ImmutableList<Term> params,
-            Term result, Term exc, Term heapAtPre, Term dep,
+            IProgramMethod pm, KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind,
+            JTerm pre, JTerm freePre,
+            JTerm mby, JTerm modifiable, boolean hasRealModifiable, JTerm self,
+            ImmutableList<JTerm> params,
+            JTerm result, JTerm exc, JTerm heapAtPre, JTerm dep,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved, int id) {
         assert baseName != null;
         assert forClass != null;
@@ -121,10 +121,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     public InformationFlowContractImpl(String baseName, KeYJavaType forClass, IProgramMethod pm,
-            KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind, Term pre, Term freePre,
-            Term mby, Term modifiable,
-            boolean hasRealModifiable, Term self, ImmutableList<Term> params, Term result, Term exc,
-            Term heapAtPre, Term dep, ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
+            KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind, JTerm pre,
+            JTerm freePre,
+            JTerm mby, JTerm modifiable,
+            boolean hasRealModifiable, JTerm self, ImmutableList<JTerm> params, JTerm result,
+            JTerm exc,
+            JTerm heapAtPre, JTerm dep, ImmutableList<InfFlowSpec> infFlowSpecs,
+            boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modalityKind, pre, freePre, mby, modifiable,
             hasRealModifiable, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
             INVALID_ID);
@@ -136,7 +139,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     // -------------------------------------------------------------------------
 
     @Override
-    public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
+    public InformationFlowContract map(UnaryOperator<JTerm> op, Services services) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
             op.apply(origPre), op.apply(origFreePre), op.apply(origMby), op.apply(origModifiable),
             hasRealModifiableClause, origSelf,
@@ -183,37 +186,37 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getPre() {
+    public JTerm getPre() {
         return origPre;
     }
 
 
     @Override
-    public Term getFreePre() {
+    public JTerm getFreePre() {
         return origFreePre;
     }
 
 
     @Override
-    public Term getModifiable() {
+    public JTerm getModifiable() {
         return origModifiable;
     }
 
 
     @Override
-    public Term getMby() {
+    public JTerm getMby() {
         return origMby;
     }
 
 
     @Override
-    public Modality.JavaModalityKind getModalityKind() {
+    public JModality.JavaModalityKind getModalityKind() {
         return modality;
     }
 
 
     @Override
-    public Term getSelf() {
+    public JTerm getSelf() {
         if (origSelf == null) {
             assert pm.isStatic() : "missing self variable in non-static method contract";
             return null;
@@ -223,25 +226,25 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<Term> getParams() {
+    public ImmutableList<JTerm> getParams() {
         return origParams;
     }
 
 
     @Override
-    public Term getResult() {
+    public JTerm getResult() {
         return origResult;
     }
 
 
     @Override
-    public Term getExc() {
+    public JTerm getExc() {
         return origExc;
     }
 
 
     @Override
-    public Term getAtPre() {
+    public JTerm getAtPre() {
         return origAtPre;
     }
 
@@ -307,7 +310,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         }
         sig.append(pm.getName());
         sig.append("(");
-        for (Term pv : origParams) {
+        for (JTerm pv : origParams) {
             sig.append(pv.toString()).append(", ");
         }
         if (!origParams.isEmpty()) {
@@ -321,7 +324,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    private String getHTMLFor(Term originalTerm, String htmlName, Services services) {
+    private String getHTMLFor(JTerm originalTerm, String htmlName, Services services) {
         if (originalTerm == null) {
             return "";
         } else {
@@ -331,9 +334,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    private String getHTMLFor(Iterable<Term> originalTerms, Services services) {
+    private String getHTMLFor(Iterable<JTerm> originalTerms, Services services) {
         StringBuilder result;
-        final Iterator<Term> it = originalTerms.iterator();
+        final Iterator<JTerm> it = originalTerms.iterator();
         if (!it.hasNext()) {
             result = new StringBuilder(
                 LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services));
@@ -341,7 +344,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             result = new StringBuilder();
         }
         while (it.hasNext()) {
-            Term term = it.next();
+            JTerm term = it.next();
             final String quickPrint = LogicPrinter.quickPrintTerm(term, services);
             result.append(LogicPrinter.escapeHTML(quickPrint, false));
             if (it.hasNext()) {
@@ -473,7 +476,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public InformationFlowContract setModality(Modality.JavaModalityKind modalityKind) {
+    public InformationFlowContract setModality(JModality.JavaModalityKind modalityKind) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn,
             modalityKind,
             origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
@@ -483,7 +486,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public InformationFlowContract setModifiable(Term modifiable) {
+    public InformationFlowContract setModifiable(JTerm modifiable) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
             origPre, origFreePre, origMby, modifiable, hasRealModifiableClause, origSelf,
             origParams,
@@ -492,7 +495,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep() {
+    public JTerm getDep() {
         return origDep;
     }
 
@@ -553,8 +556,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    public JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs (yet?)
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -571,7 +574,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(LocationVariable heap, LocationVariable selfVar,
+    public JTerm getPre(LocationVariable heap, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
@@ -580,7 +583,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    public JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
@@ -590,17 +593,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
-        throw new UnsupportedOperationException(
-            "Not supported any more. " + "Please use the POSnippetFactory instead.");
-
-    }
-
-    @Override
-    @Deprecated
-    public Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
-            Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+    public JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -609,7 +603,17 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    public JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
+        throw new UnsupportedOperationException(
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
+
+    }
+
+    @Override
+    @Deprecated
+    public JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -618,8 +622,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -633,7 +638,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+    public JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         return null;
@@ -641,32 +646,33 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         return null;
     }
 
 
     @Override
-    public Term getRequires(LocationVariable heap) {
+    public JTerm getRequires(LocationVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getModifiable(LocationVariable heap) {
+    public JTerm getModifiable(LocationVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getAccessible(LocationVariable heap) {
+    public JTerm getAccessible(LocationVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getGlobalDefs() {
+    public JTerm getGlobalDefs() {
         // information flow contracts do not have global defs (yet?)
         throw new UnsupportedOperationException("Not supported yet.");
     }

@@ -7,9 +7,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.TacletPrefix;
@@ -56,7 +56,7 @@ public class RewriteTaclet extends FindTaclet {
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
+            TacletAttributes attrs, JTerm find,
             ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -67,19 +67,18 @@ public class RewriteTaclet extends FindTaclet {
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
+            TacletAttributes attrs, JTerm find,
             ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             surviveSymbExec, tacletAnnotations);
-        createTacletServices();
     }
 
     @Override
-    public Term find() {
-        return (Term) find;
+    public JTerm find() {
+        return (JTerm) find;
     }
 
     @Override
@@ -94,7 +93,7 @@ public class RewriteTaclet extends FindTaclet {
      * @param t the Term to check
      * @return false if vetoing
      */
-    private boolean veto(Term t) {
+    private boolean veto(JTerm t) {
         return !t.freeVars().isEmpty();
     }
 
@@ -116,7 +115,7 @@ public class RewriteTaclet extends FindTaclet {
 
         PIOPathIterator it = p_pos.iterator();
         while (it.next() != -1) {
-            final Term t = (Term) it.getSubTerm();
+            final JTerm t = (JTerm) it.getSubTerm();
             var op = t.op();
             if (op instanceof Transformer) {
                 return null;
@@ -127,11 +126,11 @@ public class RewriteTaclet extends FindTaclet {
                         || veto(t)) {
                     return null;
                 } else {
-                    Term update = UpdateApplication.getUpdate(t);
+                    JTerm update = UpdateApplication.getUpdate(t);
                     svi = svi.addUpdate(update, t.getLabels());
                 }
             } else if (!applicationRestriction().equals(ApplicationRestriction.NONE)
-                    && (op instanceof Modality)) {
+                    && (op instanceof JModality)) {
                 return null;
             }
 
@@ -200,7 +199,7 @@ public class RewriteTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
-            (Term) find,
+            (JTerm) find,
             prefixMap, choices, getSurviveSymbExec(), tacletAnnotations);
     }
 }

@@ -7,7 +7,10 @@ import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Represents a position within a formula contained in a sequent. It enables navigation and
 /// analysis
@@ -40,7 +43,7 @@ public class PosInOccurrence {
     private final PosInTerm posInTerm;
 
     /// The subterm this object points to, or <code>null</code>
-    private volatile Term subTermCache = null;
+    private volatile @MonotonicNonNull Term subTermCache = null;
 
     /// Constructs a [PosInOccurrence] representing a position in a sequent formula.
     ///
@@ -48,10 +51,8 @@ public class PosInOccurrence {
     /// @param posInTerm The position within the formula.
     /// @param inAntec True if the position is within the antecedent of the sequent.
     /// @throws NullPointerException If `sequentFormula` or `posInTerm` is null.
-    public PosInOccurrence(@NonNull SequentFormula sequentFormula, @NonNull PosInTerm posInTerm,
+    public PosInOccurrence(SequentFormula sequentFormula, PosInTerm posInTerm,
             boolean inAntec) {
-        assert posInTerm != null;
-        assert sequentFormula != null;
         this.inAntec = inAntec;
         this.sequentFormula = sequentFormula;
         this.posInTerm = posInTerm;
@@ -74,15 +75,18 @@ public class PosInOccurrence {
         return posInTerm().depth();
     }
 
-    /// /**
     /// Moves up one level in the term structure and returns a new [PosInOccurrence]
     /// representing the new position.
     ///
     /// @return A new [PosInOccurrence] one level higher in the term structure.
     /// @throws IllegalStateException If the position is already at the top level.
-    public PosInOccurrence up() {
-        assert !isTopLevel() : "not possible to go up from top level position";
-        return new PosInOccurrence(sequentFormula, posInTerm.up(), inAntec);
+    public @Nullable PosInOccurrence up() {
+        final var up = posInTerm.up();
+        if (up != null) {
+            return new PosInOccurrence(sequentFormula, up, inAntec);
+        } else {
+            throw new IllegalStateException("Already on top level. Cannot go further up.");
+        }
     }
 
     /// Moves down to the specified child in the term structure and returns a new
@@ -171,7 +175,7 @@ public class PosInOccurrence {
     /// @param obj The object to compare with.
     /// @return True if both refer to the same formula, otherwise false.
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof PosInOccurrence cmp)) {
             return false;
         }
@@ -222,8 +226,10 @@ public class PosInOccurrence {
     private final class PIOPathIteratorImpl implements PIOPathIterator {
         int child;
         int count = 0;
+        @Nullable
         IntIterator currentPathIt;
-        Term currentSubTerm = null;
+        @MonotonicNonNull
+        Term currentSubTerm;
 
         private PIOPathIteratorImpl() {
             currentPathIt = posInTerm().iterator();
@@ -253,19 +259,21 @@ public class PosInOccurrence {
             return pio;
         }
 
-        /// @return the current subterm this object points to (i.e. corresponding to the latest
-        /// <code>next()</code>-call); this method satisfies
-        /// <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
-        public Term getSubTerm() {
+        /// {@inheritDoc}
+
+        public @Nullable Term getSubTerm() {
             return currentSubTerm;
         }
 
+        /// {@inheritDoc}
+        @EnsuresNonNullIf(expression = "currentPathIt", result = true)
         public boolean hasNext() {
             return currentPathIt != null;
         }
 
         /// @return the number of the next child on the path, or <code>-1</code> if no further child
         /// exists
+        @EnsuresNonNull("currentSubTerm")
         public int next() {
             int res;
 
@@ -275,7 +283,9 @@ public class PosInOccurrence {
                 currentSubTerm = currentSubTerm.sub(child);
             }
 
-            if (currentPathIt.hasNext()) {
+            if (currentPathIt == null) {
+                return -1;
+            } else if (currentPathIt.hasNext()) {
                 res = currentPathIt.next();
             } else {
                 res = -1;

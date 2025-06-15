@@ -10,13 +10,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.sequent.*;
@@ -103,8 +105,8 @@ public final class ProgVarReplacer {
             InstantiationEntry<?> ie = e.value();
             Object inst = ie.getInstantiation();
 
-            if (inst instanceof Term t) {
-                final Term newT = replace(t);
+            if (inst instanceof JTerm t) {
+                final JTerm newT = replace(t);
                 if (newT != t) {
                     result = result.replace(sv, newT, services);
                 }
@@ -184,7 +186,7 @@ public final class ProgVarReplacer {
     public SequentFormula replace(SequentFormula cf) {
         SequentFormula result = cf;
 
-        final Term newFormula = replace((Term) cf.formula());
+        final JTerm newFormula = replace((JTerm) cf.formula());
 
         if (newFormula != cf.formula()) {
             result = new SequentFormula(newFormula);
@@ -192,7 +194,7 @@ public final class ProgVarReplacer {
         return result;
     }
 
-    private Term replaceProgramVariable(Term t) {
+    private JTerm replaceProgramVariable(JTerm t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         ProgramVariable o = map.get(pv);
         if (o != null) {
@@ -201,15 +203,15 @@ public final class ProgVarReplacer {
         return t;
     }
 
-    private Term standardReplace(Term t) {
-        Term result = t;
+    private JTerm standardReplace(JTerm t) {
+        JTerm result = t;
 
-        final Term[] newSubTerms = new Term[t.arity()];
+        final JTerm[] newSubTerms = new JTerm[t.arity()];
 
         boolean changedSubTerm = false;
 
         for (int i = 0, ar = t.arity(); i < ar; i++) {
-            final Term subTerm = t.sub(i);
+            final JTerm subTerm = t.sub(i);
             if (subTerm.isRigid()) {
                 newSubTerms[i] = subTerm;
             } else {
@@ -230,7 +232,7 @@ public final class ProgVarReplacer {
             Statement newS = (Statement) replace(s);
             if (newS != s) {
                 newJb = JavaBlock.createJavaBlock((StatementBlock) newS);
-                op = Modality.getModality(mod.kind(), newJb);
+                op = JModality.getModality(mod.kind(), newJb);
             }
         }
 
@@ -244,7 +246,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a term
      */
-    public Term replace(Term t) {
+    public JTerm replace(JTerm t) {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);
@@ -263,8 +265,8 @@ public final class ProgVarReplacer {
      * @param t the Term where to replace renamed variables
      * @return the term with all replacements done
      */
-    private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
-        final Term newTerm = services.getTermBuilder().elementary(
+    private JTerm replaceProgramVariableInLHSOfElementaryUpdate(JTerm t) {
+        final JTerm newTerm = services.getTermBuilder().elementary(
             map.get(((ElementaryUpdate) t.op()).lhs()),
             standardReplace(t.sub(0)));
         return newTerm;

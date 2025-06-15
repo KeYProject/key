@@ -5,7 +5,6 @@ package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,15 +25,13 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
  * from program variables or constants to formulae instantiated for the respective variable.
  *
  * @author Dominic Scheurer
  */
-public abstract class AbstractionPredicate implements Function<Term, Term>, Named {
+public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Named {
 
     /**
      * The sort for the argument of this {@link AbstractionPredicate}.
@@ -48,7 +45,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      *
      * This field is needed to save proofs with abstraction predicates.
      */
-    private Term predicateFormWithPlaceholder;
+    private JTerm predicateFormWithPlaceholder = null;
 
     /**
      * The placeholder variable occurring in {@link #predicateFormWithPlaceholder} which is to be
@@ -57,12 +54,12 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      *
      * This field is needed to save proofs with abstraction predicates.s
      */
-    private LocationVariable placeholderVariable;
+    private LocationVariable placeholderVariable = null;
 
     /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since elements fo this
      * class should be created by the factory methods
-     * {@link #create(Term, LocationVariable, Services)} or
+     * {@link #create(JTerm, LocationVariable, Services)} or
      * {@link #create(Sort, Function, Services)}}.
      *
      * @param argSort The expected sort for the arguments of the predicate.
@@ -75,7 +72,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @return The placeholder variable and the function term that this predicate has been
      *         constructed with.
      */
-    public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
+    public Pair<LocationVariable, JTerm> getPredicateFormWithPlaceholder() {
         return new Pair<>(placeholderVariable, predicateFormWithPlaceholder);
     }
 
@@ -85,7 +82,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * <p>
      *
      * This method has been created for testing purposes; you should rather user
-     * {@link #create(Term, LocationVariable, Services)} instead.
+     * {@link #create(JTerm, LocationVariable, Services)} instead.
      *
      * @param argSort The expected sort for the arguments of the predicate.
      * @param mapping The mapping from input terms of the adequate type to formulae, e.g. "(Term
@@ -94,7 +91,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @return An abstraction predicate encapsulating the given mapping.
      */
     public static AbstractionPredicate create(final Sort argSort,
-            final Function<Term, Term> mapping, Services services) {
+            final Function<JTerm, JTerm> mapping, Services services) {
         LocationVariable placeholder =
             MergeRuleUtils.getFreshLocVariableForPrefix("_ph", argSort, services);
 
@@ -113,7 +110,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @return An abstraction predicate mapping terms to the predicate with the placeholder
      *         substituted by the respective term.
      */
-    public static AbstractionPredicate create(final Term predicate,
+    public static AbstractionPredicate create(final JTerm predicate,
             final LocationVariable placeholder, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final TermFactory tf = services.getTermFactory();
@@ -121,12 +118,12 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
             private final Name name = new Name("abstrPred_" + predicate.op());
-            private @Nullable Function<Term, Term> mapping = null;
+            private Function<JTerm, JTerm> mapping = null;
 
             @Override
-            public Term apply(Term input) {
+            public JTerm apply(JTerm input) {
                 if (mapping == null) {
-                    mapping = (Term param) -> {
+                    mapping = (JTerm param) -> {
                         if (param.sort() != fInputSort) {
                             throw new IllegalArgumentException("Input must be of sort \""
                                 + fInputSort + "\", given: \"" + param.sort() + "\".");
@@ -165,7 +162,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @see java.util.function.Function#apply(java.lang.Object)
      */
     @Override
-    public abstract Term apply(Term t);
+    public abstract JTerm apply(JTerm t);
 
     /*
      * (non-Javadoc)
@@ -186,7 +183,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      */
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
-        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
+        Pair<LocationVariable, JTerm> predicateFormWithPlaceholder =
             getPredicateFormWithPlaceholder();
 
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
@@ -224,8 +221,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
                     + "There should always be pairs of placeholders and predicate terms.";
 
-                final String phStr = Objects.requireNonNull(m.group(i));
-                final String predStr = Objects.requireNonNull(m.group(i + 1));
+                final String phStr = m.group(i);
+                final String predStr = m.group(i + 1);
 
                 // Parse the placeholder
                 Pair<Sort, Name> ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
@@ -251,14 +248,13 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }
 
-        return Objects.equals(otherPred.placeholderVariable, placeholderVariable)
-                && Objects.equals(otherPred.predicateFormWithPlaceholder,
-                    predicateFormWithPlaceholder);
+        return otherPred.placeholderVariable.equals(placeholderVariable)
+                && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);
     }
 
 }

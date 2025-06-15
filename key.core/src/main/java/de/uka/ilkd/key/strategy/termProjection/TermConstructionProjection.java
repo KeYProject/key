@@ -3,17 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
@@ -29,7 +27,7 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
 
 
     private TermConstructionProjection(Operator op, ProjectionToTerm<Goal>[] subTerms) {
-        assert !(op instanceof Modality); // XXX
+        assert !(op instanceof JModality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;
@@ -40,11 +38,10 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-            MutableState mState) {
-        final Term[] subs = new Term[subTerms.length];
+    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final JTerm[] subs = new JTerm[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
-            subs[i] = (Term) subTerms[i].toTerm(app, pos, goal, mState);
+            subs[i] = (JTerm) subTerms[i].toTerm(app, pos, goal, mState);
         }
         return goal.proof().getServices().getTermFactory().createTerm(op, subs, null, null);
     }

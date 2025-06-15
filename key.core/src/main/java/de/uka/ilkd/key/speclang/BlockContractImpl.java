@@ -13,11 +13,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -63,13 +63,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method,
-            final Modality.JavaModalityKind modalityKind,
-            final Map<LocationVariable, Term> preconditions,
-            final Map<LocationVariable, Term> freePreconditions, final Term measuredBy,
-            final Map<LocationVariable, Term> postconditions,
-            final Map<LocationVariable, Term> freePostconditions,
-            final Map<LocationVariable, Term> modifiableClauses,
-            final Map<LocationVariable, Term> freeModifiableClauses,
+            final JModality.JavaModalityKind modalityKind,
+            final Map<LocationVariable, JTerm> preconditions,
+            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> postconditions,
+            final Map<LocationVariable, JTerm> freePostconditions,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
             final Map<LocationVariable, Boolean> hasFreeModifiable,
@@ -147,21 +147,21 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     }
 
     @Override
-    public BlockContract map(UnaryOperator<Term> op, Services services) {
-        Map<LocationVariable, Term> newPreconditions = preconditions.entrySet().stream()
+    public BlockContract map(UnaryOperator<JTerm> op, Services services) {
+        Map<LocationVariable, JTerm> newPreconditions = preconditions.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newFreePreconditions = freePreconditions.entrySet().stream()
+        Map<LocationVariable, JTerm> newFreePreconditions = freePreconditions.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newPostconditions = postconditions.entrySet().stream()
+        Map<LocationVariable, JTerm> newPostconditions = postconditions.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newFreePostconditions = freePostconditions.entrySet().stream()
+        Map<LocationVariable, JTerm> newFreePostconditions = freePostconditions.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newModifiableClauses = modifiableClauses.entrySet().stream()
+        Map<LocationVariable, JTerm> newModifiableClauses = modifiableClauses.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newFreeModifiableClauses = freeModifiableClauses.entrySet()
+        Map<LocationVariable, JTerm> newFreeModifiableClauses = freeModifiableClauses.entrySet()
                 .stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Term newMeasuredBy = op.apply(measuredBy);
+        JTerm newMeasuredBy = op.apply(measuredBy);
 
         return update(block, newPreconditions, newFreePreconditions, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses,
@@ -171,14 +171,14 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
     @Override
     public BlockContract update(final StatementBlock newBlock,
-            final Map<LocationVariable, Term> newPreconditions,
-            final Map<LocationVariable, Term> newFreePreconditions,
-            final Map<LocationVariable, Term> newPostconditions,
-            final Map<LocationVariable, Term> newFreePostconditions,
-            final Map<LocationVariable, Term> newModifiableClauses,
-            final Map<LocationVariable, Term> newFreeModifiableClauses,
+            final Map<LocationVariable, JTerm> newPreconditions,
+            final Map<LocationVariable, JTerm> newFreePreconditions,
+            final Map<LocationVariable, JTerm> newPostconditions,
+            final Map<LocationVariable, JTerm> newFreePostconditions,
+            final Map<LocationVariable, JTerm> newModifiableClauses,
+            final Map<LocationVariable, JTerm> newFreeModifiableClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-            Term newMeasuredBy) {
+            JTerm newMeasuredBy) {
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
             modalityKind, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses, newinfFlowSpecs,
@@ -254,12 +254,12 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          */
         public Creator(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
-                Map<LocationVariable, Term> requires, Map<LocationVariable, Term> requiresFree,
-                Term measuredBy, Map<LocationVariable, Term> ensures,
-                Map<LocationVariable, Term> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
-                Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
-                Term signalsOnly, Term diverges, Map<LocationVariable, Term> modifiables,
-                Map<LocationVariable, Term> modifiablesFree,
+                Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
+                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
+                Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
+                JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
+                Map<LocationVariable, JTerm> modifiablesFree,
                 Map<LocationVariable, Boolean> hasModifiable,
                 Map<LocationVariable, Boolean> hasFreeModifiable,
                 Services services) {
@@ -271,13 +271,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
         @Override
         protected BlockContract build(String baseName, StatementBlock block, List<Label> labels,
-                IProgramMethod method, Modality.JavaModalityKind modalityKind,
-                Map<LocationVariable, Term> preconditions,
-                Map<LocationVariable, Term> freePreconditions, Term measuredBy,
-                Map<LocationVariable, Term> postconditions,
-                Map<LocationVariable, Term> freePostconditions,
-                Map<LocationVariable, Term> modifiableClauses,
-                Map<LocationVariable, Term> freeModifiableClauses,
+                IProgramMethod method, JModality.JavaModalityKind modalityKind,
+                Map<LocationVariable, JTerm> preconditions,
+                Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
+                Map<LocationVariable, JTerm> postconditions,
+                Map<LocationVariable, JTerm> freePostconditions,
+                Map<LocationVariable, JTerm> modifiableClauses,
+                Map<LocationVariable, JTerm> freeModifiableClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasModifiable,
                 Map<LocationVariable, Boolean> hasFreeModifiable) {

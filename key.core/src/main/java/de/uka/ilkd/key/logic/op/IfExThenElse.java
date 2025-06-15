@@ -10,6 +10,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;

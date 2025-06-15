@@ -6,16 +6,13 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a location like a local variable, method parameter, static field or an instance field
@@ -27,14 +24,14 @@ public class Location {
     /**
      * The {@link Access} path.
      */
-    private final @NonNull ImmutableList<Access> accesses;
+    private final ImmutableList<Access> accesses;
 
     /**
      * Constructor.
      *
      * @param accesses The {@link Access} path.
      */
-    public Location(@NonNull ImmutableList<Access> accesses) {
+    public Location(ImmutableList<Access> accesses) {
         assert accesses != null;
         this.accesses = accesses;
     }
@@ -44,7 +41,7 @@ public class Location {
      *
      * @param accesses The {@link Access} path.
      */
-    public Location(Access @NonNull... accesses) {
+    public Location(Access... accesses) {
         assert accesses != null;
         this.accesses = ImmutableSLList.<Access>nil().append(accesses);
     }
@@ -81,7 +78,7 @@ public class Location {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (obj instanceof Location other) {
             return Objects.equals(accesses, other.getAccesses());
         } else {
@@ -93,7 +90,7 @@ public class Location {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         boolean afterFirst = false;
         for (Access access : accesses) {
@@ -113,7 +110,7 @@ public class Location {
      * @param sub The {@link Location} to append.
      * @return The new {@link Location}.
      */
-    public @NonNull Location append(@NonNull Location sub) {
+    public Location append(Location sub) {
         return new Location(accesses.append(sub.getAccesses()));
     }
 
@@ -123,18 +120,18 @@ public class Location {
      * @param sub The {@link Access} to append.
      * @return The new {@link Location}.
      */
-    public @NonNull Location append(Access sub) {
+    public Location append(Access sub) {
         return new Location(accesses.append(sub));
     }
 
     /**
-     * Converts this {@link Location} into a {@link Term}.
+     * Converts this {@link Location} into a {@link JTerm}.
      *
      * @param services The {@link Services} to use.
-     * @return The created {@link Term}.
+     * @return The created {@link JTerm}.
      */
-    public @Nullable Term toTerm(@NonNull Services services) {
-        Term parent = null;
+    public JTerm toTerm(Services services) {
+        JTerm parent = null;
         for (Access access : accesses) {
             if (access.isArrayIndex()) {
                 // Special handling for array indices.

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -88,13 +88,13 @@ public class PrettyPrinterRoundtripTest {
     @MethodSource("getCases")
     public void roundtrip(String termString) {
         services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITH_FINAL));
-        Term term = io.parseExpression(termString);
+        JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTerm(term);
         var string = lp.result();
         System.out.println("Pretty printed: " + string);
-        Term term2 = io.parseExpression(string);
+        JTerm term2 = io.parseExpression(string);
         System.out.println("Reparsed: " + term2);
         assertEqualModAlpha(term, term2);
     }
@@ -103,18 +103,18 @@ public class PrettyPrinterRoundtripTest {
     @MethodSource("getHeapCases")
     void roundtripWithoutFinal(String termString) {
         services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITHOUT_FINAL));
-        Term term = io.parseExpression(termString);
+        JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.printTerm(term);
         var string = lp.result();
         System.out.println("Pretty printed: " + string);
-        Term term2 = io.parseExpression(string);
+        JTerm term2 = io.parseExpression(string);
         System.out.println("Reparsed: " + term2);
         assertEqualModAlpha(term, term2);
     }
 
-    private void assertEqualModAlpha(Term expected, Term actual) {
+    private void assertEqualModAlpha(JTerm expected, JTerm actual) {
         var value =
             RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
