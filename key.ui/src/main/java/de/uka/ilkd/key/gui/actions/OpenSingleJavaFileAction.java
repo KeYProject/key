@@ -42,7 +42,7 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
             mainWindow.addRecentFile(file.toAbsolutePath().toString());
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
-            ProblemLoader pl = ui.getProblemLoader(file.toPath(), Collections.emptyList(), null,
+            ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,
                 Collections.emptyList(), ui.getMediator());
             pl.setLoadSingleJavaFile(true);
             pl.runAsynchronously();

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MergeRuleTests {
     private static final Path TEST_RESOURCES_DIR_PREFIX =
         HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/");
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleTests.class);
 
     /**
      * Simple regression test case loading an existing closed proof (standard Gcd example)

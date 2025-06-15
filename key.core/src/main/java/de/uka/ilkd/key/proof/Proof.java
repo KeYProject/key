@@ -5,7 +5,6 @@ package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;

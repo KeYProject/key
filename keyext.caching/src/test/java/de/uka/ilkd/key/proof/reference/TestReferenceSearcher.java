@@ -37,13 +37,11 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(testCaseDirectory.resolve(
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
-                    .toPath());
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(testCaseDirectory.resolve(
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
-                    .toPath());
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p2 = env2.getLoadedProof();
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();
@@ -117,15 +115,15 @@ class TestReferenceSearcher {
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(testCaseDirectory.resolve(
-                "proofCaching/proofWithRule.proof").toPath());
+                "proofCaching/proofWithRule.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(testCaseDirectory.resolve(
-                "proofCaching/proofWithoutRule.proof").toPath());
+                "proofCaching/proofWithoutRule.proof"));
         Proof p2 = env2.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env3 =
             KeYEnvironment.load(testCaseDirectory.resolve(
-                "proofCaching/proofWithRule.proof").toPath());
+                "proofCaching/proofWithRule.proof"));
         Proof p3 = env3.getLoadedProof();
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();

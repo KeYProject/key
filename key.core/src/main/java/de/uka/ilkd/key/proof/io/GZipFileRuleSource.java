@@ -37,7 +37,7 @@ public class GZipFileRuleSource extends FileRuleSource {
     @Override
     public InputStream getNewStream() {
         try {
-            return new GZIPInputStream(Files.newInputStream(ruleFile.toFile()));
+            return new GZIPInputStream(Files.newInputStream(ruleFile));
         } catch (IOException e) {
             throw new RuntimeException("Error while reading rules.", e);
         }

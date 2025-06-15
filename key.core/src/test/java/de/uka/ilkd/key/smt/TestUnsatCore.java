@@ -30,7 +30,7 @@ class TestUnsatCore {
         SmtTestUtils.assumeZ3Installed();
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(testCaseDirectory.resolve("smt/unsatCore.proof").toPath());
+            KeYEnvironment.load(testCaseDirectory.resolve("smt/unsatCore.proof"));
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
         // find the SMT rule app

@@ -45,6 +45,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;

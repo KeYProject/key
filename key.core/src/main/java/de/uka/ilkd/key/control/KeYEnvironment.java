@@ -192,7 +192,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes)
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes)
             throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, false);
     }

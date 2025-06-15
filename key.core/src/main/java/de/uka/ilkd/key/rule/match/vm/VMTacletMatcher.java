@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;

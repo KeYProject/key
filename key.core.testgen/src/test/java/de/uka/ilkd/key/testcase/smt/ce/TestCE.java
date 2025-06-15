@@ -130,7 +130,7 @@ public class TestCE extends TestCommons {
     public void testMiddle() throws Exception {
         var file = testFile.resolve("middle.key");
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(file.toPath(), null, null, null);
+            KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
             Assertions.assertNotNull(proof);

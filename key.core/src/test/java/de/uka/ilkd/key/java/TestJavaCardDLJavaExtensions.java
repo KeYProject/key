@@ -7,6 +7,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,12 +27,12 @@ public class TestJavaCardDLJavaExtensions {
     @Test
     public void testTypeNotInScopeShouldNotBeFound() {
         var message = "Something with type resolution in method frames is corrupt. "
-                + "The type Test should not be found in the default scope as it is "
-                + "declared inside package test.";
+            + "The type Test should not be found in the default scope as it is "
+            + "declared inside package test.";
         Assertions.assertThrows(BuildingException.class,
-                () -> HelperClassForTests
-                        .parseThrowException(testpath.resolve("typeResolutionInMethodFrame.key")),
-                message);
+            () -> HelperClassForTests
+                    .parseThrowException(testpath.resolve("typeResolutionInMethodFrame.key")),
+            message);
     }
 
     @Test

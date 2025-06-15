@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -16,6 +16,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -72,7 +73,8 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
      *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
      *         added
      */
-    public MatchResultInfo match(ProgramElement instantiationCandidate, MatchResultInfo mc,
+    public @Nullable MatchResultInfo match(ProgramElement instantiationCandidate,
+            MatchResultInfo mc,
             LogicServices services) {
         return null;
     }

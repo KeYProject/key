@@ -119,7 +119,7 @@ public final class Main {
             Path saved = SlicingProofReplayer
                     .constructSlicer(control, proof, results, null).slice();
             KeYEnvironment<?> environment2 =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved.toPath(), null, null,
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
                     null, null, null, null, true);
             Proof slicedProof = environment2.getLoadedProof();
 

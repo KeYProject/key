@@ -221,7 +221,7 @@ public final class Main {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
             for (Path f : fileArguments) {
-                ui.loadProblem(f.toPath());
+                ui.loadProblem(f);
             }
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
@@ -627,12 +627,12 @@ public final class Main {
         if (fileArguments != null && !fileArguments.isEmpty()) {
             var f = fileArguments.get(0);
             if (Files.isDirectory(f)) {
-                return f.toPath();
+                return f;
             } else {
                 return f.getParent();
             }
         } else {
-            return IOUtil.getCurrentDirectory().toPath();
+            return IOUtil.getCurrentDirectory();
         }
     }
 

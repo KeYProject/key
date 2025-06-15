@@ -91,7 +91,7 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final List<Path> readClassPath() throws ProofInputException {
+    public final List<Path> readClassPath() {
         return classPath;
     }
 

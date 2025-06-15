@@ -58,7 +58,7 @@ class IntSemanticsTest {
         "checkedOF/mOFCheckWrong.key", })
     void testSemanticsUnprovable(String filename) throws ProblemLoaderException {
         Path keyFile = TEST_DIR.resolve(filename);
-        KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile.toPath());
+        KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile);
         Proof proof = pmapi.getLoadedProof();
         pmapi.getProofControl().startAndWaitForAutoMode(proof);
         // we expect that exactly one branch (the overflow check) is open now:

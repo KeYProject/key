@@ -19,9 +19,9 @@ import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NonNull;
 
 public class DLEmbeddedExpression extends Operator {
-    private final Function functionSymbol;
+    private final JFunction functionSymbol;
 
     public DLEmbeddedExpression(
             PositionInfo pi, List<Comment> comments, JFunction functionSymbol,
@@ -38,7 +38,7 @@ public class DLEmbeddedExpression extends Operator {
         this.functionSymbol = functionSymbol;
     }
 
-    public DLEmbeddedExpression(Function f, ExtList children) {
+    public DLEmbeddedExpression(JFunction f, ExtList children) {
         super(children);
         this.functionSymbol = f;
     }

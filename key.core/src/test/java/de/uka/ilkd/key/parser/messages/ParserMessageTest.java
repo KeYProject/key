@@ -85,7 +85,7 @@ public class ParserMessageTest {
                 + " for more information.");
 
         try {
-            KeYEnvironment.load(javaFile.toPath());
+            KeYEnvironment.load(javaFile);
             fail("Parsing unexpectedly did not throw a " + "ProblemLoaderException for file "
                 + javaFile);
             throw new Error(); // to make the rest of the method unreachable

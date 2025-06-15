@@ -6,8 +6,6 @@ package de.uka.ilkd.key.testcase.smt.ce;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -114,7 +112,7 @@ public abstract class TestCommons {
 
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-        return KeYEnvironment.load(Paths.get(filepath).toPath(), null, null, null);
+        return KeYEnvironment.load(Paths.get(filepath), null, null, null);
     }
 
     /**

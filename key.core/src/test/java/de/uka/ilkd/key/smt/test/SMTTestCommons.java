@@ -96,7 +96,7 @@ public abstract class SMTTestCommons {
     }
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-        return KeYEnvironment.load(Paths.get(filepath).toPath(), null, null, null);
+        return KeYEnvironment.load(Paths.get(filepath), null, null, null);
     }
 
     /**
@@ -128,7 +128,7 @@ public abstract class SMTTestCommons {
         ProofAggregate result = null;
         try {
             KeYUserProblemFile po =
-                new KeYUserProblemFile(file.getFileName().toString(), file.toPath(), null, pro);
+                new KeYUserProblemFile(file.getFileName().toString(), file, null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }

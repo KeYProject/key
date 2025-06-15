@@ -15,8 +15,8 @@ import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -170,7 +170,7 @@ public class TestCaseGenerator {
         services = proof.getServices();
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();
-        modDir = computeProjectSubPath(services.getJavaModel().getModelDir().toString());
+        modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
         dontCopy = modDir.resolve(DONT_COPY);
         directory = settings.getOutputFolderPath();
         sortDummyClass = new HashMap<>();

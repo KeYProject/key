@@ -260,7 +260,7 @@ public class ProveTest {
         try {
             StatisticsFile statisticsFile = getStatisticsFile();
             if (statisticsFile != null) {
-                statisticsFile.appendStatistics(loadedProof, keyFile);
+                statisticsFile.appendStatistics(loadedProof, keyFile.toPath());
             }
         } catch (IOException e) {
             LOGGER.warn("Failed to append stats", e);

@@ -74,7 +74,7 @@ public class TestTestgen extends TestCommons {
         var file = testFile.resolve("middle.key");
         assertTrue(Files.exists(file), "File " + file + " does not exists!");
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(file.toPath(), null, null, null);
+            KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);

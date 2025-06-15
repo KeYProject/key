@@ -20,7 +20,6 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.logic.op.Operator;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;

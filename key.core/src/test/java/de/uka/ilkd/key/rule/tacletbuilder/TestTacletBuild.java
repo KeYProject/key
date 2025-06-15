@@ -4,15 +4,14 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -25,11 +24,11 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * class tests the building of Taclets in TacletBuilders, especially the checking if the
@@ -142,6 +141,7 @@ public class TestTacletBuild {
             + "occurs more than once in the Taclets if and find");
     }
 
+    private final HelperClassForTests helper = new HelperClassForTests();
     public static final Path testRules =
         HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletprefix");
 
@@ -152,9 +152,15 @@ public class TestTacletBuild {
                 testRules.resolve("schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
             assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),
-            "Position of error message is wrong.");
-        assertTrue(e.getCause().getMessage().contains(
-            "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
-            "Cause should be prefix error");
+                "Position of error message is wrong.");
+            assertTrue(e.getCause().getMessage().contains(
+                "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
+                "Cause should be prefix error");
+            return;
+        } catch (ProofInputException e) {
+            fail("Unexpected exception");
+        }
+        fail("Expected an invalid prefix exception as the the addrule contains "
+            + "a schemavariable with wrong prefix.");
     }
 }

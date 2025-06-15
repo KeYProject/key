@@ -458,7 +458,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }, proofFile -> {
             // we do not use UI.loadProblem here to avoid adding the slice to the recent files
             ProblemLoader problemLoader =
-                mediator.getUI().getProblemLoader(proofFile.toPath(), null, null, null, mediator);
+                mediator.getUI().getProblemLoader(proofFile, null, null, null, mediator);
             // user already knows about any warnings
             problemLoader.setIgnoreWarnings(true);
             problemLoader.runAsynchronously();

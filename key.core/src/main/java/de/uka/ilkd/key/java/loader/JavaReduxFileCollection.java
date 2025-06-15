@@ -23,7 +23,6 @@ import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.jspecify.annotations.Nullable;
-import recoder.io.DataLocation;
 
 /**
  * This is a special {@link FileCollection} which allows to retrieve the internally stored java boot

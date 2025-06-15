@@ -215,7 +215,7 @@ public class TestFile implements Serializable {
                 // Write statistics.
                 StatisticsFile statisticsFile = settings.getStatisticsFile();
                 if (statisticsFile != null) {
-                    statisticsFile.appendStatistics(loadedProof, keyFile.toFile());
+                    statisticsFile.appendStatistics(loadedProof, keyFile);
                 }
 
                 /*
@@ -278,7 +278,7 @@ public class TestFile implements Serializable {
      */
     private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(Path keyFile)
             throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
     }
 

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -33,11 +33,13 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
-
-    public static final Path TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory().toPath();
+    public static final Path TESTCASE_DIRECTORY =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
     public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
@@ -52,21 +54,10 @@ public class HelperClassForTests {
     };
 
     public static ProofAggregate parse(Path file) {
-        return parse(file.toPath(), profile);
-    }
-
-    public ProofAggregate parse(File file, Profile profile) {
-        return parse(file.toPath(), profile);
-    }
-
-    public ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
-    public ProofAggregate parse(Path file, Profile profile) {
-        ProblemInitializer pi = null;
-        ProofAggregate result = null;
-
+    public static ProofAggregate parse(Path file, Profile profile) {
         try {
             return parseThrowException(file, profile);
         } catch (ProofInputException e) {
@@ -94,7 +85,7 @@ public class HelperClassForTests {
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
-    public static boolean isOneStepSimplificationEnabled(Proof proof) {
+    public static boolean isOneStepSimplificationEnabled(@Nullable Proof proof) {
         StrategyProperties props;
         if (proof != null && !proof.isDisposed()) {
             props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -113,7 +104,7 @@ public class HelperClassForTests {
      * @param enabled {@code true} use one step simplification, {@code false} do not use one step
      *        simplification.
      */
-    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
+    public static void setOneStepSimplificationEnabled(@Nullable Proof proof, boolean enabled) {
         final String newVal = enabled ? StrategyProperties.OSS_ON : StrategyProperties.OSS_OFF;
 
         {
@@ -153,7 +144,7 @@ public class HelperClassForTests {
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
-                KeYEnvironment.load(javaFile.toPath(), null, null, null);
+                KeYEnvironment.load(javaFile, null, null, null);
             try {
                 // Start proof
                 ImmutableSet<Contract> contracts =
@@ -178,18 +169,16 @@ public class HelperClassForTests {
      * @param containerTypeName The type name which provides the target.
      * @param targetName The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptionsForTarget(Path javaFile,
             String containerTypeName,
-            final String targetName) throws ProblemLoaderException, ProofInputException {
+            final String targetName) {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> environment = null;
             Proof proof = null;
             try {
                 // Load java file
-                environment = KeYEnvironment.load(javaFile.toPath(), null, null, null);
+                environment = KeYEnvironment.load(javaFile, null, null, null);
                 // Search type
                 KeYJavaType containerKJT =
                     environment.getJavaInfo().getTypeByClassName(containerTypeName);

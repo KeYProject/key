@@ -64,7 +64,7 @@ public class ProveRulesTest {
             "Found a taclet proof for taclet " + tacletName
                 + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
                 + "adding annotation \\lemma to the declaration of the taclet.");
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile.toPath());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
         KeyAst.ProofScript script = env.getProofScript();

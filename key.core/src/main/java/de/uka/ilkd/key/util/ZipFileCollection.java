@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.io.DataLocation;
 
 
 /**
@@ -33,13 +32,13 @@ import recoder.io.DataLocation;
 public class ZipFileCollection implements FileCollection, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
-    private final File file;
+    private final Path path;
     private ZipFile zipFile;
 
-    public ZipFileCollection(Path file) throws IOException {
-        this.file = file.toFile();
+    public ZipFileCollection(Path path) throws IOException {
+        this.path = path;
         try {
-            zipFile = new ZipFile(this.file);
+            zipFile = new ZipFile(path.toFile());
         } catch (ZipException ex) {
             throw new IOException("can't open " + path + ": " + ex.getMessage(), ex);
         }

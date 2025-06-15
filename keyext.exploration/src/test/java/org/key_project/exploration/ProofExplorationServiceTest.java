@@ -39,7 +39,7 @@ public class ProofExplorationServiceTest {
     public void setup() throws ProblemLoaderException {
         location = Paths.get("src/test/resources//org/key_project/exploration/testAdditions.key");
         Assumptions.assumeTrue(Files.exists(location), "File testAdditions.key not found.");
-        env = KeYEnvironment.load(location.toPath());
+        env = KeYEnvironment.load(location);
         currentProof = env.getLoadedProof();
         expService = new ProofExplorationService(currentProof, env.getServices());
     }

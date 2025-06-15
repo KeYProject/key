@@ -638,7 +638,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
         Path proofFile = testCaseDirectory.resolve(proofFileInRepository);
         Assertions.assertTrue(Files.exists(proofFile));
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile.toPath(), null, null, null,
+            SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, null,
             true);
         try {
             // Get loaded proof

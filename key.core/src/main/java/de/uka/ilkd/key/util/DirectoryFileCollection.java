@@ -45,11 +45,10 @@ public class DirectoryFileCollection implements FileCollection {
     /**
      * add all files in or under dir to a file list. Extension is tested
      */
-    private static void addAllFiles(Path dir, String extension, List<File> files) {
+    private static void addAllFiles(Path dir, String extension, List<Path> files) {
         try (var walker = Files.walk(dir)) {
-            List<File> listFiles = walker
+            List<Path> listFiles = walker
                     .filter(it -> it.getFileName().toString().toLowerCase().endsWith(extension))
-                    .map(Path::toFile)
                     .toList();
             files.addAll(listFiles);
         } catch (IOException e) {
@@ -131,7 +130,7 @@ public class DirectoryFileCollection implements FileCollection {
      * This class keeps an internal list of files to be iterated that is created at construction
      * time.
      */
-    private class Walker implements FileCollection.Walker {
+    public class Walker implements FileCollection.Walker {
 
         private final Iterator<Path> iterator;
         private Path currentFile;

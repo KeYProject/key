@@ -127,7 +127,7 @@ public class RunAllProofsAction extends MainWindowAction {
                 ui.reportStatus(this, "Run: " + absFile);
                 LOGGER.info("Run: {}", absFile);
                 ProblemLoader problemLoader =
-                    ui.getProblemLoader(absFile.toPath(), null, null, null, getMediator());
+                    ui.getProblemLoader(absFile, null, null, null, getMediator());
                 problemLoader.runSynchronously();
                 LOGGER.info("Loaded: {}", absFile);
 

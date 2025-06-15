@@ -25,7 +25,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsInnerType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
             null, null,
             null);
         try {
@@ -67,9 +67,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetParentName() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest").toPath(),
-            null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -111,7 +110,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
             null, null,
             null);
         try {
@@ -147,7 +146,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest").toPath(),
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
             null, null,
             null);
         try {

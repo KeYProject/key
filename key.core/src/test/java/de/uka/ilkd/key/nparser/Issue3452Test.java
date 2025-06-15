@@ -30,7 +30,7 @@ public class Issue3452Test {
         final var input =
             Paths.get(
                 "src/test/resources/de/uka/ilkd/key/nparser/fix3452/fix/Issue3452Fixture.java");
-        var env = KeYEnvironment.load(input.toPath(), null, null, null);
+        var env = KeYEnvironment.load(input, null, null, null);
         final var contract = env.getProofContracts().getFirst();
         var po = contract.createProofObl(env.getInitConfig(), contract);
         var proof = env.createProof(po); // just to ensure there is exception
@@ -46,7 +46,7 @@ public class Issue3452Test {
             "src/test/resources/de/uka/ilkd/key/nparser/fix3452/problem/Issue3452IllegalNoState.java");
 
         ProblemLoaderException exception = assertThrows(ProblemLoaderException.class, () -> {
-            var env = KeYEnvironment.load(input.toPath(), null, null, null);
+            var env = KeYEnvironment.load(input, null, null, null);
             System.err.println(env);
             System.err.println("Unexpected load success");
         });

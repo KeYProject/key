@@ -24,7 +24,7 @@ public class TestOneStepSimplifier {
         // (if more rules are added to the OSS set, this restriction may increase the chances that
         // old proofs still load)
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(testCaseDirectory.resolve("ossRestriction.proof").toPath());
+            KeYEnvironment.load(testCaseDirectory.resolve("ossRestriction.proof"));
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
         env.dispose();

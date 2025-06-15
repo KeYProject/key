@@ -258,7 +258,7 @@ public final class HeapLDT extends LDT {
      * @param op the operator to check
      * @return true if the operator is an instance of the "X::final" srot-depending function
      */
-    public boolean isFinalOp(de.uka.ilkd.key.logic.op.Operator op) {
+    public boolean isFinalOp(org.key_project.logic.op.Operator op) {
         return op instanceof SortDependingFunction
                 && ((SortDependingFunction) op).isSimilar(finalFunction);
     }

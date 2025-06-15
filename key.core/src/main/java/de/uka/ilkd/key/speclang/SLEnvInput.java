@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -38,10 +36,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -59,11 +56,6 @@ public final class SLEnvInput extends AbstractEnvInput {
             Profile profile, List<Path> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
-    }
-
-
-    public SLEnvInput(@Nullable Path javaPath, Profile profile) {
-        this(javaPath, null, null, profile, null);
     }
 
 
@@ -90,29 +82,16 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
 
-    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
-            Path path) throws ProofInputException {
+    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(
+            Collection<KeYJavaType> allKJTs,
+            Path basePath) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         int i = 0;
         for (KeYJavaType kjt : allKJTs) {
-            if (kjt.getJavaType() instanceof TypeDeclaration
-                    && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
-                final String filePath =
-                    String.format("%s/%s.key", path,
-                        kjt.getFullName().replace(".", "/")
-                                .replace('<', '_')
-                                .replace('>', '_'));
-                RuleSource rs = null;
-
-                // external or internal path?
-                var file = Paths.get(filePath);
-                if (Files.isRegularFile(file)) {
-                    rs = RuleSourceFactory.initRuleFile(file);
-                } else {
-                    URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
-                        filePath);
-                    if (url != null) {
-                        rs = RuleSourceFactory.initRuleFile(url);
+            var javaType = kjt.getJavaType();
+            if (!(javaType instanceof TypeDeclaration)
+                    || !((TypeDeclaration) javaType).isLibraryClass()) {
+                continue;
             }
 
             final Path file = basePath.resolve(kjt.getFullName().replace(".", "/") + ".key");
@@ -121,10 +100,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
             RuleSource rs = RuleSourceFactory.initRuleFile(file);
 
-                // rule source found? -> read
-                if (rs != null) {
-                    final KeYFile keyFile = new KeYFile(path.getFileName().toString(),
-                        rs, null, getProfile());
+            // read rule source found
+            LOGGER.debug("Reading library specification file: {}", file);
+            final KeYFile keyFile = new KeYFile(file.toString(), rs, null, getProfile());
             keyFile.setInitConfig(initConfig);
             warnings = warnings.union(keyFile.read());
             i += 1;
@@ -139,18 +117,18 @@ public final class SLEnvInput extends AbstractEnvInput {
      * specifications from this file.
      */
     private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
-                    final var allKJTs =
-                            initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
-                    ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
-                    var javaService = initConfig.getServices().getJavaService();
-                    warnings =
-                            warnings.union(createDLLibrarySpecsHelper(allKJTs, javaService.getBootClassPath()));
+        final var allKJTs =
+            initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+        var javaService = initConfig.getServices().getJavaService();
+        warnings =
+            warnings.union(createDLLibrarySpecsHelper(allKJTs, javaService.getBootClassPath()));
 
-                    for (var file : javaService.getLibraryPath()) {
-                        warnings =
-                                warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
-                    }
-                    return warnings;
+        for (var file : javaService.getLibraryPath()) {
+            warnings =
+                warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
+        }
+        return warnings;
     }
 
     private void addLoopInvariants(SpecExtractor specExtractor,
