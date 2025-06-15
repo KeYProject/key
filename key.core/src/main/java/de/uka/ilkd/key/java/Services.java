@@ -480,7 +480,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     @NonNull
     public JavaService getJavaService() {
-        assert javaService != null;
+        assert javaService != null : "Java Services needs to initialized in advanced.";
         return javaService;
     }
 

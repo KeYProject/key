@@ -107,13 +107,13 @@ public final class HeapLDT extends LDT {
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
         arr = addFunction(services, "arr");
-        created = addFunction(services, "java.lang.Object::<created>");
-        initialized = addFunction(services, "java.lang.Object::<initialized>");
-        classPrepared = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized = addSortDependingFunction(services, "<classInitialized>");
+        created = addFunction(services, "java.lang.Object::#$created");
+        initialized = addFunction(services, "java.lang.Object::#$initialized");
+        classPrepared = addSortDependingFunction(services, "#$classPrepared");
+        classInitialized = addSortDependingFunction(services, "#$classInitialized");
         classInitializationInProgress =
-            addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous = addSortDependingFunction(services, "<classErroneous>");
+            addSortDependingFunction(services, "#$classInitializationInProgress");
+        classErroneous = addSortDependingFunction(services, "#$classErroneous");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
@@ -140,9 +140,11 @@ public final class HeapLDT extends LDT {
         if (fieldPV.isImplicit()) {
             return fieldPV.name().toString();
         } else {
+            // FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
             int index = fieldPV.toString().indexOf("::");
-            assert index > 0;
+            if (index <= 0)
+                return fieldPVName;
             return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
         }
     }

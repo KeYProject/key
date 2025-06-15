@@ -39,14 +39,14 @@ public class ReduxTest {
         "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux";
 
     private final Services services = new Services(JavaProfile.getDefaultProfile());
-    private final KeYJPMapping mapping = services.getJavaService().getMapping();
     private final TypeSolver typeSolver = new JavaParserTypeSolver(Paths.get(PATHTOREDUX));
-    private final JP2KeYConverter converter = new JP2KeYConverter(services, mapping,
-        new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));
     private final JavaSymbolSolver javaSymbolSolver = new JavaSymbolSolver(typeSolver);
 
     private final JavaParser parser =
-        new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
+            new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
+
+    private final KeYJPMapping mapping;
+    private final JP2KeYConverter converter;
 
     public ReduxTest() {
         var sorts = services.getNamespaces().sorts();
@@ -56,6 +56,9 @@ public class ReduxTest {
         sorts.add(new SortImpl(new Name("double"), ImmutableSet.empty(), false));
         sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
         services.activateJava(null);
+        mapping = services.getJavaService().getMapping();;
+        converter = new JP2KeYConverter(services, mapping,
+                new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));;
     }
 
     @Test

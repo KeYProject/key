@@ -94,6 +94,14 @@ public record JP2KeYConverter(Services services, KeYJPMapping mapping,
     }
 
     public Object process(Node block) {
+        try{
+            // Install the symbolSolver  if the node has none.
+            block.getSymbolResolver();
+        }catch (IllegalStateException ignore) {
+            var symbolSolver = services.getJavaService().getProgramFactory().getSymbolSolver();
+            var compUnit = block.findCompilationUnit();
+            compUnit.ifPresent(it -> it.setData(Node.SYMBOL_RESOLVER_KEY, symbolSolver));
+        }
         return block.accept(new JP2KeYVisitor(services, mapping, typeConverter, schemaVariables),
             null);
     }
@@ -480,16 +488,24 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             map(n.getParameters()),
             thr,
             accept(n.getBody()), isInInterface);
-        var containing = getContainingClass(n).resolve();
-        final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
 
-        // store container type as member when visiting type declaration.
-        final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
-        var method =
-            new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
-                heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
-        return addToMapping(n, method);
+        var clazz = getContainingClass(n);
+        try {
+            var containing = clazz.resolve();
+
+            final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
+            Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
+
+            // store container type as member when visiting type declaration.
+            final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
+            var method =
+                    new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
+                            heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+            return addToMapping(n, method);
+        }catch (IllegalStateException e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
