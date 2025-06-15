@@ -148,7 +148,8 @@ public class SequentChangeInfo {
     /// @param inAntecedent a boolean used to select one of the two semisequents of a sequent
     /// (true means antecedent; false means succedent)
     /// @return list of formulas modified within the selected semisequent
-    public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean inAntecedent) {
+    public @NonNull ImmutableList<@NonNull FormulaChangeInfo> modifiedFormulas(
+            boolean inAntecedent) {
         return inAntecedent ? antecedent.modifiedFormulas() : succedent.modifiedFormulas();
     }
 
