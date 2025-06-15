@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object has to be created,
  * in KeY this is quite similar to take it out of a list of objects and setting the implicit flag
@@ -30,7 +32,7 @@ public class CreateObject extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(@NonNull ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
         TypeReference classReference = ((New) pe).getTypeReference();

@@ -42,8 +42,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
         while (localVars.hasNext()) {
             posts = posts.append(d.tb.equals(localPostVars.next(), localVars.next()));
         }
-        if (poVars.post.result != null) {
-            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
+        if (poVars.post.resultTerm != null) {
+            posts = posts.append(d.tb.equals(poVars.post.resultTerm, poVars.pre.resultTerm));
         }
         if (poVars.pre.exception != null && poVars.post.exception != null) {
             posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));

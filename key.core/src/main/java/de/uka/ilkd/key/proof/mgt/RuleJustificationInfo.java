@@ -18,9 +18,10 @@ import org.jspecify.annotations.Nullable;
 
 public class RuleJustificationInfo {
 
-    private final Map<RuleKey, RuleJustification> rule2Justification = new LinkedHashMap<>();
+    private final Map<RuleKey, @Nullable RuleJustification> rule2Justification =
+        new LinkedHashMap<>();
 
-    public void addJustification(Rule r, RuleJustification j) {
+    public void addJustification(Rule r, @Nullable RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);
         if (rule2Justification.containsKey(ruleKey)) {
             // TODO: avoid double registration of certain class axioms and remove then the below

@@ -18,6 +18,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Replaces a declaration of multiple variables by two variable declarations where the first one
  * declares a single variable and the second one the remaining variables.
@@ -29,7 +31,7 @@ public class MultipleVarDecl extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         VariableDeclaration vardecl = (VariableDeclaration) pe;
         ImmutableArray<Modifier> modifiers = vardecl.getModifiers();

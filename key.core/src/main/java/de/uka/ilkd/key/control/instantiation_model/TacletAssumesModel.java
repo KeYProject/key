@@ -27,13 +27,9 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInstantiation> {
-
-    /**
-     * generated UID
-     */
-    private static final long serialVersionUID = -5388696072469119661L;
-
     private static final AssumesFormulaInstantiation manualTextIF =
         new AssumesFormulaInstantiation() {
 
@@ -43,7 +39,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
             }
 
             @Override
-            public SequentFormula getSequentFormula() {
+            public @Nullable SequentFormula getSequentFormula() {
                 return null;
             }
         };

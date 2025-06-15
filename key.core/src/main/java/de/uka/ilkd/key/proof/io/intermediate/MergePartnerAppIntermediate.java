@@ -10,6 +10,8 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.
  *
@@ -28,7 +30,7 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      * @param mergeNodeId The ID of the corresponding merge node.
      * @param newNames New names registered in the course of partner goal closing.
      */
-    public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
+    public MergePartnerAppIntermediate(@NonNull String ruleName, Pair<Integer, PosInTerm> pos,
             int mergeNodeId, ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, null, newNames);
 

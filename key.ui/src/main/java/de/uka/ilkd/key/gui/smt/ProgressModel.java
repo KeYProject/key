@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Encapsulates the table of progress bars that is shown within the progress dialog: For each solver
  * and each goal there is a cell.
@@ -93,7 +95,7 @@ class ProgressModel extends AbstractTableModel {
         }
 
         // private final Object [] processes;
-        public final ProcessData[] data;
+        public final ProcessData @NonNull [] data;
         private boolean isEditable = false;
 
         public ProcessColumn(int size) {
@@ -152,7 +154,7 @@ class ProgressModel extends AbstractTableModel {
 
     }
 
-    public void addColumn(Column column) {
+    public void addColumn(@NonNull Column column) {
         if (rowCount != -1 && rowCount != column.getRowCount()) {
             throw new IllegalArgumentException("Columns must have the same number of rows.");
         }
@@ -224,7 +226,7 @@ class ProgressModel extends AbstractTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex) {
+    public @NonNull Class<?> getColumnClass(int columnIndex) {
         return columns.get(columnIndex).getClass();
 
     }

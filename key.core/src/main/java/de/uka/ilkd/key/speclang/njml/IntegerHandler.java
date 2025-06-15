@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
@@ -29,7 +30,7 @@ public class IntegerHandler extends LDTHandler {
      */
     private SpecMathMode specMathMode;
 
-    public IntegerHandler(Services services, SpecMathMode specMathMode) {
+    public IntegerHandler(@NonNull Services services, @NonNull SpecMathMode specMathMode) {
         super(services);
 
         if (specMathMode == null) {

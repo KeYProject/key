@@ -13,6 +13,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Projection for dividing one monomial by another.
  */
@@ -26,13 +28,14 @@ public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
         this.divisor = divisor;
     }
 
-    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> dividend,
+    public static @NonNull ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> dividend,
             ProjectionToTerm<Goal> divisor) {
         return new ReduceMonomialsProjection(dividend, divisor);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 

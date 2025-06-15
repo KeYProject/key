@@ -7,16 +7,18 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A JML set statement in textual form.
  */
 public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
-    private final JmlParser.Set_statementContext assignment;
+    private final JmlParser.@NonNull Set_statementContext assignment;
 
 
-    public TextualJMLSetStatement(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Set_statementContext assignment) {
+    public TextualJMLSetStatement(@NonNull ImmutableList<JMLModifier> modifiers,
+            JmlParser.@NonNull Set_statementContext assignment) {
         super(modifiers);
         assert assignment != null;
         this.assignment = assignment;
@@ -24,7 +26,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     }
 
 
-    public JmlParser.Set_statementContext getAssignment() {
+    public JmlParser.@NonNull Set_statementContext getAssignment() {
         return assignment;
     }
 
@@ -36,7 +38,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLSetStatement ss)) {
             return false;
         }

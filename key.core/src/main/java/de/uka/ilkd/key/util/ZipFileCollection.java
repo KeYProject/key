@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -30,13 +27,11 @@ import recoder.io.DataLocation;
  *
  * @author MU
  */
-
-
 public class ZipFileCollection implements FileCollection, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
     private final File file;
-    private ZipFile zipFile;
+    private @Nullable ZipFile zipFile;
 
     public ZipFileCollection(Path file) throws IOException {
         this.file = file.toFile();
@@ -58,7 +53,9 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        zipFile.close();
+        if (zipFile != null) {
+            zipFile.close();
+        }
     }
 
     public class Walker implements FileCollection.Walker {
@@ -68,7 +65,7 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
         private final List<String> extensions;
 
         public Walker(String[] extensions) {
-            this.enumeration = zipFile.entries();
+            this.enumeration = Objects.requireNonNull(zipFile).entries();
             this.extensions = new ArrayList<>();
             for (String extension : extensions) {
                 this.extensions.add(extension.toLowerCase());
@@ -84,10 +81,14 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
         }
 
         public InputStream openCurrent() throws IOException {
-            if (currentEntry == null) {
+            if (currentEntry == null || zipFile == null) {
                 throw new NoSuchElementException();
             } else {
-                return zipFile.getInputStream(currentEntry);
+                InputStream res = zipFile.getInputStream(currentEntry);
+                if (res == null) {
+                    throw new NoSuchElementException();
+                }
+                return res;
             }
         }
 
@@ -97,7 +98,8 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
                 // request an InputStream from the FileRepo
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                String name = currentEntry.getName();
+                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), name);
                 return fileRepo.getInputStream(uri.toURL());
             } else {
                 return openCurrent(); // fallback without FileRepo
@@ -107,10 +109,10 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
         public boolean step() {
             currentEntry = null;
             while (enumeration.hasMoreElements() && currentEntry == null) {
-                currentEntry = enumeration.nextElement();
+                var entry = enumeration.nextElement();
+                currentEntry = entry;
                 for (String extension : extensions) {
-                    if (extension != null
-                            && !currentEntry.getName().toLowerCase().endsWith(extension)) {
+                    if (extension != null && !entry.getName().toLowerCase().endsWith(extension)) {
                         currentEntry = null;
                     } else {
                         break;
@@ -126,12 +128,17 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
 
         public DataLocation getCurrentDataLocation() {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
-            try {
-                // since we actually return a zip/jar, we use URLDataLocation
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
-                return new URLDataLocation(uri.toURL());
-            } catch (IOException e) {
-                LOGGER.warn("Failed to get zip entry uri", e);
+            if (currentEntry != null) {
+                try {
+                    // since we actually return a zip/jar, we use URLDataLocation
+                    String name = currentEntry.getName();
+                    URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), name);
+                    return new URLDataLocation(uri.toURL());
+                } catch (IOException e) {
+                    LOGGER.warn("Failed to get zip entry uri", e);
+                }
+            } else {
+                LOGGER.warn("Failed to get zip entry uri of entry == null");
             }
             return SpecDataLocation.UNKNOWN_LOCATION; // fallback
         }

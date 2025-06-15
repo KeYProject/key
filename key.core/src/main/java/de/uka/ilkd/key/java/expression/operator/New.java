@@ -16,6 +16,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The object allocation operator. There are two variants for New:
  * <OL>
@@ -35,7 +38,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         ReferenceSuffix, TypeDeclarationContainer {
 
 
-    protected final ClassDeclaration anonymousClass;
+    protected final @Nullable ClassDeclaration anonymousClass;
     protected final ReferencePrefix accessPath;
 
 
@@ -49,7 +52,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      *        TypeReference
      * @param rp a ReferencePrefix as access path for the constructor
      */
-    public New(ExtList children, ReferencePrefix rp) {
+    public New(@NonNull ExtList children, ReferencePrefix rp) {
         super(children);
         anonymousClass = children.get(ClassDeclaration.class);
         accessPath = rp;
@@ -66,7 +69,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      *        TypeReference
      * @param rp a ReferencePrefix as access path for the constructor
      */
-    public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
+    public New(@NonNull ExtList children, ReferencePrefix rp, PositionInfo pi) {
         super(children, pi);
         anonymousClass = children.get(ClassDeclaration.class);
         accessPath = rp;
@@ -79,7 +82,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @param type a TypeReference (the referred type)
      * @param rp a ReferencePrefix as access path for the constructor
      */
-    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
+    public New(Expression @NonNull [] arguments, TypeReference type, ReferencePrefix rp) {
         super(arguments, type);
         anonymousClass = null;
         accessPath = rp;
@@ -87,18 +90,18 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
 
     @Override
-    public SourceElement getFirstElement() {
+    public @NonNull SourceElement getFirstElement() {
         return (accessPath != null) ? accessPath.getFirstElement() : this;
     }
 
     @Override
-    public SourceElement getFirstElementIncludingBlocks() {
+    public @NonNull SourceElement getFirstElementIncludingBlocks() {
         return (accessPath != null) ? accessPath.getFirstElementIncludingBlocks() : this;
     }
 
 
     @Override
-    public SourceElement getLastElement() {
+    public @NonNull SourceElement getLastElement() {
         return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
@@ -121,7 +124,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
 
-    public ClassDeclaration getClassDeclaration() {
+    public @Nullable ClassDeclaration getClassDeclaration() {
         return anonymousClass;
     }
 
@@ -133,7 +136,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
 
     @Override
-    public TypeDeclaration getTypeDeclarationAt(int index) {
+    public @NonNull TypeDeclaration getTypeDeclarationAt(int index) {
         if (anonymousClass != null && index == 0) {
             return anonymousClass;
         }
@@ -161,7 +164,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
 
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
             if (index == 0) {
@@ -197,18 +200,18 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @return the reference prefix.
      */
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @NonNull ReferencePrefix getReferencePrefix() {
         return accessPath;
     }
 
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnNew(this);
     }
 
 
-    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
+    public @NonNull ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }
 }

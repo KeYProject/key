@@ -11,6 +11,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A node in the symbolic execution tree which represents a method call, e.g. {@code foo()}.
@@ -30,6 +32,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The {@link MethodReference} of the called method.
      */
+    @Nullable
     MethodReference getMethodReference();
 
     /**
@@ -37,6 +40,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The called {@link IProgramMethod}.
      */
+    @Nullable
     IProgramMethod getProgramMethod();
 
     /**
@@ -54,6 +58,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      * @return The {@link MethodReference} to the explicit constructor or {@code null} if no
      *         constructor is called.
      */
+    @Nullable
     MethodReference getExplicitConstructorMethodReference();
 
     /**
@@ -61,6 +66,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The explicit constructor or {@code null} if no constructor is called.
      */
+    @Nullable
     IProgramMethod getExplicitConstructorProgramMethod();
 
     /**

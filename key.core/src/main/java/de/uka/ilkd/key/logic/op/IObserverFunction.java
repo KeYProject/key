@@ -10,11 +10,14 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
+
 public interface IObserverFunction extends SortedOperator, Operator {
 
     /**
      * Returns the result type of this symbol.
      */
+    @Nullable
     KeYJavaType getType();
 
     /**

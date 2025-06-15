@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Operator of arity 2
  *
@@ -19,11 +21,11 @@ import org.key_project.util.ExtList;
  */
 public abstract class BinaryOperator extends Operator {
 
-    protected BinaryOperator(ExtList children) {
+    protected BinaryOperator(@NonNull ExtList children) {
         super(children);
     }
 
-    protected BinaryOperator(Expression lhs, Expression rhs) {
+    protected BinaryOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -36,7 +38,7 @@ public abstract class BinaryOperator extends Operator {
         return 2;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         try {
             return tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec),

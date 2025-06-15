@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
+
 
 public class FieldReference extends VariableReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer {
@@ -28,7 +30,7 @@ public class FieldReference extends VariableReference
         this.prefix = prefix;
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix) {
         this(pv, prefix, PositionInfo.UNDEFINED);
     }
 

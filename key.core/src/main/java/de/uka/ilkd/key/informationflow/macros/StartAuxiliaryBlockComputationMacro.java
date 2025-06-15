@@ -24,6 +24,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
@@ -35,7 +38,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Start auxiliary computation for self-composition proofs";
     }
 
@@ -45,7 +48,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "In order to increase the efficiency of self-composition "
             + "proofs, this macro starts a side calculation which does "
             + "the symbolic execution only once. The result is "
@@ -55,7 +58,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (goals == null || posInOcc == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
@@ -87,8 +90,10 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+    public @NonNull ProofMacroFinishedInfo applyTo(@NonNull UserInterfaceControl uic,
+            @NonNull Proof proof,
+            @NonNull ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         final BlockContractInternalBuiltInRuleApp blockRuleApp =
             (BlockContractInternalBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();

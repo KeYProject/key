@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class DifferentInstantiationCondition extends VariableConditionAdapter {
 
@@ -38,7 +40,7 @@ public final class DifferentInstantiationCondition extends VariableConditionAdap
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\different (" + var1 + ", " + var2 + ")";
     }
 }

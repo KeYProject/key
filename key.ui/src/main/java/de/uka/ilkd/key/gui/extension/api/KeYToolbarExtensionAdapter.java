@@ -9,17 +9,19 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NonNull;
+
 public interface KeYToolbarExtensionAdapter extends KeYGuiExtension.Toolbar {
     /**
      * @param mainWindow
      * @return
      */
-    default List<Action> getToolbarActions(MainWindow mainWindow) {
+    default @NonNull List<Action> getToolbarActions(MainWindow mainWindow) {
         return Collections.emptyList();
     }
 
     @Override
-    default JToolBar getToolbar(MainWindow mainWindow) {
+    default @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar(getClass().getName());
         getToolbarActions(mainWindow).forEach(tb::add);
         return tb;

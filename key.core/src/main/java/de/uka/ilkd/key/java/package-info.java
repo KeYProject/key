@@ -102,4 +102,7 @@
  * </DD>
  * </DL>
  */
+@NullMarked
 package de.uka.ilkd.key.java;
+
+import org.jspecify.annotations.NullMarked;

@@ -792,7 +792,7 @@ public final class SpecificationRepository {
      * Returns the registered (atomic or combined) contract corresponding to the passed name, or
      * null.
      */
-    public @Nullable Contract getContractByName(String name) {
+    public @Nullable Contract getContractByName(@Nullable String name) {
         if (name == null || name.isEmpty()) {
             return null;
         }
@@ -1365,7 +1365,7 @@ public final class SpecificationRepository {
     /**
      * Returns the PO that the passed proof is about, or null.
      */
-    public ContractPO getContractPOForProof(Proof proof) {
+    public @Nullable ContractPO getContractPOForProof(Proof proof) {
         ProofOblInput po = getProofOblInput(proof);
         if (po instanceof ContractPO) {
             return (ContractPO) po;
@@ -1386,7 +1386,7 @@ public final class SpecificationRepository {
         return null;
     }
 
-    public ContractPO getPOForProof(Proof proof) {
+    public @Nullable ContractPO getPOForProof(@Nullable Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
@@ -1404,7 +1404,7 @@ public final class SpecificationRepository {
      * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not
      *         available.
      */
-    public ProofOblInput getProofOblInput(Proof proof) {
+    public @Nullable ProofOblInput getProofOblInput(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
@@ -1418,7 +1418,7 @@ public final class SpecificationRepository {
     /**
      * Returns the target that the passed proof is about, or null.
      */
-    public IObserverFunction getTargetOfProof(Proof proof) {
+    public @Nullable IObserverFunction getTargetOfProof(@Nullable Proof proof) {
         final ContractPO po = getPOForProof(proof);
         return po == null ? null : po.getContract().getTarget();
     }
@@ -1451,7 +1451,7 @@ public final class SpecificationRepository {
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
-    public LoopSpecification getLoopSpec(LoopStatement loop) {
+    public @Nullable LoopSpecification getLoopSpec(LoopStatement loop) {
         final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         LoopSpecification inv = loopInvs.get(l);
@@ -1503,11 +1503,7 @@ public final class SpecificationRepository {
         var b =
             new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.nil();
-        } else {
-            return contracts;
-        }
+        return Objects.requireNonNullElseGet(contracts, DefaultImmutableSet::nil);
     }
 
     /**
@@ -1519,11 +1515,7 @@ public final class SpecificationRepository {
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
         var b = new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.nil();
-        } else {
-            return contracts;
-        }
+        return Objects.requireNonNullElseGet(contracts, DefaultImmutableSet::nil);
     }
 
     /**
@@ -1535,20 +1527,12 @@ public final class SpecificationRepository {
     public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
         final Pair<LoopStatement, Integer> b = new Pair<>(loop, loop.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.nil();
-        } else {
-            return contracts;
-        }
+        return Objects.requireNonNullElseGet(contracts, DefaultImmutableSet::nil);
     }
 
     public ImmutableSet<MergeContract> getMergeContracts(MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
-        if (contracts == null) {
-            return DefaultImmutableSet.nil();
-        } else {
-            return contracts;
-        }
+        return Objects.requireNonNullElseGet(contracts, DefaultImmutableSet::nil);
     }
 
     /**
@@ -1735,24 +1719,18 @@ public final class SpecificationRepository {
 
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
-            if (spec instanceof Contract) {
-                addContract((Contract) spec);
-            } else if (spec instanceof ClassInvariant) {
-                addClassInvariant((ClassInvariant) spec);
-            } else if (spec instanceof InitiallyClause) {
-                addInitiallyClause((InitiallyClause) spec);
-            } else if (spec instanceof ClassAxiom) {
-                addClassAxiom((ClassAxiom) spec);
-            } else if (spec instanceof LoopSpecification) {
-                addLoopInvariant((LoopSpecification) spec);
-            } else if (spec instanceof BlockContract) {
-                addBlockContract((BlockContract) spec);
-            } else if (spec instanceof LoopContract) {
-                addLoopContract((LoopContract) spec);
-            } else if (spec instanceof MergeContract) {
-                addMergeContract((MergeContract) spec);
-            } else {
+            switch (spec) {
+            case Contract contract -> addContract(contract);
+            case ClassInvariant classInvariant -> addClassInvariant(classInvariant);
+            case InitiallyClause initiallyClause -> addInitiallyClause(initiallyClause);
+            case ClassAxiom classAxiom -> addClassAxiom(classAxiom);
+            case LoopSpecification loopSpecification -> addLoopInvariant(loopSpecification);
+            case BlockContract blockContract -> addBlockContract(blockContract);
+            case LoopContract loopContract -> addLoopContract(loopContract);
+            case MergeContract mergeContract -> addMergeContract(mergeContract);
+            default -> {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
+            }
             }
         }
     }

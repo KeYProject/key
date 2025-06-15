@@ -25,6 +25,7 @@ import de.uka.ilkd.key.util.LineProperties;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public static List<Arguments> data() throws IOException, URISyntaxException {
+    public static @NonNull List<Arguments> data() throws IOException, URISyntaxException {
         URL url = TestProofScriptCommand.class.getResource("cases");
         if (url == null) {
             throw new FileNotFoundException("Cannot find resource 'cases'.");
@@ -57,7 +58,7 @@ public class TestProofScriptCommand {
 
     @ParameterizedTest
     @MethodSource("data")
-    void testProofScript(String name, Path path) throws Exception {
+    void testProofScript(String name, @NonNull Path path) throws Exception {
 
         BufferedReader reader = Files.newBufferedReader(path);
         LineProperties props = new LineProperties();

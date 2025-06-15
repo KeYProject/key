@@ -20,6 +20,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * An extended {@link JavaProfile} used in side proofs to simplify a {@link JTerm}.
  *
@@ -58,7 +60,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+    protected @NonNull ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
         ImmutableList<TermLabelPolicy> symExcPolicies =
             ImmutableSLList.<TermLabelPolicy>nil()
@@ -75,7 +77,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableSet<StrategyFactory> getStrategyFactories() {
+    protected @NonNull ImmutableSet<StrategyFactory> getStrategyFactories() {
         return DefaultImmutableSet.<StrategyFactory>nil().add(SIDE_PROOF_FACTORY);
     }
 
@@ -83,7 +85,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public StrategyFactory getDefaultStrategyFactory() {
+    public @NonNull StrategyFactory getDefaultStrategyFactory() {
         return SIDE_PROOF_FACTORY;
     }
 
@@ -91,7 +93,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public @NonNull String name() {
         return NAME;
     }
 
@@ -107,7 +109,7 @@ public class SimplifyTermProfile extends JavaProfile {
      *
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
-    public static synchronized SimplifyTermProfile getDefaultInstance() {
+    public static synchronized @NonNull SimplifyTermProfile getDefaultInstance() {
         if (defaultInstance == null) {
             defaultInstance = new SimplifyTermProfile();
         }

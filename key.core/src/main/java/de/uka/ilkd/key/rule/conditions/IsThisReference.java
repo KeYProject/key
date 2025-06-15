@@ -14,6 +14,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if a given type denotes an abstract class or interface type.
@@ -21,9 +23,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 public final class IsThisReference extends VariableConditionAdapter {
 
     private final boolean negated;
-    private final ParsableVariable var;
+    private final @NonNull ParsableVariable var;
 
-    public IsThisReference(ParsableVariable var, boolean negation) {
+    public IsThisReference(@NonNull ParsableVariable var, boolean negation) {
         this.negated = negation;
         this.var = var;
         assert ((ProgramSV) var).sort() == ProgramSVSort.VARIABLE;
@@ -48,7 +50,7 @@ public final class IsThisReference extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String prefix = negated ? "\\not" : "";
         return prefix + "\\isThisReference (" + var + ")";
     }

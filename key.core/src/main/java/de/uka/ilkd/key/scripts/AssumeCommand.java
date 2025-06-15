@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -13,6 +14,8 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The assume command takes one argument: * a formula to which the command is applied
@@ -25,18 +28,19 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     }
 
     @Override
-    public FormulaParameter evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public FormulaParameter evaluateArguments(@NonNull EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "assume";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return """
                 The assume command is an unsound taclet rule and takes one argument:
 
@@ -45,17 +49,21 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     }
 
     @Override
-    public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
+    public void execute(@NonNull FormulaParameter parameter)
+            throws ScriptException, InterruptedException {
         Taclet cut =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
+            Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment()
+                    .lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
+        app = app.addCheckedInstantiation(sv, parameter.formula,
+            Objects.requireNonNull(state).getProof().getServices(),
             true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        Objects.requireNonNull(state).getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class FormulaParameter {
         @Option("#2")
         public JTerm formula;

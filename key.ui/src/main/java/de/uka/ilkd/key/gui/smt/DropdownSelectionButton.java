@@ -15,6 +15,9 @@ import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A button consisting of an action component (normal button) and a selection component (dropdown
  * button).
@@ -43,7 +46,7 @@ public class DropdownSelectionButton {
     /**
      * The actions that can be selected.
      */
-    private Action[] items;
+    private Action @Nullable [] items;
     /**
      * The function used to map some selected actions to the one that is to be executed. This is
      * only used if more than one item can be selected at the same time. If only one action can be
@@ -69,7 +72,7 @@ public class DropdownSelectionButton {
     /**
      * The currently executed action when clicking the action button.
      */
-    private Action executedAction = emptyItem;
+    private @NonNull Action executedAction = emptyItem;
     /**
      * A prefix prepended to every String displayed in the action component.
      */
@@ -93,7 +96,7 @@ public class DropdownSelectionButton {
     /**
      * The dropdown menu that opens when clicking the selection button.
      */
-    private JPopupMenu menu;
+    private @Nullable JPopupMenu menu;
 
     /**
      * True iff the next time the selection button's action is carried out it should open the popup
@@ -175,7 +178,7 @@ public class DropdownSelectionButton {
     /**
      * @return the currently selected actions in the selection component
      */
-    public Action[] getSelectedItems() {
+    public Action @NonNull [] getSelectedItems() {
         return selectedItems.toArray(new Action[0]);
     }
 
@@ -189,7 +192,7 @@ public class DropdownSelectionButton {
     /**
      * @return the currently set empty item
      */
-    public Action getEmptyItem() {
+    public @NonNull Action getEmptyItem() {
         return emptyItem;
     }
 
@@ -260,7 +263,7 @@ public class DropdownSelectionButton {
      *
      * @param item the new executedAction
      */
-    public void setSelectedItem(Action item) {
+    public void setSelectedItem(@Nullable Action item) {
         if (item == null) {
             return;
         }
@@ -356,7 +359,7 @@ public class DropdownSelectionButton {
      *
      * @return the popup menu opened by the selection button
      */
-    protected JPopupMenu getMenu() {
+    protected @NonNull JPopupMenu getMenu() {
         if (menu == null) {
             components.clear();
             menu = new JPopupMenu();
@@ -375,7 +378,7 @@ public class DropdownSelectionButton {
      * @param maxChoice the maximum amount of actions that can be selected, this is assumed to be at
      *        least 1 (otherwise it is changed to be 1)
      */
-    public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
+    public void setItems(Action @Nullable [] it, Function<Action[], Action> reduce, int maxChoice) {
         items = it;
         if (it == null) {
             items = new Action[0];
@@ -419,7 +422,7 @@ public class DropdownSelectionButton {
      *
      * @param newMenuItems the new actions that can be selected
      */
-    public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
+    public void refreshSelectionItems(@NonNull Collection<JMenuItem> newMenuItems) {
         /*
          * The menu could also be reused (just clear all its components first), but that leads to
          * weird behaviour when going from menu items with checkboxes to normal menu items [see
@@ -585,14 +588,14 @@ public class DropdownSelectionButton {
          * The associated action, this is performed when double-clicking the menu item and selected
          * when single-clicking it.
          */
-        private final transient Action doubleClickAction;
+        private final transient @NonNull Action doubleClickAction;
 
         /**
          * Create a new DoubleClickCheckBoxMenuItem.
          *
          * @param action the {@link #doubleClickAction} of this menu item
          */
-        private DoubleClickCheckBoxMenuItem(Action action) {
+        private DoubleClickCheckBoxMenuItem(@NonNull Action action) {
             super();
             DoubleClickCheckBoxMenuItem menuItem = this;
             super.setAction(new AbstractAction() {
@@ -642,7 +645,7 @@ public class DropdownSelectionButton {
          * @return the corresponding action of this item
          */
         @Override
-        public Action getAction() {
+        public @NonNull Action getAction() {
             return doubleClickAction;
         }
 
@@ -652,7 +655,7 @@ public class DropdownSelectionButton {
          * @param e the event that is processed by this item
          */
         @Override
-        protected void processMouseEvent(MouseEvent e) {
+        protected void processMouseEvent(@NonNull MouseEvent e) {
             if (e.getClickCount() >= 2) {
                 doubleClickAction
                         .actionPerformed(new ActionEvent(e, MouseEvent.MOUSE_CLICKED, null));

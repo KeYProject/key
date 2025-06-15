@@ -33,6 +33,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
  * variables by others or new ones.
@@ -647,7 +649,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         handleJmlStatements(x, SetStatement::new);
     }
 
-    public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
+    public <T extends Statement> void handleJmlStatements(@NonNull T x, Function<T, T> cloner) {
         var spec = Objects.requireNonNull(
             services.getSpecificationRepository().getStatementSpec(x));
 

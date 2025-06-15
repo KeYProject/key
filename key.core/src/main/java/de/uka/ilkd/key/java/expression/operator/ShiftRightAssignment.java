@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Shift right assignment.
  *
@@ -28,7 +30,7 @@ public class ShiftRightAssignment extends Assignment {
      * @param lhs an expression.
      * @param rhs an expression.
      */
-    public ShiftRightAssignment(Expression lhs, Expression rhs) {
+    public ShiftRightAssignment(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -39,7 +41,7 @@ public class ShiftRightAssignment extends Assignment {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public ShiftRightAssignment(ExtList children) {
+    public ShiftRightAssignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -80,7 +82,7 @@ public class ShiftRightAssignment extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnShiftRightAssignment(this);
     }
 }

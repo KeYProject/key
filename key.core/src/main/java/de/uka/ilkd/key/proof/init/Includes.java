@@ -54,7 +54,7 @@ public class Includes {
      * returns the corresponding RuleSource to the filename <code>name</name>
      */
     public RuleSource get(String name) {
-        return name2Source.get(name);
+        return Objects.requireNonNull(name2Source.get(name));
     }
 
     public List<Path> getFiles() {

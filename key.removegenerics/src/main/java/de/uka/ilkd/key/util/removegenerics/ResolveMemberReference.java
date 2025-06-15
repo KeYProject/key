@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
@@ -157,7 +159,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      *         ???.
      *
      */
-    private static boolean isLHS(Reference reference) {
+    private static boolean isLHS(@NonNull Reference reference) {
         NonTerminalProgramElement parent = reference.getASTParent();
         if (parent instanceof Assignment ass) {
             return ass.getExpressionAt(0) == reference;
@@ -172,7 +174,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      *
      * @return the type of the the declaration of the referenced member
      */
-    private Type getFormalType() {
+    private @Nullable Type getFormalType() {
 
         SourceInfo sourceInfo = getSourceInfo();
         Type formalType = null;
@@ -289,7 +291,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
         return targetType(getSourceInfo().getType(reference));
     }
 
-    private static MethodDeclaration getEnclosingMethod(NonTerminalProgramElement pe) {
+    private static @NonNull MethodDeclaration getEnclosingMethod(NonTerminalProgramElement pe) {
         while (!(pe instanceof MethodDeclaration)) {
             pe = pe.getASTParent();
         }

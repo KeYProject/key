@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+
 public class ArrayLength extends ProgramTransformer {
 
     /**
@@ -22,8 +24,8 @@ public class ArrayLength extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations insts) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+            @NonNull SVInstantiations insts) {
         return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services, "length",
             (Expression) pe, insts.getExecutionContext()) };
     }

@@ -8,6 +8,8 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NonNull;
+
 public class LemmaGenerationBatchModeAction extends MainWindowAction {
 
     private static final String DESCRIPTION =
@@ -37,7 +39,7 @@ public class LemmaGenerationBatchModeAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;
 
-    public LemmaGenerationBatchModeAction(MainWindow mainWindow) {
+    public LemmaGenerationBatchModeAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Show information about proving taclets by using the batch mode.");
         putValue(NAME, "Taclets Using the Batch Mode...");

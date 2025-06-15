@@ -14,6 +14,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
  * label.
@@ -23,17 +25,18 @@ import org.key_project.util.collection.ImmutableArray;
 public class TermLabelCondition extends VariableConditionAdapter {
 
     private final TermLabelSV l;
-    private final Name ln;
+    private final @NonNull Name ln;
     private final boolean negated;
 
-    public TermLabelCondition(TermLabelSV l, String t, boolean negated) {
+    public TermLabelCondition(TermLabelSV l, @NonNull String t, boolean negated) {
         this.l = l;
         this.ln = new Name(t);
         this.negated = negated;
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull SVInstantiations instMap,
             Services services) {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
@@ -48,7 +51,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
      * @param name name of the label specified in this condition
      * @return true if label matches, false if not
      */
-    static boolean hasLabel(ImmutableArray<?> labels, Name name) {
+    static boolean hasLabel(@NonNull ImmutableArray<?> labels, @NonNull Name name) {
         boolean found = false;
         for (Object o : labels) {
             assert o instanceof TermLabel;
@@ -59,7 +62,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "\\not" : "") + "\\hasLabel (" + l + ", " + ln + ")";
     }
 }

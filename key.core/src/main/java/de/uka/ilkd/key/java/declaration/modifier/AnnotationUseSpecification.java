@@ -8,22 +8,24 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 
+import org.jspecify.annotations.NonNull;
+
 public class AnnotationUseSpecification extends Modifier implements TypeReferenceContainer {
 
-    protected final TypeReference tr;
+    protected final TypeReference typeReference;
 
-    public AnnotationUseSpecification(TypeReference tr) {
+    public AnnotationUseSpecification(TypeReference typeReference) {
         super();
-        this.tr = tr;
+        this.typeReference = typeReference;
     }
 
-    protected String getSymbol() {
-        return "@" + tr.toString();
+    protected @NonNull String getSymbol() {
+        return "@" + typeReference.toString();
     }
 
-    public TypeReference getTypeReferenceAt(int index) {
+    public @NonNull TypeReference getTypeReferenceAt(int index) {
         if (index == 0) {
-            return tr;
+            return typeReference;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -32,9 +34,9 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
         return 1;
     }
 
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         if (index == 0) {
-            return tr;
+            return typeReference;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

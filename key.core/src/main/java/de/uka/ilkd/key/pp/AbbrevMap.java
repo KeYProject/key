@@ -162,7 +162,7 @@ public class AbbrevMap {
     public record AbbrevWrapper(JTerm t) {
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (!(o instanceof AbbrevWrapper scw)) {
                 return false;
             }

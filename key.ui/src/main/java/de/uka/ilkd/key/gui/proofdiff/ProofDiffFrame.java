@@ -17,6 +17,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
  * <p>
@@ -33,9 +36,9 @@ public class ProofDiffFrame extends JFrame {
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
      */
     public static class Action extends MainWindowAction {
-        private final MainWindow mainWindow;
+        private final @NonNull MainWindow mainWindow;
 
-        public Action(MainWindow mainWindow) {
+        public Action(@NonNull MainWindow mainWindow) {
             super(mainWindow);
             this.mainWindow = mainWindow;
             putValue(NAME, "Visual Node Diff");
@@ -230,7 +233,7 @@ public class ProofDiffFrame extends JFrame {
         textArea.setText(string);
     }
 
-    private boolean onlySpaces(CharSequence text) {
+    private boolean onlySpaces(@NonNull CharSequence text) {
         for (int i = 0; i < text.length(); i++) {
             if (!Character.isWhitespace(text.charAt(i))) {
                 return false;
@@ -264,7 +267,7 @@ public class ProofDiffFrame extends JFrame {
      * @param string an arbitrary string
      * @return the string converted to html
      */
-    private String toHtml(String string) {
+    private @NonNull String toHtml(String string) {
         string = string.replace("&", "&amp;");
         string = string.replace("<", "&lt;");
         string = string.replace(">", "&gt;");
@@ -280,7 +283,7 @@ public class ProofDiffFrame extends JFrame {
      * @return the proof node text
      * @throws IllegalArgumentException if the number string is bad or there is no proof.
      */
-    private String getProofNodeText(int nodeNumber) {
+    private @NonNull String getProofNodeText(int nodeNumber) {
 
         Proof proof = mainWindow.getMediator().getSelectedProof();
 
@@ -300,7 +303,7 @@ public class ProofDiffFrame extends JFrame {
 
 
     // This must have been implemented already, somewhere
-    private Node findNode(Node node, int number) {
+    private @Nullable Node findNode(@NonNull Node node, int number) {
         if (node.serialNr() == number) {
             return node;
         }
@@ -327,7 +330,7 @@ public class ProofDiffFrame extends JFrame {
         return null;
     }
 
-    private String getHelpText() {
+    private @NonNull String getHelpText() {
         return "<h1>Visual diff between sequences of Proof Nodes</h1>"
             + "<p>This window can be used to select one or two sequents of an "
             + "ongoing or closed proof. All actions refer to the currently selected proof.</p>"

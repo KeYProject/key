@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Creates a true or false literal if the given program element is or is not a static variable
  * reference.
@@ -27,7 +29,7 @@ public class IsStatic extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         if (pe instanceof VariableReference) {
             if (((VariableReference) pe).getProgramVariable().isStatic()) {

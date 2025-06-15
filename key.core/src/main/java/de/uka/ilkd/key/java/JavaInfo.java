@@ -24,6 +24,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public final class JavaInfo {
     /**
      * the type of null
      */
-    private KeYJavaType nullType = null;
+    private @Nullable KeYJavaType nullType = null;
 
     /**
      * as accessed very often caches: KeYJavaType of java.lang.Object, java.lang.Clonable,
@@ -52,9 +53,9 @@ public final class JavaInfo {
     private final KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     // some caches for the getKeYJavaType methods.
-    private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
-    private HashMap<Type, KeYJavaType> type2KJTCache = null;
-    private HashMap<String, KeYJavaType> name2KJTCache = null;
+    private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = new HashMap<>();
+    private HashMap<Type, KeYJavaType> type2KJTCache = new HashMap<>();
+    private HashMap<String, KeYJavaType> name2KJTCache = new HashMap<>();
 
 
     private final LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
@@ -70,34 +71,34 @@ public final class JavaInfo {
      * with a {@link de.uka.ilkd.key.java.statement.MethodBodyStatement} or a
      * {@link de.uka.ilkd.key.java.statement.MethodFrame}, which contains a valid execution context.
      */
-    private ExecutionContext defaultExecutionContext;
+    private @Nullable ExecutionContext defaultExecutionContext;
 
     private boolean commonTypesCacheValid;
 
     /**
      * caches the arrays' length attribute
      */
-    private ProgramVariable length;
+    private @Nullable ProgramVariable length;
 
     /**
      * caches the program variable for {@code <inv>}
      */
-    private ProgramVariable invProgVar;
+    private @Nullable ProgramVariable invProgVar;
 
     /**
      * caches the observer for {@code <inv>}
      */
-    private ObserverFunction inv;
+    private @Nullable ObserverFunction inv;
 
     /**
      * caches the program variable for {@code <inv_free>}
      */
-    private ProgramVariable invFreeProgVar;
+    private @Nullable ProgramVariable invFreeProgVar;
 
     /**
      * caches the observer for {@code <inv_free>}
      */
-    private ObserverFunction invFree;
+    private @Nullable ObserverFunction invFree;
 
     /**
      * the name of the class used as default execution context
@@ -184,14 +185,6 @@ public final class JavaInfo {
         return new TypeRef(kjt);
     }
 
-    public void resetCaches() {
-        sort2KJTCache = null;
-        type2KJTCache = null;
-        name2KJTCache = null;
-        nameCachedSize = 0;
-        sortCachedSize = 0;
-    }
-
     /**
      * looks up the fully qualifying name given by a String in the list of all available
      * KeYJavaTypes in the Java model
@@ -199,9 +192,9 @@ public final class JavaInfo {
      * @param fullName the String
      * @return the KeYJavaType with the name of the String
      */
-    public KeYJavaType getTypeByName(String fullName) {
+    public @Nullable KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
-        if (name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize) {
+        if (name2KJTCache.isEmpty() || kpmi.rec2key().size() > nameCachedSize) {
             buildNameCache();
         }
         return name2KJTCache.get(fullName);
@@ -240,32 +233,31 @@ public final class JavaInfo {
      * Translates things like int[] into [I, etc.
      */
     private String translateArrayType(String s) {
-        if ("byte[]".equals(s)) {
-            return "[B";
-        } else if ("int[]".equals(s)) {
-            return "[I";
-        } else if ("long[]".equals(s)) {
-            return "[J";
-        } else if ("short[]".equals(s)) {
-            return "[S";
-        } else if ("char[]".equals(s)) {
-            return "[C";
-        }
-        // Strangely, this one is not n
-        // else if ("boolean[]".equals(s))
-        // return "[Z";
-        // Not sure if these are needed, commented out for efficiency
-        // else if ("char[]".equals(s))
-        // return "[C";
-        // else if ("double[]".equals(s))
-        // return "[D";
-        // else if ("float[]".equals(s))
-        // return "[F";
-        // else if ("\\real[]".equals(s))
-        // return "[R";
-        // else if ("\\bigint[]".equals(s))
-        // return "[Y";
-        return s;
+        return switch (s) {
+        case "byte[]" -> "[B";
+        case "int[]" -> "[I";
+        case "long[]" -> "[J";
+        case "short[]" -> "[S";
+        case "char[]" -> "[C";
+        default ->
+            /*
+             * Strangely, this one is not n
+             * else if ("boolean[]".equals(s))
+             * return "[Z";
+             * Not sure if these are needed, commented out for efficiency
+             * else if ("char[]".equals(s))
+             * return "[C";
+             * else if ("double[]".equals(s))
+             * return "[D";
+             * else if ("float[]".equals(s))
+             * return "[F";
+             * else if ("\\real[]".equals(s))
+             * return "[R";
+             * else if ("\\bigint[]".equals(s))
+             * return "[Y";
+             */
+            s;
+        };
     }
 
     /**
@@ -347,7 +339,7 @@ public final class JavaInfo {
     /**
      * returns a primitive KeYJavaType matching the given typename.
      */
-    public KeYJavaType getPrimitiveKeYJavaType(String typename) {
+    public @Nullable KeYJavaType getPrimitiveKeYJavaType(String typename) {
         PrimitiveType type = PrimitiveType.getPrimitiveType(typename);
         if (type != null) {
             return getPrimitiveKeYJavaType(type);
@@ -430,7 +422,7 @@ public final class JavaInfo {
     /**
      * returns a KeYJavaType having the given sort
      */
-    public KeYJavaType getKeYJavaType(Sort sort) {
+    public @Nullable KeYJavaType getKeYJavaType(Sort sort) {
         List<KeYJavaType> l = lookupSort2KJTCache(sort);
         if (l != null && l.size() > 0) {
             // Return first KeYJavaType found for sort.
@@ -464,7 +456,7 @@ public final class JavaInfo {
         }
     }
 
-    public List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
+    public @Nullable List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
         updateSort2KJTCache();
         return sort2KJTCache.get(sort);
     }
@@ -545,7 +537,7 @@ public final class JavaInfo {
         return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
 
-    private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
+    private @Nullable IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
             String methodName, List<List<KeYJavaType>> signature,
             ImmutableList<KeYJavaType> partialSignature, KeYJavaType context) {
         if (signature.isEmpty()) {
@@ -571,7 +563,7 @@ public final class JavaInfo {
      * KeYJavaTypes must be considered. This is the case for sort int in KeY, which has the
      * following as possible corresponding KeYJavaTypes: char, byte, short, int, long
      */
-    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
+    public @Nullable IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             List<List<KeYJavaType>> signature, KeYJavaType context) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
         return getProgramMethodFromPartialSignature(classType, methodName, signature,
@@ -909,7 +901,7 @@ public final class JavaInfo {
      * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String programName, ImmutableList<Field> fields) {
+    private @Nullable ProgramVariable find(String programName, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             if (programName.equals(field.getProgramName())) {
@@ -1061,7 +1053,8 @@ public final class JavaInfo {
      * on an object of (dynamic) type {@code kjt} during Java program execution would end up in the
      * same type as the type of the returned {@link ProgramVariable}.
      */
-    public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
+    public @Nullable ProgramVariable getCanonicalFieldProgramVariable(String fieldName,
+            KeYJavaType kjt) {
         ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
         if (allAttributes.isEmpty()) {
             return null;
@@ -1577,7 +1570,7 @@ public final class JavaInfo {
      * @param containerType the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
      */
-    public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
+    public KeYJavaType getTypeByClassName(String name, @Nullable KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
             if (containerType != null) {

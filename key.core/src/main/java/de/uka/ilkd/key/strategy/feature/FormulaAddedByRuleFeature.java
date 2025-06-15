@@ -30,13 +30,14 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
         filter = p_filter;
     }
 
-    public static Feature create(RuleFilter p_filter) {
+    public static @NonNull Feature create(RuleFilter p_filter) {
         return new FormulaAddedByRuleFeature(p_filter);
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            @NonNull PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final SequentFormula cfma = pos.sequentFormula();

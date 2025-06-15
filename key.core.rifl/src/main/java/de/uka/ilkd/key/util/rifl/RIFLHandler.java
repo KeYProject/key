@@ -11,6 +11,9 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.collection.Pair;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -84,10 +87,10 @@ class RIFLHandler extends DefaultHandler {
     private final Map<String, String> handles2categories = new LinkedHashMap<>();
     private Set<String> domains = new LinkedHashSet<>();
     private Set<Entry<String, String>> flow = new LinkedHashSet<>();
-    private Map<SpecificationEntity, Pair<String, String>> tmpMap = null;
-    private Type type = null;
+    private Map<SpecificationEntity, Pair<String, String>> tmpMap = new HashMap<>();
+    private Type type = Type.SOURCE;
 
-    private String tmpHandle = null;
+    private @Nullable String tmpHandle = null;
 
     private String category = DEFAULT_CATEGORY;
 
@@ -96,17 +99,20 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private void assignHandle(Attributes attributes) {
-        final String handle = attributes.getValue("handle").intern();
+        @SuppressWarnings("keyfor")
+        final @KeyFor("handles2categories") String handle = attributes.getValue("handle").intern();
         final String domain = attributes.getValue("domain").intern();
         Pair<String, String> p = new Pair<>(handle, handles2categories.get(handle));
         categories2domains.put(p, domain);
     }
 
+    @EnsuresNonNull("tmpHandle")
     private void setModifiable(Attributes attributes) {
         assert tmpHandle == null;
         tmpHandle = attributes.getValue("handle");
     }
 
+    @SuppressWarnings("nullness") // uninitialization
     private void unsetModifiable() {
         assert tmpHandle != null;
         tmpHandle = null;
@@ -125,7 +131,10 @@ class RIFLHandler extends DefaultHandler {
         return new DefaultSpecificationContainer(tmp, flow);
     }
 
-    private void putField(Attributes attributes) {
+    private void putField(Attributes attributes) throws SAXException {
+        if (tmpHandle == null) {
+            throw new SAXException("This element must be in a modifiable element!");
+        }
         final String field = attributes.getValue("name");
         final String clazz = attributes.getValue("class");
         final String packg = attributes.getValue("package");
@@ -134,7 +143,10 @@ class RIFLHandler extends DefaultHandler {
         tmpMap.put(se, new Pair<>(tmpHandle, category));
     }
 
-    private void putParam(Attributes attributes) {
+    private void putParam(Attributes attributes) throws SAXException {
+        if (tmpHandle == null) {
+            throw new SAXException("This element must be in a modifiable element!");
+        }
         final String packg = attributes.getValue("package");
         final String clazz = attributes.getValue("class");
         final String method = attributes.getValue("method");
@@ -144,7 +156,10 @@ class RIFLHandler extends DefaultHandler {
         tmpMap.put(se, new Pair<>(tmpHandle, category));
     }
 
-    private void putReturn(Attributes attributes) {
+    private void putReturn(Attributes attributes) throws SAXException {
+        if (tmpHandle == null) {
+            throw new SAXException("This element must be in a modifiable element!");
+        }
         final String packageName = attributes.getValue("package");
         final String className = attributes.getValue("class");
         final String methodName = attributes.getValue("method");
@@ -196,6 +211,7 @@ class RIFLHandler extends DefaultHandler {
          */
     }
 
+    @SuppressWarnings("nullness")
     private void checkFlows() {
         for (var p : categories2domains.entrySet()) {
             assert domains.contains(categories2domains.get(p.getKey()));
@@ -203,7 +219,8 @@ class RIFLHandler extends DefaultHandler {
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) {
+    public void startElement(String uri, String localName, String qName, Attributes attributes)
+            throws SAXException {
         switch (localName) {
         case "sourcedompair", "source" -> startSources();
         case "sinkdompair", "sink" -> startSinks();

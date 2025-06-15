@@ -14,6 +14,8 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NonNull;
+
 public class ProofBundleMerger {
     private ProofBundleMerger() {
     }
@@ -25,7 +27,8 @@ public class ProofBundleMerger {
      * @param output the target path (will be zipped)
      * @throws ProofManagementException if any of the files can not be accessed
      */
-    public static void merge(List<Path> inputs, Path output, boolean force, Logger logger)
+    public static void merge(@NonNull List<Path> inputs, @NonNull Path output, boolean force,
+            @NonNull Logger logger)
             throws ProofManagementException {
 
         boolean consistent = FilesChecker.listOfPathsConsistent(inputs);

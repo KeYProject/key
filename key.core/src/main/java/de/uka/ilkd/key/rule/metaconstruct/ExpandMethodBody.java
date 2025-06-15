@@ -25,6 +25,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
  * body (execution context).
@@ -40,7 +42,7 @@ public class ExpandMethodBody extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
             SVInstantiations svInst) {
 
         MethodBodyStatement mbs = (MethodBodyStatement) pe;

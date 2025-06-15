@@ -24,6 +24,9 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +47,7 @@ public class ProofScriptEngine {
     /**
      * The initially selected goal.
      */
-    private final Goal initiallySelectedGoal;
+    private final @Nullable Goal initiallySelectedGoal;
 
     /**
      * The engine state map.
@@ -53,7 +56,7 @@ public class ProofScriptEngine {
 
     private Consumer<Message> commandMonitor;
 
-    public ProofScriptEngine(Path file) throws IOException {
+    public ProofScriptEngine(@NonNull Path file) throws IOException {
         this(ParsingFacade.parseScript(file), null);
     }
 
@@ -72,7 +75,8 @@ public class ProofScriptEngine {
         this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
-    private static Map<String, ProofScriptCommand<?>> loadCommands() {
+    @SuppressWarnings("dereference.of.nullable")
+    private static @NonNull Map<String, ProofScriptCommand<?>> loadCommands() {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 
@@ -83,7 +87,7 @@ public class ProofScriptEngine {
         return result;
     }
 
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
+    public void execute(@NonNull AbstractUserInterfaceControl uiControl, @NonNull Proof proof)
             throws IOException, InterruptedException, ScriptException {
         var ctx = ParsingFacade.getParseRuleContext(script);
         stateMap = new EngineState(proof, this);
@@ -110,8 +114,8 @@ public class ProofScriptEngine {
     }
 
     @SuppressWarnings("unchecked")
-    public void execute(AbstractUserInterfaceControl uiControl,
-            List<KeYParser.ProofScriptCommandContext> commands)
+    public void execute(@NonNull AbstractUserInterfaceControl uiControl,
+            @NonNull List<KeYParser.ProofScriptCommandContext> commands)
             throws InterruptedException, ScriptException {
         Location start = script.getStartLocation();
         Proof proof = stateMap.getProof();
@@ -131,7 +135,8 @@ public class ProofScriptEngine {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
-            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+            final Node firstNode =
+                Objects.requireNonNull(stateMap.getFirstOpenAutomaticGoal()).node();
             if (commandMonitor != null && stateMap.isEchoOn()) {
                 commandMonitor
                         .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
@@ -150,7 +155,7 @@ public class ProofScriptEngine {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
                         firstNode.serialNr(), commandContext.start.getLine(), cmd);
                 }
-                command.execute(uiControl, o, stateMap);
+                command.execute(uiControl, Objects.requireNonNull(o), stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;
@@ -167,9 +172,12 @@ public class ProofScriptEngine {
                             commandContext.getText(),
                             BuilderHelpers.getPosition(commandContext)));
                 } else {
+                    @SuppressWarnings("keyfor")
+                    @KeyFor("argMap")
+                    String key = ScriptLineParser.LITERAL_KEY;
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line {}, terminating",
-                        argMap.get(ScriptLineParser.LITERAL_KEY),
+                        argMap.get(key),
                         BuilderHelpers.getPosition(commandContext));
                     break;
                 }
@@ -187,7 +195,8 @@ public class ProofScriptEngine {
     }
 
 
-    public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
+    public static @NonNull String prettyPrintCommand(
+            KeYParser.@NonNull ProofScriptCommandContext ctx) {
         return ctx.cmd.getText() +
             (ctx.proofScriptParameters() != null
                     ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()
@@ -198,7 +207,8 @@ public class ProofScriptEngine {
     }
 
 
-    private Map<String, Object> getArguments(KeYParser.ProofScriptCommandContext commandContext) {
+    private @NonNull Map<String, Object> getArguments(
+            KeYParser.@NonNull ProofScriptCommandContext commandContext) {
         var map = new TreeMap<String, Object>();
         int i = KEY_START_INDEX_PARAMETER;
 
@@ -234,7 +244,7 @@ public class ProofScriptEngine {
         this.commandMonitor = monitor;
     }
 
-    public static ProofScriptCommand<?> getCommand(String commandName) {
+    public static @Nullable ProofScriptCommand<?> getCommand(String commandName) {
         return COMMANDS.get(commandName);
     }
 

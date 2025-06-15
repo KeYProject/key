@@ -12,9 +12,11 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+
 class FormulaTermFeatures extends StaticFeatureCollection {
 
-    public FormulaTermFeatures(ArithTermFeatures tf) {
+    public FormulaTermFeatures(@NonNull ArithTermFeatures tf) {
         forF = extendsTrans(JavaDLTheory.FORMULA);
         orF = op(Junctor.OR);
         andF = op(Junctor.AND);
@@ -68,36 +70,36 @@ class FormulaTermFeatures extends StaticFeatureCollection {
 
     }
 
-    final TermFeature forF;
+    final @NonNull TermFeature forF;
 
-    final TermFeature orF;
-    final TermFeature andF;
-    final TermFeature impF;
-    final TermFeature notF;
-    final TermFeature propJunctor;
-    final TermFeature ifThenElse;
-    final TermFeature notExecutable;
-    final TermFeature notContainsExecutable;
+    final @NonNull TermFeature orF;
+    final @NonNull TermFeature andF;
+    final @NonNull TermFeature impF;
+    final @NonNull TermFeature notF;
+    final @NonNull TermFeature propJunctor;
+    final @NonNull TermFeature ifThenElse;
+    final @NonNull TermFeature notExecutable;
+    final @NonNull TermFeature notContainsExecutable;
 
-    final TermFeature quantifiedFor;
-    final TermFeature quantifiedOr;
-    final TermFeature quantifiedAnd;
+    final @NonNull TermFeature quantifiedFor;
+    final @NonNull TermFeature quantifiedOr;
+    final @NonNull TermFeature quantifiedAnd;
 
-    final TermFeature atom;
-    final TermFeature literal;
-    final TermFeature clause;
-    final TermFeature clauseSet;
-    final TermFeature quantifiedClauseSet;
+    final @NonNull TermFeature atom;
+    final @NonNull TermFeature literal;
+    final @NonNull TermFeature clause;
+    final @NonNull TermFeature clauseSet;
+    final @NonNull TermFeature quantifiedClauseSet;
 
-    final TermFeature pureLitConjDisj;
-    final TermFeature quantifiedPureLitConjDisj;
+    final @NonNull TermFeature pureLitConjDisj;
+    final @NonNull TermFeature quantifiedPureLitConjDisj;
 
-    final TermFeature elemUpdate;
-    final TermFeature update;
-    final TermFeature program;
-    final TermFeature modalOperator;
+    final @NonNull TermFeature elemUpdate;
+    final @NonNull TermFeature update;
+    final @NonNull TermFeature program;
+    final @NonNull TermFeature modalOperator;
 
-    final TermFeature cutAllowed;
-    final TermFeature cutAllowedBelowQuantifier;
-    final TermFeature cutPriority;
+    final @NonNull TermFeature cutAllowed;
+    final @NonNull TermFeature cutAllowedBelowQuantifier;
+    final @NonNull TermFeature cutPriority;
 }

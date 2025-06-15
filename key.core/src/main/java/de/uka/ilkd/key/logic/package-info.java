@@ -28,4 +28,7 @@
  * Last modified: Wed Dec 4 15:11:14 MET 2002
  * <!-- hhmts end -->
  */
+@NullMarked
 package de.uka.ilkd.key.logic;
+
+import org.jspecify.annotations.NullMarked;

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The array allocation operator. There are two variants for NewArray:
  * <OL>
@@ -57,7 +59,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @param dimensions an int value.
      */
 
-    public NewArray(ExtList children, KeYJavaType keyJavaType, ArrayInitializer init,
+    public NewArray(@NonNull ExtList children, KeYJavaType keyJavaType, ArrayInitializer init,
             int dimensions) {
         super(children);
         this.arrayInitializer = init;
@@ -75,7 +77,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @param init the arrayInitializer
      * @param dimensions an int value.
      */
-    public NewArray(Expression[] arguments, TypeReference typeRef, KeYJavaType keyJavaType,
+    public NewArray(Expression @NonNull [] arguments, TypeReference typeRef,
+            KeYJavaType keyJavaType,
             ArrayInitializer init, int dimensions) {
         super(arguments, typeRef);
         this.arrayInitializer = init;
@@ -84,7 +87,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         assert dimensions > 0;
     }
 
-    public SourceElement getLastElement() {
+    public @NonNull SourceElement getLastElement() {
         if (arrayInitializer != null) {
             return arrayInitializer;
         }
@@ -170,7 +173,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
             if (index == 0) {
@@ -220,7 +223,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
-    public Expression getExpressionAt(int index) {
+    public @NonNull Expression getExpressionAt(int index) {
         int len;
         if (children != null) {
             len = children.size();
@@ -243,7 +246,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnNewArray(this);
     }
 
@@ -252,7 +255,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @NonNull ReferencePrefix getReferencePrefix() {
         return null;
     }
 

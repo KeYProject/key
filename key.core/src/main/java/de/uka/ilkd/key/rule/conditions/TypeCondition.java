@@ -14,6 +14,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if a schemavariable is instantiated with a reference or primitive
@@ -96,7 +98,7 @@ public final class TypeCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String prefix = "\\isReference";
         if (isReference && nonNull) {
             prefix += "[non_null]";

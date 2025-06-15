@@ -7,6 +7,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.TermServices;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A factory for creating singleton {@link TermLabel}.
  *
@@ -21,14 +23,14 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
     /**
      * The label around which the factory is built.
      */
-    private final T singletonLabel;
+    private final @NonNull T singletonLabel;
 
     /**
      * Instantiates a new singleton label factory for a label.
      *
      * @param singletonLabel the label to be wrapped, not <code>null</code>.
      */
-    public SingletonLabelFactory(T singletonLabel) {
+    public SingletonLabelFactory(@NonNull T singletonLabel) {
         assert singletonLabel != null;
         this.singletonLabel = singletonLabel;
     }
@@ -40,7 +42,7 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
      * This implementation does not accept arguments and returns the stored label
      */
     @Override
-    public T parseInstance(List<String> arguments, TermServices services)
+    public @NonNull T parseInstance(List<String> arguments, TermServices services)
             throws TermLabelException {
         if (arguments.isEmpty()) {
             return singletonLabel;

@@ -43,6 +43,8 @@ import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -110,7 +112,7 @@ public final class Main {
         AUTO
     }
 
-    private static String examplesDir = null;
+    private static @Nullable String examplesDir = null;
 
     /**
      * Determines which {@link UserInterfaceControl} is to be used.
@@ -118,7 +120,7 @@ public final class Main {
      * By specifying <code>AUTO</code> as command line argument this will be set to
      * {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
      */
-    private static UiMode uiMode = UiMode.INTERACTIVE;
+    private static @NonNull UiMode uiMode = UiMode.INTERACTIVE;
 
     /**
      * Determines whether to actually prove or only load a problem when {@link Main#uiMode} is
@@ -152,14 +154,14 @@ public final class Main {
     /**
      * Path to a RIFL specification file.
      */
-    private static Path riflFileName = null;
+    private static @Nullable Path riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation of multiple ".key"-files
      */
     private static boolean saveAllContracts = false;
 
-    private static ProofMacro autoMacro = new SkipMacro();
+    private static @NonNull ProofMacro autoMacro = new SkipMacro();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -179,7 +181,7 @@ public final class Main {
     private Main() {
     }
 
-    public static void main(final String[] args) {
+    public static void main(final String @NonNull [] args) {
         Locale.setDefault(Locale.US);
 
         // does no harm on non macs
@@ -220,8 +222,8 @@ public final class Main {
         LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
 
-    public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui,
-            List<Path> fileArguments) {
+    public static void loadCommandLineFiles(@NonNull AbstractMediatorUserInterfaceControl ui,
+            @NonNull List<Path> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
@@ -244,7 +246,7 @@ public final class Main {
      *
      * @return commandline object
      */
-    private static CommandLine createCommandLine() {
+    private static @NonNull CommandLine createCommandLine() {
         CommandLine cl = new CommandLine();
         cl.setIndentation(3);
         cl.addSection("Using KeY");
@@ -308,7 +310,7 @@ public final class Main {
      *
      * @param cl parsed command lines, not null
      */
-    public static void evaluateOptions(CommandLine cl) {
+    public static void evaluateOptions(@NonNull CommandLine cl) {
         Integer verbosity = null;
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
@@ -503,8 +505,8 @@ public final class Main {
      *
      * @return a <code>UserInterfaceControl</code> based on the value of <code>uiMode</code>
      */
-    private static AbstractMediatorUserInterfaceControl createUserInterface(
-            List<Path> fileArguments) {
+    private static @NonNull AbstractMediatorUserInterfaceControl createUserInterface(
+            @NonNull List<Path> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
@@ -558,7 +560,7 @@ public final class Main {
         setExamplesDir(examplesDir.getAbsolutePath());
     }
 
-    private static File setupExamples() {
+    private static @Nullable File setupExamples() {
         try {
             URL examplesURL = Main.class.getResource("/examples.zip");
             if (examplesURL == null) {
@@ -578,7 +580,7 @@ public final class Main {
     }
 
 
-    private static File createTempDirectory() throws IOException {
+    private static @Nullable File createTempDirectory() throws IOException {
         final File tempDir = File.createTempFile("keyheap-examples-", null);
         tempDir.delete();
         if (!tempDir.mkdir()) {
@@ -588,7 +590,7 @@ public final class Main {
         return tempDir;
     }
 
-    private static void evaluateLemmataOptions(CommandLine options) {
+    private static void evaluateLemmataOptions(@NonNull CommandLine options) {
 
         LemmataAutoModeOptions opt;
         try {
@@ -607,7 +609,8 @@ public final class Main {
 
     }
 
-    public static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
+    public static void printUsageAndExit(boolean printUsage, @Nullable String offending,
+            int exitValue) {
         PrintStream ps = exitValue == 0 ? System.out : System.err;
         if (offending != null) {
             ps.println(offending);
@@ -644,7 +647,7 @@ public final class Main {
      * Perform necessary actions before loading any problem files. Currently only performs RIFL to
      * JML transformation.
      */
-    private static List<Path> preProcessInput(List<Path> filesOnStartup) {
+    private static @NonNull List<Path> preProcessInput(@NonNull List<Path> filesOnStartup) {
         List<Path> result = new ArrayList<>();
         // RIFL to JML transformation
         if (riflFileName != null) {
@@ -674,7 +677,7 @@ public final class Main {
         return filesOnStartup;
     }
 
-    public static String getExamplesDir() {
+    public static @Nullable String getExamplesDir() {
         return examplesDir;
     }
 

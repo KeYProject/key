@@ -8,6 +8,8 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Listener for an {@link InnerNodeView}
  *
@@ -30,7 +32,7 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
     }
 
     @Override
-    public void mouseClicked(MouseEvent me) {
+    public void mouseClicked(@NonNull MouseEvent me) {
         if (Math.abs(System.currentTimeMillis() - getLastPopupCloseTime()) >= POPUP_DELAY) {
             PosInSequent mousePos = getSequentView().getPosInSequent(me.getPoint());
             if (mousePos != null) {

@@ -10,6 +10,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /*
  * Functions for diff, match and patch. Computes the difference between two texts to create a patch.
  * Applies the patch onto another text, allowing for errors.
@@ -97,7 +100,7 @@ public class diff_match_patch {
      * @param text2 New string to be diffed.
      * @return Linked List of Diff objects.
      */
-    public LinkedList<Diff> diff_main(String text1, String text2) {
+    public @NonNull LinkedList<Diff> diff_main(@NonNull String text1, @NonNull String text2) {
         return diff_main(text1, text2, true);
     }
 
@@ -110,7 +113,8 @@ public class diff_match_patch {
      *        the changed areas. If true, then run a faster slightly less optimal diff.
      * @return Linked List of Diff objects.
      */
-    public LinkedList<Diff> diff_main(String text1, String text2, boolean checklines) {
+    public @NonNull LinkedList<Diff> diff_main(@NonNull String text1, @NonNull String text2,
+            boolean checklines) {
         // Set a deadline by which time the diff must be complete.
         long deadline;
         if (Diff_Timeout <= 0) {
@@ -133,7 +137,8 @@ public class diff_match_patch {
      *        calls. Users should set DiffTimeout instead.
      * @return Linked List of Diff objects.
      */
-    private LinkedList<Diff> diff_main(String text1, String text2, boolean checklines,
+    private @NonNull LinkedList<Diff> diff_main(@NonNull String text1, @NonNull String text2,
+            boolean checklines,
             long deadline) {
         // Check for null inputs.
         if (text1 == null || text2 == null) {
@@ -188,7 +193,8 @@ public class diff_match_patch {
      * @param deadline Time when the diff should be complete by.
      * @return Linked List of Diff objects.
      */
-    private LinkedList<Diff> diff_compute(String text1, String text2, boolean checklines,
+    private @NonNull LinkedList<Diff> diff_compute(@NonNull String text1, @NonNull String text2,
+            boolean checklines,
             long deadline) {
         LinkedList<Diff> diffs = new LinkedList<>();
 
@@ -263,7 +269,8 @@ public class diff_match_patch {
      * @param deadline Time when the diff should be complete by.
      * @return Linked List of Diff objects.
      */
-    private LinkedList<Diff> diff_lineMode(String text1, String text2, long deadline) {
+    private @NonNull LinkedList<Diff> diff_lineMode(@NonNull String text1, @NonNull String text2,
+            long deadline) {
         // Scan the text on a line-by-line basis first.
         LinesToCharsResult b = diff_linesToChars(text1, text2);
         text1 = b.chars1;
@@ -332,7 +339,8 @@ public class diff_match_patch {
      * @param deadline Time at which to bail if not yet complete.
      * @return LinkedList of Diff objects.
      */
-    protected LinkedList<Diff> diff_bisect(String text1, String text2, long deadline) {
+    protected @NonNull LinkedList<Diff> diff_bisect(@NonNull String text1, @NonNull String text2,
+            long deadline) {
         // Cache the text lengths to prevent multiple calls.
         int text1_length = text1.length();
         int text2_length = text2.length();
@@ -453,7 +461,8 @@ public class diff_match_patch {
      * @param deadline Time at which to bail if not yet complete.
      * @return LinkedList of Diff objects.
      */
-    private LinkedList<Diff> diff_bisectSplit(String text1, String text2, int x, int y,
+    private @NonNull LinkedList<Diff> diff_bisectSplit(@NonNull String text1, @NonNull String text2,
+            int x, int y,
             long deadline) {
         String text1a = text1.substring(0, x);
         String text2a = text2.substring(0, y);
@@ -477,7 +486,8 @@ public class diff_match_patch {
      * @return An object containing the encoded text1, the encoded text2 and the List of unique
      *         strings. The zeroth element of the List of unique strings is intentionally blank.
      */
-    protected LinesToCharsResult diff_linesToChars(String text1, String text2) {
+    protected @NonNull LinesToCharsResult diff_linesToChars(@NonNull String text1,
+            @NonNull String text2) {
         List<String> lineArray = new ArrayList<>();
         Map<String, Integer> lineHash = new LinkedHashMap<>();
         // e.g. linearray[4] == "Hello\n"
@@ -501,8 +511,9 @@ public class diff_match_patch {
      * @param lineHash Map of strings to indices.
      * @return Encoded string.
      */
-    private String diff_linesToCharsMunge(String text, List<String> lineArray,
-            Map<String, Integer> lineHash) {
+    private @NonNull String diff_linesToCharsMunge(@NonNull String text,
+            @NonNull List<String> lineArray,
+            @NonNull Map<String, Integer> lineHash) {
         int lineStart = 0;
         int lineEnd = -1;
         String line;
@@ -535,7 +546,8 @@ public class diff_match_patch {
      * @param diffs LinkedList of Diff objects.
      * @param lineArray List of unique strings.
      */
-    protected void diff_charsToLines(LinkedList<Diff> diffs, List<String> lineArray) {
+    protected void diff_charsToLines(@NonNull LinkedList<Diff> diffs,
+            @NonNull List<String> lineArray) {
         StringBuilder text;
         for (Diff diff : diffs) {
             text = new StringBuilder();
@@ -553,7 +565,7 @@ public class diff_match_patch {
      * @param text2 Second string.
      * @return The number of characters common to the start of each string.
      */
-    public int diff_commonPrefix(String text1, String text2) {
+    public int diff_commonPrefix(@NonNull String text1, @NonNull String text2) {
         // Performance analysis: http://neil.fraser.name/news/2007/10/09/
         int n = Math.min(text1.length(), text2.length());
         for (int i = 0; i < n; i++) {
@@ -571,7 +583,7 @@ public class diff_match_patch {
      * @param text2 Second string.
      * @return The number of characters common to the end of each string.
      */
-    public int diff_commonSuffix(String text1, String text2) {
+    public int diff_commonSuffix(@NonNull String text1, @NonNull String text2) {
         // Performance analysis: http://neil.fraser.name/news/2007/10/09/
         int text1_length = text1.length();
         int text2_length = text2.length();
@@ -592,7 +604,7 @@ public class diff_match_patch {
      * @return The number of characters common to the end of the first string and the start of the
      *         second string.
      */
-    protected int diff_commonOverlap(String text1, String text2) {
+    protected int diff_commonOverlap(@NonNull String text1, @NonNull String text2) {
         // Cache the text lengths to prevent multiple calls.
         int text1_length = text1.length();
         int text2_length = text2.length();
@@ -642,7 +654,7 @@ public class diff_match_patch {
      *         prefix of text2, the suffix of text2 and the common middle. Or null if there was no
      *         match.
      */
-    protected String[] diff_halfMatch(String text1, String text2) {
+    protected String @Nullable [] diff_halfMatch(@NonNull String text1, @NonNull String text2) {
         if (Diff_Timeout <= 0) {
             // Don't risk returning a non-optimal diff if we have unlimited time.
             return null;
@@ -689,7 +701,8 @@ public class diff_match_patch {
      *         the prefix of shorttext, the suffix of shorttext and the common middle. Or null if
      *         there was no match.
      */
-    private String[] diff_halfMatchI(String longtext, String shorttext, int i) {
+    private String @Nullable [] diff_halfMatchI(@NonNull String longtext, @NonNull String shorttext,
+            int i) {
         // Start with a 1/4 length substring at position i as a seed.
         String seed = longtext.substring(i, i + longtext.length() / 4);
         int j = -1;
@@ -722,7 +735,7 @@ public class diff_match_patch {
      *
      * @param diffs LinkedList of Diff objects.
      */
-    public void diff_cleanupSemantic(LinkedList<Diff> diffs) {
+    public void diff_cleanupSemantic(@NonNull LinkedList<Diff> diffs) {
         if (diffs.isEmpty()) {
             return;
         }
@@ -870,7 +883,7 @@ public class diff_match_patch {
      *
      * @param diffs LinkedList of Diff objects.
      */
-    public void diff_cleanupSemanticLossless(LinkedList<Diff> diffs) {
+    public void diff_cleanupSemanticLossless(@NonNull LinkedList<Diff> diffs) {
         String equality1, edit, equality2;
         String commonString;
         int commonOffset;
@@ -956,7 +969,7 @@ public class diff_match_patch {
      * @param two Second string.
      * @return The score.
      */
-    private int diff_cleanupSemanticScore(String one, String two) {
+    private int diff_cleanupSemanticScore(@NonNull String one, @NonNull String two) {
         if (one.length() == 0 || two.length() == 0) {
             // Edges are the best.
             return 6;
@@ -1006,7 +1019,7 @@ public class diff_match_patch {
      *
      * @param diffs LinkedList of Diff objects.
      */
-    public void diff_cleanupEfficiency(LinkedList<Diff> diffs) {
+    public void diff_cleanupEfficiency(@NonNull LinkedList<Diff> diffs) {
         if (diffs.isEmpty()) {
             return;
         }
@@ -1111,7 +1124,7 @@ public class diff_match_patch {
      *
      * @param diffs LinkedList of Diff objects.
      */
-    public void diff_cleanupMerge(LinkedList<Diff> diffs) {
+    public void diff_cleanupMerge(@NonNull LinkedList<Diff> diffs) {
         diffs.add(new Diff(Operation.EQUAL, "")); // Add a dummy entry at the end.
         ListIterator<Diff> pointer = diffs.listIterator();
         int count_delete = 0;
@@ -1261,7 +1274,7 @@ public class diff_match_patch {
      * @param loc Location within text1.
      * @return Location within text2.
      */
-    public int diff_xIndex(LinkedList<Diff> diffs, int loc) {
+    public int diff_xIndex(@NonNull LinkedList<Diff> diffs, int loc) {
         int chars1 = 0;
         int chars2 = 0;
         int last_chars1 = 0;
@@ -1298,7 +1311,7 @@ public class diff_match_patch {
      * @param diffs LinkedList of Diff objects.
      * @return HTML representation.
      */
-    public String diff_prettyHtml(LinkedList<Diff> diffs) {
+    public @NonNull String diff_prettyHtml(@NonNull LinkedList<Diff> diffs) {
         StringBuilder html = new StringBuilder();
         for (Diff aDiff : diffs) {
             String text = aDiff.text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -1324,7 +1337,7 @@ public class diff_match_patch {
      * @param diffs LinkedList of Diff objects.
      * @return Source text.
      */
-    public String diff_text1(LinkedList<Diff> diffs) {
+    public @NonNull String diff_text1(@NonNull LinkedList<Diff> diffs) {
         StringBuilder text = new StringBuilder();
         for (Diff aDiff : diffs) {
             if (aDiff.operation != Operation.INSERT) {
@@ -1340,7 +1353,7 @@ public class diff_match_patch {
      * @param diffs LinkedList of Diff objects.
      * @return Destination text.
      */
-    public String diff_text2(LinkedList<Diff> diffs) {
+    public @NonNull String diff_text2(@NonNull LinkedList<Diff> diffs) {
         StringBuilder text = new StringBuilder();
         for (Diff aDiff : diffs) {
             if (aDiff.operation != Operation.DELETE) {
@@ -1356,7 +1369,7 @@ public class diff_match_patch {
      * @param diffs LinkedList of Diff objects.
      * @return Number of changes.
      */
-    public int diff_levenshtein(LinkedList<Diff> diffs) {
+    public int diff_levenshtein(@NonNull LinkedList<Diff> diffs) {
         int levenshtein = 0;
         int insertions = 0;
         int deletions = 0;
@@ -1388,7 +1401,7 @@ public class diff_match_patch {
      * @param diffs Array of Diff objects.
      * @return Delta text.
      */
-    public String diff_toDelta(LinkedList<Diff> diffs) {
+    public @NonNull String diff_toDelta(@NonNull LinkedList<Diff> diffs) {
         StringBuilder text = new StringBuilder();
         for (Diff aDiff : diffs) {
             switch (aDiff.operation) {
@@ -1424,7 +1437,7 @@ public class diff_match_patch {
      * @return Array of Diff objects or null if invalid.
      * @throws IllegalArgumentException If invalid input.
      */
-    public LinkedList<Diff> diff_fromDelta(String text1, String delta)
+    public @NonNull LinkedList<Diff> diff_fromDelta(@NonNull String text1, @NonNull String delta)
             throws IllegalArgumentException {
         LinkedList<Diff> diffs = new LinkedList<>();
         int pointer = 0; // Cursor in text1
@@ -1502,7 +1515,7 @@ public class diff_match_patch {
      * @param loc The location to search around.
      * @return Best match index or -1.
      */
-    public int match_main(String text, String pattern, int loc) {
+    public int match_main(@NonNull String text, @NonNull String pattern, int loc) {
         // Check for null inputs.
         if (text == null || pattern == null) {
             throw new IllegalArgumentException("Null inputs. (match_main)");
@@ -1534,7 +1547,7 @@ public class diff_match_patch {
      * @param loc The location to search around.
      * @return Best match index or -1.
      */
-    protected int match_bitap(String text, String pattern, int loc) {
+    protected int match_bitap(@NonNull String text, @NonNull String pattern, int loc) {
         assert (Match_MaxBits == 0 || pattern.length() <= Match_MaxBits)
                 : "Pattern too long for this application.";
 
@@ -1637,7 +1650,7 @@ public class diff_match_patch {
      * @param pattern Pattern being sought.
      * @return Overall score for match (0.0 = good, 1.0 = bad).
      */
-    private double match_bitapScore(int e, int x, int loc, String pattern) {
+    private double match_bitapScore(int e, int x, int loc, @NonNull String pattern) {
         float accuracy = (float) e / pattern.length();
         int proximity = Math.abs(loc - x);
         if (Match_Distance == 0) {
@@ -1653,7 +1666,7 @@ public class diff_match_patch {
      * @param pattern The text to encode.
      * @return Hash of character locations.
      */
-    protected Map<Character, Integer> match_alphabet(String pattern) {
+    protected @NonNull Map<Character, Integer> match_alphabet(@NonNull String pattern) {
         Map<Character, Integer> s = new LinkedHashMap<>();
         char[] char_pattern = pattern.toCharArray();
         for (char c : char_pattern) {
@@ -1678,7 +1691,7 @@ public class diff_match_patch {
      * @param patch The patch to grow.
      * @param text Source text.
      */
-    protected void patch_addContext(Patch patch, String text) {
+    protected void patch_addContext(@NonNull Patch patch, @NonNull String text) {
         if (text.length() == 0) {
             return;
         }
@@ -1723,7 +1736,7 @@ public class diff_match_patch {
      * @param text2 New text.
      * @return LinkedList of Patch objects.
      */
-    public LinkedList<Patch> patch_make(String text1, String text2) {
+    public @NonNull LinkedList<Patch> patch_make(@NonNull String text1, @NonNull String text2) {
         if (text1 == null || text2 == null) {
             throw new IllegalArgumentException("Null inputs. (patch_make)");
         }
@@ -1743,7 +1756,7 @@ public class diff_match_patch {
      * @param diffs Array of Diff objects for text1 to text2.
      * @return LinkedList of Patch objects.
      */
-    public LinkedList<Patch> patch_make(LinkedList<Diff> diffs) {
+    public @NonNull LinkedList<Patch> patch_make(@NonNull LinkedList<Diff> diffs) {
         if (diffs == null) {
             throw new IllegalArgumentException("Null inputs. (patch_make)");
         }
@@ -1763,7 +1776,8 @@ public class diff_match_patch {
      * @deprecated Prefer patch_make(String text1, LinkedList<Diff> diffs).
      */
     @Deprecated
-    public LinkedList<Patch> patch_make(String text1, String text2, LinkedList<Diff> diffs) {
+    public @NonNull LinkedList<Patch> patch_make(@NonNull String text1, String text2,
+            @NonNull LinkedList<Diff> diffs) {
         return patch_make(text1, diffs);
     }
 
@@ -1775,7 +1789,8 @@ public class diff_match_patch {
      * @param diffs Array of Diff objects for text1 to text2.
      * @return LinkedList of Patch objects.
      */
-    public LinkedList<Patch> patch_make(String text1, LinkedList<Diff> diffs) {
+    public @NonNull LinkedList<Patch> patch_make(@NonNull String text1,
+            @NonNull LinkedList<Diff> diffs) {
         if (text1 == null || diffs == null) {
             throw new IllegalArgumentException("Null inputs. (patch_make)");
         }
@@ -1861,7 +1876,7 @@ public class diff_match_patch {
      * @param patches Array of Patch objects.
      * @return Array of Patch objects.
      */
-    public LinkedList<Patch> patch_deepCopy(LinkedList<Patch> patches) {
+    public @NonNull LinkedList<Patch> patch_deepCopy(@NonNull LinkedList<Patch> patches) {
         LinkedList<Patch> patchesCopy = new LinkedList<>();
         for (Patch aPatch : patches) {
             Patch patchCopy = new Patch();
@@ -1886,7 +1901,7 @@ public class diff_match_patch {
      * @param text Old text.
      * @return Two element Object array, containing the new text and an array of boolean values.
      */
-    public Object[] patch_apply(LinkedList<Patch> patches, String text) {
+    public Object @NonNull [] patch_apply(@NonNull LinkedList<Patch> patches, String text) {
         if (patches.isEmpty()) {
             return new Object[] { text, new boolean[0] };
         }
@@ -1992,7 +2007,7 @@ public class diff_match_patch {
      * @param patches Array of Patch objects.
      * @return The padding string added to each side.
      */
-    public String patch_addPadding(LinkedList<Patch> patches) {
+    public @NonNull String patch_addPadding(@NonNull LinkedList<Patch> patches) {
         short paddingLength = this.Patch_Margin;
         StringBuilder nullPadding = new StringBuilder();
         for (short x = 1; x <= paddingLength; x++) {
@@ -2052,7 +2067,7 @@ public class diff_match_patch {
      *
      * @param patches LinkedList of Patch objects.
      */
-    public void patch_splitMax(LinkedList<Patch> patches) {
+    public void patch_splitMax(@NonNull LinkedList<Patch> patches) {
         short patch_size = Match_MaxBits;
         String precontext, postcontext;
         Patch patch;
@@ -2154,7 +2169,7 @@ public class diff_match_patch {
      * @param patches List of Patch objects.
      * @return Text representation of patches.
      */
-    public String patch_toText(List<Patch> patches) {
+    public @NonNull String patch_toText(@NonNull List<Patch> patches) {
         StringBuilder text = new StringBuilder();
         for (Patch aPatch : patches) {
             text.append(aPatch);
@@ -2169,7 +2184,8 @@ public class diff_match_patch {
      * @return List of Patch objects.
      * @throws IllegalArgumentException If invalid input.
      */
-    public List<Patch> patch_fromText(String textline) throws IllegalArgumentException {
+    public @NonNull List<Patch> patch_fromText(@NonNull String textline)
+            throws IllegalArgumentException {
         List<Patch> patches = new LinkedList<>();
         if (textline.length() == 0) {
             return patches;
@@ -2282,7 +2298,7 @@ public class diff_match_patch {
          *
          * @return text version.
          */
-        public String toString() {
+        public @NonNull String toString() {
             String prettyText = this.text.replace('\n', '\u00b6');
             return "Diff(" + this.operation + ",\"" + prettyText + "\")";
         }
@@ -2307,7 +2323,7 @@ public class diff_match_patch {
          * @return true or false.
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -2334,7 +2350,7 @@ public class diff_match_patch {
      * Class representing one patch operation.
      */
     public static class Patch {
-        public final LinkedList<Diff> diffs;
+        public final @NonNull LinkedList<Diff> diffs;
         public int start1;
         public int start2;
         public int length1;
@@ -2353,7 +2369,7 @@ public class diff_match_patch {
          *
          * @return The GNU diff string.
          */
-        public String toString() {
+        public @NonNull String toString() {
             String coords1, coords2;
             if (this.length1 == 0) {
                 coords1 = this.start1 + ",0";
@@ -2403,7 +2419,7 @@ public class diff_match_patch {
      * @param str The string to escape.
      * @return The escaped string.
      */
-    private static String unescapeForEncodeUriCompatability(String str) {
+    private static @NonNull String unescapeForEncodeUriCompatability(@NonNull String str) {
         return str.replace("%21", "!").replace("%7E", "~").replace("%27", "'").replace("%28", "(")
                 .replace("%29", ")").replace("%3B", ";").replace("%2F", "/").replace("%3F", "?")
                 .replace("%3A", ":").replace("%40", "@").replace("%26", "&").replace("%3D", "=")

@@ -189,34 +189,34 @@ public class TestMiscTools {
     public void testTryParseURL() throws Exception {
         // test null string -> MalformedURLException
         try {
-            URL uNull = MiscTools.parseURL(null);
+            var uNull = MiscTools.parseURL(null);
             fail("Expected a MalformedURLException!");
         } catch (NullPointerException e) {
             assertEquals("No URL can be created from null!", e.getMessage());
         }
 
         // test empty string -> URL of user working directory
-        URL u0 = MiscTools.parseURL("");
+        var u0 = MiscTools.parseURL("");
         assertEquals(System.getProperty("user.dir"), Paths.get(u0.toURI()).toString());
 
         String tmp = System.getProperty("java.io.tmpdir");
         Path p = Paths.get(tmp, "te st.txt");
 
         // test simple path string without url prefix and encoding
-        URL u1 = MiscTools.parseURL(p.toString());
+        var u1 = MiscTools.parseURL(p.toString());
         assertNotNull(u1);
 
         // test file url string
         String correctURL = p.toUri().toURL().toString();
-        URL u2 = MiscTools.parseURL(correctURL);
+        var u2 = MiscTools.parseURL(correctURL);
         assertNotNull(u2);
 
         // test removal of redundant elements
         Path pRedundant = Paths.get(tmp, ".", ".", "te st.txt");
-        URL uRedundant = MiscTools.parseURL(pRedundant.toString());
+        var uRedundant = MiscTools.parseURL(pRedundant.toString());
 
         // test a special format of string from antlr parser ("URL:<url_string>")
-        URL parserURL = MiscTools.parseURL("URL:" + correctURL);
+        var parserURL = MiscTools.parseURL("URL:" + correctURL);
 
         assertEquals(u1, u2);
         assertEquals(u1, uRedundant);
@@ -224,7 +224,7 @@ public class TestMiscTools {
 
         // test http url string
         String correctHttp = "https://www.key-project.org/KEY.cer";
-        URL u3 = MiscTools.parseURL(correctHttp);
+        var u3 = MiscTools.parseURL(correctHttp);
         assertNotNull(u3);
 
         // write a test zip file
@@ -248,7 +248,7 @@ public class TestMiscTools {
             }
 
             // test reparsing jar url
-            URL u4 = MiscTools.parseURL(entryURL.toString());
+            var u4 = MiscTools.parseURL(entryURL.toString());
             assertNotNull(u4);
             assertEquals(entryURL, u4);
         }

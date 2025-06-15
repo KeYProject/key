@@ -9,6 +9,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Saves the current selected proof.
  */
@@ -19,7 +21,7 @@ public final class SaveFileAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -5479654127272775831L;
 
-    public SaveFileAction(MainWindow mainWindow) {
+    public SaveFileAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Save...");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));

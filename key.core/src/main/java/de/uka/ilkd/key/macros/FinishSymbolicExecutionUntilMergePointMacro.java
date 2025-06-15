@@ -29,6 +29,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
  * merge point is reached (i.e. a point where a {@link MergeRule} can be applied) or there is no
@@ -43,18 +45,9 @@ import org.key_project.util.collection.ImmutableList;
  * @see FinishSymbolicExecutionMacro
  */
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
-
-    private HashSet<ProgramElement> blockElems = new HashSet<>();
+    private final HashSet<ProgramElement> blockElems = new HashSet<>();
     private final HashSet<JavaBlock> alreadySeen = new HashSet<>();
-
-    private UserInterfaceControl uic = null;
-
-    public FinishSymbolicExecutionUntilMergePointMacro() {
-    }
-
-    public FinishSymbolicExecutionUntilMergePointMacro(HashSet<ProgramElement> blockElems) {
-        this.blockElems = blockElems;
-    }
+    private @Nullable UserInterfaceControl uic = null;
 
     @Override
     public String getName() {
@@ -73,17 +66,16 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
-        this.uic = uic;
+        this.uic = uic; // weigl: It is not appropriate to store uic in a macro.
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -127,6 +119,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             // Undo until a break condition is the first active statement again.
             while (!hasBreakPoint(lastNode.sequent().succedent())) {
                 lastNode = lastNode.parent();
+                assert lastNode != null;
                 proof.pruneProof(lastNode);
             }
 

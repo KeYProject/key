@@ -12,10 +12,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm<Goal> {
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @Nullable Term toTerm(@NonNull RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();
 

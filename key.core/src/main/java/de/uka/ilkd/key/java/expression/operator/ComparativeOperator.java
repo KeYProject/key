@@ -11,6 +11,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Comparative operator.
  *
@@ -27,11 +29,11 @@ public abstract class ComparativeOperator extends Operator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    protected ComparativeOperator(ExtList children) {
+    protected ComparativeOperator(@NonNull ExtList children) {
         super(children);
     }
 
-    protected ComparativeOperator(Expression lhs, Expression rhs) {
+    protected ComparativeOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -56,11 +58,11 @@ public abstract class ComparativeOperator extends Operator {
         return INFIX;
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
         return getKeYJavaType(services);
     }
 
-    public KeYJavaType getKeYJavaType(Services services) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services services) {
         return services.getTypeConverter().getBooleanType();
     }
 

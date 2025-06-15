@@ -40,6 +40,9 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link IExecutionMethodReturn}.
  *
@@ -71,7 +74,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionMethodReturn(ITreeSettings settings, Node proofNode,
-            ExecutionMethodCall methodCall) {
+            @NonNull ExecutionMethodCall methodCall) {
         super(settings, proofNode, methodCall);
     }
 
@@ -79,7 +82,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() throws ProofInputException {
+    protected @NonNull String lazyComputeName() throws ProofInputException {
         return createMethodReturnName(null, computeCalledMethodName());
     }
 
@@ -99,7 +102,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeSignature() throws ProofInputException {
+    protected @NonNull String lazyComputeSignature() throws ProofInputException {
         return createMethodReturnName(null, computeCalledMethodSignature());
     }
 
@@ -108,7 +111,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      *
      * @return The signature of the called method.
      */
-    protected String computeCalledMethodSignature() throws ProofInputException {
+    protected @NonNull String computeCalledMethodSignature() throws ProofInputException {
         MethodReference explicitConstructorMR =
             getMethodCall().getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
@@ -137,7 +140,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @return The name including the return value.
      * @throws ProofInputException
      */
-    protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
+    protected @NonNull String lazyComputeNameIncludingReturnValue() throws ProofInputException {
         IExecutionMethodReturnValue[] returnValues = getReturnValues();
         if (returnValues.length == 0) {
             return createMethodReturnName(null, computeCalledMethodName());
@@ -180,7 +183,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @return The name including the return value.
      * @throws ProofInputException
      */
-    protected String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
+    protected @NonNull String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
         IExecutionMethodReturnValue[] returnValues = getReturnValues();
         if (returnValues.length == 0) {
             return createMethodReturnName(null, computeCalledMethodSignature());
@@ -230,7 +233,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
      */
-    protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
+    protected IExecutionMethodReturnValue @NonNull [] lazyComputeReturnValues()
+            throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
             final Services services = initConfig.getServices();
@@ -351,7 +355,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @return The found {@link Node} with rule "methodCallReturn" or {@code null} if no node was
      *         found.
      */
-    protected Node findMethodReturnNode(Node node) {
+    protected @Nullable Node findMethodReturnNode(@NonNull Node node) {
         Node resultNode = null;
         SymbolicExecutionTermLabel origianlLabel =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
@@ -377,7 +381,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @param methodName The name of the method that is completely executed.
      * @return The created human readable name.
      */
-    public static String createMethodReturnName(Object returnValue, String methodName) {
+    public static @NonNull String createMethodReturnName(@Nullable Object returnValue,
+            String methodName) {
         return INTERNAL_NODE_NAME_START + "return"
             + (returnValue != null ? " " + returnValue + "as result" : "")
             + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
@@ -388,7 +393,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -396,7 +401,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Method Return";
     }
 }

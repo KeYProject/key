@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Methods for computing conflicts affecting a delayed cut application. Relies on the given
  * {@link ApplicationCheck} object.
@@ -23,11 +25,13 @@ import org.key_project.prover.sequent.SequentFormula;
 public enum LateApplicationCheck {
     INSTANCE;
 
-    public List<String> check(Node node, Node cutNode, ApplicationCheck check) {
+    public @NonNull List<String> check(@NonNull Node node, Node cutNode,
+            @NonNull ApplicationCheck check) {
         return check(check, node.sequent(), cutNode);
     }
 
-    private List<String> check(ApplicationCheck check, Sequent sequent, Node cutNode) {
+    private @NonNull List<String> check(@NonNull ApplicationCheck check, @NonNull Sequent sequent,
+            Node cutNode) {
         List<String> conflicts = new LinkedList<>();
         for (SequentFormula sf : sequent) {
             String result = check.check(cutNode, (JTerm) sf.formula());

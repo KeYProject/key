@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -113,7 +114,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      * @param arg 0 or more objects that will be expanded to a ;-separated list after the message
      */
 
-    public static void debugOut(String msg, Object... arg) {
+    public static void debugOut(String msg, Object @NonNull... arg) {
         if (DEBUG_OUTPUT) {
             var args = new StringBuilder();
             if (arg.length > 0) {

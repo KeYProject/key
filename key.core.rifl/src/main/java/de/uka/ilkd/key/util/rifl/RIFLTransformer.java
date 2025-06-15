@@ -120,7 +120,7 @@ public class RIFLTransformer {
 
     private static Path getBaseDirPath(Path origSourcePath) {
         if (Files.isRegularFile(origSourcePath)) {
-            return origSourcePath.getParent();
+            return Objects.requireNonNull(origSourcePath.getParent());
         } else {
             return origSourcePath;
         }

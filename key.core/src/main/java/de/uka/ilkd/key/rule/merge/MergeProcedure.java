@@ -19,6 +19,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines a concrete merge procedure, in particular the result of merging two terms for a given
  * location variable in two Symbolic Execution states.
@@ -40,7 +43,7 @@ import org.key_project.util.collection.ImmutableSet;
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
+    static @NonNull ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
 
     static {
         CONCRETE_RULES =
@@ -89,7 +92,7 @@ public abstract class MergeProcedure {
      * @param procName Name of the merge procedure.
      * @return The merge procedure of the given name; null if there is no such procedure.
      */
-    public static MergeProcedure getProcedureByName(String procName) {
+    public static @Nullable MergeProcedure getProcedureByName(String procName) {
         for (MergeProcedure proc : CONCRETE_RULES) {
             if (proc.toString().equals(procName)) {
                 return proc;
@@ -104,7 +107,7 @@ public abstract class MergeProcedure {
      *
      * @return
      */
-    public static ImmutableList<MergeProcedure> getMergeProcedures() {
+    public static @NonNull ImmutableList<MergeProcedure> getMergeProcedures() {
         return CONCRETE_RULES;
     }
 

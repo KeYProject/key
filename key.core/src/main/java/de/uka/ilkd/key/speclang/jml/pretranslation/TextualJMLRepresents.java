@@ -7,29 +7,31 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A JML represents clause in textual form.
  */
 public final class TextualJMLRepresents extends TextualJMLConstruct {
 
-    private final LabeledParserRuleContext represents;
+    private final @NonNull LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
-            LabeledParserRuleContext represents) {
+    public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
+            @NonNull LabeledParserRuleContext represents) {
         super(modifiers);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
-            LabeledParserRuleContext represents, String name) {
+    public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
+            @NonNull LabeledParserRuleContext represents, String name) {
         this(modifiers, represents);
         this.name = name;
     }
 
-    public LabeledParserRuleContext getRepresents() {
+    public @NonNull LabeledParserRuleContext getRepresents() {
         return represents;
     }
 
@@ -40,7 +42,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLRepresents r)) {
             return false;
         }

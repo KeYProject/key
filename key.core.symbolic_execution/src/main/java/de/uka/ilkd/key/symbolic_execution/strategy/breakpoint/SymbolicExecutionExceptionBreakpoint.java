@@ -20,6 +20,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
  * responsible to tell the debugger to stop execution when the respective breakpoint is hit.
@@ -35,12 +38,12 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * a Set of Nodes that represent exceptions
      */
-    private final Set<Node> exceptionNodes;
+    private final @NonNull Set<Node> exceptionNodes;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private final Set<Node> exceptionParentNodes;
+    private final @NonNull Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception
@@ -125,7 +128,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * @param parent The {@link Node} that is thought to be the parent.
      * @return true if the parent node is one of the nodes parents
      */
-    public boolean isParentNode(Node node, Node parent) {
+    public boolean isParentNode(@Nullable Node node, Node parent) {
         if (node != null) {
             Node parentIter = node.parent();
             boolean result = false;

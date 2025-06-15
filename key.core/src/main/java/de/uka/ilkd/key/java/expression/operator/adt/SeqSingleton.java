@@ -13,13 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 public class SeqSingleton extends Operator {
 
-    public SeqSingleton(ExtList children) {
+    public SeqSingleton(@NonNull ExtList children) {
         super(children);
     }
 
-    public SeqSingleton(Expression child) {
+    public SeqSingleton(@NonNull Expression child) {
         super(child);
     }
 
@@ -34,7 +36,7 @@ public class SeqSingleton extends Operator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSeqSingleton(this);
     }
 
@@ -42,7 +44,7 @@ public class SeqSingleton extends Operator {
         return 1;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 }

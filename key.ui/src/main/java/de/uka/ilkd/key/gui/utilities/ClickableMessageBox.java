@@ -11,6 +11,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A simple textpane that supports lines that can be clicked by the users in order to trigger
  * events. It can especially be used for messages that contain detailed information that should not
@@ -57,7 +60,7 @@ public class ClickableMessageBox extends JTextPane {
         listeners.add(listener);
     }
 
-    public void add(Object item, String message, Color color) {
+    public void add(@Nullable Object item, String message, @NonNull Color color) {
         try {
             if (item != null) {
                 kit.insertHTML(doc, doc.getLength(),

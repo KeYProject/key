@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This task notifies the user about an unexpected error.
  *
@@ -33,7 +35,7 @@ public class GeneralFailureNotification extends NotificationTask {
      * @see NotificationEventID
      */
     @Override
-    public NotificationEventID getEventID() {
+    public @NonNull NotificationEventID getEventID() {
         return NotificationEventID.GENERAL_FAILURE;
     }
 

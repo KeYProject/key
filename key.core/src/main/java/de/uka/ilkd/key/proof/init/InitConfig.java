@@ -33,7 +33,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -74,14 +76,14 @@ public class InitConfig {
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private Map<Name, Taclet> activatedTacletCache = null;
+    private @Nullable Map<Name, Taclet> activatedTacletCache = null;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
 
     private String originalKeYFileName;
 
-    private ProofSettings settings;
+    private @Nullable ProofSettings settings;
 
 
 
@@ -112,11 +114,13 @@ public class InitConfig {
      *
      * @return the Services of this initial configuration
      */
+    @Pure
     public final Services getServices() {
         return services;
     }
 
 
+    @Pure
     public Profile getProfile() {
         return services.getProfile();
     }
@@ -394,7 +398,7 @@ public class InitConfig {
     }
 
 
-    public void setSettings(ProofSettings newSettings) {
+    public void setSettings(@Nullable ProofSettings newSettings) {
         this.settings = newSettings;
     }
 

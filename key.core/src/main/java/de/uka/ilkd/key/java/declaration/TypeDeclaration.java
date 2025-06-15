@@ -359,7 +359,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         return super.isAbstract();
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof TypeDeclaration) {
             return ((TypeDeclaration) o).fullName.equals(fullName);
         } else {

@@ -37,7 +37,7 @@ public class DeleteMergePointRuleFeature implements Feature {
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+            PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         return ((de.uka.ilkd.key.proof.Goal) goal).node().parent()
                 .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                         ? NumberRuleAppCost.create(-50000)

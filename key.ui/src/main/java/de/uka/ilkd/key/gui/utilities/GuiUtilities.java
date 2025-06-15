@@ -16,6 +16,9 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public final class GuiUtilities {
 
     private GuiUtilities() {
@@ -25,7 +28,7 @@ public final class GuiUtilities {
     /**
      * paints empty view with white background.
      */
-    public static void paintEmptyViewComponent(JComponent pane, String name) {
+    public static void paintEmptyViewComponent(@NonNull JComponent pane, String name) {
         pane.setBorder(new TitledBorder(name));
         pane.setBackground(Color.white);
         if (pane instanceof JScrollPane) {
@@ -34,7 +37,7 @@ public final class GuiUtilities {
         pane.setMinimumSize(new java.awt.Dimension(150, 0));
     }
 
-    public static void copyHighlightToClipboard(SequentView view, PosInSequent pos) {
+    public static void copyHighlightToClipboard(@NonNull SequentView view, PosInSequent pos) {
         // Replace nbsp; from html with normal spaces
         String s = view.getHighlightedText(pos).replace('\u00A0', ' ');
         // now CLIPBOARD
@@ -52,7 +55,7 @@ public final class GuiUtilities {
      * @preconditions comp.getSize() as on screen.
      * @see #setCenter(Component, Component)
      */
-    public static void setCenter(Component comp) {
+    public static void setCenter(@NonNull Component comp) {
         Dimension screenSize = comp.getToolkit().getScreenSize();
         Dimension frameSize = comp.getSize();
         if (frameSize.height > screenSize.height) {
@@ -72,7 +75,7 @@ public final class GuiUtilities {
      * @param parent center relative to what. <code>null</code> to center relative to screen.
      * @see #setCenter(Component)
      */
-    public static void setCenter(Component comp, Component parent) {
+    public static void setCenter(@NonNull Component comp, @Nullable Component parent) {
         if (parent == null) {
             setCenter(comp);
             return;
@@ -95,7 +98,7 @@ public final class GuiUtilities {
      *
      * @param button the button to click
      */
-    public static void attachClickOnEscListener(JButton button) {
+    public static void attachClickOnEscListener(@NonNull JButton button) {
         ActionListener escapeListener = event -> {
             if (event.getActionCommand().equals(ESC_COMMAND)) {
                 button.doClick();

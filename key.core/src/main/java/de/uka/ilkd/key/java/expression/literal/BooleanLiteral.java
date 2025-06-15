@@ -13,6 +13,8 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Boolean literal.
@@ -55,7 +57,7 @@ public class BooleanLiteral extends Literal {
      * @param children list with all children May contain: Comments
      * @param value a boolean value.
      */
-    public BooleanLiteral(ExtList children, boolean value) {
+    public BooleanLiteral(@NonNull ExtList children, boolean value) {
         super(children);
         this.value = value;
     }
@@ -67,7 +69,7 @@ public class BooleanLiteral extends Literal {
      * @param pos The source code position.
      * @param value a boolean value.
      */
-    public BooleanLiteral(ExtList children, PositionInfo pos, boolean value) {
+    public BooleanLiteral(@NonNull ExtList children, @NonNull PositionInfo pos, boolean value) {
         super(children, pos);
         this.value = value;
     }
@@ -78,7 +80,7 @@ public class BooleanLiteral extends Literal {
      * @param pos The source code position.
      * @param value a boolean value.
      */
-    public BooleanLiteral(PositionInfo pos, boolean value) {
+    public BooleanLiteral(@NonNull PositionInfo pos, boolean value) {
         super(pos);
         this.value = value;
     }
@@ -99,7 +101,7 @@ public class BooleanLiteral extends Literal {
      * @return the string.
      */
 
-    public String getName() {
+    public @NonNull String getName() {
         return (value ? "true" : "false");
     }
 
@@ -109,7 +111,7 @@ public class BooleanLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -125,17 +127,17 @@ public class BooleanLiteral extends Literal {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnBooleanLiteral(this);
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return BooleanLDT.NAME;
     }
 

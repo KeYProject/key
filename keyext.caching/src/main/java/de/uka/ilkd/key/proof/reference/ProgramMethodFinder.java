@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 import org.key_project.logic.Visitor;
 
+
 /**
  * Simple visitor to find instances of non-model {@link ProgramMethod} in terms.
  *

@@ -12,9 +12,9 @@ import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * A string with associated position information (file and line number). The position information is
@@ -41,7 +41,7 @@ public class PositionedString {
     }
 
     public PositionedString(String text) {
-        this(text, (URI) null);
+        this(text, Location.UNDEFINED);
     }
 
     /**
@@ -62,16 +62,16 @@ public class PositionedString {
             + location.getPosition() + ")";
     }
 
-    public @NonNull String getText() {
+    public String getText() {
         return text;
     }
 
-    public @NonNull Location getLocation() {
+    public Location getLocation() {
         return location;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (this == o) {
             return true;
         }

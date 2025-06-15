@@ -13,10 +13,11 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
-    private GUIAbstractTreeNode[] children;
+    private GUIAbstractTreeNode @Nullable [] children;
 
     public GUIProofTreeNode(GUIProofTreeModel tree, Node node) {
         super(tree, node);
@@ -32,7 +33,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         return children.length;
     }
 
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         Node n = getNode();
         if (n == null) {
             return null;
@@ -47,7 +48,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         return getChildCount() == 0;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         // changed to serial:name for searching
         // the proof tree in ProofTreeView.java
         Node n = getNode();

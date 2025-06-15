@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Extension adapter for Heatmap
@@ -36,11 +37,11 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private HeatmapSettingsAction settingsAction;
 
     @Override
-    public List<Action> getMainMenuActions(MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         return getActions(mainWindow);
     }
 
-    private List<Action> getActions(MainWindow mainWindow) {
+    private @NonNull List<Action> getActions(@NonNull MainWindow mainWindow) {
         if (actions.isEmpty()) {
             actions.add(toggleAction = new HeatmapToggleAction(mainWindow));
             actions.add(settingsAction = new HeatmapSettingsAction(mainWindow));
@@ -49,7 +50,7 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(@NonNull MainWindow mainWindow) {
         getActions(mainWindow);// initialize
         JToolBar tb = new JToolBar("Heatmap Options");
         JToggleButton comp = new JToggleButton(toggleAction);
@@ -60,7 +61,7 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public SettingsProvider getSettings() {
+    public @NonNull SettingsProvider getSettings() {
         return new HeatmapSettingsProvider();
     }
 }
@@ -99,7 +100,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         + "terms or formulae, or number of newest terms or formulae\n"
         + "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
 
-    private final JSpinner spinnerAge;
+    private final @NonNull JSpinner spinnerAge;
 
     enum HeatmapMode {
         DEFAULT("No heatmaps", "No heatmaps are shown.", false, false, false),
@@ -182,18 +183,18 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         });
     }
 
-    private void addRadio(HeatmapMode mode) {
+    private void addRadio(@NonNull HeatmapMode mode) {
         JRadioButton radio = map.get(mode);
         addRowWithHelp(mode.desc, new JLabel(), radio);
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Heatmap";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             HeatmapMode mode = entry.getKey();

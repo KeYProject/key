@@ -13,6 +13,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Offers a loading of a single Java file, without considering the folder as part of a classpath.
  *
@@ -21,7 +23,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
  * @see OpenFileAction
  */
 public class OpenSingleJavaFileAction extends MainWindowAction {
-    public OpenSingleJavaFileAction(MainWindow mainWindow) {
+    public OpenSingleJavaFileAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Open Single Java File...");
         // setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));

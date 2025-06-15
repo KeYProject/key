@@ -13,6 +13,8 @@ import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This singleton class implements a conditional operator "\ifEx iv; (phi) \then (t1) \else (t2)",
@@ -36,7 +38,7 @@ public final class IfExThenElse extends AbstractOperator implements Operator {
 
 
     @Override
-    public <T extends Term> void validTopLevelException(T term)
+    public <T extends Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {
         super.validTopLevelException(term);
         final Sort s0 = term.sub(0).sort();

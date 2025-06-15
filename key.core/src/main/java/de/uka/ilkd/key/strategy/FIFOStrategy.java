@@ -16,6 +16,7 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
@@ -37,8 +38,7 @@ public class FIFOStrategy implements Strategy<Goal> {
      */
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pio,
-            Goal goal,
+            PosInOccurrence pio, @NonNull Goal goal,
             MutableState mState) {
         return NumberRuleAppCost.create(((de.uka.ilkd.key.proof.Goal) goal).getTime());
     }
@@ -60,7 +60,7 @@ public class FIFOStrategy implements Strategy<Goal> {
             RuleAppCostCollector collector) {}
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 
@@ -68,17 +68,17 @@ public class FIFOStrategy implements Strategy<Goal> {
 
     public static class Factory implements StrategyFactory {
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return NAME;
         }
 
         @Override
-        public Strategy create(Proof proof, StrategyProperties properties) {
+        public @NonNull Strategy create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }
 
         @Override
-        public StrategySettingsDefinition getSettingsDefinition() {
+        public @Nullable StrategySettingsDefinition getSettingsDefinition() {
             return null;
         }
     }

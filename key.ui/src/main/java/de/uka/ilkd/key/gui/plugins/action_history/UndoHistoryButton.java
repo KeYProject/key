@@ -17,6 +17,9 @@ import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A button consisting of an action component (normal button) and a selection menu (dropdown
  * button). Selecting an entry from the dropdown executes an action based on that entry,
@@ -38,7 +41,7 @@ public class UndoHistoryButton {
     /**
      * The action starting button.
      */
-    private final UndoAction action;
+    private final @NonNull UndoAction action;
     /**
      * The actions that can be selected.
      */
@@ -55,7 +58,7 @@ public class UndoHistoryButton {
     /**
      * The dropdown menu that opens when clicking the selection button.
      */
-    private JPopupMenu menu;
+    private @Nullable JPopupMenu menu;
 
     /**
      * True iff the next time the selection button's action is carried out it should open the popup
@@ -92,7 +95,8 @@ public class UndoHistoryButton {
      * @param pressedSelection callback if a dropdown entry is selected
      * @param actionSupplier callback that provides the list of actions to display
      */
-    public UndoHistoryButton(MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
+    public UndoHistoryButton(@NonNull MainWindow mainWindow, int iconSize,
+            IconFontProvider actionIcon,
             String prefix,
             Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection,
             Supplier<List<UserAction>> actionSupplier) {
@@ -175,7 +179,7 @@ public class UndoHistoryButton {
      *
      * @return the action
      */
-    public MainWindowAction getAction() {
+    public @NonNull MainWindowAction getAction() {
         return action;
     }
 
@@ -186,7 +190,7 @@ public class UndoHistoryButton {
      *
      * @return the popup menu opened by the selection button
      */
-    protected JPopupMenu getMenu() {
+    protected @NonNull JPopupMenu getMenu() {
         if (menu == null) {
             menu = new JPopupMenu();
         }
@@ -198,7 +202,7 @@ public class UndoHistoryButton {
      *
      * @param it the selectable actions
      */
-    private void setItems(List<UserAction> it) {
+    private void setItems(@NonNull List<UserAction> it) {
         items = it;
         menuItems.clear();
 
@@ -229,7 +233,7 @@ public class UndoHistoryButton {
      *
      * @param newMenuItems the new actions that can be selected
      */
-    public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
+    public void refreshSelectionItems(@NonNull Collection<JMenuItem> newMenuItems) {
         /*
          * The menu could also be reused (just clear all its components first), but that leads to
          * weird behaviour when going from menu items with checkboxes to normal menu items [see
@@ -269,7 +273,7 @@ public class UndoHistoryButton {
          * @param mainWindow main window
          * @param callback callback responsible for undoing actions
          */
-        UndoAction(MainWindow mainWindow, Consumer<UserAction> callback) {
+        UndoAction(@NonNull MainWindow mainWindow, Consumer<UserAction> callback) {
             super(mainWindow);
             setIcon(actionIcon.get(iconSize));
             setTooltip("Undo the last action performed on the proof");

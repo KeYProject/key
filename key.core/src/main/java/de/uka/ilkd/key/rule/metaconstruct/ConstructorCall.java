@@ -27,6 +27,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The constructor call meta construct is used to handle a allocation expression like
  * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
@@ -45,8 +48,8 @@ public class ConstructorCall extends ProgramTransformer {
         ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
-    private final SchemaVariable newObjectSV;
-    private final ProgramVariable newObjectVar;
+    private final @Nullable SchemaVariable newObjectSV;
+    private final @Nullable ProgramVariable newObjectVar;
 
     /**
      * @param name Constructor Name.
@@ -87,8 +90,8 @@ public class ConstructorCall extends ProgramTransformer {
      * no null pointer check is necessary.
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+            @NonNull SVInstantiations svInst) {
 
         final New constructorReference = (New) pe;
         final KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();
@@ -107,8 +110,10 @@ public class ConstructorCall extends ProgramTransformer {
     /**
      * returns a sequence of statements modelling the Java constructor call semantics explicitly
      */
-    protected List<Statement> constructorCallSequence(final New constructorReference,
-            final KeYJavaType classType, SVInstantiations svInst, Services services) {
+    protected @NonNull List<Statement> constructorCallSequence(
+            final @NonNull New constructorReference,
+            final @NonNull KeYJavaType classType, @NonNull SVInstantiations svInst,
+            @NonNull Services services) {
         assert (newObjectVar == null) != (newObjectSV == null);
 
         final ProgramVariable newObject = newObjectSV == null ? newObjectVar

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -40,7 +41,8 @@ public class ClasslevelTranslatorTest {
         return readInputs(resourceAsStream, this::parseAndInterpret);
     }
 
-    static Stream<DynamicTest> readInputs(InputStream resourceAsStream, Consumer<String> fn)
+    static Stream<DynamicTest> readInputs(InputStream resourceAsStream,
+            @NonNull Consumer<String> fn)
             throws IOException {
         List<String> seq = new LinkedList<>();
         try (InputStream s = resourceAsStream;
@@ -66,7 +68,7 @@ public class ClasslevelTranslatorTest {
         return seq.stream().map(it -> DynamicTest.dynamicTest(it, () -> fn.accept(it)));
     }
 
-    public void parseAndInterpret(String expr) {
+    public void parseAndInterpret(@NonNull String expr) {
         Assertions.assertNotEquals("", expr);
         KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
@@ -82,7 +84,7 @@ public class ClasslevelTranslatorTest {
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
     }
 
-    private void debugLexer(String expr) {
+    private void debugLexer(@NonNull String expr) {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         DebugJmlLexer.debug(lexer);
     }

@@ -14,6 +14,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Takes care of providing the whole ProofMacro interface by only making it necessary to implement
  * to most general application methods for a given list of goals and translating the less general
@@ -37,11 +39,11 @@ public abstract class AbstractProofMacro implements ProofMacro {
     /**
      * {@inheritDoc}
      *
-     * By default, proof macros do not support scripts, thus <code>null</code> is returned.
+     * By default, proof macros do not support scripts, thus empty string is returned.
      */
     @Override
     public String getScriptCommandName() {
-        return null;
+        return "";
     }
 
     @Override
@@ -61,13 +63,13 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Node node, @Nullable PosInOccurrence posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-            PosInOccurrence posInOcc, ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Node node,
+            @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }

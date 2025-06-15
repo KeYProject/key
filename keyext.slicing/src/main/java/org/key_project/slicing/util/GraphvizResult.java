@@ -5,6 +5,8 @@ package org.key_project.slicing.util;
 
 import java.awt.image.BufferedImage;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Result of running an external graph renderer.
  * Either an image or an error.
@@ -24,7 +26,7 @@ public record GraphvizResult(BufferedImage image, String error) {
      * @param image rendered image
      * @return new result object with that image attached
      */
-    public static GraphvizResult makeImage(BufferedImage image) {
+    public static @NonNull GraphvizResult makeImage(BufferedImage image) {
         return new GraphvizResult(image, null);
     }
 
@@ -32,7 +34,7 @@ public record GraphvizResult(BufferedImage image, String error) {
      * @param error error text
      * @return new result object with that error attached
      */
-    public static GraphvizResult makeError(String error) {
+    public static @NonNull GraphvizResult makeError(String error) {
         return new GraphvizResult(null, error);
     }
 

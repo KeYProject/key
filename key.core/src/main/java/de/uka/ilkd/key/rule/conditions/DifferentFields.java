@@ -12,6 +12,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if given two terms s, t both terms have a different unique symbol
@@ -56,7 +58,7 @@ public final class DifferentFields extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\differentFields (" + var1 + ", " + var2 + ")";
     }
 }

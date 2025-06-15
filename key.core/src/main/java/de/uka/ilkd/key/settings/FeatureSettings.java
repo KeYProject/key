@@ -6,6 +6,7 @@ package de.uka.ilkd.key.settings;
 import java.util.*;
 import java.util.function.Consumer;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,7 @@ public class FeatureSettings extends AbstractSettings {
      * Use the system properties ({@code -P FEATURE:XXX=true} to activate a feature from the command
      * line.
      */
-    private void readFromSystemProperties() {
+    private void readFromSystemProperties(@UnknownInitialization FeatureSettings this) {
         var prefix = CATEGORY.toUpperCase() + ":";
         for (Map.Entry<Object, Object> entries : System.getProperties().entrySet()) {
             final var s = entries.getKey().toString();
@@ -90,7 +91,7 @@ public class FeatureSettings extends AbstractSettings {
      *
      * @return true, if {@code value} feels like a feature activation.
      */
-    private boolean isTrue(Object value) {
+    private boolean isTrue(@UnknownInitialization FeatureSettings this, Object value) {
         return switch (value.toString().toLowerCase()) {
         case "true", "yes", "on" -> true;
         default -> false;
@@ -152,7 +153,7 @@ public class FeatureSettings extends AbstractSettings {
     /**
      * Activates the given feature by {@code id}.
      */
-    private void activate(String id) {
+    private void activate(@UnknownInitialization FeatureSettings this, String id) {
         if (!isActivated(id)) {
             activatedFeatures.add(id);
             firePropertyChange(id, false, isActivated(id));
@@ -189,19 +190,19 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     public static Feature createFeature(String id, String doc) {
-        return new Feature(id, doc, true);
+        var f = new Feature(id, doc, true);
+        FEATURES.add(f);
+        return f;
     }
 
     public static Feature createFeature(String id, String doc, boolean restartRequired) {
-        return new Feature(id, doc, restartRequired);
+        var f = new Feature(id, doc, restartRequired);
+        FEATURES.add(f);
+        return f;
     }
 
+    public static final List<Feature> FEATURES = new ArrayList<>();
+
     public record Feature(String id, String documentation, boolean restartRequired) {
-
-        public static final List<Feature> FEATURES = new ArrayList<>();
-
-        public Feature {
-            FEATURES.add(this);
-        }
     }
 }

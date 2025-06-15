@@ -11,6 +11,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();
@@ -19,7 +21,8 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert app.taclet().hasTrigger();
 
         SVInstantiationProjection instProj = SVInstantiationProjection

@@ -8,16 +8,18 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 
 /**
  * A JML class invariant declaration in textual form.
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
-    private final ParserRuleContext inv;
+    private final @NonNull ParserRuleContext inv;
     private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, ParserRuleContext inv,
+    public TextualJMLClassInv(@NonNull ImmutableList<JMLModifier> modifiers,
+            @NonNull ParserRuleContext inv,
             String name, boolean free) {
         super(modifiers, name);
         assert inv != null;
@@ -27,12 +29,12 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Class_invariantContext inv, boolean free) {
+    public TextualJMLClassInv(@NonNull ImmutableList<JMLModifier> modifiers,
+            JmlParser.@NonNull Class_invariantContext inv, boolean free) {
         this(modifiers, inv, null, free);
     }
 
-    public ParserRuleContext getInv() {
+    public @NonNull ParserRuleContext getInv() {
         return inv;
     }
 
@@ -44,7 +46,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLClassInv ci)) {
             return false;
         }

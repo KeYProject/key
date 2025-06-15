@@ -56,6 +56,8 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +129,7 @@ public final class SourceView extends JComponent {
     /**
      * The main window of KeY (needed to get the mediator).
      */
-    private final MainWindow mainWindow;
+    private final @NonNull MainWindow mainWindow;
 
     /**
      * Maps every file to a tab.
@@ -142,17 +144,17 @@ public final class SourceView extends JComponent {
     /**
      * Currently selected file.
      */
-    private URI selectedFile = null;
+    private @Nullable URI selectedFile = null;
 
     /**
      * The status bar for displaying information about the current proof branch.
      */
-    private final JLabel sourceStatusBar;
+    private final @NonNull JLabel sourceStatusBar;
 
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
-    private LinkedList<Pair<Node, PositionInfo>> lines;
+    private @Nullable LinkedList<Pair<Node, PositionInfo>> lines;
 
     /** The symbolic execution highlights. */
     private final Set<Highlight> symbExHighlights = new HashSet<>();
@@ -162,7 +164,7 @@ public final class SourceView extends JComponent {
      *
      * @param mainWindow the MainWindow of the GUI
      */
-    private SourceView(MainWindow mainWindow) {
+    private SourceView(@NonNull MainWindow mainWindow) {
         super();
         this.mainWindow = mainWindow;
 
@@ -216,7 +218,7 @@ public final class SourceView extends JComponent {
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+            public void selectedProofChanged(@NonNull KeYSelectionEvent<Proof> e) {
                 clear();
                 ensureProofJavaSourceCollectionExists(e.getSource().getSelectedProof());
                 updateGUI();
@@ -228,7 +230,7 @@ public final class SourceView extends JComponent {
 
     }
 
-    private void ensureProofJavaSourceCollectionExists(Proof proof) {
+    private void ensureProofJavaSourceCollectionExists(@Nullable Proof proof) {
         if (proof != null && proof.lookup(ProofJavaSourceCollection.class) == null) {
             final var sources = new ProofJavaSourceCollection();
             proof.register(sources, ProofJavaSourceCollection.class);
@@ -259,7 +261,7 @@ public final class SourceView extends JComponent {
      * @param mainWindow KeY's main window
      * @return the component responsible for showing source code and symbolic execution information
      */
-    public static SourceView getSourceView(MainWindow mainWindow) {
+    public static @NonNull SourceView getSourceView(@NonNull MainWindow mainWindow) {
         if (instance == null) {
             instance = new SourceView(mainWindow);
         }
@@ -291,7 +293,7 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public Highlight addHighlight(URI fileURI, int line, Color color, int level)
+    public @NonNull Highlight addHighlight(URI fileURI, int line, Color color, int level)
             throws BadLocationException, IOException {
         openFile(fileURI);
 
@@ -337,7 +339,8 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public Set<Highlight> addHighlightsForJMLStatement(URI fileURI, int firstLine, Color color,
+    public @NonNull Set<Highlight> addHighlightsForJMLStatement(URI fileURI, int firstLine,
+            Color color,
             int level) throws BadLocationException, IOException {
         openFile(fileURI);
 
@@ -382,7 +385,8 @@ public final class SourceView extends JComponent {
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public void changeHighlight(Highlight highlight, int newLine) throws BadLocationException {
+    public void changeHighlight(@NonNull Highlight highlight, int newLine)
+            throws BadLocationException {
         URI fileURI = highlight.getFileURI();
         int oldLine = highlight.getLine();
 
@@ -420,7 +424,7 @@ public final class SourceView extends JComponent {
      * @return {@code true} iff this {@code SourceView} previously contained the specified
      *         highlight.
      */
-    public boolean removeHighlight(Highlight highlight) {
+    public boolean removeHighlight(@NonNull Highlight highlight) {
         Tab tab = tabs.get(highlight.getFileURI());
 
         if (tab == null) {
@@ -468,7 +472,7 @@ public final class SourceView extends JComponent {
      *
      * @throws IOException if one of the files cannot be opened.
      */
-    public void openFiles(Iterable<URI> fileURIs) throws IOException {
+    public void openFiles(@NonNull Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
 
         final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
@@ -497,7 +501,7 @@ public final class SourceView extends JComponent {
      * @param pos the position to check
      * @return the range of text (may be empty if there is just whitespace in the line)
      */
-    private static Range calculateLineRange(JTextPane textPane, int pos) {
+    private static @NonNull Range calculateLineRange(@NonNull JTextPane textPane, int pos) {
         Document doc = textPane.getDocument();
         String text = "";
         try {
@@ -528,14 +532,14 @@ public final class SourceView extends JComponent {
      * @param s the String to replace
      * @return the resulting String (without tabs)
      */
-    private static String replaceTabs(String s) {
+    private static @NonNull String replaceTabs(@NonNull String s) {
         // fill a new array with the specified amount of spaces
         char[] rep = new char[TAB_SIZE];
         Arrays.fill(rep, ' ');
         return s.replace("\t", new String(rep));
     }
 
-    private boolean isSelected(Tab tab) {
+    private boolean isSelected(@NonNull Tab tab) {
         return Objects.equals(selectedFile, tab.absoluteFileName);
     }
 
@@ -608,7 +612,7 @@ public final class SourceView extends JComponent {
      * @return {@code true} if this source view did not already contain the file.
      * @throws IOException if the file cannot be opened.
      */
-    private boolean addFile(URI fileURI) throws IOException {
+    private boolean addFile(@Nullable URI fileURI) throws IOException {
         final Proof proof = mainWindow.getMediator().getSelectedProof();
         // quick fix: fileName could be null (see bug #1520)
         if (proof == null || fileURI == null || tabs.containsKey(fileURI)) {
@@ -693,8 +697,9 @@ public final class SourceView extends JComponent {
         }
     }
 
-    private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
-            Node node) {
+    private void addPosToList(@Nullable PositionInfo pos,
+            @NonNull LinkedList<Pair<Node, PositionInfo>> list,
+            @NonNull Node node) {
         if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI().isPresent()) {
             list.addLast(new Pair<>(node, pos));
@@ -710,7 +715,7 @@ public final class SourceView extends JComponent {
      * @return a linked list of pairs of PositionInfo objects containing the start and end positions
      *         for the highlighting and Nodes.
      */
-    private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
+    private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(@Nullable Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
 
         if (node == null) {
@@ -805,7 +810,7 @@ public final class SourceView extends JComponent {
      * @return a new PositionInfo starting at the minimum of all the contained positions and ending
      *         at the maximum position
      */
-    private static PositionInfo joinPositionsRec(SourceElement se) {
+    private static @NonNull PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement ntpe) {
             // TODO: additional elements, e.g. code inside if
             if (se instanceof If || se instanceof Then || se instanceof Else) {
@@ -836,7 +841,7 @@ public final class SourceView extends JComponent {
      * @param node the current node
      * @return a String containing the path information to display
      */
-    private static String collectPathInformation(Node node) {
+    private static @NonNull String collectPathInformation(@Nullable Node node) {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();
@@ -887,19 +892,19 @@ public final class SourceView extends JComponent {
         /**
          * The file this tab belongs to.
          */
-        private final URI absoluteFileName;
+        private final @NonNull URI absoluteFileName;
 
         /**
          * The file this tab belongs to.
          */
-        private final String simpleFileName;
+        private final @NonNull String simpleFileName;
 
         /**
          * The text pane containing the file's content.
          */
         private final JTextPane textPane = new JTextPane() {
             @Override
-            public String getToolTipText(MouseEvent mouseEvent) {
+            public @Nullable String getToolTipText(@NonNull MouseEvent mouseEvent) {
                 if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .isShowSourceViewTooltips()) {
                     return null;
@@ -925,7 +930,7 @@ public final class SourceView extends JComponent {
         /**
          * The highlight for the user's selection.
          */
-        private Highlight selectionHL;
+        private @Nullable Highlight selectionHL;
 
         /**
          * Maps line numbers to highlights.
@@ -938,7 +943,7 @@ public final class SourceView extends JComponent {
         private final SourceHighlightDocument doc =
             new SourceHighlightDocument(new JavaJMLEditorLexer());
 
-        private Tab(URI fileURI, InputStream stream) {
+        private Tab(@NonNull URI fileURI, @NonNull InputStream stream) {
             this.absoluteFileName = fileURI;
             this.simpleFileName = extractFileName(fileURI);
 
@@ -974,7 +979,7 @@ public final class SourceView extends JComponent {
             setRowHeaderView(tln);
         }
 
-        private String extractFileName(URI uri) {
+        private @NonNull String extractFileName(@NonNull URI uri) {
             String s = uri.toString();
             int index = s.lastIndexOf('/');
             if (index < 0) {
@@ -1001,7 +1006,7 @@ public final class SourceView extends JComponent {
             textPane.setEditable(false);
             textPane.addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
-                public void mouseMoved(MouseEvent mouseEvent) {
+                public void mouseMoved(@NonNull MouseEvent mouseEvent) {
                     if (isHighlighted(mouseEvent.getPoint())) {
                         textPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     } else {
@@ -1021,7 +1026,7 @@ public final class SourceView extends JComponent {
             // add a listener to highlight the line currently pointed to
             textPane.addMouseMotionListener(new MouseMotionListener() {
                 @Override
-                public void mouseMoved(MouseEvent e) {
+                public void mouseMoved(@NonNull MouseEvent e) {
                     synchronized (SourceView.this) {
                         if (selectionHL != null) {
                             paintSelectionHighlight(e.getPoint(), selectionHL);
@@ -1171,7 +1176,7 @@ public final class SourceView extends JComponent {
          * @param p the current position of the mouse pointer
          * @param highlight the highlight to change
          */
-        private void paintSelectionHighlight(Point p, Highlight highlight) {
+        private void paintSelectionHighlight(Point p, @NonNull Highlight highlight) {
             try {
                 int line = posToLine(textPane.viewToModel2D(p));
                 changeHighlight(highlight, line);
@@ -1245,7 +1250,7 @@ public final class SourceView extends JComponent {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -1277,7 +1282,7 @@ public final class SourceView extends JComponent {
         }
 
         @Override
-        public int compareTo(Highlight other) {
+        public int compareTo(@NonNull Highlight other) {
             int result = fileURI.compareTo(other.fileURI);
 
             if (result == 0) {
@@ -1303,7 +1308,7 @@ public final class SourceView extends JComponent {
          * @see Highlighter#changeHighlight(Object, int, int)
          * @see Highlighter#removeHighlight(Object)
          */
-        private void setTag(Object tag) {
+        private void setTag(@Nullable Object tag) {
             if (tag == null) {
                 TAGS.remove(this);
             } else {
@@ -1388,7 +1393,7 @@ public final class SourceView extends JComponent {
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mouseClicked(@NonNull MouseEvent e) {
             final int pos = textPane.viewToModel2D(e.getPoint());
             if (isHighlighted(e.getPoint())) {
                 int line = 0;

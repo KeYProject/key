@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Logical or.
@@ -23,12 +25,12 @@ public class LogicalOr extends Operator {
      * Logical or.
      */
 
-    public LogicalOr(ExtList children) {
+    public LogicalOr(@NonNull ExtList children) {
         super(children);
     }
 
 
-    public LogicalOr(Expression lhs, Expression rhs) {
+    public LogicalOr(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -69,11 +71,11 @@ public class LogicalOr extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnLogicalOr(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services services, ExecutionContext ec) {
         return services.getTypeConverter().getBooleanType();
     }
 }

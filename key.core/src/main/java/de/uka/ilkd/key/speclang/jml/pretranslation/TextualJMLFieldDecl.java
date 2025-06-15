@@ -7,16 +7,18 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A JML field declaration (ghost or model) in textual form.
  */
 public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
-    private final JmlParser.Field_declarationContext decl;
+    private final JmlParser.@NonNull Field_declarationContext decl;
 
 
-    public TextualJMLFieldDecl(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Field_declarationContext decl) {
+    public TextualJMLFieldDecl(@NonNull ImmutableList<JMLModifier> modifiers,
+            JmlParser.@NonNull Field_declarationContext decl) {
         super(modifiers);
         assert decl != null;
         this.decl = decl;
@@ -24,7 +26,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     }
 
 
-    public JmlParser.Field_declarationContext getDecl() {
+    public JmlParser.@NonNull Field_declarationContext getDecl() {
         return decl;
     }
 
@@ -36,7 +38,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLFieldDecl fd)) {
             return false;
         }

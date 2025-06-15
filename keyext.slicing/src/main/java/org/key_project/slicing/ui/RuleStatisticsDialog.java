@@ -17,6 +17,8 @@ import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Dialog that displays the results of the dependency analysis algorithm.
  *
@@ -34,7 +36,7 @@ public class RuleStatisticsDialog extends JDialog {
      * @param window main window
      * @param results the results to show
      */
-    public RuleStatisticsDialog(Window window, AnalysisResults results) {
+    public RuleStatisticsDialog(Window window, @NonNull AnalysisResults results) {
         super(window, "Rule Statistics");
 
         this.statistics = results.ruleStatistics;
@@ -99,7 +101,7 @@ public class RuleStatisticsDialog extends JDialog {
      * @param statisticsPane text pane showing the statistics
      * @return the buttons panel
      */
-    private JPanel constructButtonPanel(JEditorPane statisticsPane) {
+    private @NonNull JPanel constructButtonPanel(@NonNull JEditorPane statisticsPane) {
         JPanel buttonPane = new JPanel();
 
         JButton okButton = new JButton("Close");
@@ -146,7 +148,7 @@ public class RuleStatisticsDialog extends JDialog {
         getRootPane().addKeyListener(new KeyAdapter() {
 
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void keyTyped(@NonNull KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     getRootPane().getDefaultButton().doClick();
                 }
@@ -161,7 +163,7 @@ public class RuleStatisticsDialog extends JDialog {
      * @param rules statistics on rule apps (see {@link RuleStatistics})
      * @return HTML
      */
-    private String genTable(List<RuleStatisticEntry> rules) {
+    private @NonNull String genTable(@NonNull List<RuleStatisticEntry> rules) {
         List<String> columns = List.of("Rule name", "Total applications", "Useless applications",
             "Initial useless applications");
 

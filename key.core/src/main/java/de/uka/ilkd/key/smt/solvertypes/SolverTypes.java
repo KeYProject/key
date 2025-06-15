@@ -5,7 +5,7 @@ package de.uka.ilkd.key.smt.solvertypes;
 
 import java.util.*;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for the management of {@link SolverType}. This class holds references to common and known
@@ -39,7 +39,7 @@ public final class SolverTypes {
      *
      * @return the available solver types, including experimental solvers
      */
-    public static @NonNull Collection<SolverType> getSolverTypes() {
+    public static Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
             SOLVERS.addAll(solverLoader.getSolvers());
@@ -54,7 +54,7 @@ public final class SolverTypes {
      *
      * @return the available experimental solver types
      */
-    public static @NonNull Collection<SolverType> getExperimentalSolvers() {
+    public static Collection<SolverType> getExperimentalSolvers() {
         if (SOLVERS.isEmpty()) {
             getSolverTypes();
         }
@@ -64,8 +64,10 @@ public final class SolverTypes {
     /**
      * Z3 counterexample solver.
      */
-    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(
-        it -> it.getClass().equals(SolverTypeImplementation.class) && it.getName().equals("Z3_CE"))
-            .findFirst().orElse(null);
-
+    public static final @Nullable SolverType Z3_CE_SOLVER =
+        getSolverTypes().stream()
+                .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                        && it.getName().equals("Z3_CE"))
+                .findFirst()
+                .orElse(null);
 }

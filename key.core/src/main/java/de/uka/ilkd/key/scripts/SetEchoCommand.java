@@ -8,6 +8,8 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A simple "echo" command for giving feedback to human observers during lengthy executions.
  */
@@ -17,22 +19,24 @@ public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "@echo";
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         state.setEchoOn("on".equalsIgnoreCase(args.command));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "off".

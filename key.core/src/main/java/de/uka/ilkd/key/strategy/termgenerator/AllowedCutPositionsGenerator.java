@@ -15,6 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).
  * This term-generator does not descend below quantifiers, only below propositional junctors

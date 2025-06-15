@@ -19,6 +19,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -32,8 +34,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * formula, and <code>applicationPosition</code> is the original position for which the rule app
      * was created
      */
-    private final FormulaTag positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final @NonNull FormulaTag positionTag;
+    private final @NonNull PosInOccurrence applicationPosition;
 
     /**
      * Creates a FindTacletAppContainer for applying a find taclet.
@@ -44,8 +46,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
-    FindTacletAppContainer(NoPosTacletApp app, PosInOccurrence pio,
-            RuleAppCost cost, Goal goal,
+    FindTacletAppContainer(NoPosTacletApp app, @NonNull PosInOccurrence pio,
+            RuleAppCost cost,
+            @NonNull Goal goal,
             long age) {
         super(app, cost, age);
         applicationPosition = pio;
@@ -63,7 +66,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         find-position does still exist (if-formulas are not considered)
      */
     @Override
-    protected boolean isStillApplicable(Goal p_goal) {
+    protected boolean isStillApplicable(@NonNull Goal p_goal) {
         PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
@@ -74,7 +77,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @return true iff a subformula that contains the find position stored by this object has been
      *         altered since the creation of this object or if a preceding update has changed
      */
-    private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
+    private boolean subformulaOrPreceedingUpdateHasChanged(@NonNull Goal goal) {
         ImmutableList<FormulaChangeInfo> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
@@ -109,8 +112,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         formulas) and no indirect relationship exists which is established by a modification
      *         that occurred inside an update
      */
-    private boolean independentSubformulas(PosInOccurrence changePos,
-            SequentFormula newFormula) {
+    private boolean independentSubformulas(@NonNull PosInOccurrence changePos,
+            @NonNull SequentFormula newFormula) {
         final PIOPathIterator changePIO = changePos.iterator();
         final PIOPathIterator appPIO = applicationPosition.iterator();
 
@@ -173,7 +176,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @return non-null for FindTaclets
      */
     @Override
-    protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
+    protected @NonNull PosInOccurrence getPosInOccurrence(@NonNull Goal p_goal) {
         final PosInOccurrence topPos =
             p_goal.getFormulaTagManager().getPosForTag(positionTag);
         assert topPos != null;

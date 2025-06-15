@@ -22,6 +22,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Checks that there exists a proof for every contract.
  * Has to be combined with other checkers to ensure that the proofs are actually replayable
@@ -32,7 +34,8 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
 public class MissingProofsChecker implements Checker {
 
     @Override
-    public void check(ProofBundleHandler pbh, CheckerData data) throws ProofManagementException {
+    public void check(ProofBundleHandler pbh, @NonNull CheckerData data)
+            throws ProofManagementException {
         data.addCheck("missing_proofs");
         data.print("Running missing proofs checker ...");
 
@@ -68,7 +71,8 @@ public class MissingProofsChecker implements Checker {
         }
     }
 
-    private static void removeContractsWithProof(Set<Contract> contracts, CheckerData data)
+    private static void removeContractsWithProof(@NonNull Set<Contract> contracts,
+            @NonNull CheckerData data)
             throws ProofManagementException {
 
         // compare: Is there a proof for every contract?
@@ -95,7 +99,8 @@ public class MissingProofsChecker implements Checker {
         }
     }
 
-    private static void reportContractsWithoutProof(Set<Contract> contracts, CheckerData data) {
+    private static void reportContractsWithoutProof(@NonNull Set<Contract> contracts,
+            @NonNull CheckerData data) {
         for (Contract c : contracts) {
             // Only contracts defined in files inside src directory of bundle are
             // considered. For other contracts (e.g. from bootclasspath) a message is

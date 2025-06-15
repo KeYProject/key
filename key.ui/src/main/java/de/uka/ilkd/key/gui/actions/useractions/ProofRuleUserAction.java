@@ -7,6 +7,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * User action that represents the manual application of a rule.
  * Only used for action history purposes, {@link #apply()} has no functionality.
@@ -27,13 +29,14 @@ public class ProofRuleUserAction extends ProofModifyingUserAction {
      * @param goal node the rule was applied on
      * @param name name of the rule
      */
-    public ProofRuleUserAction(KeYMediator mediator, Proof proof, Node goal, String name) {
+    public ProofRuleUserAction(@NonNull KeYMediator mediator, @NonNull Proof proof, Node goal,
+            String name) {
         super(mediator, proof, goal);
         this.name = name;
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return "Apply: " + name;
     }
 

@@ -44,7 +44,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      */
     protected ImmutableList<Goal> selectedList;
 
-    protected Node currentSubtreeRoot = null;
+    protected @Nullable Node currentSubtreeRoot = null;
 
     public DefaultGoalChooser() {
     }
@@ -70,7 +70,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         setupGoals(p_goals);
     }
 
-    protected void setupGoals(ImmutableList<Goal> p_goals) {
+    protected void setupGoals(@NonNull ImmutableList<Goal> p_goals) {
         goalList = ImmutableSLList.nil();
         selectedList = ImmutableSLList.nil();
         nextGoals = ImmutableSLList.nil();
@@ -104,7 +104,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
          * descendants of that node are unaffected.
          */
         @Override
-        public void proofPruned(ProofTreeEvent e) {
+        public void proofPruned(@NonNull ProofTreeEvent e) {
             currentSubtreeRoot = e.getNode();
             setupGoals(proof.getSubtreeGoals(proof.root()));
         }
@@ -185,7 +185,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         }
     }
 
-    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Object node, @NonNull ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
@@ -215,7 +215,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         }
     }
 
-    protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
+    protected ImmutableList<Goal> insertNewGoals(@NonNull ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
         for (final Goal g : newGoals) {
@@ -231,7 +231,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     }
 
 
-    protected static ImmutableList<Goal> rotateList(ImmutableList<Goal> p_list) {
+    protected static @NonNull ImmutableList<Goal> rotateList(@NonNull ImmutableList<Goal> p_list) {
         if (p_list.isEmpty()) {
             return ImmutableSLList.nil();
         }

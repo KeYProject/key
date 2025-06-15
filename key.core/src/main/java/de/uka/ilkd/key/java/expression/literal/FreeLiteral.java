@@ -12,6 +12,8 @@ import de.uka.ilkd.key.ldt.FreeLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 public class FreeLiteral extends Literal {
 
     public final static FreeLiteral INSTANCE = new FreeLiteral();
@@ -21,7 +23,7 @@ public class FreeLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o == this;
     }
 
@@ -36,12 +38,12 @@ public class FreeLiteral extends Literal {
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return FreeLDT.NAME;
     }
 

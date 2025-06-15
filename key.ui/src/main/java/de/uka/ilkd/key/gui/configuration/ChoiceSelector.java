@@ -28,6 +28,8 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +38,8 @@ public class ChoiceSelector extends JDialog {
     private static final long serialVersionUID = -4470713015801365801L;
     private static final String EXPLANATIONS_RESOURCE =
         "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
-    private final ChoiceSettings settings;
-    private final Map<String, String> category2DefaultChoice;
+    private final @NonNull ChoiceSettings settings;
+    private final @NonNull Map<String, String> category2DefaultChoice;
     private Map<String, Set<String>> category2Choices;
     private boolean changed = false;
 
@@ -55,7 +57,7 @@ public class ChoiceSelector extends JDialog {
      * @param mainWindow the parent window (dialog is centered on this)
      * @param settings the currently selected settings
      */
-    public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
+    public ChoiceSelector(JFrame mainWindow, @NonNull ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
         this.settings = settings;
         category2DefaultChoice = new HashMap<>(settings.getDefaultChoices());
@@ -172,7 +174,7 @@ public class ChoiceSelector extends JDialog {
     /**
      * is called to set the selected choice in <code>category2DefaultChoice</code>
      */
-    private void setDefaultChoice(String sel) {
+    private void setDefaultChoice(@Nullable String sel) {
         String category = catList.getSelectedValue();
         if (sel != null) {
             category2DefaultChoice.put(category, sel);
@@ -207,7 +209,7 @@ public class ChoiceSelector extends JDialog {
      * @param category The category for which the explanation is requested.
      * @return The explanation for the given category.
      */
-    public static String getExplanation(String category) {
+    public static @NonNull String getExplanation(String category) {
         synchronized (ChoiceSelector.class) {
             if (explanationMap == null) {
                 explanationMap = new Properties();
@@ -263,7 +265,7 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
-    public static String getInformation(String choice) {
+    public static @Nullable String getInformation(String choice) {
         if ("JavaCard:on".equals(choice)) {
             return "Sound if a JavaCard program is proven.";
         } else if ("JavaCard:off".equals(choice)) {
@@ -284,7 +286,8 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
+    public static @Nullable ChoiceEntry findChoice(ChoiceEntry @NonNull [] choices,
+            final String choice) {
         return ArrayUtil.search(choices, element -> element.choice().equals(choice));
     }
 
@@ -294,7 +297,7 @@ public class ChoiceSelector extends JDialog {
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static ChoiceEntry[] createChoiceEntries(Set<String> choices) {
+    public static ChoiceEntry[] createChoiceEntries(@Nullable Set<String> choices) {
         if (choices != null) {
             ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
             int i = 0;
@@ -314,7 +317,7 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice.
      * @return The created {@link ChoiceEntry}.
      */
-    public static ChoiceEntry createChoiceEntry(String choice) {
+    public static @NonNull ChoiceEntry createChoiceEntry(String choice) {
         return new ChoiceEntry(choice, isUnsound(choice), isIncomplete(choice),
             getInformation(choice));
     }
@@ -397,7 +400,7 @@ public class ChoiceSelector extends JDialog {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof ChoiceEntry(String choice1, boolean unsound1, boolean incomplete1, String information1)) {
                 return choice.equals(choice1) && incomplete == incomplete1
                         && unsound == unsound1
@@ -411,7 +414,7 @@ public class ChoiceSelector extends JDialog {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             if (unsound && incomplete) {
                 if (information != null) {
                     return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", "

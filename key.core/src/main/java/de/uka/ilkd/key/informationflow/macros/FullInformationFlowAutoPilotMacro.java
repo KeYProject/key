@@ -19,6 +19,9 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
 
     /**
@@ -28,7 +31,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     private static final int NUMBER_OF_TRY_STEPS = -1;
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Full Information Flow Auto Pilot";
     }
 
@@ -38,12 +41,12 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     }
 
     @Override
-    public String getScriptCommandName() {
+    public @NonNull String getScriptCommandName() {
         return "infflow-autopilot";
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "<html><ol><li>Search exhaustively for applicable position, then"
             + "<li>Start auxiliary computation" + "<li>Finish symbolic execution"
             + "<li>Try to close as many goals as possible" + "<li>Apply macro recursively"
@@ -52,53 +55,53 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     }
 
     @Override
-    protected ProofMacro getProofMacro() {
+    protected @NonNull ProofMacro getProofMacro() {
         final SequentialProofMacro stateExpansionAndCloseMacro = new SequentialProofMacro() {
             @Override
-            protected ProofMacro[] createProofMacroArray() {
+            protected ProofMacro @NonNull [] createProofMacroArray() {
                 return new ProofMacro[] { new StateExpansionAndInfFlowContractApplicationMacro(),
                     new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
             }
 
             @Override
-            public String getName() { return ""; }
+            public @NonNull String getName() { return ""; }
 
             @Override
-            public String getCategory() { return null; }
+            public @Nullable String getCategory() { return null; }
 
             @Override
-            public String getDescription() { return "Anonymous Macro"; }
+            public @NonNull String getDescription() { return "Anonymous Macro"; }
         };
 
         final SequentialProofMacro finishMainCompMacro = new SequentialOnLastGoalProofMacro() {
             @Override
-            protected ProofMacro[] createProofMacroArray() {
+            protected ProofMacro @NonNull [] createProofMacroArray() {
                 return new ProofMacro[] { new FinishAuxiliaryComputationMacro(),
                     stateExpansionAndCloseMacro };
             }
 
             @Override
-            public String getName() { return ""; }
+            public @NonNull String getName() { return ""; }
 
             @Override
-            public String getCategory() { return null; }
+            public @Nullable String getCategory() { return null; }
 
             @Override
-            public String getDescription() { return "Anonymous Macro"; }
+            public @NonNull String getDescription() { return "Anonymous Macro"; }
         };
 
         final AlternativeMacro alternativesMacro = new AlternativeMacro() {
             @Override
-            public String getName() { return ""; }
+            public @NonNull String getName() { return ""; }
 
             @Override
-            public String getCategory() { return null; }
+            public @Nullable String getCategory() { return null; }
 
             @Override
-            public String getDescription() { return "Anonymous Macro"; }
+            public @NonNull String getDescription() { return "Anonymous Macro"; }
 
             @Override
-            protected ProofMacro[] createProofMacroArray() {
+            protected ProofMacro @NonNull [] createProofMacroArray() {
                 return new ProofMacro[] { new AuxiliaryComputationAutoPilotMacro(),
                     finishMainCompMacro };
             }
@@ -108,7 +111,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     }
 
     @Override
-    protected ProofMacro getAltProofMacro() {
+    protected @NonNull ProofMacro getAltProofMacro() {
         return new SkipMacro();
     }
 

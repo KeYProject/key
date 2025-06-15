@@ -14,6 +14,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.LRUCache;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Caches whether a Term contains a modality operation.
  *
@@ -27,7 +29,7 @@ public class ModalityCache {
      * a single element cache for the sequent
      * -> Caching more than one sequent did not help since the autopilot rarely revisits nodes
      */
-    private Sequent sequent = null;
+    private @Nullable Sequent sequent = null;
     /**
      * the value of the sequent cache
      */

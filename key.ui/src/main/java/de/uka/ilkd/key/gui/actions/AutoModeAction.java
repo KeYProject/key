@@ -25,6 +25,9 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public final class AutoModeAction extends MainWindowAction {
 
     private static final KeyStroke START_KEY =
@@ -37,26 +40,26 @@ public final class AutoModeAction extends MainWindowAction {
     final Icon startLogo = IconFactory.autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
     final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
 
-    private Proof associatedProof;
+    private @Nullable Proof associatedProof;
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
         @Override
-        public void proofStructureChanged(ProofTreeEvent e) {
+        public void proofStructureChanged(@NonNull ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
         @Override
-        public void proofClosed(ProofTreeEvent e) {
+        public void proofClosed(@NonNull ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
         @Override
-        public void proofGoalsAdded(ProofTreeEvent e) {
+        public void proofGoalsAdded(@NonNull ProofTreeEvent e) {
             Proof p = e.getSource();
             ImmutableList<Goal> newGoals = e.getGoals();
             // Check for a closed goal ...
@@ -67,7 +70,7 @@ public final class AutoModeAction extends MainWindowAction {
         }
     };
 
-    public AutoModeAction(MainWindow mainWindow) {
+    public AutoModeAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         associatedProof = getMediator().getSelectedProof();
         putValue("hideActionText", Boolean.TRUE);
@@ -90,7 +93,7 @@ public final class AutoModeAction extends MainWindowAction {
              * the selected proof has changed. Enable or disable action depending whether a proof is
              * available or not
              */
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
                 if (associatedProof != null) {
                     associatedProof.removeProofTreeListener(ptl);
                 }
@@ -144,7 +147,7 @@ public final class AutoModeAction extends MainWindowAction {
         setEnabled(associatedProof != null && !associatedProof.closed());
     }
 
-    private String getStartCommand() {
+    private @NonNull String getStartCommand() {
         if (associatedProof != null && !associatedProof.root().leaf()) {
             return "Continue";
         } else {

@@ -7,6 +7,8 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * An event thrown by a {@link ProofSaver}.
  *
@@ -35,7 +37,7 @@ public class ProofSaverEvent extends EventObject {
      * @param filename The file name.
      * @param errorMsg The error message.
      */
-    public ProofSaverEvent(ProofSaver source, String filename, String errorMsg) {
+    public ProofSaverEvent(@NonNull ProofSaver source, String filename, String errorMsg) {
         super(source);
         this.filename = filename;
         this.errorMsg = errorMsg;

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public final class QuickSaveAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public QuickSaveAction(MainWindow mainWindow) {
+    public QuickSaveAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Quicksave");
         setTooltip("Save current proof to a temporal location.");
@@ -49,7 +50,7 @@ public final class QuickSaveAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public static void quickSave(MainWindow mainWindow) {
+    public static void quickSave(@NonNull MainWindow mainWindow) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();

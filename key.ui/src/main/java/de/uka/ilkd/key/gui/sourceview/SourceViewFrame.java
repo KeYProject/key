@@ -13,6 +13,8 @@ import javax.swing.JTabbedPane;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This frame contains the {@link SourceView}. Other components may be added in a
  * {@link JTabbedPane} below the {@link SourceView} via {@link #addComponent(JComponent)}
@@ -24,10 +26,10 @@ public class SourceViewFrame extends JSplitPane {
     private static final long serialVersionUID = 382427737154314400L;
 
     /** The source view contained in this frame. */
-    private final SourceView sourceView;
+    private final @NonNull SourceView sourceView;
 
     /** The tabbed pane containing the additional components in this frame. */
-    private final JTabbedPane tabbedPane;
+    private final @NonNull JTabbedPane tabbedPane;
 
     /** The size of the divider between {@link #sourceView} and {@link #tabbedPane}. */
     private final int dividerSize;
@@ -40,7 +42,7 @@ public class SourceViewFrame extends JSplitPane {
      *
      * @param mainWindow the main window.
      */
-    public SourceViewFrame(MainWindow mainWindow) {
+    public SourceViewFrame(@NonNull MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
 
         sourceView = SourceView.getSourceView(mainWindow);
@@ -76,7 +78,7 @@ public class SourceViewFrame extends JSplitPane {
      *
      * @param component the component to be shown.
      */
-    public void addComponent(JComponent component) {
+    public void addComponent(@NonNull JComponent component) {
         addComponent(component, null, new AbstractAction() {
 
             private static final long serialVersionUID = -3905660332423077705L;
@@ -112,7 +114,8 @@ public class SourceViewFrame extends JSplitPane {
      * @param toolTipText the tool tip text for the new tab.
      * @param closeAction the action to perform when the tab is closed.
      */
-    public void addComponent(JComponent component, String toolTipText, Action closeAction) {
+    public void addComponent(@NonNull JComponent component, String toolTipText,
+            Action closeAction) {
         tabbedPane.add(component);
         tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(component),
             new ClosableTabComponent(component.getName(), closeAction));

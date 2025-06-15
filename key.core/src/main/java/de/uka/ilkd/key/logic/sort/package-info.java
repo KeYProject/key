@@ -7,4 +7,7 @@
  * In KeY we distinguish formulas from terms by the special sort instance
  * <tt>Sort.Formula</tt>.
  */
+@NullMarked
 package de.uka.ilkd.key.logic.sort;
+
+import org.jspecify.annotations.NullMarked;

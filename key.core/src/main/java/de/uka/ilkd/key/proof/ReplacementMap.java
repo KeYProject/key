@@ -17,6 +17,8 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A map to be used in an {@link OpReplacer}. It maps operators that should be replaced to their
  * replacements.
@@ -141,7 +143,7 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
         }
 
         @Override
-        public boolean containsKey(Object key) {
+        public boolean containsKey(@NonNull Object key) {
             return map.containsKey(wrap(key));
         }
 
@@ -156,7 +158,7 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
         }
 
         @Override
-        public T put(S key, T value) {
+        public T put(@NonNull S key, T value) {
             return map.put(wrap(key), value);
         }
 

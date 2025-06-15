@@ -12,6 +12,9 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
@@ -67,14 +70,14 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
                 Note: If this option is not selected, an exception is thrown in the case that a not supported number occurs.
                 """;
-    private final JCheckBox useExplicitTypeHierachy;
-    private final JCheckBox useNullInstantiation;
-    private final JCheckBox useBuiltInUniqueness;
-    private final JCheckBox useUIMultiplication;
-    private final JCheckBox useConstantsForIntegers;
-    private final JSpinner minField;
-    private final JSpinner maxField;
-    private ProofDependentSMTSettings settings;
+    private final @NonNull JCheckBox useExplicitTypeHierachy;
+    private final @NonNull JCheckBox useNullInstantiation;
+    private final @NonNull JCheckBox useBuiltInUniqueness;
+    private final @NonNull JCheckBox useUIMultiplication;
+    private final @NonNull JCheckBox useConstantsForIntegers;
+    private final @NonNull JSpinner minField;
+    private final @NonNull JSpinner maxField;
+    private @Nullable ProofDependentSMTSettings settings;
 
 
     public TranslationOptions() {
@@ -90,7 +93,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     }
 
-    public void setSmtSettings(ProofDependentSMTSettings settings) {
+    public void setSmtSettings(@Nullable ProofDependentSMTSettings settings) {
         this.settings = settings;
         if (settings == null) {
             setEnabled(false);
@@ -106,30 +109,30 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
 
-    protected JCheckBox createUseExplicitTypeHierachy() {
+    protected @NonNull JCheckBox createUseExplicitTypeHierachy() {
         return addCheckBox("Use an explicit type hierarchy.", infoUseExplicitTypeHierarchy, false,
             e -> settings.setUseExplicitTypeHierarchy(useExplicitTypeHierachy.isSelected()));
     }
 
-    protected JCheckBox createNullInstantiation() {
+    protected @NonNull JCheckBox createNullInstantiation() {
         return addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
             infoUseNullInstantiation, false,
             e -> settings.setUseNullInstantiation(useNullInstantiation.isSelected()));
     }
 
-    protected JCheckBox createBuiltInUniqueness() {
+    protected @NonNull JCheckBox createBuiltInUniqueness() {
         return addCheckBox("Use built-in mechanism for uniqueness if possible.",
             infoUseBuiltInUniqueness, false,
             e -> settings.setUseBuiltInUniqueness(useBuiltInUniqueness.isSelected()));
     }
 
-    protected JCheckBox createUIMultiplication() {
+    protected @NonNull JCheckBox createUIMultiplication() {
         return addCheckBox("Use uninterpreted multiplication if necessary.",
             infoUseUIMultiplication, false,
             e -> settings.setUseUIMultiplication(useUIMultiplication.isSelected()));
     }
 
-    protected JSpinner createMaxField() {
+    protected @NonNull JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
             if (settings != null) {
                 settings.setMaxInteger(e.longValue());
@@ -150,12 +153,12 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
         return max;
     }
 
-    protected JSpinner createMinField() {
+    protected @NonNull JSpinner createMinField() {
         return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "",
             val -> settings.setMinInteger(val.longValue()));
     }
 
-    protected JCheckBox createConstantsForIntegers() {
+    protected @NonNull JCheckBox createConstantsForIntegers() {
         return addCheckBox("Active", infoUseConstantsForIntegers, false, e -> {
             settings.setUseConstantsForIntegers(useConstantsForIntegers.isSelected());
             maxField.setEnabled(useConstantsForIntegers.isSelected());
@@ -164,18 +167,18 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "SMT Translation (Old)";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPdSettings(window).clone());
         return this;
     }
 
     @Override
-    public void applySettings(MainWindow window) {
+    public void applySettings(@NonNull MainWindow window) {
         ProofDependentSMTSettings current = SettingsManager.getSmtPdSettings(window);
         current.copy(settings);// transfer settings
     }

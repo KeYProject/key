@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -43,7 +45,7 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() { return correspondingNode; }
+    public @Nullable Node getCorrespondingNode() { return correspondingNode; }
 
     /**
      * @return The corresponding SE state (without the program counter).
@@ -54,7 +56,8 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
 
     @Override
     public String toString() {
-        final Services services = getCorrespondingNode().proof().getServices();
+        final Services services =
+            Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("

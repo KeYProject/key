@@ -24,6 +24,8 @@ import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -252,7 +254,7 @@ class EndToEndTests {
         Files.delete(iteration1.second);
     }
 
-    private Proof sliceProof(String filename, int expectedTotal,
+    private @Nullable Proof sliceProof(@NonNull String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         var it =
@@ -262,7 +264,7 @@ class EndToEndTests {
         return it.first;
     }
 
-    private Proof sliceProofOffline(String filename, int expectedTotal,
+    private @Nullable Proof sliceProofOffline(@NonNull String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         var it =

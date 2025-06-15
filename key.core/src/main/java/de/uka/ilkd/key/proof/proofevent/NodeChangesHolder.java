@@ -7,6 +7,8 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 
 public class NodeChangesHolder {
     public ImmutableList<SequentChangeInfo> scis;
@@ -25,7 +27,7 @@ public class NodeChangesHolder {
     }
 
     @Override
-    public Object clone() {
+    public @NonNull Object clone() {
         return new NodeChangesHolder(scis);
     }
 }

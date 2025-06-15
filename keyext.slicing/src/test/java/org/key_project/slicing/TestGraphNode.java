@@ -7,13 +7,15 @@ import de.uka.ilkd.key.proof.BranchLocation;
 
 import org.key_project.slicing.graph.GraphNode;
 
+import org.jspecify.annotations.NonNull;
+
 public class TestGraphNode extends GraphNode {
     TestGraphNode() {
         super(BranchLocation.ROOT);
     }
 
     @Override
-    public GraphNode popLastBranchID() {
+    public @NonNull GraphNode popLastBranchID() {
         return this;
     }
 

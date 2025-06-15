@@ -16,14 +16,13 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.exploration.ExplorationModeModel;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Common functionalities for proof exploration actions.
  */
 public abstract class ExplorationAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -1662459714803539089L;
-
-    protected ExplorationAction(MainWindow mw) {
+    public ExplorationAction(MainWindow mw) {
         super(mw);
     }
 
@@ -31,7 +30,8 @@ public abstract class ExplorationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
     }
 
-    JTerm promptForTerm(MainWindow window, JTerm term) {
+    @Nullable
+    JTerm promptForTerm(MainWindow window, @Nullable JTerm term) {
         final String initialValue =
             term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 

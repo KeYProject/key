@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -44,7 +45,7 @@ public class ExpressionTranslatorTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "exprs.txt", delimiter = '^')
-    public void parseAndInterpret(String expr) {
+    public void parseAndInterpret(@NonNull String expr) {
         KeYJavaType kjt = new KeYJavaType(JavaDLTheory.ANY);
         LocationVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);

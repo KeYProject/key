@@ -9,6 +9,8 @@ package de.uka.ilkd.key.rule.inst;
  */
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This exception thrown if there is no appropriate instantiation of the generic sorts occurring
  * within an "SVInstantiations"-object
@@ -36,7 +38,7 @@ public class GenericSortException extends SortException {
         this.conditions = pConditions;
     }
 
-    public String getMessage() {
+    public @NonNull String getMessage() {
         return super.getMessage() + (conditions == null ? "" : conditions);
     }
 }

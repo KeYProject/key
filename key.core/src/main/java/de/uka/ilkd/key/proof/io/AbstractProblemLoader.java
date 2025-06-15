@@ -108,7 +108,7 @@ public abstract class AbstractProblemLoader {
     /**
      * The filename of the proof in the zipped file (null if file is not a proof bundle).
      */
-    private Path proofFilename;
+    private @Nullable Path proofFilename;
 
     /**
      * The optional class path entries to use.
@@ -156,28 +156,28 @@ public abstract class AbstractProblemLoader {
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
-    private EnvInput envInput;
+    private @Nullable EnvInput envInput;
 
     /**
      * The instantiated {@link ProblemInitializer} used during the loading process.
      */
-    private ProblemInitializer problemInitializer;
+    private @Nullable ProblemInitializer problemInitializer;
 
     /**
      * The instantiated {@link InitConfig} which provides access to the loaded source elements and
      * specifications.
      */
-    private InitConfig initConfig;
+    private @Nullable InitConfig initConfig;
 
     /**
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
-    private Proof proof;
+    private @Nullable Proof proof;
 
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
-    private ReplayResult result;
+    private @Nullable ReplayResult result;
 
     /**
      * Whether warnings (generated when loading the proof) should be ignored
@@ -223,7 +223,8 @@ public abstract class AbstractProblemLoader {
      *        the loaded {@link InitConfig}.
      */
     protected AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
-            List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+            List<Path> includes, @Nullable Profile profileOfNewProofs,
+            boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce) {
@@ -266,7 +267,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(Consumer<Proof> callbackProofLoaded)
+    public final void load(@Nullable Consumer<Proof> callbackProofLoaded)
             throws Exception {
         control.loadingStarted(this);
 
@@ -335,7 +336,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            Consumer<Proof> callbackProofLoaded) {
+            @Nullable Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -554,7 +555,7 @@ public abstract class AbstractProblemLoader {
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected LoadedPOContainer createProofObligationContainer() throws Exception {
+    protected @Nullable LoadedPOContainer createProofObligationContainer() throws Exception {
         final String chooseContract;
         final Configuration proofObligation;
 
@@ -812,7 +813,7 @@ public abstract class AbstractProblemLoader {
      * @return The instantiate proof or {@code null} if no proof was instantiated during loading
      *         process.
      */
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 

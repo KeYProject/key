@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A very simple type of prover, but it is sufficient for the automatic lemmata handling: Normally
  * there is a mechanism for choosing the next goal in a cyclic way if for the currently chosen goal
@@ -80,7 +82,7 @@ public class AutomaticProver {
             this.maxNumberOfRules = maxNumberOfRules;
         }
 
-        private LinkedList<Goal> copyGoals(ImmutableList<Goal> goals) {
+        private @NonNull LinkedList<Goal> copyGoals(@NonNull ImmutableList<Goal> goals) {
             LinkedList<Goal> result = new LinkedList<>();
             for (Goal goal : goals) {
                 result.add(goal);
@@ -128,7 +130,7 @@ public class AutomaticProver {
             }
         }
 
-        private RuleApp getNextApp(Goal goal) {
+        private RuleApp getNextApp(@NonNull Goal goal) {
             RuleApp app = goal.getRuleAppManager().next();
             if (app == null) {
                 goal.ruleAppIndex().scanBuiltInRules(goal);

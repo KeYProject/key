@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Action to select the next goal below in the proof tree.
  */
@@ -20,7 +22,7 @@ public final class GoalSelectBelowAction extends MainWindowAction {
      *
      * @param mainWindow the main window this action belongs to
      */
-    public GoalSelectBelowAction(MainWindow mainWindow) {
+    public GoalSelectBelowAction(@NonNull MainWindow mainWindow) {
         super(mainWindow, true);
         setName("Select Goal Below");
         setIcon(IconFactory.selectGoalBelow(MainWindow.TOOLBAR_ICON_SIZE));

@@ -8,9 +8,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 public class SetMinus extends BinaryOperator {
 
-    public SetMinus(ExtList children) {
+    public SetMinus(@NonNull ExtList children) {
         super(children);
     }
 
@@ -25,7 +27,7 @@ public class SetMinus extends BinaryOperator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSetMinus(this);
     }
 

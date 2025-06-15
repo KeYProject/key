@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.CommandLineException;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public final class Main {
 
     }
 
-    private static void processFileOrDir(Path path, boolean overwrite) {
+    private static void processFileOrDir(@NonNull Path path, boolean overwrite) {
         if (Files.isRegularFile(path)) {
             try {
                 if (!path.toString().endsWith(".proof")) {
@@ -75,7 +76,7 @@ public final class Main {
      *
      * @param args command-line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String @NonNull [] args) {
         try {
             var cl = createCommandLine();
             cl.parse(args);
@@ -144,7 +145,7 @@ public final class Main {
         }
     }
 
-    private static CommandLine createCommandLine() {
+    private static @NonNull CommandLine createCommandLine() {
         var cl = new CommandLine();
         cl.setIndentation(3);
         cl.addSection("Using KeY's proof slicer");
@@ -156,7 +157,7 @@ public final class Main {
         return cl;
     }
 
-    private static void evaluateOptions(CommandLine cl) {
+    private static void evaluateOptions(@NonNull CommandLine cl) {
         if (cl.getFileArguments().isEmpty()) {
             LOGGER.error("provide at least one proof to slice");
             System.exit(1);

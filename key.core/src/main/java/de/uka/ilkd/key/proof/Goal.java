@@ -44,7 +44,9 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -88,11 +90,11 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * the strategy object that determines automated application of rules
      */
-    private Strategy goalStrategy = null;
+    private @Nullable Strategy goalStrategy = null;
     /**
      * This is the object which keeps book about all applicable rules.
      */
-    private RuleApplicationManager<Goal> ruleAppManager;
+    private @Nullable RuleApplicationManager<Goal> ruleAppManager;
     /**
      * goal listeners
      */
@@ -104,7 +106,7 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * Marks this goal as linked (-> {@link MergeRule})
      */
-    private Goal linkedGoal = null;
+    private @Nullable Goal linkedGoal = null;
     /**
      * The namespaces local to this goal. This may evolve over time.
      */
@@ -115,7 +117,8 @@ public final class Goal implements ProofGoal<Goal> {
      */
     private Goal(Node node, RuleAppIndex ruleAppIndex,
             ImmutableList<RuleApp> appliedRuleApps,
-            FormulaTagManager tagManager, RuleApplicationManager<Goal> ruleAppManager,
+            @Nullable FormulaTagManager tagManager,
+            @Nullable RuleApplicationManager<Goal> ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex.copy(this);
@@ -150,7 +153,10 @@ public final class Goal implements ProofGoal<Goal> {
      * @return {@code true} has applicable rules, {@code false} no rules are applicable.
      */
     public static boolean hasApplicableRules(Goal goal) {
-        return goal.getRuleAppManager().peekNext() != null;
+        final var appManager = goal.getRuleAppManager();
+        if (appManager == null)
+            return false;
+        return appManager.peekNext() != null;
     }
 
     /**
@@ -163,16 +169,18 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * @return the strategy that determines automated rule applications for this goal
      */
-    public Strategy getGoalStrategy() {
+    public @Nullable Strategy getGoalStrategy() {
         if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
         }
         return goalStrategy;
     }
 
-    public void setGoalStrategy(Strategy p_goalStrategy) {
-        goalStrategy = p_goalStrategy;
-        ruleAppManager.clearCache();
+    public void setGoalStrategy(@Nullable Strategy goalStrategy) {
+        this.goalStrategy = goalStrategy;
+        if (ruleAppManager != null) {
+            ruleAppManager.clearCache();
+        }
     }
 
     @Override
@@ -180,23 +188,25 @@ public final class Goal implements ProofGoal<Goal> {
         return ruleAppManager;
     }
 
+    @SuppressWarnings("nullness") // TODO: Why do we temporarily set fields to null??
     public void setRuleAppManager(RuleApplicationManager<Goal> manager) {
         if (ruleAppManager != null) {
-            ruleAppIndex.setNewRuleListener(null);
             ruleAppManager.setGoal(null);
+            ruleAppIndex.setNewRuleListener(null);
         }
 
         ruleAppManager = manager;
 
         if (ruleAppManager != null) {
-            ruleAppIndex.setNewRuleListener(ruleAppManager);
             ruleAppManager.setGoal(this);
+            ruleAppIndex.setNewRuleListener(ruleAppManager);
         }
     }
 
     /**
      * returns the referenced node
      */
+    @Pure
     public Node node() {
         return node;
     }
@@ -335,6 +345,7 @@ public final class Goal implements ProofGoal<Goal> {
      *
      * @return true, if is automatic
      */
+    @Pure
     public boolean isAutomatic() {
         return automatic;
     }
@@ -356,6 +367,7 @@ public final class Goal implements ProofGoal<Goal> {
      *
      * @return true iff this goal is linked to another node.
      */
+    @Pure
     public boolean isLinked() {
         return this.linkedGoal != null;
     }
@@ -368,7 +380,7 @@ public final class Goal implements ProofGoal<Goal> {
      *
      * @param linkedGoal The goal that this goal is linked to.
      */
-    public void setLinkedGoal(final Goal linkedGoal) {
+    public void setLinkedGoal(final @Nullable Goal linkedGoal) {
         this.linkedGoal = linkedGoal;
     }
 
@@ -473,7 +485,8 @@ public final class Goal implements ProofGoal<Goal> {
      * Rebuild all rule caches
      */
     public void clearAndDetachRuleAppIndex() {
-        getRuleAppManager().clearCache();
+        if (ruleAppManager != null)
+            ruleAppManager.clearCache();
         ruleAppIndex.clearAndDetachCache();
     }
 
@@ -493,12 +506,14 @@ public final class Goal implements ProofGoal<Goal> {
     public Goal clone(Node node) {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
-            clone = new Goal(node, ruleAppIndex, appliedRuleApps, null, ruleAppManager.copy(),
+            clone = new Goal(node, ruleAppIndex, appliedRuleApps, null,
+                ruleAppManager == null ? null : ruleAppManager.copy(),
                 strategyInfos.clone(), localNamespaces);
         } else {
             clone =
                 new Goal(node, ruleAppIndex, appliedRuleApps, getFormulaTagManager().copy(),
-                    ruleAppManager.copy(), strategyInfos.clone(), localNamespaces);
+                    ruleAppManager == null ? null : ruleAppManager.copy(),
+                    strategyInfos.clone(), localNamespaces);
         }
         clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
         clone.automatic = this.automatic;
@@ -555,7 +570,7 @@ public final class Goal implements ProofGoal<Goal> {
             this.setNode(newNode);
             goalList = goalList.prepend(this);
         } else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary
-                            // creation of arrays
+            // creation of arrays
             Node[] newNode = new Node[n];
 
             for (int i = 0; i < n; i++) {
@@ -613,7 +628,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return new goal(s)
      */
     @Override
-    public ImmutableList<Goal> apply(@NonNull final RuleApp ruleApp) {
+    public @Nullable ImmutableList<Goal> apply(@NonNull final RuleApp ruleApp) {
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);

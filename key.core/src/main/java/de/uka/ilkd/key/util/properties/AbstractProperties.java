@@ -9,6 +9,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 public abstract class AbstractProperties implements Properties {
 
     private final Map<Property<?>, Set<PropertyListener>> listenerMap =
@@ -48,7 +50,7 @@ public abstract class AbstractProperties implements Properties {
         }
     }
 
-    protected <T> void firePropertyChange(Property<T> property, T oldValue, T newValue) {
+    protected <T> void firePropertyChange(Property<T> property, @Nullable T oldValue, T newValue) {
         if (oldValue == null || !oldValue.equals(newValue)) {
             Set<PropertyListener> list = listenerMap.get(property);
             if (list != null) {

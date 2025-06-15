@@ -20,6 +20,9 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This is the starting class for ProofManagement.
  * <br>
@@ -63,16 +66,16 @@ public final class Main {
     private static final String USAGE_MERGE = STRINGS.getString("usage_merge");
 
     /** main command line of proof management */
-    private static final CommandLine CL;
+    private static final @NonNull CommandLine CL;
 
     /** subcommandline for the check commmand */
-    private static final CommandLine CL_MERGE;
+    private static final @NonNull CommandLine CL_MERGE;
 
     /** subcommandline for the merge commmand */
-    private static final CommandLine CL_CHECK;
+    private static final @NonNull CommandLine CL_CHECK;
 
     /** subcommandline of merge (used as a hack for forwarding check options) */
-    private static final CommandLine CL_MERGE_CHECK;
+    private static final @NonNull CommandLine CL_MERGE_CHECK;
 
     static {
         // TODO: check todos in CommandLine class
@@ -116,7 +119,7 @@ public final class Main {
      *
      * @param args the commandline arguments. See class JavaDoc for a detailed description.
      */
-    public static void main(String[] args) {
+    public static void main(String @NonNull [] args) {
         try {
             CL.parse(args);
             if (CL.subCommandUsed("check")) {
@@ -161,7 +164,7 @@ public final class Main {
      * @param reportPath the output path for the HTML report (if selected)
      */
     public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
-            Path bundlePath, Path reportPath) {
+            @NonNull Path bundlePath, @Nullable Path reportPath) {
 
         // we accumulate results in this variable
         CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
@@ -206,7 +209,8 @@ public final class Main {
         }
     }
 
-    private static void generateReport(CheckerData globalResult, Path reportPath) {
+    private static void generateReport(@NonNull CheckerData globalResult,
+            @NonNull Path reportPath) {
         try {
             HTMLReport.print(globalResult, reportPath);
         } catch (IOException e) {
@@ -216,7 +220,7 @@ public final class Main {
     }
 
     // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
-    private static void check(CommandLine commandLine) {
+    private static void check(@NonNull CommandLine commandLine) {
         List<String> arguments = commandLine.getArguments();
         if (arguments.size() != 1) {
             commandLine.printUsage(System.out);

@@ -3,40 +3,40 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import java.util.Optional;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
+
+
 /**
  * Ccatch.
- *
  */
 public class Ccatch extends BranchImp implements ParameterContainer, VariableScope {
 
     /**
      * Parameter.
      */
-    protected final Optional<ParameterDeclaration> parameter;
+    protected final @Nullable ParameterDeclaration parameter;
 
-    private final Optional<CcatchNonstandardParameterDeclaration> nonStdParameter;
+    private final @Nullable CcatchNonstandardParameterDeclaration nonStdParameter;
 
     /**
      * Body.
      */
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
 
     /**
      * Ccatch.
      */
     public Ccatch() {
         super();
-        parameter = Optional.empty();
+        parameter = null;
         body = null;
-        nonStdParameter = Optional.empty();
+        nonStdParameter = null;
     }
 
     /**
@@ -48,8 +48,8 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
         this.body = body;
-        parameter = Optional.of(e);
-        nonStdParameter = Optional.empty();
+        parameter = e;
+        nonStdParameter = null;
     }
 
     /**
@@ -61,8 +61,8 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
         super();
         this.body = body;
-        parameter = Optional.empty();
-        nonStdParameter = Optional.of(e);
+        parameter = null;
+        nonStdParameter = e;
     }
 
     /**
@@ -74,9 +74,8 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      */
     public Ccatch(ExtList children) {
         super(children);
-        parameter = Optional.ofNullable(children.get(ParameterDeclaration.class));
-        nonStdParameter =
-            Optional.ofNullable(children.get(CcatchNonstandardParameterDeclaration.class));
+        parameter = children.get(ParameterDeclaration.class);
+        nonStdParameter = children.get(CcatchNonstandardParameterDeclaration.class);
         body = children.get(StatementBlock.class);
     }
 
@@ -86,11 +85,11 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     }
 
     public boolean hasParameterDeclaration() {
-        return parameter.isPresent();
+        return parameter != null;
     }
 
     public boolean hasNonStdParameterDeclaration() {
-        return nonStdParameter.isPresent();
+        return nonStdParameter != null;
     }
 
     /**
@@ -118,19 +117,19 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
             if (index == 0) {
-                return parameter.get();
+                return parameter;
             }
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
             if (index == 0) {
-                return nonStdParameter.get();
+                return nonStdParameter;
             }
             index--;
         }
@@ -185,15 +184,13 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      * declaration array.
      *
      * @param index an index for a parameter declaration.
-     *
      * @return the parameter declaration with the given index.
-     *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
         if (hasParameterDeclaration() && index == 0) {
-            return parameter.get();
+            return parameter;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -203,14 +200,12 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      * parameter declaration array.
      *
      * @param index an index for a parameter declaration.
-     *
      * @return the parameter declaration with the given index.
-     *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(int index) {
         if (hasNonStdParameterDeclaration() && index == 0) {
-            return nonStdParameter.get();
+            return nonStdParameter;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -230,7 +225,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      * @return the parameter declaration.
      */
     public ParameterDeclaration getParameterDeclaration() {
-        return parameter.orElse(null);
+        return parameter;
     }
 
     /**
@@ -239,7 +234,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      * @return the parameter declaration.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclaration() {
-        return nonStdParameter.orElse(null);
+        return nonStdParameter;
     }
 
     /**

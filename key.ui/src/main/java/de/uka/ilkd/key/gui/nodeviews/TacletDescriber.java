@@ -20,6 +20,9 @@ import org.key_project.prover.rules.conditions.NewDependingOn;
 import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They
  * compute the text to show for a rule application which consists of the sequent including the
@@ -27,7 +30,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 class TacletDescriber {
 
-    private static void writeSVModifiers(StringBuffer out, SchemaVariable psv) {
+    private static void writeSVModifiers(@NonNull StringBuffer out, SchemaVariable psv) {
         boolean started = false;
         if (psv instanceof JOperatorSV sv) {
             if (sv.isRigid() && !(sv instanceof VariableSV)) {
@@ -53,7 +56,8 @@ class TacletDescriber {
         }
     }
 
-    private static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
+    private static void writeTacletSchemaVariable(@NonNull StringBuffer out,
+            SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
             for (final var op : modalOpSV.getModalities()) {
@@ -91,7 +95,8 @@ class TacletDescriber {
         out.append(" ").append(schemaVar.name());
     }
 
-    private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
+    private static void writeTacletSchemaVariablesHelper(@NonNull StringBuffer out,
+            final @NonNull Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getAssumesAndFindVariables();
 
         for (final NewVarcond nvc : t.varsNew()) {
@@ -130,7 +135,8 @@ class TacletDescriber {
      * @param app The {@link RuleApp} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {
+    public static @NonNull String getTacletDescription(@NonNull KeYMediator mediator,
+            @Nullable RuleApp app, int width) {
         StringBuilder s = new StringBuilder();
 
         if (app != null) {
@@ -161,7 +167,7 @@ class TacletDescriber {
         return s.toString();
     }
 
-    private static VisibleTermLabels getVisibleTermLabels() {
+    private static @NonNull VisibleTermLabels getVisibleTermLabels() {
         return MainWindow.getInstance().getVisibleTermLabels();
     }
 

@@ -279,7 +279,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof DependencyContractPO)) {
             return false;
         } else {

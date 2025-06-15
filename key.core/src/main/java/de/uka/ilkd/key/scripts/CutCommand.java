@@ -15,6 +15,8 @@ import de.uka.ilkd.key.scripts.meta.Option;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
  * id "#2"
@@ -27,12 +29,12 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "cut";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return """
                 CutCommand has as script command name "cut"
 
@@ -41,7 +43,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
@@ -54,7 +56,9 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
      * @throws InterruptedException
      */
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    @SuppressWarnings("override.param.invalid")
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(CUT_TACLET_NAME);
@@ -66,6 +70,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public JTerm formula;

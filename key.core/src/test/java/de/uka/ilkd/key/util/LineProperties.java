@@ -48,7 +48,7 @@ public class LineProperties {
             if (line.startsWith("###")) {
                 if (lastKey != null) {
                     String str = sb.toString().trim();
-                    if (str.length() > 0) {
+                    if (!str.isEmpty()) {
                         map.put(lastKey, str);
                     }
                 }
@@ -65,7 +65,7 @@ public class LineProperties {
 
         if (lastKey != null) {
             String str = sb.toString().trim();
-            if (str.length() > 0) {
+            if (!str.isEmpty()) {
                 map.put(lastKey, str);
             }
         }

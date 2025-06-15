@@ -7,6 +7,8 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class MetaBinaryXOr extends MetaArithBitMaskOp {
 
@@ -16,7 +18,7 @@ public final class MetaBinaryXOr extends MetaArithBitMaskOp {
 
 
     @Override
-    protected BigInteger bitmaskOp(BigInteger left, BigInteger right) {
+    protected @NonNull BigInteger bitmaskOp(@NonNull BigInteger left, BigInteger right) {
         return left.xor(right);
     }
 }

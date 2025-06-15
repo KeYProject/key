@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Wraps a list of expressions.
  */
@@ -30,7 +32,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
      * @param services the Services
      * @return the list of types that compose the type signature
      */
-    public ImmutableList<KeYJavaType> getSignature(Services services) {
+    public @NonNull ImmutableList<KeYJavaType> getSignature(@NonNull Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
@@ -47,6 +49,6 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
         return result;
     }
 
-    public String toString() { return parameters == null ? "" : parameters.toString(); }
+    public @NonNull String toString() { return parameters == null ? "" : parameters.toString(); }
 
 }

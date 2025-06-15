@@ -44,6 +44,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,8 @@ public abstract class AbstractTestGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestGenerator.class);
     private final UserInterfaceControl ui;
     private final Proof originalProof;
-    private SolverLauncher launcher;
-    private List<Proof> proofs;
+    private @Nullable SolverLauncher launcher;
+    private @Nullable List<Proof> proofs;
 
     /**
      * Constructor.
@@ -72,10 +73,7 @@ public abstract class AbstractTestGenerator {
     }
 
     public void generateTestCases(final StopRequest stopRequest, final TestGenerationLog log) {
-
-
         TestGenerationSettings settings = TestGenerationSettings.getInstance();
-
 
         if (!SolverTypes.Z3_CE_SOLVER.isInstalled(true)) {
             log.writeln("Could not find the z3 SMT solver. Aborting.");

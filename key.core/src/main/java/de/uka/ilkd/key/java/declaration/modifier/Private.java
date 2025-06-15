@@ -5,6 +5,8 @@ package de.uka.ilkd.key.java.declaration.modifier;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Private.
@@ -35,7 +37,7 @@ public class Private extends VisibilityModifier {
      *
      * @return the string.
      */
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "private";
     }
 

@@ -4,6 +4,7 @@
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;
@@ -54,7 +55,7 @@ public class EditFormulaAction extends ExplorationAction {
         Goal g = getMediator().getSelectedGoal();
         JTerm newTerm = promptForTerm(mainWindow, term);
 
-        if (newTerm.equals(term)) {
+        if (Objects.equals(newTerm, term) || newTerm == null) {
             return;
         }
 

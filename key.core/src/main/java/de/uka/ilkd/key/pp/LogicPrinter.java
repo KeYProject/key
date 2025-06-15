@@ -44,6 +44,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +122,7 @@ public class LogicPrinter {
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param services The Services object
      */
-    public static LogicPrinter purePrinter(NotationInfo notationInfo, Services services) {
+    public static LogicPrinter purePrinter(NotationInfo notationInfo, @Nullable Services services) {
         return new LogicPrinter(notationInfo, services, PosTableLayouter.pure());
     }
 

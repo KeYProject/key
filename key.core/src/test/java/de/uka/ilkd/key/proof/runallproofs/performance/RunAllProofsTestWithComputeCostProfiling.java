@@ -19,6 +19,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.*;
 
 /**
@@ -68,7 +69,7 @@ public class RunAllProofsTestWithComputeCostProfiling {
         createPlots(directories.instantiateAppDataDir);
     }
 
-    public static void createPlots(File dataDir) throws IOException {
+    public static void createPlots(@NonNull File dataDir) throws IOException {
         for (File ruleData : Objects.requireNonNull(dataDir.listFiles())) {
             String ruleName = ruleData.getAbsolutePath();
             // /.../rulename.data -> /.../rulename [remove file ending]

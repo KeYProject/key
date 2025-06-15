@@ -13,22 +13,23 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A JML model method declaration in textual form.
  */
 public final class TextualJMLMethodDecl extends TextualJMLConstruct {
-    private final JmlParser.Method_declarationContext methodDefinition;
+    private final JmlParser.@NonNull Method_declarationContext methodDefinition;
 
 
-    public TextualJMLMethodDecl(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Method_declarationContext methodDefinition) {
+    public TextualJMLMethodDecl(@NonNull ImmutableList<JMLModifier> modifiers,
+            JmlParser.@NonNull Method_declarationContext methodDefinition) {
         super(modifiers);
         this.methodDefinition = methodDefinition;
         setPosition(methodDefinition);
     }
 
-    public String getParsableDeclaration() {
+    public @NonNull String getParsableDeclaration() {
         String m = modifiers.stream().map(it -> {
             if (JMLTransformer.javaModifiers.contains(it)) {
                 return it.toString();
@@ -52,7 +53,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
             getMethodName(), paramsString);
     }
 
-    public JmlParser.Method_declarationContext getDecl() {
+    public JmlParser.@NonNull Method_declarationContext getDecl() {
         return methodDefinition;
     }
 
@@ -60,7 +61,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         return methodDefinition.IDENT().getText();
     }
 
-    public ParserRuleContext getMethodDefinition() {
+    public @NonNull ParserRuleContext getMethodDefinition() {
         return methodDefinition;
     }
 
@@ -70,7 +71,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (this == o) {
             return true;
         }

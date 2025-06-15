@@ -8,6 +8,7 @@ import de.uka.ilkd.key.speclang.njml.PreParser;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TextualJMLAssertStatementTest {
-    private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {
+    private static ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull String ms) {
         return new PreParser(true).parseMethodLevel(ms, null, Position.newOneBased(1, 1));
     }
 
@@ -27,7 +28,7 @@ public class TextualJMLAssertStatementTest {
                 //@ assert (\\forall int j; 0 <= j < 10; true); # (\\forall int j; 0 <= j < 10; true);
                 //@ assert (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k)); # (\\forall int j; 0 <= j < 10; (\\exists int k; 0 <= k < 10; j == k));
                 """)
-    void assertTextRepr(String input, String text) {
+    void assertTextRepr(@NonNull String input, String text) {
         var constructs = parseMethodLevel(input);
         assertNotNull(constructs);
         assertEquals(1, constructs.size());

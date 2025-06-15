@@ -28,6 +28,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
 
+
 /**
  * This{@link KeYWatchpoint} represents a KeY watchpoint and is responsible to tell the debugger to
  * stop execution when the respective watchpoint evaluates its condition to true.

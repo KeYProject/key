@@ -7,6 +7,8 @@ import java.awt.Frame;
 
 import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
 
+import org.jspecify.annotations.NonNull;
+
 public class ExceptionFailureNotification extends NotificationTask {
 
     public ExceptionFailureNotification(Frame parentComponent) {
@@ -24,7 +26,7 @@ public class ExceptionFailureNotification extends NotificationTask {
     }
 
     @Override
-    public NotificationEventID getEventID() {
+    public @NonNull NotificationEventID getEventID() {
         return NotificationEventID.EXCEPTION_CAUSED_FAILURE;
     }
 

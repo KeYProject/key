@@ -12,6 +12,8 @@ import de.uka.ilkd.key.ldt.MapLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 public class EmptyMapLiteral extends Literal {
 
     public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral();
@@ -20,7 +22,7 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o == this;
     }
 
@@ -30,17 +32,17 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnEmptyMapLiteral(this);
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MAP);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return MapLDT.NAME;
     }
 

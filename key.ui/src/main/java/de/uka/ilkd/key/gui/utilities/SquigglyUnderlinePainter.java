@@ -9,6 +9,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A highlight painter for drawing a squiggly line under the selection. Color and width of the line
  * can be set, although the result may not always look nice since there is no anti-aliasing.
@@ -20,7 +23,7 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     private final Color highlightColor;
 
     /** the stroke of the highlights to paint (for the line width) */
-    private final Stroke stroke;
+    private final @NonNull Stroke stroke;
 
     /** the size, i.e., radius, of a single squiggle */
     private final int squiggleSize;
@@ -39,7 +42,8 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     }
 
     @Override
-    public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
+    public void paint(@NonNull Graphics g, int offs0, int offs1, @Nullable Shape bounds,
+            @NonNull JTextComponent c) {
         // don't render if empty
         if (offs0 == offs1) {
             return;

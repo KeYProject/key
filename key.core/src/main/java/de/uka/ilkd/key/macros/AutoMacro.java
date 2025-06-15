@@ -24,6 +24,8 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in proof scripts. It is
  * possible to
@@ -83,8 +85,7 @@ public class AutoMacro extends StrategyProofMacro {
 
     @Override
     public String getCategory() {
-        // This is only meant for proof scripting
-        return null;
+        return "";
     }
 
     @Override
@@ -146,7 +147,7 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }

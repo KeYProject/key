@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * The JML modifier "two_state".
@@ -21,7 +23,7 @@ public class TwoState extends Modifier {
     }
 
 
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "two_state";
     }
 }

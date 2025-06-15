@@ -33,7 +33,7 @@ public class TestgenExtension
     private TestGenerationAction actionTestGeneration;
     private CounterExampleAction actionCounterExample;
 
-    private void init(MainWindow window) {
+    private void init(@NonNull MainWindow window) {
         this.actionCounterExample = new CounterExampleAction(window);
         this.actionTestGeneration = new TestGenerationAction(window);
     }
@@ -45,7 +45,7 @@ public class TestgenExtension
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
+    public void init(@NonNull MainWindow window, KeYMediator mediator) {
         init(window);
         KeyStrokeSettings.defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,
             KeyStrokeManager.MULTI_KEY_MASK));
@@ -60,13 +60,13 @@ public class TestgenExtension
     }
 
     @Override
-    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+    public @NonNull Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
             JComponent component) {
         return Collections.emptyList();
     }
 
     @Override
-    public SettingsProvider getSettings() {
+    public @NonNull SettingsProvider getSettings() {
         return new TestgenOptionsPanel();
     }
 }

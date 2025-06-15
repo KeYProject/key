@@ -20,6 +20,7 @@ import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public class PerfScope {
         }
     }
 
-    public static String formatTime(long dt) {
+    public static @NonNull String formatTime(long dt) {
         String unit;
         double time;
         if (dt < 1000000) {

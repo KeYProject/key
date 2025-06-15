@@ -108,6 +108,7 @@ public interface JTerm
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
+    @Nullable
     TermLabel getLabel(Name termLabelName);
 
     /**

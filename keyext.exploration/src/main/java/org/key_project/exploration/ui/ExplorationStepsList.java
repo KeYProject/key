@@ -50,7 +50,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         treeExploration.setSelectionPath(selectionPath);
     };
 
-    private transient Proof currentProof;
+    private transient @Nullable Proof currentProof;
     private boolean enabled;
 
 
@@ -84,7 +84,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    public Proof getProof() { return currentProof; }
+    public @Nullable Proof getProof() {
+        return currentProof;
+    }
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
@@ -259,7 +261,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    private TreePath getTreePath(Node n) {
+    private @Nullable TreePath getTreePath(Node n) {
         MyTreeNode rootNode = (MyTreeNode) treeModelExploration.getRoot();
         Enumeration<TreeNode> treeNodeEnumeration = rootNode.depthFirstEnumeration();
         while (treeNodeEnumeration.hasMoreElements()) {
@@ -382,7 +384,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             if (explorationNode != null) {
                 ExplorationNodeData lookup = explorationNode.lookup(ExplorationNodeData.class);
-                explorationNode.deregister(lookup, ExplorationNodeData.class);
+                if (lookup != null)
+                    explorationNode.deregister(lookup, ExplorationNodeData.class);
                 // update list and tree with current proof
             }
             createModel(mediator.getSelectedProof());

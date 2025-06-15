@@ -17,6 +17,8 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel. It contains a
  * table for presenting the taclets using special filters. The dialog owns two SelectionPanels, one
@@ -55,7 +57,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
         this.setLocationRelativeTo(MainWindow.getInstance());
     }
 
-    public ImmutableSet<Taclet> showModal(List<TacletInfo> taclets) {
+    public @NonNull ImmutableSet<Taclet> showModal(@NonNull List<TacletInfo> taclets) {
         this.setModal(true);
         this.getTacletChooser().setItems(taclets, "Taclets");
         this.setVisible(true);
@@ -152,7 +154,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     }
 
     @Override
-    public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
+    public @NonNull ImmutableSet<Taclet> filter(@NonNull List<TacletInfo> taclets) {
 
         return showModal(taclets);
     }

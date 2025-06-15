@@ -27,6 +27,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This profile sets up KeY for verification of JavaCard programs.
  *
@@ -45,14 +47,14 @@ public class JavaProfile extends AbstractProfile {
      * {@link Thread}).
      * </p>
      */
-    public static JavaProfile defaultInstance;
-    public static JavaProfile defaultInstancePermissions;
+    private static @Nullable JavaProfile defaultInstance;
+    private static @Nullable JavaProfile defaultInstancePermissions;
 
     public static final StrategyFactory DEFAULT = new JavaCardDLStrategyFactory();
 
     private boolean permissions = false;
 
-    private OneStepSimplifier oneStepSimpilifier;
+    private @Nullable OneStepSimplifier oneStepSimpilifier;
 
     protected JavaProfile(String standardRules) {
         super(standardRules);

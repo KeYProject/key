@@ -15,6 +15,9 @@ import de.uka.ilkd.key.settings.TermLabelSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Opens a {@link OriginTermLabelVisualizer} for the selected term.
  *
@@ -24,14 +27,14 @@ public class ShowOriginAction extends MainWindowAction {
 
     private static final long serialVersionUID = 4557953425770258852L;
 
-    private final PosInSequent pos;
+    private final @NonNull PosInSequent pos;
 
     /**
      * Creates a new {@link ShowOriginAction}.
      *
      * @param pos the position of the term whose origin shall be shown.
      */
-    public ShowOriginAction(PosInSequent pos) {
+    public ShowOriginAction(@Nullable PosInSequent pos) {
         super(MainWindow.getInstance());
         this.pos = pos == null ? PosInSequent.createSequentPos() : pos;
 

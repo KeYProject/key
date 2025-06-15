@@ -9,6 +9,9 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
 /**
@@ -20,8 +23,6 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
  * @version 1 (13.02.19)
  */
 public abstract class KeyAction extends AbstractAction {
-    private static final long serialVersionUID = -3939943174392925224L;
-
     /**
      * SHORTCUT_FOCUSED_CONDITION
      */
@@ -39,7 +40,7 @@ public abstract class KeyAction extends AbstractAction {
      * <p>
      * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
      * a sub-sub Menu Options below Heatmap.
-     *
+     * <p>
      * (see {@code KeYGuiExtensionFacade.findMenu(JMenu, Iterator)})
      */
     public static final String PATH = "PATH";
@@ -62,11 +63,11 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(NAME);
     }
 
-    protected void setName(String name) {
+    protected void setName(@UnderInitialization KeyAction this, String name) {
         putValue(NAME, name);
     }
 
-    protected void setAcceleratorLetter(int letter) {
+    protected void setAcceleratorLetter(@UnderInitialization KeyAction this, int letter) {
         setAcceleratorKey(KeyStroke.getKeyStroke(letter, SHORTCUT_KEY_MASK));
     }
 
@@ -82,7 +83,7 @@ public abstract class KeyAction extends AbstractAction {
         return (KeyStroke) getValue(ACCELERATOR_KEY);
     }
 
-    protected void setAcceleratorKey(KeyStroke keyStroke) {
+    protected void setAcceleratorKey(@UnderInitialization KeyAction this, KeyStroke keyStroke) {
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
@@ -90,7 +91,8 @@ public abstract class KeyAction extends AbstractAction {
         KeyStrokeManager.lookupAndOverride(this);
     }
 
-    protected void lookupAcceleratorKey(KeyStroke defaultValue) {
+    protected void lookupAcceleratorKey(@UnderInitialization KeyAction this,
+            @NonNull KeyStroke defaultValue) {
         KeyStrokeManager.lookupAndOverride(this, defaultValue.toString());
     }
 
@@ -98,7 +100,7 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(SHORT_DESCRIPTION);
     }
 
-    protected void setTooltip(String toolTip) {
+    protected void setTooltip(@UnderInitialization KeyAction this, String toolTip) {
         putValue(SHORT_DESCRIPTION, toolTip);
     }
 
@@ -106,7 +108,7 @@ public abstract class KeyAction extends AbstractAction {
         putValue(SMALL_ICON, icon);
     }
 
-    protected void setLargeIcon(Icon icon) {
+    protected void setLargeIcon(@UnderInitialization KeyAction this, Icon icon) {
         putValue(LARGE_ICON_KEY, icon);
     }
 
@@ -118,7 +120,7 @@ public abstract class KeyAction extends AbstractAction {
         return (Icon) getValue(SMALL_ICON);
     }
 
-    protected void setSmallIcon(Icon icon) {
+    protected void setSmallIcon(@UnderInitialization KeyAction this, Icon icon) {
         putValue(SMALL_ICON, icon);
     }
 
@@ -130,7 +132,7 @@ public abstract class KeyAction extends AbstractAction {
         return getValue(SELECTED_KEY) == Boolean.TRUE;
     }
 
-    protected void setSelected(Boolean b) {
+    protected void setSelected(@UnderInitialization KeyAction this, Boolean b) {
         putValue(SELECTED_KEY, b);
     }
 
@@ -138,7 +140,7 @@ public abstract class KeyAction extends AbstractAction {
         return (String) getValue(PATH);
     }
 
-    protected void setMenuPath(String path) {
+    protected void setMenuPath(@UnderInitialization KeyAction this, String path) {
         putValue(PATH, path);
     }
 
@@ -152,7 +154,7 @@ public abstract class KeyAction extends AbstractAction {
      *
      * @param priority integer value
      */
-    protected void setPriority(int priority) {
+    protected void setPriority(@UnderInitialization KeyAction this, int priority) {
         putValue(PRIORITY, priority);
     }
 }

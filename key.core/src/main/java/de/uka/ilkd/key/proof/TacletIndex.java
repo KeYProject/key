@@ -483,7 +483,7 @@ public abstract class TacletIndex {
      * @param name the name to lookup
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
-    public NoPosTacletApp lookup(Name name) {
+    public @Nullable NoPosTacletApp lookup(Name name) {
         for (NoPosTacletApp tacletApp : allNoPosTacletApps()) {
             if (tacletApp.taclet().name().equals(name)) {
                 return tacletApp;

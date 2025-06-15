@@ -14,6 +14,8 @@ import de.uka.ilkd.key.scripts.meta.Option;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  *
  */
@@ -24,13 +26,13 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
 
         if (args.type == null || args.var == null) {
             throw new ScriptException("Missing argument: type var");
@@ -63,10 +65,11 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "schemaVar";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public String type;

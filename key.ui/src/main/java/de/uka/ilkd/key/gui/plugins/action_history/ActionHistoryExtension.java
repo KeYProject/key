@@ -23,6 +23,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Entry point for the Action History functionality.
@@ -44,8 +47,8 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * The undo button contained in the main toolbar.
      */
-    private UndoHistoryButton undoButton = null;
-    private JButton undoUptoButton = null;
+    private @Nullable UndoHistoryButton undoButton = null;
+    private @Nullable JButton undoUptoButton = null;
     /**
      * Proofs this extension is monitoring for changes.
      */
@@ -53,9 +56,9 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * The currently shown proof.
      */
-    private Proof currentProof = null;
+    private @Nullable Proof currentProof = null;
 
-    private List<UserAction> getActions() {
+    private @NonNull List<UserAction> getActions() {
         List<UserAction> actions = userActions.get(currentProof);
         if (actions == null) {
             return List.of();
@@ -70,7 +73,7 @@ public class ActionHistoryExtension implements UserActionListener,
         return actions;
     }
 
-    private void undoOneAction(UserAction userAction) {
+    private void undoOneAction(@NonNull UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
         assert !allActions.isEmpty();
         assert allActions.get(allActions.size() - 1) == userAction;
@@ -84,7 +87,7 @@ public class ActionHistoryExtension implements UserActionListener,
      *
      * @param userAction the action
      */
-    private void undoUptoAction(UserAction userAction) {
+    private void undoUptoAction(@NonNull UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
         int idx = allActions.indexOf(userAction);
         for (int i = allActions.size() - 1; i >= idx; i--) {
@@ -93,7 +96,7 @@ public class ActionHistoryExtension implements UserActionListener,
         }
     }
 
-    public ActionHistoryExtension(MainWindow window, KeYMediator mediator) {
+    public ActionHistoryExtension(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         mediator.addUserActionListener(this);
         mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
@@ -107,7 +110,7 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     @Override
-    public void actionPerformed(UserAction action) {
+    public void actionPerformed(@NonNull UserAction action) {
         List<UserAction> userActionList =
             userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
@@ -116,7 +119,7 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
+    public void proofDisposing(@NonNull ProofDisposedEvent e) {
         Proof p = e.getSource();
         if (p == currentProof) {
             currentProof = null;
@@ -136,7 +139,7 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
         currentProof = p;
         if (p == null || registeredProofs.contains(p)) {
@@ -146,11 +149,11 @@ public class ActionHistoryExtension implements UserActionListener,
         p.addProofDisposedListener(this);
     }
 
-    public JButton getUndoUptoButton() {
+    public @Nullable JButton getUndoUptoButton() {
         return undoUptoButton;
     }
 
-    public UndoHistoryButton getUndoButton() {
+    public @Nullable UndoHistoryButton getUndoButton() {
         return undoButton;
     }
 }

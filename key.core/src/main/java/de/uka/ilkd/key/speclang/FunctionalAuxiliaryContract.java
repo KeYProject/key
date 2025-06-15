@@ -26,6 +26,8 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
  *
@@ -65,7 +67,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @param contract a block contract.
      */
-    FunctionalAuxiliaryContract(T contract) {
+    FunctionalAuxiliaryContract(@NonNull T contract) {
         this(contract, INVALID_ID);
     }
 
@@ -74,7 +76,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @param contract a block contract.
      * @param id an ID.
      */
-    FunctionalAuxiliaryContract(T contract, int id) {
+    FunctionalAuxiliaryContract(@NonNull T contract, int id) {
         this.contract = contract;
         this.id = id;
 
@@ -337,7 +339,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @return the corresponding {@link AuxiliaryContract}.
      */
-    public T getAuxiliaryContract() {
+    public @NonNull T getAuxiliaryContract() {
         return contract;
     }
 

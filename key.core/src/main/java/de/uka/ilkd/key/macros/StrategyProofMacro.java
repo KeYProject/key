@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -21,6 +22,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class StrategyProofMacro can be used to define proof macros which use their own
  * strategy.
@@ -37,7 +40,8 @@ import org.key_project.util.collection.ImmutableList;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy<Goal> createStrategy(Proof proof, PosInOccurrence posInOcc);
+    protected abstract Strategy<Goal> createStrategy(Proof proof,
+            @Nullable PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}
@@ -49,7 +53,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -69,13 +73,15 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * If the automation is interrupted, report the interruption as an exception.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns
             // false
-            return null;
+            throw new AssertionError();
+            // return null;
         }
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
@@ -95,7 +101,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             FocussedRuleApplicationManager manager;
             for (Goal goal : goals) {
                 realManager = goal.getRuleAppManager();
-                realManager.clearCache();
+                Objects.requireNonNull(realManager).clearCache();
                 manager = new FocussedRuleApplicationManager(realManager, goal, posInOcc);
                 goal.setRuleAppManager(manager);
             }

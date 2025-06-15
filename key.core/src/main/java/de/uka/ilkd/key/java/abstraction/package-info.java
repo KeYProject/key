@@ -1,5 +1,6 @@
 /**
- * This package contains the metamodel abstractions as used by the
+ * This @org.jspecify.annotations.NullMarked packagecontains the metamodel abstractions as used by
+ * the
  * semantical services. The {@link recoder.abstraction.ProgramModelElement}s
  * hide the origin of the information, be it from Java source code,
  * Java byte code, or predefined lacking any syntactical representation.
@@ -15,4 +16,5 @@
  * {@link recoder.service.SourceInfo} implementations and should
  * not be modified from others.
  */
+@org.jspecify.annotations.NullMarked
 package de.uka.ilkd.key.java.abstraction;

@@ -7,16 +7,14 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.Position;
 
-public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
+import org.jspecify.annotations.Nullable;
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4411508672178909020L;
+public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
     private final String instantiation;
     private final String detail;
 
-    public SVInstantiationParserException(String instantiation, Position position, String detail,
+    public SVInstantiationParserException(String instantiation, Position position,
+            @Nullable String detail,
             boolean inIfSequent) {
         super("Parser Error", position, inIfSequent);
         this.instantiation = instantiation;
@@ -63,7 +61,7 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
     }
 
     @Override
-    public SVInstantiationParserException initCause(Throwable cause) {
+    public SVInstantiationParserException initCause(@Nullable Throwable cause) {
         super.initCause(cause);
         return this;
     }

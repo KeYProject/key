@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class ArrayLengthCondition extends VariableConditionAdapter {
 
@@ -43,7 +45,7 @@ public final class ArrayLengthCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? " \\not " : "") + "\\isArrayLength(" + reference + ")";
     }
 }

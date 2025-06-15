@@ -3,4 +3,7 @@
  * also contain parsers for extended versions of Java, as it is used in proofs
  * and in rule files.
  */
+@NullMarked
 package de.uka.ilkd.key.parser;
+
+import org.jspecify.annotations.NullMarked;

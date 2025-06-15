@@ -211,7 +211,7 @@ public class SMTTermCall extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object term) {
 
         if (this == term) {
             return true;

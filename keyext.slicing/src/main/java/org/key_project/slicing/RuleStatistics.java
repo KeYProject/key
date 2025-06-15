@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.key_project.prover.rules.Rule;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Simple data object to store a mapping of rules to various counters.
  *
@@ -34,7 +36,7 @@ public class RuleStatistics {
      * @param rule the rule
      * @param branches whether this rule application creates new proof branches
      */
-    public void addApplication(Rule rule, boolean branches) {
+    public void addApplication(@NonNull Rule rule, boolean branches) {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
@@ -50,7 +52,7 @@ public class RuleStatistics {
      * @param rule the rule
      * @param branches whether this rule application creates new proof branches
      */
-    public void addUselessApplication(Rule rule, boolean branches) {
+    public void addUselessApplication(@NonNull Rule rule, boolean branches) {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
@@ -66,7 +68,7 @@ public class RuleStatistics {
      * @param rule the rule
      * @param branches whether this rule application creates new proof branches
      */
-    public void addInitialUselessApplication(Rule rule, boolean branches) {
+    public void addInitialUselessApplication(@NonNull Rule rule, boolean branches) {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
@@ -84,7 +86,7 @@ public class RuleStatistics {
      * @param comparator custom comparator
      * @return list of rule names + counters
      */
-    public List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
+    public @NonNull List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
         return map.entrySet().stream()
                 .map(entry -> new RuleStatisticEntry(entry.getKey(),
                     entry.getValue().numberOfApplications,

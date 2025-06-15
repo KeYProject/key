@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class PosInSequentTransferable implements Transferable {
     }
 
     /** the highlighted position in the sequentview to be transferred */
-    private final PosInSequent pis;
+    private final @NonNull PosInSequent pis;
 
     /** the highlighted term as parseable string */
     private String stringSelection;
@@ -51,7 +53,7 @@ public class PosInSequentTransferable implements Transferable {
      * @param pis the PosInSequent to be transfered (string flavor only supported if pis denotes a
      *        term or formula, not the complete sequent)
      */
-    public PosInSequentTransferable(PosInSequent pis, Services serv) {
+    public PosInSequentTransferable(@NonNull PosInSequent pis, Services serv) {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
@@ -65,7 +67,7 @@ public class PosInSequentTransferable implements Transferable {
      *
      * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
      */
-    public DataFlavor[] getTransferDataFlavors() {
+    public DataFlavor @NonNull [] getTransferDataFlavors() {
         return new DataFlavor[] { POS_IN_SEQUENT_TRANSFER, DataFlavor.stringFlavor };
     }
 
@@ -75,7 +77,7 @@ public class PosInSequentTransferable implements Transferable {
      * @see
      * java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
      */
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
+    public boolean isDataFlavorSupported(@Nullable DataFlavor flavor) {
         return flavor != null && (flavor.equals(POS_IN_SEQUENT_TRANSFER)
                 || flavor.equals(DataFlavor.stringFlavor));
     }
@@ -87,7 +89,7 @@ public class PosInSequentTransferable implements Transferable {
      *
      * @throws UnsupportedFlavorException if the flavor is not supported
      */
-    public Object getTransferData(DataFlavor flavor)
+    public @NonNull Object getTransferData(@Nullable DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
         if (flavor != null) {
             if (flavor.equals(POS_IN_SEQUENT_TRANSFER)) {

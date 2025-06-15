@@ -12,6 +12,8 @@ import javax.swing.ListSelectionModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Action enabling or disabling a selected set of goals. The component to which this action is
  * registered must implement the {@link ListSelectionModel} interface.
@@ -40,7 +42,7 @@ public abstract class DisableGoal extends AbstractAction {
      *
      * @param goals array of goals to be enabled or disabled
      */
-    private void setGoalStatus(Iterable<Goal> goals) {
+    private void setGoalStatus(@NonNull Iterable<Goal> goals) {
         for (final Goal g : goals) {
             g.setEnabled(enableGoals);
         }

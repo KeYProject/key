@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines the basic methods and properties each element in the symbolic execution tree model has.
  *
@@ -24,6 +26,7 @@ public interface IExecutionElement {
      *
      * @return The {@link ITreeSettings} to use.
      */
+    @Nullable
     ITreeSettings getSettings();
 
     /**
@@ -31,6 +34,7 @@ public interface IExecutionElement {
      *
      * @return The {@link Services} used by {@link #getProof()}.
      */
+    @Nullable
     Services getServices();
 
     /**
@@ -38,6 +42,7 @@ public interface IExecutionElement {
      *
      * @return The {@link InitConfig} used by {@link #getProof()}.
      */
+    @Nullable
     InitConfig getInitConfig();
 
     /**
@@ -45,6 +50,7 @@ public interface IExecutionElement {
      *
      * @return The {@link Proof} from which the symbolic execution tree was extracted.
      */
+    @Nullable
     Proof getProof();
 
     /**
@@ -54,6 +60,7 @@ public interface IExecutionElement {
      * @return The {@link Node} in KeY's proof tree which is represented by this execution tree
      *         node.
      */
+    @Nullable
     Node getProofNode();
 
     /**
@@ -61,6 +68,7 @@ public interface IExecutionElement {
      *
      * @return The applied {@link RuleApp}.
      */
+    @Nullable
     RuleApp getAppliedRuleApp();
 
     /**
@@ -68,6 +76,7 @@ public interface IExecutionElement {
      *
      * @return The {@link PosInOccurrence} of the modality of interest including updates.
      */
+    @Nullable
     PosInOccurrence getModalityPIO();
 
     /**
@@ -75,6 +84,7 @@ public interface IExecutionElement {
      *
      * @return The {@link NodeInfo} of {@link #getProofNode()}.
      */
+    @Nullable
     NodeInfo getProofNodeInfo();
 
     /**

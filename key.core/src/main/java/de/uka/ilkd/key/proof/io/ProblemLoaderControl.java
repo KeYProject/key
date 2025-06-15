@@ -13,6 +13,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Allows to observe and control the loading performed by an {@link AbstractProblemLoader}.
  *
@@ -35,8 +37,10 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
      * @param result The occurred {@link ReplayResult}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
+    void loadingFinished(AbstractProblemLoader loader,
+            @Nullable LoadedPOContainer poContainer,
+            @Nullable ProofAggregate proofList,
+            @Nullable ReplayResult result) throws ProblemLoaderException;
 
     /**
      * This method is called if no {@link LoadedPOContainer} was created via

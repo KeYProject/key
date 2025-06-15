@@ -66,8 +66,7 @@ public class TestProofStarter {
             env = KeYEnvironment.load(file, null, null, null);
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);
-            ProofStarter ps = new ProofStarter(false);
-            ps.init(proof);
+            ProofStarter ps = new ProofStarter.Builder(false).build(proof);
             HelperClassForTests.setOneStepSimplificationEnabled(proof, oneStepSimplification);
             ProofSearchInformation<Proof, Goal> info = ps.start();
             assertNotNull(info);

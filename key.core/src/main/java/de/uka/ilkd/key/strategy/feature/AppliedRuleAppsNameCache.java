@@ -39,7 +39,7 @@ public class AppliedRuleAppsNameCache {
      * @return the value
      */
     private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(
-            Node node) {
+            @NonNull Node node) {
         HashMap<Name, List<RuleApp>> nodeCache;
         try {
             writeLock.lock();

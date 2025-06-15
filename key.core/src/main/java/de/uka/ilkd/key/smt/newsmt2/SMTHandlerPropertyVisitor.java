@@ -8,6 +8,8 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.IntegerProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Visitor pattern for {@link SMTHandlerProperty} objects.
  *
@@ -15,11 +17,15 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
  * @param <R> return type
  */
 public interface SMTHandlerPropertyVisitor<A, R> {
+    @Nullable
     R visit(EnumProperty<?> enumProp, A arg);
 
+    @Nullable
     R visit(IntegerProperty integerProp, A arg);
 
+    @Nullable
     R visit(BooleanProperty booleanProp, A arg);
 
+    @Nullable
     R visit(StringProperty stringProp, A arg);
 }

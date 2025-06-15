@@ -16,6 +16,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if an array component is of reference type
@@ -71,7 +73,7 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (checkReferenceType ? "" : " \\not ") + "\\isReferenceArray(" + var + ")";
     }
 

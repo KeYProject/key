@@ -18,6 +18,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         super(SMTCommandArguments.class);
     }
 
-    private static Map<String, SolverType> computeSolverMap() {
+    private static @NonNull Map<String, SolverType> computeSolverMap() {
         Map<String, SolverType> result = new HashMap<>();
 
         for (SolverType type : SolverTypes.getSolverTypes()) {
@@ -41,18 +42,20 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public SMTCommandArguments evaluateArguments(@NonNull EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "smt";
     }
 
     @Override
-    public void execute(SMTCommandArguments args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull SMTCommandArguments args)
+            throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
@@ -67,7 +70,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         }
     }
 
-    private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
+    private void runSMT(@NonNull SMTCommandArguments args, @NonNull SolverTypeCollection su,
+            @NonNull Goal goal) {
         DefaultSMTSettings settings =
             new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
@@ -96,7 +100,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         }
     }
 
-    private SolverTypeCollection computeSolvers(String value) throws ScriptException {
+    private @NonNull SolverTypeCollection computeSolvers(@NonNull String value)
+            throws ScriptException {
         String[] parts = value.split(" *, *");
         List<SolverType> types = new ArrayList<>();
         for (String name : parts) {
@@ -111,7 +116,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
 
     public static class SMTCommandArguments {
         @Option("solver")
-        public String solver = "Z3";
+        public @NonNull String solver = "Z3";
 
         @Option(value = "all", required = false)
         public boolean all = false;
@@ -144,7 +149,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     private static class SMTSettingsTimeoutWrapper extends DefaultSMTSettings {
         private final int timeout;
 
-        public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {
+        public SMTSettingsTimeoutWrapper(@NonNull DefaultSMTSettings settings, int timeout) {
             super(settings.getPdSettings(), settings.getPiSettings(),
                 settings.getNewTranslationSettings(), settings.getProof());
             this.timeout = timeout;

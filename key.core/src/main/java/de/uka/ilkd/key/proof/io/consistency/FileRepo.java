@@ -15,6 +15,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This interface provides access to files. In addition, it can be used to save a consistent zip
  * bundle containing all proof relevant files.
@@ -25,10 +27,8 @@ public interface FileRepo extends ProofDisposedListener {
     /**
      * Provides access to a file on disk.
      *
-     * May return <code>null</code> if the path cannot be handled by this repository.
-     *
      * @param path the path of the file
-     * @return an InputStream of the requested file, or <code>null</code>
+     * @return an InputStream of the requested file
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
@@ -37,8 +37,6 @@ public interface FileRepo extends ProofDisposedListener {
     /**
      * Provides access to the InputStream of a RuleSource. The file the RuleSource is read from is
      * registered to the FileRepo.
-     *
-     * May return <code>null</code> if the source cannot be handled by this repository.
      *
      * @param ruleSource the RuleSource
      * @return an InputStream of the RuleSource, or <code>null</code>
@@ -49,8 +47,6 @@ public interface FileRepo extends ProofDisposedListener {
     /**
      * Provides access to the InputStream of a file identified by an URL. The file is registered to
      * the FileRepo.
-     *
-     * May return <code>null</code> if the url cannot be handled by this repository.
      *
      * @param url the URL of the file
      * @return an InputStream to the file identified by the URL, or <code>null</code>
@@ -66,6 +62,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
      */
+    @Nullable
     OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**

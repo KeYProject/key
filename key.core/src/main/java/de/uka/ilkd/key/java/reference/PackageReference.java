@@ -79,7 +79,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
@@ -147,7 +147,8 @@ public class PackageReference extends JavaNonTerminalProgramElement
         return this;
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }

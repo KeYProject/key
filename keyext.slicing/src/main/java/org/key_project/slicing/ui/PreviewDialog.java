@@ -13,6 +13,8 @@ import javax.swing.border.EmptyBorder;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 import org.key_project.slicing.util.GraphvizResult;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Dialog that displays a rendering of the dependency graph.
  * Requires that graphviz (dot) is installed on the system.
@@ -23,7 +25,7 @@ public class PreviewDialog extends JDialog implements WindowListener {
     /**
      * Graphviz executor.
      */
-    private final transient GraphvizDotExecutor worker;
+    private final transient @NonNull GraphvizDotExecutor worker;
     /**
      * Parent window of this dialog.
      */
@@ -36,7 +38,7 @@ public class PreviewDialog extends JDialog implements WindowListener {
      * @param window parent window
      * @param dot graph in DOT format
      */
-    public PreviewDialog(Window window, String dot) {
+    public PreviewDialog(Window window, @NonNull String dot) {
         super(window, "Preview");
 
         this.window = window;
@@ -82,7 +84,7 @@ public class PreviewDialog extends JDialog implements WindowListener {
         }
     }
 
-    private void workerDone(GraphvizResult result) {
+    private void workerDone(@NonNull GraphvizResult result) {
         if (result.hasImage()) {
             getContentPane().removeAll();
             PanZoomImageView pziv = new PanZoomImageView(result.image(), 800, 600);

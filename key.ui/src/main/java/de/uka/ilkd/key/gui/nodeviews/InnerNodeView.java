@@ -31,6 +31,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,22 +54,21 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     private static final long serialVersionUID = -6542881446084654358L;
 
 
-    private InitialPositionTable posTable;
+    private @Nullable InitialPositionTable posTable;
 
-    private final InnerNodeViewListener listener;
+    private final @NonNull InnerNodeViewListener listener;
 
-    private JTextArea tacletInfo = new JTextArea();
+    private @NonNull JTextArea tacletInfo = new JTextArea();
 
-    private Node node;
+    private @Nullable Node node;
     private final RuleApp ruleApp;
 
-    public InnerNodeView(Node node, MainWindow mainWindow) {
+    public InnerNodeView(@NonNull Node node, @NonNull MainWindow mainWindow) {
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
     }
 
-    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp,
-            Sequent sequent,
-            MainWindow mainWindow) {
+    public InnerNodeView(@NonNull Proof proof, Node node, RuleApp ruleApp, @NonNull Sequent sequent,
+            @NonNull MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
         this.ruleApp = ruleApp;
@@ -89,7 +90,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
         new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
 
-    private void highlightRuleAppPosition(RuleApp app) {
+    private void highlightRuleAppPosition(@NonNull RuleApp app) {
         try {
             // Set the find highlight first and then the if highlights
             // This seems to make cause the find one to be painted
@@ -115,7 +116,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      * @param tapp The taclet app whose assumes-formulas should be highlighted.
      * @throws BadLocationException if the highlight is placed at a non-existing position
      */
-    private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
+    private void highlightIfFormulas(@NonNull TacletApp tapp) throws BadLocationException {
         final ImmutableList<AssumesFormulaInstantiation> ifs = tapp.assumesFormulaInstantiations();
         if (ifs == null) {
             return;
@@ -131,7 +132,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         }
     }
 
-    private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
+    private void highlightIfInsts(@NonNull IBuiltInRuleApp bapp) throws BadLocationException {
         final ImmutableList<PosInOccurrence> ifs = bapp.assumesInsts();
         if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
             /*
@@ -160,7 +161,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      *         highlighted.
      * @throws BadLocationException
      */
-    private Range highlightPos(PosInOccurrence pos,
+    private @NonNull Range highlightPos(@NonNull PosInOccurrence pos,
             HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, getFilter());
@@ -213,7 +214,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         // If a leaf becomes an inner node, it is already closed.
         if (node != null && node.leaf()) {
             return "Closed Goal";

@@ -7,9 +7,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 public class Intersect extends BinaryOperator {
 
-    public Intersect(ExtList children) {
+    public Intersect(@NonNull ExtList children) {
         super(children);
     }
 
@@ -24,7 +26,7 @@ public class Intersect extends BinaryOperator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnIntersect(this);
     }
 

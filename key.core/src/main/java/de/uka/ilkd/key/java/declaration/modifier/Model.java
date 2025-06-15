@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * The JML modifier "model".
@@ -21,7 +23,7 @@ public class Model extends Modifier {
     }
 
 
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "model";
     }
 }

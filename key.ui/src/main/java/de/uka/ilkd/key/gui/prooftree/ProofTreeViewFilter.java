@@ -11,6 +11,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Filters for the proof tree view.
  *
@@ -128,7 +131,7 @@ public abstract class ProofTreeViewFilter {
          * @return the number of child nodes, not counting the ones hidden by the active filters.
          * @see #countChild(TreeNode, TreeNode, int)
          */
-        public int getChildCount(Object parent) {
+        public int getChildCount(@NonNull Object parent) {
             TreeNode child;
             int count = 0;
             for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
@@ -148,7 +151,7 @@ public abstract class ProofTreeViewFilter {
          *         filters.
          * @see #countChild(TreeNode, TreeNode, int)
          */
-        public Object getChild(Object parent, int index) {
+        public @Nullable Object getChild(@NonNull Object parent, int index) {
             TreeNode child;
             int count = -1;
             for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
@@ -207,7 +210,8 @@ public abstract class ProofTreeViewFilter {
     private static class HideIntermediateFilter extends NodeFilter {
 
         @Override
-        protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
+        protected boolean countChild(@NonNull GUIProofTreeNode node, @NonNull TreeNode parent,
+                int pos) {
             if (pos == parent.getChildCount() - 1) {
                 return true;
             }
@@ -236,12 +240,12 @@ public abstract class ProofTreeViewFilter {
         }
 
         @Override
-        public String name() {
+        public @NonNull String name() {
             return "Hide Intermediate Proofsteps";
         }
 
         @Override
-        public boolean showSubtree(Node node) {
+        public boolean showSubtree(@NonNull Node node) {
             Node parent = node.parent();
             return node.equals(parent.child(parent.childrenCount() - 1));
         }
@@ -250,7 +254,8 @@ public abstract class ProofTreeViewFilter {
     private static class OnlyInteractiveFilter extends NodeFilter {
 
         @Override
-        protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
+        protected boolean countChild(@NonNull GUIProofTreeNode node, @NonNull TreeNode parent,
+                int pos) {
             if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
                 return true;
             }
@@ -283,12 +288,12 @@ public abstract class ProofTreeViewFilter {
         }
 
         @Override
-        public String name() {
+        public @NonNull String name() {
             return "Hide Non-interactive Proofsteps";
         }
 
         @Override
-        public boolean showSubtree(Node node) {
+        public boolean showSubtree(@NonNull Node node) {
             return node.getNodeInfo().getInteractiveRuleApplication();
         }
     }
@@ -308,7 +313,7 @@ public abstract class ProofTreeViewFilter {
         }
 
         @Override
-        public String name() {
+        public @NonNull String name() {
             return "Hide Closed Subtrees";
         }
 
@@ -318,7 +323,7 @@ public abstract class ProofTreeViewFilter {
         }
 
         @Override
-        public boolean showSubtree(Node node) {
+        public boolean showSubtree(@NonNull Node node) {
             return !node.isClosed();
         }
     }
@@ -338,7 +343,7 @@ public abstract class ProofTreeViewFilter {
         }
 
         @Override
-        public String name() {
+        public @NonNull String name() {
             return "Hide Subtrees Whose Goals are Interactive";
         }
 
@@ -353,7 +358,7 @@ public abstract class ProofTreeViewFilter {
         }
 
         @Override
-        public boolean showSubtree(Node node) {
+        public boolean showSubtree(@NonNull Node node) {
             Proof proof = node.proof();
 
             // Show subtrees with at least one automatic goal.

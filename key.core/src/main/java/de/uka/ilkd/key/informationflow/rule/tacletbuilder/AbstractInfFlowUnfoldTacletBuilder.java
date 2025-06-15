@@ -152,8 +152,9 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         JTerm guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ? guardAtPreSV
                 : createTermSV(poVars.post.guard, schemaPrefix, services);
-        JTerm resAtPostSV = (poVars.post.result == null || poVars.post.result.op().equals(n)) ? null
-                : createTermSV(poVars.post.result, schemaPrefix, services);
+        JTerm resAtPostSV =
+            (poVars.post.resultTerm == null || poVars.post.resultTerm.op().equals(n)) ? null
+                    : createTermSV(poVars.post.resultTerm, schemaPrefix, services);
         JTerm excAtPostSV =
             (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ? null
                     : createTermSV(poVars.post.exception, schemaPrefix, services);
@@ -232,7 +233,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         JTerm self = schemaVars.self;
         JTerm guard = schemaVars.guard;
         ImmutableList<JTerm> localVars = schemaVars.localVars;
-        JTerm result = schemaVars.result;
+        JTerm result = schemaVars.resultTerm;
         JTerm exception = schemaVars.exception;
         JTerm heap = schemaVars.heap;
         JTerm mbyAtPre = schemaVars.mbyAtPre;
@@ -247,7 +248,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         } else if (origVars.localVars.isEmpty()) {
             localVars = ImmutableSLList.nil();
         }
-        if (origVars.result == null) {
+        if (origVars.resultTerm == null) {
             result = null;
         }
         if (origVars.exception == null) {

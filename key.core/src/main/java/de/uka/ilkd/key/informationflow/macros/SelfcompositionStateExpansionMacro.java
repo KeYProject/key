@@ -41,12 +41,12 @@ import org.jspecify.annotations.NonNull;
 public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExpansionMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Self-composition state expansion";
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Extract the self-composed states after the merge of the "
             + "symbolic execution goals which is included in the proof "
             + "obligation generation from information flow contracts.";
@@ -60,18 +60,18 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     @Override
-    protected Set<String> getAdmittedRuleNames() {
+    protected @NonNull Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected @NonNull Strategy createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+    protected boolean ruleApplicationInContextAllowed(@NonNull RuleApp ruleApp,
             PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
@@ -125,13 +125,14 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return NAME;
         }
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
-                PosInOccurrence pio, Goal p_goal, MutableState mState) {
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(
+                @NonNull RuleApp ruleApp, @NonNull PosInOccurrence pio,
+                @NonNull Goal p_goal, MutableState mState) {
             final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))

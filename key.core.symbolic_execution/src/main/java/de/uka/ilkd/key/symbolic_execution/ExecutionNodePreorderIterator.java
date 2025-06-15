@@ -5,6 +5,9 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Iterates preorder over the whole sub tree of a given {@link IExecutionNode}.
@@ -85,7 +88,7 @@ public class ExecutionNodePreorderIterator {
      * @param node The visited {@link IExecutionNode}.
      * @return The next {@link IExecutionNode} to visit.
      */
-    protected IExecutionNode<?> getNextOnParent(IExecutionNode<?> node) {
+    protected @Nullable IExecutionNode<?> getNextOnParent(@NonNull IExecutionNode<?> node) {
         IExecutionNode<?> parent = node.getParent();
         while (parent != null) {
             boolean IExecutionNodeFound = false; // Indicates that IExecutionNode was found on the

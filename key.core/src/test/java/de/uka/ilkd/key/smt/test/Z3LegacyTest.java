@@ -9,6 +9,8 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,7 @@ public class Z3LegacyTest extends SMTSolverTest {
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(Z3LegacyTest.class);
     private static final String SOLVER_NAME = "Z3 (Legacy Translation)";
-    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+    private static final @Nullable SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals(SOLVER_NAME))
             .findFirst().orElse(null);
@@ -38,17 +40,17 @@ public class Z3LegacyTest extends SMTSolverTest {
     }
 
     @Override
-    protected String getSystemPropertySolverPath() {
+    protected @NonNull String getSystemPropertySolverPath() {
         return SYSTEM_PROPERTY_SOLVER_PATH;
     }
 
     @Override
-    protected String getSolverName() {
+    protected @NonNull String getSolverName() {
         return SOLVER_NAME;
     }
 
     @Override
-    public SolverType getSolverType() {
+    public @NonNull SolverType getSolverType() {
         SolverType type = Z3_SOLVER;
         String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
         if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
@@ -58,7 +60,7 @@ public class Z3LegacyTest extends SMTSolverTest {
     }
 
     @Override
-    protected Stream<Arguments> provideTestData() {
+    protected @NonNull Stream<Arguments> provideTestData() {
         return Stream.of(
             Arguments.of(FALSIFIABLE, "andnot.key"),
             Arguments.of(VALID, "ornot.key"),

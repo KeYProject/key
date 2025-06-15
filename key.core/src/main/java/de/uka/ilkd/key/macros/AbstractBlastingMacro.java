@@ -47,6 +47,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -57,9 +58,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     protected abstract Set<String> getAllowedPullOut();
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         for (Goal goal : goals) {
             addInvariantFormula(goal);
@@ -90,8 +91,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
 
@@ -119,6 +119,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             Sort sort = kjt.getSort();
 
+            if (sort == null) {
+                continue;
+            }
             if (!containsSubTypes(sort, sorts)) {
                 continue;
             }
@@ -129,10 +132,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 continue;
             }
 
-            LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
+            LogicVariable o = new LogicVariable(new Name("o"), sort);
             for (ClassAxiom c : spec.getClassAxioms(kjt)) {
                 if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
-                    addFormulas(result, kjt, c, o, h, services);
+                    addFormulas(result, sort, c, o, h, services);
                 }
             }
         }
@@ -140,10 +143,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     private static void addFormulas(List<SequentFormula> result,
-            KeYJavaType kjt, ClassAxiom c,
+            Sort sort, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        JTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+        JTerm exactInstance = tb.exactInstance(sort, tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
 
         try {

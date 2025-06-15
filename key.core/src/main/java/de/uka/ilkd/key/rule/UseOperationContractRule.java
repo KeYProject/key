@@ -72,6 +72,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
@@ -338,7 +339,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         PosInProgram result = PosInProgram.TOP;
 
-        if (pe instanceof ProgramPrefix curPrefix) {
+        if (pe instanceof @Nullable ProgramPrefix curPrefix) {
 
             final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();

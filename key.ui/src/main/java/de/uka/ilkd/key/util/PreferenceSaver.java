@@ -8,6 +8,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A simple utility which stores and loads user manipulatable properties of swing components in the
  * system's preferences.
@@ -101,7 +103,7 @@ public class PreferenceSaver {
         saveChildren(component);
     }
 
-    private <C extends Component> void saveComponent(C component) {
+    private <C extends Component> void saveComponent(@NonNull C component) {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);
@@ -135,7 +137,7 @@ public class PreferenceSaver {
         loadChildren(component);
     }
 
-    private <C extends Component> void loadComponent(C component) {
+    private <C extends Component> void loadComponent(@NonNull C component) {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);

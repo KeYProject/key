@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.GraphNode;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Context menu action to display the dependency graph "around" a formula.
  *
@@ -37,7 +39,7 @@ public class ShowGraphAction extends MainWindowAction {
      * @param tracker dependency tracker of the active proof
      * @param node the graph node to show a graph around
      */
-    public ShowGraphAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
+    public ShowGraphAction(@NonNull MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph around this formula");
         this.tracker = tracker;

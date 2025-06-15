@@ -17,6 +17,8 @@ import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * for debugging - opens a window with the settings from current Proof and the default settings
  */
@@ -24,7 +26,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     private static final long serialVersionUID = -3038735283059371442L;
 
-    public ShowActiveSettingsAction(MainWindow mainWindow) {
+    public ShowActiveSettingsAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Show All Active Settings");
         setIcon(IconFactory.properties(16));
@@ -35,7 +37,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         showDialog();
     }
 
-    private ViewSettingsDialog showDialog() {
+    private @NonNull ViewSettingsDialog showDialog() {
         ProofSettings settings =
             (getMediator().getSelectedProof() == null) ? null
                     : getMediator().getSelectedProof().getSettings();
@@ -64,7 +66,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         private JSplitPane splitPane;
         private JPanel optionPanel;
 
-        public ViewSettingsDialog(TreeModel model, JComponent startComponent) {
+        public ViewSettingsDialog(@NonNull TreeModel model, JComponent startComponent) {
             super(mainWindow);
             Container cp = this.getContentPane();
             cp.setLayout(new BorderLayout());
@@ -98,7 +100,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             getRootPane().setDefaultButton(okButton);
         }
 
-        private Dimension computePreferredSize(TreeModel model) {
+        private @NonNull Dimension computePreferredSize(@NonNull TreeModel model) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) model.getRoot();
             Dimension dim = computePreferredSize(node);
             dim.width = dim.width + getOptionTree().getPreferredSize().width + 100;
@@ -106,7 +108,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             return dim;
         }
 
-        private Dimension computePreferredSize(DefaultMutableTreeNode node) {
+        private @NonNull Dimension computePreferredSize(@NonNull DefaultMutableTreeNode node) {
 
             Dimension dim = node instanceof OptionContentNode
                     ? new Dimension(((OptionContentNode) node).getComponent().getPreferredSize())
@@ -154,7 +156,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
         }
 
-        private JPanel getOptionPanel() {
+        private @NonNull JPanel getOptionPanel() {
             if (optionPanel == null) {
                 optionPanel = new JPanel();
             }

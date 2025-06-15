@@ -50,7 +50,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
+    public KeYUserProblemFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -63,7 +64,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
+    public KeYUserProblemFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            Profile profile,
             boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
@@ -207,7 +209,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }

@@ -13,6 +13,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class wraps the information about the delayed cut. It only wraps data but not functional
  * information.
@@ -29,9 +32,9 @@ public class DelayedCut {
     private final int cutMode;
     private final JTerm decisionPredicate;
     private final RuleApp firstAppliedRuleApp;
-    private NoPosTacletApp hideApp = null;
-    private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
-    private Goal remainingGoal = null;
+    private @Nullable NoPosTacletApp hideApp = null;
+    private @Nullable ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
+    private @Nullable Goal remainingGoal = null;
 
     public DelayedCut(Proof proof, Node node, JTerm formula, ImmutableList<Node> subtrees,
             int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
@@ -55,7 +58,7 @@ public class DelayedCut {
         return firstAppliedRuleApp;
     }
 
-    public Services getServices() {
+    public @NonNull Services getServices() {
         return proof.getServices();
     }
 
@@ -85,15 +88,15 @@ public class DelayedCut {
         this.remainingGoal = remainingGoal;
     }
 
-    public Goal getRemainingGoal() {
+    public @Nullable Goal getRemainingGoal() {
         return remainingGoal;
     }
 
-    public ImmutableList<NodeGoalPair> getGoalsAfterUncovering() {
+    public @Nullable ImmutableList<NodeGoalPair> getGoalsAfterUncovering() {
         return goalsAfterUncovering;
     }
 
-    public NoPosTacletApp getHideApp() {
+    public @Nullable NoPosTacletApp getHideApp() {
         return hideApp;
     }
 

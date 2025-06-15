@@ -13,6 +13,9 @@ import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @deprecated weigl, 2019-05-10: integrated into the
  *             {@link de.uka.ilkd.key.gui.settings.StandardUISettings}
@@ -160,7 +163,8 @@ public class ViewSelector extends JDialog {
          */
         private static final long serialVersionUID = -5423315366275141764L;
 
-        public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+        public void insertString(int offs, @Nullable String str, AttributeSet a)
+                throws BadLocationException {
             if (str == null) {
                 return;
             }
@@ -186,7 +190,7 @@ public class ViewSelector extends JDialog {
             setText(String.valueOf(number));
         }
 
-        protected Document createDefaultModel() {
+        protected @NonNull Document createDefaultModel() {
             return new NumberDocument();
         }
     }

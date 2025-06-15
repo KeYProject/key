@@ -13,27 +13,33 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Class to manage the tags of the formulas of a sequent (node). Instances of this class are stored
  * by instances of the <code>Goal</code> class, and are not immutable
  */
 public class FormulaTagManager {
 
-    /** Maps for the assignment of tags to formulas and vice versa */
+    /* Maps for the assignment of tags to formulas and vice versa */
 
-    /** Key: FormulaTag Value: FormulaInfo */
+    /**
+     * Key: FormulaTag Value: FormulaInfo
+     */
     private final HashMap<FormulaTag, FormulaInfo> tagToFormulaInfo;
 
-    /** Key: PosInOccurrence Value: FormulaTag */
+    /**
+     * Key: PosInOccurrence Value: FormulaTag
+     */
     private final HashMap<PosInOccurrence, FormulaTag> pioToTag;
 
     /**
      * Create a new manager that is initialised with the formulas of the given sequent
      */
-    FormulaTagManager(Goal p_goal) {
+    FormulaTagManager(Goal goal) {
         tagToFormulaInfo = new LinkedHashMap<>();
         pioToTag = new LinkedHashMap<>();
-        createNewTags(p_goal);
+        createNewTags(goal);
     }
 
     private FormulaTagManager(HashMap<FormulaTag, FormulaInfo> p_tagToPIO,
@@ -45,8 +51,8 @@ public class FormulaTagManager {
     /**
      * @return the tag of the formula at the given position
      */
-    public FormulaTag getTagForPos(PosInOccurrence p_pio) {
-        return pioToTag.get(p_pio);
+    public FormulaTag getTagForPos(PosInOccurrence pio) {
+        return pioToTag.get(pio);
     }
 
     /**
@@ -54,7 +60,7 @@ public class FormulaTagManager {
      *         returned <code>PosInOccurrence</code> can be obsolete and refer to a previous node.
      *         If no formula is assigned to the given tag, <code>null</code> is returned
      */
-    public PosInOccurrence getPosForTag(FormulaTag p_tag) {
+    public @Nullable PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
         if (info == null) {
             return null;
@@ -88,8 +94,8 @@ public class FormulaTagManager {
     public void sequentChanged(Goal source,
             SequentChangeInfo sci) {
         assert source != null;
-        removeTags(sci, true, source);
-        removeTags(sci, false, source);
+        removeTags(sci, true);
+        removeTags(sci, false);
 
         updateTags(sci, true, source);
         updateTags(sci, false, source);
@@ -114,7 +120,7 @@ public class FormulaTagManager {
     }
 
     private void removeTags(SequentChangeInfo sci,
-            boolean p_antec, Goal p_goal) {
+            boolean p_antec) {
         for (SequentFormula sf : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
@@ -136,11 +142,11 @@ public class FormulaTagManager {
     /**
      * Create new tags for all formulas of a sequent
      *
-     * @param p_goal The sequent
+     * @param goal The sequent
      */
-    private void createNewTags(Goal p_goal) {
-        createNewTags(p_goal, false);
-        createNewTags(p_goal, true);
+    private void createNewTags(Goal goal) {
+        createNewTags(goal, false);
+        createNewTags(goal, true);
     }
 
     /**
@@ -197,20 +203,20 @@ public class FormulaTagManager {
         pioToTag.put(newInfo.pio, tag);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    /// /////////////////////////////////////////////////////////////////////////
     // Simple cache for <code>getFormulaInfo</code>
 
-    private FormulaTag lastTagQueried = null;
-    private FormulaInfo lastQueryResult = null;
+    private @Nullable FormulaTag lastTagQueried = null;
+    private @Nullable FormulaInfo lastQueryResult = null;
 
-    private void putInQueryCache(FormulaTag p_tag, FormulaInfo p_info) {
+    private void putInQueryCache(FormulaTag p_tag, @Nullable FormulaInfo info) {
         lastTagQueried = p_tag;
-        lastQueryResult = p_info;
+        lastQueryResult = info;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    /// /////////////////////////////////////////////////////////////////////////
 
-    private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
+    private @Nullable FormulaInfo getFormulaInfo(FormulaTag p_tag) {
         if (lastTagQueried != p_tag) {
             putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag));
         }

@@ -33,6 +33,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +101,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     }
 
     @Override
-    public void mouseMoved(MouseEvent me) {
+    public void mouseMoved(@NonNull MouseEvent me) {
         showTermInfo(me.getPoint());
         if (sequentView.refreshHighlightning && refresh
                 && sequentView.getDocument().getLength() > 0) {
@@ -124,7 +125,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(@NonNull MouseEvent e) {
         if (!sequentView.isMainSequentView()) {
             return;
         }

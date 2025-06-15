@@ -14,6 +14,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Projection of taclet apps to the instantiation of a schema variable. The projection can either be
  * partial and undefined for those apps that do not instantiate the schema variable in question, or
@@ -29,13 +32,14 @@ public class SVInstantiationProjection implements ProjectionToTerm<Goal> {
         this.demandInst = demandInst;
     }
 
-    public static SVInstantiationProjection create(Name svName, boolean demandInst) {
+    public static @NonNull SVInstantiationProjection create(Name svName, boolean demandInst) {
         return new SVInstantiationProjection(svName, demandInst);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
-        if (!(app instanceof final TacletApp tapp)) {
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
+        if (!(app instanceof final @NonNull TacletApp tapp)) {
             Debug.fail("Projection is only applicable to taclet apps," + " but got " + app);
             throw new IllegalArgumentException(
                 "Projections can only be applied to taclet applications, not to " + app);

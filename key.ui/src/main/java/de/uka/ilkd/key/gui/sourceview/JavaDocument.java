@@ -13,6 +13,8 @@ import javax.swing.text.*;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This document performs syntax highlighting when strings are inserted. However, only inserting the
  * whole String at once is supported, otherwise the syntax highlighting will be faulty.
@@ -254,17 +256,17 @@ public class JavaDocument extends DefaultStyledDocument {
     /**
      * The current token of the parser.
      */
-    private String token = "";
+    private @NonNull String token = "";
 
     /**
      * Stores the mode in which the parser currently is.
      */
-    private JavaDocument.Mode mode = Mode.NORMAL;
+    private JavaDocument.@NonNull Mode mode = Mode.NORMAL;
 
     /**
      * Stores the current comment state of the parser to recognize comments/comment ends.
      */
-    private JavaDocument.CommentState state = CommentState.NO;
+    private JavaDocument.@NonNull CommentState state = CommentState.NO;
 
     /**
      * The settings listener of this document (registered in the static listener list).
@@ -481,25 +483,25 @@ public class JavaDocument extends DefaultStyledDocument {
         }
     }
 
-    private void insertCommentString(String str, int pos) throws BadLocationException {
+    private void insertCommentString(@NonNull String str, int pos) throws BadLocationException {
         // remove the old word and formatting
         this.remove(pos, str.length());
         super.insertString(pos, str, comment);
     }
 
-    private void insertAnnotation(String str, int pos) throws BadLocationException {
+    private void insertAnnotation(@NonNull String str, int pos) throws BadLocationException {
         // remove the old word and formatting
         this.remove(pos, str.length());
         super.insertString(pos, str, annotation);
     }
 
-    private void insertJavadocString(String str, int pos) throws BadLocationException {
+    private void insertJavadocString(@NonNull String str, int pos) throws BadLocationException {
         // remove the old word and formatting
         this.remove(pos, str.length());
         super.insertString(pos, str, javadoc);
     }
 
-    private void insertJMLString(String str, int pos) throws BadLocationException {
+    private void insertJMLString(@NonNull String str, int pos) throws BadLocationException {
         // remove the old word and formatting
         this.remove(pos, str.length());
         int offset = 0;
@@ -514,7 +516,7 @@ public class JavaDocument extends DefaultStyledDocument {
         }
     }
 
-    private void insertNormalString(String str, int pos) throws BadLocationException {
+    private void insertNormalString(@NonNull String str, int pos) throws BadLocationException {
         // remove the old word and formatting
         this.remove(pos, str.length());
         int offset = 0;
@@ -530,7 +532,8 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     @Override
-    public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+    public void insertString(int offs, @NonNull String str, AttributeSet a)
+            throws BadLocationException {
         // insert the unformatted string as a placeholder
         super.insertString(offs, str, normal);
         int strLen = str.length();

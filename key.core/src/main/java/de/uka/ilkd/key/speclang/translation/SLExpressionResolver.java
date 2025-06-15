@@ -13,6 +13,9 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.PackageReference;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Expression resolvers are used by specification parsers (e.g. for JML or OCL) to translate complex
  * expressions to terms. Subclasses of this abstract base class deal with specific operators that
@@ -20,13 +23,13 @@ import de.uka.ilkd.key.java.reference.PackageReference;
  */
 public abstract class SLExpressionResolver {
 
-    protected final JavaInfo javaInfo;
-    protected final Services services;
-    protected final SLResolverManager manager;
-    protected final KeYJavaType specInClass;
+    protected final @NonNull JavaInfo javaInfo;
+    protected final @NonNull Services services;
+    protected final @NonNull SLResolverManager manager;
+    protected final @NonNull KeYJavaType specInClass;
 
-    protected SLExpressionResolver(JavaInfo javaInfo, SLResolverManager manager,
-            KeYJavaType specInClass) {
+    protected SLExpressionResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager,
+            @NonNull KeYJavaType specInClass) {
         assert javaInfo != null;
         assert manager != null;
         assert specInClass != null;
@@ -42,7 +45,7 @@ public abstract class SLExpressionResolver {
      * Cuts off names of enclosing classes from a "package reference". Helper for
      * areInSamePackage().
      */
-    private String trimPackageRef(String ref) {
+    private String trimPackageRef(@Nullable String ref) {
         if (ref == null || javaInfo.isPackage(ref)) {
             return ref;
         }
@@ -59,7 +62,7 @@ public abstract class SLExpressionResolver {
     /**
      * Helper for isVisible().
      */
-    private boolean areInSamePackage(KeYJavaType kjt1, KeYJavaType kjt2) {
+    private boolean areInSamePackage(@NonNull KeYJavaType kjt1, @NonNull KeYJavaType kjt2) {
         final PackageReference p1 = kjt1.createPackagePrefix();
         final PackageReference p2 = kjt2.createPackagePrefix();
         final String ps1 = trimPackageRef(p1 == null ? null : p1.toString());
@@ -78,8 +81,9 @@ public abstract class SLExpressionResolver {
     /**
      * Helper for isVisible().
      */
-    private final boolean isVisibleHelper(MemberDeclaration md, KeYJavaType containingType,
-            KeYJavaType inType) {
+    private final boolean isVisibleHelper(@NonNull MemberDeclaration md,
+            @NonNull KeYJavaType containingType,
+            @NonNull KeYJavaType inType) {
         // use spec visibility
         VisibilityModifier mod = manager.getSpecVisibility(md);
 
@@ -111,7 +115,8 @@ public abstract class SLExpressionResolver {
     /**
      * Checks whether the passed member, contained in the passed type, is visible in specInClass.
      */
-    protected final boolean isVisible(MemberDeclaration md, KeYJavaType containingType) {
+    protected final boolean isVisible(@NonNull MemberDeclaration md,
+            @NonNull KeYJavaType containingType) {
         // visible in specInClass directly?
         KeYJavaType inType = specInClass;
         boolean result = isVisibleHelper(md, containingType, inType);
@@ -140,11 +145,12 @@ public abstract class SLExpressionResolver {
      * @return a suitable term or collection if successful, null otherwise
      * @throws SLTranslationException
      */
-    protected abstract SLExpression doResolving(SLExpression receiver, String name,
+    protected abstract @Nullable SLExpression doResolving(SLExpression receiver, String name,
             SLParameters parameters) throws SLTranslationException;
 
 
-    public final SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
+    public final @Nullable SLExpression resolve(SLExpression receiver, String name,
+            SLParameters parameters)
             throws SLTranslationException {
         if (!canHandleReceiver(receiver)) {
             return null;

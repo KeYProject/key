@@ -27,6 +27,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class implements custom instantiation of if-formulas.
  */
@@ -37,18 +40,18 @@ public class AssumesInstantiator {
     private ImmutableArray<AssumesFormulaInstantiation> allAntecFormulas;
     private ImmutableArray<AssumesFormulaInstantiation> allSuccFormulas;
 
-    private ImmutableList<NoPosTacletApp> results = ImmutableSLList.nil();
+    private @NonNull ImmutableList<NoPosTacletApp> results = ImmutableSLList.nil();
 
     private final TacletAppContainer tacletAppContainer;
 
-    AssumesInstantiator(TacletAppContainer tacletAppContainer, final Goal goal) {
+    AssumesInstantiator(TacletAppContainer tacletAppContainer, final @NonNull Goal goal) {
         this.goal = goal;
         this.tacletAppContainer = tacletAppContainer;
         this.ifInstCache =
             goal.proof().getServices().getCaches().getIfInstantiationCache().getCache(goal.node());
     }
 
-    private void addResult(NoPosTacletApp app) {
+    private void addResult(@Nullable NoPosTacletApp app) {
         if (app == null) {
             return;
         }
@@ -85,7 +88,7 @@ public class AssumesInstantiator {
         }
     }
 
-    private Taclet getTaclet() {
+    private @NonNull Taclet getTaclet() {
         return tacletAppContainer.getTacletApp().taclet();
     }
 
@@ -120,7 +123,8 @@ public class AssumesInstantiator {
      *         the current goal for which the method <code>isNewFormula</code> returns
      *         <code>true</code>
      */
-    private ImmutableArray<AssumesFormulaInstantiation> selectNewFormulas(boolean p_antec) {
+    private @NonNull ImmutableArray<AssumesFormulaInstantiation> selectNewFormulas(
+            boolean p_antec) {
         final ImmutableArray<AssumesFormulaInstantiation> allSequentFormulas =
             getAllSequentFormulas(p_antec);
         final AssumesFormulaInstantiation[] res =
@@ -204,10 +208,10 @@ public class AssumesInstantiator {
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(
-            ImmutableList<SequentFormula> p_ifSeqTail,
-            ImmutableList<SequentFormula> p_ifSeqTail2nd,
-            ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
-            MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
+            @NonNull ImmutableList<SequentFormula> p_ifSeqTail,
+            @Nullable ImmutableList<SequentFormula> p_ifSeqTail2nd,
+            @NonNull ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
+            @NonNull MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 
         while (p_ifSeqTail.isEmpty()) {
             if (p_ifSeqTail2nd == null) {
@@ -244,12 +248,12 @@ public class AssumesInstantiator {
         }
     }
 
-    private Services getServices() {
+    private @NonNull Services getServices() {
         return goal.proof().getServices();
     }
 
-    private NoPosTacletApp setAllInstantiations(MatchConditions p_matchCond,
-            ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched) {
+    private @NonNull NoPosTacletApp setAllInstantiations(@NonNull MatchConditions p_matchCond,
+            @NonNull ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched) {
         return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(),
             p_alreadyMatched, getServices());
     }
@@ -257,7 +261,7 @@ public class AssumesInstantiator {
     /**
      * @return Returns the results.
      */
-    public ImmutableList<NoPosTacletApp> getResults() {
+    public @NonNull ImmutableList<NoPosTacletApp> getResults() {
         return results;
     }
 }

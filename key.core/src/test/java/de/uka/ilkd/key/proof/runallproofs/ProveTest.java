@@ -24,6 +24,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,32 +52,32 @@ public class ProveTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
 
     protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
-    protected String baseDirectory = "";
-    protected String statisticsFile = "tmp.csv";
-    protected String name = "unnamed_tests";
+    protected @NonNull String baseDirectory = "";
+    protected @NonNull String statisticsFile = "tmp.csv";
+    protected @NonNull String name = "unnamed_tests";
     protected boolean reloadEnabled = false;
-    protected String tempDir = "/tmp";
-    protected String globalSettings = "";
-    protected String localSettings = "";
+    protected @NonNull String tempDir = "/tmp";
+    protected @NonNull String globalSettings = "";
+    protected @NonNull String localSettings = "";
     private StatisticsFile statistics;
 
-    protected void assertProvability(String file) throws Exception {
+    protected void assertProvability(@NonNull String file) throws Exception {
         runKey(file, TestProperty.PROVABLE);
     }
 
-    protected void assertUnProvability(String file) throws Exception {
+    protected void assertUnProvability(@NonNull String file) throws Exception {
         runKey(file, TestProperty.NOTPROVABLE);
     }
 
-    protected void assertLoadability(String file) throws Exception {
+    protected void assertLoadability(@NonNull String file) throws Exception {
         runKey(file, TestProperty.LOADABLE);
     }
 
-    protected void assertUnLoadability(String file) throws Exception {
+    protected void assertUnLoadability(@NonNull String file) throws Exception {
         runKey(file, TestProperty.NOTLOADABLE);
     }
 
-    private void runKey(String file, TestProperty testProperty) throws Exception {
+    private void runKey(@NonNull String file, @NonNull TestProperty testProperty) throws Exception {
         var keyFile = new File(file).toPath();
 
         // a name for this run. helps to find it in the mass of logger
@@ -182,8 +184,9 @@ public class ProveTest {
      * By overriding this method we can change the way how we invoke automode, for instance if we
      * want to use a different strategy.
      */
-    private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            KeyAst.ProofScript script) throws Exception {
+    private void autoMode(@NonNull KeYEnvironment<DefaultUserInterfaceControl> env,
+            @NonNull Proof loadedProof,
+            KeyAst.@Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -244,7 +247,7 @@ public class ProveTest {
         }
     }
 
-    protected StatisticsFile getStatisticsFile() throws IOException {
+    protected @Nullable StatisticsFile getStatisticsFile() throws IOException {
         if (!statisticsFile.isEmpty()) {
             if (statistics == null) {
                 statistics = new StatisticsFile(new File(statisticsFile));
@@ -255,7 +258,7 @@ public class ProveTest {
         return null;
     }
 
-    private void appendStatistics(Proof loadedProof, File keyFile) {
+    private void appendStatistics(@NonNull Proof loadedProof, File keyFile) {
         // Write statistics.
         try {
             StatisticsFile statisticsFile = getStatisticsFile();
@@ -267,7 +270,7 @@ public class ProveTest {
         }
     }
 
-    private void debugOut(String format, Object... args) {
+    private void debugOut(@NonNull String format, Object... args) {
         if (verbose) {
             System.err.format(format, args);
         }

@@ -18,6 +18,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class provides means to run macros with key bindings such that these can be bound to the
  * main window making them independent of any menu.
@@ -29,9 +31,10 @@ public class MacroKeyBinding extends AbstractAction {
 
     private final SequentView sequentView;
     private final KeYMediator mediator;
-    private final ProofMacro macro;
+    private final @NonNull ProofMacro macro;
 
-    public MacroKeyBinding(KeYMediator mediator, SequentView sequentView, ProofMacro macro) {
+    public MacroKeyBinding(KeYMediator mediator, SequentView sequentView,
+            @NonNull ProofMacro macro) {
         super("Invoking macro " + macro.getClass());
         this.sequentView = sequentView;
         this.mediator = mediator;
@@ -66,7 +69,7 @@ public class MacroKeyBinding extends AbstractAction {
      * @param comp component to register key bindings in
      */
     public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView,
-            JComponent comp) {
+            @NonNull JComponent comp) {
 
         for (final ProofMacro macro : ProofMacroMenu.REGISTERED_MACROS) {
             KeyStroke ks = KeyStrokeManager.get(macro);

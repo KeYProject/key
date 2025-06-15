@@ -19,6 +19,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This transformation is used to transform a for-loop into a while-loop.
  *
@@ -35,8 +37,8 @@ import org.key_project.util.ExtList;
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
 
-    public ForToWhileTransformation(ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, Services services) {
+    public ForToWhileTransformation(@NonNull ProgramElement root, ProgramElementName outerLabel,
+            ProgramElementName innerLabel, @NonNull Services services) {
         super(root, outerLabel, innerLabel, services);
     }
 

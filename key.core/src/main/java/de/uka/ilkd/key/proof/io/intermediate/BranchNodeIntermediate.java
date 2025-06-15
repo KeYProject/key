@@ -12,7 +12,7 @@ package de.uka.ilkd.key.proof.io.intermediate;
  */
 public class BranchNodeIntermediate extends NodeIntermediate {
 
-    private String branchTitle = null;
+    private final String branchTitle;
 
     public BranchNodeIntermediate(String branchTitle) {
         this.branchTitle = branchTitle;

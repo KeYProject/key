@@ -13,6 +13,8 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Float literal.
  *
@@ -44,7 +46,7 @@ public class FloatLiteral extends Literal {
      * @param value a string.
      */
 
-    public FloatLiteral(ExtList children, String value) {
+    public FloatLiteral(@NonNull ExtList children, String value) {
         super(children);
         this.value = value;
     }
@@ -60,7 +62,7 @@ public class FloatLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -91,16 +93,16 @@ public class FloatLiteral extends Literal {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnFloatLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return FloatLDT.NAME;
     }
 

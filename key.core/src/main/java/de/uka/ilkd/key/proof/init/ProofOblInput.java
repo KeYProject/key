@@ -6,6 +6,8 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Represents something that produces an input proof obligation for the prover. A .key file or a
@@ -37,5 +39,6 @@ public interface ProofOblInput {
      * @return The {@link KeYJavaType} in which the proven element is contained in or {@code null}
      *         if not available.
      */
+    @Nullable
     KeYJavaType getContainerType();
 }

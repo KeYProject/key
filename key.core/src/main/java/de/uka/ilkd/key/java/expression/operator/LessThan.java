@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Less than.
  */
@@ -21,7 +23,7 @@ public class LessThan extends ComparativeOperator {
      * @param children an ExtList with all children of this node the first children in list will be
      *        the one on the left side, the second the one on the right side.
      */
-    public LessThan(ExtList children) {
+    public LessThan(@NonNull ExtList children) {
         super(children);
     }
 
@@ -31,7 +33,7 @@ public class LessThan extends ComparativeOperator {
      * @param lhs the expression that is checked to be less than rhs
      * @param rhs the expression that is checked to be greater than lhs
      */
-    public LessThan(Expression lhs, Expression rhs) {
+    public LessThan(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -51,7 +53,7 @@ public class LessThan extends ComparativeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnLessThan(this);
     }
 }

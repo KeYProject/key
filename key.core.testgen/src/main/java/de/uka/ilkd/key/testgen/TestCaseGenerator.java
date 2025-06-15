@@ -208,7 +208,7 @@ public class TestCaseGenerator {
                 params.append(",").append(var.name());
             }
         }
-        if (params.length() > 0) {
+        if (!params.isEmpty()) {
             params = new StringBuilder(params.substring(1));
         }
 
@@ -323,8 +323,7 @@ public class TestCaseGenerator {
                             sb.append("{ return \"").append(className).append("\";}");
                             returnNull = false;
                         }
-                    } catch (final Exception e) {
-                        returnNull = true;
+                    } catch (final Exception ignored) {
                     }
                     if (returnNull) {
                         sb.append("{ return null;}");

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,7 +65,7 @@ public final class ExceptionTools {
         } else if (throwable instanceof NoViableAltException nvae) {
             return getNiceMessage(nvae);
         } else {
-            return throwable.getMessage();
+            return Objects.requireNonNullElse(throwable.getMessage(), "");
         }
     }
 
@@ -120,23 +121,19 @@ public final class ExceptionTools {
      */
     public static @Nullable Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
-        if (exc instanceof HasLocation) {
-            return ((HasLocation) exc).getLocation();
-        } else if (exc instanceof ParseException) {
-            return getLocation((ParseException) exc);
-        } else if (exc instanceof TokenMgrError) {
-            return getLocation((TokenMgrError) exc);
-        } else if (exc instanceof InputMismatchException ime) {
-            return getLocation(ime);
-        } else if (exc instanceof NoViableAltException nvae) {
-            return getLocation(nvae);
+        return switch (exc) {
+        case HasLocation hasLocation -> hasLocation.getLocation();
+        case ParseException parseException -> getLocation(parseException);
+        case TokenMgrError tokenMgrError -> getLocation(tokenMgrError);
+        case InputMismatchException ime -> getLocation(ime);
+        case NoViableAltException nvae -> getLocation(nvae);
+        default -> {
+            if (exc.getCause() != null) {
+                yield getLocation(exc.getCause());
+            }
+            yield null;
         }
-
-        if (exc.getCause() != null) {
-            return getLocation(exc.getCause());
-        }
-
-        return null;
+        };
     }
 
     private static @Nullable Location getLocation(ParseException exc) {
@@ -169,8 +166,10 @@ public final class ExceptionTools {
     private static @Nullable Location getLocation(TokenMgrError exc) {
         Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
         if (m.find()) {
-            int line = Integer.parseInt(m.group(1));
-            int col = Integer.parseInt(m.group(2));
+            final var group1 = Objects.requireNonNull(m.group(1));
+            final var group2 = Objects.requireNonNull(m.group(2));
+            int line = Integer.parseInt(group1);
+            int col = Integer.parseInt(group2);
             return new Location(null, Position.newOneBased(line, col));
         }
         return null;

@@ -41,6 +41,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -66,15 +68,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
      **/
     private static final TermLabel IMPL_TERM_LABEL =
         ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL;
-    private final Services services;
-    private final JMLSpecFactory jsf;
-    private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
+    private final @NonNull Services services;
+    private final @NonNull JMLSpecFactory jsf;
+    private @NonNull ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(InitConfig initConfig) {
+    public JMLSpecExtractor(@NonNull InitConfig initConfig) {
         FinalHeapResolution.rememberIfFinalEnabled(initConfig);
         this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
@@ -88,7 +90,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * Concatenates the passed comments in a position-preserving way. (see also
      * JMLTransformer::concatenate(), which does the same thing for Recoder ASTs)
      */
-    private String concatenate(Comment[] comments) {
+    private @NonNull String concatenate(Comment @NonNull [] comments) {
         if (comments.length == 0) {
             return "";
         }
@@ -135,7 +137,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return sb.toString();
     }
 
-    private int getIndexOfMethodDecl(IProgramMethod pm, TextualJMLConstruct[] constructsArray) {
+    private int getIndexOfMethodDecl(@NonNull IProgramMethod pm,
+            TextualJMLConstruct @NonNull [] constructsArray) {
         for (int i = 0; i < constructsArray.length; i++) {
             if (constructsArray[i] instanceof TextualJMLMethodDecl methodDecl) {
                 if (methodDecl.getMethodName().equals(pm.getName())) {
@@ -148,7 +151,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     // includes unchecked exceptions (instances of Error or RuntimeException)
     // (see resolution to issue #1379)
-    private ParserRuleContext getDefaultSignalsOnly(IProgramMethod pm) {
+    private @NonNull ParserRuleContext getDefaultSignalsOnly(@NonNull IProgramMethod pm) {
         if (pm.getThrown() == null) {
             return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
         }
@@ -187,9 +190,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param services the services object
      * @return set of formulas specifying non-nullity for field/variables
      */
-    public static ImmutableSet<LabeledParserRuleContext> createNonNullPositionedString(
-            String varName, KeYJavaType kjt, boolean isImplicitVar, Location location,
-            Services services) {
+    public static @NonNull ImmutableSet<LabeledParserRuleContext> createNonNullPositionedString(
+            String varName, @NonNull KeYJavaType kjt, boolean isImplicitVar,
+            @NonNull Location location,
+            @NonNull Services services) {
         ImmutableSet<LabeledParserRuleContext> result = DefaultImmutableSet.nil();
         final Type varType = kjt.getJavaType();
 
@@ -214,7 +218,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * Get the depth for the nonNull predicate. The depth is 0 for non array types, its dimension
      * for reference array types, and its dimension -1 for array types with primitive base type.
      */
-    public static int arrayDepth(Type type, Services services) {
+    public static int arrayDepth(Type type, @NonNull Services services) {
         assert services != null;
         final TypeConverter tc = services.getTypeConverter();
         if (type instanceof ArrayType) {
@@ -233,7 +237,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // -------------------------------------------------------------------------
 
     @Override
-    public ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
+    public @NonNull ImmutableSet<SpecificationElement> extractClassSpecs(@NonNull KeYJavaType kjt)
             throws SLTranslationException {
         ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
 
@@ -352,7 +356,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
+    public @NonNull ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
             throws SLTranslationException {
         return extractMethodSpecs(pm, true);
     }
@@ -364,7 +368,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+    public @NonNull ImmutableSet<SpecificationElement> extractMethodSpecs(
+            @NonNull IProgramMethod pm,
             boolean addInvariant) throws SLTranslationException {
         ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
 
@@ -539,14 +544,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
+    public @NonNull ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
             final StatementBlock block) throws SLTranslationException {
         return createBlockContracts(method, new LinkedList<>(), block, block.getComments());
     }
 
     @Override
-    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
-            final LabeledStatement labeled) throws SLTranslationException {
+    public @NonNull ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
+            final @NonNull LabeledStatement labeled) throws SLTranslationException {
         final List<Label> labels = new LinkedList<>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
@@ -563,20 +568,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
+    public @NonNull ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
             final LoopStatement loop) throws SLTranslationException {
         return createLoopContracts(method, new LinkedList<>(), loop, loop.getComments());
     }
 
     @Override
-    public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
+    public @NonNull ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
             final StatementBlock block) throws SLTranslationException {
         return createLoopContracts(method, new LinkedList<>(), block, block.getComments());
     }
 
     @Override
-    public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
-            final LabeledStatement labeled) throws SLTranslationException {
+    public @NonNull ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
+            final @NonNull LabeledStatement labeled) throws SLTranslationException {
         final List<Label> labels = new LinkedList<>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
@@ -596,8 +601,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
+    public @NonNull ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
+            @NonNull MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
         // In cases of specifications immediately following each other (like a
         // merge_point and a block contract / loop invariant), it might happen
@@ -611,8 +616,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0]);
     }
 
-    private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
-            final List<Label> labels, final StatementBlock block, final Comment[] comments)
+    private @NonNull ImmutableSet<BlockContract> createBlockContracts(
+            final @NonNull IProgramMethod method,
+            final @NonNull List<Label> labels, final @NonNull StatementBlock block,
+            final Comment[] comments)
             throws SLTranslationException {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
@@ -631,8 +638,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    private ImmutableSet<LoopContract> createLoopContracts(final IProgramMethod method,
-            final List<Label> labels, final LoopStatement loop, final Comment[] comments)
+    private @NonNull ImmutableSet<LoopContract> createLoopContracts(
+            final @NonNull IProgramMethod method,
+            final @NonNull List<Label> labels, final @NonNull LoopStatement loop,
+            final Comment[] comments)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
@@ -651,8 +660,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    private ImmutableSet<LoopContract> createLoopContracts(final IProgramMethod method,
-            final List<Label> labels, final StatementBlock block, final Comment[] comments)
+    private @NonNull ImmutableSet<LoopContract> createLoopContracts(
+            final @NonNull IProgramMethod method,
+            final @NonNull List<Label> labels, final @NonNull StatementBlock block,
+            final Comment[] comments)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
@@ -671,12 +682,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    private URI getFileName(final IProgramMethod method) {
+    private @Nullable URI getFileName(final @NonNull IProgramMethod method) {
         final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
         return type.getPositionInfo().getURI().orElse(null);
     }
 
-    private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
+    private TextualJMLConstruct @NonNull [] parseMethodLevelComments(
+            final Comment @NonNull [] comments,
             final URI fileName) {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
@@ -690,13 +702,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
-    private Comment[] removeDuplicates(final Comment[] comments) {
+    private Comment @NonNull [] removeDuplicates(final Comment[] comments) {
         final Set<Comment> uniqueComments = new LinkedHashSet<>(Arrays.asList(comments));
         return uniqueComments.toArray(new Comment[0]);
     }
 
     @Override
-    public LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop) {
+    public @NonNull LoopSpecification extractLoopInvariant(@NonNull IProgramMethod pm,
+            @NonNull LoopStatement loop) {
         LoopSpecification result = null;
 
         // get type declaration, file name
@@ -741,12 +754,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public ImmutableList<PositionedString> getWarnings() {
+    public @NonNull ImmutableList<PositionedString> getWarnings() {
         return warnings.append(JMLTransformer.getWarningsOfLastInstance());
     }
 
     @Override
-    public Contract createDefaultContract(IProgramMethod method, boolean useSoundDefault) {
+    public @NonNull Contract createDefaultContract(IProgramMethod method, boolean useSoundDefault) {
         return jsf.createDefaultContract(method, useSoundDefault);
     }
 }

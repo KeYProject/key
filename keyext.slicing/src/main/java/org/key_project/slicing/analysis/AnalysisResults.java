@@ -27,6 +27,8 @@ import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Results of the dependency analysis algorithm.
  *
@@ -37,7 +39,7 @@ public final class AnalysisResults {
     /**
      * The analyzed proof.
      */
-    public final Proof proof;
+    public final @NonNull Proof proof;
     public final DependencyGraph dependencyGraph;
     /**
      * Total amount of rule applications.
@@ -55,15 +57,15 @@ public final class AnalysisResults {
     /**
      * Set of useful proof steps.
      */
-    public final Set<Node> usefulSteps;
+    public final @NonNull Set<Node> usefulSteps;
     /**
      * Set of graph nodes required by useful rule applications.
      */
-    public final Set<GraphNode> usefulNodes;
+    public final @NonNull Set<GraphNode> usefulNodes;
     /**
      * Set of branches in the proof guaranteed to be omitted in the proof slice.
      */
-    public final Set<BranchLocation> uselessBranches;
+    public final @NonNull Set<BranchLocation> uselessBranches;
     /**
      * Equal to size of {@link #uselessBranches}.
      */
@@ -105,13 +107,13 @@ public final class AnalysisResults {
      * @param executionTime timings
      */
     public AnalysisResults(
-            Proof proof,
+            @NonNull Proof proof,
             DependencyGraph dependencyGraph,
             int totalSteps,
             RuleStatistics ruleStatistics,
-            Set<Node> usefulSteps,
-            Set<GraphNode> usefulNodes,
-            Set<BranchLocation> uselessBranches,
+            @NonNull Set<Node> usefulSteps,
+            @NonNull Set<GraphNode> usefulNodes,
+            @NonNull Set<BranchLocation> uselessBranches,
             Map<Node, List<Node>> branchStacks,
             boolean didDependencyAnalysis,
             boolean didDeduplicateRuleApps,
@@ -140,7 +142,7 @@ public final class AnalysisResults {
      * @param branchLocation branch location
      * @return whether that branch is marked as useless
      */
-    public boolean branchIsUseful(BranchLocation branchLocation) {
+    public boolean branchIsUseful(@NonNull BranchLocation branchLocation) {
         return uselessBranches.stream().noneMatch(branchLocation::hasPrefix);
     }
 
@@ -158,7 +160,7 @@ public final class AnalysisResults {
      * @param node proof node
      * @return sequent with only useful formulas
      */
-    public Sequent reduceSequent(Node node) {
+    public @NonNull Sequent reduceSequent(@NonNull Node node) {
         final Sequent seq = node.sequent();
         return JavaDLSequentKit.createSequent(reduce(seq.antecedent().asList(), node, true),
             reduce(seq.succedent().asList(), node, false));
@@ -178,7 +180,7 @@ public final class AnalysisResults {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "AnalysisResults{" +
             "totalSteps=" + totalSteps +
             ", usefulSteps=" + usefulStepsNr +

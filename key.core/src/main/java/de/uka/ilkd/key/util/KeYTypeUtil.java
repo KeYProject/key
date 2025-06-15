@@ -183,7 +183,8 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given
      *         {@link ParameterDeclaration} is {@code null}.
      */
-    public static String resolveType(ParameterDeclaration parameterDeclaration) {
+    public static @Nullable String resolveType(
+            @Nullable ParameterDeclaration parameterDeclaration) {
         return parameterDeclaration != null ? resolveType(parameterDeclaration.getTypeReference())
                 : null;
     }
@@ -195,7 +196,7 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given {@link TypeReference} is
      *         {@code null}.
      */
-    public static String resolveType(TypeReference typeReference) {
+    public static @Nullable String resolveType(@Nullable TypeReference typeReference) {
         return typeReference != null ? resolveType(typeReference.getKeYJavaType()) : null;
     }
 
@@ -206,7 +207,7 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given {@link Type} is
      *         {@code null}.
      */
-    public static String resolveType(Type type) {
+    public static @Nullable String resolveType(@Nullable Type type) {
         if (type instanceof KeYJavaType) {
             return resolveType(((KeYJavaType) type).getJavaType());
         } else if (type instanceof ArrayType arrayType) {

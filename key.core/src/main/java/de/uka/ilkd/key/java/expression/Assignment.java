@@ -11,6 +11,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * An assignment is an operator with side-effects.
@@ -29,7 +31,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      *        the children is IMPORTANT. May contain: 2 of Expression (the first Expression as left
      *        hand side, the second as right hand side), Comments
      */
-    protected Assignment(ExtList children) {
+    protected Assignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -72,7 +74,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return the type of the assignment expression
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getExpressionAt(0).getKeYJavaType(javaServ, ec);
     }
 
@@ -80,7 +82,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * overriden from Operator
      */
-    public String reuseSignature(Services services, ExecutionContext ec) {
+    public @NonNull String reuseSignature(Services services, ExecutionContext ec) {
         String base = super.reuseSignature(services, ec);
         Expression rhs;
         try {

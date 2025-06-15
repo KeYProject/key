@@ -9,6 +9,9 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Inspects whether a given string can be translated into a formula.
  */
@@ -26,7 +29,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
 
     @Override
-    public String check(String toBeChecked) {
+    public @Nullable String check(@NonNull String toBeChecked) {
         if (toBeChecked.isEmpty()) {
             return NO_USER_INPUT;
         }

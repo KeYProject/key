@@ -20,7 +20,7 @@ public abstract class CompareCostsFeature
         this.b = b;
     }
 
-    public static Feature less(Feature a, Feature b) {
+    public static @NonNull Feature less(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             @Override
             protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
@@ -31,7 +31,7 @@ public abstract class CompareCostsFeature
         };
     }
 
-    public static Feature leq(Feature a, Feature b) {
+    public static @NonNull Feature leq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             @Override
             protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
@@ -42,7 +42,7 @@ public abstract class CompareCostsFeature
         };
     }
 
-    public static Feature eq(Feature a, Feature b) {
+    public static @NonNull Feature eq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             @Override
             protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,

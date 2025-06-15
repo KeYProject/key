@@ -16,6 +16,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if an instantiation is an array.
@@ -69,7 +71,7 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "" : " \\not ") + "\\isArray(" + var + ")";
     }
 }

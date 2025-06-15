@@ -15,6 +15,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link IExecutionLoopCondition}.
  *
@@ -45,7 +48,7 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Java
      * {@inheritDoc}
      */
     @Override
-    public Expression getGuardExpression() {
+    public @Nullable Expression getGuardExpression() {
         if (getActiveStatement() instanceof LoopStatement) {
             return ((LoopStatement) getActiveStatement()).getGuardExpression();
         } else if (getActiveStatement() instanceof If) {
@@ -59,7 +62,7 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Java
      * {@inheritDoc}
      */
     @Override
-    public PositionInfo getGuardExpressionPositionInfo() {
+    public @NonNull PositionInfo getGuardExpressionPositionInfo() {
         return getGuardExpression().getPositionInfo();
     }
 
@@ -67,7 +70,7 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Java
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -75,7 +78,7 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Java
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Loop Condition";
     }
 }

@@ -23,6 +23,9 @@ import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
@@ -30,7 +33,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         super(Parameters.class);
     }
 
-    private static Map<String, ProofMacro> loadMacroMap() {
+    private static @NonNull Map<String, ProofMacro> loadMacroMap() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
         Map<String, ProofMacro> result = new HashMap<>();
 
@@ -45,18 +48,19 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "macro";
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
         // look up macro name
@@ -125,9 +129,10 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
      * @return
      * @throws ScriptException
      */
-    public static PosInOccurrence extractMatchingPio(
-            final Sequent sequent, final String matchRegEx,
-            final Services services) throws ScriptException {
+    public static @NonNull PosInOccurrence extractMatchingPio(
+            final @NonNull Sequent sequent,
+            final String matchRegEx,
+            final @NonNull Services services) throws ScriptException {
         PosInOccurrence pio = null;
         boolean matched = false;
 
@@ -159,25 +164,36 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
      * @param str The string to "clean up".
      * @return The original without spaces and line breaks.
      */
-    private static String formatTermString(String str) {
+    private static @NonNull String formatTermString(@NonNull String str) {
         return str //
                 .replace("\n", " ") //
                 .replace(" +", " ");
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
-        /** Macro name parameter */
+        /**
+         * Macro name parameter
+         */
         @Option("#2")
         public String macroName;
-        /** Run on formula number "occ" parameter */
+        /**
+         * Run on formula number "occ" parameter
+         */
         @Option(value = "occ", required = false)
+        @Nullable
         public Integer occ = -1;
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "matches", required = false)
+        @Nullable
         public String matches = null;
-        /** Variable macro parameters */
+        /**
+         * Variable macro parameters
+         */
         @Varargs(as = String.class, prefix = "arg_")
-        public Map<String, String> instantiations = new HashMap<>();
+        public @NonNull Map<String, String> instantiations = new HashMap<>();
     }
 
 }

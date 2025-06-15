@@ -12,6 +12,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -35,7 +36,7 @@ public final class JmlChecks {
     /**
      * Returns a list of currently registered JML checks.
      */
-    public static List<JmlCheck> getJmlChecks() {
+    public static @NonNull List<JmlCheck> getJmlChecks() {
         // secure internal copy
         return new ArrayList<>(jmlChecks);
     }
@@ -52,7 +53,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
         return warnings;
     }
 
-    protected void addWarning(ParserRuleContext ctx, String text) {
+    protected void addWarning(@NonNull ParserRuleContext ctx, @NonNull String text) {
         PositionedString ps = new PositionedString(text, Location.fromToken(ctx.start));
         warnings.add(ps);
     }
@@ -66,13 +67,13 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
  */
 class JmlWarnDifferentRequiresSemantics extends AbstractCheck {
     @Override
-    public Void visitSpec_body(JmlParser.Spec_bodyContext ctx) {
+    public @Nullable Void visitSpec_body(JmlParser.@NonNull Spec_bodyContext ctx) {
         checkRequires(ctx.a);
         checkRequires(ctx.inner);
         return null;
     }
 
-    private void checkRequires(List<JmlParser.ClauseContext> clauses) {
+    private void checkRequires(@NonNull List<JmlParser.ClauseContext> clauses) {
         boolean otherClause = false;
         for (JmlParser.ClauseContext clause : clauses) {
             if (!isRequiresClause(clause)) {
@@ -88,7 +89,7 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck {
     }
 
 
-    private boolean isRequiresClause(JmlParser.ClauseContext clause) {
+    private boolean isRequiresClause(JmlParser.@NonNull ClauseContext clause) {
         return clause.requires_clause() != null;
     }
 }

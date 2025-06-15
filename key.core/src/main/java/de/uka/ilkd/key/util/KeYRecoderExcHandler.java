@@ -8,13 +8,14 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import recoder.service.ErrorHandler;
 
 
 public class KeYRecoderExcHandler implements ErrorHandler {
 
     private final List<Throwable> exceptions = new LinkedList<>();
-    private int errorThreshold;
+    private int errorThreshold = 0;
 
     public void reportException(Throwable e) {
         exceptions.add(e);
@@ -61,7 +62,8 @@ public class KeYRecoderExcHandler implements ErrorHandler {
 
 
     @Override
-    public final void setErrorThreshold(int maxCount) {
+    public final void setErrorThreshold(@UnderInitialization KeYRecoderExcHandler this,
+            int maxCount) {
         if (maxCount < 0) {
             throw new IllegalArgumentException("Recoder: Threshold should be >= 0");
         }

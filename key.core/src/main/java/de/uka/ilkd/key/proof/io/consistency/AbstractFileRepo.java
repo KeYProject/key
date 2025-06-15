@@ -23,6 +23,9 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
  * cached. This mainly includes saving of all files registered to the repo as well as adapting the
@@ -34,13 +37,13 @@ public abstract class AbstractFileRepo implements FileRepo {
     /**
      * The URL to KeY's built-in rules (used to prevent built-in rules from getting copied).
      */
-    protected static final URL RULES_URL =
+    protected static final @Nullable URL RULES_URL =
         KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/");
 
     /**
      * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
      */
-    protected static final URL REDUX_URL =
+    protected static final @Nullable URL REDUX_URL =
         KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
 
     /**
@@ -68,16 +71,16 @@ public abstract class AbstractFileRepo implements FileRepo {
         FileSystems.getDefault().getPathMatcher("glob:**.class");
 
     /** The original java source path (absolute and normalized). */
-    private Path javaPath;
+    private @Nullable Path javaPath;
 
     /** The original class path (absolute and normalized). */
-    private List<Path> classpath;
+    private @Nullable List<Path> classpath;
 
     /**
      * The boot class path, that is, the path to the folder where stubs of library classes (e.g.
      * Object, List, ...) used in KeY are stored. The path stored here is absolute and normalized.
      */
-    private Path bootclasspath;
+    private @Nullable Path bootclasspath;
 
     /**
      * The base directory of the loaded proof (needed to calculate relative paths). If a .key/.proof
@@ -85,7 +88,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * loaded, baseDir should be set to the path of the directory. The path stored here is absolute
      * and normalized.
      */
-    private Path baseDir;
+    private @Nullable Path baseDir;
 
     /**
      * Stores the source paths of all files that have been copied to the repo as absolute paths. In
@@ -95,12 +98,12 @@ public abstract class AbstractFileRepo implements FileRepo {
      *
      * When the method {@link #saveProof(Path)} is called, all files registered here will be saved.
      */
-    private Set<Path> files = new HashSet<>();
+    private @Nullable Set<Path> files = new HashSet<>();
 
     /**
      * This set stores all proofs that use this repo. When it gets empty, the repo is disposed.
      */
-    private Set<Proof> registeredProofs = new HashSet<>();
+    private @Nullable Set<Proof> registeredProofs = new HashSet<>();
 
     /**
      * This flag indicates that the repo and all data in it have been deleted.
@@ -116,7 +119,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return true if copy was performed and false if not performed
      * @throws IOException if an I/O error occurs
      */
-    private static boolean copy(InputStream source, OutputStream target) throws IOException {
+    private static boolean copy(@Nullable InputStream source, @Nullable OutputStream target)
+            throws IOException {
         if (source != null && target != null) {
             byte[] buffer = new byte[1024];
             int read;
@@ -137,7 +141,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param target path of the target file
      * @throws IOException if an I/O error occurs (e.g. user has no permission to write target)
      */
-    protected static void createDirsAndCopy(Path source, Path target) throws IOException {
+    protected static void createDirsAndCopy(@NonNull Path source, @NonNull Path target)
+            throws IOException {
         Files.createDirectories(target.getParent());
         Files.copy(source, target);
     }
@@ -150,7 +155,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return true iff it is an internal file
      * @throws MalformedURLException if the path can not be converted to an URL
      */
-    protected static boolean isInternalFile(Path path) throws MalformedURLException {
+    protected static boolean isInternalFile(@NonNull Path path) throws MalformedURLException {
         URL url = path.toUri().toURL();
         return isInternalResource(url);
     }
@@ -162,7 +167,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param url the url to test
      * @return true iff the file is an internal file
      */
-    protected static boolean isInternalResource(URL url) {
+    protected static boolean isInternalResource(@NonNull URL url) {
         String urlStr = url.toString();
         String rulesURLStr = RULES_URL.toString();
         String reduxURLStr = REDUX_URL.toString();
@@ -170,7 +175,7 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     }
 
-    protected Path getJavaPath() {
+    protected @Nullable Path getJavaPath() {
         return javaPath;
     }
 
@@ -178,15 +183,15 @@ public abstract class AbstractFileRepo implements FileRepo {
         return disposed;
     }
 
-    protected List<Path> getClasspath() {
+    protected @Nullable List<Path> getClasspath() {
         return classpath;
     }
 
-    protected Path getBootclasspath() {
+    protected @Nullable Path getBootclasspath() {
         return bootclasspath;
     }
 
-    protected Path getBaseDir() {
+    protected @Nullable Path getBaseDir() {
         return baseDir;
     }
 
@@ -199,7 +204,7 @@ public abstract class AbstractFileRepo implements FileRepo {
         files.add(p);
     }
 
-    protected Set<Proof> getRegisteredProofs() {
+    protected @Nullable Set<Proof> getRegisteredProofs() {
         return registeredProofs;
     }
 
@@ -209,7 +214,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param path the path to check
      * @return true if the path is inside the Java path and false if not
      */
-    protected boolean isInJavaPath(Path path) {
+    protected boolean isInJavaPath(@NonNull Path path) {
         return javaPath != null && path.startsWith(javaPath);
     }
 
@@ -219,7 +224,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param path the path to check
      * @return true if the path is inside the boot class path and false if not
      */
-    protected boolean isInBootClassPath(Path path) {
+    protected boolean isInBootClassPath(@NonNull Path path) {
         return bootclasspath != null && path.startsWith(bootclasspath);
     }
 
@@ -230,7 +235,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param savePath the target path of the ZIP archive
      * @throws IOException on IO errors, e.g. if the user has no permission to write at the path
      */
-    public void saveProof(Path savePath) throws IOException {
+    public void saveProof(@NonNull Path savePath) throws IOException {
         // We overwrite an existing proof here in any case. Checks have to be done earlier.
         if (Files.exists(savePath)) {
             Files.delete(savePath);
@@ -279,16 +284,16 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return the name (may include subdirectories) the file should have in proof package, that is
      *         a path relative to the root of the package
      */
-    protected abstract Path getSaveName(Path path);
+    protected abstract @Nullable Path getSaveName(Path path);
 
     @Override
-    public InputStream getInputStream(Path path) throws IOException {
+    public @Nullable InputStream getInputStream(@NonNull Path path) throws IOException {
         // wrap path into URL for uniform treatment
         return getInputStream(path.toUri().toURL());
     }
 
     @Override
-    public InputStream getInputStream(RuleSource ruleSource) throws IOException {
+    public @Nullable InputStream getInputStream(@NonNull RuleSource ruleSource) throws IOException {
         return getInputStream(ruleSource.url());
     }
 
@@ -302,7 +307,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @throws FileNotFoundException if the does not file exist, is a directory, or can not be
      *         opened
      */
-    protected abstract InputStream getInputStreamInternal(Path p) throws FileNotFoundException;
+    protected abstract @Nullable InputStream getInputStreamInternal(Path p)
+            throws FileNotFoundException;
 
     /**
      * Rewrites the file references inside of .key/.proof files such that the point correctly to the
@@ -312,7 +318,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return an InputStream to a (in-memory) copy of the file
      * @throws IOException if an I/O error occurs
      */
-    protected InputStream adaptFileRefs(Path p) throws IOException {
+    protected @NonNull InputStream adaptFileRefs(Path p) throws IOException {
         // TODO: adapt include/includeFile (e.g. for Taclets)
         // TODO: may replace/filter too much (e.g. in comments)
 
@@ -345,7 +351,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param keyFileContent a String containing the content of a .key/.proof file.
      * @return the modified content of the file with inserted "\classpath ..." declarations.
      */
-    private String addClasspath(String keyFileContent) {
+    private @NonNull String addClasspath(@NonNull String keyFileContent) {
         if (classpath == null || classpath.isEmpty()) {
             return keyFileContent;
         }
@@ -398,7 +404,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setClassPath(List<Path> paths) throws IllegalStateException {
+    public void setClassPath(@Nullable List<Path> paths) throws IllegalStateException {
         if (classpath != null) {
             throw new IllegalStateException("Classpath is already set!");
         }
@@ -422,7 +428,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setBaseDir(Path path) {
+    public void setBaseDir(@NonNull Path path) {
         /*
          * Path can be a file or a directory. In case of a file the complete containing directory is
          * read in.
@@ -437,7 +443,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void registerProof(Proof proof) {
+    public void registerProof(@NonNull Proof proof) {
         registeredProofs.add(proof);
         // register the repo in the proof to listen to ProofDisposedEvents.
         proof.addProofDisposedListener(this);
@@ -456,8 +462,6 @@ public abstract class AbstractFileRepo implements FileRepo {
         classpath = null;
         bootclasspath = null;
         baseDir = null;
-
-        files.clear();
         files = null;
         registeredProofs = null; // this set is already empty, else the repo must not be disposed
 
@@ -469,7 +473,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void proofDisposed(ProofDisposedEvent e) {
+    public void proofDisposed(@NonNull ProofDisposedEvent e) {
         Proof source = e.getSource();
         source.removeProofDisposedListener(this);
 

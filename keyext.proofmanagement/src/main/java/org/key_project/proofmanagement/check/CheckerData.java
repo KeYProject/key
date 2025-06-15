@@ -30,6 +30,9 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
  *
@@ -41,7 +44,7 @@ public final class CheckerData implements Logger {
         this.minLogLevel = minLogLevel;
     }
 
-    public String getCheckDate() {
+    public @NonNull String getCheckDate() {
         return checkDate;
     }
 
@@ -64,7 +67,7 @@ public final class CheckerData implements Logger {
 
     ////////////////////////////////// results from missing proofs checker
 
-    public Set<Contract> getContractsWithoutProof() {
+    public @NonNull Set<Contract> getContractsWithoutProof() {
         return contractsWithoutProof;
     }
 
@@ -92,7 +95,7 @@ public final class CheckerData implements Logger {
     /** all choice names that occur in at least one settings object of a proof */
     private final SortedSet<String> choiceNames = new TreeSet<>();
 
-    public SortedSet<String> getChoiceNames() {
+    public @NonNull SortedSet<String> getChoiceNames() {
         return choiceNames;
     }
 
@@ -110,7 +113,7 @@ public final class CheckerData implements Logger {
      *
      * @param choices the reference choices to add
      */
-    public void addReferenceChoices(Map<String, String> choices) {
+    public void addReferenceChoices(@NonNull Map<String, String> choices) {
         int nextId = referenceChoices.size();
         referenceChoices.putIfAbsent(choices, nextId);
         // add an entry in the map for id lookup
@@ -131,7 +134,7 @@ public final class CheckerData implements Logger {
         choices2Id.putIfAbsent(choices, referenceId);
     }
 
-    public Map<Map<String, String>, Integer> getChoices2Id() {
+    public @NonNull Map<Map<String, String>, Integer> getChoices2Id() {
         return choices2Id;
     }
 
@@ -141,7 +144,7 @@ public final class CheckerData implements Logger {
      *
      * @return a map of choice settings to reference id, using short choice values
      */
-    public Map<Map<String, String>, Integer> getShortChoices2Id() {
+    public @NonNull Map<Map<String, String>, Integer> getShortChoices2Id() {
 
         Map<Map<String, String>, Integer> res = new HashMap<>();
 
@@ -167,7 +170,7 @@ public final class CheckerData implements Logger {
     // private ReplayState replayState = ReplayState.UNKNOWN;
     // private DependencyState depState = DependencyState.UNKNOWN;
     private SettingsState settingsState = SettingsState.UNKNOWN;
-    private GlobalState globalState = GlobalState.UNKNOWN;
+    private @NonNull GlobalState globalState = GlobalState.UNKNOWN;
 
     private ProofBundleHandler pbh;
     private PathNode fileTree;
@@ -266,10 +269,10 @@ public final class CheckerData implements Logger {
     }
 
     public class ProofEntry {
-        public LoadingState loadingState = LoadingState.UNKNOWN;
-        public ReplayState replayState = ReplayState.UNKNOWN;
-        public DependencyState dependencyState = DependencyState.UNKNOWN;
-        public ProofState proofState = ProofState.UNKNOWN;
+        public @NonNull LoadingState loadingState = LoadingState.UNKNOWN;
+        public @NonNull ReplayState replayState = ReplayState.UNKNOWN;
+        public @NonNull DependencyState dependencyState = DependencyState.UNKNOWN;
+        public @NonNull ProofState proofState = ProofState.UNKNOWN;
 
         public boolean replaySuccess() {
             return replayState == ReplayState.SUCCESS;
@@ -291,7 +294,7 @@ public final class CheckerData implements Logger {
         }
     }
 
-    public ProofEntry getProofEntryByContract(Contract contract) {
+    public @Nullable ProofEntry getProofEntryByContract(Contract contract) {
         for (ProofEntry p : proofEntries) {
             if (p.contract.equals(contract)) {
                 return p;
@@ -301,7 +304,7 @@ public final class CheckerData implements Logger {
     }
 
     // TODO: equals method of ChoiceSettings (may be impossible, since listeners are not compared)
-    private static boolean settingsEqual(ChoiceSettings a, ChoiceSettings b) {
+    private static boolean settingsEqual(@NonNull ChoiceSettings a, @NonNull ChoiceSettings b) {
         // all currently selected choices equal?
         return a.getDefaultChoices().equals(b.getDefaultChoices());
     }
@@ -310,17 +313,17 @@ public final class CheckerData implements Logger {
         checks.put(checkName, checkName);
     }
 
-    public Map<String, String> getChecks() {
+    public @NonNull Map<String, String> getChecks() {
         return checks;
     }
 
     @Override
-    public void print(String message) {
+    public void print(@NonNull String message) {
         print(LogLevel.DEFAULT, message);
     }
 
     @Override
-    public void print(LogLevel level, String message) {
+    public void print(@NonNull LogLevel level, @NonNull String message) {
         // suppress message if level is smaller than current log level
         if (level.compareTo(minLogLevel) >= 0) {
             // for multiline strings, every line should have correct prefix
@@ -332,7 +335,7 @@ public final class CheckerData implements Logger {
         }
     }
 
-    public List<String> getMessages() {
+    public @NonNull List<String> getMessages() {
         return messages;
     }
 
@@ -340,7 +343,7 @@ public final class CheckerData implements Logger {
         return fileTree;
     }
 
-    public List<ProofEntry> getProofEntries() {
+    public @NonNull List<ProofEntry> getProofEntries() {
         return proofEntries;
     }
 
@@ -360,7 +363,7 @@ public final class CheckerData implements Logger {
         return srcLoadingState;
     }
 
-    private LoadingState determineProofLoadingState() {
+    private @NonNull LoadingState determineProofLoadingState() {
         LoadingState worst = LoadingState.SUCCESS;
         for (ProofEntry entry : proofEntries) {
             if (entry.loadingState.compareTo(worst) < 0) {
@@ -371,7 +374,7 @@ public final class CheckerData implements Logger {
         return worst;
     }
 
-    private ReplayState determineReplayState() {
+    private @NonNull ReplayState determineReplayState() {
         ReplayState worst = ReplayState.SUCCESS;
         for (ProofEntry entry : proofEntries) {
             if (entry.replayState.compareTo(worst) < 0) {
@@ -382,7 +385,7 @@ public final class CheckerData implements Logger {
         return worst;
     }
 
-    private DependencyState determineDependencyState() {
+    private @NonNull DependencyState determineDependencyState() {
         DependencyState worst = DependencyState.OK;
         for (ProofEntry entry : proofEntries) {
             if (entry.dependencyState.compareTo(worst) < 0) {
@@ -488,7 +491,7 @@ public final class CheckerData implements Logger {
         return unprovenCount() != 0;
     }
 
-    public GlobalState getGlobalState() {
+    public @NonNull GlobalState getGlobalState() {
         updateGlobalState();
         return globalState;
     }

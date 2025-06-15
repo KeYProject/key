@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ParserException;
@@ -17,9 +20,9 @@ import recoder.service.DefaultConstantEvaluator;
 public class ConstantExpressionEvaluator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConstantExpressionEvaluator.class);
-    private Services services = null;
+    private final Services services;
 
-    private ConstantEvaluator recCe = null;
+    private @Nullable ConstantEvaluator recCe = null;
 
     static final int BOOLEAN_TYPE = 0, BYTE_TYPE = 1, SHORT_TYPE = 2, CHAR_TYPE = 3, INT_TYPE = 4,
             LONG_TYPE = 5, FLOAT_TYPE = 6, DOUBLE_TYPE = 7, STRING_TYPE = 8;
@@ -70,6 +73,6 @@ public class ConstantExpressionEvaluator {
         } catch (ParserException exc) {
             LOGGER.error("Failed to parse {} as Java expression!", expr);
         }
-        return recExpr;
+        return Objects.requireNonNull(recExpr);
     }
 }

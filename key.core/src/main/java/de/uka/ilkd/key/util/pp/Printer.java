@@ -5,6 +5,8 @@ package de.uka.ilkd.key.util.pp;
 
 import java.util.ArrayList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The intermediate layer of the pretty printing library. Using the block size information provided
  * by the {@link Layouter} class, this decides where to insert line breaks. It tries to break as few
@@ -59,6 +61,7 @@ class Printer<M> {
     }
 
     /** Accumulated result */
+    @NonNull
     String result() {
         return back.result();
     }
@@ -69,7 +72,7 @@ class Printer<M> {
     }
 
     /** write the String <code>s</code> to <code>out</code> */
-    void print(String s) {
+    void print(@NonNull String s) {
         back.print(s);
         pos += s.length();
     }

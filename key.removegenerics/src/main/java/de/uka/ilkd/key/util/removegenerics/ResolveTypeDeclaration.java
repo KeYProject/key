@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
@@ -111,7 +113,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      *
      * @return a boolean true if the method with the given name and signature existed already
      */
-    private boolean methodAlreadyPresent(String name, List<Type> signature) {
+    private boolean methodAlreadyPresent(String name, @NonNull List<Type> signature) {
 
         //
         // has always been there
@@ -169,7 +171,8 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * @param localSign this is the signature of the method after removal of TV
      * @param superSig this is the target signature of the supertype.
      */
-    private void addMethod(Method origMethod, List<Type> localSign, List<Type> superSig) {
+    private void addMethod(@NonNull Method origMethod, @NonNull List<Type> localSign,
+            @NonNull List<Type> superSig) {
         ProgramFactory programFactory = getProgramFactory();
 
         //
@@ -255,7 +258,8 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         debugOut("Method added", methodDecl.toSource());
     }
 
-    private ASTList<DeclarationSpecifier> getDeclarationSpecifiers(Method origMethod) {
+    private @NonNull ASTList<DeclarationSpecifier> getDeclarationSpecifiers(
+            @NonNull Method origMethod) {
         ASTList<DeclarationSpecifier> ret = new ASTArrayList<>();
         ProgramFactory programFactory = getProgramFactory();
         if (origMethod.isFinal()) {
@@ -287,7 +291,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * @param exceptions a list of exception
      * @return a newly created throws-clause, or null if either null exceptions or empty list
      */
-    private Throws createThrows(List<ClassType> exceptions) {
+    private Throws createThrows(@Nullable List<ClassType> exceptions) {
 
         if (exceptions == null || exceptions.isEmpty()) {
             return null;
@@ -302,7 +306,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         return getProgramFactory().createThrows(tr);
     }
 
-    private List<Type> getUngenericSignature(List<Type> signature) {
+    private @NonNull List<Type> getUngenericSignature(@NonNull List<Type> signature) {
 
         List<Type> newSignature = new ArrayList<>(signature.size());
 
@@ -313,7 +317,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         return newSignature;
     }
 
-    private List<Method> getOverriddenMethods(Method method) {
+    private @NonNull List<Method> getOverriddenMethods(@NonNull Method method) {
         SourceInfo sourceInfo = getSourceInfo();
 
         ClassType classType = sourceInfo.getContainingClassType(method);

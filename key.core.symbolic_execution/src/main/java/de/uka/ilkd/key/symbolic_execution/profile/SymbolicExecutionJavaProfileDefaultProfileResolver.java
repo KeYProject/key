@@ -6,6 +6,8 @@ package de.uka.ilkd.key.symbolic_execution.profile;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A {@link DefaultProfileResolver} which returns
  * {@link SymbolicExecutionJavaProfile#getDefaultInstance()}.
@@ -17,7 +19,7 @@ public class SymbolicExecutionJavaProfileDefaultProfileResolver implements Defau
      * {@inheritDoc}
      */
     @Override
-    public String getProfileName() {
+    public @NonNull String getProfileName() {
         return SymbolicExecutionJavaProfile.NAME;
     }
 
@@ -25,7 +27,7 @@ public class SymbolicExecutionJavaProfileDefaultProfileResolver implements Defau
      * {@inheritDoc}
      */
     @Override
-    public Profile getDefaultProfile() {
+    public @NonNull Profile getDefaultProfile() {
         return SymbolicExecutionJavaProfile.getDefaultInstance();
     }
 }

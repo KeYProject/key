@@ -35,6 +35,7 @@ import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entry point for the Proof Exploration Extension.
@@ -51,9 +52,9 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
-    private JToolBar explorationToolbar;
+    private @Nullable JToolBar explorationToolbar;
 
-    private ExplorationStepsList leftPanel;
+    private @Nullable ExplorationStepsList leftPanel;
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
@@ -72,8 +73,10 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
         @Override
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
-            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
-                ExplorationNodeData.class);
+            final var obj = e.getNode().lookup(ExplorationNodeData.class);
+            if (obj != null) {
+                e.getNode().deregister(obj, ExplorationNodeData.class);
+            }
         }
     };
 
@@ -100,12 +103,16 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         ExplorationExtension extension = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 // ignored
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                if (leftPanel == null) {
+                    return;
+                }
+
                 Proof oldProof = leftPanel.getProof();
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {

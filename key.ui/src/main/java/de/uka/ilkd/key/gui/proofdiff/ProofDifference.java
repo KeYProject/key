@@ -15,13 +15,16 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
 public class ProofDifference {
     private static final Integer THRESHOLD = 25;
-    private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
+    private @NonNull List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
             rightSucc = new LinkedList<>(), leftSucc = new LinkedList<>();
 
     private final Set<String> exclusiveAntec = new HashSet<>();
@@ -29,13 +32,14 @@ public class ProofDifference {
     private final Set<String> exclusiveSucc = new HashSet<>();
     private final Set<String> commonAntec = new HashSet<>();
 
-    public static ProofDifference create(Services services, Node left, Node right) {
+    public static @NonNull ProofDifference create(@NonNull Services services, @NonNull Node left,
+            @NonNull Node right) {
         return create(left, right,
             (Term t) -> LogicPrinter.quickPrintTerm((JTerm) t, services));
     }
 
-    public static ProofDifference create(Node left, Node right,
-            Function<Term, String> printer) {
+    public static @NonNull ProofDifference create(@NonNull Node left, @NonNull Node right,
+            @NonNull Function<Term, String> printer) {
         ProofDifference pd = new ProofDifference();
         assert left != null && right != null;
         pd.leftAntec = initialise(printer, left.sequent().antecedent());
@@ -46,32 +50,36 @@ public class ProofDifference {
         return pd;
     }
 
-    private static List<String> initialise(Function<Term, String> printer,
-            Semisequent semisequent) {
+    private static @NonNull List<String> initialise(
+            @NonNull Function<Term, String> printer,
+            @NonNull Semisequent semisequent) {
         return semisequent.asList().stream().map(it -> printer.apply(it.formula()))
                 .collect(Collectors.toList());
     }
 
-    private static Collection<? extends String> intersect(Set<String> left, Set<String> right) {
+    private static @NonNull Collection<? extends String> intersect(@NonNull Set<String> left,
+            @NonNull Set<String> right) {
         Set<String> intersection = new TreeSet<>(left);
         intersection.retainAll(right);
         return intersection;
     }
 
-    private static void computeDiff(List<String> left, List<String> right, Set<String> common,
-            Set<String> exclusive) {
+    private static void computeDiff(@NonNull List<String> left, @NonNull List<String> right,
+            @NonNull Set<String> common,
+            @NonNull Set<String> exclusive) {
         computeDiff(new HashSet<>(left), new HashSet<>(right), common, exclusive);
     }
 
-    private static void computeDiff(Set<String> left, Set<String> right, Set<String> common,
-            Set<String> exclusive) {
+    private static void computeDiff(@NonNull Set<String> left, @NonNull Set<String> right,
+            @NonNull Set<String> common,
+            @NonNull Set<String> exclusive) {
         common.addAll(intersect(left, right));
         exclusive.addAll(left);
         exclusive.addAll(right);
         exclusive.removeAll(common);
     }
 
-    static String findAndPopNearestMatch(String l, List<String> right) {
+    static @Nullable String findAndPopNearestMatch(String l, @NonNull List<String> right) {
         String current = null;
         // Ignore whitespace:
         l = l.replaceAll("\\s", "");
@@ -97,7 +105,8 @@ public class ProofDifference {
     private record QueueEntry(int idxLeft, int idxRight, int distance) {
     }
 
-    static List<Matching> findPairs(List<String> left, List<String> right) {
+    static @NonNull List<Matching> findPairs(@NonNull List<String> left,
+            @NonNull List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         int initCap =
             Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
@@ -144,43 +153,43 @@ public class ProofDifference {
         computeDiff(leftSucc, rightSucc, commonSucc, exclusiveSucc);
     }
 
-    public List<String> getLeftAntec() {
+    public @NonNull List<String> getLeftAntec() {
         return leftAntec;
     }
 
-    public List<String> getRightAntec() {
+    public @NonNull List<String> getRightAntec() {
         return rightAntec;
     }
 
-    public List<String> getRightSucc() {
+    public @NonNull List<String> getRightSucc() {
         return rightSucc;
     }
 
-    public List<String> getLeftSucc() {
+    public @NonNull List<String> getLeftSucc() {
         return leftSucc;
     }
 
-    public Set<String> getExclusiveAntec() {
+    public @NonNull Set<String> getExclusiveAntec() {
         return exclusiveAntec;
     }
 
-    public Set<String> getCommonSucc() {
+    public @NonNull Set<String> getCommonSucc() {
         return commonSucc;
     }
 
-    public Set<String> getExclusiveSucc() {
+    public @NonNull Set<String> getExclusiveSucc() {
         return exclusiveSucc;
     }
 
-    public Set<String> getCommonAntec() {
+    public @NonNull Set<String> getCommonAntec() {
         return commonAntec;
     }
 
-    public List<Matching> getSuccPairs() {
+    public @NonNull List<Matching> getSuccPairs() {
         return findPairs(getLeftSucc(), getRightSucc());
     }
 
-    public List<Matching> getAntecPairs() {
+    public @NonNull List<Matching> getAntecPairs() {
         return findPairs(getLeftAntec(), getRightAntec());
     }
 
@@ -188,7 +197,7 @@ public class ProofDifference {
      * https://www.baeldung.com/java-levenshtein-distance
      */
     static class Levensthein {
-        static int calculate(String x, String y) {
+        static int calculate(@NonNull String x, @NonNull String y) {
             int[][] dp = new int[x.length() + 1][y.length() + 1];
             for (int i = 0; i <= x.length(); i++) {
                 for (int j = 0; j <= y.length(); j++) {
@@ -211,7 +220,7 @@ public class ProofDifference {
         }
 
 
-        public static int min(int... numbers) {
+        public static int min(int @NonNull... numbers) {
             return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
         }
     }
@@ -219,7 +228,7 @@ public class ProofDifference {
     record Matching(String left, String right, int distance) {
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return String.format("(%s, %s)", left, right);
         }
     }

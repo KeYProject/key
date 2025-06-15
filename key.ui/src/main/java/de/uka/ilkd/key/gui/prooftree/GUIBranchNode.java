@@ -9,6 +9,7 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * this class implements a TreeModel that can be displayed using the JTree class framework
@@ -17,7 +18,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
 
     private final Object label;
 
-    private ArrayList<TreeNode> childrenCache = null;
+    private @Nullable ArrayList<TreeNode> childrenCache = null;
 
 
     public GUIBranchNode(GUIProofTreeModel tree, Node subTree, Object label) {
@@ -84,7 +85,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         return childrenCache.size();
     }
 
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         Node self = getNode();
         if (self == null) {
             return null;

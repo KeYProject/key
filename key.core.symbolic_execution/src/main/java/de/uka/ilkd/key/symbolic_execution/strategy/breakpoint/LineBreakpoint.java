@@ -20,6 +20,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The path of the class this {@link LineBreakpoint} is associated with.
@@ -57,7 +60,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      * @param methodEnd the line the containing method of this breakpoint ends at
      * @throws SLTranslationException if the condition could not be parsed to a valid Term
      */
-    public LineBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm,
+    public LineBreakpoint(String classPath, int lineNumber, int hitCount,
+            @NonNull IProgramMethod pm,
             Proof proof, String condition, boolean enabled, boolean conditionEnabled,
             int methodStart, int methodEnd) throws SLTranslationException {
         super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd,
@@ -80,7 +84,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *         Breakpoint
      */
     @Override
-    protected StatementBlock getStatementBlock(StatementContainer statementContainer) {
+    protected @NonNull StatementBlock getStatementBlock(
+            @NonNull StatementContainer statementContainer) {
         // list of all statements
         ExtList nextResult = new ExtList();
         for (int i = 0; i < statementContainer.getStatementCount(); i++) {
@@ -124,7 +129,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
                 && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
-    private boolean isInLine(SourceElement activeStatement) {
+    private boolean isInLine(@Nullable SourceElement activeStatement) {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             final String path =
                 Paths.get(activeStatement.getPositionInfo().getParentClassURI()).toString();

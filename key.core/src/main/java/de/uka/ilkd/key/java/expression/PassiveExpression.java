@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Marks an active statement as inactive.
@@ -35,7 +37,7 @@ public class PassiveExpression extends ParenthesizedExpression {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnPassiveExpression(this);
     }
 }

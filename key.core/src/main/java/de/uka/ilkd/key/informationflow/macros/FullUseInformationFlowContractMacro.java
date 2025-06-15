@@ -15,6 +15,8 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  *
  * @author christoph scheben
@@ -22,7 +24,7 @@ import org.key_project.util.collection.ImmutableList;
 public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Use information flow contracts";
     }
 
@@ -32,18 +34,18 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Applies all applicable information flow contract rules and "
             + "prepares the information flow pre branches.";
     }
 
     @Override
-    public String getScriptCommandName() {
+    public @NonNull String getScriptCommandName() {
         return "use-inf-flow-contracts";
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
+    protected ProofMacro @NonNull [] createProofMacroArray() {
         return new ProofMacro[] { new UseInformationFlowContractMacro(),
             new PrepareInfFlowContractPreBranchesMacro() };
     }

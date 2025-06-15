@@ -15,6 +15,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Shows the license dialog.
  * <p>
@@ -28,7 +30,7 @@ public class LicenseAction extends MainWindowAction {
 
     private static final long serialVersionUID = 5606343347731759150L;
 
-    public LicenseAction(MainWindow mainWindow) {
+    public LicenseAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("License");
     }
@@ -38,7 +40,7 @@ public class LicenseAction extends MainWindowAction {
         showLicense();
     }
 
-    private JComponent createLicenseViewer(String s) {
+    private @NonNull JComponent createLicenseViewer(String s) {
         JTextArea text = new JTextArea(s, 20, 40);
         text.setEditable(false);
         text.setCaretPosition(0);
@@ -46,7 +48,7 @@ public class LicenseAction extends MainWindowAction {
         return scroll;
     }
 
-    private String readStream(URL resource, String fallback) {
+    private String readStream(@NonNull URL resource, String fallback) {
         StringBuilder sb = new StringBuilder();
         try {
             InputStreamReader inp =

@@ -10,15 +10,17 @@ import java.util.Date;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 
+import org.jspecify.annotations.NonNull;
+
 @SuppressWarnings("serial")
 public class ProfilingDirectories extends RunAllProofsDirectories {
 
-    public final File profilingDataDir;
-    public final File ruleIndependentDataDir;
-    public final File ruleDependentDataDir;
-    public final File computeCostDataDir;
-    public final File instantiateAppDataDir;
-    private final File runDir;
+    public final @NonNull File profilingDataDir;
+    public final @NonNull File ruleIndependentDataDir;
+    public final @NonNull File ruleDependentDataDir;
+    public final @NonNull File computeCostDataDir;
+    public final @NonNull File instantiateAppDataDir;
+    private final @NonNull File runDir;
 
     public ProfilingDirectories(Date runStart) throws IOException {
         SimpleDateFormat format = new SimpleDateFormat("dd.MMM_yyyy____HH:mm:ss");

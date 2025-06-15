@@ -31,7 +31,7 @@ public class Name implements Comparable<Name> {
     @Override
     @SuppressWarnings("all") // Suppress String comparison ==-warning, which is unnecessary due to
                              // interning
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof Name other)) {
             return false;
         }

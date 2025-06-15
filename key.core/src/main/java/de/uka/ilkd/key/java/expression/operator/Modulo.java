@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Modulo.
@@ -19,11 +21,11 @@ public class Modulo extends BinaryOperator {
      * Modulo.
      */
 
-    public Modulo(ExtList children) {
+    public Modulo(@NonNull ExtList children) {
         super(children);
     }
 
-    public Modulo(Expression lhs, Expression rhs) {
+    public Modulo(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -55,7 +57,7 @@ public class Modulo extends BinaryOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnModulo(this);
     }
 

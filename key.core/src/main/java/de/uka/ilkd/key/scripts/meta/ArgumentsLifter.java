@@ -10,6 +10,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (21.04.17)
@@ -20,7 +22,8 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
+    public static <T> @NonNull List<ProofScriptArgument<T>> inferScriptArguments(
+            @NonNull Class<?> clazz,
             ProofScriptCommand<T> command) {
         List<ProofScriptArgument<T>> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
@@ -48,7 +51,7 @@ public final class ArgumentsLifter {
         return args;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Varargs vargs, Field field) {
+    private static <T> @NonNull ProofScriptArgument<T> lift(@NonNull Varargs vargs, Field field) {
         ProofScriptArgument<T> arg = new ProofScriptArgument<>();
         arg.setName(vargs.prefix());
         arg.setRequired(false);
@@ -58,7 +61,8 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Option option, Field field) {
+    private static <T> @NonNull ProofScriptArgument<T> lift(@NonNull Option option,
+            @NonNull Field field) {
         ProofScriptArgument<T> arg = new ProofScriptArgument<>();
         arg.setName(option.value());
         arg.setRequired(option.required());

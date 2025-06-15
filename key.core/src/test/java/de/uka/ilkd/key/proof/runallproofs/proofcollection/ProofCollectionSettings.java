@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,12 +62,12 @@ public class ProofCollectionSettings implements Serializable {
     /**
      * String {@link Map} containing all settings entries.
      */
-    private final Map<String, String> settingsMap;
+    private final @NonNull Map<String, String> settingsMap;
 
     /**
      * File in which statistics are written.
      */
-    private StatisticsFile statisticsFile;
+    private @Nullable StatisticsFile statisticsFile;
 
     /**
      * {@link List} of settings entries that are created from system properties.
@@ -79,7 +81,7 @@ public class ProofCollectionSettings implements Serializable {
      * properties by providing JVM arguments like:
      * "-Dkey.runallproofs.forkMode=perFile"
      */
-    private static final Map<String, String> SYSTEM_PROPERTIES_ENTRIES;
+    private static final @NonNull Map<String, String> SYSTEM_PROPERTIES_ENTRIES;
 
     static {
         /*
@@ -113,7 +115,7 @@ public class ProofCollectionSettings implements Serializable {
      * Creates a {@link ProofCollectionSettings} object that overrides an existing
      * {@link ProofCollectionSettings} object.
      */
-    public ProofCollectionSettings(ProofCollectionSettings parentSettings) {
+    public ProofCollectionSettings(@NonNull ProofCollectionSettings parentSettings) {
         this.runStart = parentSettings.runStart;
         settingsMap = new HashMap<>(parentSettings.settingsMap);
 
@@ -134,12 +136,12 @@ public class ProofCollectionSettings implements Serializable {
         return settingsMap.get(key);
     }
 
-    private ProofCollectionSettings set(String key, String value) {
+    private @NonNull ProofCollectionSettings set(String key, String value) {
         settingsMap.put(key, value);
         return this;
     }
 
-    public ForkMode getForkMode() {
+    public @NonNull ForkMode getForkMode() {
 
         ForkMode forkMode = null;
         String forkModeString = get(FORK_MODE);
@@ -181,7 +183,7 @@ public class ProofCollectionSettings implements Serializable {
     /**
      * Returns KeY settings that will be used as default settings.
      */
-    public String getGlobalKeYSettings() {
+    public @NonNull String getGlobalKeYSettings() {
         String gks = get(KEY_SETTINGS_KEY);
         return gks == null ? "" : gks;
     }
@@ -200,7 +202,7 @@ public class ProofCollectionSettings implements Serializable {
      * {@link ProofCollectionSettings} paths will
      * be treated as relative to directory returned by this method.
      */
-    public File getBaseDirectory() {
+    public @NonNull File getBaseDirectory() {
         String baseDirectoryName = get(BASE_DIRECTORY_KEY);
         return baseDirectoryName == null
                 ? new File(".").getAbsoluteFile()
@@ -211,7 +213,7 @@ public class ProofCollectionSettings implements Serializable {
      * Returns location of statistics file. Can be null. In this case no statistics
      * are saved.
      */
-    public StatisticsFile getStatisticsFile() {
+    public @Nullable StatisticsFile getStatisticsFile() {
         if (statisticsFile == null) {
             // Compute location of statistics file.
             String statisticsFileName = get(STATISTICS_FILE);
@@ -225,7 +227,7 @@ public class ProofCollectionSettings implements Serializable {
         return statisticsFile;
     }
 
-    public File getTempDir() throws IOException {
+    public @NonNull File getTempDir() throws IOException {
         String tempDirString = get(TEMP_DIR);
         if (tempDirString == null) {
             throw new IOException(
@@ -252,7 +254,7 @@ public class ProofCollectionSettings implements Serializable {
      * null, then only test cases whose name is contained in the returned set are
      * enabled.
      */
-    public Set<String> getEnabledTestCaseNames() {
+    public @Nullable Set<String> getEnabledTestCaseNames() {
         String testCases = get("testCases");
         if (testCases == null || testCases.length() == 0) {
             return null;
@@ -285,15 +287,16 @@ public class ProofCollectionSettings implements Serializable {
     /**
      * Static method for creation of {@link ProofCollectionSettings} entries.
      */
-    public static Entry<String, String> getSettingsEntry(final String key, final String value) {
+    public static @NonNull Entry<String, String> getSettingsEntry(final @NonNull String key,
+            final @NonNull String value) {
         return new Entry<>() {
             @Override
-            public String getKey() {
+            public @NonNull String getKey() {
                 return key;
             }
 
             @Override
-            public String getValue() {
+            public @NonNull String getValue() {
                 return value;
             }
 
@@ -312,7 +315,7 @@ public class ProofCollectionSettings implements Serializable {
      *
      * @return <code>null</code> or a list.
      */
-    public List<String> getRunOnlyOn() {
+    public @Nullable List<String> getRunOnlyOn() {
         String runOnly = get(RUN_ONLY_ON);
         if (runOnly == null) {
             return null;
@@ -330,7 +333,7 @@ public class ProofCollectionSettings implements Serializable {
      *
      * @return the directory for the current group.
      */
-    public File getGroupDirectory() {
+    public @NonNull File getGroupDirectory() {
         String localDir = get(DIRECTORY);
         if (localDir != null) {
             return new File(getBaseDirectory(), localDir);
@@ -339,39 +342,39 @@ public class ProofCollectionSettings implements Serializable {
         }
     }
 
-    public ProofCollectionSettings setBaseDirectory(String folder) {
+    public @NonNull ProofCollectionSettings setBaseDirectory(String folder) {
         return set(BASE_DIRECTORY_KEY, folder);
     }
 
-    public ProofCollectionSettings setStatisticsFile(String path) {
+    public @NonNull ProofCollectionSettings setStatisticsFile(String path) {
         return set(STATISTICS_FILE, path);
     }
 
-    public ProofCollectionSettings setReloadEnabled(boolean flag) {
+    public @NonNull ProofCollectionSettings setReloadEnabled(boolean flag) {
         return set(RELOAD_ENABLED, "" + flag);
     }
 
-    public ProofCollectionSettings setForkMode(ForkMode forkMode) {
+    public @NonNull ProofCollectionSettings setForkMode(ForkMode forkMode) {
         return set(FORK_MODE, "" + forkMode);
     }
 
-    public ProofCollectionSettings setTempDir(String path) {
+    public @NonNull ProofCollectionSettings setTempDir(String path) {
         return set(TEMP_DIR, path);
     }
 
-    public ProofCollectionSettings setForkTimeout(int i) {
+    public @NonNull ProofCollectionSettings setForkTimeout(int i) {
         return set(FORK_TIMEOUT_KEY, "" + i);
     }
 
-    public ProofCollectionSettings setKeySettings(String props) {
+    public @NonNull ProofCollectionSettings setKeySettings(String props) {
         return set(KEY_SETTINGS_KEY, props);
     }
 
-    public ProofCollectionSettings setLocalKeYSettings(String settings) {
+    public @NonNull ProofCollectionSettings setLocalKeYSettings(String settings) {
         return set(LOCAL_SETTINGS_KEY, settings);
     }
 
-    public ProofCollectionSettings setRunOnlyOn(String settings) {
+    public @NonNull ProofCollectionSettings setRunOnlyOn(String settings) {
         return set(RUN_ONLY_ON, settings);
     }
 
@@ -379,7 +382,7 @@ public class ProofCollectionSettings implements Serializable {
         return "true".equals(get(VERBOSE_OUTPUT_KEY));
     }
 
-    public ProofCollectionSettings setVerboseOutput(boolean val) {
+    public @NonNull ProofCollectionSettings setVerboseOutput(boolean val) {
         return set(VERBOSE_OUTPUT_KEY, "" + val);
     }
 
@@ -399,7 +402,7 @@ public class ProofCollectionSettings implements Serializable {
         return get(FORK_TIMEOUT_KEY);
     }
 
-    public ProofCollectionSettings setDirectory(String s) {
+    public @NonNull ProofCollectionSettings setDirectory(String s) {
         return set(DIRECTORY, s);
     }
 }

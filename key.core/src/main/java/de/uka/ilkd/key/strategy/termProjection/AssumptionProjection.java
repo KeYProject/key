@@ -12,6 +12,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Term projection that delivers the assumptions of a taclet application (the formulas that the
@@ -25,12 +27,13 @@ public class AssumptionProjection implements ProjectionToTerm<Goal> {
         this.no = no;
     }
 
-    public static ProjectionToTerm<Goal> create(int no) {
+    public static @NonNull ProjectionToTerm<Goal> create(int no) {
         return new AssumptionProjection(no);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
         assert app instanceof TacletApp
                 : "Projection is only applicable to taclet apps," + " but got " + app;
         final TacletApp tapp = (TacletApp) app;

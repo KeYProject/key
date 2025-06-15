@@ -14,6 +14,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The default implementation of {@link IExecutionLoopInvariant}.
  *
@@ -28,7 +30,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionLoopInvariant(ITreeSettings settings, Node proofNode) {
+    public ExecutionLoopInvariant(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -44,7 +46,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         return getLoopInvariant().getPlainText(getServices(), getAppliedRuleApp().getHeapContext(),
             getSettings().usePrettyPrinting(), getSettings().useUnicode()).trim();
     }
@@ -53,7 +55,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Loop Invariant";
     }
 
@@ -61,7 +63,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -69,7 +71,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public LoopSpecification getLoopInvariant() {
+    public @NonNull LoopSpecification getLoopInvariant() {
         return ((LoopInvariantBuiltInRuleApp) getProofNode().getAppliedRuleApp()).getSpec();
     }
 
@@ -77,7 +79,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public While getLoopStatement() {
+    public @NonNull While getLoopStatement() {
         return ((LoopInvariantBuiltInRuleApp) getProofNode().getAppliedRuleApp())
                 .getLoopStatement();
     }

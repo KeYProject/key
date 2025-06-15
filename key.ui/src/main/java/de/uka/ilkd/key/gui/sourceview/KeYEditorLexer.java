@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.nparser.KeYLexer;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.nparser.KeYLexer.*;
 
@@ -119,13 +120,13 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
         addAll(MODALITIES, MODALITY);
     }
 
-    private static void addAll(BitSet bitSet, int... values) {
+    private static void addAll(@NonNull BitSet bitSet, int @NonNull... values) {
         for (int value : values) {
             bitSet.set(value);
         }
     }
 
-    private SimpleAttributeSet getAttributes(int type) {
+    private @NonNull SimpleAttributeSet getAttributes(int type) {
         if (KEYWORDS.get(type)) {
             return keywordStyle;
         } else if (KEYWORDS2.get(type)) {
@@ -142,7 +143,7 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
     }
 
     @Override
-    public List<SourceHighlightDocument.Token> applyTo(String text) {
+    public @NonNull List<SourceHighlightDocument.Token> applyTo(@NonNull String text) {
         KeYLexer keYLexer = new KeYLexer(CharStreams.fromString(text));
         List<SourceHighlightDocument.Token> result = new ArrayList<>();
         var t = keYLexer.nextToken();

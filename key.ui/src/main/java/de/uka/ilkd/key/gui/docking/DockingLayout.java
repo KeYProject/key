@@ -29,6 +29,7 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
 
     private MainWindow window;
 
-    private void installIcons(MainWindow mw) {
+    private void installIcons(@NonNull MainWindow mw) {
         CControl globalPort = mw.getDockControl();
         IconManager icons = globalPort.getController().getIcons();
         Priority p = Priority.CLIENT;
@@ -83,7 +84,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
             IconFontSwing.buildIcon(FontAwesomeRegular.WINDOW_CLOSE, SIZE_ICON_DOCK));
     }
 
-    private static void loadLayouts(CControl globalPort) {
+    private static void loadLayouts(@NonNull CControl globalPort) {
         try {
             if (LAYOUT_FILE.exists()) {
                 globalPort.readXML(LAYOUT_FILE);
@@ -94,7 +95,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
+    public void init(@NonNull MainWindow window, KeYMediator mediator) {
         this.window = window;
         installIcons(window);
         loadLayouts(window.getDockControl());
@@ -155,7 +156,7 @@ final class SaveLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = -2646217961498111734L;
     private final String layoutName;
 
-    SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
+    SaveLayoutAction(@NonNull MainWindow mainWindow, String name, @Nullable Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Save " + name);
@@ -180,7 +181,7 @@ final class LoadLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 3378477658914832831L;
     private final String layoutName;
 
-    LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
+    LoadLayoutAction(@NonNull MainWindow mainWindow, String name, @Nullable Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Load " + name);
@@ -209,7 +210,7 @@ final class LoadLayoutAction extends MainWindowAction {
 final class ResetLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 8772915552504055750L;
 
-    ResetLayoutAction(MainWindow mainWindow) {
+    ResetLayoutAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Reset Layout");
         KeyStrokeManager.lookupAndOverride(this);

@@ -16,6 +16,8 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This{@link FieldWatchpoint} represents a Java watchpoint and is responsible to tell the debugger
  * to stop execution when the respective variable is accessed or modified.
@@ -27,7 +29,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
 
     private boolean isModification;
 
-    private final String fullFieldName;
+    private final @NonNull String fullFieldName;
 
     /**
      * Creates a new {@link FieldWatchpoint}.
@@ -41,7 +43,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
      * @param proof the {@link Proof} that will be executed and should stop
      */
     public FieldWatchpoint(boolean enabled, int hitCount, String fieldName, boolean isAcces,
-            boolean isModification, KeYJavaType containerKJT, Proof proof) {
+            boolean isModification, @NonNull KeYJavaType containerKJT, Proof proof) {
         super(hitCount, proof, enabled);
         this.isAccess = isAcces;
         this.isModification = isModification;

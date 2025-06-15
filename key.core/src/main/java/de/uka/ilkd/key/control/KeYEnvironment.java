@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -41,7 +42,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
-    private final U ui;
+    private final @NonNull U ui;
 
     /**
      * The loaded project.
@@ -51,7 +52,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * An optional {@link Proof} which was loaded by the specified proof file.
      */
-    private final Proof loadedProof;
+    private final @Nullable Proof loadedProof;
 
     /**
      * An optional field denoting a script contained in the proof file.
@@ -66,7 +67,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * The {@link ReplayResult} if available.
      */
-    private final ReplayResult replayResult;
+    private final @Nullable ReplayResult replayResult;
 
     /**
      * Constructor
@@ -74,7 +75,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      * @param initConfig The loaded project.
      */
-    public KeYEnvironment(U ui, InitConfig initConfig) {
+    public KeYEnvironment(@NonNull U ui, InitConfig initConfig) {
         this(ui, initConfig, null, null, null);
     }
 
@@ -85,8 +86,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param initConfig The loaded project.
      * @param proofScript add an optional proof script
      */
-    public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-            @Nullable ProofScript proofScript, ReplayResult replayResult) {
+    public KeYEnvironment(@NonNull U ui, InitConfig initConfig, @Nullable Proof loadedProof,
+            @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -99,7 +100,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      *
      * @return The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
-    public U getUi() {
+    public @NonNull U getUi() {
         return ui;
     }
 
@@ -157,7 +158,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      *
      * @return The loaded {@link Proof} if available and {@code null} otherwise.
      */
-    public Proof getLoadedProof() {
+    public @Nullable Proof getLoadedProof() {
         return loadedProof;
     }
 
@@ -166,7 +167,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      *
      * @return The {@link ReplayResult} or {@code null} if not available.
      */
-    public ReplayResult getReplayResult() {
+    public @Nullable ReplayResult getReplayResult() {
         return replayResult;
     }
 
@@ -193,7 +194,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes)
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes)
             throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, false);
     }
@@ -234,7 +236,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
@@ -260,9 +263,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
-            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile,
+            @Nullable Path location,
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
             ruleCompletionHandler,
@@ -290,9 +295,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
-            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
-            Consumer<Proof> callbackProofLoaded,
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
+            @Nullable RuleCompletionHandler ruleCompletionHandler,
+            @Nullable Consumer<Proof> callbackProofLoaded,
             boolean forceNewProfileOfNewProofs)
             throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);

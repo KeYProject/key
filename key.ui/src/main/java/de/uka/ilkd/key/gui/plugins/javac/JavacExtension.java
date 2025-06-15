@@ -25,6 +25,8 @@ import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +127,7 @@ public class JavacExtension
         });
     }
 
-    private void loadProof(Proof selectedProof) throws RuntimeException {
+    private void loadProof(@Nullable Proof selectedProof) throws RuntimeException {
         try {
             if (selectedProof != null) {
                 JavacData data = selectedProof.getUserData().get(JavacData.class);
@@ -171,7 +173,7 @@ public class JavacExtension
      *
      * @param data data to use
      */
-    private void updateLabel(JavacData data) {
+    private void updateLabel(@Nullable JavacData data) {
         if (data == null || data.issues == null) {
             lblStatus.setText("Javac");
             lblStatus.setIcon(null);
@@ -207,12 +209,12 @@ public class JavacExtension
     }
 
     @Override
-    public List<JComponent> getStatusLineComponents() {
+    public @NonNull List<JComponent> getStatusLineComponents() {
         return Collections.singletonList(lblStatus);
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
+    public void init(MainWindow window, @NonNull KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
     }
@@ -223,7 +225,7 @@ public class JavacExtension
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
         loadProof(e.getSource().getSelectedProof());
     }
 }
@@ -238,6 +240,7 @@ class JavacData {
     /**
      * The diagnostics emitted by the compiler.
      */
+    @Nullable
     List<PositionedIssueString> issues = null;
     /**
      * True if there was no Java source file to compile.

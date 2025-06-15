@@ -5,10 +5,14 @@ package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.key_project.util.collection.Pair;
 
-public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public class LinkedHashMap<K, V extends @Nullable Object> extends java.util.LinkedHashMap<K, V>
         implements Iterable<Pair<K, V>> {
 
 
@@ -29,7 +33,6 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
         put(key, value);
     }
 
-
     public LinkedHashMap(K[] keys, V[] values) {
         super();
         putAll(keys, values);
@@ -42,7 +45,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
     }
 
 
-    public void putAll(K[] keys, V[] vals) {
+    public void putAll(LinkedHashMap<K, @Nullable V> this, K[] keys, V[] vals) {
         for (int i = 0; i < keys.length; i++) {
             if (i < vals.length) {
                 put(keys[i], vals[i]);
@@ -53,7 +56,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
     }
 
 
-    public void putAll(Iterable<K> keys, Iterable<V> vals) {
+    public void putAll(LinkedHashMap<K, @Nullable V> this, Iterable<K> keys, Iterable<V> vals) {
         Iterator<V> itVals = vals.iterator();
         for (K key : keys) {
             if (itVals.hasNext()) {
@@ -65,18 +68,20 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
     }
 
     public Iterator<Pair<K, V>> iterator() {
-        return new PairIterator<>(this);
+        return new PairIterator<K, V>(this);
     }
 
-    private static class PairIterator<K, V> implements Iterator<Pair<K, V>> {
+    private static class PairIterator<K, V extends @Nullable Object>
+            implements Iterator<Pair<K, V>> {
 
-        private final Iterator<K> keyIt;
+        private final Iterator<@KeyFor("map") K> keyIt;
         private final LinkedHashMap<K, V> map;
-        private K last = null;
+        private @Nullable K last = null;
 
         public PairIterator(final LinkedHashMap<K, V> map) {
             this.map = map;
-            keyIt = map.keySet().iterator();
+            Set<@KeyFor("this.map") K> ks = this.map.keySet();
+            keyIt = ks.iterator();
         }
 
         @Override

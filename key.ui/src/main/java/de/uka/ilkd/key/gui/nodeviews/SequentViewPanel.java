@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JPanel;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Creates the layout for SequentViews.
  *
@@ -17,7 +19,7 @@ class SequentViewPanel extends JPanel {
 
     private static final long serialVersionUID = -4052156449188977483L;
 
-    protected SequentViewPanel(SequentView sequentView) {
+    protected SequentViewPanel(@NonNull SequentView sequentView) {
 
         setLayout(new GridBagLayout());
         setBackground(sequentView.getBackground());

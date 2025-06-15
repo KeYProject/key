@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class performs a labeled break. This means <code>
  *  l1:l2:{l3:{l4:{break l3;}} ...}
@@ -63,7 +65,7 @@ public class DoBreak extends ProgramTransformer {
      * @return the transformated program
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         // get label of break
         // ContextInstantiationEntry ctx = insts.getContextInstantiation();

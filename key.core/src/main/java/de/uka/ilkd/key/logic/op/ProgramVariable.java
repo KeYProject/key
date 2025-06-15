@@ -20,6 +20,8 @@ import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
+import org.checkerframework.dataflow.qual.Pure;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         ParsableVariable, ReferenceSuffix, ProgramInLogic {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramVariable.class);
 
-    private final KeYJavaType type;
+    private final @Nullable KeYJavaType type;
     private final boolean isStatic;
     private final boolean isModel;
     private final boolean isGhost;
@@ -48,10 +50,11 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
     // the type where this program variable is declared if and only if
     // the program variable denotes a field
-    private final KeYJavaType containingType;
+    private final @Nullable KeYJavaType containingType;
 
-    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
-            KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
+    protected ProgramVariable(ProgramElementName name, @Nullable Sort s, @Nullable KeYJavaType t,
+            @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
+            boolean isGhost,
             boolean isFinal) {
         super(name, s == null ? t.getSort() : s, false);
         this.type = t;
@@ -66,8 +69,9 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         assert sort() != JavaDLTheory.UPDATE;
     }
 
-    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
-            KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
+    protected ProgramVariable(ProgramElementName name, Sort s, @Nullable KeYJavaType t,
+            @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
+            boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
 
@@ -121,7 +125,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
      * returns the KeYJavaType where the program variable is declared or null if the program
      * variable denotes not a field
      */
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return containingType;
     }
 
@@ -179,19 +183,20 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     @Override
-    public KeYJavaType getKeYJavaType() {
+    @Pure
+    public @Nullable KeYJavaType getKeYJavaType() {
         return type;
     }
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return getKeYJavaType();
     }
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType();
     }
 

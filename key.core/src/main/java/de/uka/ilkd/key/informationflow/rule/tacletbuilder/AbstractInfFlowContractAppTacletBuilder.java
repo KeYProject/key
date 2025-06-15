@@ -176,7 +176,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         ImmutableList<JTerm> localVarsAtPreSVs =
             createTermSV(appData.pre.localVars, schemaPrefix, services);
         JTerm guardAtPreSV = createTermSV(appData.pre.guard, schemaPrefix, services);
-        JTerm resAtPreSV = createTermSV(appData.pre.result, schemaPrefix, services);
+        JTerm resAtPreSV = createTermSV(appData.pre.resultTerm, schemaPrefix, services);
         JTerm excAtPreSV = createTermSV(appData.pre.exception, schemaPrefix, services);
         JTerm heapAtPreSV = createTermSV(appData.pre.heap, schemaPrefix, services);
         JTerm mbyAtPreSV = createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
@@ -203,8 +203,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         JTerm guardAtPostSV = (appData.pre.guard == appData.post.guard ? guardAtPreSV
                 : createTermSV(appData.post.guard, schemaPrefix, services));
-        JTerm resAtPostSV = (appData.pre.result == appData.post.result ? resAtPreSV
-                : createTermSV(appData.post.result, schemaPrefix, services));
+        JTerm resAtPostSV = (appData.pre.resultTerm == appData.post.resultTerm ? resAtPreSV
+                : createTermSV(appData.post.resultTerm, schemaPrefix, services));
         JTerm excAtPostSV = (appData.pre.exception == appData.post.exception ? excAtPreSV
                 : createTermSV(appData.post.exception, schemaPrefix, services));
         JTerm heapAtPostSV = (appData.pre.heap == appData.post.heap ? heapAtPreSV

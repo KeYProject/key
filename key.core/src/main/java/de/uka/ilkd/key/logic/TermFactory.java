@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -38,7 +40,7 @@ public final class TermFactory {
 
 
     public TermFactory() {
-        this.cache = null;
+        this.cache = new HashMap<>();
     }
 
     public TermFactory(Map<JTerm, JTerm> cache) {
@@ -55,9 +57,10 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public JTerm createTerm(@NonNull Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(Operator op,
+            @Nullable ImmutableArray<JTerm> subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -80,8 +83,8 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
@@ -116,8 +119,8 @@ public final class TermFactory {
     }
 
     private JTerm doCreateTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()

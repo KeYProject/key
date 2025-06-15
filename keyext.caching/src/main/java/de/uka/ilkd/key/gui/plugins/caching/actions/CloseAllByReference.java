@@ -17,6 +17,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Proof context menu action to perform proof caching for all open goals on that proof.
  *
@@ -34,7 +36,7 @@ public class CloseAllByReference extends KeyAction {
     /**
      * The proof whose open goals we try to close by reference.
      */
-    private final Proof proof;
+    private final @NonNull Proof proof;
 
     /**
      * Construct new action.
@@ -43,7 +45,7 @@ public class CloseAllByReference extends KeyAction {
      * @param proof the proof
      */
     public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
-            Proof proof) {
+            @NonNull Proof proof) {
         this.cachingExtension = cachingExtension;
         this.mediator = mediator;
         this.proof = proof;

@@ -11,6 +11,8 @@ import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NonNull;
+
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
 /**
@@ -101,7 +103,8 @@ public class DependencyChecker implements Checker {
         data.print(LogLevel.INFO, "Dependency checks completed!");
     }
 
-    private boolean hasUnprovenDependencies(DependencyGraph graph, CheckerData data)
+    private boolean hasUnprovenDependencies(@NonNull DependencyGraph graph,
+            @NonNull CheckerData data)
             throws ProofManagementException {
         // needs replay (to ensure that proof can be closed)
         KeYFacade.ensureProofsReplayed(data);
@@ -165,7 +168,7 @@ public class DependencyChecker implements Checker {
      * @param graph the graph to check
      * @return true iff the graph is legal
      */
-    private boolean hasIllegalCycles(DependencyGraph graph) {
+    private boolean hasIllegalCycles(@NonNull DependencyGraph graph) {
 
         for (DependencyGraph.SCC scc : graph.getAllSCCs()) {
             // IMPORTANT: we do not check that the modalities inside a cycle match,
@@ -196,7 +199,7 @@ public class DependencyChecker implements Checker {
      * @param scc the given strongly connected component
      * @return true iff all edges are termination insensitive
      */
-    private boolean terminationInsensitive(DependencyGraph.SCC scc) {
+    private boolean terminationInsensitive(DependencyGraph.@NonNull SCC scc) {
         // are all edges inside scc termination insensitive?
         for (DependencyNode node : scc.getNodes()) {
             for (DependencyGraph.EdgeType term : scc.internalEdges(node).values()) {
@@ -218,7 +221,7 @@ public class DependencyChecker implements Checker {
      * @param scc the given strongly connected component
      * @return true iff termination is ensured for all contracts in SCC
      */
-    private boolean terminationEnsured(DependencyGraph.SCC scc) {
+    private boolean terminationEnsured(DependencyGraph.@NonNull SCC scc) {
         for (DependencyNode node : scc.getNodes()) {
             for (DependencyNode next : scc.internalEdges(node).keySet()) {
                 // cycle is illegal if:

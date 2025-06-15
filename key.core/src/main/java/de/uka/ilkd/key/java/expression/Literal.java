@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Literal.
  *
@@ -26,7 +28,7 @@ public abstract class Literal extends JavaProgramElement
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
-    protected Literal(ExtList children) {
+    protected Literal(@NonNull ExtList children) {
         super(children);
     }
 
@@ -43,7 +45,7 @@ public abstract class Literal extends JavaProgramElement
      * @param children the children of this AST element as KeY classes. May contain: Comments
      * @param pos The specific source code position.
      */
-    protected Literal(ExtList children, PositionInfo pos) {
+    protected Literal(@NonNull ExtList children, @NonNull PositionInfo pos) {
         super(children, pos);
     }
 
@@ -52,7 +54,7 @@ public abstract class Literal extends JavaProgramElement
      *
      * @param pos The specific source code position.
      */
-    protected Literal(PositionInfo pos) {
+    protected Literal(@NonNull PositionInfo pos) {
         super(pos);
     }
 
@@ -65,7 +67,7 @@ public abstract class Literal extends JavaProgramElement
      * @return the literal's type
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 
@@ -79,7 +81,7 @@ public abstract class Literal extends JavaProgramElement
 
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @NonNull MatchConditions match(@NonNull SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (this.equals(src)) {
             source.next();

@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Abstract.
  */
@@ -35,7 +37,7 @@ public class Abstract extends Modifier {
      *
      * @return the string.
      */
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "abstract";
     }
 }

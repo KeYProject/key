@@ -10,12 +10,14 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class SLTranslationException extends ProofInputException implements HasLocation {
-    protected final Location location;
+    protected final @NonNull Location location;
 
-    public SLTranslationException(String message, Throwable cause, Location location) {
+    public SLTranslationException(@NonNull String message, @NonNull Throwable cause,
+            @NonNull Location location) {
         super(message, cause);
         if (location == null) {
             throw new IllegalArgumentException();
@@ -23,15 +25,16 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this.location = location;
     }
 
-    public SLTranslationException(String message, Location location, Throwable cause) {
+    public SLTranslationException(@NonNull String message, @NonNull Location location,
+            @NonNull Throwable cause) {
         this(message, cause, location);
     }
 
-    public SLTranslationException(String message, Location location) {
+    public SLTranslationException(@NonNull String message, @NonNull Location location) {
         this(message, null, location);
     }
 
-    public SLTranslationException(String message) {
+    public SLTranslationException(@NonNull String message) {
         this(message, null, new Location(null, Position.UNDEFINED));
     }
 

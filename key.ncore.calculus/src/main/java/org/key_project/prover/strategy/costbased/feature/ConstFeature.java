@@ -24,7 +24,7 @@ public class ConstFeature implements Feature {
         val = p_val;
     }
 
-    public static Feature createConst(RuleAppCost p_val) {
+    public static @NonNull Feature createConst(RuleAppCost p_val) {
         return new ConstFeature(p_val);
     }
 

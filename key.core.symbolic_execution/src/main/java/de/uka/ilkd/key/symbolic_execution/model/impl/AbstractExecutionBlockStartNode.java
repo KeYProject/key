@@ -12,6 +12,9 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides a basic implementation of {@link IExecutionBlockStartNode}.
  *
@@ -22,7 +25,7 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
     /**
      * The up to know discovered completing {@link IExecutionNode}s.
      */
-    private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
 
     /**
      * Defines if a block is or might be opened.
@@ -81,7 +84,7 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
      *
      * @param blockCompletion The {@link IExecutionNode} to register.
      */
-    public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
+    public void addBlockCompletion(@Nullable IExecutionNode<?> blockCompletion) {
         if (blockCompletion != null && !blockCompletions.contains(blockCompletion)) {
             if (blockCompletion instanceof AbstractExecutionNode<?>) {
                 blockCompletions = blockCompletions.append(blockCompletion);

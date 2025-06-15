@@ -35,6 +35,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,11 +81,11 @@ public abstract class SequentView extends JEditorPane {
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
     public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
 
-    private final MainWindow mainWindow;
+    private final @NonNull MainWindow mainWindow;
 
-    private final Cached<String, Void> setTextCache;
+    private final @NonNull Cached<String, Void> setTextCache;
 
-    public MainWindow getMainWindow() {
+    public @NonNull MainWindow getMainWindow() {
         return mainWindow;
     }
 
@@ -103,23 +105,23 @@ public abstract class SequentView extends JEditorPane {
         return lineWidth;
     }
 
-    public VisibleTermLabels getVisibleTermLabels() {
+    public @NonNull VisibleTermLabels getVisibleTermLabels() {
         return mainWindow.getVisibleTermLabels();
     }
 
-    private final ConfigChangeListener configChangeListener;
+    private final @NonNull ConfigChangeListener configChangeListener;
     protected SequentPrintFilter filter;
-    private SequentViewLogicPrinter printer;
+    private @Nullable SequentViewLogicPrinter printer;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
-    private Object defaultHighlight;
+    private @Nullable Object defaultHighlight;
 
     // the current tag of the highlight
-    private Object currentHighlight;
+    private @Nullable Object currentHighlight;
 
     // an additional highlight to mark the first active java statement
-    private Object additionalJavaHighlight;
+    private @Nullable Object additionalJavaHighlight;
 
     /*
      * Store highlights in a HashMap in order to prevent duplicate highlights.
@@ -132,13 +134,13 @@ public abstract class SequentView extends JEditorPane {
      */
     private Point lastMousePosition = OUTSIDE_MOUSE_POSITION;
 
-    private final SequentViewInputListener sequentViewInputListener;
+    private final @NonNull SequentViewInputListener sequentViewInputListener;
 
-    private Object userSelectionHighlight = null;
-    private Range userSelectionHighlightRange = null;
-    private PosInSequent userSelectionHighlightPis = null;
+    private @Nullable Object userSelectionHighlight = null;
+    private @Nullable Range userSelectionHighlightRange = null;
+    private @Nullable PosInSequent userSelectionHighlightPis = null;
 
-    protected SequentView(MainWindow mainWindow) {
+    protected SequentView(@NonNull MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
         filter = new IdentitySequentPrintFilter();
@@ -201,7 +203,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
+    public @Nullable String getToolTipText(@NonNull MouseEvent event) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isShowSequentViewTooltips()) {
             return null;
@@ -267,7 +269,7 @@ public abstract class SequentView extends JEditorPane {
      * @param range the Range to be highlighted
      * @param highlighter the Object painting the highlight
      */
-    public void paintHighlight(Range range, Object highlighter) {
+    public void paintHighlight(@Nullable Range range, Object highlighter) {
         try {
             if (range != null) {
                 getHighlighter().changeHighlight(highlighter, range.start(), range.end());
@@ -287,7 +289,7 @@ public abstract class SequentView extends JEditorPane {
      * @param color the Color used to highlight regions of the sequent
      * @return the highlight for the specified color
      */
-    public final Object createColorHighlight(Color color) {
+    public final @Nullable Object createColorHighlight(Color color) {
         Object highlight = null;
         if (!color2Highlight.containsKey(color)) {
             // show highlights above each other
@@ -335,7 +337,7 @@ public abstract class SequentView extends JEditorPane {
     /**
      * Get the PosInSequent object for the last observed and highlighted mouse position.
      */
-    public PosInSequent getLastPosInSequent() {
+    public @Nullable PosInSequent getLastPosInSequent() {
         if (lastMousePosition.equals(OUTSIDE_MOUSE_POSITION)) {
             // point to toplevel if mouse was outside.
             return PosInSequent.createSequentPos();
@@ -347,14 +349,14 @@ public abstract class SequentView extends JEditorPane {
     /**
      * @return the initial position table
      */
-    protected InitialPositionTable getInitialPositionTable() {
+    protected @Nullable InitialPositionTable getInitialPositionTable() {
         return printer == null ? null : printer.layouter().getInitialPositionTable();
     }
 
     /**
      * Get a PosInSequent object for a given coordinate of the displayed sequent.
      */
-    protected synchronized PosInSequent getPosInSequent(Point p) {
+    protected synchronized @Nullable PosInSequent getPosInSequent(@Nullable Point p) {
         String seqText = getText();
         if (seqText != null && !seqText.isEmpty()) {
             final InitialPositionTable initialPositionTable = getInitialPositionTable();
@@ -371,7 +373,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @return The LogicPrinter that is used.
      */
-    public SequentViewLogicPrinter getLogicPrinter() {
+    public @Nullable SequentViewLogicPrinter getLogicPrinter() {
         return printer;
     }
 
@@ -380,7 +382,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @param p The LogicPrinter to be used
      */
-    protected void setLogicPrinter(SequentViewLogicPrinter p) {
+    protected void setLogicPrinter(@NonNull SequentViewLogicPrinter p) {
         if (p.layouter().isPure()) {
             throw new IllegalArgumentException(
                 "Pure printer passed to sequent view which needs position table");
@@ -388,7 +390,7 @@ public abstract class SequentView extends JEditorPane {
         printer = p;
     }
 
-    public String getHighlightedText(PosInSequent pos) {
+    public String getHighlightedText(@Nullable PosInSequent pos) {
         if (pos == null) {
             return "";
         }
@@ -418,7 +420,7 @@ public abstract class SequentView extends JEditorPane {
      * one given by viewToModel, subtract it from the given x value, and get the character at the
      * new position. That is the correct one.
      */
-    public int correctedViewToModel(Point p) {
+    public int correctedViewToModel(@NonNull Point p) {
         String seqText = getText();
         int cursorPosition = viewToModel(p);
         cursorPosition -= (cursorPosition > 0 ? 1 : 0);
@@ -475,7 +477,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @return the current tag used for highlighting
      */
-    public Object getCurrentHighlight() {
+    public @Nullable Object getCurrentHighlight() {
         return currentHighlight;
     }
 
@@ -484,7 +486,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @param p the mouse pointer coordinates
      */
-    public void paintHighlights(Point p) {
+    public void paintHighlights(@NonNull Point p) {
         // re-initialize highlights if needed
         if (!Arrays.asList(getHighlighter().getHighlights()).contains(additionalJavaHighlight)) {
             additionalJavaHighlight = createColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
@@ -502,7 +504,7 @@ public abstract class SequentView extends JEditorPane {
     /**
      * Get the character range to be highlighted for the given coordinate in the displayed sequent.
      */
-    synchronized Range getHighlightRange(Point p) {
+    synchronized @Nullable Range getHighlightRange(@NonNull Point p) {
         String seqText = getText();
         if (seqText.length() > 0) {
             int characterIndex = correctedViewToModel(p);
@@ -537,7 +539,7 @@ public abstract class SequentView extends JEditorPane {
      * Get the character range to be highlighted for the first statement in a java block at the
      * given coordinate in the displayed sequent. Returns null if there is no java block there.
      */
-    protected synchronized Range getFirstStatementRange(Point p) {
+    protected synchronized @Nullable Range getFirstStatementRange(@NonNull Point p) {
         if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
             Range result =
@@ -567,6 +569,7 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
+    @Nullable
     Range getUserSelectionHighlightRange() {
         return userSelectionHighlightRange;
     }
@@ -596,7 +599,7 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
-    protected void setUserSelectionHighlight(Point point) {
+    protected void setUserSelectionHighlight(@NonNull Point point) {
         removeUserSelectionHighlight();
 
         try {
@@ -638,7 +641,7 @@ public abstract class SequentView extends JEditorPane {
      * @see #setUserSelectionHighlight(Point)
      * @see #removeUserSelectionHighlight()
      */
-    protected boolean isInUserSelectionHighlight(Point point) {
+    protected boolean isInUserSelectionHighlight(@Nullable Point point) {
         return point == null && userSelectionHighlightRange == null
                 || point != null && userSelectionHighlightRange != null
                         && Objects.equals(userSelectionHighlightRange, getHighlightRange(point));
@@ -652,7 +655,7 @@ public abstract class SequentView extends JEditorPane {
      * @see #removeUserSelectionHighlight()
      * @see #isInUserSelectionHighlight(Point)
      */
-    protected void setUserSelectionHighlight(PosInSequent pis) {
+    protected void setUserSelectionHighlight(@NonNull PosInSequent pis) {
         removeUserSelectionHighlight();
 
         try {
@@ -668,7 +671,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
 
-    public void highlight(Point p) {
+    public void highlight(@NonNull Point p) {
         if (p == null) {
             throw new IllegalArgumentException("p is null");
         }
@@ -691,7 +694,7 @@ public abstract class SequentView extends JEditorPane {
         setFont();
     }
 
-    public static int computeLineWidthFor(JComponent c) {
+    public static int computeLineWidthFor(@NonNull JComponent c) {
         // assumes we have a uniform font width
         int maxChars =
             (int) (c.getVisibleRect().getWidth() / c.getFontMetrics(c.getFont()).charWidth('W'));
@@ -914,7 +917,7 @@ public abstract class SequentView extends JEditorPane {
      * @param age the age of the given term / sf
      * @return the color, with interpolated opacity
      */
-    private Color computeColorForAge(int max_age, int age) {
+    private @NonNull Color computeColorForAge(int max_age, int age) {
         float[] color = HEATMAP_COLOR.get().getRGBColorComponents(null);
         float alpha = HEATMAP_DEFAULT_START_OPACITY * (1 - (float) age / max_age);
 
@@ -931,7 +934,7 @@ public abstract class SequentView extends JEditorPane {
      * @param max_age the maximum age, specified in viewSettings
      * @return the sf's age
      */
-    private int computeSeqFormulaAge(Node node, SequentFormula form,
+    private int computeSeqFormulaAge(@Nullable Node node, @NonNull SequentFormula form,
             int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
@@ -943,7 +946,7 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
-    protected void updateSequent(Node node) {
+    protected void updateSequent(@Nullable Node node) {
         var start = System.nanoTime();
         getLogicPrinter().update(getFilter(), getLineWidth());
         String printed = getLogicPrinter().result();
@@ -1056,12 +1059,12 @@ public abstract class SequentView extends JEditorPane {
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "PIO_age [pio=" + pio + ", age=" + age + ", active=" + active + "]";
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (o instanceof PIO_age c) {
                 return this.age == c.age && this.pio == c.pio;
             }

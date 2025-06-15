@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Times assignment.
  *
@@ -30,7 +32,7 @@ public class TimesAssignment extends Assignment {
      * @param rhs an expression.
      */
 
-    public TimesAssignment(Expression lhs, Expression rhs) {
+    public TimesAssignment(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -41,7 +43,7 @@ public class TimesAssignment extends Assignment {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public TimesAssignment(ExtList children) {
+    public TimesAssignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -81,7 +83,7 @@ public class TimesAssignment extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnTimesAssignment(this);
     }
 }

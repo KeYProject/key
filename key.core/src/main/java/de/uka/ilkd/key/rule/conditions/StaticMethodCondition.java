@@ -21,6 +21,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * ensures that the given instantiation for the schemavariable denotes a static method. For
@@ -46,8 +48,8 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
         this.args = args;
     }
 
-    private static ImmutableArray<Expression> toExpArray(
-            ImmutableArray<? extends ProgramElement> a) {
+    private static @NonNull ImmutableArray<Expression> toExpArray(
+            @NonNull ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
@@ -58,7 +60,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, @NonNull SVInstantiations svInst,
             Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
@@ -98,7 +100,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller + ", " + methname
             + ", " + args + ")";
     }

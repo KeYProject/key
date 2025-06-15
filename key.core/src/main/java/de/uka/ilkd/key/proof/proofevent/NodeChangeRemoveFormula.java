@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Information about a formula that has been removed from a node (the position given is the position
@@ -15,7 +17,7 @@ public class NodeChangeRemoveFormula extends NodeChangeARFormula {
         super(p_pos);
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return "Formula removed: " + getPos();
     }
 }

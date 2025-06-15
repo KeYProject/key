@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The constructor call meta construct is used to handle a allocation expression like
  * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
@@ -38,7 +40,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
         SpecialConstructorReference constructorReference = (SpecialConstructorReference) pe;

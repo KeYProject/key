@@ -14,6 +14,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Return zero iff the monomial <code>dividendSV</code> can be made smaller (in the polynomial
@@ -28,28 +30,31 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         this.divisor = divisor;
     }
 
-    public static Feature createReducible(ProjectionToTerm<Goal> dividend,
+    public static @NonNull Feature createReducible(ProjectionToTerm<Goal> dividend,
             ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
             @Override
-            protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
+            protected boolean checkReducibility(@NonNull Monomial mDividend,
+                    @NonNull Monomial mDivisor) {
                 return mDivisor.reducible(mDividend);
             }
         };
     }
 
-    public static Feature createDivides(ProjectionToTerm<Goal> dividend,
+    public static @NonNull Feature createDivides(ProjectionToTerm<Goal> dividend,
             ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
             @Override
-            protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
+            protected boolean checkReducibility(@NonNull Monomial mDividend,
+                    @NonNull Monomial mDivisor) {
                 return mDivisor.divides(mDividend);
             }
         };
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 

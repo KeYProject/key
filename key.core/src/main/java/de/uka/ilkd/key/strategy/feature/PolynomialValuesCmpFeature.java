@@ -17,6 +17,9 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Return zero only if the value of one (left) polynomial always will be (less or equal) or (less)
  * than the value of a second (right) polynomial. Both polynomials can optionally be multiplied with
@@ -34,57 +37,59 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         this.rightCoeff = rightCoeff;
     }
 
-    public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static @NonNull Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return lt(left, right, null, null);
     }
 
-    public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static @NonNull Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
+            protected boolean compare(@NonNull Polynomial leftPoly, @NonNull Polynomial rightPoly) {
                 return leftPoly.valueLess(rightPoly);
             }
         };
     }
 
-    public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static @NonNull Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return leq(left, right, null, null);
     }
 
-    public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static @NonNull Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
+            protected boolean compare(@NonNull Polynomial leftPoly, @NonNull Polynomial rightPoly) {
                 return leftPoly.valueLeq(rightPoly);
             }
         };
     }
 
-    public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static @NonNull Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return eq(left, right, null, null);
     }
 
-    public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static @NonNull Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
+            protected boolean compare(@NonNull Polynomial leftPoly, @NonNull Polynomial rightPoly) {
                 return leftPoly.valueEq(rightPoly);
             }
         };
     }
 
-    public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static @NonNull Feature divides(ProjectionToTerm<Goal> left,
+            ProjectionToTerm<Goal> right) {
         return divides(left, right, null, null);
     }
 
-    public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static @NonNull Feature divides(ProjectionToTerm<Goal> left,
+            ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             @Override
-            protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
+            protected boolean compare(@NonNull Polynomial leftPoly, @NonNull Polynomial rightPoly) {
                 // we currently only support constant polynomials
                 assert leftPoly.getParts().isEmpty();
                 assert rightPoly.getParts().isEmpty();
@@ -101,17 +106,17 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         return compare(getPolynomial(left, leftCoeff, app, pos, goal, mState),
             getPolynomial(right, rightCoeff, app, pos, goal, mState));
     }
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
 
-    private Polynomial getPolynomial(ProjectionToTerm<Goal> polyProj,
-            ProjectionToTerm<Goal> coeffProj,
-            TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    private @NonNull Polynomial getPolynomial(@NonNull ProjectionToTerm<Goal> polyProj,
+            @Nullable ProjectionToTerm<Goal> coeffProj,
+            TacletApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Polynomial poly =
             Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);

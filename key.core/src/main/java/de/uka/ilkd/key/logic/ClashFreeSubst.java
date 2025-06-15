@@ -12,6 +12,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 public class ClashFreeSubst {
     protected final QuantifiableVariable v;
     protected final JTerm s;
@@ -59,8 +61,8 @@ public class ClashFreeSubst {
     }
 
     // XXX
-    protected static ImmutableArray<QuantifiableVariable> getSingleArray(
-            ImmutableArray<QuantifiableVariable>[] bv) {
+    protected static @Nullable ImmutableArray<QuantifiableVariable> getSingleArray(
+            @Nullable ImmutableArray<QuantifiableVariable> @Nullable [] bv) {
         if (bv == null) {
             return null;
         }
@@ -119,7 +121,7 @@ public class ClashFreeSubst {
      * resulting bound variables (which might be new) into <code>newBoundVars</code>, starting from
      * position <code>varInd</code>, and the resulting subTerm into
      * <code>newSubterms[subInd]</code>.
-     * <P>
+     * <p>
      * It is assumed that <code>v</code> occurrs free in in this quantified subterm, i.e. it occurrs
      * free in <code>subTerm</code>, but does not occurr in <code>boundVars</code> from
      * <code>varInd</code> upwards..
@@ -206,7 +208,7 @@ public class ClashFreeSubst {
     /**
      * returns a new variable that has a name derived from that of <code>var</code>, that is
      * different from any of the names of variables in <code>usedVars</code>.
-     * <P>
+     * <p>
      * Assumes that <code>var</code> is a @link{LogicVariable}.
      */
     protected LogicVariable newVarFor(QuantifiableVariable var,
@@ -234,14 +236,19 @@ public class ClashFreeSubst {
 
     // This helper is used in other places as well. Perhaps make it toplevel one
     // day.
+
     /**
      * A Visitor class to collect all (not just the free) variables occurring in a term.
      */
     public static class VariableCollectVisitor implements DefaultVisitor {
-        /** the collected variables */
+        /**
+         * the collected variables
+         */
         private ImmutableSet<QuantifiableVariable> vars;
 
-        /** creates the Variable collector */
+        /**
+         * creates the Variable collector
+         */
         public VariableCollectVisitor() {
             vars = DefaultImmutableSet.nil();
         }
@@ -260,7 +267,9 @@ public class ClashFreeSubst {
             }
         }
 
-        /** the set of all occurring variables. */
+        /**
+         * the set of all occurring variables.
+         */
         public ImmutableSet<QuantifiableVariable> vars() {
             return vars;
         }

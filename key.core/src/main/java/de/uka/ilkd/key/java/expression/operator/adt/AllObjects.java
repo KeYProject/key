@@ -12,9 +12,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 public class AllObjects extends Operator {
 
-    public AllObjects(ExtList children) {
+    public AllObjects(@NonNull ExtList children) {
         super(children);
     }
 
@@ -29,7 +31,7 @@ public class AllObjects extends Operator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnAllObjects(this);
     }
 
@@ -37,7 +39,7 @@ public class AllObjects extends Operator {
         return 1;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
     }
 }

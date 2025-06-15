@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
+import org.jspecify.annotations.NonNull;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Type;
 import recoder.java.declaration.TypeArgumentDeclaration;
@@ -31,14 +32,15 @@ public class ResolveTypeReference extends GenericResolutionTransformation {
 
     private final CrossReferenceSourceInfo sourceInfo;
 
-    public ResolveTypeReference(TypeReference reference, CrossReferenceServiceConfiguration sc) {
+    public ResolveTypeReference(TypeReference reference,
+            @NonNull CrossReferenceServiceConfiguration sc) {
         super(sc);
         this.reference = reference;
         sourceInfo = sc.getCrossReferenceSourceInfo();
     }
 
     @Override
-    public ProblemReport analyze() {
+    public @NonNull ProblemReport analyze() {
         ASTList<TypeArgumentDeclaration> typeArguments = reference.getTypeArguments();
         if (typeArguments != null && !typeArguments.isEmpty()) {
             return EQUIVALENCE;

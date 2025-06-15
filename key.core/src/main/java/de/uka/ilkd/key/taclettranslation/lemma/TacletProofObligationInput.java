@@ -23,6 +23,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +40,12 @@ public class TacletProofObligationInput implements IPersistablePO {
     public static final String AXIOM_FILE = "axiomFile";
 
     private final String tacletName;
-    private ProofAggregate proofObligation;
+    private @Nullable ProofAggregate proofObligation;
     private Throwable ex;
 
     // The following may all possibly be null
-    private String definitionFile;
-    private String tacletFile;
+    private @Nullable String definitionFile;
+    private @Nullable String tacletFile;
     private String[] axiomFiles;
     private String baseDir;
 
@@ -53,7 +54,7 @@ public class TacletProofObligationInput implements IPersistablePO {
      */
     private final TacletFilter filter = new TacletFilter() {
         @Override
-        public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
+        public @NonNull ImmutableSet<Taclet> filter(@NonNull List<TacletInfo> taclets) {
             Name name = new Name(tacletName);
             for (TacletInfo tacletInfo : taclets) {
                 if (tacletInfo.getTaclet().name().equals(name)) {
@@ -116,7 +117,7 @@ public class TacletProofObligationInput implements IPersistablePO {
      * Fill in only the necessary info.
      */
     @Override
-    public Configuration createLoaderConfig() throws IOException {
+    public @NonNull Configuration createLoaderConfig() throws IOException {
         var c = new Configuration();
         c.set(PROPERTY_CLASS, getClass().getCanonicalName());
         c.set(PROPERTY_NAME, name());
@@ -140,7 +141,7 @@ public class TacletProofObligationInput implements IPersistablePO {
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return tacletName;
     }
 
@@ -176,12 +177,12 @@ public class TacletProofObligationInput implements IPersistablePO {
         }
     }
 
-    private ProofEnvironment createProofEnvironment() {
+    private @NonNull ProofEnvironment createProofEnvironment() {
         return new ProofEnvironment(environmentConfig);
     }
 
 
-    private Collection<Path> fileCollection(String[] strings) {
+    private @NonNull Collection<Path> fileCollection(String @NonNull [] strings) {
         ArrayList<Path> result = new ArrayList<>();
         for (String string : strings) {
             result.add(Paths.get(baseDir, string));
@@ -193,7 +194,7 @@ public class TacletProofObligationInput implements IPersistablePO {
      * just deliver the precalculated PO
      */
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
+    public @NonNull ProofAggregate getPO() throws ProofInputException {
         assert proofObligation != null : "readProblem should have been called first";
         return proofObligation;
     }
@@ -203,7 +204,7 @@ public class TacletProofObligationInput implements IPersistablePO {
         return this == po;
     }
 
-    void setLoadInfo(Configuration properties) {
+    void setLoadInfo(@NonNull Configuration properties) {
         final var pathname =
             Objects.requireNonNull(properties.getString(PROPERTY_FILENAME));
         this.baseDir = new File(pathname).getParent();

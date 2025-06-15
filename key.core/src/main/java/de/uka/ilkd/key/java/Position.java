@@ -152,7 +152,7 @@ public class Position implements Comparable<Position> {
      *         <CODE>false</CODE> otherwise.
      */
 
-    public boolean equals(Object x) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object x) {
         if (x == this) {
             return true;
         }
