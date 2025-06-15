@@ -105,7 +105,8 @@ public class DropdownSelectionButton {
      * Create a new DropdownSelectionButton with a given icon size used to display the selection
      * component's icon.
      *
-     * @param iconSize the size of the selection component's icon (e.g. down-arrow)
+     * @param iconSize
+     *        the size of the selection component's icon (e.g. down-arrow)
      */
     public DropdownSelectionButton(int iconSize) {
         this.iconSize = iconSize;
@@ -114,7 +115,8 @@ public class DropdownSelectionButton {
     /**
      * Enables or disables the action button (enabling is only possible if the items aren't empty).
      *
-     * @param b true iff the action button should be enabled
+     * @param b
+     *        true iff the action button should be enabled
      */
     public void setEnabled(boolean b) {
         if (items.length == 0) {
@@ -127,7 +129,8 @@ public class DropdownSelectionButton {
      * Add a ChangeListener to this button that will be notified by #setSelectedItem(). A listener
      * cannot be added more than once (nothing will change if it is already present).
      *
-     * @param listener the new ChangeListener
+     * @param listener
+     *        the new ChangeListener
      */
     public void addListener(ChangeListener listener) {
         listeners.add(listener);
@@ -136,7 +139,8 @@ public class DropdownSelectionButton {
     /**
      * Remove a previously added ChangeListener from this button.
      *
-     * @param listener the listener to remove
+     * @param listener
+     *        the listener to remove
      */
     public void removeListener(ChangeListener listener) {
         listeners.remove(listener);
@@ -159,7 +163,8 @@ public class DropdownSelectionButton {
     /**
      * Set the action to be executed by the action component.
      *
-     * @param action the action to be executed
+     * @param action
+     *        the action to be executed
      */
     public void setAction(Action action) {
         getActionButton().setAction(action);
@@ -196,8 +201,10 @@ public class DropdownSelectionButton {
     /**
      * Set the information for the empty item.
      *
-     * @param text the text displayed in the action button when the empty item is executed
-     * @param toolTip the tooltip of the empty item
+     * @param text
+     *        the text displayed in the action button when the empty item is executed
+     * @param toolTip
+     *        the tooltip of the empty item
      */
     public void setEmptyItem(String text, String toolTip) {
         boolean update = isEmptyItem();
@@ -212,7 +219,8 @@ public class DropdownSelectionButton {
     /**
      * Set the prefix String that will be prepended to all items in the menu.
      *
-     * @param prefix the new prefix
+     * @param prefix
+     *        the new prefix
      */
     public void setPrefix(String prefix) {
         this.prefix = prefix;
@@ -241,7 +249,8 @@ public class DropdownSelectionButton {
      * Check whether a given action is contained in the actions that can be selected via the
      * selection component.
      *
-     * @param item the action to search
+     * @param item
+     *        the action to search
      * @return whether the given item can be selected
      */
     public boolean contains(Action item) {
@@ -258,7 +267,8 @@ public class DropdownSelectionButton {
      * Set the executedAction to be the given one and update the action button. Notify the
      * ChangeListeners of this change.
      *
-     * @param item the new executedAction
+     * @param item
+     *        the new executedAction
      */
     public void setSelectedItem(Action item) {
         if (item == null) {
@@ -369,10 +379,13 @@ public class DropdownSelectionButton {
      * same time (a positive integer) and the function used to create the action component's action
      * out of all the selected actions.
      *
-     * @param it the selectable actions
-     * @param reduce the function used to collapse multiple selected actions into one for the action
+     * @param it
+     *        the selectable actions
+     * @param reduce
+     *        the function used to collapse multiple selected actions into one for the action
      *        component
-     * @param maxChoice the maximum amount of actions that can be selected, this is assumed to be at
+     * @param maxChoice
+     *        the maximum amount of actions that can be selected, this is assumed to be at
      *        least 1 (otherwise it is changed to be 1)
      */
     public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
@@ -417,7 +430,8 @@ public class DropdownSelectionButton {
     /**
      * Set new selection items/actions while keeping all other components of the popup menu.
      *
-     * @param newMenuItems the new actions that can be selected
+     * @param newMenuItems
+     *        the new actions that can be selected
      */
     public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
         /*
@@ -440,7 +454,8 @@ public class DropdownSelectionButton {
     /**
      * Add a component to the popup menu (below the selection items).
      *
-     * @param comp the added component
+     * @param comp
+     *        the added component
      */
     public void addComponent(Component comp) {
         getMenu().add(comp);
@@ -451,7 +466,8 @@ public class DropdownSelectionButton {
     /**
      * Remove a component (other than the selection items) from the popup menu.
      *
-     * @param comp the component to remove
+     * @param comp
+     *        the component to remove
      */
     public void removeComponent(Component comp) {
         components.remove(comp);
@@ -517,7 +533,8 @@ public class DropdownSelectionButton {
         /**
          * Create a new EmptyAction with text "empty".
          *
-         * @param enabled the EmptyAction's {@link #leaveButtonsEnabled} attribute
+         * @param enabled
+         *        the EmptyAction's {@link #leaveButtonsEnabled} attribute
          */
         public EmptyAction(boolean enabled) {
             leaveButtonsEnabled = enabled;
@@ -527,7 +544,8 @@ public class DropdownSelectionButton {
         /**
          * Set this EmptyAction's {@link #text}.
          *
-         * @param t the new text
+         * @param t
+         *        the new text
          */
         public void setText(String t) {
             text = t;
@@ -538,7 +556,8 @@ public class DropdownSelectionButton {
         /**
          * Set this EmptyAction's {@link #toolTip}.
          *
-         * @param tip the new tooltip
+         * @param tip
+         *        the new tooltip
          */
         public void setToolTip(String tip) {
             toolTip = tip;
@@ -590,7 +609,8 @@ public class DropdownSelectionButton {
         /**
          * Create a new DoubleClickCheckBoxMenuItem.
          *
-         * @param action the {@link #doubleClickAction} of this menu item
+         * @param action
+         *        the {@link #doubleClickAction} of this menu item
          */
         private DoubleClickCheckBoxMenuItem(Action action) {
             super();
@@ -624,7 +644,8 @@ public class DropdownSelectionButton {
          * If the item is selected, add its corresponding action to the selectedItems, otherwise
          * remove it. Set the executedAction to reduceChoice(selectedItems).
          *
-         * @param b true iff this item should be selected
+         * @param b
+         *        true iff this item should be selected
          */
         @Override
         public void setSelected(boolean b) {
@@ -649,7 +670,8 @@ public class DropdownSelectionButton {
         /**
          * On double-click, select this item AND execute the corresponding action.
          *
-         * @param e the event that is processed by this item
+         * @param e
+         *        the event that is processed by this item
          */
         @Override
         protected void processMouseEvent(MouseEvent e) {
@@ -682,7 +704,8 @@ public class DropdownSelectionButton {
         /**
          * Create a new SelectionMenuItem.
          *
-         * @param item the menu item's {@link #action}.
+         * @param item
+         *        the menu item's {@link #action}.
          */
         public SelectionMenuItem(Action item) {
             super();

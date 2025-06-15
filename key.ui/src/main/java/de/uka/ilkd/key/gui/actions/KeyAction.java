@@ -150,7 +150,8 @@ public abstract class KeyAction extends AbstractAction {
     /**
      * Set the priority of this action. Actions are sorted from low priority to high priority.
      *
-     * @param priority integer value
+     * @param priority
+     *        integer value
      */
     protected void setPriority(int priority) {
         putValue(PRIORITY, priority);

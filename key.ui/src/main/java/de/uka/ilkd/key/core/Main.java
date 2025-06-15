@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -38,15 +37,12 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-import recoder.ParserException;
 
 /**
  * The main entry point for KeY
@@ -176,8 +172,7 @@ public final class Main {
      */
     public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
-    private Main() {
-    }
+    private Main() {}
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
@@ -306,7 +301,8 @@ public final class Main {
     /**
      * Evaluate the commandline options
      *
-     * @param cl parsed command lines, not null
+     * @param cl
+     *        parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
         Integer verbosity = null;
@@ -655,18 +651,21 @@ public final class Main {
             // only use one input file
             Path fileNameOnStartUp = filesOnStartup.getFirst().toAbsolutePath();
             // final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            try {
-                RIFLTransformer transformer = new RIFLTransformer();
-                transformer.doTransform(riflFileName, fileNameOnStartUp,
-                    RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
-
-                LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
-                    fileNameOnStartUp);
-                return transformer.getProblemFiles();
-            } catch (ParserConfigurationException | SAXException | ParserException
-                    | IOException e) {
-                LOGGER.warn("rifl transform failed", e);
-            }
+            /*
+             * weigl: disable rifl
+             * try {
+             * RIFLTransformer transformer = new RIFLTransformer();
+             * transformer.doTransform(riflFileName, fileNameOnStartUp,
+             * RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+             *
+             * LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
+             * fileNameOnStartUp);
+             * return transformer.getProblemFiles();
+             * } catch (ParserConfigurationException | SAXException | ParserException
+             * | IOException e) {
+             * LOGGER.warn("rifl transform failed", e);
+             * }
+             */
 
             return result;
         }
@@ -682,7 +681,8 @@ public final class Main {
      * Defines the examples directory. This method is used by the Eclipse integration (KeY4Eclipse)
      * to use the examples extract from the plug-in into the workspace.
      *
-     * @param newExamplesDir The new examples directory to use.
+     * @param newExamplesDir
+     *        The new examples directory to use.
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;

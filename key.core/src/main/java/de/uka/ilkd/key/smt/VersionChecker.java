@@ -21,8 +21,10 @@ public class VersionChecker {
 
     /**
      *
-     * @param command to start the solver process
-     * @param parameter version parameter of the solver
+     * @param command
+     *        to start the solver process
+     * @param parameter
+     *        version parameter of the solver
      * @return the returned version String of the solver, if any was returned, null otherwise
      */
     public @Nullable String getVersionFor(String command, String parameter) {

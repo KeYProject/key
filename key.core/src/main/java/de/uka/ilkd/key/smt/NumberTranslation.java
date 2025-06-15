@@ -21,7 +21,8 @@ public final class NumberTranslation {
     /**
      * This methods translates a term with sort "numbers" into a BigInteger representing the number.
      *
-     * @param term term with sort "numbers"
+     * @param term
+     *        term with sort "numbers"
      * @return An instance of BigInteger representing the number
      */
     public static BigInteger translate(Term term) {

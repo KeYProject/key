@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -32,8 +32,10 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     protected AbstractExecutionBlockStartNode(ITreeSettings settings, Node proofNode) {
@@ -51,7 +53,8 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
     /**
      * Defines if a block might be opened or not.
      *
-     * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or
+     * @param blockOpened
+     *        {@code false} block is definitively not opened, {@code true} block is or
      *        might be opened.
      */
     public void setBlockOpened(boolean blockOpened) {
@@ -69,7 +72,8 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
     /**
      * Removes the given block completion.
      *
-     * @param completion The block completion to be removed.
+     * @param completion
+     *        The block completion to be removed.
      * @author Anna Filighera
      */
     public void removeBlockCompletion(IExecutionNode<?> completion) {
@@ -79,7 +83,8 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
     /**
      * Registers the given {@link IExecutionNode}.
      *
-     * @param blockCompletion The {@link IExecutionNode} to register.
+     * @param blockCompletion
+     *        The {@link IExecutionNode} to register.
      */
     public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
         if (blockCompletion != null && !blockCompletions.contains(blockCompletion)) {

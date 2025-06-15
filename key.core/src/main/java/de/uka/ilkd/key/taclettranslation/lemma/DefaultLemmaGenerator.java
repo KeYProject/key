@@ -130,8 +130,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * Returns the instantiation for a certain schema variable, i.e. the skolem term that is used
      * for the instantiation.
      *
-     * @param owner The taclet the schema variable belongs to.
-     * @param var The variable to be instantiated.
+     * @param owner
+     *        The taclet the schema variable belongs to.
+     * @param var
+     *        The variable to be instantiated.
      * @param services
      * @return instantiation of the schema variable <code>var</code>.
      */
@@ -184,9 +186,12 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * Creates the instantiation for a schema variable of type variable, i.e a new logical variable
      * is returned.
      *
-     * @param owner the taclet the schema variable belongs to.
-     * @param sv the schema variable to be instantiated.
-     * @param services some information about the proof currently considered.
+     * @param owner
+     *        the taclet the schema variable belongs to.
+     * @param sv
+     *        the schema variable to be instantiated.
+     * @param services
+     *        some information about the proof currently considered.
      * @return a term that can be used for instantiating the schema variable.
      */
     private JTerm createInstantiation(Taclet owner, VariableSV sv, TermServices services) {
@@ -295,8 +300,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * <p>
      * By default, this method returns the argument <tt>op</tt>.
      *
-     * @param op the operator to be replaced, not <code>null</code>
-     * @param services A services object for lookups
+     * @param op
+     *        the operator to be replaced, not <code>null</code>
+     * @param services
+     *        A services object for lookups
      * @return the replacement operator, not <code>null</code>
      */
     protected Operator replaceOp(Operator op, TermServices services) {
@@ -310,8 +317,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * <p>
      * By default, this method returns the argument <tt>sort</tt>.
      *
-     * @param sort the sort to be replaced, not <code>null</code>
-     * @param services A services object for lookups
+     * @param sort
+     *        the sort to be replaced, not <code>null</code>
+     * @param services
+     *        A services object for lookups
      * @return the replacement sort, not <code>null</code>
      */
     protected Sort replaceSort(Sort sort, TermServices services) {

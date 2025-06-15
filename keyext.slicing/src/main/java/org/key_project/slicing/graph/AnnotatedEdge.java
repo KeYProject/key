@@ -25,8 +25,10 @@ public class AnnotatedEdge extends DefaultEdge {
     /**
      * Construct a new annotated edge.
      *
-     * @param proofStep proof step
-     * @param consumesInput whether the step replaced the input formula
+     * @param proofStep
+     *        proof step
+     * @param consumesInput
+     *        whether the step replaced the input formula
      */
     public AnnotatedEdge(Node proofStep, boolean consumesInput) {
         this.proofStep = proofStep;

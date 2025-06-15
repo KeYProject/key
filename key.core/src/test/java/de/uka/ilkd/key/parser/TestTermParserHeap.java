@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.op.Operator;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -204,7 +203,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            @NonNull
             JTerm t = io.parseExpression("(a.f + a.f)@h2");
             LOGGER.info("Out: {}", t);
             fail();

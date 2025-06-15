@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -44,11 +46,15 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * creates the WhileLoopTransformation for the transformation mode
      *
-     * @param root the ProgramElement where to begin
-     * @param outerLabel the ProgramElementName of the outer label
-     * @param innerLabel the ProgramElementName of the inner label
+     * @param root
+     *        the ProgramElement where to begin
+     * @param outerLabel
+     *        the ProgramElementName of the outer label
+     * @param innerLabel
+     *        the ProgramElementName of the inner label
      */
-    public WhileInvariantTransformation(ProgramElement root, ProgramElementName outerLabel,
+    public WhileInvariantTransformation(
+            ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
             ProgramVariable excParam, ProgramVariable thrownException, ProgramVariable brk,
             ProgramVariable rtrn, ProgramVariable returnExpr,
@@ -69,8 +75,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * creates the WhileLoopTransformation for the check mode
      *
-     * @param root the ProgramElement where to begin
-     * @param inst the SVInstantiations if available
+     * @param root
+     *        the ProgramElement where to begin
+     * @param inst
+     *        the SVInstantiations if available
      */
     public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
             Services services) {

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.merge.MergeRule;

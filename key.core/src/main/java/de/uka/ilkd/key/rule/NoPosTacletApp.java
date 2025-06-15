@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.rule;
 
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.TermServices;

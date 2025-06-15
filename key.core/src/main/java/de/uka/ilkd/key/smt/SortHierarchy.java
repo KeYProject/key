@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.smt;
 
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
@@ -99,7 +101,8 @@ public class SortHierarchy {
     /**
      * Create a Sort Hierarchy.
      *
-     * @param sortnames a HashMap of sorts mapped to the Strings which is displayed in Formulas
+     * @param sortnames
+     *        a HashMap of sorts mapped to the Strings which is displayed in Formulas
      */
     protected SortHierarchy(Map<Sort, StringBuilder> sortnames, Map<Sort, StringBuilder> prednames,
             boolean explicitNullHierarchy, boolean explicitHierarchy, Services services) {

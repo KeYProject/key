@@ -17,8 +17,7 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
 public final class ArgumentsLifter {
     // private static final Map<Class, Type> TYPE_MAP = new HashMap<>();
 
-    private ArgumentsLifter() {
-    }
+    private ArgumentsLifter() {}
 
     public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
             ProofScriptCommand<T> command) {

@@ -197,7 +197,8 @@ public class Lookup {
      * @param clazz
      * @param <T>
      * @return
-     * @throws InjectionException if non suitable constructors could be found.
+     * @throws InjectionException
+     *         if non suitable constructors could be found.
      */
     @SuppressWarnings({ "unchecked",
         "keyfor", "nullness", // KeyFor and type variable bounds
@@ -243,8 +244,10 @@ public class Lookup {
      * This method searchs for methods single argument methods, that are annotated with
      * {@link Inject}, and calls it with the service implementation.
      *
-     * @param instance arbitrary non-null method
-     * @throws InjectionException is thrown iff a service is unknown but needed for an
+     * @param instance
+     *        arbitrary non-null method
+     * @throws InjectionException
+     *         is thrown iff a service is unknown but needed for an
      *         {@link Inject} method.
      */
     public void inject(Object instance) throws InjectionException {

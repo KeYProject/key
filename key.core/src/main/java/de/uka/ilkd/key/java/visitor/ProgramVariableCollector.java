@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.statement.JmlAssert;
+import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -41,8 +41,10 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * collects all program variables occurring in the AST <tt>root</tt> using this constructor is
      * equivalent to <tt>ProggramVariableCollector(root, false)</tt>
      *
-     * @param root the ProgramElement which is the root of the AST
-     * @param services the Services object
+     * @param root
+     *        the ProgramElement which is the root of the AST
+     * @param services
+     *        the Services object
      */
     public ProgramVariableCollector(ProgramElement root, Services services) {
         super(root, services);
@@ -72,8 +74,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     }
 
     @Override
-    protected void doDefaultAction(SourceElement x) {
-    }
+    protected void doDefaultAction(SourceElement x) {}
 
     @Override
     public void performActionOnLocationVariable(LocationVariable x) {
@@ -84,7 +85,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     public void performActionOnMergeContract(MergeContract x) {
         assert (x instanceof UnparameterizedMergeContract)
                 || (x instanceof PredicateAbstractionMergeContract)
-                : "Unexpected type of merge contract: " + x.getClass().getSimpleName();
+                : "Unexpected type of merge contract: "
+                    + x.getClass().getSimpleName();
 
         if (x instanceof UnparameterizedMergeContract) {
             return;

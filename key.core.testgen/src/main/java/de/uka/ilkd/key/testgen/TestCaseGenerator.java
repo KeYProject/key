@@ -10,12 +10,13 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -191,7 +192,8 @@ public class TestCaseGenerator {
      * Computes the project specific sub path of the output directory ({@link #directory}) in which
      * the generated files will be stored.
      *
-     * @param modelDir The path to the source files of the performed {@link Proof}.
+     * @param modelDir
+     *        The path to the source files of the performed {@link Proof}.
      * @return The computed sub path.
      */
     protected Path computeProjectSubPath(Path modelDir) {
@@ -621,14 +623,13 @@ public class TestCaseGenerator {
             // sort "Field" because it is just the name of the field. To get
             // the actual class of the field
             Function func = (Function) t.op();
-            String name = func.name().toString();
             Sort sort = func.sort();
             HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
             if (sort == hLDT.getFieldSort()) {
                 ProgramVariable pv = getProgramVariable(t);
 
                 if (pv != null) {
-                    name = name.replace("::$", "::");
+                    String name = JavaDLFieldNames.toJava(func.name());
 
                     if (map.containsKey(name)) {
                         if (map.get(name) != pv.sort()) {

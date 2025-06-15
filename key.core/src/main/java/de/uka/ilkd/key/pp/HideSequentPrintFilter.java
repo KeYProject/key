@@ -22,8 +22,10 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
     /**
      *
-     * @param lp the logic printer in use
-     * @param regex should the search be treated as regex?
+     * @param lp
+     *        the logic printer in use
+     * @param regex
+     *        should the search be treated as regex?
      */
     public HideSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
         this.lp = lp;
