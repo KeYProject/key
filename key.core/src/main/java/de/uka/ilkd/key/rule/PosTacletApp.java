@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -18,9 +18,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -60,9 +58,8 @@ public class PosTacletApp extends TacletApp {
             SVInstantiations instantiations,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             PosInOccurrence pos, Services services) {
-        Debug.assertTrue(ifInstsCorrectSize(taclet, assumesInstantiations),
-            "If instantiations list has wrong size");
-
+        assert ifInstsCorrectSize(taclet, assumesInstantiations)
+                : "If instantiations list has wrong size";
         instantiations = resolveCollisionWithContext(taclet,
             resolveCollisionVarSV(taclet, instantiations, services), pos, services);
         if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
@@ -91,7 +88,6 @@ public class PosTacletApp extends TacletApp {
         this.pos = pos;
     }
 
-
     /**
      * returns the LogicVariables that are bound above the PositionInOccurrence of the PosTacletApp.
      * __OPTIMIZE__ If this method is needed more than once caching the result should be considered.
@@ -99,31 +95,31 @@ public class PosTacletApp extends TacletApp {
      * @return the set of the logicvariables that are bound for the indicated application position
      *         of the TacletApp.
      */
-    private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
+    private static Set<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
             PosInOccurrence pos) {
-
-        if (!(taclet instanceof RewriteTaclet)) {
-            return DefaultImmutableSet.nil();
+        if (taclet instanceof RewriteTaclet) {
+            return collectBoundVarsAbove(pos);
+        } else {
+            return Collections.emptySet();
         }
-
-        return collectBoundVarsAbove(pos);
     }
 
-    private static Iterator<SchemaVariable> allVariableSV(Taclet taclet) {
+    private static Iterable<SchemaVariable> allVariableSV(Taclet taclet) {
         TacletVariableSVCollector coll = new TacletVariableSVCollector();
         coll.visit(taclet, true); // __CHANGE__ true or false???
-        return coll.varIterator();
+        return coll.vars();
     }
 
 
     @Override
-    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
+    protected Set<QuantifiableVariable> contextVars(SchemaVariable sv) {
         final TacletPrefix prefix = taclet().getPrefix(sv);
         assert prefix != null : "prefix should not be null for taclets with a find";
-        if (!prefix.context()) {
-            return DefaultImmutableSet.nil();
+        if (prefix.context()) {
+            return varsBoundAboveFindPos(taclet(), posInOccurrence());
+        } else {
+            return Collections.emptySet();
         }
-        return varsBoundAboveFindPos(taclet(), posInOccurrence());
     }
 
 
@@ -137,11 +133,11 @@ public class PosTacletApp extends TacletApp {
             SVInstantiations insts, PosInOccurrence pos, Services services) {
 
         if (taclet.isContextInPrefix()) {
-            ImmutableSet<QuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
-            Iterator<SchemaVariable> it = allVariableSV(taclet);
-            while (it.hasNext()) {
-                SchemaVariable varSV = it.next();
-                JTerm inst = insts.getInstantiation(varSV);
+            Set<QuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
+            for (var varSV : allVariableSV(taclet)) {
+                final JTerm inst = insts.getInstantiation(varSV);
+                // if inst != null then inst.op() must be a QuantifiableVAriable
+                // as we look only at VariableSVs
                 if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }

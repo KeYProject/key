@@ -4,6 +4,9 @@
 package de.uka.ilkd.key.rule;
 
 
+import java.util.Collections;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -19,9 +22,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -198,8 +199,8 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     @Override
-    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        return DefaultImmutableSet.nil();
+    protected Set<QuantifiableVariable> contextVars(SchemaVariable sv) {
+        return Collections.emptySet();
     }
 
     /**
@@ -292,7 +293,6 @@ public class NoPosTacletApp extends TacletApp {
 
         return mc;
     }
-
 
     private boolean updateContextCompatible(MatchConditions p_mc) {
         return instantiations().getUpdateContext()

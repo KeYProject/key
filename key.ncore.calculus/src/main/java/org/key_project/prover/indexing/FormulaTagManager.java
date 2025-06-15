@@ -82,6 +82,7 @@ public final class FormulaTagManager {
      *
      * @return All modifications that were applied to the formula with the given tag since the
      *         creation of the tag, starting with the most recent one
+     * @throws NullPointerException if the provided tag is not managed by this manager
      */
     public ImmutableList<@NonNull FormulaChangeInfo> getModifications(FormulaTag p_tag) {
         final FormulaInfo formulaInfo = getFormulaInfo(p_tag);
@@ -149,7 +150,7 @@ public final class FormulaTagManager {
      * Create new tags for all formulas of a semisequent
      *
      * @param semisequent the {@link Semisequent} for which to create the tags
-     * @param newAge the long indicating the age of the {@link ProofGoal} to which the semisequent
+     * @param newAge a long indicating the age of the {@link ProofGoal} to which the semisequent
      *        belongs
      * @param p_antec true iff the semisequent is an antecedent
      */
