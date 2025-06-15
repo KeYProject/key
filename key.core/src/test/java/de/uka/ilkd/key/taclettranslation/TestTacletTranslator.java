@@ -19,7 +19,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.CharStreams;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

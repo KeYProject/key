@@ -197,7 +197,7 @@ public class TestMiscTools {
 
         // test empty string -> URL of user working directory
         var u0 = MiscTools.parseURL("");
-        assertEquals(System.getProperty("user.dir"), Paths.get(u0).toString());
+        assertEquals(System.getProperty("user.dir"), Paths.get(u0.toURI()).toString());
 
         String tmp = System.getProperty("java.io.tmpdir");
         Path p = Paths.get(tmp, "te st.txt");

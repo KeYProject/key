@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -100,7 +100,7 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public Node soundAddition(Goal g, Term t, boolean antecedent) {
+    public Node soundAddition(Goal g, JTerm t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
@@ -139,7 +139,8 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public @Nullable Node applyChangeFormula(Goal g, PosInOccurrence pio, Term term, Term newTerm) {
+    public @Nullable Node applyChangeFormula(Goal g, PosInOccurrence pio, JTerm term,
+            JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
@@ -180,9 +181,8 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(@NonNull PosInOccurrence pio,
-            @NonNull JTerm term,
-            @NonNull JTerm newTerm) {
+    private TacletApp soundChange(PosInOccurrence pio,
+            JTerm term, JTerm newTerm) {
         Taclet cut = getCutTaclet();
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();

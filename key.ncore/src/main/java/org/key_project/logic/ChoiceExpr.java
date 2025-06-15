@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /// A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
 /// activated. [ChoiceExpr] are built over and, or, or not. Its atoms are choices
