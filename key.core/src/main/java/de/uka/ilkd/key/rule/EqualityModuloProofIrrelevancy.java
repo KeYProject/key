@@ -10,11 +10,12 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -56,10 +57,10 @@ public class EqualityModuloProofIrrelevancy {
             return equalsModProofIrrelevancy(_thisLV, (LogicVariable) that);
         } else if (_this instanceof LocationVariable _thisLoc) {
             return equalsModProofIrrelevancy(_thisLoc, (LocationVariable) that);
-        } else if (_this instanceof Modality _thisMod) {
-            return _thisMod.kind().equals(((Modality) that).kind()) &&
+        } else if (_this instanceof JModality _thisMod) {
+            return _thisMod.kind().equals(((JModality) that).kind()) &&
                     equalsModProofIrrelevancy(_thisMod.programBlock(),
-                        ((Modality) that).programBlock());
+                        ((JModality) that).programBlock());
         }
 
         // assume name and arity uniquely identifies operator
@@ -292,8 +293,8 @@ public class EqualityModuloProofIrrelevancy {
             return true;
         }
         if (_this != null && that != null) {
-            Term thisFormula = (Term) _this.formula();
-            Term thatFormula = (Term) that.formula();
+            JTerm thisFormula = (JTerm) _this.formula();
+            JTerm thatFormula = (JTerm) that.formula();
             return PROOF_IRRELEVANCY_PROPERTY.equalsModThisProperty(thisFormula, thatFormula);
         }
         return false;
@@ -307,7 +308,7 @@ public class EqualityModuloProofIrrelevancy {
      */
     public static int hashCodeModProofIrrelevancy(
             SequentFormula sf) {
-        return PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty((Term) sf.formula());
+        return PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty((JTerm) sf.formula());
     }
 
     // RuleApp
@@ -565,7 +566,7 @@ public class EqualityModuloProofIrrelevancy {
 
         for (final var e : _this.getInstantiationMap()) {
             final Object inst = e.value().getInstantiation();
-            if (inst instanceof Term instAsTerm) {
+            if (inst instanceof JTerm instAsTerm) {
                 if (!instAsTerm.equalsModProperty(
                     that.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
                     return false;

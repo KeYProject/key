@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -27,8 +27,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ArrayUtil;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionValue}.
@@ -75,9 +73,8 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @param conditionString the condition under which the variable has this value as
      *        human-readable {@link String}
      */
-    public ExecutionValue(@NonNull Node proofNode, @NonNull ExecutionVariable variable,
-            boolean valueUnknown,
-            Term value, String valueString, String typeString, Term condition,
+    public ExecutionValue(Node proofNode, ExecutionVariable variable, boolean valueUnknown,
+            JTerm value, String valueString, String typeString, JTerm condition,
             String conditionString) {
         super(variable.getSettings(), proofNode, variable, condition, value);
         this.valueUnknown = valueUnknown;
@@ -130,12 +127,11 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @return The contained child {@link IExecutionVariable}s.
      * @throws ProofInputException Occurred Exception.
      */
-    protected IExecutionVariable @NonNull [] lazyComputeChildVariables()
-            throws ProofInputException {
+    protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
         List<IExecutionVariable> children = new LinkedList<>();
         if (!isDisposed()) {
             final Services services = getServices();
-            Term value = getValue();
+            JTerm value = getValue();
             if (value != null && !isValueUnknown()) { // Don't show children of unknown values
                 Sort valueSort = value.sort();
                 if (valueSort != services.getJavaInfo().getNullType().getSort()) {
@@ -162,7 +158,8 @@ public class ExecutionValue extends AbstractExecutionValue {
                                                             .formatTerm(lengthValue.getValue(),
                                                                 services, false, true));
                                             for (int i = 0; i < length; i++) {
-                                                Term indexTerm = services.getTermBuilder().zTerm(i);
+                                                JTerm indexTerm =
+                                                    services.getTermBuilder().zTerm(i);
                                                 ExecutionVariable childI = new ExecutionVariable(
                                                     getVariable().getParentNode(),
                                                     getVariable().getProofNode(),

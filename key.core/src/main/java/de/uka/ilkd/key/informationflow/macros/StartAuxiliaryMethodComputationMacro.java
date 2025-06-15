@@ -10,7 +10,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,7 +70,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(po.getContract(),
             po.getIFVars().c1, po.getIFVars().c2, services);
-        final Term selfComposedExec =
+        final JTerm selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         return RENAMING_TERM_PROPERTY.equalsModThisProperty(posInOcc.subTerm(), selfComposedExec);

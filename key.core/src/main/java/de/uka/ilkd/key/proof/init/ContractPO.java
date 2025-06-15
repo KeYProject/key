@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.Contract;
-
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -16,6 +14,5 @@ public interface ContractPO extends ProofOblInput {
 
     Contract getContract();
 
-    @Nullable
-    Term getMbyAtPre();
+    JTerm getMbyAtPre();
 }

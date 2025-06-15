@@ -6,13 +6,11 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * A Lemma Generator translates a taclet to its corresponding first order logic formula thats
@@ -25,9 +23,9 @@ public interface LemmaGenerator extends TacletTranslator {
 
 class LemmaFormula implements TacletFormula {
     private final Taclet taclet;
-    private final LinkedList<Term> formula = new LinkedList<>();
+    private final LinkedList<JTerm> formula = new LinkedList<>();
 
-    public LemmaFormula(Taclet taclet, Term formula) {
+    public LemmaFormula(Taclet taclet, JTerm formula) {
         this.taclet = taclet;
         this.formula.add(formula);
     }
@@ -38,17 +36,17 @@ class LemmaFormula implements TacletFormula {
     }
 
     @Override
-    public Term getFormula(TermServices services) {
+    public JTerm getFormula(TermServices services) {
         return formula.getFirst();
     }
 
     @Override
-    public @NonNull String getStatus() {
+    public String getStatus() {
         return "";
     }
 
     @Override
-    public @NonNull Collection<Term> getInstantiations() {
+    public Collection<JTerm> getInstantiations() {
         return formula;
     }
 

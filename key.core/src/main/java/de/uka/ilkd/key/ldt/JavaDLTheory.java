@@ -9,9 +9,8 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -150,47 +149,53 @@ public class JavaDLTheory extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
-        assert false;
-        return false;
-    }
-
-    @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services,
+    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
             ExecutionContext ec) {
         assert false;
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
         assert false;
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
-        throw new IllegalStateException("Not implemented.");
+    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+            ExecutionContext ec) {
+        assert false;
+        return false;
+    }
+
+    @Override
+    public JTerm translateLiteral(Literal lit, Services services) {
+        assert false;
+        return null;
     }
 
     @Override
     public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        throw new IllegalStateException("Not implemented.");
+        assert false;
+        return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
-        throw new IllegalStateException("Not implemented.");
+    public boolean hasLiteralFunction(Function f) {
+        assert false;
+        return false;
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
-        throw new IllegalStateException("Not implemented.");
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+        assert false;
+        return null;
     }
 
     @Override
-    public Type getType(Term t) {
-        throw new IllegalStateException("Not implemented.");
+    public Type getType(JTerm t) {
+        assert false;
+        return null;
     }
 }

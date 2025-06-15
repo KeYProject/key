@@ -5,12 +5,13 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 
 
 public final class MemberPVToField extends AbstractTermTransformer {
@@ -21,7 +22,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
 

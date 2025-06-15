@@ -11,16 +11,13 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
-
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -33,9 +30,9 @@ public final class BooleanLDT extends LDT {
 
     /** the boolean literals as function symbols and terms */
     private final Function bool_true;
-    private final Term term_bool_true;
+    private final JTerm term_bool_true;
     private final Function bool_false;
-    private final Term term_bool_false;
+    private final JTerm term_bool_false;
 
 
     // -------------------------------------------------------------------------
@@ -56,12 +53,12 @@ public final class BooleanLDT extends LDT {
     // public interface
     // -------------------------------------------------------------------------
 
-    public Term getFalseTerm() {
+    public JTerm getFalseTerm() {
         return term_bool_false;
     }
 
 
-    public Term getTrueTerm() {
+    public JTerm getTrueTerm() {
         return term_bool_true;
     }
 
@@ -83,7 +80,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -95,7 +92,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
 
@@ -103,14 +100,14 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public @Nullable Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         if (lit instanceof BooleanLiteral) {
             return (((BooleanLiteral) lit).getValue() ? term_bool_true : term_bool_false);
         }
@@ -123,34 +120,37 @@ public final class BooleanLDT extends LDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        throw new RuntimeException("Not Implemented");
+        assert false;
+        return null;
     }
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return containsFunction(f) && f.arity() == 0;
     }
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() == bool_true) {
             return BooleanLiteral.TRUE;
         } else if (t.op() == bool_false) {
             return BooleanLiteral.FALSE;
         } else {
-            throw new AssertionError("BooleanLDT: Cannot convert term to program: " + t);
+            assert false : "BooleanLDT: Cannot convert term to program: " + t;
+            return null;
         }
     }
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_BOOLEAN;
         } else {
-            throw new AssertionError("BooleanLDT: Cannot get Java type for term: " + t);
+            assert false : "BooleanLDT: Cannot get Java type for term: " + t;
+            return null;
         }
     }
 }

@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
@@ -57,7 +58,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
      * @return the subterm representing the update being applies
      * @param t term with this operator as top level operator
      */
-    public static Term getUpdate(Term t) {
+    public static JTerm getUpdate(JTerm t) {
         assert t.op() == UPDATE_APPLICATION;
         return t.sub(updatePos());
     }
@@ -76,7 +77,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
      * @return the subterm representing the formula/term the update is applied to
      * @param t term with this operator as top level operator
      */
-    public static Term getTarget(Term t) {
+    public static JTerm getTarget(JTerm t) {
         assert t.op() == UPDATE_APPLICATION;
         return t.sub(targetPos());
     }

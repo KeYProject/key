@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Generate term "self != null".
@@ -16,14 +14,14 @@ import org.jspecify.annotations.NonNull;
 class BasicPostconditionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.POSTCONDITION) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "postcondition for a contract without postcondition.");
         }
-        assert Term.class.equals(BasicSnippetData.Key.POSTCONDITION.getType());
-        Term origPost = (Term) d.get(BasicSnippetData.Key.POSTCONDITION);
+        assert JTerm.class.equals(BasicSnippetData.Key.POSTCONDITION.getType());
+        JTerm origPost = (JTerm) d.get(BasicSnippetData.Key.POSTCONDITION);
         return replace(origPost, d.origVars, poVars.post, d.tb);
     }
 }

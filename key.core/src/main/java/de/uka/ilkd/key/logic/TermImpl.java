@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -27,12 +28,12 @@ import org.jspecify.annotations.Nullable;
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
-class TermImpl implements Term {
+class TermImpl implements JTerm {
 
     /**
      * A static empty list of terms used for memory reasons.
      */
-    private static final ImmutableArray<Term> EMPTY_TERM_LIST = new ImmutableArray<>();
+    private static final ImmutableArray<JTerm> EMPTY_TERM_LIST = new ImmutableArray<>();
 
     /**
      * A static empty list of quantifiable variables used for memory reasons.
@@ -51,7 +52,7 @@ class TermImpl implements Term {
 
     // content
     private final Operator op;
-    private final ImmutableArray<Term> subs;
+    private final ImmutableArray<JTerm> subs;
     private final ImmutableArray<QuantifiableVariable> boundVars;
 
     // caches
@@ -64,17 +65,17 @@ class TermImpl implements Term {
      * A cached value for computing the term's rigidness.
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
-    private @Nullable ImmutableSet<QuantifiableVariable> freeVars = null;
+    private ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
 
-    private @Nullable Sort sort;
+    private Sort sort;
 
     /**
-     * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
-     * {@link JavaBlock}. {@link Term}s which provides a {@link JavaBlock} directly or indirectly
+     * This flag indicates that the {@link JTerm} itself or one of its children contains a non-empty
+     * {@link JavaBlock}. {@link JTerm}s which provides a {@link JavaBlock} directly or indirectly
      * can't be cached because it is possible that the contained meta information inside the
      * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
      */
@@ -93,9 +94,8 @@ class TermImpl implements Term {
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
-    public TermImpl(Operator op,
-            ImmutableArray<Term> subs,
-            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+    public TermImpl(Operator op, ImmutableArray<JTerm> subs,
+            ImmutableArray<QuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
         assert subs != null;
@@ -105,7 +105,7 @@ class TermImpl implements Term {
         this.origin = origin;
     }
 
-    TermImpl(Operator op, ImmutableArray<Term> subs,
+    TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars) {
         this(op, subs, boundVars, "");
     }
@@ -152,7 +152,7 @@ class TermImpl implements Term {
      * Checks whether the Term is valid on the top level. If this is the case this method returns
      * the Term unmodified. Otherwise, a TermCreationException is thrown.
      */
-    public Term checked() {
+    public JTerm checked() {
         op.validTopLevelException(this);
         return this;
         /*
@@ -178,14 +178,14 @@ class TermImpl implements Term {
 
 
     @Override
-    public ImmutableArray<Term> subs() {
+    public ImmutableArray<JTerm> subs() {
         return subs;
     }
 
 
     @Override
-    public Term sub(int nr) {
-        return Objects.requireNonNull(subs.get(nr));
+    public JTerm sub(int nr) {
+        return subs.get(nr);
     }
 
 
@@ -203,7 +203,7 @@ class TermImpl implements Term {
 
     @Override
     public @NonNull JavaBlock javaBlock() {
-        if (op instanceof Modality mod) {
+        if (op instanceof JModality mod) {
             return mod.programBlock();
         } else {
             return JavaBlock.EMPTY_JAVABLOCK;
@@ -305,7 +305,7 @@ class TermImpl implements Term {
      * true iff <code>o</code> is syntactically equal to this term
      */
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
@@ -349,15 +349,15 @@ class TermImpl implements Term {
     }
 
     @Override
-    public <V> boolean equalsModProperty(Object o, Property<Term> property, V... v) {
-        if (!(o instanceof Term other)) {
+    public <V> boolean equalsModProperty(Object o, Property<JTerm> property, V... v) {
+        if (!(o instanceof JTerm other)) {
             return false;
         }
         return property.equalsModThisProperty(this, other);
     }
 
     @Override
-    public int hashCodeModProperty(Property<? super Term> property) {
+    public int hashCodeModProperty(Property<? super JTerm> property) {
         return property.hashCodeModThisProperty(this);
     }
 
@@ -369,10 +369,10 @@ class TermImpl implements Term {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (!javaBlock().isEmpty()) {
-            var op = (Modality) op();
-            if (op.kind() == Modality.JavaModalityKind.DIA) {
+            var op = (JModality) op();
+            if (op.kind() == JModality.JavaModalityKind.DIA) {
                 sb.append("\\<").append(javaBlock()).append("\\> ");
-            } else if (op.kind() == Modality.JavaModalityKind.BOX) {
+            } else if (op.kind() == JModality.JavaModalityKind.BOX) {
                 sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
                 sb.append(op()).append("|{").append(javaBlock()).append("}| ");
@@ -410,7 +410,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public @Nullable TermLabel getLabel(Name termLabelName) {
+    public TermLabel getLabel(Name termLabelName) {
         return null;
     }
 

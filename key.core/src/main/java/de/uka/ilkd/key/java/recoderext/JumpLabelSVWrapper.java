@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 
 public class JumpLabelSVWrapper implements SVWrapper {
 
-    private final OperatorSV label;
+    private final JOperatorSV label;
 
-    public JumpLabelSVWrapper(OperatorSV l) {
+    public JumpLabelSVWrapper(JOperatorSV l) {
         label = l;
     }
 
-    public OperatorSV getSV() {
+    public JOperatorSV getSV() {
         return label;
     }
 

@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -69,7 +69,7 @@ public class ContainsAssignmentCondition extends VariableConditionAdapter {
 
 
         final ProgramElement pe;
-        if (instCandidate instanceof Term) {
+        if (instCandidate instanceof JTerm) {
             return true;
         } else {
             pe = (ProgramElement) instCandidate;

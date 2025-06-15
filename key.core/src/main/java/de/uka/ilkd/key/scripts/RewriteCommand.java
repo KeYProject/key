@@ -27,9 +27,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -72,20 +69,19 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "rewrite";
     }
 
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
-            @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         Proof proof = state.getProof();
         assert proof != null;
@@ -111,8 +107,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * get all TacletApps that are applicable on the formula term
      */
-    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p,
-            @NonNull EngineState state)
+    private ImmutableList<TacletApp> findAllTacletApps(Parameters p, EngineState state)
             throws ScriptException {
         Services services = state.getProof().getServices();
         TacletFilter filter = TacletFilter.TRUE;
@@ -127,7 +122,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null) {
-                Term term = (Term) sf.formula();
+                JTerm term = (JTerm) sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -139,7 +134,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null) {
-                Term term = (Term) sf.formula();
+                JTerm term = (JTerm) sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -155,8 +150,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * Filter tacletapps: term = find && result = replace and execute taclet that matches the
      * conditions
      **/
-    private @NonNull List<PosInOccurrence> findAndExecReplacement(@NonNull Parameters p,
-            @NonNull ImmutableList<TacletApp> list, @NonNull EngineState state) {
+    private List<PosInOccurrence> findAndExecReplacement(Parameters p,
+            ImmutableList<TacletApp> list, EngineState state) {
 
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
@@ -204,9 +199,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param goalold
      * @param rewriteResult
      */
-    private void executeRewriteTaclet(@NonNull Parameters p, @NonNull PosTacletApp pta,
-            @NonNull Goal goalold,
-            @NonNull SequentFormula rewriteResult) {
+    private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold,
+            SequentFormula rewriteResult) {
         if (rewriteResult.formula().equals(p.replace)
                 || getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)) {
             failposInOccs.remove(pta.posInOccurrence());
@@ -226,13 +220,13 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pio PosInOccurrence of the to be returned term
      * @return term at pio
      */
-    public Term getTermAtPos(@NonNull SequentFormula sf, @NonNull PosInOccurrence pio) {
+    public JTerm getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
         if (pio.isTopLevel()) {
-            return (Term) sf.formula();
+            return (JTerm) sf.formula();
 
         } else {
             PosInTerm pit = pio.posInTerm();
-            return getSubTerm((Term) sf.formula(), pit.iterator());
+            return getSubTerm((JTerm) sf.formula(), pit.iterator());
         }
 
     }
@@ -244,7 +238,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pit
      * @return subterm
      */
-    private Term getSubTerm(@NonNull Term t, @NonNull IntIterator pit) {
+    private JTerm getSubTerm(JTerm t, IntIterator pit) {
         if (pit.hasNext()) {
             int i = pit.next();
             return getSubTerm(t.sub(i), pit);
@@ -263,17 +257,16 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
          * Term, which should be replaced
          */
         @Option(value = "find")
-        public Term find;
+        public JTerm find;
         /**
          * Substitutent
          */
         @Option(value = "replace")
-        public Term replace;
+        public JTerm replace;
         /**
          * Formula, where to find {@see find}.
          */
         @Option(value = "formula", required = false)
-        @Nullable
-        public Term formula;
+        public JTerm formula;
     }
 }

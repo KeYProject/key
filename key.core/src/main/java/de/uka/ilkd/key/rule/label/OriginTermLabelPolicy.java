@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -13,9 +13,6 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Policy for {@link OriginTermLabel}s.
@@ -27,10 +24,10 @@ import org.jspecify.annotations.Nullable;
 public class OriginTermLabelPolicy implements TermLabelPolicy {
 
     @Override
-    public @Nullable TermLabel keepLabel(TermLabelState state, @NonNull Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm,
-            @NonNull Term newTerm, TermLabel label) {
+    public TermLabel keepLabel(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm,
+            JTerm newTerm, TermLabel label) {
         if (services.getProof() == null) {
             return label;
         }

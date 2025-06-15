@@ -1,6 +1,7 @@
 /**
- * This @org.jspecify.annotations.NullMarked packagecontains classes implementing the proof search
- * strategies of KeY.
+ * This package contains classes implementing the proof search strategies of KeY.
  */
-@org.jspecify.annotations.NullMarked
+@NullMarked
 package de.uka.ilkd.key.strategy;
+
+import org.jspecify.annotations.NullMarked;

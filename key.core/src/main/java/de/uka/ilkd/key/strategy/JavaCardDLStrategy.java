@@ -12,7 +12,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -40,6 +40,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -1443,32 +1444,32 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Term tOne = getServices().getTermBuilder().zTerm("1");
         final TermBuffer one = new TermBuffer() {
             @Override
-            public void setContent(org.key_project.logic.Term term, MutableState mState) {}
+            public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public Term getContent(MutableState mState) {
+            public @NonNull Term getContent(MutableState mState) {
                 return tOne;
             }
 
             @Override
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
             }
         };
 
-        final Term tTwo = getServices().getTermBuilder().zTerm("2");
+        final JTerm tTwo = getServices().getTermBuilder().zTerm("2");
         final TermBuffer two = new TermBuffer() {
             @Override
-            public void setContent(org.key_project.logic.Term term, MutableState mState) {}
+            public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public Term getContent(MutableState mState) {
+            public @NonNull Term getContent(MutableState mState) {
                 return tTwo;
             }
 
             @Override
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;
             }

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
@@ -146,7 +147,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             @NonNull ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                Term term = (Term) pta.posInOccurrence().subTerm();
+                JTerm term = (JTerm) pta.posInOccurrence().subTerm();
                 if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     return pta;
                 }
@@ -168,7 +169,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
                 if (params.var.equals(varName)) {
                     occ--;
                     if (occ == 0) {
-                        params.formula = (Term) term;
+                        params.formula = (JTerm) term;
                         return;
                     }
                 }
@@ -183,7 +184,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
                 if (params.var.equals(varName)) {
                     occ--;
                     if (occ == 0) {
-                        params.formula = (Term) term;
+                        params.formula = (JTerm) term;
                         return;
                     }
                 }
@@ -194,7 +195,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             "Variable '" + params.var + "' has no occurrence no. '" + params.occ + "'.");
     }
 
-    private org.key_project.logic.Term stripUpdates(org.key_project.logic.Term term) {
+    private Term stripUpdates(Term term) {
         while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
             term = term.sub(1);
         }
@@ -243,7 +244,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
      */
     public static class Parameters {
         @Option(value = "formula", required = false)
-        public Term formula;
+        public JTerm formula;
         @Option(value = "var", required = false)
         public String var;
         @Option(value = "occ", required = false)
@@ -253,7 +254,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         public @NonNull String hide = "";
 
         @Option(value = "with", required = false)
-        public Term with;
+        public JTerm with;
     }
 
     private static class TacletNameFilter extends TacletFilter {

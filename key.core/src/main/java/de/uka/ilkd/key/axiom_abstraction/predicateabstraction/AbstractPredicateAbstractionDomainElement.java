@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
@@ -107,7 +107,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * (de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public Term getDefiningAxiom(Term varOrConst, Services services) {
+    public JTerm getDefiningAxiom(JTerm varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         if (topElem) {
@@ -118,9 +118,9 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
             return tb.ff();
         }
 
-        Term result = null;
+        JTerm result = null;
         for (AbstractionPredicate pred : predicates) {
-            Term application = pred.apply(varOrConst);
+            JTerm application = pred.apply(varOrConst);
             if (result == null) {
                 result = application;
             } else {
@@ -139,7 +139,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * @param services The services object.
      * @return The combination of preds with newPred.
      */
-    protected abstract Term combinePredicates(Term preds, Term newPred, Services services);
+    protected abstract JTerm combinePredicates(JTerm preds, JTerm newPred, Services services);
 
     /**
      * NOTE: This method should be defined in accordance with

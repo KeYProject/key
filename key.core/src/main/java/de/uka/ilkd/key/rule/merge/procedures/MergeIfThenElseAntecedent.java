@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.merge.procedures;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -17,9 +17,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
@@ -35,9 +32,9 @@ import org.jspecify.annotations.Nullable;
 public class MergeIfThenElseAntecedent extends MergeProcedure
         implements UnparametricMergeProcedure {
 
-    private static @Nullable MergeIfThenElseAntecedent INSTANCE = null;
+    private static MergeIfThenElseAntecedent INSTANCE = null;
 
-    public static @NonNull MergeIfThenElseAntecedent instance() {
+    public static MergeIfThenElseAntecedent instance() {
         if (INSTANCE == null) {
             INSTANCE = new MergeIfThenElseAntecedent();
         }
@@ -57,11 +54,9 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     }
 
     @Override
-    public @NonNull ValuesMergeResult mergeValuesInStates(@NonNull Term v,
-            @NonNull SymbolicExecutionState state1,
-            @NonNull Term valueInState1, @NonNull SymbolicExecutionState state2,
-            @NonNull Term valueInState2,
-            Term distinguishingFormula, @NonNull Services services) {
+    public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -70,7 +65,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConst.name());
 
-        ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+        ImmutableSet<JTerm> newConstraints = DefaultImmutableSet.nil();
         newConstraints = newConstraints.union(getIfThenElseConstraints(tb.func(newSkolemConst),
             valueInState1, valueInState2, state1, state2, distinguishingFormula, services));
 
@@ -99,27 +94,25 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
      * @return A list of if-then-else constraints for the given constrained term, states and if/else
      *         terms.
      */
-    private static @NonNull ImmutableSet<Term> getIfThenElseConstraints(@NonNull Term constrained,
-            @NonNull Term ifTerm,
-            @NonNull Term elseTerm, @NonNull SymbolicExecutionState state1,
-            @NonNull SymbolicExecutionState state2,
-            @Nullable Term distinguishingFormula, @NonNull Services services) {
+    private static ImmutableSet<JTerm> getIfThenElseConstraints(JTerm constrained, JTerm ifTerm,
+            JTerm elseTerm, SymbolicExecutionState state1, SymbolicExecutionState state2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableSet<Term> result = DefaultImmutableSet.nil();
+        ImmutableSet<JTerm> result = DefaultImmutableSet.nil();
 
         if (distinguishingFormula == null) {
             final MergeByIfThenElse.DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
                     elseTerm, services);
 
-            final Term cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
-            final Term ifForm = distFormAndRightSidesForITEUpd.ifTerm();
-            final Term elseForm = distFormAndRightSidesForITEUpd.elseTerm();
+            final JTerm cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            final JTerm ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            final JTerm elseForm = distFormAndRightSidesForITEUpd.elseTerm();
             final boolean isSwapped = distFormAndRightSidesForITEUpd.sideCommuted();
 
-            final Term varEqualsIfForm = tb.equals(constrained, ifForm);
-            final Term varEqualsElseForm = tb.equals(constrained, elseForm);
+            final JTerm varEqualsIfForm = tb.equals(constrained, ifForm);
+            final JTerm varEqualsElseForm = tb.equals(constrained, elseForm);
 
             if (!(ifTerm.equals(constrained) && !isSwapped
                     || elseTerm.equals(constrained) && isSwapped)) {
@@ -131,8 +124,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
                 result = result.add(tb.or(cond, varEqualsElseForm));
             }
         } else {
-            final Term varEqualsIfForm = tb.equals(constrained, ifTerm);
-            final Term varEqualsElseForm = tb.equals(constrained, elseTerm);
+            final JTerm varEqualsIfForm = tb.equals(constrained, ifTerm);
+            final JTerm varEqualsElseForm = tb.equals(constrained, elseTerm);
 
             result = result.add(tb.imp(distinguishingFormula, varEqualsIfForm));
             result = result.add(tb.or(distinguishingFormula, varEqualsElseForm));
@@ -143,7 +136,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return DISPLAY_NAME;
     }
 }

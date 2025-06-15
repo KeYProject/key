@@ -617,22 +617,23 @@ public final class JavaInfo {
         return getToplevelPM(kjt, methodName, sig);
     }
 
-    private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
+    private List<List<KeYJavaType>> termArrayToSignature(JTerm[] args) {
         List<List<KeYJavaType>> signature = new LinkedList<>();
-        for (Term arg : args) {
+        for (JTerm arg : args) {
             signature.add(lookupSort2KJTCache(arg.sort()));
         }
         return signature;
     }
 
-    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+    public JTerm getStaticProgramMethodTerm(String methodName, JTerm[] args, String className) {
         List<List<KeYJavaType>> signature = termArrayToSignature(args);
         KeYJavaType classKJT = getTypeByClassName(className);
         IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
-    public Term getProgramMethodTerm(Term prefix, String methodName, Term[] args, String className,
+    public JTerm getProgramMethodTerm(JTerm prefix, String methodName, JTerm[] args,
+            String className,
             boolean traverseHierarchy) {
 
         /*
@@ -676,13 +677,13 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    public Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
-            Term[] args, Term prefix) throws IllegalArgumentException {
+    public JTerm getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
+            JTerm[] args, JTerm prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException(
                 "Program method " + methodName + " in " + className + " not found.");
         }
-        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length
+        JTerm[] subs = new JTerm[pm.getHeapCount(services) * pm.getStateCount() + args.length
                 + (pm.isStatic() ? 0 : 1)];
         int offset = 0;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {

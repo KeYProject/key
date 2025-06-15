@@ -4,13 +4,11 @@
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Metaoperator for computing the result of dividing one monomial by another
@@ -23,15 +21,15 @@ public final class DivideLCRMonomials extends AbstractTermTransformer {
 
 
     /** calculates the resulting term. */
-    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
-        final Term arg1 = term.sub(0);
-        final Term arg2 = term.sub(1);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        final JTerm arg1 = term.sub(0);
+        final JTerm arg2 = term.sub(1);
 
         final Monomial m1 = Monomial.create(arg1, services);
         final Monomial m2 = Monomial.create(arg2, services);
 
         final Monomial res = m2.divideLCR(m1);
-        return (Term) res.toTerm(services);
+        return (JTerm) res.toTerm(services);
     }
 
 }

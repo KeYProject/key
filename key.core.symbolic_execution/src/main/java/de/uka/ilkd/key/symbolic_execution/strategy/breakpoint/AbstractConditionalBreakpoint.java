@@ -38,9 +38,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
  *
@@ -50,7 +47,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The condition for this Breakpoint (set by user).
      */
-    private Term condition;
+    private JTerm condition;
 
     /**
      * The flag if the the condition for the associated Breakpoint is enabled
@@ -76,7 +73,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * A list of variables KeY has to hold to evaluate the condition
      */
-    private final @NonNull Set<LocationVariable> toKeep;
+    private final Set<LocationVariable> toKeep;
 
     /**
      * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent
@@ -87,7 +84,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The list of parameter variables of the method that contains the associated breakpoint
      */
-    private final @NonNull Set<LocationVariable> paramVars;
+    private final Set<LocationVariable> paramVars;
 
     /**
      * A {@link LocationVariable} representing the instance the class KeY is working on
@@ -149,8 +146,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param node
      * @param inScope
      */
-    private void putValuesFromGlobalVars(@NonNull ProgramVariable varForCondition,
-            @NonNull Node node,
+    private void putValuesFromGlobalVars(ProgramVariable varForCondition, Node node,
             boolean inScope) {
         for (IProgramVariable progVar : node.getLocalProgVars()) {
             if (inScope && varForCondition.name().equals(progVar.name())
@@ -169,7 +165,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the cloned map
      */
-    private @NonNull Map<SyntaxElement, SyntaxElement> getOldMap() {
+    private Map<SyntaxElement, SyntaxElement> getOldMap() {
         Map<SyntaxElement, SyntaxElement> oldMap = new HashMap<>();
         for (Entry<SyntaxElement, SyntaxElement> svSubstituteSVSubstituteEntry : getVariableNamingMap()
                 .entrySet()) {
@@ -207,9 +203,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *        breakpoint
      * @param oldMap the oldMap variableNamings
      */
-    private void putValuesFromRenamings(@NonNull ProgramVariable varForCondition,
-            @NonNull Node node, boolean inScope,
-            @NonNull Map<SyntaxElement, SyntaxElement> oldMap,
+    private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
+            Map<SyntaxElement, SyntaxElement> oldMap,
             RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
@@ -270,7 +265,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param ruleApp the applied rule app
      * @param node the current node
      */
-    protected void refreshVarMaps(RuleApp ruleApp, @NonNull Node node) {
+    protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
         // collect old values
         Map<SyntaxElement, SyntaxElement> oldMap = getOldMap();
@@ -291,9 +286,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Computes the Term that can be evaluated, from the user given condition
      *
      * @param condition the condition given by the user
-     * @return the {@link Term} that represents the condition
+     * @return the {@link JTerm} that represents the condition
      */
-    private @NonNull Term computeTermForCondition(@Nullable String condition) {
+    private JTerm computeTermForCondition(String condition) {
         if (condition == null) {
             return getProof().getServices().getTermBuilder().tt();
         }
@@ -362,8 +357,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            var t = pio.subTerm();
-            Term term = TermBuilder.goBelowUpdates(t);
+            JTerm t = (JTerm) pio.subTerm();
+            JTerm term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), getProof().getServices());
             // put values into map which have to be replaced
@@ -374,9 +369,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             final TermBuilder tb = getProof().getServices().getTermBuilder();
             OpReplacer replacer =
                 new OpReplacer(getVariableNamingMap(), tb.tf());
-            Term termForSideProof = replacer.replace(condition);
+            JTerm termForSideProof = replacer.replace(condition);
             // start side proof
-            Term toProof = tb.equals(tb.tt(), termForSideProof);
+            JTerm toProof = tb.equals(tb.tt(), termForSideProof);
             // New OneStepSimplifier is required because it has an internal state and the default
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
@@ -431,8 +426,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     protected abstract boolean isInScopeForCondition(Node node);
 
-    private @NonNull ImmutableList<LocationVariable> saveAddVariable(@NonNull LocationVariable x,
-            @NonNull ImmutableList<LocationVariable> varsForCondition) {
+    private ImmutableList<LocationVariable> saveAddVariable(LocationVariable x,
+            ImmutableList<LocationVariable> varsForCondition) {
         boolean contains = false;
         for (var paramVar : varsForCondition) {
             if (paramVar.toString().equals(x.toString())) {
@@ -460,7 +455,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the condition of the associated Breakpoint
      */
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 

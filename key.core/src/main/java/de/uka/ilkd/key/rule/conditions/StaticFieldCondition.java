@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -42,7 +42,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
             @NonNull SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
-        if (!(o instanceof Term f)) {
+        if (!(o instanceof JTerm f)) {
             return false;
         }
         final Operator op = f.op();

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 import org.key_project.logic.Visitor;
@@ -15,7 +15,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Arne Keller
  */
-public class ProgramMethodFinder implements Visitor<Term> {
+public class ProgramMethodFinder implements Visitor<JTerm> {
 
     /**
      * Whether a program method has been found.
@@ -23,13 +23,13 @@ public class ProgramMethodFinder implements Visitor<Term> {
     private boolean foundProgramMethod = false;
 
     @Override
-    public boolean visitSubtree(Term visited) {
+    public boolean visitSubtree(JTerm visited) {
         // visit all sub-terms
         return true;
     }
 
     @Override
-    public void visit(@NonNull Term visited) {
+    public void visit(JTerm visited) {
         if (visited.op() instanceof ProgramMethod pm) {
             if (!pm.isModel()) {
                 foundProgramMethod = true;
@@ -38,12 +38,12 @@ public class ProgramMethodFinder implements Visitor<Term> {
     }
 
     @Override
-    public void subtreeEntered(Term subtreeRoot) {
+    public void subtreeEntered(JTerm subtreeRoot) {
 
     }
 
     @Override
-    public void subtreeLeft(Term subtreeRoot) {
+    public void subtreeLeft(JTerm subtreeRoot) {
 
     }
 

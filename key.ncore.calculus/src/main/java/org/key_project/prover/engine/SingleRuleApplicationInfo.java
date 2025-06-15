@@ -7,6 +7,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Represents information about the result of a single rule application in the KeY verification
 /// system.
@@ -36,16 +37,16 @@ public class SingleRuleApplicationInfo {
     /// This could be a success message or a reason for failure.
     private final String message;
     /// The proof goal associated with the rule application.
-    private final ProofGoal<?> goal;
+    private final @Nullable ProofGoal<?> goal;
     /// The rule that was applied.
-    private final RuleApp appliedRuleApp;
+    private final @Nullable RuleApp appliedRuleApp;
 
     /// Constructs a new `SingleRuleApplicationInfo` for a successful rule application.
     ///
     /// @param mayCloseableGoal the proof goal that may be closed by this rule application.
     /// @param appliedRuleApp the rule that was successfully applied.
-    public SingleRuleApplicationInfo(ProofGoal<?> mayCloseableGoal,
-            RuleApp appliedRuleApp) {
+    public SingleRuleApplicationInfo(@Nullable ProofGoal<?> mayCloseableGoal,
+            @NonNull RuleApp appliedRuleApp) {
         this.message = "Rule applied successful";
         this.goal = mayCloseableGoal;
         this.appliedRuleApp = appliedRuleApp;
@@ -57,8 +58,8 @@ public class SingleRuleApplicationInfo {
     /// @param message a message explaining why the rule application failed.
     /// @param nonCloseableGoal the proof goal that could not be closed by this rule application.
     /// @param appliedRuleApp the rule that was applied (if any).
-    public SingleRuleApplicationInfo(String message, ProofGoal<?> nonCloseableGoal,
-            RuleApp appliedRuleApp) {
+    public SingleRuleApplicationInfo(String message, @Nullable ProofGoal<?> nonCloseableGoal,
+            @Nullable RuleApp appliedRuleApp) {
         this.message = message;
         this.goal = nonCloseableGoal;
         this.appliedRuleApp = appliedRuleApp;
@@ -76,7 +77,7 @@ public class SingleRuleApplicationInfo {
     ///
     /// @param <G> the type of the proof goal.
     /// @return the proof goal associated with this rule application.
-    public <G extends ProofGoal<@NonNull G>> G getGoal() {
+    public <G extends @Nullable ProofGoal<G>> G getGoal() {
         // noinspection unchecked
         return (G) goal;
     }
@@ -95,7 +96,7 @@ public class SingleRuleApplicationInfo {
     /// Retrieves the rule that was applied.
     ///
     /// @return the applied rule, or `null` if no rule was applied.
-    public RuleApp getAppliedRuleApp() {
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 }

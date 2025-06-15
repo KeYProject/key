@@ -5,15 +5,13 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -73,12 +71,11 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     boolean isPathConditionChanged();
 
     /**
-     * Returns the path condition to reach this node as {@link Term}.
+     * Returns the path condition to reach this node as {@link JTerm}.
      *
-     * @return The path condition to reach this node as {@link Term}.
+     * @return The path condition to reach this node as {@link JTerm}.
      */
-    @Nullable
-    Term getPathCondition() throws ProofInputException;
+    JTerm getPathCondition() throws ProofInputException;
 
     /**
      * Returns the human readable path condition to reach this node as string.
@@ -92,7 +89,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      *
      * @return The method call stack.
      */
-    IExecutionNode<?> @Nullable [] getCallStack();
+    IExecutionNode<?>[] getCallStack();
 
     /**
      * Returns all available {@link IExecutionConstraint}s.
@@ -106,7 +103,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      *
      * @return The active statement which is executed in the code.
      */
-    @Nullable
     S getActiveStatement();
 
     /**
@@ -114,7 +110,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      *
      * @return The {@link PositionInfo} of {@link #getActiveStatement()}.
      */
-    @Nullable
     PositionInfo getActivePositionInfo();
 
     /**
@@ -128,10 +123,10 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     /**
      * Returns the variable value pairs of the current state under the given condition.
      *
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param condition A {@link JTerm} specifying some additional constraints to consider.
      * @return The variable value pairs.
      */
-    IExecutionVariable @Nullable [] getVariables(Term condition) throws ProofInputException;
+    IExecutionVariable[] getVariables(JTerm condition) throws ProofInputException;
 
     /**
      * Returns the number of memory layouts.
@@ -148,7 +143,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The equivalence classes of the memory layout at the given index.
      * @throws ProofInputException Occurred Exception.
      */
-    @Nullable
     ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex)
             throws ProofInputException;
 
@@ -159,7 +153,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The initial memory layout at the given index.
      * @throws ProofInputException Occurred Exception.
      */
-    @Nullable
     ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException;
 
     /**
@@ -170,7 +163,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The current memory layout at the given index.
      * @throws ProofInputException Occurred Exception.
      */
-    @Nullable
     ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
 
     /**
@@ -189,8 +181,7 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @return The condition under which this node completes the code block of the given
      *         {@link IExecutionBlockStartNode}.
      */
-    @Nullable
-    Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+    JTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException;
 
     /**
@@ -211,7 +202,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @param target The target {@link IExecutionNode}.
      * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
      */
-    @Nullable
     IExecutionLink getOutgoingLink(IExecutionNode<?> target);
 
     /**
@@ -227,7 +217,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
      * @param source The source {@link IExecutionNode}.
      * @return The found {@link IExecutionLink} or {@code null} if such a link is not available.
      */
-    @Nullable
     IExecutionLink getIncomingLink(IExecutionNode<?> source);
 
     /**

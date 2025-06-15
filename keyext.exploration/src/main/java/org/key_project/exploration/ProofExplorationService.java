@@ -180,7 +180,9 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
+    private TacletApp soundChange(@NonNull PosInOccurrence pio,
+            @NonNull JTerm term,
+            @NonNull JTerm newTerm) {
         Taclet cut = getCutTaclet();
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
@@ -188,7 +190,7 @@ public class ProofExplorationService {
         return app;
     }
 
-    public void soundHide(Goal g, PosInOccurrence pio, Term term) {
+    public void soundHide(Goal g, PosInOccurrence pio, JTerm term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());
         explorationNodeData.setExplorationAction("Hide " + term);

@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Generate conjunction of... - "p_i.<created> = TRUE | p_i = null" for object parameters, and -
@@ -18,10 +16,10 @@ import org.jspecify.annotations.NonNull;
 class BasicParamsOkSnippet implements FactoryMethod {
 
     @Override
-    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        Term paramsOK = d.tb.tt();
-        for (Term param : poVars.pre.localVars) {
+        JTerm paramsOK = d.tb.tt();
+        for (JTerm param : poVars.pre.localVars) {
             if (!(param.op() instanceof ProgramVariable pv)) {
                 throw new UnsupportedOperationException(
                     "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");

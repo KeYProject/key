@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import java.util.Objects;
-
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -14,10 +12,9 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -59,8 +56,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, Objects.requireNonNull(services.getNamespaces().sorts().lookup(SeqLDT.NAME)),
-            services);
+        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
@@ -80,7 +76,7 @@ public final class CharListLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private String translateCharTerm(Term t) {
+    private String translateCharTerm(JTerm t) {
         char charVal;
         int intVal;
         String result = printLastFirst(t.sub(0)).toString();
@@ -98,7 +94,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    private StringBuffer printLastFirst(Term t) {
+    private StringBuffer printLastFirst(JTerm t) {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
@@ -169,34 +165,34 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public @Nullable Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final TermBuilder tb = services.getTermBuilder();
-        final Term term_empty = tb.func(seqLDT.getSeqEmpty());
+        final JTerm term_empty = tb.func(seqLDT.getSeqEmpty());
 
         char[] charArray;
-        Term result = term_empty;
+        JTerm result = term_empty;
 
         if (lit instanceof StringLiteral) {
             charArray = ((StringLiteral) lit).getValue().toCharArray();
@@ -211,7 +207,7 @@ public final class CharListLDT extends LDT {
         }
 
         for (int i = charArray.length - 2; i >= 1; i--) {
-            Term singleton =
+            JTerm singleton =
                 tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services));
             result = tb.seqConcat(singleton, result);
         }
@@ -223,20 +219,21 @@ public final class CharListLDT extends LDT {
     @Override
     public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
-        throw new RuntimeException("Not Implemented");
+        assert false;
+        return null;
     }
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return false;
     }
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         final StringBuilder result = new StringBuilder();
-        Term term = t;
+        JTerm term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));
             term = term.sub(1);
@@ -246,8 +243,9 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
-        throw new RuntimeException("Not Implemented");
+    public Type getType(JTerm t) {
+        assert false;
+        return null;
     }
 
     @Override

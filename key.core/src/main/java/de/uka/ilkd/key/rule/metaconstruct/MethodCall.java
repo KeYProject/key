@@ -28,8 +28,8 @@ import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -229,8 +229,9 @@ public class MethodCall extends ProgramTransformer {
 
         newContext = methRef.getReferencePrefix();
         if (newContext == null) {
-            Term self = services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(),
-                execContext);
+            JTerm self =
+                services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(),
+                    execContext);
             if (self != null) {
                 newContext =
                     (ReferencePrefix) services.getTypeConverter().convertToProgramElement(self);

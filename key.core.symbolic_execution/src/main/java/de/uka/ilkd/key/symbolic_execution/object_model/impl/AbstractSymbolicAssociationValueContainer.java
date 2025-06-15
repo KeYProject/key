@@ -5,7 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
@@ -15,9 +15,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
@@ -29,12 +26,12 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * The contained {@link ISymbolicAssociation}s.
      */
-    private @NonNull ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+    private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
 
     /**
      * The contained {@link ISymbolicValue}s.
      */
-    private @NonNull ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+    private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -66,8 +63,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      * {@inheritDoc}
      */
     @Override
-    public @Nullable ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
-            final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
+    public ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
+            final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
         return CollectionUtil.search(associations,
             element -> element.getProgramVariable() == programVariable
                     && element.isArrayIndex() == isArrayIndex
@@ -96,8 +93,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      * {@inheritDoc}
      */
     @Override
-    public @Nullable ISymbolicValue getValue(final IProgramVariable programVariable,
-            final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
+    public ISymbolicValue getValue(final IProgramVariable programVariable,
+            final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
         return CollectionUtil.search(values,
             element -> element.getProgramVariable() == programVariable
                     && element.isArrayIndex() == isArrayIndex

@@ -6,10 +6,13 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
 public class MatchProgramInstruction implements MatchInstruction {
 
@@ -20,15 +23,12 @@ public class MatchProgramInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
             LogicServices services) {
         final MatchConditions result = pe.match(
-            new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1,
+            new SourceData(((JavaBlock) actualElement).program(), -1,
                 (Services) services),
-            matchConditions);
-        if (result != null) {
-            termPosition.gotoNext();
-        }
+            (MatchConditions) matchConditions);
         return result;
     }
 }

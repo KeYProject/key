@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.PosInTerm;
@@ -11,8 +11,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Projection for computing a subterm of a given term. The position of the subterm within the
@@ -23,7 +21,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
     private final PosInTerm pit;
     private final ProjectionToTerm<Goal> completeTerm;
 
-    public static @NonNull ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> completeTerm,
+    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> completeTerm,
             PosInTerm pit) {
         return new SubtermProjection(completeTerm, pit);
     }
@@ -34,7 +32,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return (Term) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
+    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return (JTerm) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }
 }

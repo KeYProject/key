@@ -5,9 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
-import de.uka.ilkd.key.logic.Term;
-
-import org.jspecify.annotations.NonNull;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms and joins. There are
@@ -52,7 +50,7 @@ public interface Constraint {
      * @param services the Services
      * @return a term the given metavariable can be instantiated with
      */
-    Term getInstantiation(Metavariable p_mv, Services services);
+    JTerm getInstantiation(Metavariable p_mv, Services services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -66,7 +64,7 @@ public interface Constraint {
      *
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services);
+    Constraint unify(JTerm t1, JTerm t2, Services services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -77,7 +75,7 @@ public interface Constraint {
      * @param unchanged true iff the new constraint equals this one
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services, BooleanContainer unchanged);
+    Constraint unify(JTerm t1, JTerm t2, Services services, BooleanContainer unchanged);
 
     /**
      * @return true iff this constraint is as strong as "co", i.e. every instantiation satisfying
@@ -154,8 +152,7 @@ public interface Constraint {
          * @return the instantiation of the metavariable
          */
         @Override
-        public @NonNull Term getInstantiation(@NonNull Metavariable p_mv,
-                @NonNull Services services) {
+        public JTerm getInstantiation(Metavariable p_mv, Services services) {
             // As there is in fact no instantiation satisfying this
             // constraint, we could return everything
             return services.getTermBuilder().var(p_mv);
@@ -168,19 +165,19 @@ public interface Constraint {
          * @return always this
          */
         @Override
-        public @NonNull Constraint unify(Term t1, Term t2, Services services) {
+        public Constraint unify(JTerm t1, JTerm t2, Services services) {
             return this;
         }
 
         @Override
-        public @NonNull Constraint unify(Term t1, Term t2, Services services,
-                @NonNull BooleanContainer unchanged) {
+        public Constraint unify(JTerm t1, JTerm t2, Services services,
+                BooleanContainer unchanged) {
             unchanged.setVal(true);
             return this;
         }
 
         @Override
-        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(Object obj) {
             return (obj instanceof Top);
         }
 
@@ -203,7 +200,7 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public @NonNull Constraint join(Constraint co, Services services) {
+        public Constraint join(Constraint co, Services services) {
             return this;
         }
 
@@ -213,8 +210,7 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public @NonNull Constraint join(Constraint co, Services services,
-                @NonNull BooleanContainer c) {
+        public Constraint join(Constraint co, Services services, BooleanContainer c) {
             c.setVal(true);
             return this;
         }
@@ -233,7 +229,7 @@ public interface Constraint {
          * @return String representing the TOP constraint
          */
         @Override
-        public @NonNull String toString() {
+        public String toString() {
             return "TOP";
         }
 

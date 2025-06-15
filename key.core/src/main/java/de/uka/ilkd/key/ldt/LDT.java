@@ -11,9 +11,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
@@ -24,7 +23,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
-import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -48,18 +46,21 @@ public abstract class LDT implements Named {
     // -------------------------------------------------------------------------
 
     protected LDT(Name name, TermServices services) {
-        var s = services.getNamespaces().sorts().lookup(name);
-        if (s == null) {
+        sort = services.getNamespaces().sorts().lookup(name);
+        if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
-        this.sort = s;
         this.name = name;
     }
 
 
     protected LDT(Name name, Sort targetSort, TermServices services) {
         sort = targetSort;
+        if (sort == null) {
+            throw new RuntimeException("LDT " + name + " not found.\n"
+                + "It seems that there are definitions missing from the .key files.");
+        }
         this.name = name;
     }
 
@@ -72,7 +73,7 @@ public abstract class LDT implements Named {
      *
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(@UnknownInitialization LDT this, Function f) {
+    protected final Function addFunction(Function f) {
         functions.addSafely(f);
         return f;
     }
@@ -83,10 +84,7 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    @SuppressWarnings("unchecked")
-    protected final <F extends Function> F addFunction(@UnknownInitialization LDT this,
-            TermServices services,
-            String funcName) {
+    protected final <F extends Function> F addFunction(TermServices services, String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
@@ -96,8 +94,8 @@ public abstract class LDT implements Named {
         return (F) addFunction(f);
     }
 
-    protected final SortDependingFunction addSortDependingFunction(@UnknownInitialization LDT this,
-            TermServices services, String kind) {
+    protected final SortDependingFunction addSortDependingFunction(TermServices services,
+            String kind) {
         final SortDependingFunction f =
             SortDependingFunction.getFirstInstance(new Name(kind), services);
         assert f != null : "LDT: Sort depending function " + kind + " not found";
@@ -183,7 +181,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
             Services services, ExecutionContext ec);
 
 
@@ -198,8 +196,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left,
-            Term right, Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+            JTerm right, Services services, ExecutionContext ec);
 
 
     /**
@@ -212,7 +210,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
             TermServices services, ExecutionContext ec);
 
 
@@ -222,7 +220,7 @@ public abstract class LDT implements Named {
      * @param lit the Literal to be translated
      * @return the Term that represents the given literal in its logic form
      */
-    public abstract @Nullable Term translateLiteral(Literal lit, Services services);
+    public abstract JTerm translateLiteral(Literal lit, Services services);
 
     /**
      * returns the function symbol for the given <em>Java</em> operator.
@@ -230,7 +228,7 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract @Nullable Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services, ExecutionContext ec);
 
     /**
@@ -251,10 +249,10 @@ public abstract class LDT implements Named {
         return null;
     }
 
-    public abstract boolean hasLiteralFunction(JFunction f);
+    public abstract boolean hasLiteralFunction(Function f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract @Nullable Expression translateTerm(Term t, ExtList children, Services services);
+    public abstract Expression translateTerm(JTerm t, ExtList children, Services services);
 
-    public abstract @Nullable Type getType(Term t);
+    public abstract Type getType(JTerm t);
 }

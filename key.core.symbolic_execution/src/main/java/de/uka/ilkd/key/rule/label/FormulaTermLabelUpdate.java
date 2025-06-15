@@ -29,9 +29,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * The {@link TermLabelUpdate} used to label predicates with a {@link FormulaTermLabel} of add
  * clauses which were not labeled before.
@@ -51,12 +48,11 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     @Override
-    public void updateLabels(@NonNull TermLabelState state, @NonNull Services services,
-            @NonNull PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm,
-            Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, @NonNull Term newTerm,
-            @NonNull Set<TermLabel> labels) {
+    public void updateLabels(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+            Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
@@ -84,7 +80,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                     new LinkedHashMap<>();
                 for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
-                        ((Term) ifInst.getSequentFormula().formula()).getLabels());
+                        ((JTerm) ifInst.getSequentFormula().formula()).getLabels());
                     if (ifLabel != null) {
                         ifLabels.put(ifInst.getSequentFormula(), ifLabel);
                     }
@@ -116,7 +112,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * @param name The {@link Name} of the {@link TermLabel} to search.
      * @return The found {@link TermLabel} or {@code} null if no element was found.
      */
-    protected @Nullable TermLabel getTermLabel(@NonNull Set<TermLabel> labels, final Name name) {
+    protected TermLabel getTermLabel(Set<TermLabel> labels, final Name name) {
         return CollectionUtil.search(labels,
             element -> element != null && element.name().equals(name));
     }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 import org.key_project.prover.proof.ProofGoal;
@@ -44,7 +44,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
         while (it.next() != -1) {
             final var op = it.getSubTerm().op();
 
-            if (op instanceof Modality) {
+            if (op instanceof JModality) {
                 return true;
             }
             if (op instanceof UpdateApplication) {

@@ -8,16 +8,15 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandler;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public abstract class LDTHandler implements JMLOperatorHandler {
@@ -50,8 +49,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         return jop;
     }
 
-    public @Nullable SLExpression build(JMLOperator jop, @NonNull SLExpression left,
-            @NonNull SLExpression right)
+    public @Nullable SLExpression build(JMLOperator jop, SLExpression left, SLExpression right)
             throws SLTranslationException {
         if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) {
             return buildUnary(jop, left);
@@ -64,9 +62,9 @@ public abstract class LDTHandler implements JMLOperatorHandler {
             return null;
         }
 
-        Term a = promote(left.getTerm(), promotedType);
-        Term b = promote(right.getTerm(), promotedType);
-        Term resultTerm = services.getTermFactory().createTerm(top.operator, a, b);
+        JTerm a = promote(left.getTerm(), promotedType);
+        JTerm b = promote(right.getTerm(), promotedType);
+        JTerm resultTerm = services.getTermFactory().createTerm(top.operator, a, b);
         if (OverloadedOperatorHandler.PREDICATES.contains(jop)) {
             // should be "formula", but apparently there is no KJT for that.
             return new SLExpression(resultTerm);
@@ -75,17 +73,17 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         }
     }
 
-    private @Nullable SLExpression buildUnary(JMLOperator jop, @NonNull SLExpression left) {
+    private SLExpression buildUnary(JMLOperator jop, SLExpression left) {
         KeYJavaType type = left.getType();
         TypedOperator top = getOperator(type.getJavaType(), jop);
         if (top == null) {
             return null;
         }
-        Term resultTerm = services.getTermFactory().createTerm(top.operator, left.getTerm());
+        JTerm resultTerm = services.getTermFactory().createTerm(top.operator, left.getTerm());
         return new SLExpression(resultTerm, top.type);
     }
 
-    private @NonNull Term promote(@NonNull Term term, @NonNull KeYJavaType resultType) {
+    private JTerm promote(JTerm term, KeYJavaType resultType) {
         Sort targetSort = resultType.getSort();
         if (term.sort() != targetSort) {
             return services.getTermBuilder().cast(targetSort, term);

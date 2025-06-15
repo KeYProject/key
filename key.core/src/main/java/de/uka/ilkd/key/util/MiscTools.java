@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,10 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
@@ -30,14 +28,8 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -55,7 +47,6 @@ import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.TokenSource;
-import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.jspecify.annotations.Nullable;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
@@ -90,9 +81,9 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
+    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final JTerm loopTerm,
             final Services services) {
-        assert loopTerm.op() instanceof Modality;
+        assert loopTerm.op() instanceof JModality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
 
         final ProgramElement pe = loopTerm.javaBlock().program();
@@ -116,14 +107,14 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether the given {@link Modality.JavaModalityKind} is a
+     * Checks whether the given {@link JModality.JavaModalityKind} is a
      * transaction modality.
      *
      * @param modalityKind The modality to check.
-     * @return true iff the given {@link Modality.JavaModalityKind} is a
+     * @return true iff the given {@link JModality.JavaModalityKind} is a
      *         transaction modality.
      */
-    public static boolean isTransaction(final Modality.JavaModalityKind modalityKind) {
+    public static boolean isTransaction(final JModality.JavaModalityKind modalityKind) {
         return modalityKind.transaction();
     }
 
@@ -137,7 +128,7 @@ public final class MiscTools {
      * @return The list of the applicable heaps for the given scenario.
      */
     public static List<LocationVariable> applicableHeapContexts(
-            Modality.JavaModalityKind modalityKind,
+            JModality.JavaModalityKind modalityKind,
             Services services) {
         final List<LocationVariable> result = new ArrayList<>();
 
@@ -148,16 +139,13 @@ public final class MiscTools {
         }
 
         if (isPermissions(services)) {
-            LocationVariable permissionHeap =
-                services.getTypeConverter().getHeapLDT().getPermissionHeap();
-            result.add(NullnessUtil.castNonNull(permissionHeap, "permission heap is null"));
-
+            result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap());
         }
         return result;
     }
 
     // TODO Is rp always a program variable?
-    public static @Nullable ProgramVariable getSelf(MethodFrame mf) {
+    public static ProgramVariable getSelf(MethodFrame mf) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
@@ -176,7 +164,7 @@ public final class MiscTools {
      * @return the receiver term of the passed method frame, or null if the frame belongs to a
      *         static method.
      */
-    public static @Nullable Term getSelfTerm(MethodFrame mf, Services services) {
+    public static JTerm getSelfTerm(MethodFrame mf, Services services) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
@@ -250,14 +238,13 @@ public final class MiscTools {
      * @param t the term for which we want to collect the observer functions.
      * @return the observers as a set of pairs with sorts and according observers
      */
-    public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
+    public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(JTerm t) {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result =
-                result.add(new Pair<Sort, IObserverFunction>(NullnessUtil.castNonNull(s), obs));
+            result = result.add(new Pair<>(s, obs));
         }
-        for (Term sub : t.subs()) {
+        for (JTerm sub : t.subs()) {
             result = result.union(collectObservers(sub));
         }
         return result;
@@ -437,7 +424,7 @@ public final class MiscTools {
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
      *         one exists.
      */
-    public static @Nullable String getRuleDisplayName(@Nullable Node node) {
+    public static String getRuleDisplayName(Node node) {
         String name = null;
         if (node != null) {
             name = getRuleDisplayName(node.getAppliedRuleApp());
@@ -457,7 +444,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static @Nullable String getRuleDisplayName(@Nullable RuleApp ruleApp) {
+    public static String getRuleDisplayName(RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
@@ -481,7 +468,7 @@ public final class MiscTools {
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
      *         one exists.
      */
-    public static @Nullable String getRuleName(@Nullable Node node) {
+    public static String getRuleName(Node node) {
         String name = null;
         if (node != null) {
             name = getRuleName(node.getAppliedRuleApp());
@@ -501,7 +488,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static @Nullable String getRuleName(@Nullable RuleApp ruleApp) {
+    public static String getRuleName(RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
@@ -518,7 +505,7 @@ public final class MiscTools {
      * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
-    public static @Nullable OneStepSimplifier findOneStepSimplifier(@Nullable Proof proof) {
+    public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
         if (proof != null && !proof.isDisposed() && proof.getInitConfig() != null) {
             Profile profile = proof.getInitConfig().getProfile();
             return findOneStepSimplifier(profile);
@@ -533,7 +520,7 @@ public final class MiscTools {
      * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
-    public static @Nullable OneStepSimplifier findOneStepSimplifier(Profile profile) {
+    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
         if (profile instanceof JavaProfile) {
             return ((JavaProfile) profile).getOneStepSimpilifier();
         } else {
@@ -547,8 +534,7 @@ public final class MiscTools {
      * @param node the Node where to look up the actual variable (result from renaming)
      * @return The renamed variable
      */
-    public static ProgramVariable findActualVariable(ProgramVariable originalVar,
-            @Nullable Node node) {
+    public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
         if (node != null) {
             do {
                 if (node.getRenamingTable() != null) {
@@ -652,11 +638,13 @@ public final class MiscTools {
         }
     }
 
-    public static ImmutableList<Term> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
+    public static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (var pv : list) {
-            Term t = tb.var(pv);
-            result = result.append(t);
+            if (pv != null) {
+                JTerm t = tb.var(pv);
+                result = result.append(t);
+            }
         }
         return result;
     }
@@ -678,10 +666,10 @@ public final class MiscTools {
         return sb.toString();
     }
 
-    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
-            ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term localIn : localIns) {
+    public static ImmutableList<JTerm> filterOutDuplicates(ImmutableList<JTerm> localIns,
+            ImmutableList<JTerm> localOuts) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        for (JTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
             }
@@ -722,6 +710,10 @@ public final class MiscTools {
      * @return an URI identifying the resource of the DataLocation
      */
     public static Optional<URI> extractURI(DataLocation loc) {
+        if (loc == null) {
+            throw new IllegalArgumentException("The given DataLocation is null!");
+        }
+
         try {
             return switch (loc.getType()) {
             case "URL" -> // URLDataLocation
@@ -849,7 +841,7 @@ public final class MiscTools {
      * @throws MalformedURLException if the string can not be converted to URL because of an unknown
      *         protocol or illegal format
      */
-    public static URI parseURL(@Nullable String input) throws URISyntaxException {
+    public static URL parseURL(final String input) throws MalformedURLException {
         if (input == null) {
             throw new NullPointerException("No URL can be created from null!");
         }
@@ -858,14 +850,13 @@ public final class MiscTools {
         String schemeSpecPart = "";
         Matcher m = URL_PATTERN.matcher(input);
         if (m.matches() && m.groupCount() == 2) {
-            scheme = Objects.requireNonNull(m.group(1));
+            scheme = m.group(1);
             schemeSpecPart = m.group(2);
-            assert schemeSpecPart != null;
         }
         switch (scheme) {
         case "URL" -> {
             // schemeSpecPart actually contains a URL again
-            return new URI(schemeSpecPart);
+            return new URL(schemeSpecPart);
         }
         case "ARCHIVE" -> {
             // format: "ARCHIVE:<filename>?<itemname>"
@@ -876,21 +867,23 @@ public final class MiscTools {
             try {
                 ZipFile zip = new ZipFile(zipName);
                 // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName);
+                return getZipEntryURI(zip, itemName).toURL();
             } catch (IOException e) {
-                throw new URISyntaxException(input,
-                    "Does not contain a valid URI: " + e.getMessage());
+                MalformedURLException me =
+                    new MalformedURLException(input + " does not contain a valid URL");
+                me.initCause(e);
+                throw me;
             }
         }
         case "FILE" -> {
             // format: "FILE:<path>"
             Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
-            return path.toUri();
+            return path.toUri().toURL();
         }
         case "" -> {
             // only file/path without protocol
             Path p = Paths.get(input).toAbsolutePath().normalize();
-            return p.toUri();
+            return p.toUri().toURL();
         }
         default -> {
             // may still be Windows path starting with <drive_letter>:
@@ -898,11 +891,11 @@ public final class MiscTools {
                 // TODO: Theoretically, a protocol with only a single letter is allowed.
                 // This (very rare) case currently is not handled correctly.
                 Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
-                return windowsPath.toUri();
+                return windowsPath.toUri().toURL();
             }
             // otherwise call URL constructor
             // if this also fails, there is an unknown protocol -> MalformedURLException
-            return new URI(input);
+            return new URL(input);
         }
         }
     }

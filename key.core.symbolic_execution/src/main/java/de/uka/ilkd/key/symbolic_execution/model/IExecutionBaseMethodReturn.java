@@ -4,10 +4,8 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * Defines the common interface of {@link IExecutionMethodReturn} and
@@ -21,7 +19,6 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      *
      * @return The call of the now returned method.
      */
-    @Nullable
     IExecutionMethodCall getMethodCall();
 
     /**
@@ -37,10 +34,9 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * {@link IExecutionMethodCall}.
      *
      * @return The method return condition to reach this node from its {@link IExecutionMethodCall}
-     *         as {@link Term}.
+     *         as {@link JTerm}.
      */
-    @Nullable
-    Term getMethodReturnCondition() throws ProofInputException;
+    JTerm getMethodReturnCondition() throws ProofInputException;
 
     /**
      * Returns the human readable condition under which this method return is reached from the

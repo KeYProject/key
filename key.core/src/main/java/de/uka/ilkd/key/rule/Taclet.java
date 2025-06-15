@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -140,6 +141,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             tacletAnnotations);
     }
 
+    @EnsuresNonNull("matcher")
     protected void createAndInitializeMatcher() {
         this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }
@@ -337,14 +339,14 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         private final SequentFormula sequentFormula;
 
         /**
-         * The optional replace {@link Term} of the taclet.
+         * The optional replace {@link JTerm} of the taclet.
          */
-        private final Term term;
+        private final JTerm term;
 
         /**
-         * The stack maintained during application of a taclet {@link Term}.
+         * The stack maintained during application of a taclet {@link JTerm}.
          */
-        private Deque<Term> tacletTermStack;
+        private Deque<JTerm> tacletTermStack;
 
         /**
          * Constructor.
@@ -366,9 +368,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          * Constructor creating a hint indicating
          * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param term The optional replace {@link Term} of the taclet.
+         * @param term The optional replace {@link JTerm} of the taclet.
          */
-        public TacletLabelHint(Term term) {
+        public TacletLabelHint(JTerm term) {
             assert term != null;
             this.tacletOperation = TacletOperation.REPLACE_TERM;
             this.sequent = null;
@@ -422,29 +424,29 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         }
 
         /**
-         * Returns the stack maintained during application of a taclet {@link Term}.
+         * Returns the stack maintained during application of a taclet {@link JTerm}.
          *
-         * @return The stack maintained during application of a taclet {@link Term}.
+         * @return The stack maintained during application of a taclet {@link JTerm}.
          */
-        public Deque<Term> getTacletTermStack() {
+        public Deque<JTerm> getTacletTermStack() {
             return tacletTermStack;
         }
 
         /**
-         * Sets the stack maintained during application of a taclet {@link Term}.
+         * Sets the stack maintained during application of a taclet {@link JTerm}.
          *
-         * @param tacletTermStack The stack maintained during application of a taclet {@link Term}.
+         * @param tacletTermStack The stack maintained during application of a taclet {@link JTerm}.
          */
-        public void setTacletTermStack(Deque<Term> tacletTermStack) {
+        public void setTacletTermStack(Deque<JTerm> tacletTermStack) {
             this.tacletTermStack = tacletTermStack;
         }
 
         /**
-         * Returns the optional replace {@link Term} of the taclet.
+         * Returns the optional replace {@link JTerm} of the taclet.
          *
-         * @return The optional replace {@link Term} of the taclet.
+         * @return The optional replace {@link JTerm} of the taclet.
          */
-        public Term getTerm() {
+        public JTerm getTerm() {
             return term;
         }
 
@@ -506,7 +508,8 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             REPLACE_TO_SUCCEDENT,
 
             /**
-             * Replace clause of a {@link Taclet} provides a {@link Term} which is currently used to
+             * Replace clause of a {@link Taclet} provides a {@link JTerm} which is currently used
+             * to
              * modify the {@link PosInOccurrence}. Available information are
              * {@link TacletLabelHint#getTerm()}.
              */

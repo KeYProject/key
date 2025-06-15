@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
@@ -22,8 +22,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.rules.RuleApp;
-
-import org.jspecify.annotations.NonNull;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
@@ -69,8 +67,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param isExit flag to tell whether to stop on method exit
      * @throws SLTranslationException if the condition could not be parsed to a valid Term
      */
-    public MethodBreakpoint(String classPath, int lineNumber, int hitCount,
-            @NonNull IProgramMethod pm,
+    public MethodBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm,
             Proof proof, String condition, boolean enabled, boolean conditionEnabled,
             int methodStart, int methodEnd, boolean isEntry, boolean isExit)
             throws SLTranslationException {
@@ -99,7 +96,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param ruleApp the applied rule app
      * @return true if the node represents a method call
      */
-    private boolean isMethodCallNode(@NonNull Node node, @NonNull RuleApp ruleApp) {
+    private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
         IProgramMethod currentPm = null;
         if (statement instanceof MethodBodyStatement mbs) {
@@ -122,7 +119,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param ruleApp the applied rule app
      * @return true if the node represents a method return
      */
-    private boolean isMethodReturnNode(@NonNull Node node, @NonNull RuleApp ruleApp) {
+    private boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
         if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp))
                 && isCorrectMethodReturn(node, ruleApp)) {
@@ -136,9 +133,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         return false;
     }
 
-    private boolean isCorrectMethodReturn(@NonNull Node node, @NonNull RuleApp ruleApp) {
-        var t = ruleApp.posInOccurrence().subTerm();
-        Term term = TermBuilder.goBelowUpdates(t);
+    private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp) {
+        final JTerm term = TermBuilder.goBelowUpdates((JTerm) ruleApp.posInOccurrence().subTerm());
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
         return Objects.equals(getPm(), mf.getProgramMethod());

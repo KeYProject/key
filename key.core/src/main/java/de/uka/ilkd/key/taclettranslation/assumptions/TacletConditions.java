@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
@@ -16,25 +17,32 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
-
-import static org.key_project.util.collection.ImmutableSLList.nil;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
  */
-public class TacletConditions {
+class TacletConditions {
+
+    //
+    private ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
+    private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
+    private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
+        ImmutableSLList.nil();
+    private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
+        ImmutableSLList.nil();
+
+
+
     public final static int FALSE = 0;
     public final static int NULL_LEGAL = 1;
     public final static int NULL_ILLEGAL = 2;
 
-    private ImmutableList<TypeComparisonCondition> comparisionCondition = nil();
-    private ImmutableList<TypeCondition> typeCondition = nil();
-    private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition = nil();
-    private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition = nil();
+
 
     public TacletConditions(Taclet t) throws IllegalTacletException {
+
+
         for (final VariableCondition cond : t.getVariableConditions()) {
             boolean supported = false;
 
@@ -62,6 +70,18 @@ public class TacletConditions {
             }
         }
 
+    }
+
+    public boolean containsIsReferenceArray(JTerm t) {
+
+        for (ArrayComponentTypeCondition cond : arrayComponentCondition) {
+
+            if (cond.isCheckReferenceType()) {
+                return true;
+            }
+
+        }
+        return false;
     }
 
     /**
@@ -154,8 +174,7 @@ public class TacletConditions {
         return false;
     }
 
-    private boolean containsComparisionCondition(@NonNull TypeComparisonCondition tcc, Sort s1,
-            Sort s2,
+    private boolean containsComparisionCondition(TypeComparisonCondition tcc, Sort s1, Sort s2,
             TypeComparisonCondition.Mode mode) {
 
         GenericSortResolver first = null, second = null;
@@ -181,7 +200,7 @@ public class TacletConditions {
 
     }
 
-    public boolean containsIsSubtypeRelation(Sort gen, @NonNull Sort inst,
+    public boolean containsIsSubtypeRelation(Sort gen, Sort inst,
             TypeComparisonCondition.Mode mode) {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {

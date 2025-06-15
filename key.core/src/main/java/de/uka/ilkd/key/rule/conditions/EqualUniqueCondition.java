@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -15,7 +15,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 
 public final class EqualUniqueCondition implements VariableCondition {
@@ -31,12 +31,12 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
 
 
-    private static Term equalUnique(Term t1, Term t2, TermServices services) {
+    private static JTerm equalUnique(JTerm t1, JTerm t2, TermServices services) {
         if (!(t1.op() instanceof Function && t2.op() instanceof Function
                 && ((Function) t1.op()).isUnique() && ((Function) t2.op()).isUnique())) {
             return null;
         } else if (t1.op() == t2.op()) {
-            Term result = services.getTermBuilder().tt();
+            JTerm result = services.getTermBuilder().tt();
             for (int i = 0, n = t1.arity(); i < n; i++) {
                 result = services.getTermBuilder().and(result,
                     services.getTermBuilder().equals(t1.sub(i), t2.sub(i)));
@@ -49,18 +49,18 @@ public final class EqualUniqueCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo mc,
             LogicServices services) {
         var svInst = (SVInstantiations) mc.getInstantiations();
-        Term tInst = svInst.getInstantiation(t);
-        Term t2Inst = svInst.getInstantiation(t2);
-        Term resInst = (Term) svInst.getInstantiation(res);
+        JTerm tInst = svInst.getInstantiation(t);
+        JTerm t2Inst = svInst.getInstantiation(t2);
+        JTerm resInst = (JTerm) svInst.getInstantiation(res);
         if (tInst == null || t2Inst == null) {
             return mc;
         }
 
-        Term properResInst = equalUnique(tInst, t2Inst, (TermServices) services);
+        JTerm properResInst = equalUnique(tInst, t2Inst, (TermServices) services);
         if (properResInst == null) {
             return null;
         } else if (resInst == null) {

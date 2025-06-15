@@ -10,7 +10,9 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 ///
 /// Realizes a variable bank for strategy features such that each feature
@@ -29,19 +31,17 @@ import org.jspecify.annotations.NonNull;
 public class MutableState {
 
     /// maps a term buffer to its value
-    private HashMap<TermBuffer<?>, Term> content;
+    private final HashMap<TermBuffer<?>, @Nullable Term> content = HashMap.newHashMap(32);
 
     /// manages backtracking for features that create [ChoicePoint]s
-    private BackTrackingManager btManager;
+    private @MonotonicNonNull BackTrackingManager btManager;
 
     /// assign the given [TermBuffer] the provided value
     ///
     /// @param v the [TermBuffer]
     /// @param value the Term which is assigned as the value
-    public <Goal extends ProofGoal<@NonNull Goal>> void assign(TermBuffer<Goal> v, Term value) {
-        if (content == null) {
-            content = new HashMap<>();
-        }
+    public <Goal extends ProofGoal<Goal>> void assign(@NonNull TermBuffer<Goal> v,
+            @Nullable Term value) {
         content.put(v, value);
     }
 
@@ -49,17 +49,14 @@ public class MutableState {
     ///
     /// @param v the TermBuffer whose value is asked for
     /// @return the current value of the [TermBuffer] or `null` if there is none
-    public <Goal extends ProofGoal<@NonNull Goal>> Term read(TermBuffer<Goal> v) {
-        if (content == null) {
-            return null;
-        }
+    public <Goal extends @NonNull ProofGoal<Goal>> @Nullable Term read(TermBuffer<Goal> v) {
         return content.get(v);
     }
 
     /// returns the backtracking manager to access [ChoicePoint]s
     ///
     /// @return the backtracking manager
-    public BackTrackingManager getBacktrackingManager() {
+    public @Nullable BackTrackingManager getBacktrackingManager() {
         if (btManager == null) {
             btManager = new BackTrackingManager();
         }

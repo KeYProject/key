@@ -9,22 +9,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
-
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -32,13 +29,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
         Goal g;
         if (args.number != null && args.formula == null && args.branch == null) {
             ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
@@ -60,14 +57,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         state.setGoal(g);
     }
 
-    private @NonNull Goal findGoalWith(String branchTitle, @NonNull Proof proof)
-            throws ScriptException {
+    private Goal findGoalWith(String branchTitle, Proof proof) throws ScriptException {
         return findGoalWith(node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
                 .orElse("").equals(branchTitle),
             node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
-    private static @Nullable Goal getFirstSubtreeGoal(@NonNull Node node, @NonNull Proof proof) {
+    private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
         Goal goal;
         if (node.leaf() && //
                 (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
@@ -89,15 +85,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private @NonNull Goal findGoalWith(@NonNull Term formula, @NonNull Proof proof)
-            throws ScriptException {
+    private Goal findGoalWith(JTerm formula, Proof proof) throws ScriptException {
         return findGoalWith(node -> node.leaf() && contains(node.sequent(), formula),
             node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
-    private @NonNull Goal findGoalWith(@NonNull Function<Node, Boolean> filter,
-            @NonNull Function<Node, Goal> goalRetriever,
-            @NonNull Proof proof) throws ScriptException {
+    private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
+            Proof proof) throws ScriptException {
         Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();
 
@@ -136,13 +130,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         throw new ScriptException("There is no such goal");
     }
 
-    private boolean contains(@NonNull Sequent seq, @NonNull Term formula) {
+    private boolean contains(Sequent seq, JTerm formula) {
         return contains(seq.antecedent(), formula) || contains(seq.succedent(), formula);
     }
 
-    private boolean contains(@NonNull Semisequent semiseq, @NonNull Term formula) {
+    private boolean contains(Semisequent semiseq, JTerm formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            org.key_project.logic.Term term = sf.formula();
+            Term term = sf.formula();
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                 return true;
             }
@@ -151,15 +145,14 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         return "select";
     }
 
-    @SuppressWarnings("initialization")
     public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
-        public Term formula;
+        public JTerm formula;
         /**
          * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
          * the last goal, -2 the second-to-last, etc.

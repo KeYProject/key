@@ -4,16 +4,13 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation of {@link ISymbolicAssociation}.
@@ -24,37 +21,37 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     /**
      * The {@link Services} to use.
      */
-    private final @NonNull Services services;
+    private final Services services;
 
     /**
      * The array index.
      */
-    private final @Nullable Term arrayIndex;
+    private final JTerm arrayIndex;
 
     /**
      * The array start index or {@code null} if not used.
      */
-    private final @Nullable Term arrayStartIndex;
+    private final JTerm arrayStartIndex;
 
     /**
      * The array end index or {@code null} if not used.
      */
-    private final @Nullable Term arrayEndIndex;
+    private final JTerm arrayEndIndex;
 
     /**
      * The {@link IProgramVariable}.
      */
-    private final @Nullable IProgramVariable programVariable;
+    private final IProgramVariable programVariable;
 
     /**
      * The target {@link ISymbolicObject}.
      */
-    private final @NonNull ISymbolicObject target;
+    private final ISymbolicObject target;
 
     /**
      * The optional condition under which this association is valid.
      */
-    private final Term condition;
+    private final JTerm condition;
 
     /**
      * Constructor.
@@ -65,9 +62,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(@NonNull Services services, Term arrayIndex,
-            @NonNull ISymbolicObject target,
-            Term condition, IModelSettings settings) {
+    public SymbolicAssociation(Services services, JTerm arrayIndex, ISymbolicObject target,
+            JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -91,9 +87,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(@NonNull Services services, Term arrayIndex, Term arrayStartIndex,
-            Term arrayEndIndex, @NonNull ISymbolicObject target, Term condition,
-            IModelSettings settings) {
+    public SymbolicAssociation(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
+            JTerm arrayEndIndex, ISymbolicObject target, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -115,9 +110,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(@NonNull Services services,
-            @NonNull IProgramVariable programVariable,
-            @NonNull ISymbolicObject target, Term condition, IModelSettings settings) {
+    public SymbolicAssociation(Services services, IProgramVariable programVariable,
+            ISymbolicObject target, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;
@@ -135,7 +129,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getName() {
+    public String getName() {
         StringBuilder sb = new StringBuilder();
         if (isArrayRange()) {
             sb.append("[");
@@ -190,7 +184,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @Nullable Term getArrayIndex() {
+    public JTerm getArrayIndex() {
         return arrayIndex;
     }
 
@@ -198,7 +192,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @Nullable IProgramVariable getProgramVariable() {
+    public IProgramVariable getProgramVariable() {
         return programVariable;
     }
 
@@ -206,7 +200,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getProgramVariableString() {
+    public String getProgramVariableString() {
         return SymbolicExecutionUtil.getDisplayString(programVariable);
     }
 
@@ -222,7 +216,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "Association " + getName() + " to " + getTarget();
     }
 
@@ -230,7 +224,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 
@@ -238,7 +232,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getConditionString() {
+    public String getConditionString() {
         return condition != null ? formatTerm(condition, services) : null;
     }
 
@@ -246,7 +240,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getArrayIndexString() {
+    public String getArrayIndexString() {
         return arrayIndex != null ? formatTerm(arrayIndex, services) : null;
     }
 
@@ -255,7 +249,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      *
      * @return The array start index.
      */
-    public @Nullable Term getArrayStartIndex() {
+    public JTerm getArrayStartIndex() {
         return arrayStartIndex;
     }
 
@@ -264,7 +258,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      *
      * @return The human readable array start index.
      */
-    public @Nullable String getArrayStartIndexString() {
+    public String getArrayStartIndexString() {
         return arrayStartIndex != null ? formatTerm(arrayStartIndex, services) : null;
     }
 
@@ -273,7 +267,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      *
      * @return The array end index.
      */
-    public @Nullable Term getArrayEndIndex() {
+    public JTerm getArrayEndIndex() {
         return arrayEndIndex;
     }
 
@@ -282,7 +276,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      *
      * @return The human readable array end index.
      */
-    public @Nullable String getArrayEndIndexString() {
+    public String getArrayEndIndexString() {
         return arrayEndIndex != null ? formatTerm(arrayEndIndex, services) : null;
     }
 }

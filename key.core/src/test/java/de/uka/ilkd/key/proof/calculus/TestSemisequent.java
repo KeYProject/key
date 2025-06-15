@@ -5,7 +5,7 @@ package de.uka.ilkd.key.proof.calculus;
 
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -42,13 +42,13 @@ public class TestSemisequent {
         Function c = new JFunction(new Name("c"), JavaDLTheory.FORMULA, new Sort[] {});
 
 
-        Term t_p = TB.func(p, new Term[] {});
-        Term t_q = TB.func(q, new Term[] {});
-        Term t_r = TB.func(r, new Term[] {});
+        JTerm t_p = TB.func(p, new JTerm[] {});
+        JTerm t_q = TB.func(q, new JTerm[] {});
+        JTerm t_r = TB.func(r, new JTerm[] {});
 
-        Term t_a = TB.func(a, new Term[] {});
-        Term t_b = TB.func(b, new Term[] {});
-        Term t_c = TB.func(c, new Term[] {});
+        JTerm t_a = TB.func(a, new JTerm[] {});
+        JTerm t_b = TB.func(b, new JTerm[] {});
+        JTerm t_c = TB.func(c, new JTerm[] {});
 
 
         con = new SequentFormula[7];

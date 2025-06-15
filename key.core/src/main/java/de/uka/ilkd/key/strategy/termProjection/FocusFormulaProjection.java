@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.rules.RuleApp;
@@ -11,21 +11,17 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-
 public class FocusFormulaProjection implements ProjectionToTerm<Goal> {
 
-    public static final ProjectionToTerm<Goal> INSTANCE =
-        new de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection();
+    public static final ProjectionToTerm<Goal> INSTANCE = new FocusFormulaProjection();
 
     private FocusFormulaProjection() {}
 
     @Override
-    public @NonNull Term toTerm(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
-            MutableState mutableState) {
+    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
-        return (Term) pos.sequentFormula().formula();
+        return (JTerm) pos.sequentFormula().formula();
     }
 
 }

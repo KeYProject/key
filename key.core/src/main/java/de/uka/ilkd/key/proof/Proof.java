@@ -249,7 +249,7 @@ public class Proof implements ProofObject<Goal>, Named {
         this.proofFile = proofFile;
     }
 
-    public Proof(String name, Term problem, String header, InitConfig initConfig) {
+    public Proof(String name, JTerm problem, String header, InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
                     .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),

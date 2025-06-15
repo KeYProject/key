@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -32,9 +32,9 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
      * information flow contract applications.
      */
     @SuppressWarnings("unchecked")
-    public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
+    public static final Properties.Property<ImmutableList<JTerm>> INF_FLOW_CONTRACT_APPL_PROPERTY =
         new Properties.Property<>(
-            (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
+            (Class<ImmutableList<JTerm>>) (Class<?>) ImmutableList.class,
             "information flow contract applicaton property");
 
 
@@ -53,7 +53,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
      *        taclet
      * @param pos the PosInOccurrence describing the place in the sequent or null for head of
      *        antecedent
-     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link JTerm} which is
      *        rewritten
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
@@ -68,7 +68,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     @Override
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos, PosInOccurrence applicationPosInOccurrence,
-            MatchConditions matchCond, @NonNull Goal goal,
+            MatchResultInfo matchCond, @NonNull Goal goal,
             @NonNull TacletApp tacletApp,
             LogicServices services, Object... instantiationInfo) {
 
@@ -78,7 +78,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(goal.proof().openEnabledGoals().head(),
-            (Term) replacements.iterator().next().formula());
+            (JTerm) replacements.iterator().next().formula());
         super.addToAntec(semi, currentSequent, pos, applicationPosInOccurrence, matchCond, goal,
             tacletApp, services, instantiationInfo);
     }
@@ -89,14 +89,14 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
      * @param goal the current goal
      * @param applFormula the information contract application formula added by this taclet
      */
-    private void updateStrategyInfo(Goal goal, final Term applFormula) {
-        ImmutableList<Term> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
+    private void updateStrategyInfo(Goal goal, final JTerm applFormula) {
+        ImmutableList<JTerm> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
             applFormulas = ImmutableSLList.nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = strategyInfos -> {
-            ImmutableList<Term> applFormulas1 =
+            ImmutableList<JTerm> applFormulas1 =
                 strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
             strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY,
                 applFormulas1.removeAll(applFormula));

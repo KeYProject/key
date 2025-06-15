@@ -31,7 +31,7 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
@@ -1181,7 +1181,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
                 String on = LogicPrinter.quickPrintTerm(
-                    (Term) pio.subTerm(), node.proof().getServices());
+                    (JTerm) pio.subTerm(), node.proof().getServices());
                 style.tooltip.addAppliedOn(cutIfTooLong(on));
             }
 
@@ -1261,7 +1261,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.text = app.rule().name().toString();
             Services services = node.getNode().proof().getServices();
             String on =
-                LogicPrinter.quickPrintTerm((Term) app.posInOccurrence().subTerm(), services);
+                LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
             style.tooltip.addRule(style.text);
             style.tooltip.addAppliedOn(cutIfTooLong(on));
         }

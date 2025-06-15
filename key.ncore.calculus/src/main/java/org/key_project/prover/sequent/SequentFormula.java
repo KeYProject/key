@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
+import java.util.Objects;
+
 import org.key_project.logic.Term;
+
+import org.jspecify.annotations.Nullable;
 
 /// A sequent formula is a wrapper around a formula that occurs as top level formula in a sequent.
 /// SequentFormula instances have to be unique in the sequent as they are used by PosInOccurrence to
@@ -38,12 +42,12 @@ public class SequentFormula {
     }
 
     /// equal if terms and constraints are equal
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj instanceof SequentFormula cmp) {
-            return term.equals(cmp.formula());
+            return Objects.equals(term, cmp.formula());
         }
         return false;
     }

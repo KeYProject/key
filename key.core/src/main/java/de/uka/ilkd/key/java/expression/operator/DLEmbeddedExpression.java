@@ -10,29 +10,26 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 public class DLEmbeddedExpression extends Operator {
 
-    private final JFunction functionSymbol;
+    private final Function functionSymbol;
 
     /**
      * @return the functionSymbol
      */
-    public JFunction getFunctionSymbol() {
+    public Function getFunctionSymbol() {
         return functionSymbol;
     }
 
-    public DLEmbeddedExpression(JFunction f, @NonNull ExtList children) {
+    public DLEmbeddedExpression(Function f, ExtList children) {
         super(children);
         this.functionSymbol = f;
     }
@@ -56,7 +53,7 @@ public class DLEmbeddedExpression extends Operator {
      * de.uka.ilkd.key.java.reference.ExecutionContext)
      */
     @Override
-    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 
         Sort sort = functionSymbol.sort();
 
@@ -80,12 +77,11 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     @Override
-    public void visit(@NonNull Visitor v) {
+    public void visit(Visitor v) {
         v.performActionOnDLEmbeddedExpression(this);
     }
 
-    public void check(@NonNull Services javaServ, @NonNull KeYJavaType containingClass)
-            throws ConvertException {
+    public void check(Services javaServ, KeYJavaType containingClass) throws ConvertException {
 
         if (functionSymbol == null) {
             throw new ConvertException("null function symbol");
@@ -131,12 +127,11 @@ public class DLEmbeddedExpression extends Operator {
     }
 
 
-    private static @NonNull Sort getHeapSort(@NonNull Services javaServ) {
+    private static Sort getHeapSort(Services javaServ) {
         return javaServ.getTypeConverter().getHeapLDT().targetSort();
     }
 
-    private static @Nullable KeYJavaType getKeYJavaType(@NonNull Services javaServ,
-            @NonNull Sort argSort) {
+    private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
         JavaInfo javaInfo = javaServ.getJavaInfo();
@@ -148,13 +143,12 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    public @NonNull Term makeTerm(@NonNull LocationVariable heap, Term @NonNull [] subs,
-            @NonNull Services services) {
+    public JTerm makeTerm(LocationVariable heap, JTerm[] subs, Services services) {
         // we silently assume that check has been called earlier
         if (functionSymbol.arity() == subs.length) {
             return services.getTermFactory().createTerm(functionSymbol, subs);
         } else {
-            Term[] extSubs = new Term[subs.length + 1];
+            JTerm[] extSubs = new JTerm[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);
             extSubs[0] = services.getTermBuilder().var(heap);
             return services.getTermFactory().createTerm(functionSymbol, extSubs);

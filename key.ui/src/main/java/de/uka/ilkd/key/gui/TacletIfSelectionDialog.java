@@ -206,7 +206,7 @@ public class TacletIfSelectionDialog extends JPanel {
                 AssumesFormulaInstantiation value, int index, boolean isSelected,
                 boolean cellHasFocus) {
             cellRenderer.setOpaque(true);
-            final String valStr = value.toString(services);
+            final String valStr = value.toString();
             if (isSelected) {
                 list.setToolTipText(valStr);
             }

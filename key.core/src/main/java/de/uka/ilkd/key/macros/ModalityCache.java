@@ -5,8 +5,9 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
@@ -50,11 +51,11 @@ public class ModalityCache {
 
         boolean hasModality;
 
-        if (((de.uka.ilkd.key.logic.Term) term)
+        if (((JTerm) term)
                 .containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
             // ignore self composition terms
             hasModality = false;
-        } else if (term.op() instanceof Modality) {
+        } else if (term.op() instanceof JModality) {
             hasModality = true;
         } else {
             hasModality = false;

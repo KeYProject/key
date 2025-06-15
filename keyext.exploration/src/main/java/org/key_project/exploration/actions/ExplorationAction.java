@@ -9,7 +9,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.parsing.BuildingException;
@@ -31,11 +31,11 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     @Nullable
-    Term promptForTerm(MainWindow window, @Nullable Term term) {
+    Term promptForTerm(MainWindow window, @Nullable JTerm term) {
         final String initialValue =
             term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 
-        Term result = null;
+        JTerm result = null;
 
         while (result == null) {
             String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);

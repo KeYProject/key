@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
@@ -17,8 +17,6 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * The proof object used by Information Flow Proofs.
@@ -37,14 +35,14 @@ public class InfFlowProof extends Proof {
     /**
      * Aggregated proof statistics from other proofs which contributed to this one.
      */
-    private @Nullable SideProofStatistics sideProofStatistics = null;
+    private SideProofStatistics sideProofStatistics = null;
 
     public InfFlowProof(String name, Sequent sequent, String header, TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
         super(name, sequent, header, rules, builtInRules, initConfig);
     }
 
-    public InfFlowProof(String name, Term problem, String header, InitConfig initConfig) {
+    public InfFlowProof(String name, JTerm problem, String header, InitConfig initConfig) {
         super(name, problem, header, initConfig);
     }
 
@@ -59,12 +57,14 @@ public class InfFlowProof extends Proof {
     }
 
     public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     public void addIFSymbol(Object s) {
-        if (s instanceof Term) {
-            infFlowSymbols.add((Term) s);
+        assert s != null;
+        if (s instanceof JTerm) {
+            infFlowSymbols.add((JTerm) s);
         } else if (s instanceof Named) {
             infFlowSymbols.add((Named) s);
         } else {
@@ -73,8 +73,9 @@ public class InfFlowProof extends Proof {
     }
 
     public void addLabeledIFSymbol(Object s) {
-        if (s instanceof Term) {
-            infFlowSymbols.addLabeled((Term) s);
+        assert s != null;
+        if (s instanceof JTerm) {
+            infFlowSymbols.addLabeled((JTerm) s);
         } else if (s instanceof Named) {
             infFlowSymbols.addLabeled((Named) s);
         } else {
@@ -82,32 +83,38 @@ public class InfFlowProof extends Proof {
         }
     }
 
-    public void addTotalTerm(Term p) {
+    public void addTotalTerm(JTerm p) {
+        assert p != null;
         infFlowSymbols.addTotalTerm(p);
     }
 
-    public void addLabeledTotalTerm(Term p) {
+    public void addLabeledTotalTerm(JTerm p) {
+        assert p != null;
         infFlowSymbols.addLabeledTotalTerm(p);
     }
 
     public void addGoalTemplates(Taclet t) {
+        assert t != null;
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
+        assert temps != null;
         for (TacletGoalTemplate tgt : temps) {
             for (SequentFormula sf : tgt.sequent().antecedent()
                     .asList()) {
-                addLabeledTotalTerm((Term) sf.formula());
+                addLabeledTotalTerm((JTerm) sf.formula());
             }
             for (SequentFormula sf : tgt.sequent().succedent().asList()) {
-                addLabeledTotalTerm((Term) sf.formula());
+                addLabeledTotalTerm((JTerm) sf.formula());
             }
         }
     }
 
     public void unionIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
         infFlowSymbols = infFlowSymbols.union(symbols);
     }
 
     public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
@@ -120,6 +127,7 @@ public class InfFlowProof extends Proof {
     }
 
     public void addSideProof(InfFlowProof proof) {
+        assert proof != null;
         if (proof.hasSideProofs()) {
             if (this.hasSideProofs()) {
                 sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
@@ -132,6 +140,7 @@ public class InfFlowProof extends Proof {
     }
 
     private void addSideProofStatistics(Statistics stat) {
+        assert stat != null;
         if (this.hasSideProofs()) {
             sideProofStatistics = sideProofStatistics.add(stat);
         } else {

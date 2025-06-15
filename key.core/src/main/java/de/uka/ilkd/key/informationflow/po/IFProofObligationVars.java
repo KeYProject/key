@@ -9,10 +9,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -26,17 +24,17 @@ public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
 
-    private final @NonNull Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
+    private final Map<ProofObligationVars, Map<JTerm, JTerm>> infFlowToSymbExecVarsMaps;
 
 
-    public IFProofObligationVars(@NonNull ProofObligationVars symbExecVars, Services services) {
+    public IFProofObligationVars(ProofObligationVars symbExecVars, Services services) {
         this(new ProofObligationVars(symbExecVars, "_A", services),
             new ProofObligationVars(symbExecVars, "_B", services), symbExecVars);
     }
 
 
     public IFProofObligationVars(ProofObligationVars c1, ProofObligationVars c2,
-            @NonNull ProofObligationVars symbExecVars) {
+            ProofObligationVars symbExecVars) {
         this.c1 = c1;
         this.c2 = c2;
         this.symbExecVars = symbExecVars;
@@ -49,7 +47,7 @@ public class IFProofObligationVars {
     }
 
 
-    public @NonNull IFProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
+    public IFProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
         ProofObligationVars newC1 = c1.labelHeapAtPreAsAnonHeapFunc();
         ProofObligationVars newC2 = c2.labelHeapAtPreAsAnonHeapFunc();
         ProofObligationVars sev = symbExecVars.labelHeapAtPreAsAnonHeapFunc();
@@ -65,11 +63,10 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkStateVarsToCopies(@NonNull StateVars ifVars, @NonNull StateVars seVars,
-            @NonNull Map<Term, Term> map) {
-        final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
-        for (final Term symbTerm : seVars.termList) {
-            final Term ifTerm;
+    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<JTerm, JTerm> map) {
+        final Iterator<JTerm> ifVarsIt = ifVars.termList.iterator();
+        for (final JTerm symbTerm : seVars.termList) {
+            final JTerm ifTerm;
             if (ifVarsIt.hasNext()) {
                 ifTerm = ifVarsIt.next();
             } else {
@@ -82,13 +79,13 @@ public class IFProofObligationVars {
     }
 
 
-    public Map<Term, Term> getMapFor(ProofObligationVars vars) {
+    public Map<JTerm, JTerm> getMapFor(ProofObligationVars vars) {
         return infFlowToSymbExecVarsMaps.get(vars);
     }
 
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "[" + symbExecVars + "," + c1 + "," + c2 + "]";
     }
 }

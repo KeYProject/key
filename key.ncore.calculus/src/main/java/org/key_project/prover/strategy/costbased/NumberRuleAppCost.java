@@ -15,11 +15,11 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
         new LRUCache<>(255);
 
-    public static @NonNull RuleAppCost getZeroCost() {
+    public static RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
 
-    public static @NonNull RuleAppCost create(int p_cost) {
+    public static RuleAppCost create(int p_cost) {
         if (p_cost == 0) {
             return getZeroCost();
         }
@@ -39,7 +39,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return ac;
     }
 
-    public static @NonNull RuleAppCost create(long p_cost) {
+    public static RuleAppCost create(long p_cost) {
 
         if (p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
             return create((int) p_cost);
@@ -71,7 +71,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
 
-    public int compareTo(@NonNull NumberRuleAppCost c) {
+    public int compareTo(NumberRuleAppCost c) {
         final long this_cost = getValue();
         final long other_cost = c.getValue();
         return (Long.compare(this_cost, other_cost));
@@ -79,8 +79,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
 
 
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }
@@ -91,19 +90,17 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return (int) getValue();
     }
 
-    public final @Nullable RuleAppCost add(RuleAppCost cost2) {
+    public final RuleAppCost add(RuleAppCost cost2) {
         if (cost2 instanceof NumberRuleAppCost) {
             return add((NumberRuleAppCost) cost2);
         } else if (cost2 instanceof TopRuleAppCost) {
             return TopRuleAppCost.INSTANCE;
         } else {
-            assert false : "Can't add costs of class " + cost2.getClass();
-            // Should not be reached
-            return null;
+            throw new AssertionError("Can't add costs of class " + cost2.getClass());
         }
     }
 
-    public final @NonNull RuleAppCost add(@NonNull NumberRuleAppCost cost2) {
+    public final RuleAppCost add(NumberRuleAppCost cost2) {
         if (getValue() == 0) {
             return cost2;
         } else if (cost2.getValue() == 0) {
@@ -114,7 +111,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return String.valueOf(getValue());
     }
 

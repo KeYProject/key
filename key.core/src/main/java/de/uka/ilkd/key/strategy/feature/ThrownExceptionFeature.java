@@ -12,10 +12,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.sort.Sort;
@@ -27,16 +27,14 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
-    public static @NonNull Feature create(String @NonNull [] blockedExceptions,
-            @NonNull Services services) {
+    public static Feature create(String[] blockedExceptions, Services services) {
         return new ThrownExceptionFeature(blockedExceptions, services);
     }
 
-    private final Sort @NonNull [] filteredExceptions;
+    private final Sort[] filteredExceptions;
 
     /**
      * creates a feature filtering first active throw statements where the thrown exception is of
@@ -45,8 +43,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param p_filteredExceptions the String array with the types of the thrown exceptions
      * @param services the Services
      */
-    private ThrownExceptionFeature(String @NonNull [] p_filteredExceptions,
-            @NonNull Services services) {
+    private ThrownExceptionFeature(String[] p_filteredExceptions, Services services) {
         final List<Sort> filtered = new ArrayList<>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -60,7 +57,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         filteredExceptions = filtered.toArray(new Sort[0]);
     }
 
-    private boolean blockedExceptions(@NonNull Sort excType) {
+    private boolean blockedExceptions(Sort excType) {
         for (Sort filteredException : filteredExceptions) {
             if (excType.extendsTrans(filteredException)) {
                 return true;
@@ -71,16 +68,14 @@ public class ThrownExceptionFeature extends BinaryFeature {
 
     @Override
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            @NonNull PosInOccurrence pos, @NonNull Goal goal,
-            MutableState mState) {
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         return app instanceof TacletApp tacletApp
-                && filter((Term) pos.subTerm(), (Services) goal.proof().getServices(),
+                && filter((JTerm) pos.subTerm(), (Services) goal.proof().getServices(),
                     tacletApp.instantiations().getExecutionContext());
     }
 
-    protected boolean filter(@NonNull Term term, @NonNull Services services,
-            @NonNull ExecutionContext ec) {
-        if (term.op() instanceof Modality) {
+    protected boolean filter(JTerm term, Services services, ExecutionContext ec) {
+        if (term.op() instanceof JModality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(
                 fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
@@ -94,7 +89,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param term the Term with the program at top level
      * @return the first executable statement
      */
-    private @Nullable ProgramElement getFirstExecutableStatement(@NonNull Term term) {
+    private ProgramElement getFirstExecutableStatement(JTerm term) {
         if (term.javaBlock().isEmpty()) {
             return null;
         }

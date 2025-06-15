@@ -16,7 +16,6 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -47,6 +46,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -59,7 +59,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,7 +181,7 @@ public class OutputStreamProofSaver {
                 strategySettings.setActiveStrategyProperties(strategyProperties);
                 for (final SequentFormula s : proof.root().sequent()
                         .succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm((Term) s.formula());
+                    ((InfFlowProof) proof).addLabeledTotalTerm((JTerm) s.formula());
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -746,7 +745,7 @@ public class OutputStreamProofSaver {
 
             final Object value = pair.value().getInstantiation();
 
-            if (!(value instanceof Term || value instanceof ProgramElement
+            if (!(value instanceof JTerm || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
                     + "FIXME: Unhandled instantiation type: " + value.getClass());
@@ -784,7 +783,7 @@ public class OutputStreamProofSaver {
             } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm((Term) sequentFormula.formula(), node.proof().getServices());
+                    printTerm((JTerm) sequentFormula.formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
@@ -831,26 +830,26 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(Term t, @Nullable Services serv) {
+    public static String printTerm(JTerm t, Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(Term t, @Nullable Services serv, boolean shortAttrNotation) {
+    public static String printTerm(JTerm t, Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
     }
 
-    public static @Nullable String printAnything(Object val, @Nullable Services services) {
+    public static String printAnything(Object val, Services services) {
         return printAnything(val, services, true);
     }
 
-    public static @Nullable String printAnything(@Nullable Object val, @Nullable Services services,
+    public static String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
-        } else if (val instanceof Term) {
-            return printTerm((Term) val, services, shortAttrNotation);
+        } else if (val instanceof JTerm) {
+            return printTerm((JTerm) val, services, shortAttrNotation);
         } else if (val instanceof Sequent) {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {
@@ -866,14 +865,13 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, @Nullable Services services) {
+    private static String printSequent(Sequent val, Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(@Nullable Services serv,
-            boolean shortAttrNotation) {
+    private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
 
         final NotationInfo ni = new NotationInfo();
 
