@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Comparator;
@@ -47,9 +48,9 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
     @Deprecated
     public static Location fromFileName(@Nullable String filename, Position position) {
         try {
-            return new Location(filename == null ? null : MiscTools.parseURL(filename),
+            return new Location(filename == null ? null : MiscTools.parseURL(filename).toURI(),
                 position);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }

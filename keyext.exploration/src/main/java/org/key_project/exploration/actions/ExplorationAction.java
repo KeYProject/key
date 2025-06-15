@@ -31,7 +31,7 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     @Nullable
-    Term promptForTerm(MainWindow window, @Nullable JTerm term) {
+    JTerm promptForTerm(MainWindow window, @Nullable JTerm term) {
         final String initialValue =
             term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 
