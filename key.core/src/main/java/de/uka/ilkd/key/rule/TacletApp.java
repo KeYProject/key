@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -106,14 +107,14 @@ public abstract class TacletApp implements RuleApp {
      * @param pos the posInOccurrence describing the position of the schemavariable
      * @return set of the bound variables
      */
-    protected static ImmutableSet<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
+    protected static Set<QuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
             SVInstantiations instantiations, @Nullable PosInOccurrence pos) {
 
-        ImmutableSet<QuantifiableVariable> result =
+        Set<QuantifiableVariable> result =
             collectPrefixInstantiations(prefix, instantiations);
 
         if (pos != null && prefix.context()) {
-            result = result.union(collectBoundVarsAbove(pos));
+            result.addAll(collectBoundVarsAbove(pos));
         }
 
         return result;
@@ -127,14 +128,14 @@ public abstract class TacletApp implements RuleApp {
      * @return the set of the logic variables whose elements are the instantiations of a bound
      *         SchemaVariable appearing in the TacletPrefix
      */
-    private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
+    private static Set<QuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
             SVInstantiations instantiations) {
 
-        ImmutableSet<QuantifiableVariable> instanceSet = DefaultImmutableSet.nil();
+        LinkedHashSet<QuantifiableVariable> instanceSet = new LinkedHashSet<>();
 
         for (final var prefixSchemaVar : pre.prefix()) {
-            instanceSet = instanceSet.add(
-                (LogicVariable) ((JTerm) instantiations.getInstantiation(prefixSchemaVar)).op());
+            instanceSet.add(
+                (LogicVariable) instantiations.<Term>getInstantiation(prefixSchemaVar).op());
         }
         return instanceSet;
     }
@@ -1016,7 +1017,7 @@ public abstract class TacletApp implements RuleApp {
         return result;
     }
 
-    protected abstract ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv);
+    protected abstract Set<QuantifiableVariable> contextVars(SchemaVariable sv);
 
     /**
      * creates a new variable namespace by adding names of the instantiations of the schema
@@ -1042,9 +1043,7 @@ public abstract class TacletApp implements RuleApp {
             }
         }
         if (tacletPrefix.context()) {
-            for (final QuantifiableVariable quantifiableVariable : contextVars(sv)) {
-                ns.add(quantifiableVariable);
-            }
+            ns.add(contextVars(sv));
         }
         return ns;
     }
@@ -1197,14 +1196,13 @@ public abstract class TacletApp implements RuleApp {
                 continue;
             }
 
-            final ImmutableSet<QuantifiableVariable> boundVarSet =
+            final Set<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet((TacletPrefix) prefix, instantiations, pos);
             final Term inst = instantiations.getInstantiation(sv);
-            if (!inst.freeVars().subset(boundVarSet)) {
+            if (inst.freeVars().exists(Predicate.not(boundVarSet::contains))) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -1215,21 +1213,14 @@ public abstract class TacletApp implements RuleApp {
      * @param pos the PosInOccurrence describing a subterm in Term
      * @return a set of logic variables that are bound above the specified subterm
      */
-    protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
+    protected static Set<QuantifiableVariable> collectBoundVarsAbove(
             PosInOccurrence pos) {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
-
+        LinkedHashSet<QuantifiableVariable> result = new LinkedHashSet<>();
         PIOPathIterator it = pos.iterator();
         int i;
-        ImmutableArray<QuantifiableVariable> vars;
-
         while ((i = it.next()) != -1) {
-            vars = (ImmutableArray<QuantifiableVariable>) it.getSubTerm().varsBoundHere(i);
-            for (i = 0; i < vars.size(); i++) {
-                result = result.add(vars.get(i));
-            }
+            it.getSubTerm().varsBoundHere(i).forEach(result::add);
         }
-
         return result;
     }
 
