@@ -9,7 +9,7 @@ dependencies {
     implementation project(':key.core')
     implementation project(':key.ui')
 
-    implementation group: 'org.antlr', name: 'ST4', version: '4.3.4'
+    implementation("org.freemarker:freemarker:2.3.34")
 }
 
 application {
