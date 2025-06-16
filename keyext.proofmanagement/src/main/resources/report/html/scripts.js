@@ -1,4 +1,3 @@
-<script type="text/javascript">
 // id: name of table
 // column: index of column for sortint (starting at index 0)
 // headerSize: count of static headers at the top to skip
@@ -58,9 +57,7 @@ function sortTable(id, column, headerSize) {
     }
   }
 }
-</script>
 
-<script type="text/javascript">
 function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
 
@@ -77,9 +74,7 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
-</script>
 
-<script type="text/javascript">
 function handleClick(source) {
 	var messages = document.getElementById("messages");
 	var spans = messages.getElementsByTagName("span");
@@ -96,4 +91,3 @@ function handleClick(source) {
 		}
 	}
 }
-</script>
