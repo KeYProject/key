@@ -1,19 +1,20 @@
+<#-- @ftlvariable name="checkerData" type="org.key_project.proofmanagement.check.CheckerData" -->
 <ul>
-	<li>Bundle: ${cd.Pbh.bundleName}</li>
+	<li>Bundle: ${checkerData.pbh.bundleName!"n/a"}</li>
 	<li>Checks run:
-      <#list cd.checks as c>
+      <#list checkerData.checks as c>
           ${c}<#if c_has_next>, </#if>
       </#list>
 	</li>
-	<li>Date: ${cd.checkDate}</li>
-	<li>Overall Status: ${cd.globalState}</li>
+	<li>Date: ${checkerData.checkDate}</li>
+	<li>Overall Status: ${checkerData.globalState}</li>
 	<li>Contracts:
       <@globalprogress
       data=cd
-      total=cd.bundleProofCount
-      proven=cd.provenCount
-      lemmaLeft=cd.lemmaLeftCount
-      unproven=cd.unprovenCount />
+      total=checkerData.bundleProofCount
+      proven=checkerData.provenCount
+      lemmaLeft=checkerData.lemmaLeftCount
+      unproven=checkerData.unprovenCount />
 	</li>
 	<li>Standard output:
 		<div style="text-align:end;">
@@ -36,12 +37,13 @@
                     font-size:16px;
                     width:max-content;
                     padding:10px">
-        <#list cd.messages as msg>
+        <#list checkerData.messages as msg>
             <#escape x as x?xml>
                 ${msg}
-            </#escape><#if msg_has_next>
-					<br/>
-        </#if>
+            </#escape>
+            <#if msg_has_next>
+							<br/>
+            </#if>
         </#list>
 		</div>
 	</li>
