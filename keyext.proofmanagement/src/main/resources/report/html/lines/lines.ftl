@@ -19,6 +19,8 @@
     </tr>
     </thead>
     <tbody>
-        $entries:{e | $line(entry=e, cd=cd)$}$
+        <#list entries as e>
+            <@line entry=e cd=cd />
+        </#list>
     </tbody>
 </table>
