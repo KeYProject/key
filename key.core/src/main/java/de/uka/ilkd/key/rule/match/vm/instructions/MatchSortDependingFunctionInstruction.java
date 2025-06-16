@@ -99,4 +99,8 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MatchSortDependingFunctionInstruction";
+    }
 }

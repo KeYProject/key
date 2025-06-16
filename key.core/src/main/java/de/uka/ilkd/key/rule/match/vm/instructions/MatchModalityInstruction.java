@@ -11,6 +11,9 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
  * the <strong>same</strong> modality like the one for which this instruction has been
@@ -18,6 +21,7 @@ import org.key_project.logic.LogicServices;
  */
 public class MatchModalityInstruction extends Instruction<Modality>
         implements MatchOperatorInstruction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MatchModalityInstruction.class);
 
     public MatchModalityInstruction(Modality op) {
         super(op);
@@ -54,4 +58,8 @@ public class MatchModalityInstruction extends Instruction<Modality>
         return match(termPosition.getCurrentSubterm(), matchConditions, services);
     }
 
+    @Override
+    public String toString() {
+        return "MatchModalityInstruction(op: " + op.toString() + ")";
+    }
 }

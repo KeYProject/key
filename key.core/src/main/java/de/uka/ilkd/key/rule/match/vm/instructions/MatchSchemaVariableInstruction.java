@@ -77,4 +77,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     }
 
 
+    @Override
+    public String toString() {
+        return "MatchSchemaVariableInstruction<OperatorSV>";
+    }
 }

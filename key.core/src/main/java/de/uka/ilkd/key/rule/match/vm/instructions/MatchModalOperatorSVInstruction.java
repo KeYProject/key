@@ -35,4 +35,9 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
             LogicServices services) {
         return match(termPosition.getCurrentSubterm(), mc, services);
     }
+
+    @Override
+    public String toString() {
+        return "MatchModalOperatorSVInstruction";
+    }
 }

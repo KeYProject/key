@@ -43,4 +43,9 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MatchVariableSVInstruction";
+    }
+
 }

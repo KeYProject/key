@@ -29,6 +29,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The default lemma generator: Supports only certain types of taclets. If a taclet is not
  * supported, the generator throws an exception.
@@ -38,6 +41,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     // Describes how a schema variable is mapped to another operator, e.g.
     // logical variable.
     private final HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLemmaGenerator.class);
 
     @Override
     public TacletFormula translate(Taclet taclet, TermServices services) {
@@ -100,6 +104,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     }
 
     public static String checkForIllegalConditions(Taclet taclet) {
+        LOGGER.info("{} {}", taclet, taclet.getVariableConditions());
         if (!taclet.getVariableConditions().isEmpty()) {
             return "The given taclet " + taclet.name()
                 + " contains variable conditions that are not supported.";

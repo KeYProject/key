@@ -34,4 +34,9 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermS
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MatchTermSVInstruction";
+    }
+
 }

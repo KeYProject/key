@@ -171,4 +171,16 @@ public class TacletMatchProgram {
         return mc;
     }
 
+    @Override
+    public String toString() {
+        String s = "MatchProgram {" + System.lineSeparator();
+        for (var inst : instruction) {
+            s += "    " + inst.toString() + System.lineSeparator();
+        }
+
+        s += "}" + System.lineSeparator();
+
+        return s;
+    }
+
 }

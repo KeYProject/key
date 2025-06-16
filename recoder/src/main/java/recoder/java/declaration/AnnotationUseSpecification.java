@@ -50,7 +50,7 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      */
     public AnnotationUseSpecification(AnnotationUseSpecification proto) {
         super(proto);
-        this.reference = (TypeReference) proto.parent.deepClone();
+        this.reference = (TypeReference) proto.parent;
         this.elementValuePairs = proto.elementValuePairs.deepClone();
         makeParentRoleValid();
     }
@@ -266,4 +266,8 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
         parent = c;
     }
 
+    @Override
+    public String toString() {
+        return "@" + reference.getName();
+    }
 }

@@ -13,4 +13,5 @@ public interface MatchOperatorInstruction extends MatchInstruction {
     MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
             LogicServices services);
 
+    String toString();
 }

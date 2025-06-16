@@ -54,4 +54,9 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "MatchElemantaryUpdateInstruction";
+    }
 }

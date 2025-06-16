@@ -16,4 +16,8 @@ public class UnbindVariablesInstruction implements MatchInstruction {
         return matchConditions.shrinkRenameTable();
     }
 
+    @Override
+    public String toString() {
+        return "UnbindVariablesInstruction";
+    }
 }

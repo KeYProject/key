@@ -67,7 +67,7 @@ import recoder.service.UnresolvedReferenceException;
  *
  * It manages the entire contact with the recoder framework and ensures that their cross-referencing
  * data is always uptodate. Prior to reading any source code, special classes (i.e. stubs for some
- * needed library classes) are parsed in to have them available at any time.
+ * needed library classes) are parsed in order to have them available at any time.
  *
  * To use a Recoder2KeY bridge to convert data structures you can use the functions:
  * {@link #readCompilationUnit(String)}, {@link #readCompilationUnitsAsFiles(String[], FileRepo)} or

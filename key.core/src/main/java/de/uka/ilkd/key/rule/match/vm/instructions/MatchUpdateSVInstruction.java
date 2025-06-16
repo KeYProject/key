@@ -34,4 +34,8 @@ public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<Upd
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MatchUpdateSVInstruction";
+    }
 }

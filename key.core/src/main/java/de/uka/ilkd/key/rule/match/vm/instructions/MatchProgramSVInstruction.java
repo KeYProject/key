@@ -126,4 +126,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "MatchProgramSVInstruction";
+    }
 }

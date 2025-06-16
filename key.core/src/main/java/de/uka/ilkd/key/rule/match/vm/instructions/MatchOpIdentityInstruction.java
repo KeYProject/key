@@ -61,4 +61,9 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MatchIdentityInstruction<OPerator>";
+    }
+
 }

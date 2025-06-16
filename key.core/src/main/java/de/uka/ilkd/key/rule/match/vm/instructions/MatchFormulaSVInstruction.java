@@ -40,4 +40,8 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MatchFormulaSVInstruction(op: " + op + ")";
+    }
 }
