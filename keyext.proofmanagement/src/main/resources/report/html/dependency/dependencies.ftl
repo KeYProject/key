@@ -8,7 +8,9 @@
     </tr>
     </thead>
     <tbody>
-        $graph.nodes:{node | $dep(graph=graph, node=node)$}$
+    <#list graph.nodes as node>
+        <@dep graph=graph node=node />
+    </#list>
     </tbody>
 </table>
 
