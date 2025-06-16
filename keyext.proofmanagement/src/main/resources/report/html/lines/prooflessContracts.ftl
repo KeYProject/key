@@ -5,8 +5,10 @@
     </tr>
     </thead>
     <tbody>
-        $cd.contractsWithoutProof:{c | <tr class="blue">
-            <td>$contract(contract=c)$</td>
-        </tr>}$
+    <#list cd.contractsWithoutProof as c>
+        <tr class="blue">
+            <td><@contract contract=c /></td>
+        </tr>
+    </#list>
     </tbody>
 </table>
