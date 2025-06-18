@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.PrimitiveType;
 import recoder.abstraction.Type;
@@ -10,7 +11,6 @@ import recoder.java.Reference;
 import recoder.java.declaration.VariableSpecification;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.UncollatedReferenceQualifier;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 public class SchemaCrossReferenceSourceInfo extends KeYCrossReferenceSourceInfo {
 

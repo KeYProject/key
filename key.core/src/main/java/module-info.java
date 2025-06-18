@@ -1,6 +1,6 @@
 import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
+import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
 /**
  *
@@ -42,12 +42,10 @@ module org.key_project.core {
     exports de.uka.ilkd.key.logic.equality;
     exports de.uka.ilkd.key.rule.label;
     exports de.uka.ilkd.key.macros;
-    exports de.uka.ilkd.key.macros.scripts;
-    exports de.uka.ilkd.key.prover;
+    exports de.uka.ilkd.key.scripts;
     exports de.uka.ilkd.key.strategy.feature;
     exports de.uka.ilkd.key.strategy.definition;
     exports de.uka.ilkd.key.speclang.translation;
-    exports de.uka.ilkd.key.proof.rulefilter;
     exports de.uka.ilkd.key.strategy.feature.instantiator;
     exports de.uka.ilkd.key.strategy.termProjection;
     exports de.uka.ilkd.key.strategy.termfeature;
@@ -75,6 +73,8 @@ module org.key_project.core {
     exports de.uka.ilkd.key.smt.newsmt2;
     exports de.uka.ilkd.key.util.pp;
     exports de.uka.ilkd.key.axiom_abstraction;
+    exports de.uka.ilkd.key.proof.calculus;
+    exports de.uka.ilkd.key.proof.init.loader;
     requires org.slf4j;
     requires key.recoder;
     requires org.key_project.ncore;
@@ -83,6 +83,8 @@ module org.key_project.core {
     requires org.jspecify;
     requires org.antlr.antlr4.runtime;
     requires java.scripting;
+    requires org.key_project.prover;
+    requires org.checkerframework.checker.qual;
 
     provides ProofMacro with
             de.uka.ilkd.key.informationflow.macros.FullInformationFlowAutoPilotMacro,
@@ -108,36 +110,36 @@ module org.key_project.core {
             de.uka.ilkd.key.macros.TranscendentalFloatSMTMacro;
 
     provides ProofScriptCommand with
-            de.uka.ilkd.key.macros.scripts.EchoCommand,
-            de.uka.ilkd.key.macros.scripts.MacroCommand,
-            de.uka.ilkd.key.macros.scripts.FocusCommand,
-            de.uka.ilkd.key.macros.scripts.AutoCommand,
-            de.uka.ilkd.key.macros.scripts.CutCommand,
-            de.uka.ilkd.key.macros.scripts.SetCommand,
-            de.uka.ilkd.key.macros.scripts.SetEchoCommand,
-            de.uka.ilkd.key.macros.scripts.SetFailOnClosedCommand,
-            de.uka.ilkd.key.macros.scripts.SMTCommand,
-            de.uka.ilkd.key.macros.scripts.RuleCommand,
-            de.uka.ilkd.key.macros.scripts.ActivateCommand,
-            de.uka.ilkd.key.macros.scripts.LeaveCommand,
-            de.uka.ilkd.key.macros.scripts.TryCloseCommand,
-            de.uka.ilkd.key.macros.scripts.ExitCommand,
-            de.uka.ilkd.key.macros.scripts.InstantiateCommand,
-            de.uka.ilkd.key.macros.scripts.SelectCommand,
-            de.uka.ilkd.key.macros.scripts.ScriptCommand,
-            de.uka.ilkd.key.macros.scripts.LetCommand,
-            de.uka.ilkd.key.macros.scripts.SaveInstCommand,
-            de.uka.ilkd.key.macros.scripts.SaveNewNameCommand,
-            de.uka.ilkd.key.macros.scripts.SchemaVarCommand,
-            de.uka.ilkd.key.macros.scripts.JavascriptCommand,
-            de.uka.ilkd.key.macros.scripts.SkipCommand,
-            de.uka.ilkd.key.macros.scripts.AxiomCommand,
-            de.uka.ilkd.key.macros.scripts.AssumeCommand,
-            de.uka.ilkd.key.macros.scripts.AssertCommand,
-            de.uka.ilkd.key.macros.scripts.RewriteCommand,
-            de.uka.ilkd.key.macros.scripts.AllCommand,
-            de.uka.ilkd.key.macros.scripts.HideCommand,
-            de.uka.ilkd.key.macros.scripts.UnhideCommand;
+            de.uka.ilkd.key.scripts.EchoCommand,
+            de.uka.ilkd.key.scripts.MacroCommand,
+            de.uka.ilkd.key.scripts.FocusCommand,
+            de.uka.ilkd.key.scripts.AutoCommand,
+            de.uka.ilkd.key.scripts.CutCommand,
+            de.uka.ilkd.key.scripts.SetCommand,
+            de.uka.ilkd.key.scripts.SetEchoCommand,
+            de.uka.ilkd.key.scripts.SetFailOnClosedCommand,
+            de.uka.ilkd.key.scripts.SMTCommand,
+            de.uka.ilkd.key.scripts.RuleCommand,
+            de.uka.ilkd.key.scripts.ActivateCommand,
+            de.uka.ilkd.key.scripts.LeaveCommand,
+            de.uka.ilkd.key.scripts.TryCloseCommand,
+            de.uka.ilkd.key.scripts.ExitCommand,
+            de.uka.ilkd.key.scripts.InstantiateCommand,
+            de.uka.ilkd.key.scripts.SelectCommand,
+            de.uka.ilkd.key.scripts.ScriptCommand,
+            de.uka.ilkd.key.scripts.LetCommand,
+            de.uka.ilkd.key.scripts.SaveInstCommand,
+            de.uka.ilkd.key.scripts.SaveNewNameCommand,
+            de.uka.ilkd.key.scripts.SchemaVarCommand,
+            de.uka.ilkd.key.scripts.JavascriptCommand,
+            de.uka.ilkd.key.scripts.SkipCommand,
+            de.uka.ilkd.key.scripts.AxiomCommand,
+            de.uka.ilkd.key.scripts.AssumeCommand,
+            de.uka.ilkd.key.scripts.AssertCommand,
+            de.uka.ilkd.key.scripts.RewriteCommand,
+            de.uka.ilkd.key.scripts.AllCommand,
+            de.uka.ilkd.key.scripts.HideCommand,
+            de.uka.ilkd.key.scripts.UnhideCommand;
 
     provides DefaultProfileResolver with
             de.uka.ilkd.key.proof.init.JavaProfileDefaultProfileResolver,
