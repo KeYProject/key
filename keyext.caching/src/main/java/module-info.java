@@ -13,4 +13,5 @@ module keyext.caching {
     requires org.slf4j;
     requires org.jspecify;
     requires org.key_project.util;
+    requires com.miglayout.core;
 }

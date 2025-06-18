@@ -80,6 +80,9 @@ module org.key_project.core {
     exports de.uka.ilkd.key.proof.init.loader;
     exports de.uka.ilkd.key.proof.proofevent;
     exports de.uka.ilkd.key.proof.replay;
+    exports de.uka.ilkd.key.util.parsing;
+    exports de.uka.ilkd.key.proof.io.intermediate;
+    exports de.uka.ilkd.key.smt.lang;
     requires org.slf4j;
     requires key.recoder;
     requires org.key_project.ncore;
