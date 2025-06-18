@@ -21,14 +21,14 @@
 
 <body>
 
-<div class="tab">
-	<button class="tablinks" onclick="openTab(event, 'overview')" id="defaultOpen">Overview</button>
-	<button class="tablinks" onclick="openTab(event, 'files')">Files</button>
-	<button class="tablinks" onclick="openTab(event, 'contracts')">Contracts</button>
-	<button class="tablinks" onclick="openTab(event, 'dependencies')">Dependencies</button>
+<div class="nav">
+	<a class="tablinks" href="#overview" id="defaultOpen">Overview</a>
+	<a class="tablinks" href="#files">Files</a>
+	<a class="tablinks" href="#contracts">Contracts</a>
+	<a class="tablinks" href="#dependencies">Dependencies</a>
 </div>
 
-<div id="overview" class="tabcontent">
+<div id="overview" class="tabcontent default">
 	<ul>
 		<li>Bundle: ${checkerData.pbh.bundleName!"n/a"}</li>
 		<li>Checks run:
@@ -291,9 +291,6 @@
             this.classList.toggle("caret-down");
         });
     }
-
-    // ensure that the overview tab is opened when the file is loaded
-    document.getElementById("defaultOpen").click()
 </script>
 </body>
 </html>
