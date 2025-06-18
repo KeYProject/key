@@ -6,7 +6,7 @@ package de.uka.ilkd.key.core;
 import java.awt.*;
 import java.util.Set;
 
-import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

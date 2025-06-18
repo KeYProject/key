@@ -21,7 +21,7 @@ import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.key_project.util.java.SwingUtil;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import bibliothek.gui.dock.dockable.AbstractDockable;
 import org.junit.jupiter.api.*;

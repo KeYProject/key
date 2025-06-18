@@ -1,14 +1,17 @@
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  * @author Alexander Weigl 
  * @version 1 (31.03.24)
  */
+@NullMarked
 module org.key_project.core {
     exports de.uka.ilkd.key.java;
+    exports de.uka.ilkd.key.smt.communication;
     exports de.uka.ilkd.key.java.abstraction;
     exports de.uka.ilkd.key.logic.op;
     exports de.uka.ilkd.key.proof;
@@ -75,6 +78,8 @@ module org.key_project.core {
     exports de.uka.ilkd.key.axiom_abstraction;
     exports de.uka.ilkd.key.proof.calculus;
     exports de.uka.ilkd.key.proof.init.loader;
+    exports de.uka.ilkd.key.proof.proofevent;
+    exports de.uka.ilkd.key.proof.replay;
     requires org.slf4j;
     requires key.recoder;
     requires org.key_project.ncore;
