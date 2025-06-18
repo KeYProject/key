@@ -1,34 +1,36 @@
 body, html {
     margin: 0;
-    font-family: Arial;
+    font-family: "Arial", sans-serif;
 }
 
-.tab {
+div.tabcontent {
     overflow: hidden;
     background-color: #f1f1f1;
+    display:none; /* Hide all tabs */
 }
 
-.tab button {
+div.tabcontent:target, /*show tabs if targeted */
+:root:not(:has(:target)) div.tabcontent.default /*if nothing targeted at all, show the default tab*/ {
+    display: block
+}
+
+
+.nav a {
     background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
     padding: 14px 16px;
     transition: 0.3s;
     font-size: 20px;
 }
 
-.tab button:hover {
+.tab a:hover {
     background-color: #ddd;
 }
 
-.tab button.active {
+.tab a.active {
     background-color: #ccc
 }
 
 .tabcontent {
-    display: none;
     padding: 6px 12px;
 }
 
