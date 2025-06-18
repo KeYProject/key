@@ -14,6 +14,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 
@@ -115,7 +116,7 @@ public abstract class ProofBundleHandler implements Closeable {
      * @return the bootclasspath or null, if none is specified
      * @throws IOException if the bundle can not be opened/accessed
      */
-    public abstract Path getBootclasspath() throws IOException;
+    public abstract @Nullable Path getBootclasspath() throws IOException;
 
     /**
      * Returns a tree of the complete file hierarchy inside the bundle.
