@@ -33,9 +33,11 @@ import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 
+import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -44,7 +46,6 @@ import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 
-import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -420,11 +421,12 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             updateUIState();
             return;
         }
+        final var mediatorUI = mediator.getUI();
         new GenericWorker<>(() -> {
             // slice proof with a headless LoaderControl to avoid countless UI redraws
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer replayer = SlicingProofReplayer
-                    .constructSlicer(control, currentProof, results, mediator.getUI());
+                    .constructSlicer(control, currentProof, results, mediatorUI);
             Path proofFile;
             // first slice attempt: leave aggressive de-duplicate on
             if (results.didDeduplicateRuleApps
@@ -439,7 +441,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                             .deactivateAggressiveDeduplicate(currentProof);
                     AnalysisResults fixedResults = analyzeProof();
                     proofFile = SlicingProofReplayer
-                            .constructSlicer(control, currentProof, fixedResults, mediator.getUI())
+                            .constructSlicer(control, currentProof, fixedResults, mediatorUI)
                             .slice();
                 }
             } else {
@@ -456,7 +458,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }, proofFile -> {
             // we do not use UI.loadProblem here to avoid adding the slice to the recent files
             ProblemLoader problemLoader =
-                mediator.getUI().getProblemLoader(proofFile, null, null, null, mediator);
+                mediatorUI.getProblemLoader(proofFile, null, null, null, mediator);
             // user already knows about any warnings
             problemLoader.setIgnoreWarnings(true);
             problemLoader.runAsynchronously();

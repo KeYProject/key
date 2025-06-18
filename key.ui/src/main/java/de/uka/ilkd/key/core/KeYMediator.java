@@ -31,7 +31,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.prover.engine.TaskFinishedInfo;

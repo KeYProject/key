@@ -4,6 +4,18 @@
  * @version 1 (31.03.24)
  */
 module org.key_project.ui {
+    exports de.uka.ilkd.key.gui.extension.api;
+    exports de.uka.ilkd.key.gui;
+    exports de.uka.ilkd.key.gui.actions;
+    exports de.uka.ilkd.key.gui.configuration;
+    exports de.uka.ilkd.key.core;
+    exports de.uka.ilkd.key.gui.fonticons;
+    exports de.uka.ilkd.key.gui.help;
+    exports de.uka.ilkd.key.ui.proof.io;
+    exports de.uka.ilkd.key.gui.settings;
+    exports de.uka.ilkd.key.ui.util;
+    exports de.uka.ilkd.key.ui;
+
     requires org.slf4j;
     requires java.desktop;
     requires org.key_project.core;
@@ -18,9 +30,11 @@ module org.key_project.ui {
     requires key.recoder;
     requires org.key_project.core.rifl;
     requires java.compiler;
-    requires docking.frames.core;
-    requires docking.frames.common;
+    requires dockingframes.core;
+    requires dockingframes.common;
     requires org.key_project.prover;
+    requires org.antlr.antlr4.runtime;
+    requires java.management;
 
     provides de.uka.ilkd.key.gui.extension.api.KeYGuiExtension with
             de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt,

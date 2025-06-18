@@ -32,14 +32,14 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.key_project.dockingframes.common.common.action.CAction;
+import org.key_project.dockingframes.common.common.action.CDropDownButton;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CDropDownButton;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;

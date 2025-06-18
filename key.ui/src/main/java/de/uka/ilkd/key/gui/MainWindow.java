@@ -26,6 +26,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -65,11 +66,18 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.util.PreferenceSaver;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.dockingframes.common.common.CControl;
+import org.key_project.dockingframes.common.common.SingleCDockable;
+import org.key_project.dockingframes.common.common.intern.CDockable;
+import org.key_project.dockingframes.core.gui.dock.StackDockStation;
+import org.key_project.dockingframes.core.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
@@ -433,7 +441,7 @@ public final class MainWindow extends JFrame {
             UIManager.setLookAndFeel(laf);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
-            FlatLightLaf.setup();
+            com.formdev.flatlaf.FlatLightLaf.setup();
         }
 
         if (SystemInfo.isLinux) {

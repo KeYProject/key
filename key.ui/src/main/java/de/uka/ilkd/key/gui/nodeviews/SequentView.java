@@ -28,7 +28,7 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-import de.uka.ilkd.key.util.DoNothingCaret;
+import de.uka.ilkd.key.ui.util.DoNothingCaret;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;

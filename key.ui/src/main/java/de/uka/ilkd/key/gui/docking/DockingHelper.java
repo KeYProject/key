@@ -20,19 +20,16 @@ import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
-import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.MultipleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
-import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
-import bibliothek.gui.dock.control.focus.FocusRequest;
 import org.jspecify.annotations.NonNull;
+import org.key_project.dockingframes.common.common.*;
+import org.key_project.dockingframes.common.common.action.CAction;
+import org.key_project.dockingframes.common.common.action.CButton;
+import org.key_project.dockingframes.common.common.action.CCheckBox;
+import org.key_project.dockingframes.common.common.action.core.CommonDecoratableDockAction;
+import org.key_project.dockingframes.common.common.intern.*;
+import org.key_project.dockingframes.common.common.intern.action.CDecorateableAction;
+import org.key_project.dockingframes.core.gui.dock.control.focus.DefaultFocusRequest;
+import org.key_project.dockingframes.core.gui.dock.control.focus.FocusRequest;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
