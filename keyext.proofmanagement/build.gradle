@@ -20,15 +20,12 @@ application {
 
 
 tasks.register('testIntegrationReport', JavaExec) {
+    group = "verification"
     mainClass.set(application.mainClass)
     classpath = sourceSets.main.runtimeClasspath
 
     args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency',
             'proofBundle/simpleBundleGeneration')
-
-    // not necessary any more with the workaround in HTMLReport
-    // needed for access of Node.getValue in string template
-    // jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
 }
 
 run {
