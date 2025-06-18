@@ -123,7 +123,7 @@ public class DependencyChecker implements Checker {
             changed = false;
             for (DependencyNode n : graph.getNodes()) {
                 if (!closed.contains(n)) {
-                    CheckerData.ProofEntry entry = data.getProofEntryByContract(n.getContract());
+                    ProofEntry entry = data.getProofEntryByContract(n.getContract());
                     if (entry != null) {
                         Set<DependencyNode> deps = n.getDependencies().keySet();
                         // filter out internal contracts (not in use-provided sources)
@@ -154,7 +154,7 @@ public class DependencyChecker implements Checker {
 
         // update data: all other (successfully replayed) closed proofs
         // have dependencies left unproven
-        for (CheckerData.ProofEntry entry : data.getProofEntries()) {
+        for (ProofEntry entry : data.getProofEntries()) {
             if (entry.dependencyState == CheckerData.DependencyState.UNKNOWN
                     && entry.replayState == CheckerData.ReplayState.SUCCESS) {
                 Contract c = entry.contract;
@@ -193,7 +193,7 @@ public class DependencyChecker implements Checker {
 
                 // update all nodes from SCC to illegal cycle state
                 for (DependencyNode n : scc.getNodes()) {
-                    CheckerData.ProofEntry entry = data.getProofEntryByContract(n.getContract());
+                    ProofEntry entry = data.getProofEntryByContract(n.getContract());
                     // TODO: entry == null can not happen
                     // (if node has dependencies it has been parsed,
                     // thus also a proof entry exists)
