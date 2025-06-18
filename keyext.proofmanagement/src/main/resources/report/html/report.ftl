@@ -4,7 +4,7 @@
 <#-- @ftlvariable name="title" type="String" -->
 <#-- @ftlvariable name="bundleFileName" type="String" -->
 <#-- @ftlvariable name="treeRoot" type="org.key_project.proofmanagement.check.PathNode" -->
-<#-- @ftlvariable name="entries" type="java.util.List<org.key_project.proofmanagement.check.CheckerData.ProofEntry>" -->
+<#-- @ftlvariable name="entries" type="java.util.List<org.key_project.proofmanagement.check.ProofEntry>" -->
 <#-- @ftlvariable name="graph" type="org.key_project.proofmanagement.check.dependency.DependencyGraph" -->
 <!DOCTYPE html>
 <html lang="en">
@@ -96,9 +96,7 @@
               <#escape x as x?xml>
                   ${msg}
               </#escape>
-              <#if msg_has_next>
-								<br/>
-              </#if>
+              <#sep> <br/> </#sep>
           </#list>
 			</div>
 		</li>
@@ -219,17 +217,21 @@
 		<tr>
 			<th>ID</th>
         <#list checkerData.choiceNames as names>
-					<th>${c}</th>
+					<th>${names}</th>
         </#list>
 		</tr>
 		</thead>
 		<tbody>
-    <#list checkerData.shortChoices2Id as key,value>
+    <#list checkerData.shortChoices2Id as choices , value>
 			<tr id="settings-$entry.value$" class="blue">
-				<td>${value} format="%02d"$</td>
-          <#list checkerData.choiceNames as name >
-						<td>${key.get(name)}</td>
-          </#list>
+				<td>${value}</td>
+				<#list checkerData.choiceNames as name>
+						<td>${choices[name]???string('yes','no')}</td>
+				</#list>
+					<!--This works:
+						<#list choices as category, option >
+						<td>${category} : ${option}</td>
+					</#list>-->
 			</tr>
     </#list>
 		</tbody>
