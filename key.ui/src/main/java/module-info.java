@@ -18,6 +18,9 @@ module org.key_project.ui {
     requires key.recoder;
     requires org.key_project.core.rifl;
     requires java.compiler;
+    requires docking.frames.core;
+    requires docking.frames.common;
+    requires org.key_project.prover;
 
     provides de.uka.ilkd.key.gui.extension.api.KeYGuiExtension with
             de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt,
