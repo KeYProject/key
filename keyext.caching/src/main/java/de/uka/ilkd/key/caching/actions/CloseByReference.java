@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.caching.gui.plugins.caching.actions;
+package de.uka.ilkd.key.caching.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -9,15 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.caching.gui.plugins.caching.CachingExtension;
-import de.uka.ilkd.key.caching.proof.reference.ReferenceSearcher;
+import de.uka.ilkd.key.caching.CachingExtension;
+import de.uka.ilkd.key.caching.ReferenceSearcher;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
 /**
  * Action to search for suitable references on a single node.
@@ -80,7 +78,7 @@ public final class CloseByReference extends KeyAction {
             }
         }
         if (!nodes.isEmpty()) {
-            cachingExtension.updateGUIState(nodes.get(0).proof());
+            cachingExtension.updateGUIState(nodes.getFirst().proof());
         }
         if (!mismatches.isEmpty()) {
             // since e.getSource() is the popup menu, it is better to use the MainWindow

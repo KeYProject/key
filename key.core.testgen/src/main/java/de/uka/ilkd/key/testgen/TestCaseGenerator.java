@@ -32,6 +32,8 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.logic.Term;

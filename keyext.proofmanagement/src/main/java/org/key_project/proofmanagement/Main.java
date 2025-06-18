@@ -6,7 +6,10 @@ package org.key_project.proofmanagement;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.ResourceBundle;
+
+import de.uka.ilkd.key.ui.util.CommandLine;
+import de.uka.ilkd.key.ui.util.CommandLineException;
 
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;

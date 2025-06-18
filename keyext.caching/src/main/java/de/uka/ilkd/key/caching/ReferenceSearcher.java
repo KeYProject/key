@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.caching.proof.reference;
+package de.uka.ilkd.key.caching;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -172,7 +172,7 @@ public final class ReferenceSearcher {
      * @return whether it can be closed by reference
      */
     public static boolean suitableForCloseByReference(Node node) {
-        de.uka.ilkd.key.caching.proof.reference.ProgramMethodFinder f = new de.uka.ilkd.key.caching.proof.reference.ProgramMethodFinder();
+        ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
             JTerm term = (JTerm) seq.getFormulaByNr(i).formula();

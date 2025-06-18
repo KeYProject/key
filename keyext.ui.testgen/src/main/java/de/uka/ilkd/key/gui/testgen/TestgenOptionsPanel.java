@@ -8,7 +8,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.testgen.TestGenerationSettings;
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
     private static final String INFO_APPLY_SYMBOLIC_EX =

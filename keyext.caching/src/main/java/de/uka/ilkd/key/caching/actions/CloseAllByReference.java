@@ -1,15 +1,15 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.caching.gui.plugins.caching.actions;
+package de.uka.ilkd.key.caching.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
-import de.uka.ilkd.key.caching.gui.plugins.caching.CachingExtension;
-import de.uka.ilkd.key.caching.proof.reference.ReferenceSearcher;
+import de.uka.ilkd.key.caching.CachingExtension;
+import de.uka.ilkd.key.caching.ReferenceSearcher;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;

@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.caching.gui.plugins.caching;
+package de.uka.ilkd.key.caching;
 
 import java.awt.*;
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * The table of reference search results.
      */
-    private final de.uka.ilkd.key.caching.gui.plugins.caching.ReferenceSearchTable table;
+    private final ReferenceSearchTable table;
     /**
      * Button to copy the relevant proof steps.
      */
@@ -49,7 +49,7 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * Listener used to react to user inputs.
      */
-    private final de.uka.ilkd.key.caching.gui.plugins.caching.ReferenceSearchDialogListener listener;
+    private final ReferenceSearchDialogListener listener;
 
     /**
      * Construct a new dialog. Use {@link #setVisible(boolean)} afterwards to show it.
@@ -57,9 +57,9 @@ public class ReferenceSearchDialog extends JDialog {
      * @param proof the proof
      * @param listener control listener
      */
-    public ReferenceSearchDialog(Proof proof, de.uka.ilkd.key.caching.gui.plugins.caching.ReferenceSearchDialogListener listener) {
+    public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
-        table = new de.uka.ilkd.key.caching.gui.plugins.caching.ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
+        table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
         table.getTableHeader().setReorderingAllowed(false);
         this.setLocationByPlatform(true);
         this.setTitle("Proof Caching");

@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.caching.gui.plugins.caching;
+package de.uka.ilkd.key.caching;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 
-import de.uka.ilkd.key.caching.gui.plugins.caching.actions.*;
-import de.uka.ilkd.key.caching.gui.plugins.caching.settings.CachingSettingsProvider;
-import de.uka.ilkd.key.caching.gui.plugins.caching.settings.ProofCachingSettings;
-import de.uka.ilkd.key.caching.gui.plugins.caching.toolbar.CachingToggleAction;
-import de.uka.ilkd.key.caching.proof.reference.ReferenceSearcher;
+import de.uka.ilkd.key.caching.actions.*;
+import de.uka.ilkd.key.caching.settings.CachingSettingsProvider;
+import de.uka.ilkd.key.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;

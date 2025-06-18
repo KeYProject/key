@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
+import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.Rule;
