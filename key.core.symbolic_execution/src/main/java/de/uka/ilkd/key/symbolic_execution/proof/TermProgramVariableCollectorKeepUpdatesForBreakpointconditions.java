@@ -1,11 +1,12 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.symbolic_execution.proof;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.symbolic_execution.strategy.*;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 

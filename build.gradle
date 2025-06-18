@@ -513,8 +513,6 @@ tasks.register('alldoc', Javadoc){
         bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
-        links += "http://www.antlr2.org/javadoc/"
-        links += "http://www.antlr3.org/api/Java/"
         links += "https://www.antlr.org/api/Java/"
     }
 }

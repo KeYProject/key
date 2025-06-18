@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package recoder.service;
+package de.uka.ilkd.key.java;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
 import de.uka.ilkd.key.java.recoderext.EscapeExpression;
@@ -65,6 +64,7 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.Case;
 import recoder.list.generic.ASTList;
+import recoder.service.*;
 
 
 public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo {
@@ -225,7 +225,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         }
     }
 
-    void registerSubtype(ClassType c1, ClassType c2) {
+    public void registerSubtype(ClassType c1, ClassType c2) {
 
         try {
             super.registerSubtype(c1, c2);
