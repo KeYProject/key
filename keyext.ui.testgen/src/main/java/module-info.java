@@ -4,4 +4,8 @@
  * @version 1 (31.03.24)
  */
 module keyext.ui.testgen {
+    requires org.key_project.ui;
+    requires java.desktop;
+    requires org.slf4j;
+    requires org.key_project.core;
 }

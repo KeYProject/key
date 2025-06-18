@@ -11,7 +11,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 
 /**
  * Offers a loading of a single Java file, without considering the folder as part of a classpath.

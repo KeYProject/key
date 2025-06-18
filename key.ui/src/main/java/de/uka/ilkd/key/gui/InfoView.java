@@ -26,8 +26,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.util.ThreadUtilities;
-import de.uka.ilkd.key.util.XMLResources;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
+import de.uka.ilkd.key.ui.util.XMLResources;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.
