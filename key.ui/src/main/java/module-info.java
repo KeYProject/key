@@ -15,6 +15,10 @@ module org.key_project.ui {
     exports de.uka.ilkd.key.gui.settings;
     exports de.uka.ilkd.key.ui.util;
     exports de.uka.ilkd.key.ui;
+    exports de.uka.ilkd.key.gui.colors;
+    exports de.uka.ilkd.key.gui.prooftree;
+    exports de.uka.ilkd.key.gui.smt;
+    exports de.uka.ilkd.key.gui.keyshortcuts;
 
     requires org.slf4j;
     requires java.desktop;

@@ -8,4 +8,7 @@ module keyext.ui.testgen {
     requires java.desktop;
     requires org.slf4j;
     requires org.key_project.core;
+    requires org.key_project.prover;
+    requires org.key_project.testgen;
+    requires org.jspecify;
 }
