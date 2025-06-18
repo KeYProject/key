@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,11 +15,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -56,9 +50,9 @@ public final class CheckerData implements Logger {
     private final List<String> messages = new ArrayList<>();
 
     // TODO: side effects: may be changed by checkers (e.g. remove paths of taclet proofs)
-    private List<Path> proofPaths;
+    private List<Path> proofPaths = new ArrayList<>();
 
-    ////////////////////////////////// results from dependency checker
+    /// /////////////////////////////// results from dependency checker
 
     private DependencyGraph dependencyGraph;
 
@@ -262,32 +256,6 @@ public final class CheckerData implements Logger {
         @Override
         public String toString() {
             return shortStr;
-        }
-    }
-
-    public class ProofEntry {
-        public LoadingState loadingState = LoadingState.UNKNOWN;
-        public ReplayState replayState = ReplayState.UNKNOWN;
-        public DependencyState dependencyState = DependencyState.UNKNOWN;
-        public ProofState proofState = ProofState.UNKNOWN;
-
-        public boolean replaySuccess() {
-            return replayState == ReplayState.SUCCESS;
-        }
-
-        public Path proofFile;
-        public KeYUserProblemFile envInput;
-        public ProblemInitializer problemInitializer;
-        public Proof proof;
-
-        public Contract contract;
-        public URL sourceFile;
-        public String shortSrc;
-        public IntermediatePresentationProofFileParser.Result parseResult;
-        public AbstractProblemLoader.ReplayResult replayResult;
-
-        public Integer settingsId() {
-            return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
         }
     }
 

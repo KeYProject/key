@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;
 import org.key_project.proofmanagement.io.LogLevel;
@@ -49,6 +50,7 @@ import org.key_project.proofmanagement.merge.ProofBundleMerger;
  *
  * @author Wolfram Pfeifer
  */
+@SuppressWarnings("CallToPrintStackTrace")
 public final class Main {
     /** resource bundle where the description strings for the CLI are stored */
     private static final ResourceBundle STRINGS = ResourceBundle.getBundle("strings");
@@ -161,7 +163,7 @@ public final class Main {
      * @param reportPath the output path for the HTML report (if selected)
      */
     public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
-            Path bundlePath, Path reportPath) {
+            Path bundlePath, @Nullable Path reportPath) {
 
         // we accumulate results in this variable
         CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
@@ -229,7 +231,7 @@ public final class Main {
             reportPath = Paths.get(outFileName).toAbsolutePath();
         }
 
-        String pathStr = arguments.get(0);
+        String pathStr = arguments.getFirst();
         Path bundlePath = Paths.get(pathStr);
         check(commandLine.isSet("--missing"), commandLine.isSet("--settings"),
             commandLine.isSet("--replay"), commandLine.isSet("--dependency"),
@@ -254,7 +256,7 @@ public final class Main {
         for (int i = 0; i < arguments.size() - 1; i++) {
             inputs.add(Paths.get(arguments.get(i)));
         }
-        Path output = Paths.get(arguments.get(arguments.size() - 1));
+        Path output = Paths.get(arguments.getLast());
 
         // Usually, the merging process is cancelled if there are conflicting files in both bundles.
         // This option forces merging. For the conflicting files, their versions from the first

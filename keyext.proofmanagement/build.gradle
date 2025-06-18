@@ -28,6 +28,16 @@ tasks.register('testIntegrationReport', JavaExec) {
             'proofBundle/simpleBundleGeneration')
 }
 
+tasks.register('testIntegrationReport2', JavaExec) {
+    group = "verification"
+    mainClass.set(application.mainClass)
+    classpath = sourceSets.main.runtimeClasspath
+
+    args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency',
+            'src/test/pmexample2')
+}
+
+
 run {
     // for debugging, something like this can be used:
     //args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency', 'pmexample2')
@@ -41,4 +51,22 @@ run {
 shadowJar {
     archiveClassifier = "exe"
     archiveBaseName = "keyext.proofmanagement"
+}
+
+
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.proofmanagement",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$projectDir/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
+                "-AstubNoWarnIfNotFound",
+                //"-Werror",
+                "-Aversion",
+        ]
+    }
 }
