@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.docking;
 
+import java.util.function.Supplier;
+import javax.swing.*;
+
 import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.dockingframes.common.common.action.CMenu;
 import org.key_project.dockingframes.common.common.action.core.CommonDecoratableDockAction;
@@ -14,9 +17,6 @@ import org.key_project.dockingframes.core.gui.dock.action.MenuDockAction;
 import org.key_project.dockingframes.core.gui.dock.action.actions.SimpleDockAction;
 import org.key_project.dockingframes.core.gui.dock.action.view.ActionViewConverter;
 import org.key_project.dockingframes.core.gui.dock.action.view.ViewTarget;
-
-import java.util.function.Supplier;
-import javax.swing.*;
 
 
 /**
@@ -76,7 +76,7 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
         }
 
         public <V> V createView(ViewTarget<V> target, ActionViewConverter converter,
-                                Dockable dockable) {
+                Dockable dockable) {
             return converter.createView(ActionType.MENU, this, target, dockable);
         }
 

@@ -1,15 +1,15 @@
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+
 import org.jspecify.annotations.NullMarked;
 
 /**
  *
- * @author Alexander Weigl 
+ * @author Alexander Weigl
  * @version 1 (31.03.24)
  */
-@NullMarked
-module key.core {
+@NullMarked module key.core {
     exports de.uka.ilkd.key.java;
     exports de.uka.ilkd.key.smt.communication;
     exports de.uka.ilkd.key.java.abstraction;
@@ -83,6 +83,7 @@ module key.core {
     exports de.uka.ilkd.key.util.parsing;
     exports de.uka.ilkd.key.proof.io.intermediate;
     exports de.uka.ilkd.key.smt.lang;
+
     requires org.slf4j;
     requires key.recoder;
     requires key.ncore;

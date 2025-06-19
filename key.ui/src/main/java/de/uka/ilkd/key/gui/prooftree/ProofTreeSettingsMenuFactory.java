@@ -11,11 +11,11 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.dockingframes.common.common.action.CButton;
 import org.key_project.dockingframes.common.common.action.CCheckBox;
 import org.key_project.dockingframes.common.common.action.CMenu;
-
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 

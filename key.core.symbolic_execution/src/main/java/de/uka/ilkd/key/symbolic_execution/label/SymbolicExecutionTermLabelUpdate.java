@@ -11,8 +11,8 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.rule.*;
-
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
+
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;

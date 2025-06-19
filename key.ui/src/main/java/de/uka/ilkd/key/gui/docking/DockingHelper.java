@@ -20,7 +20,6 @@ import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.dockingframes.common.common.*;
 import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.dockingframes.common.common.action.CButton;
@@ -30,6 +29,8 @@ import org.key_project.dockingframes.common.common.intern.*;
 import org.key_project.dockingframes.common.common.intern.action.CDecorateableAction;
 import org.key_project.dockingframes.core.gui.dock.control.focus.DefaultFocusRequest;
 import org.key_project.dockingframes.core.gui.dock.control.focus.FocusRequest;
+
+import org.jspecify.annotations.NonNull;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();

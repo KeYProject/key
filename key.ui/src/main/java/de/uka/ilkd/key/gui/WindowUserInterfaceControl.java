@@ -41,9 +41,10 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
+import de.uka.ilkd.key.ui.util.SwingUtil;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.TaskFinishedInfo;
@@ -51,7 +52,6 @@ import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;

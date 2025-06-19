@@ -37,9 +37,9 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

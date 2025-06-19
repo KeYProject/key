@@ -10,11 +10,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -43,6 +43,9 @@ public class CompoundStopCondition implements StopCondition<Goal> {
      * which will provide the reason via {@link StopCondition#getStopMessage}.
      */
     private @Nullable StopCondition<Goal> lastShouldStopChild;
+
+    public CompoundStopCondition() {
+    }
 
     /**
      * Constructor.

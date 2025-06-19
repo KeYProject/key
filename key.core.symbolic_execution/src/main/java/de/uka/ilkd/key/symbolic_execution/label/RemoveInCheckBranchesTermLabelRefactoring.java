@@ -16,8 +16,8 @@ import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
+
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;

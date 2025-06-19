@@ -33,9 +33,8 @@ import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 
 import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.slicing.DependencyTracker;

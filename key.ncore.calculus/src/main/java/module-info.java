@@ -4,8 +4,7 @@ import org.jspecify.annotations.NullMarked;
  * @author Alexander Weigl
  * @version 1 (6/18/25)
  */
-@NullMarked
-module key.prover {
+@NullMarked module key.prover {
     exports org.key_project.prover.sequent;
     exports org.key_project.prover.rules;
     exports org.key_project.prover.proof;
@@ -25,6 +24,7 @@ module key.prover {
     exports org.key_project.prover.strategy.costbased.termgenerator;
     exports org.key_project.prover.strategy.costbased.feature.instantiator;
     exports org.key_project.prover.rules.matcher.vm;
+
     requires key.ncore;
     requires org.key_project.util;
     requires org.jspecify;

@@ -14,9 +14,9 @@ import javax.swing.table.TableColumnModel;
 
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel.ProcessColumn.ProcessData;
-import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
