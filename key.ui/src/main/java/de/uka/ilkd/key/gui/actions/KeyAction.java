@@ -8,6 +8,7 @@ import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+
 import org.checkerframework.checker.initialization.qual.UnderInitialization;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;

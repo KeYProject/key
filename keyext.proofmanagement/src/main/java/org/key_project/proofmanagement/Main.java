@@ -14,12 +14,13 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is the starting class for ProofManagement.
