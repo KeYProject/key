@@ -1,9 +1,12 @@
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl 
  * @version 1 (31.03.24)
  */
-module org.key_project.ui {
+@NullMarked
+module key.ui {
     exports de.uka.ilkd.key.gui.extension.api;
     exports de.uka.ilkd.key.gui;
     exports de.uka.ilkd.key.gui.actions;
@@ -22,21 +25,21 @@ module org.key_project.ui {
 
     requires org.slf4j;
     requires java.desktop;
-    requires org.key_project.core;
+    requires key.core;
     requires java.prefs;
     requires org.jspecify;
     requires org.key_project.util;
-    requires org.key_project.ncore;
+    requires key.ncore;
     requires com.miglayout.core;
     requires com.miglayout.swing;
     requires ch.qos.logback.core;
     requires ch.qos.logback.classic;
     requires key.recoder;
-    requires org.key_project.core.rifl;
+    requires key.core.rifl;
     requires java.compiler;
     requires dockingframes.core;
     requires dockingframes.common;
-    requires org.key_project.prover;
+    requires key.prover;
     requires org.antlr.antlr4.runtime;
     requires java.management;
 

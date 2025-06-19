@@ -1,7 +1,10 @@
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (6/18/25)
  */
+@NullMarked
 module org.key_project.util {
     exports org.key_project.util.collection;
     exports org.key_project.util;

@@ -1,8 +1,11 @@
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (6/18/25)
  */
-module org.key_project.ncore {
+@NullMarked
+module key.ncore {
     requires org.jspecify;
     requires org.key_project.util;
     requires org.slf4j;

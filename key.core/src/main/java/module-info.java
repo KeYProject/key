@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
  * @version 1 (31.03.24)
  */
 @NullMarked
-module org.key_project.core {
+module key.core {
     exports de.uka.ilkd.key.java;
     exports de.uka.ilkd.key.smt.communication;
     exports de.uka.ilkd.key.java.abstraction;
@@ -85,13 +85,13 @@ module org.key_project.core {
     exports de.uka.ilkd.key.smt.lang;
     requires org.slf4j;
     requires key.recoder;
-    requires org.key_project.ncore;
+    requires key.ncore;
     requires org.key_project.util;
     requires java.desktop;
     requires org.jspecify;
     requires org.antlr.antlr4.runtime;
     requires java.scripting;
-    requires org.key_project.prover;
+    requires key.prover;
     requires org.checkerframework.checker.qual;
 
     provides ProofMacro with

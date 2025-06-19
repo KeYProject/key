@@ -15,6 +15,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     /**
      * The settings instance
      */
-    private static IsabelleTranslationSettings INSTANCE;
+    private static @Nullable IsabelleTranslationSettings INSTANCE;
 
     /**
      * Key to get Isabelle path in JSON
@@ -50,11 +51,11 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     /**
      * The Isabelle path
      */
-    private Path isabellePath;
+    private @Nullable Path isabellePath;
     /**
      * The translation path
      */
-    private Path translationPath;
+    private @Nullable Path translationPath;
     /**
      * The timeout in seconds
      */
@@ -171,7 +172,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     }
 
     @Override
-    public void readSettings(@NonNull Configuration props) {
+    public void readSettings(Configuration props) {
         if (isabellePath == null || translationPath == null) {
             isabellePath = DEFAULT_ISABELLE_PATH;
             translationPath = DEFAULT_TRANSLATION_PATH;
@@ -204,11 +205,11 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         return "theory Translation imports Main KeYTranslations.TranslationPreamble begin";
     }
 
-    public Path getIsabellePath() {
+    public @Nullable Path getIsabellePath() {
         return isabellePath;
     }
 
-    public Path getTranslationPath() {
+    public @Nullable Path getTranslationPath() {
         return translationPath;
     }
 
