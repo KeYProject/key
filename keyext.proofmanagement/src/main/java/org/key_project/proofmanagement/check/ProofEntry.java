@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
+
+import java.net.URL;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.speclang.Contract;
-import org.jspecify.annotations.Nullable;
 
-import java.net.URL;
-import java.nio.file.Path;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import static de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser.Result;
@@ -37,7 +41,9 @@ public class ProofEntry {
     public @Nullable Result parseResult;
     public @Nullable ReplayResult replayResult;
 
-    /*public Integer settingsId() {
-        return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
-    }*/
+    /*
+     * public Integer settingsId() {
+     * return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
+     * }
+     */
 }

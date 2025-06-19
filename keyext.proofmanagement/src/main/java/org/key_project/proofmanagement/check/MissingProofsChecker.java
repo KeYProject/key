@@ -73,7 +73,7 @@ public class MissingProofsChecker implements Checker {
 
         // compare: Is there a proof for every contract?
         for (ProofEntry entry : data.getProofEntries()) {
-            Proof p = entry.proof;
+            Proof p = Objects.requireNonNull(entry.proof);
             SpecificationRepository sr = p.getServices().getSpecificationRepository();
             ContractPO cpo = sr.getPOForProof(p);
             Contract foundContract = cpo.getContract();
@@ -104,7 +104,8 @@ public class MissingProofsChecker implements Checker {
             if (type instanceof TypeDeclaration td) {
                 PositionInfo positionInfo = td.getPositionInfo();
                 URI uri = positionInfo.getURI().orElseThrow().normalize();
-                URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
+                URI srcURI = Objects.requireNonNull(data.getPbh())
+                        .getPath("src").toAbsolutePath().normalize().toUri();
 
 
                 // ignore contracts from files not in src path (e.g. from bootclasspath)

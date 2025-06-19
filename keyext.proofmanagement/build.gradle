@@ -19,7 +19,7 @@ application {
 }
 
 
-tasks.register('testIntegrationReport', JavaExec) {
+def testIntegrationReport = tasks.register('testIntegrationReport', JavaExec) {
     group = "verification"
     mainClass.set(application.mainClass)
     classpath = sourceSets.main.runtimeClasspath
@@ -28,7 +28,7 @@ tasks.register('testIntegrationReport', JavaExec) {
             'proofBundle/simpleBundleGeneration')
 }
 
-tasks.register('testIntegrationReport2', JavaExec) {
+def testIntegrationReport2 = tasks.register('testIntegrationReport2', JavaExec) {
     group = "verification"
     mainClass.set(application.mainClass)
     classpath = sourceSets.main.runtimeClasspath
@@ -36,7 +36,7 @@ tasks.register('testIntegrationReport2', JavaExec) {
     args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency',
             'src/test/pmexample2')
 }
-
+check.dependsOn(testIntegrationReport, testIntegrationReport2)
 
 run {
     // for debugging, something like this can be used:
