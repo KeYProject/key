@@ -2,11 +2,10 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  *
- * @author Alexander Weigl 
+ * @author Alexander Weigl
  * @version 1 (31.03.24)
  */
-@NullMarked
-module key.ui {
+@NullMarked module key.ui {
     exports de.uka.ilkd.key.gui.extension.api;
     exports de.uka.ilkd.key.gui;
     exports de.uka.ilkd.key.gui.actions;

@@ -12,7 +12,6 @@ import java.net.URL;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
 import de.uka.ilkd.key.ui.util.SwingUtil;
 
 /**

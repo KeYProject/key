@@ -10,6 +10,7 @@ import de.uka.ilkd.key.settings.AbstractSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsConverter;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
