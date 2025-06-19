@@ -54,13 +54,13 @@ public class ContractAppCollector extends NodeIntermediateWalker {
      * the proof we search for contract applications (needed to get the SpecificationRepository,
      * JavaInfo, ...)
      */
-    private Proof proof;
+    private final Proof proof;
 
     /** the logger to print out messages */
-    private Logger logger;
+    private final Logger logger;
 
     /** the contracts (by name) as found by this collector as well as the termination type */
-    private Map<String, DependencyGraph.EdgeType> result = new HashMap<>();
+    private final Map<String, DependencyGraph.EdgeType> result = new HashMap<>();
 
     /**
      * Creates a new collector for the given proof, starting at given root node.
@@ -154,7 +154,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
          * only one model method with same name is allowed (no overloading)
          */
         assert axiomList.size() == 1;
-        ClassAxiom axiom = axiomList.get(0);
+        ClassAxiom axiom = axiomList.getFirst();
 
         // found axiom always is a contract axiom, target always a program (model) method!
         assert axiom instanceof ContractAxiom;
@@ -171,7 +171,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         // TODO: this is not the case if multiple contracts are combined with also keyword,
         // however, in this case the contract axioms are completely broken anyway
         assert contractList.size() == 1;
-        Contract contract = contractList.get(0);
+        Contract contract = contractList.getFirst();
 
         // model method contract application is always termination sensitive!
         result.putIfAbsent(contract.getName(), TERMINATION_SENSITIVE);

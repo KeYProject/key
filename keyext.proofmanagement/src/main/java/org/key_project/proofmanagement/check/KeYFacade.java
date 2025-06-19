@@ -318,7 +318,7 @@ public final class KeYFacade {
     }
 
     private static ReplayResult replayProof(ProofEntry line, EnvInput envInput,
-                                            Logger logger) throws ProofInputException {
+            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 

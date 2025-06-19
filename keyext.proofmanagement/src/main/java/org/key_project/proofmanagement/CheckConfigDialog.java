@@ -111,7 +111,7 @@ class CheckConfigDialog extends JDialog {
                             containerPoint.x,
                             containerPoint.y);
                     if (component == runButton) {
-                        if(checkWorker!=null) {
+                        if (checkWorker != null) {
                             checkWorker.cancel(true);
                         }
                     } else {
@@ -212,17 +212,7 @@ class CheckConfigDialog extends JDialog {
         bundleBox.add(bundleFileField);
         bundleBox.add(Box.createHorizontalStrut(5));
         runButton.setEnabled(false);
-        JButton chooseBundleButton = new JButton("Choose file...");
-        chooseBundleButton.addActionListener(e -> {
-            KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file");
-            fc.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
-            if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
-                bundleFileField.setText(fc.getSelectedFile().toString());
-                runButton.setEnabled(true);
-            }
-        });
-        chooseBundleButton.setPreferredSize(buttonDim);
-        chooseBundleButton.setMinimumSize(buttonDim);
+        JButton chooseBundleButton = getChooseBundleButton(buttonDim);
         bundleBox.add(chooseBundleButton);
         centerBox.add(bundleBox);
 
@@ -298,5 +288,20 @@ class CheckConfigDialog extends JDialog {
 
         pack();
         setLocationRelativeTo(parent);
+    }
+
+    private JButton getChooseBundleButton(Dimension buttonDim) {
+        JButton chooseBundleButton = new JButton("Choose file...");
+        chooseBundleButton.addActionListener(e -> {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file");
+            fc.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
+            if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
+                bundleFileField.setText(fc.getSelectedFile().toString());
+                runButton.setEnabled(true);
+            }
+        });
+        chooseBundleButton.setPreferredSize(buttonDim);
+        chooseBundleButton.setMinimumSize(buttonDim);
+        return chooseBundleButton;
     }
 }

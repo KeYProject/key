@@ -14,6 +14,8 @@ import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.Nullable;
+
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
 /**
@@ -58,7 +60,7 @@ public class DependencyChecker implements Checker {
      * data container used to store checker result and share intermediate data
      * (for example proof AST, dependency graph, ...)
      */
-    private CheckerData data;
+    private @Nullable CheckerData data;
 
     @Override
     public void check(ProofBundleHandler pbh, CheckerData checkerData)

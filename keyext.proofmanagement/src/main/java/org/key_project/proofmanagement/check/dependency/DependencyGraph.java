@@ -6,8 +6,9 @@ package org.key_project.proofmanagement.check.dependency;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.io.Logger;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a graph of dependencies between contracts/proofs, i.e. which proof depends on
@@ -17,7 +18,7 @@ import org.key_project.proofmanagement.io.Logger;
  */
 public class DependencyGraph {
     /**
-     * indicates the type of a contract application (if termination has to be considered or not)
+     * indicates the type of contract application (if termination has to be considered or not)
      */
     public enum EdgeType {
         /**
