@@ -1,16 +1,19 @@
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (6/18/25)
  */
-module org.key_project.testgen {
+@NullMarked
+module key.testgen {
     exports de.uka.ilkd.key.testgen.smt.counterexample;
     exports de.uka.ilkd.key.testgen.macros;
     exports de.uka.ilkd.key.testgen.smt.testgen;
     exports de.uka.ilkd.key.testgen.settings;
     requires org.slf4j;
-    requires org.key_project.core;
-    requires org.key_project.prover;
-    requires org.key_project.ncore;
+    requires key.core;
+    requires key.prover;
+    requires key.ncore;
     requires org.key_project.util;
     requires org.jspecify;
 }
