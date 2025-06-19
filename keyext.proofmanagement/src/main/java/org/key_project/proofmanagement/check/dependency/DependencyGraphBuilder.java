@@ -52,7 +52,8 @@ public abstract class DependencyGraphBuilder {
         for (ProofEntry line : proofEntries) {
             // get current node and root of proof
             Proof proof = Objects.requireNonNull(line.proof);
-            DependencyNode currentNode = Objects.requireNonNull(graph.getNodeByName(proof.name().toString()));
+            DependencyNode currentNode =
+                Objects.requireNonNull(graph.getNodeByName(proof.name().toString()));
             BranchNodeIntermediate node = Objects.requireNonNull(line.parseResult).parsedResult();
 
             // collect all contracts the current proof refers to

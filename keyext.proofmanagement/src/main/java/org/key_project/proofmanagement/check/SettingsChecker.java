@@ -101,7 +101,7 @@ public class SettingsChecker implements Checker {
         boolean consistent = true;
 
         // store reference settings in data with id 0
-        ChoiceSettings reference = choiceSettings.get(0);
+        ChoiceSettings reference = choiceSettings.getFirst();
         Map<String, String> refChoices = reference.getDefaultChoices();
         data.addReferenceChoices(refChoices);
         data.print(LogLevel.DEBUG, "Reference settings (id 0) are: " + refChoices);
