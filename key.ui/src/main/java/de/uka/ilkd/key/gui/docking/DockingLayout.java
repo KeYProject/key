@@ -25,10 +25,11 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.dockingframes.common.common.CControl;
 import org.key_project.dockingframes.core.gui.dock.util.IconManager;
 import org.key_project.dockingframes.core.gui.dock.util.Priority;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

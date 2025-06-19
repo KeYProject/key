@@ -7,10 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.dockingframes.common.common.intern.DefaultCDockable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl

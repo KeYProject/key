@@ -2,12 +2,12 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  *
- * @author Alexander Weigl 
+ * @author Alexander Weigl
  * @version 1 (31.03.24)
  */
-@NullMarked
-module key.core.rifl {
+@NullMarked module key.core.rifl {
     exports de.uka.ilkd.key.util.rifl;
+
     requires key.core;
     requires key.recoder;
     requires java.xml;

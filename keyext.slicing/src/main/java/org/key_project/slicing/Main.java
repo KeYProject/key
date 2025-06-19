@@ -16,9 +16,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
-
 import de.uka.ilkd.key.ui.util.CommandLine;
 import de.uka.ilkd.key.ui.util.CommandLineException;
+
 import org.key_project.slicing.analysis.AnalysisResults;
 
 import org.slf4j.Logger;

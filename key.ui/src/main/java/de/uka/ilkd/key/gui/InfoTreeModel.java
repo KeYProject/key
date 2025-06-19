@@ -12,8 +12,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.ui.util.XMLResources;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 

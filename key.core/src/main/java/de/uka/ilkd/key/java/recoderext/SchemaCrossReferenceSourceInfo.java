@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
+
 import recoder.ServiceConfiguration;
 import recoder.abstraction.PrimitiveType;
 import recoder.abstraction.Type;
