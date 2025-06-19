@@ -6,14 +6,7 @@ package org.key_project.proofmanagement.check;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
@@ -23,6 +16,8 @@ import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
@@ -50,11 +45,11 @@ public final class CheckerData implements Logger {
     private final List<String> messages = new ArrayList<>();
 
     // TODO: side effects: may be changed by checkers (e.g. remove paths of taclet proofs)
-    private List<Path> proofPaths = new ArrayList<>();
+    private @Nullable List<Path> proofPaths = null;
 
     /// /////////////////////////////// results from dependency checker
 
-    private DependencyGraph dependencyGraph;
+    private @Nullable DependencyGraph dependencyGraph;
 
     ////////////////////////////////// results from missing proofs checker
 
@@ -163,16 +158,16 @@ public final class CheckerData implements Logger {
     private SettingsState settingsState = SettingsState.UNKNOWN;
     private GlobalState globalState = GlobalState.UNKNOWN;
 
-    private ProofBundleHandler pbh;
-    private PathNode fileTree;
+    private @Nullable ProofBundleHandler pbh;
+    private @Nullable PathNode fileTree;
     private final List<ProofEntry> proofEntries = new ArrayList<>();
-    private SLEnvInput slenv;
+    private @Nullable SLEnvInput slenv;
 
-    public SLEnvInput getSlenv() {
+    public @Nullable SLEnvInput getSlenv() {
         return slenv;
     }
 
-    public void setSlenv(SLEnvInput slenv) {
+    public void setSlenv(@Nullable SLEnvInput slenv) {
         this.slenv = slenv;
     }
 
@@ -191,9 +186,9 @@ public final class CheckerData implements Logger {
     }
 
     public enum ReplayState {
-        ERROR("\u2718"), // cross/xmark
+        ERROR("✘"), // cross/xmark
         UNKNOWN("?"),
-        SUCCESS("\u2714"); // checkmark
+        SUCCESS("✔"); // checkmark
 
         private final String shortStr;
 
@@ -208,9 +203,9 @@ public final class CheckerData implements Logger {
     }
 
     public enum LoadingState {
-        ERROR("\u2718"), // cross/xmark
+        ERROR("✘"), // cross/xmark
         UNKNOWN("?"),
-        SUCCESS("\u2714"); // checkmark
+        SUCCESS("✔"); // checkmark
 
         private final String shortStr;
 
@@ -228,7 +223,7 @@ public final class CheckerData implements Logger {
         UNKNOWN("?"),
         ILLEGAL_CYCLE("cycle"),
         UNPROVEN_DEP("open dep."),
-        OK("\u2714"); // checkmark
+        OK("✔"); // checkmark
 
         private final String shortStr;
 
@@ -259,9 +254,9 @@ public final class CheckerData implements Logger {
         }
     }
 
-    public ProofEntry getProofEntryByContract(Contract contract) {
+    public @Nullable ProofEntry getProofEntryByContract(Contract contract) {
         for (ProofEntry p : proofEntries) {
-            if (p.contract.equals(contract)) {
+            if (Objects.equals(p.contract, contract)) {
                 return p;
             }
         }
@@ -304,7 +299,7 @@ public final class CheckerData implements Logger {
         return messages;
     }
 
-    public PathNode getFileTree() {
+    public @Nullable PathNode getFileTree() {
         return fileTree;
     }
 
@@ -316,7 +311,7 @@ public final class CheckerData implements Logger {
         return dependencyGraph;
     }
 
-    public ProofBundleHandler getPbh() {
+    public @Nullable ProofBundleHandler getPbh() {
         return pbh;
     }
 
@@ -465,8 +460,8 @@ public final class CheckerData implements Logger {
         this.pbh = pbh;
     }
 
-    public List<Path> getProofPaths() throws ProofManagementException {
-        if (proofPaths == null) {
+    public @Nullable List<Path> getProofPaths() throws ProofManagementException {
+        if (proofPaths == null && pbh != null) {
             proofPaths = pbh.getProofFiles();
         }
         return proofPaths;

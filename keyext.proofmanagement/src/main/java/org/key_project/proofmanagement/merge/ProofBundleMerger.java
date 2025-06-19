@@ -23,6 +23,8 @@ public class ProofBundleMerger {
      *
      * @param inputs the paths to the input bundles to merge
      * @param output the target path (will be zipped)
+     * @param force may the force be with you
+     * @param logger a logger instance to which message are reported
      * @throws ProofManagementException if any of the files can not be accessed
      */
     public static void merge(List<Path> inputs, Path output, boolean force, Logger logger)
