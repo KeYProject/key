@@ -6,6 +6,8 @@ package org.key_project.proofmanagement.check;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a vertex/node of a tree.
  *
@@ -14,7 +16,7 @@ import java.util.TreeSet;
  */
 public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
     /** the parent node */
-    private final Node<T> parent;
+    private final @Nullable Node<T> parent;
 
     /** the children nodes */
     private final SortedSet<Node<T>> children = new TreeSet<>();
@@ -28,7 +30,7 @@ public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
      * @param parent the parent node
      * @param element the content to store inside this node
      */
-    public Node(Node<T> parent, T element) {
+    public Node(@Nullable Node<T> parent, T element) {
         this.parent = parent;
         this.content = element;
     }
@@ -37,7 +39,7 @@ public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
         return content;
     }
 
-    public Node<T> getParent() {
+    public @Nullable Node<T> getParent() {
         return parent;
     }
 

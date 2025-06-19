@@ -4,6 +4,7 @@
 package org.key_project.proofmanagement.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -48,10 +49,8 @@ public final class HTMLReport {
         // Prepare data model
         Map<String, Object> st = new HashMap<>();
 
-        st.put("style",
-            IOUtil.readFrom(HTMLReport.class.getResourceAsStream("/report/html/style.css")));
-        st.put("scripts",
-            IOUtil.readFrom(HTMLReport.class.getResourceAsStream("/report/html/scripts.js")));
+        st.put("style", loadFromClasspath("/report/html/style.css"));
+        st.put("scripts", loadFromClasspath("/report/html/scripts.js"));
 
 
         st.put("title", data.getPbh() != null ? data.getPbh().getBundleName() : "");
@@ -76,6 +75,14 @@ public final class HTMLReport {
         } catch (TemplateException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String loadFromClasspath(String name) throws IOException {
+        InputStream input = HTMLReport.class.getResourceAsStream(name);
+        if (input == null) {
+            return "";
+        }
+        return IOUtil.readFrom(input);
     }
 
 }

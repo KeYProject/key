@@ -14,9 +14,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides methods to collect paths of files inside a proof bundle.
