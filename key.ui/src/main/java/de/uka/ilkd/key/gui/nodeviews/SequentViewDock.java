@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.key_project.dockingframes.common.common.CLocation;
 import org.key_project.dockingframes.common.common.DefaultMultipleCDockable;
 import org.key_project.dockingframes.common.common.NullMultipleCDockableFactory;

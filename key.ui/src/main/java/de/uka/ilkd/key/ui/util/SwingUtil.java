@@ -18,6 +18,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import org.key_project.dockingframes.core.gui.dock.themes.basic.BasicDockableDisplayer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

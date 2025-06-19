@@ -29,8 +29,8 @@ import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-
 import de.uka.ilkd.key.ui.proof.mgt.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
