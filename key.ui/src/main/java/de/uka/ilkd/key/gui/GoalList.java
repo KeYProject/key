@@ -29,7 +29,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -48,15 +48,13 @@ import org.slf4j.LoggerFactory;
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
-    public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
-
-    @Serial
-    private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
     private final static Icon linkedGoalIcon = IconFactory.keyHoleLinked(20, 20);
+
     private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
+    private static final IconFontProvider GOAL_LIST_ICON =
+        new IconFontProvider(FontAwesomeSolid.FLAG_CHECKERED);
     /**
      * the model used by this view
      */
@@ -118,7 +116,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return GOAL_LIST_ICON;
+        return GOAL_LIST_ICON.get(MainWindow.TAB_ICON_SIZE);
     }
 
     @Override
@@ -598,8 +596,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * used to prevent the display of goals that appear closed for the present user constraint.
      */
     private class SelectingGoalListModel extends AbstractListModel<Goal> {
-        @Serial
-        private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
         /**
          * List of <code>Integer</code> objects that determine the (strictly monotonic) mapping of

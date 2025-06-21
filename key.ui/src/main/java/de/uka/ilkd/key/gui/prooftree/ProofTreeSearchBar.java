@@ -17,8 +17,6 @@ import org.key_project.util.collection.Pair;
 import org.jspecify.annotations.NonNull;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
-
-    private static final long serialVersionUID = 683318838568020629L;
     private final ProofTreeView proofTreeView;
     private int startRow = 0;
     private int currentRow = 0;
