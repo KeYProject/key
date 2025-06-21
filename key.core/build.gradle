@@ -11,7 +11,7 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     api project(':key.ncore.calculus')
-    //api group: group, name: 'recoderkey', version: '1.0'
+
     api project(':recoder')
     implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'

@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
