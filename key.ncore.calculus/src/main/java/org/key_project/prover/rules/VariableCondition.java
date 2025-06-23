@@ -8,6 +8,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /// The instantiations of a schema variable can be restricted on rule scope by attaching conditions
 /// on these variables. Such a condition is realized by a class which implements this interface.
 ///
@@ -23,6 +26,7 @@ public interface VariableCondition {
     /// @param services the logic and program information object
     /// @return modified match results if the condition can be satisfied, or `null`
     /// otherwise
-    MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchResultInfo matchCond, LogicServices services);
+    @Nullable
+    MatchResultInfo check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            @NonNull MatchResultInfo matchCond, @NonNull LogicServices services);
 }

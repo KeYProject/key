@@ -39,4 +39,10 @@ public interface ProofGoal<G extends @Nullable ProofGoal<G>> {
     /// @return the RuleApplicationManager selecting the next rule
     /// application to be applied on this goal
     RuleApplicationManager<G> getRuleAppManager();
+
+    /// returns the current time of this goal
+    /// the only requirement is that a goal that is a successor of this goal returns
+    /// a larger number
+    /// @return long with current time of goal
+    long getTime();
 }
