@@ -239,7 +239,7 @@ subprojects {
 
 
     checkstyle {
-        toolVersion = "10.6.0"
+        toolVersion = "10.26.0"
         ignoreFailures = true
         configFile = file("$rootDir/gradle/key_checks.xml")
         showViolations = false // disable console output
