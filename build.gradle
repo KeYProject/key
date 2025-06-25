@@ -214,7 +214,7 @@ subprojects {
     pmd {
         pmdTest.enabled = false
         ignoreFailures = true
-        toolVersion = "6.53.0"
+        toolVersion = "7.10.0"
         consoleOutput = false
         rulesMinimumPriority = 5
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
