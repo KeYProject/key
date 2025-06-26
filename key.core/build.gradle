@@ -1,5 +1,5 @@
 plugins {
-    id 'ca.coglinc.javacc' version '2.4.0'
+    id 'org.javacc.javacc' version '4.0.1'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
