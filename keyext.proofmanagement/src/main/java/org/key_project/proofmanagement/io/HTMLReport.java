@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import freemarker.template.DefaultObjectWrapper;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.util.java.IOUtil;
@@ -42,6 +43,11 @@ public final class HTMLReport {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_32);
         cfg.setClassLoaderForTemplateLoading(HTMLReport.class.getClassLoader(), "/report/html");
         cfg.setDefaultEncoding("UTF-8");
+
+        // Use DefaultObjectWrapper to expose fields of objects in the data model
+        DefaultObjectWrapper wrapper = new DefaultObjectWrapper(Configuration.VERSION_2_3_32);
+        wrapper.setExposeFields(true);
+        cfg.setObjectWrapper(wrapper);
 
         // Load template
         Template template = cfg.getTemplate("report.ftl");
