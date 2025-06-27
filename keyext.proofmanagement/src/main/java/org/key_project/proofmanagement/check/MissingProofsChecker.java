@@ -72,7 +72,7 @@ public class MissingProofsChecker implements Checker {
             throws ProofManagementException {
 
         // compare: Is there a proof for every contract?
-        for (ProofEntry entry : data.getProofEntries()) {
+        for (CheckerData.ProofEntry entry : data.getProofEntries()) {
             Proof p = Objects.requireNonNull(entry.proof);
             SpecificationRepository sr = p.getServices().getSpecificationRepository();
             ContractPO cpo = sr.getPOForProof(p);

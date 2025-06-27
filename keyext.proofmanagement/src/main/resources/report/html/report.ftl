@@ -4,7 +4,7 @@
 <#-- @ftlvariable name="title" type="String" -->
 <#-- @ftlvariable name="bundleFileName" type="String" -->
 <#-- @ftlvariable name="treeRoot" type="org.key_project.proofmanagement.check.PathNode" -->
-<#-- @ftlvariable name="entries" type="java.util.List<org.key_project.proofmanagement.check.ProofEntry>" -->
+<#-- @ftlvariable name="entries" type="java.util.List<org.key_project.proofmanagement.check.CheckerData.ProofEntry>" -->
 <#-- @ftlvariable name="graph" type="org.key_project.proofmanagement.check.dependency.DependencyGraph" -->
 <!DOCTYPE html>
 <html lang="en">
@@ -93,7 +93,7 @@
                     width:max-content;
                     padding:10px">
           <#list checkerData.messages as msg>
-              <#escape x as x?xml>
+              <#escape x as x>
                   ${msg}
               </#escape>
               <#sep> <br/> </#sep>
@@ -156,23 +156,23 @@
 			<tr class="blue">
 				<td>
 					class: ${entry.contract.KJT.javaType.name}<br>
-					target: ${entry.contract.target.name?xml}<br>
-					type: ${entry.contract.displayName?xml}
+					target: ${entry.contract.target.name()}<br>
+					type: ${entry.contract.displayName}
 				</td>
 				<td>
 					<div title="${entry.sourceFile}"> ${entry.shortSrc} </div>
 				</td>
 				<td>
-					<div title="${entry.proofFile.toFile}"> ${entry.proofFile.toFile.name}</div>
+					<div title="${entry.proofFile.toFile()}"> ${entry.proofFile.toFile().name}</div>
 				</td>
-				<td><a href="#settings-${entry.settingsId}">#${entry.settingsId?string("00")}</a></td>
+				<td><a href="#settings-${entry.settingsId()}">#${entry.settingsId()?string("00")}</a></td>
 				<td>${entry.loadingState}</td>
 				<td>${entry.replayState}</td>
 				<td>${entry.proofState}</td>
 				<td>${entry.dependencyState}</td>
 
-          <#if cd.checks.replay>
-              <#if entry.replaySuccess>
+          <#if checkerData.checks.replay??>
+              <#if entry.replaySuccess()>
 								<td>
 									Nodes: ${entry.proof.statistics.nodes} <br>
 									Interactive Steps: ${entry.proof.statistics.interactiveSteps} <br>
@@ -251,14 +251,14 @@
 				</tr>
 				</thead>
 				<tbody>
-        <#list graph.nodes as node>
+        <#list graph.node2SCC as node, scc>
 					<tr class="blue">
-						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${graph.node2SCC[node].id}),60%,90%);">
-                ${node.contract.name?xml}
+						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${scc.id}),60%,90%);">
+                ${node.contract.name}
 						</td>
-						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${graph.node2SCC[node].id}),60%,90%);">
-							#${graph.node2SCC[node].id?string("00")}
-                <#if graph.node2SCC[node].legal>
+						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${scc.id}),60%,90%);">
+							#${scc.id?string("00")}
+                <#if scc.legal>
 									(legal)
                 <#else>
 									(illegal)
@@ -267,7 +267,7 @@
 						<td>&#10230;</td>
 						<td>
                 <#list node.dependencies?keys as d>
-                    ${d.contract.name?xml}<br>
+                    ${d.contract.name}<br>
                 </#list>
 						</td>
 					</tr>
