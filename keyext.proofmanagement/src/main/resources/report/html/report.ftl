@@ -4,7 +4,7 @@
 <#-- @ftlvariable name="title" type="String" -->
 <#-- @ftlvariable name="bundleFileName" type="String" -->
 <#-- @ftlvariable name="treeRoot" type="org.key_project.proofmanagement.check.PathNode" -->
-<#-- @ftlvariable name="entries" type="java.util.List<org.key_project.proofmanagement.check.ProofEntry>" -->
+<#-- @ftlvariable name="entries" type="java.util.List<org.key_project.proofmanagement.check.CheckerData.ProofEntry>" -->
 <#-- @ftlvariable name="graph" type="org.key_project.proofmanagement.check.dependency.DependencyGraph" -->
 <!DOCTYPE html>
 <html lang="en">
@@ -93,7 +93,7 @@
                     width:max-content;
                     padding:10px">
           <#list checkerData.messages as msg>
-              <#escape x as x?xml>
+              <#escape x as x>
                   ${msg}
               </#escape>
               <#sep> <br/> </#sep>
@@ -157,7 +157,7 @@
 				<td>
 					class: ${entry.contract.KJT.javaType.name}<br>
 					target: ${entry.contract.target.name()}<br>
-					type: ${entry.contract.getDisplayName()}
+					type: ${entry.contract.displayName}
 				</td>
 				<td>
 					<div title="${entry.sourceFile}"> ${entry.shortSrc} </div>
@@ -171,7 +171,7 @@
 				<td>${entry.proofState}</td>
 				<td>${entry.dependencyState}</td>
 
-          <#if data.checks.replay??>
+          <#if checkerData.checks.replay??>
               <#if entry.replaySuccess()>
 								<td>
 									Nodes: ${entry.proof.statistics.nodes} <br>
@@ -251,20 +251,23 @@
 				</tr>
 				</thead>
 				<tbody>
-        <#list graph.nodes as node>
-            <#assign scc=graph.getSCCofNode(node) />
+        <#list graph.node2SCC as node, scc>
 					<tr class="blue">
 						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${scc.id}),60%,90%);">
-                ${node.contract.name?xml}
+                ${node.contract.name}
 						</td>
 						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${scc.id}),60%,90%);">
 							#${scc.id?string("00")}
-                <#if scc.legal> (legal) <#else> (illegal) </#if>
+                <#if scc.legal>
+									(legal)
+                <#else>
+									(illegal)
+                </#if>
 						</td>
 						<td>&#10230;</td>
 						<td>
                 <#list node.dependencies?keys as d>
-                    ${d.contract.name?xml}<br>
+                    ${d.contract.name}<br>
                 </#list>
 						</td>
 					</tr>

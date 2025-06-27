@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 
-import org.key_project.proofmanagement.check.ProofEntry;
+import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.io.Logger;
 
 /**
@@ -29,13 +29,13 @@ public abstract class DependencyGraphBuilder {
      * @param logger the logger to print out error messages generated during graph creation
      * @return the newly created DependencyGraph
      */
-    public static DependencyGraph buildGraph(List<ProofEntry> proofEntries,
+    public static DependencyGraph buildGraph(List<CheckerData.ProofEntry> proofEntries,
             Logger logger) {
 
         DependencyGraph graph = new DependencyGraph();
 
         // first create the nodes of the graph (one for each loaded proof)
-        for (ProofEntry line : proofEntries) {
+        for (CheckerData.ProofEntry line : proofEntries) {
 
             Proof proof = Objects.requireNonNull(line.proof);
             String contractName = proof.name().toString();
@@ -49,7 +49,7 @@ public abstract class DependencyGraphBuilder {
         }
 
         // add dependencies between nodes
-        for (ProofEntry line : proofEntries) {
+        for (CheckerData.ProofEntry line : proofEntries) {
             // get current node and root of proof
             Proof proof = Objects.requireNonNull(line.proof);
             DependencyNode currentNode =
