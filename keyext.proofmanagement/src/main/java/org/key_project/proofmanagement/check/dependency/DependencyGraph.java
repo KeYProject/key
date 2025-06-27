@@ -137,6 +137,10 @@ public class DependencyGraph {
         return node2SCC;
     }
 
+    public SCC getSCCofNode(DependencyNode node) {
+        return node2SCC.get(node);
+    }
+
     public Set<DependencyNode> getNodes() {
         return nodes;
     }
