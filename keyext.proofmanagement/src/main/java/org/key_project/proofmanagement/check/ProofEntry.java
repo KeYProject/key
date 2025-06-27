@@ -41,9 +41,66 @@ public class ProofEntry {
     public @Nullable Result parseResult;
     public @Nullable ReplayResult replayResult;
 
-    /*
-     * public Integer settingsId() {
-     * return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
-     * }
-     */
+
+    public int settingsId(CheckerData data) {
+        int val = -1;
+        if (proof != null) {
+            val = data.getChoices2Id()
+                    .getOrDefault(proof.getSettings().getChoiceSettings().getDefaultChoices(), -1);
+        }
+        return val;
+    }
+
+
+    public @Nullable Contract getContract() {
+        return contract;
+    }
+
+    public CheckerData.DependencyState getDependencyState() {
+        return dependencyState;
+    }
+
+    public @Nullable KeYUserProblemFile getEnvInput() {
+        return envInput;
+    }
+
+    public CheckerData.LoadingState getLoadingState() {
+        return loadingState;
+    }
+
+    public @Nullable Result getParseResult() {
+        return parseResult;
+    }
+
+    public @Nullable ProblemInitializer getProblemInitializer() {
+        return problemInitializer;
+    }
+
+    public @Nullable Proof getProof() {
+        return proof;
+    }
+
+    public @Nullable Path getProofFile() {
+        return proofFile;
+    }
+
+    public CheckerData.ProofState getProofState() {
+        return proofState;
+    }
+
+    public @Nullable ReplayResult getReplayResult() {
+        return replayResult;
+    }
+
+    public CheckerData.ReplayState getReplayState() {
+        return replayState;
+    }
+
+    public @Nullable String getShortSrc() {
+        return shortSrc;
+    }
+
+    public @Nullable URL getSourceFile() {
+        return sourceFile;
+    }
 }
