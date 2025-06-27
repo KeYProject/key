@@ -156,23 +156,23 @@
 			<tr class="blue">
 				<td>
 					class: ${entry.contract.KJT.javaType.name}<br>
-					target: ${entry.contract.target.name?xml}<br>
-					type: ${entry.contract.displayName?xml}
+					target: ${entry.contract.target.name()}<br>
+					type: ${entry.contract.getDisplayName()}
 				</td>
 				<td>
 					<div title="${entry.sourceFile}"> ${entry.shortSrc} </div>
 				</td>
 				<td>
-					<div title="${entry.proofFile.toFile}"> ${entry.proofFile.toFile.name}</div>
+					<div title="${entry.proofFile.toFile()}"> ${entry.proofFile.toFile().name}</div>
 				</td>
-				<td><a href="#settings-${entry.settingsId}">#${entry.settingsId?string("00")}</a></td>
+				<td><a href="#settings-${entry.settingsId(checkerData)}">#${entry.settingsId(checkerData)?string("00")}</a></td>
 				<td>${entry.loadingState}</td>
 				<td>${entry.replayState}</td>
 				<td>${entry.proofState}</td>
 				<td>${entry.dependencyState}</td>
 
-          <#if cd.checks.replay>
-              <#if entry.replaySuccess>
+          <#if data.checks.replay??>
+              <#if entry.replaySuccess()>
 								<td>
 									Nodes: ${entry.proof.statistics.nodes} <br>
 									Interactive Steps: ${entry.proof.statistics.interactiveSteps} <br>
@@ -225,10 +225,10 @@
     <#list checkerData.shortChoices2Id as choices , value>
 			<tr id="settings-$entry.value$" class="blue">
 				<td>${value}</td>
-				<#list checkerData.choiceNames as name>
+          <#list checkerData.choiceNames as name>
 						<td>${choices[name]???string('yes','no')}</td>
-				</#list>
-					<!--This works:
+          </#list>
+				<!--This works:
 						<#list choices as category, option >
 						<td>${category} : ${option}</td>
 					</#list>-->
@@ -252,17 +252,14 @@
 				</thead>
 				<tbody>
         <#list graph.nodes as node>
+            <#assign scc=graph.getSCCofNode(node) />
 					<tr class="blue">
-						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${graph.node2SCC[node].id}),60%,90%);">
+						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${scc.id}),60%,90%);">
                 ${node.contract.name?xml}
 						</td>
-						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${graph.node2SCC[node].id}),60%,90%);">
-							#${graph.node2SCC[node].id?string("00")}
-                <#if graph.node2SCC[node].legal>
-									(legal)
-                <#else>
-									(illegal)
-                </#if>
+						<td style="background-color:hsl(calc(360/${graph.nodes?size} * ${scc.id}),60%,90%);">
+							#${scc.id?string("00")}
+                <#if scc.legal> (legal) <#else> (illegal) </#if>
 						</td>
 						<td>&#10230;</td>
 						<td>
