@@ -39,6 +39,8 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.key_project.proofmanagement.check.CheckerData.ProofEntry;
+
 /**
  * This class provides static methods to access the prover (KeY).
  *
@@ -81,7 +83,7 @@ public final class KeYFacade {
             // for (Path proofPath : proofPaths) {
             while (iterator.hasNext()) {
                 Path proofPath = iterator.next();
-                ProofEntry line = ensureProofEntryExists(proofPath, data);
+                CheckerData.ProofEntry line = ensureProofEntryExists(proofPath, data);
                 // only load every line once
                 if (line.loadingState == CheckerData.LoadingState.UNKNOWN) {
                     if (!loadProofTree(proofPath, line, data)) {
@@ -103,14 +105,14 @@ public final class KeYFacade {
     private static ProofEntry ensureProofEntryExists(Path proofPath, CheckerData data) {
         ProofEntry line = findProofLine(proofPath, data);
         if (line == null) {
-            line = new ProofEntry();
+            line = data.new ProofEntry();
             data.getProofEntries().add(line);
         }
         return line;
     }
 
-    private static ProofEntry findProofLine(Path proofPath, CheckerData data) {
-        for (ProofEntry line : data.getProofEntries()) {
+    private static CheckerData.ProofEntry findProofLine(Path proofPath, CheckerData data) {
+        for (CheckerData.ProofEntry line : data.getProofEntries()) {
             if (line.proofFile != null && line.proofFile.equals(proofPath)) {
                 return line;
             }
@@ -118,7 +120,7 @@ public final class KeYFacade {
         return null;
     }
 
-    private static boolean loadProofTree(Path path, ProofEntry line, Logger logger)
+    private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger)
             throws Exception {
 
         logger.print(LogLevel.DEBUG, "Loading proof from " + path);
@@ -150,7 +152,7 @@ public final class KeYFacade {
         return true;
     }
 
-    private static Proof[] loadProofFile(Path path, ProofEntry line)
+    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
             throws Exception {
         Profile profile = AbstractProfile.getDefaultProfile();
 
@@ -293,7 +295,7 @@ public final class KeYFacade {
         List<Path> proofPaths = data.getProofPaths();
         ensureProofsLoaded(data);
 
-        for (ProofEntry line : data.getProofEntries()) {
+        for (CheckerData.ProofEntry line : data.getProofEntries()) {
             // skip replay for proofs if not requested
             if (proofPaths.contains(line.proofFile)) {
                 // skip proofs that have already been replayed
@@ -317,8 +319,8 @@ public final class KeYFacade {
         }
     }
 
-    private static ReplayResult replayProof(ProofEntry line, EnvInput envInput,
-            Logger logger) throws ProofInputException {
+    private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
+                                            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 

@@ -3,11 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -473,5 +479,35 @@ public final class CheckerData implements Logger {
 
     public void setDependencyGraph(DependencyGraph dependencyGraph) {
         this.dependencyGraph = dependencyGraph;
+    }
+
+    /**
+     * @author Alexander Weigl
+     * @version 1 (6/18/25)
+     */
+    public class ProofEntry {
+        public LoadingState loadingState = LoadingState.UNKNOWN;
+        public ReplayState replayState = ReplayState.UNKNOWN;
+        public DependencyState dependencyState = DependencyState.UNKNOWN;
+        public ProofState proofState = ProofState.UNKNOWN;
+
+        public boolean replaySuccess() {
+            return replayState == ReplayState.SUCCESS;
+        }
+
+        public @Nullable Path proofFile;
+        public @Nullable KeYUserProblemFile envInput;
+        public @Nullable ProblemInitializer problemInitializer;
+        public @Nullable Proof proof;
+
+        public @Nullable Contract contract;
+        public @Nullable URL sourceFile;
+        public @Nullable String shortSrc;
+        public IntermediatePresentationProofFileParser.Result parseResult;
+        public AbstractProblemLoader.ReplayResult replayResult;
+
+        public Integer settingsId() {
+          return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
+        }
     }
 }
