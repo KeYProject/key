@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import java.rmi.UnexpectedException;
-
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
@@ -85,7 +83,7 @@ public class ProgramContextAdder {
                 return createExecStatementWrapper((StatementBlock) body, (Exec) context);
             } else {
                 throw new RuntimeException(
-                    new UnexpectedException("Unexpected block type: " + context.getClass()));
+                    new RuntimeException("Unexpected block type: " + context.getClass()));
             }
         }
     }

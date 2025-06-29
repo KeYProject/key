@@ -82,6 +82,9 @@ subprojects {
         maven {
             url = 'https://git.key-project.org/api/v4/projects/35/packages/maven'
         }
+        maven { // remove if docking frames 1.1.3p5 on Maven Central
+            url "https://central.sonatype.com/repository/maven-snapshots"
+        }
     }
 
     dependencies {
@@ -110,6 +113,8 @@ subprojects {
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
+
+
 
     }
 
@@ -525,8 +530,6 @@ task alldoc(type: Javadoc) {
         bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
-        links += "http://www.antlr2.org/javadoc/"
-        links += "http://www.antlr3.org/api/Java/"
         links += "https://www.antlr.org/api/Java/"
     }
 }
