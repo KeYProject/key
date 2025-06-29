@@ -33,13 +33,12 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.proofmanagement.check.CheckerData.ProofEntry;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
-
-import org.key_project.proofmanagement.check.CheckerData.ProofEntry;
 
 /**
  * This class provides static methods to access the prover (KeY).
@@ -320,7 +319,7 @@ public final class KeYFacade {
     }
 
     private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-                                            Logger logger) throws ProofInputException {
+            Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 

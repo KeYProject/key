@@ -10,12 +10,12 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import freemarker.template.DefaultObjectWrapper;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.util.java.IOUtil;
 
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
