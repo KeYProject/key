@@ -212,7 +212,7 @@ subprojects {
     pmd {
         pmdTest.enabled = false
         ignoreFailures = true
-        toolVersion = "6.53.0"
+        toolVersion = "7.10.0"
         consoleOutput = false
         rulesMinimumPriority = 5
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
@@ -237,7 +237,7 @@ subprojects {
 
 
     checkstyle {
-        toolVersion = "10.6.0"
+        toolVersion = "10.26.0"
         ignoreFailures = true
         configFile = file("$rootDir/gradle/key_checks.xml")
         showViolations = false // disable console output
