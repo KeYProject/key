@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -36,24 +35,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public record TestInstance(String key, String script, @Nullable String exception,
+    public record TestInstance(
+            String name,
+            String key, String script, @Nullable String exception,
             String[] goals, Integer selectedGoal) {
     }
 
     public static List<Arguments> data() throws IOException, URISyntaxException {
-        var folder = Paths.get("src/test/resources/de/uka/ilkd/key/macros/scripts");
+        var folder = Paths.get("src/test/resources/de/uka/ilkd/key/scripts/cases")
+                .toAbsolutePath();
         try (var walker = Files.walk(folder)) {
             List<Path> files =
                 walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
             var objectMapper = new ObjectMapper(new YAMLFactory());
             objectMapper.findAndRegisterModules();
 
-            List<Arguments> args = new ArrayList(files.size());
+            List<Arguments> args = new ArrayList<>(files.size());
             for (Path path : files) {
                 try {
                     TestInstance instance =
                         objectMapper.readValue(path.toFile(), TestInstance.class);
-                    args.add(Arguments.of(path.toFile(), instance));
+                    args.add(Arguments.of(instance));
                 } catch (Exception e) {
                     System.out.println(path);
                     e.printStackTrace();
@@ -66,8 +68,8 @@ public class TestProofScriptCommand {
 
     @ParameterizedTest
     @MethodSource("data")
-    void testProofScript(File file, TestInstance data) throws Exception {
-        var name = file.getName().replace(".yml", "");
+    void testProofScript(TestInstance data) throws Exception {
+        var name = data.name();
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.writeString(tmpKey, data.key());
 
