@@ -507,7 +507,7 @@ public final class CheckerData implements Logger {
         public AbstractProblemLoader.ReplayResult replayResult;
 
         public Integer settingsId() {
-          return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
+            return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
         }
     }
 }
