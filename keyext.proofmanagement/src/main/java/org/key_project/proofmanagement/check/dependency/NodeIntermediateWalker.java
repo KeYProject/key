@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
  */
 public abstract class NodeIntermediateWalker {
     /** the root where the walker starts */
-    private NodeIntermediate root;
+    private final NodeIntermediate root;
 
     /**
      * create a walker starting from the given root
