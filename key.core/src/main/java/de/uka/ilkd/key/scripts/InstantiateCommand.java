@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -16,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
@@ -30,6 +29,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -39,21 +40,16 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author mulbrich
  */
-public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Parameters> {
+public class InstantiateCommand extends AbstractCommand {
 
     public InstantiateCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
-            EngineState state) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState stateMap) throws ScriptException, InterruptedException {
+        var params = state.getValueInjector().inject(new Parameters(), args);
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
@@ -96,7 +92,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
 
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p, EngineState state)
             throws ScriptException {
-        boolean hide = p.hide.equals("hide");
+        boolean hide = p.hide;
 
 
         String rulename;
@@ -236,18 +232,18 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
      *
      */
     public static class Parameters {
-        @Option(value = "formula", required = false)
+        @Option(value = "formula")
         public JTerm formula;
-        @Option(value = "var", required = false)
+        @Option(value = "var")
         public String var;
-        @Option(value = "occ", required = false)
-        public int occ = 1;
+        @Option(value = "occ")
+        public @Nullable int occ = 1;
 
-        @Option(value = "#2", required = false)
-        public String hide = "";
+        @Flag("hide")
+        public boolean hide;
 
-        @Option(value = "with", required = false)
-        public JTerm with;
+        @Option(value = "with")
+        public @Nullable JTerm with;
     }
 
     private static class TacletNameFilter extends TacletFilter {
