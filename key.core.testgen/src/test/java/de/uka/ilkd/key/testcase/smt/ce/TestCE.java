@@ -8,14 +8,14 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
-import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
+import de.uka.ilkd.key.testcase.HelperClassForTestgenTests;
+import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -139,7 +139,7 @@ public class TestCE extends TestCommons {
             TryCloseMacro close = new TryCloseMacro();
             close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             // should not be provable
-            assertFalse(proof.openGoals().isEmpty());
+            assertFalse(!proof.openGoals().isEmpty());
             // there should be a counterexample for each goal...
             for (Goal g : proof.openGoals()) {
                 SemanticsBlastingMacro sb = new SemanticsBlastingMacro();
