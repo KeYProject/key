@@ -80,8 +80,10 @@ public class KeYCollections {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null collection
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null collection
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -95,8 +97,10 @@ public class KeYCollections {
      * <p>
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null array of objects
-     * @param delimiter a non-null string which is put between the elements.
+     * @param collection
+     *        an arbitrary non-null array of objects
+     * @param delimiter
+     *        a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -111,7 +115,8 @@ public class KeYCollections {
      * All alphabetic characters (A-Z and a-z) are copied to the result while all other characters
      * are removed.
      *
-     * @param string an arbitrary string
+     * @param string
+     *        an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
      * @author mattias ulbrich
      */

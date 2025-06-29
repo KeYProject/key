@@ -109,7 +109,8 @@ public interface IProofReference<T> {
     /**
      * Adds the given {@link Node}s to the own {@link Node}s.
      *
-     * @param nodes The {@link Node}s to add.
+     * @param nodes
+     *        The {@link Node}s to add.
      */
     void addNodes(Collection<Node> nodes);
 

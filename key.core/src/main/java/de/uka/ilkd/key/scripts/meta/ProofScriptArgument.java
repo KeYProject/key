@@ -129,7 +129,8 @@ public class ProofScriptArgument<T> {
     /**
      * Documentation for this argument.
      *
-     * @param documentation a string
+     * @param documentation
+     *        a string
      * @return this
      */
     public ProofScriptArgument<T> setDocumentation(String documentation) {

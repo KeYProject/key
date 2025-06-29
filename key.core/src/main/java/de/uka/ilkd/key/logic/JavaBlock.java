@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import java.util.Objects;
+
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.logic.Program;
@@ -20,10 +22,9 @@ public final class JavaBlock implements Program {
      * Attention using the JavaBlock below means no program not the empty program. It is used as a
      * realization of the sentinel design pattern to mark terms with operators that are incapable of
      * containing a program like predicate symbols.
-     *
+     * <p>
      * If you want to have an empty program, create a new JavaBlock instance with an empty statement
      * block.
-     *
      */
     public static final JavaBlock EMPTY_JAVABLOCK = new JavaBlock(new StatementBlock());
 
@@ -47,11 +48,7 @@ public final class JavaBlock implements Program {
      *        being indeed a StatementBlock.
      */
     public static JavaBlock createJavaBlock(StatementBlock prg) {
-        assert prg != null;
-        /*
-         * if (prg.isEmpty() && ! ) { return EMPTY_JAVABLOCK; }
-         */
-        return new JavaBlock(prg);
+        return new JavaBlock(Objects.requireNonNull(prg));
     }
 
 
@@ -69,12 +66,16 @@ public final class JavaBlock implements Program {
         return 0;
     }
 
-    /** returns the hashCode */
+    /**
+     * returns the hashCode
+     */
     public int hashCode() {
         return 17 + ((program() == null) ? 0 : program().hashCode());
     }
 
-    /** returns true iff the program elements are equal */
+    /**
+     * returns true iff the program elements are equal
+     */
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -99,7 +100,9 @@ public final class JavaBlock implements Program {
         return prg;
     }
 
-    /** toString */
+    /**
+     * toString
+     */
     public String toString() {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
         printer.print(prg);

@@ -149,8 +149,10 @@ public class EqualityConstraint implements Constraint {
      * instantiation that satisfies this constraint (that means, the term such an instantiation
      * substitutes the metavariable with can always be unified with the returned term).
      *
-     * @param p_mv the Metavariable
-     * @param services the Services
+     * @param p_mv
+     *        the Metavariable
+     * @param services
+     *        the Services
      * @return a term the given metavariable can be instantiated with
      */
     @Override
@@ -187,7 +189,8 @@ public class EqualityConstraint implements Constraint {
      * instantiates term <code>p</code> according to the instantiations of the metavariables
      * described by this constraint.
      *
-     * @param p the Term p to be instantiated
+     * @param p
+     *        the Term p to be instantiated
      * @return the instantiated term
      */
     private JTerm instantiate(JTerm p, Services services) {
@@ -203,9 +206,12 @@ public class EqualityConstraint implements Constraint {
     /**
      * unifies terms t1 and t2
      *
-     * @param t1 Term to be unified
-     * @param t2 term to be unified
-     * @param services the Services providing access to the type model (e.g. necessary when
+     * @param t1
+     *        Term to be unified
+     * @param t2
+     *        term to be unified
+     * @param services
+     *        the Services providing access to the type model (e.g. necessary when
      *        introducing intersection sorts)
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
@@ -217,11 +223,15 @@ public class EqualityConstraint implements Constraint {
     /**
      * executes unification for terms t1 and t2.
      *
-     * @param t1 Term to be unfied
-     * @param t2 Term to be unfied
-     * @param services the Services providing access to the type model (e.g. necessary when
+     * @param t1
+     *        Term to be unfied
+     * @param t2
+     *        Term to be unfied
+     * @param services
+     *        the Services providing access to the type model (e.g. necessary when
      *        introducing intersection sorts)
-     * @param unchanged true iff the new constraint equals this one
+     * @param unchanged
+     *        true iff the new constraint equals this one
      * @return TOP if not possible, else a new constraint unifying t1 and t2 ( == this iff this
      *         subsumes the unification )
      */
@@ -246,10 +256,14 @@ public class EqualityConstraint implements Constraint {
     /**
      * compare two quantifiable variables if they are equal modulo renaming
      *
-     * @param ownVar first QuantifiableVariable to be compared
-     * @param cmpVar second QuantifiableVariable to be compared
-     * @param ownBoundVars variables bound above the current position
-     * @param cmpBoundVars variables bound above the current position
+     * @param ownVar
+     *        first QuantifiableVariable to be compared
+     * @param cmpVar
+     *        second QuantifiableVariable to be compared
+     * @param ownBoundVars
+     *        variables bound above the current position
+     * @param cmpBoundVars
+     *        variables bound above the current position
      */
     private static boolean compareBoundVariables(QuantifiableVariable ownVar,
             QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
@@ -293,13 +307,19 @@ public class EqualityConstraint implements Constraint {
      * Compares two terms modulo bound renaming and return a (possibly new) constraint object that
      * holds the instantiations necessary to make the two terms equal.
      *
-     * @param t0 the first term
-     * @param t1 the second term
-     * @param ownBoundVars variables bound above the current position
-     * @param cmpBoundVars variables bound above the current position
-     * @param modifyThis <code>this</code> is an object that has just been created during this
+     * @param t0
+     *        the first term
+     * @param t1
+     *        the second term
+     * @param ownBoundVars
+     *        variables bound above the current position
+     * @param cmpBoundVars
+     *        variables bound above the current position
+     * @param modifyThis
+     *        <code>this</code> is an object that has just been created during this
      *        unification process
-     * @param services the Services providing access to the type model (e.g. necessary when
+     * @param services
+     *        the Services providing access to the type model (e.g. necessary when
      *        introducing intersection sorts). Value <code>null</code> is allowed, but unification
      *        fails (i.e. @link Constraint#TOP is returned), if e.g. intersection sorts are
      *        required.
@@ -527,9 +547,11 @@ public class EqualityConstraint implements Constraint {
     /**
      * Unify t1 and t2
      *
-     * @param modifyThis <code>this</code> is an object that has just been created during this
+     * @param modifyThis
+     *        <code>this</code> is an object that has just been created during this
      *        unification process
-     * @param services the Services providing access to the type model
+     * @param services
+     *        the Services providing access to the type model
      *
      * @return a constraint under which t0, t1 are equal modulo bound renaming. <code>this</code> is
      *         returned iff the terms are equal modulo bound renaming under <code>this</code>, or
@@ -549,9 +571,12 @@ public class EqualityConstraint implements Constraint {
      * PRECONDITION: the sorts of mv and t match; if t is also a metavariable with same sort as mv,
      * the order of mv and t is correct (using Metavariable.compareTo)
      *
-     * @param mv Metavariable asked to be mapped to the term t
-     * @param t the Term the metavariable should be mapped to (if there are no cycles )
-     * @param services the Services providing access to the type model
+     * @param mv
+     *        Metavariable asked to be mapped to the term t
+     * @param t
+     *        the Term the metavariable should be mapped to (if there are no cycles )
+     * @param services
+     *        the Services providing access to the type model
      * @return the resulting Constraint ( == this iff this subsumes the new constraint )
      */
     private Constraint normalize(Metavariable mv, JTerm t, boolean modifyThis,
@@ -644,7 +669,8 @@ public class EqualityConstraint implements Constraint {
     /**
      * joins the given constraint with this constraint and returns the joint new constraint.
      *
-     * @param co Constraint to be joined with this one
+     * @param co
+     *        Constraint to be joined with this one
      * @return the joined constraint
      */
     @Override
@@ -658,9 +684,12 @@ public class EqualityConstraint implements Constraint {
      * BooleanContainer is used to wrap a second return value and indicates a subsumption of co by
      * this constraint.
      *
-     * @param co Constraint to be joined with this one
-     * @param services the Services providing access to the type model
-     * @param unchanged the BooleanContainers value set true, if this constraint is as strong as co
+     * @param co
+     *        Constraint to be joined with this one
+     * @param services
+     *        the Services providing access to the type model
+     * @param unchanged
+     *        the BooleanContainers value set true, if this constraint is as strong as co
      * @return the joined constraint
      */
     @Override
@@ -737,8 +766,10 @@ public class EqualityConstraint implements Constraint {
      * checks if there is a cycle if the metavariable mv and Term term would be added to this
      * constraint e.g. X=g(Y), Y=f(X)
      *
-     * @param mv the Metavariable
-     * @param term The Term
+     * @param mv
+     *        the Metavariable
+     * @param term
+     *        The Term
      * @return a boolean that is true iff. adding a mapping (mv,term) would cause a cycle
      */
     private boolean hasCycle(Metavariable mv, JTerm term, Services services) {

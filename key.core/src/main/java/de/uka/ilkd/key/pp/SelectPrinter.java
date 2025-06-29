@@ -5,12 +5,13 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.Function;
@@ -72,7 +73,7 @@ class SelectPrinter extends FieldPrinter {
                     printAnySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
             } else if (isBuiltinObjectProperty(fieldTerm)) {
-                // object properties denoted like o.<created>
+                // object properties denoted like o.$created
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
 
             } else if (ni.isFinalImmutable() && isFinalFieldConstant(fieldTerm)) {
@@ -127,7 +128,7 @@ class SelectPrinter extends FieldPrinter {
      * Get sort of selected field.
      */
     private Sort getFieldSort(JTerm fieldTerm) {
-        String lookup = fieldTerm.op().toString().replace("$", "");
+        String lookup = JavaDLFieldNames.toJava(fieldTerm.op().name());
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }
@@ -237,7 +238,7 @@ class SelectPrinter extends FieldPrinter {
 
     /*
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
-     * For example: boolean::select(heap, object, java.lang.Object::<created>)
+     * For example: boolean::select(heap, object, java.lang.Object::#$created)
      */
     private void printBuiltinObjectProperty(LogicPrinter lp, JTerm t, JTerm heapTerm,
             JTerm objectTerm,
@@ -249,8 +250,7 @@ class SelectPrinter extends FieldPrinter {
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 
         if (selectKJT != null && objectKJT != null) {
-
-            assert fieldTerm.op().name().toString().contains("::<");
+            assert JavaDLFieldNames.isImplicitField(fieldTerm.op().name());
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
             ProgramVariable pv =
                 javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);

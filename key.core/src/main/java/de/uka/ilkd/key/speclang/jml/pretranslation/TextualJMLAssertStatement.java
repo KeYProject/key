@@ -32,8 +32,10 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
      * <p>
      * This assumes the following tree layout: `RuleContext (-> RuleContext)* -> Some leaf`
      *
-     * @param builder The StringBuilder to insert the text into
-     * @param context The RuleContext to transform
+     * @param builder
+     *        The StringBuilder to insert the text into
+     * @param context
+     *        The RuleContext to transform
      */
     public static void ruleContextToText(StringBuilder builder, RuleContext context) {
         for (int i = 0; i < context.getChildCount(); i++) {

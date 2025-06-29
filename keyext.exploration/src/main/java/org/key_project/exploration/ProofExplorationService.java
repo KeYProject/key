@@ -100,8 +100,10 @@ public class ProofExplorationService {
      * Create a new Tacletapp that add a formula to the sequent using the cut rule and disabeling
      * one of the branches
      *
-     * @param t Term to add to teh sequent
-     * @param antecedent whether to add teh term to antecedent
+     * @param t
+     *        Term to add to teh sequent
+     * @param antecedent
+     *        whether to add teh term to antecedent
      */
     public @NonNull Node soundAddition(@NonNull Goal g, @NonNull JTerm t, boolean antecedent) {
         Taclet cut =

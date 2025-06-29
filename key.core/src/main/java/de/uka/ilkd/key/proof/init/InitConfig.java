@@ -222,13 +222,6 @@ public class InitConfig {
         this.activatedTacletCache = null;
     }
 
-    public void setTaclets(Collection<Taclet> tacs) {
-        taclets = ImmutableSLList.nil();
-        addTaclets(tacs);
-        // invalidate active taclet cache
-        this.activatedTacletCache = null;
-    }
-
     public ImmutableList<Taclet> getTaclets() {
         return taclets;
     }

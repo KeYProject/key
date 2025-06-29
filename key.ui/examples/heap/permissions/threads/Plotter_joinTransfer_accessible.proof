@@ -512,7 +512,7 @@
 (rule "commute_and" (formula "58") (term "0,0,1"))
 (rule "commute_and_2" (formula "58") (term "0,1"))
 (rule "ifthenelse_split" (formula "8") (term "0"))
-(branch "(self.buffer@heap).<created>@permissions = TRUE TRUE"
+(branch "(self.buffer@heap).$created@permissions = TRUE TRUE"
    (rule "applyEqReverse" (formula "59") (term "1,1,0,1") (ifseqformula "9"))
    (rule "hideAuxiliaryEq" (formula "9"))
    (rule "replace_known_left" (formula "4") (term "0,0") (ifseqformula "8"))
@@ -524,7 +524,7 @@
    (rule "applyEqReverse" (formula "57") (term "1,1,0,0,1") (ifseqformula "3"))
    (rule "hideAuxiliaryEq" (formula "3"))
    (rule "ifthenelse_split" (formula "4") (term "0"))
-   (branch " (self.buffer@heapAtPre).<created>@permissionsAtPre = TRUE TRUE"
+   (branch " (self.buffer@heapAtPre).$created@permissionsAtPre = TRUE TRUE"
       (rule "applyEqReverse" (formula "57") (term "2,2,0,1,0,0,1") (ifseqformula "5"))
       (rule "hideAuxiliaryEq" (formula "5"))
       (rule "replace_known_left" (formula "5") (term "0,0") (ifseqformula "4"))
@@ -536,26 +536,26 @@
       (rule "applyEqReverse" (formula "55") (term "2,2,0,0,0,0,1") (ifseqformula "1"))
       (rule "hideAuxiliaryEq" (formula "1"))
       (rule "ifthenelse_split" (formula "2") (term "0"))
-      (branch "self.tb.<created> = TRUE TRUE"
+      (branch "self.tb.$created = TRUE TRUE"
          (rule "applyEqReverse" (formula "55") (term "0,2,2,2,0,1,0,1") (ifseqformula "3"))
          (rule "hideAuxiliaryEq" (formula "3"))
          (rule "ifthenelse_split" (formula "1") (term "0"))
-         (branch "self.ta.<created> = TRUE TRUE"
+         (branch "self.ta.$created = TRUE TRUE"
             (rule "applyEqReverse" (formula "55") (term "0,2,2,2,2,0,1,0,1") (ifseqformula "2"))
              (builtin "One Step Simplification" (formula "55"))
             (rule "closeTrue" (formula "55"))
          )
-         (branch "self.ta.<created> = TRUE FALSE"
+         (branch "self.ta.$created = TRUE FALSE"
             (rule "referencedObjectIsCreatedRight" (formula "43") (ifseqformula "49"))
             (rule "close" (formula "43") (ifseqformula "5"))
          )
       )
-      (branch "self.tb.<created> = TRUE FALSE"
+      (branch "self.tb.$created = TRUE FALSE"
          (rule "referencedObjectIsCreatedRight" (formula "43") (ifseqformula "50"))
          (rule "close" (formula "43") (ifseqformula "5"))
       )
    )
-   (branch " (self.buffer@heapAtPre).<created>@permissionsAtPre = TRUE FALSE"
+   (branch " (self.buffer@heapAtPre).$created@permissionsAtPre = TRUE FALSE"
       (rule "applyEqReverse" (formula "57") (term "2,2,0,1,0,0,1") (ifseqformula "4"))
       (rule "hideAuxiliaryEq" (formula "4"))
       (rule "replace_known_right" (formula "1") (term "0,0") (ifseqformula "44"))
@@ -567,11 +567,11 @@
       (rule "applyEqReverse" (formula "55") (term "2,2,2,2,2,0,1,0,1") (ifseqformula "3"))
       (rule "hideAuxiliaryEq" (formula "3"))
       (rule "ifthenelse_split" (formula "2") (term "0"))
-      (branch "self.tb.<created> = TRUE TRUE"
+      (branch "self.tb.$created = TRUE TRUE"
          (rule "applyEqReverse" (formula "55") (term "0,2,2,2,0,1,0,1") (ifseqformula "3"))
          (rule "hideAuxiliaryEq" (formula "3"))
          (rule "ifthenelse_split" (formula "1") (term "0"))
-         (branch "self.ta.<created> = TRUE TRUE"
+         (branch "self.ta.$created = TRUE TRUE"
             (rule "applyEqReverse" (formula "55") (term "0,2,2,2,2,0,1,0,1") (ifseqformula "2"))
             (rule "hideAuxiliaryEq" (formula "2"))
             (rule "ifthenelse_split" (formula "54") (term "0"))
@@ -654,18 +654,18 @@
                (rule "closeTrue" (formula "48"))
             )
          )
-         (branch "self.ta.<created> = TRUE FALSE"
+         (branch "self.ta.$created = TRUE FALSE"
             (rule "referencedObjectIsCreatedRight" (formula "42") (ifseqformula "49"))
             (rule "close" (formula "42") (ifseqformula "4"))
          )
       )
-      (branch "self.tb.<created> = TRUE FALSE"
+      (branch "self.tb.$created = TRUE FALSE"
          (rule "referencedObjectIsCreatedRight" (formula "42") (ifseqformula "50"))
          (rule "close" (formula "42") (ifseqformula "4"))
       )
    )
 )
-(branch "(self.buffer@heap).<created>@permissions = TRUE FALSE"
+(branch "(self.buffer@heap).$created@permissions = TRUE FALSE"
    (rule "applyEqReverse" (formula "59") (term "1,1,0,1") (ifseqformula "8"))
    (rule "hideAuxiliaryEq" (formula "8"))
    (rule "replace_known_right" (formula "3") (term "0,0") (ifseqformula "46"))
@@ -677,7 +677,7 @@
    (rule "applyEqReverse" (formula "57") (term "1,0,0,0,1") (ifseqformula "3"))
    (rule "hideAuxiliaryEq" (formula "3"))
    (rule "ifthenelse_split" (formula "4") (term "0"))
-   (branch " (self.buffer@heapAtPre).<created>@permissionsAtPre = TRUE TRUE"
+   (branch " (self.buffer@heapAtPre).$created@permissionsAtPre = TRUE TRUE"
       (rule "applyEqReverse" (formula "57") (term "2,2,0,1,0,0,1") (ifseqformula "5"))
       (rule "hideAuxiliaryEq" (formula "5"))
       (rule "replace_known_left" (formula "5") (term "0,0") (ifseqformula "4"))
@@ -689,11 +689,11 @@
       (rule "applyEqReverse" (formula "55") (term "2,2,0,0,0,0,1") (ifseqformula "1"))
       (rule "hideAuxiliaryEq" (formula "1"))
       (rule "ifthenelse_split" (formula "2") (term "0"))
-      (branch "self.tb.<created> = TRUE TRUE"
+      (branch "self.tb.$created = TRUE TRUE"
          (rule "applyEqReverse" (formula "55") (term "0,2,2,2,0,1,0,1") (ifseqformula "3"))
          (rule "hideAuxiliaryEq" (formula "3"))
          (rule "ifthenelse_split" (formula "1") (term "0"))
-         (branch "self.ta.<created> = TRUE TRUE"
+         (branch "self.ta.$created = TRUE TRUE"
             (rule "applyEqReverse" (formula "55") (term "0,2,2,2,2,0,1,0,1") (ifseqformula "2"))
             (rule "hideAuxiliaryEq" (formula "2"))
             (rule "ifthenelse_split" (formula "54") (term "0"))
@@ -748,17 +748,17 @@
                (rule "closeTrue" (formula "46"))
             )
          )
-         (branch "self.ta.<created> = TRUE FALSE"
+         (branch "self.ta.$created = TRUE FALSE"
             (rule "referencedObjectIsCreatedRight" (formula "42") (ifseqformula "49"))
             (rule "close" (formula "42") (ifseqformula "4"))
          )
       )
-      (branch "self.tb.<created> = TRUE FALSE"
+      (branch "self.tb.$created = TRUE FALSE"
          (rule "referencedObjectIsCreatedRight" (formula "42") (ifseqformula "50"))
          (rule "close" (formula "42") (ifseqformula "4"))
       )
    )
-   (branch " (self.buffer@heapAtPre).<created>@permissionsAtPre = TRUE FALSE"
+   (branch " (self.buffer@heapAtPre).$created@permissionsAtPre = TRUE FALSE"
       (rule "applyEqReverse" (formula "57") (term "2,2,0,1,0,0,1") (ifseqformula "4"))
       (rule "hideAuxiliaryEq" (formula "4"))
       (rule "replace_known_right" (formula "1") (term "0,0") (ifseqformula "43"))
@@ -770,11 +770,11 @@
       (rule "applyEqReverse" (formula "55") (term "2,2,2,2,2,0,1,0,1") (ifseqformula "3"))
       (rule "hideAuxiliaryEq" (formula "3"))
       (rule "ifthenelse_split" (formula "2") (term "0"))
-      (branch "self.tb.<created> = TRUE TRUE"
+      (branch "self.tb.$created = TRUE TRUE"
          (rule "applyEqReverse" (formula "55") (term "0,2,2,2,0,1,0,1") (ifseqformula "3"))
          (rule "hideAuxiliaryEq" (formula "3"))
          (rule "ifthenelse_split" (formula "1") (term "0"))
-         (branch "self.ta.<created> = TRUE TRUE"
+         (branch "self.ta.$created = TRUE TRUE"
             (rule "applyEqReverse" (formula "55") (term "0,2,2,2,2,0,1,0,1") (ifseqformula "2"))
             (rule "hideAuxiliaryEq" (formula "2"))
             (rule "ifthenelse_split" (formula "54") (term "0"))
@@ -812,12 +812,12 @@
                (rule "closeTrue" (formula "46"))
             )
          )
-         (branch "self.ta.<created> = TRUE FALSE"
+         (branch "self.ta.$created = TRUE FALSE"
             (rule "referencedObjectIsCreatedRight" (formula "41") (ifseqformula "49"))
             (rule "close" (formula "41") (ifseqformula "3"))
          )
       )
-      (branch "self.tb.<created> = TRUE FALSE"
+      (branch "self.tb.$created = TRUE FALSE"
          (rule "referencedObjectIsCreatedRight" (formula "41") (ifseqformula "50"))
          (rule "close" (formula "41") (ifseqformula "3"))
       )

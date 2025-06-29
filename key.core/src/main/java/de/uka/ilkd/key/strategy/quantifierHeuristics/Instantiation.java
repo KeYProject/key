@@ -83,7 +83,8 @@ class Instantiation {
     }
 
     /**
-     * @param terms on which trigger are doning matching search every <code>Substitution</code> s by
+     * @param terms
+     *        on which trigger are doning matching search every <code>Substitution</code> s by
      *        matching <code>triggers</code> from <code>triggersSet</code> to <code>terms</code>
      *        compute their cost and store the pair of instance (Term) and cost(Long) in
      *        <code>instancesCostCache</code>
@@ -145,7 +146,8 @@ class Instantiation {
 
     /**
      * @param seq
-     * @param services TODO
+     * @param services
+     *        TODO
      * @return all literals in antesequent, and all negation of literal in succedent
      */
     private ImmutableSet<JTerm> initAssertLiterals(Sequent seq,

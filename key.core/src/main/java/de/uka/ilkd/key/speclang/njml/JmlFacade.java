@@ -29,8 +29,7 @@ import org.jspecify.annotations.NonNull;
  */
 public final class JmlFacade {
 
-    private JmlFacade() {
-    }
+    private JmlFacade() {}
 
     /**
      * Creates an JML lexer for the give stream.

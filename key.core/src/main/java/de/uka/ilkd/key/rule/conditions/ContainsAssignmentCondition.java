@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -39,9 +39,12 @@ public class ContainsAssignmentCondition extends VariableConditionAdapter {
     /**
      * creates an instance of the variable condition
      *
-     * @param x the schemavariable whose instantiation is to be checked
-     * @param negated true iff the check should ensure the absence of an assignment statement
-     * @throws IllegalArgumentException if the given schemavariable is not a {@link ProgramSV}
+     * @param x
+     *        the schemavariable whose instantiation is to be checked
+     * @param negated
+     *        true iff the check should ensure the absence of an assignment statement
+     * @throws IllegalArgumentException
+     *         if the given schemavariable is not a {@link ProgramSV}
      */
     public ContainsAssignmentCondition(SchemaVariable x, boolean negated) {
         if (!(x instanceof ProgramSV)) {

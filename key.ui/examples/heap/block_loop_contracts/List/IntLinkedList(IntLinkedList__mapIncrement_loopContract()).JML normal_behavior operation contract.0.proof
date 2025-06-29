@@ -1253,7 +1253,7 @@
          (builtin "One Step Simplification" (formula "31"))
          (rule "true_left" (formula "31"))
          (rule "ifthenelse_split" (formula "24") (term "0"))
-         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].<created> = TRUE TRUE"
+         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].$created = TRUE TRUE"
             (rule "andLeft" (formula "24"))
             (rule "notLeft" (formula "24"))
             (rule "notLeft" (formula "24"))
@@ -1421,7 +1421,7 @@
                (rule "close" (formula "32") (ifseqformula "15"))
             )
          )
-         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].<created> = TRUE FALSE"
+         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].$created = TRUE FALSE"
             (rule "applyEqReverse" (formula "25") (term "0,0") (ifseqformula "24"))
             (rule "hideAuxiliaryEq" (formula "24"))
             (rule "ifthenelse_split" (formula "14") (term "0"))
@@ -2027,7 +2027,7 @@
                         (builtin "One Step Simplification" (formula "28"))
                         (rule "true_left" (formula "28"))
                         (rule "ifthenelse_split" (formula "1") (term "0"))
-                        (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE TRUE"
+                        (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE TRUE"
                            (rule "applyEqReverse" (formula "48") (term "1,1") (ifseqformula "2"))
                            (rule "hideAuxiliaryEq" (formula "2"))
                            (rule "replace_known_left" (formula "2") (term "0,1,0,0") (ifseqformula "1"))
@@ -4820,7 +4820,7 @@
                               )
                            )
                         )
-                        (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE FALSE"
+                        (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE FALSE"
                            (rule "applyEqReverse" (formula "48") (term "1,1") (ifseqformula "1"))
                            (rule "hideAuxiliaryEq" (formula "1"))
                            (rule "replace_known_right" (formula "1") (term "0,1,0,0") (ifseqformula "40"))
@@ -6210,7 +6210,7 @@
                         (builtin "One Step Simplification" (formula "29"))
                         (rule "true_left" (formula "29"))
                         (rule "ifthenelse_split" (formula "2") (term "0"))
-                        (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE TRUE"
+                        (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE TRUE"
                            (rule "applyEqReverse" (formula "46") (term "1,1") (ifseqformula "3"))
                            (rule "hideAuxiliaryEq" (formula "3"))
                            (rule "replace_known_left" (formula "3") (term "0,1,0,0") (ifseqformula "2"))
@@ -7187,7 +7187,7 @@
                               )
                            )
                         )
-                        (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE FALSE"
+                        (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE FALSE"
                            (rule "applyEqReverse" (formula "46") (term "1,1") (ifseqformula "2"))
                            (rule "hideAuxiliaryEq" (formula "2"))
                            (rule "replace_known_right" (formula "2") (term "0,1,0,0") (ifseqformula "38"))
@@ -8086,7 +8086,7 @@
       (branch "CUT: anonOut_current = null FALSE"
          (builtin "One Step Simplification" (formula "30"))
          (rule "ifthenelse_split" (formula "24") (term "0"))
-         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].<created> = TRUE TRUE"
+         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].$created = TRUE TRUE"
             (rule "andLeft" (formula "24"))
             (rule "notLeft" (formula "25"))
             (rule "notLeft" (formula "24"))
@@ -8252,7 +8252,7 @@
                (rule "close" (formula "31") (ifseqformula "15"))
             )
          )
-         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].<created> = TRUE FALSE"
+         (branch " ¬(IntNode)self.nodeseq[-1 + self.size] = null ∧ ¬ (IntNode)self.nodeseq[-1 + self.size].$created = TRUE FALSE"
             (rule "applyEqReverse" (formula "25") (term "0,0") (ifseqformula "24"))
             (rule "hideAuxiliaryEq" (formula "24"))
             (rule "ifthenelse_split" (formula "14") (term "0"))
@@ -8768,7 +8768,7 @@
                               (rule "applyEq" (formula "2") (term "0") (ifseqformula "25"))
                               (rule "eqSymm" (formula "2"))
                               (rule "cut_direct" (formula "31") (term "0"))
-                              (branch "CUT: anonOut_current.<created> = TRUE TRUE"
+                              (branch "CUT: anonOut_current.$created = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "32"))
                                  (rule "true_left" (formula "32"))
                                  (rule "allLeft" (formula "11") (inst "t=i_2_0"))
@@ -8786,7 +8786,7 @@
                                  (builtin "One Step Simplification" (formula "11"))
                                  (rule "closeFalse" (formula "11"))
                               )
-                              (branch "CUT: anonOut_current.<created> = TRUE FALSE"
+                              (branch "CUT: anonOut_current.$created = TRUE FALSE"
                                  (builtin "One Step Simplification" (formula "31"))
                                  (rule "allLeft" (formula "11") (inst "t=i_2_0"))
                                  (rule "replace_known_left" (formula "11") (term "0,0,0") (ifseqformula "20"))
@@ -8809,7 +8809,7 @@
                               (rule "replace_known_right" (formula "25") (term "0,0,1,0,0") (ifseqformula "32"))
                               (builtin "One Step Simplification" (formula "25") (ifInst ""  (formula "16")))
                               (rule "cut_direct" (formula "31") (term "0"))
-                              (branch "CUT: anonOut_current.<created> = TRUE TRUE"
+                              (branch "CUT: anonOut_current.$created = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "32"))
                                  (rule "true_left" (formula "32"))
                                  (rule "allLeft" (formula "11") (inst "t=i_2_0"))
@@ -8827,7 +8827,7 @@
                                  (builtin "One Step Simplification" (formula "11"))
                                  (rule "closeFalse" (formula "11"))
                               )
-                              (branch "CUT: anonOut_current.<created> = TRUE FALSE"
+                              (branch "CUT: anonOut_current.$created = TRUE FALSE"
                                  (builtin "One Step Simplification" (formula "31"))
                                  (rule "allLeft" (formula "11") (inst "t=i_2_0"))
                                  (rule "replace_known_left" (formula "11") (term "0,0,0") (ifseqformula "20"))
@@ -8901,7 +8901,7 @@
                               (rule "applyEq" (formula "28") (term "1,0,0,0,0,0") (ifseqformula "19"))
                               (rule "applyEq" (formula "28") (term "1,1,0") (ifseqformula "19"))
                               (rule "cut_direct" (formula "34") (term "0"))
-                              (branch "CUT: anonOut_current.<created> = TRUE TRUE"
+                              (branch "CUT: anonOut_current.$created = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "35"))
                                  (rule "true_left" (formula "35"))
                                  (rule "allLeft" (formula "14") (inst "t=Z(0(#))"))
@@ -8917,7 +8917,7 @@
                                  (builtin "One Step Simplification" (formula "14"))
                                  (rule "closeFalse" (formula "14"))
                               )
-                              (branch "CUT: anonOut_current.<created> = TRUE FALSE"
+                              (branch "CUT: anonOut_current.$created = TRUE FALSE"
                                  (builtin "One Step Simplification" (formula "34"))
                                  (rule "allLeft" (formula "14") (inst "t=Z(0(#))"))
                                  (rule "leq_literals" (formula "14") (term "1,0"))
@@ -8938,7 +8938,7 @@
                               (rule "replace_known_left" (formula "28") (term "0,1,1,0,0") (ifseqformula "19"))
                               (builtin "One Step Simplification" (formula "28") (ifInst ""  (formula "35")))
                               (rule "cut_direct" (formula "34") (term "0"))
-                              (branch "CUT: anonOut_current.<created> = TRUE TRUE"
+                              (branch "CUT: anonOut_current.$created = TRUE TRUE"
                                  (builtin "One Step Simplification" (formula "35"))
                                  (rule "true_left" (formula "35"))
                                  (rule "ifthenelse_split" (formula "6") (term "0"))
@@ -9703,7 +9703,7 @@
                                     )
                                  )
                               )
-                              (branch "CUT: anonOut_current.<created> = TRUE FALSE"
+                              (branch "CUT: anonOut_current.$created = TRUE FALSE"
                                  (builtin "One Step Simplification" (formula "34"))
                                  (rule "ifthenelse_split" (formula "6") (term "0"))
                                  (branch "∃ int j; ( (IntNode)self.nodeseq[j] = self.last ∧ j ≥ 0 ∧ j ≤ i_2_0) TRUE"
@@ -10691,7 +10691,7 @@
                         (rule "qeq_literals" (formula "15") (term "0,1"))
                         (builtin "One Step Simplification" (formula "15"))
                         (rule "cut_direct" (formula "37") (term "0"))
-                        (branch "CUT: anonOut_current.<created> = TRUE TRUE"
+                        (branch "CUT: anonOut_current.$created = TRUE TRUE"
                            (builtin "One Step Simplification" (formula "38"))
                            (rule "true_left" (formula "38"))
                            (rule "ifthenelse_split" (formula "30") (term "0"))
@@ -10831,7 +10831,7 @@
                               (rule "add_zero_left" (formula "18") (term "1,0,1,0"))
                               (builtin "One Step Simplification" (formula "18"))
                               (rule "ifthenelse_split" (formula "2") (term "0"))
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE TRUE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE TRUE"
                                  (rule "applyEqReverse" (formula "52") (term "1,1") (ifseqformula "3"))
                                  (rule "hideAuxiliaryEq" (formula "3"))
                                  (rule "eqSymm" (formula "51") (term "1"))
@@ -13652,7 +13652,7 @@
                                     )
                                  )
                               )
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE FALSE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE FALSE"
                                  (rule "applyEqReverse" (formula "52") (term "1,1") (ifseqformula "2"))
                                  (rule "hideAuxiliaryEq" (formula "2"))
                                  (rule "eqSymm" (formula "51") (term "1"))
@@ -15485,7 +15485,7 @@
                               (rule "add_zero_left" (formula "19") (term "1,0,1,0"))
                               (builtin "One Step Simplification" (formula "19"))
                               (rule "ifthenelse_split" (formula "3") (term "0"))
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE TRUE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE TRUE"
                                  (rule "applyEqReverse" (formula "50") (term "1,1") (ifseqformula "4"))
                                  (rule "hideAuxiliaryEq" (formula "4"))
                                  (rule "eqSymm" (formula "49") (term "1"))
@@ -15874,7 +15874,7 @@
                                     (rule "closeFalse" (formula "38"))
                                  )
                               )
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE FALSE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE FALSE"
                                  (rule "applyEqReverse" (formula "50") (term "1,1") (ifseqformula "3"))
                                  (rule "hideAuxiliaryEq" (formula "3"))
                                  (rule "eqSymm" (formula "49") (term "1"))
@@ -16287,7 +16287,7 @@
                               )
                            )
                         )
-                        (branch "CUT: anonOut_current.<created> = TRUE FALSE"
+                        (branch "CUT: anonOut_current.$created = TRUE FALSE"
                            (builtin "One Step Simplification" (formula "37"))
                            (rule "ifthenelse_split" (formula "30") (term "0"))
                            (branch "∃ int j; ( (IntNode)self.nodeseq[j] = self.last ∧ j ≥ 0 ∧ j ≤ -1 + self.size) TRUE"
@@ -16426,7 +16426,7 @@
                               (rule "add_zero_left" (formula "18") (term "1,0,1,0"))
                               (builtin "One Step Simplification" (formula "18"))
                               (rule "ifthenelse_split" (formula "2") (term "0"))
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE TRUE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE TRUE"
                                  (rule "applyEqReverse" (formula "53") (term "1,1") (ifseqformula "3"))
                                  (rule "hideAuxiliaryEq" (formula "3"))
                                  (rule "eqSymm" (formula "52") (term "1"))
@@ -19268,7 +19268,7 @@
                                     )
                                  )
                               )
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE FALSE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE FALSE"
                                  (rule "applyEqReverse" (formula "53") (term "1,1") (ifseqformula "2"))
                                  (rule "hideAuxiliaryEq" (formula "2"))
                                  (rule "eqSymm" (formula "52") (term "1"))
@@ -21078,7 +21078,7 @@
                               (rule "add_zero_left" (formula "19") (term "1,0,1,0"))
                               (builtin "One Step Simplification" (formula "19"))
                               (rule "ifthenelse_split" (formula "3") (term "0"))
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE TRUE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE TRUE"
                                  (rule "applyEqReverse" (formula "51") (term "1,1") (ifseqformula "4"))
                                  (rule "hideAuxiliaryEq" (formula "4"))
                                  (rule "eqSymm" (formula "50") (term "1"))
@@ -21469,7 +21469,7 @@
                                     (rule "closeFalse" (formula "38"))
                                  )
                               )
-                              (branch "(IntNode)self.nodeseq[i_2_0].<created> = TRUE FALSE"
+                              (branch "(IntNode)self.nodeseq[i_2_0].$created = TRUE FALSE"
                                  (rule "applyEqReverse" (formula "51") (term "1,1") (ifseqformula "3"))
                                  (rule "hideAuxiliaryEq" (formula "3"))
                                  (rule "eqSymm" (formula "50") (term "1"))

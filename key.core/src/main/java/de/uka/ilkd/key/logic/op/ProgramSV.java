@@ -6,12 +6,14 @@ package de.uka.ilkd.key.logic.op;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramConstruct;
@@ -46,7 +48,8 @@ public final class ProgramSV extends JOperatorSV
     /**
      * creates a new SchemaVariable used as a placeholder for program constructs
      *
-     * @param name the Name of the SchemaVariable allowed to match a list of program constructs
+     * @param name
+     *        the Name of the SchemaVariable allowed to match a list of program constructs
      */
     ProgramSV(Name name, ProgramSVSort s, boolean isListSV) {
         super(name, s, false, false);
@@ -89,11 +92,6 @@ public final class ProgramSV extends JOperatorSV
     @Override
     public Position getEndPosition() {
         return Position.UNDEFINED;
-    }
-
-    @Override
-    public recoder.java.SourceElement.Position getRelativePosition() {
-        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     @Override
@@ -211,9 +209,12 @@ public final class ProgramSV extends JOperatorSV
      * and returns the updated match conditions or null if mapping is not possible because of
      * violating some variable condition
      *
-     * @param pe the ProgramElement <code>var</code> is mapped to
-     * @param matchCond the MatchConditions to be updated
-     * @param services the Services provide access to the Java model
+     * @param pe
+     *        the ProgramElement <code>var</code> is mapped to
+     * @param matchCond
+     *        the MatchConditions to be updated
+     * @param services
+     *        the Services provide access to the Java model
      * @return the updated match conditions including mapping <code>var</code> to <code>pe</code> or
      *         null if some variable condition would be hurt by the mapping
      */
@@ -252,9 +253,12 @@ public final class ProgramSV extends JOperatorSV
      * <code>list</code> and returns the updated match conditions or null if mapping is not possible
      * because of violating some variable condition
      *
-     * @param list the ProgramList <code>var</code> is mapped to
-     * @param matchCond the MatchConditions to be updated
-     * @param services the Services provide access to the Java model
+     * @param list
+     *        the ProgramList <code>var</code> is mapped to
+     * @param matchCond
+     *        the MatchConditions to be updated
+     * @param services
+     *        the Services provide access to the Java model
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
@@ -309,8 +313,10 @@ public final class ProgramSV extends JOperatorSV
     /**
      * returns true, if the given SchemaVariable can stand for the ProgramElement
      *
-     * @param match the ProgramElement to be matched
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param match
+     *        the ProgramElement to be matched
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return true if the SchemaVariable can stand for the given element
      */

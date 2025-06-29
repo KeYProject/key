@@ -89,22 +89,18 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
 
             @Override
-            public void componentResized(ComponentEvent e) {
-            }
+            public void componentResized(ComponentEvent e) {}
 
             @Override
-            public void componentMoved(ComponentEvent e) {
-            }
+            public void componentMoved(ComponentEvent e) {}
 
             @Override
-            public void componentHidden(ComponentEvent e) {
-            }
+            public void componentHidden(ComponentEvent e) {}
         });
 
         proofDisposedListener = new ProofDisposedListener() {
             @Override
-            public void proofDisposing(ProofDisposedEvent e) {
-            }
+            public void proofDisposing(ProofDisposedEvent e) {}
 
             @Override
             public void proofDisposed(ProofDisposedEvent e) {
@@ -205,8 +201,7 @@ public class InfoView extends JSplitPane implements TabPanel {
          * focused node has changed
          */
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-        }
+        public void selectedNodeChanged(KeYSelectionEvent e) {}
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)

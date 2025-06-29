@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -98,7 +98,8 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
     /**
      * Returns the {@link KeYJavaType} which provides the proof obligation of the current proof.
      *
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The {@link KeYJavaType} which provides the proof obligation or {@code null} if it was
      *         not possible to compute it.
      */

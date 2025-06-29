@@ -22,7 +22,8 @@ import org.jspecify.annotations.NullMarked;
  * <b>Version 2 (2017-03-28):</b> change of the interface support for structured arguments.
  * </p>
  *
- * @param <T> the arguments
+ * @param <T>
+ *        the arguments
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
@@ -41,11 +42,16 @@ public interface ProofScriptCommand<T> {
     T evaluateArguments(EngineState state, Map<String, Object> arguments) throws Exception;
 
     /**
-     * @param uiControl the current ui controller
-     * @param args the script arguments
-     * @param stateMap the current state
-     * @throws ScriptException if something bad happens
-     * @throws InterruptedException if something bad happens
+     * @param uiControl
+     *        the current ui controller
+     * @param args
+     *        the script arguments
+     * @param stateMap
+     *        the current state
+     * @throws ScriptException
+     *         if something bad happens
+     * @throws InterruptedException
+     *         if something bad happens
      */
     // TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
     void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)

@@ -347,8 +347,10 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * {@link Parameters#formula} parameter or its String representation matches the
      * {@link Parameters#matches} regex. If both parameters are not supplied, always returns true.
      *
-     * @param p The {@link Parameters} object.
-     * @param sf The {@link SequentFormula} to check.
+     * @param p
+     *        The {@link Parameters} object.
+     * @param sf
+     *        The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
     private boolean isFormulaSearchedFor(Parameters p,
@@ -369,7 +371,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     /**
      * Removes spaces and line breaks from the string representation of a term.
      *
-     * @param str The string to "clean up".
+     * @param str
+     *        The string to "clean up".
      * @return The original without spaces and line breaks.
      */
     private static String formatTermString(String str) {
