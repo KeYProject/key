@@ -36,7 +36,7 @@ def testIntegrationReport2 = tasks.register('testIntegrationReport2', JavaExec) 
     args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency',
             'src/test/pmexample2')
 }
-check.dependsOn(testIntegrationReport, testIntegrationReport2)
+test.dependsOn(testIntegrationReport, testIntegrationReport2)
 
 run {
     // for debugging, something like this can be used:

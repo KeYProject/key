@@ -165,7 +165,7 @@
 				<td>
 					<div title="${entry.proofFile.toFile()}"> ${entry.proofFile.toFile().name}</div>
 				</td>
-				<td><a href="#settings-${entry.settingsId(checkerData)}">#${entry.settingsId(checkerData)?string("00")}</a></td>
+				<td><a href="#settings-${entry.settingsId()}">#${entry.settingsId()?string("00")}</a></td>
 				<td>${entry.loadingState}</td>
 				<td>${entry.replayState}</td>
 				<td>${entry.proofState}</td>
