@@ -3,5 +3,5 @@ description = "Translation of Sequents to Isabelle"
 dependencies {
     implementation project(':key.core')
     implementation project(':key.ui')
-    implementation("de.unruh:scala-isabelle_2.13:0.4.3-RC2")
+    implementation("de.unruh:scala-isabelle_2.13:0.4.3")
 }
