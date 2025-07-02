@@ -14,9 +14,6 @@
 	<style>
 		${style}
 	</style>
-	<script type="text/javascript">
-      ${scripts}
-	</script>
 </head>
 
 <body>
@@ -29,78 +26,74 @@
 </div>
 
 <div id="overview" class="tabcontent default">
-	<ul>
-		<li>Bundle: ${checkerData.pbh.bundleName!"n/a"}</li>
-		<li>Checks run:
-        <#list checkerData.checks as key, c>
-            ${c}<#sep>, </#sep>
-        </#list>
-		</li>
-		<li>Date: ${checkerData.checkDate}</li>
-		<li>Overall Status: ${checkerData.globalState}</li>
-		<li>Contracts:
-        <#assign total=checkerData.bundleProofCount()
-        proven=checkerData.provenCount()
-        lemmaLeft=checkerData.lemmaLeftCount()
-        unproven=checkerData.unprovenCount()
-        data=checkerData>
 
-			<div style="width:100%; text-align:center">
-          <#if data.hasProvenContracts()>
-						<div style="width: calc(${proven/total*100}%); float:left;">proven</div>
-          </#if>
-          <#if data.hasLemmaLeftContracts()>
-						<div style="width: calc(${lemmaLeft/total*100}%); float:left; white-space:nowrap;">dependencies left
-						</div>
-          </#if>
-          <#if data.hasUnprovenContracts()>
-						<div style="width: calc(${unproven/total*100}%); float:left;">unproven</div>
-          </#if>
-			</div>
+	<div id="bundleName">
+		Bundle: ${checkerData.pbh.bundleName!"n/a"}
+	</div>
 
-			<div style="width:100%; background:#f1f1f1; color:white; text-align:center">
-          <#if data.hasProvenContracts()>
-						<div style="width: calc(${proven/total*100}%); background:#4CAF50; float:left;">${proven}</div>
-          </#if>
-          <#if data.hasLemmaLeftContracts()>
-						<div style="width: calc(${lemmaLeft/total*100}%); background:#f48336; float:left;">${lemmaLeft}</div>
-          </#if>
-          <#if data.hasUnprovenContracts()>
-						<div style="width: calc(${unproven/total*100}%); background:#f44336; float:left;">${unproven}</div>
-          </#if>
-			</div>
 
-		</li>
-		<li>Standard output:
-			<div style="text-align:end;">
-				<div>
-					<input type="checkbox" id="errors" name="errors" value="[    Error    ]" onclick="handleClick(this)" checked>
-					<label for="errors">Error</label>
-					<input type="checkbox" id="warnings" name="warnings" value="[   Warning   ]" onclick="handleClick(this)"
-					       checked>
-					<label for="warnings">Warning</label>
-					<input type="checkbox" id="info" name="info" value="[ Information ]" onclick="handleClick(this)" checked>
-					<label for="info">Information</label>
-					<input type="checkbox" id="debug" name="debug" value="[    Debug    ]" onclick="handleClick(this)" checked>
-					<label for="debug">Debug</label>
-				</div>
+	<div id="checks-ran">
+		Checks run:
+      <#list checkerData.checks as key, c>
+          ${c}<#sep>, </#sep>
+      </#list>
+	</div>
+
+	<div class="report-date">Date of report: ${checkerData.checkDate}</div>
+
+	<div class="overall-status status-${checkerData.globalState}">Overall Status: ${checkerData.globalState}</div>
+
+	<div>
+		<h3>Contracts Overview</h3>
+      <#assign  total=checkerData.bundleProofCount()
+      proven=checkerData.provenCount()
+      lemmaLeft=checkerData.lemmaLeftCount()
+      unproven=checkerData.unprovenCount()
+      data=checkerData >
+
+		<div>
+			<div>
+				<span class="legend">proven</span>
+				<span style="width: calc(${proven/total*100}%); background:#4CAF50" class="bar"></span>
+					${proven} (${proven/total*100}%)
 			</div>
-			<div id="messages"
-			     style="background-color:#002b36;
-                    color:#93a1a1;
-                    font-family:monospace;
-                    font-size:16px;
-                    width:max-content;
-                    padding:10px">
-          <#list checkerData.messages as msg>
-              <#escape x as x>
+			<div>
+				<span class="legend">dependencies left</span>
+				<span style="width: calc(${lemmaLeft/total*100}%); background:#f48336;" class="bar"></span>
+          ${lemmaLeft} (${lemmaLeft/total*100}%)
+			</div>
+			<div>
+				<span class="legend">unproven</span>
+				<span style="width: calc(${unproven/total*100}%); background:#f44336;" class="bar"></span>
+          ${unproven} (${unproven/total*100}%)
+			</div>
+		</div>
+	</div>
+
+	<div class="log-messages">
+		<h3>Log messages</h3>
+		<div style="text-align:end;">
+			<div>
+				<input type="checkbox" id="errors" value="4" checked>
+				<label for="errors">Error</label>
+				<input type="checkbox" id="warnings" value="3" checked>
+				<label for="warnings">Warning</label>
+				<input type="checkbox" id="info" value="2" checked>
+				<label for="info">Information</label>
+				<input type="checkbox" id="debug" value="0" checked>
+				<label for="debug">Debug</label>
+			</div>
+		</div>
+		<div id="messages">
+        <#list checkerData.messages as msg>
+            <#escape x as x>
+							<div class="logline loglevel-${msg.level().ordinal()}">
                   ${msg}
-              </#escape>
-              <#sep> <br/> </#sep>
-          </#list>
-			</div>
-		</li>
-	</ul>
+							</div>
+            </#escape>
+        </#list>
+		</div>
+	</div>
 </div>
 
 <div id="files" class="tabcontent">
@@ -284,15 +277,10 @@
     </#if>
 </div>
 
+
 <script type="text/javascript">
-    // make the filetree foldable/expandable
-    let toggler = document.getElementsByClassName("caret");
-    for (let i = 0; i < toggler.length; i++) {
-        toggler[i].addEventListener("click", function () {
-            this.parentElement.querySelector(".nested").classList.toggle("active");
-            this.classList.toggle("caret-down");
-        });
-    }
+    ${scripts}
 </script>
+
 </body>
 </html>
