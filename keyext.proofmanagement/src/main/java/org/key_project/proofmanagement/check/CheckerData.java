@@ -3,12 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import java.net.URL;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -17,13 +11,17 @@ import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
-import org.jspecify.annotations.Nullable;
+import java.net.URL;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
@@ -45,10 +43,12 @@ public final class CheckerData implements Logger {
 
     private final Map<String, String> checks = new HashMap<>();
 
-    /** minimum log level: all messages with a smaller LogLevel will be suppressed */
+    /**
+     * minimum log level: all messages with a smaller LogLevel will be suppressed
+     */
     private final LogLevel minLogLevel;
 
-    private final List<String> messages = new ArrayList<>();
+    private final List<Logline> messages = new ArrayList<>();
 
     // TODO: side effects: may be changed by checkers (e.g. remove paths of taclet proofs)
     private @Nullable List<Path> proofPaths = null;
@@ -57,16 +57,20 @@ public final class CheckerData implements Logger {
 
     private @Nullable DependencyGraph dependencyGraph;
 
-    ////////////////////////////////// results from missing proofs checker
+    /// /////////////////////////////// results from missing proofs checker
 
     public Set<Contract> getContractsWithoutProof() {
         return contractsWithoutProof;
     }
 
-    /** user provided contracts for which no proof exists */
+    /**
+     * user provided contracts for which no proof exists
+     */
     private final Set<Contract> contractsWithoutProof = new HashSet<>();
 
-    /** internal contracts (from classes shipped with KeY) without a proof */
+    /**
+     * internal contracts (from classes shipped with KeY) without a proof
+     */
     private final Set<Contract> internalContractsWithoutProof = new HashSet<>();
 
     public void addContractWithoutProof(Contract c, boolean internal) {
@@ -84,17 +88,23 @@ public final class CheckerData implements Logger {
 
     ////////////////////////////////// results from settings checker
 
-    /** all choice names that occur in at least one settings object of a proof */
+    /**
+     * all choice names that occur in at least one settings object of a proof
+     */
     private final SortedSet<String> choiceNames = new TreeSet<>();
 
     public SortedSet<String> getChoiceNames() {
         return choiceNames;
     }
 
-    /** choices used as reference (mapped to their corresponding id) */
+    /**
+     * choices used as reference (mapped to their corresponding id)
+     */
     private final Map<Map<String, String>, Integer> referenceChoices = new HashMap<>();
 
-    /** mapping from choices to the reference id */
+    /**
+     * mapping from choices to the reference id
+     */
     private final Map<Map<String, String>, Integer> choices2Id = new HashMap<>();
 
     /**
@@ -154,7 +164,7 @@ public final class CheckerData implements Logger {
         return res;
     }
 
-    //////////////////////////////////
+    /// ///////////////////////////////
 
     private LoadingState srcLoadingState = LoadingState.UNKNOWN;
     // we use methods to determine these states on the fly
@@ -295,13 +305,14 @@ public final class CheckerData implements Logger {
             // for multiline strings, every line should have correct prefix
             String[] lines = message.split("\\r?\\n");
             for (String l : lines) {
-                messages.add(level + l);
-                System.out.println(level + l);
+                var ll = new Logline(level, l);
+                messages.add(ll);
+                System.out.println(ll);
             }
         }
     }
 
-    public List<String> getMessages() {
+    public List<Logline> getMessages() {
         return messages;
     }
 
@@ -481,10 +492,6 @@ public final class CheckerData implements Logger {
         this.dependencyGraph = dependencyGraph;
     }
 
-    /**
-     * @author Alexander Weigl
-     * @version 1 (6/18/25)
-     */
     public class ProofEntry {
         public LoadingState loadingState = LoadingState.UNKNOWN;
         public ReplayState replayState = ReplayState.UNKNOWN;
@@ -503,11 +510,12 @@ public final class CheckerData implements Logger {
         public @Nullable Contract contract;
         public @Nullable URL sourceFile;
         public @Nullable String shortSrc;
-        public IntermediatePresentationProofFileParser.Result parseResult;
-        public AbstractProblemLoader.ReplayResult replayResult;
+        public IntermediatePresentationProofFileParser.@Nullable Result parseResult;
+        public AbstractProblemLoader.@Nullable ReplayResult replayResult;
 
         public Integer settingsId() {
             return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
         }
     }
+
 }
