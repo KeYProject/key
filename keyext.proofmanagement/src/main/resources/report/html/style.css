@@ -5,29 +5,33 @@ body, html {
 
 div.tabcontent {
     overflow: hidden;
-    background-color: #f1f1f1;
-    display:none; /* Hide all tabs */
+    display: none; /* Hide all tabs */
 }
 
 div.tabcontent:target, /*show tabs if targeted */
-:root:not(:has(:target)) div.tabcontent.default /*if nothing targeted at all, show the default tab*/ {
+:root:not(:has(:target)) div.tabcontent.default /*if nothing targeted at all, show the default tab*/
+{
     display: block
 }
 
+.nav {
+    background-color: #ccc;
+    padding: 1em;
+    margin-bottom: 2em;
+    border-bottom: 1px solid lightblue;
 
-.nav a {
-    background-color: inherit;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 20px;
-}
+    a {
+        padding: 1ex;
+        font-size: 120%;
+    }
 
-.tab a:hover {
-    background-color: #ddd;
-}
+    a:hover {
+        background-color: #ddd;
+    }
 
-.tab a.active {
-    background-color: #ccc
+    a.active {
+        background-color: #ccc
+    }
 }
 
 .tabcontent {
@@ -112,7 +116,47 @@ thead.tableHead {
     padding-right: 4px;
 }
 
-#messages span {
-    display: block;
-    white-space: pre;
+
+#bundleTable {
+    font-weight: bold;
+    font-size: 110%;
+}
+
+
+.legend {
+    display: inline-block;
+    text-align: right;
+    width: 20%;
+}
+
+.bar {
+    display: inline-block;
+    height: 1em;
+}
+
+div#messages {
+    background-color: #002b36;
+    color: #93a1a1;
+    font-family: monospace;
+    font-size: 10pt;
+    padding: 10px;
+    .loglevel-4 /*error line*/ {
+        color: hsla(10 100% 50%);
+    }
+
+    .loglevel-3 /*warning line*/ {
+        color: hsla(40 100% 50%);
+    }
+
+    .loglevel-2 /*info*/ {
+        color: hsla(170 100% 50%);
+    }
+
+    .loglevel-1 /*normal line*/ {
+        color:yellow;
+    }
+
+    .loglevel-0t /*error line*/ {
+        color: #ccc;
+    }
 }
