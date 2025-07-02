@@ -40,8 +40,6 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
         if (!(inst instanceof Term)) return false;
         var op = ((Term) inst).op();
 
-        LOGGER.info("{} {}", variable, variable.getClass());
-
         if (op.arity() != 0) return false;
 
         if (op instanceof Function) {

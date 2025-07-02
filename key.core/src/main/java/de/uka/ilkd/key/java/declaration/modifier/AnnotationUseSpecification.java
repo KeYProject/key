@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration.modifier;
 
+import org.key_project.logic.SyntaxElement;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -37,6 +39,11 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
             return tr;
         }
         throw new ArrayIndexOutOfBoundsException();
+    }
+
+    @Override
+    public SyntaxElement getChild(int index) {
+        return getChildAt(index);
     }
 
     public int getChildCount() {

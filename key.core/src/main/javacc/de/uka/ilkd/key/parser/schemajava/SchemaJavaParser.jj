@@ -3455,26 +3455,25 @@ TypeOperator AllocationExpression() :
     ASTList<TypeArgumentDeclaration> typeArgs;
 }
 {
+    "new"
+    (AnnotationUse())*
     (
      LOOKAHEAD(2)
-     ( "new"
+     (
+       (tr = PrimitiveType()  | tr = TypeMC())
      {
 	 na = factory.createNewArray();
 	 setPrefixInfo(na);
-     }
-       (tr = PrimitiveType()  | tr = TypeMC())
-     {
 	 na.setTypeReference(tr);
      }
        result = ArrayDimsAndInits(na)
        )
      | (
-	"new"
+	(qn = TypedName() | tr = TypeSV())
      {
 	 result = factory.createNew();
 	 setPrefixInfo(result);
      }
-	(qn = TypedName() | tr = TypeSV())
   [typeArgs = NonWildcardTypeArguments() { qn.setTypeArguments(typeArgs); } ]
 	(
 	 ( args = Arguments()
