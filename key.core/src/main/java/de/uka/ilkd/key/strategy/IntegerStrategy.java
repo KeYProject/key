@@ -36,40 +36,58 @@ import org.jspecify.annotations.NonNull;
 
 public class IntegerStrategy extends AbstractFeatureStrategy {
 
-
     public static final Name NAME = new Name("Integer Strategy");
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
-    private final ArithTermFeatures tf;
+    /// Magic constants
     private static final int IN_EQ_SIMP_NON_LIN_COST = 1000;
     private static final int POLY_DIVISION_COST = -2250;
-    protected final StrategyProperties strategyProperties;
-    private final FormulaTermFeatures ff;
+
+    /// The features defining the three phases: cost computation, approval,
+    /// additionalInstanceCreationAndEvaluation
+    private final RuleSetDispatchFeature costComputationDispatcher;
     private final RuleSetDispatchFeature approvalDispatcher;
     private final RuleSetDispatchFeature instantiationDispatcher;
 
+    /// Useful [TermFeature] collections
+    private final ArithTermFeatures tf;
+    private final FormulaTermFeatures ff;
+
+    /// configuration options extracted from [StrategyProperties]
+    private final boolean nonLinearArithmeticEnabled;
+    private final boolean divAndModuloReasoningEnabled;
+    private final boolean stopAtFirstNonCloseableGoal;
 
     public IntegerStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
         this.tf = new ArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
+
+        // determine configuration
+        nonLinearArithmeticEnabled = StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
+                strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
+
+        divAndModuloReasoningEnabled =
+                nonLinearArithmeticEnabled || StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(
+                        strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
+
+        stopAtFirstNonCloseableGoal =
+                strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+
+        // setup cost computations
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
         instantiationDispatcher = setupInstantiationF();
+
     }
 
     private RuleSetDispatchFeature setupInstantiationF() {
         enableInstantiate();
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
-
         setupArithPrimaryCategories(d);
         setupDefOpsPrimaryCategories(d);
-
         setupInstantiationWithoutRetry(d);
-
         setupInEqSimpInstantiation(d);
 
         disableInstantiate();
@@ -136,16 +154,18 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
     }
 
     private boolean arithNonLinInferences() {
-        return StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
+        return nonLinearArithmeticEnabled;
     }
 
-    protected boolean arithDefOps() {
-        return StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(
-            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY))
-                || StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-                    strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
+    private boolean arithDefOps() {
+        return divAndModuloReasoningEnabled;
     }
+
+    @Override
+    public boolean isStopAtFirstNonCloseableGoal() {
+        return stopAtFirstNonCloseableGoal;
+    }
+
 
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
@@ -916,12 +936,6 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
     private void setupInstantiationWithoutRetry(RuleSetDispatchFeature d) {
         setupPolySimpInstantiationWithoutRetry(d);
         setupInEqSimpInstantiationWithoutRetry(d);
-    }
-
-    @Override
-    public boolean isStopAtFirstNonCloseableGoal() {
-        return strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     @Override
