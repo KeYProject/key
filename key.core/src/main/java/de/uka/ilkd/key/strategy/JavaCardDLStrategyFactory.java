@@ -455,7 +455,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
 
     @Override
     public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties) {
-        return new JavaCardDLStrategy(proof, strategyProperties);
+        return new ModularJavaDLStrategy(proof, strategyProperties);
     }
 
     @Override
