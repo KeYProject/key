@@ -25,11 +25,12 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final List<AbstractFeatureStrategy> strategies = new ArrayList<>();
     private final StrategyProperties strategyProperties;
 
-    public ModularJavaDLStrategy(Proof proof, StrategyProperties strategyProperties) {
+    public ModularJavaDLStrategy(Proof proof, StrategyProperties properties) {
         super(proof);
-        strategies.add(new JavaCardDLStrategy(proof, strategyProperties));
-        strategies.add(new IntegerStrategy(proof, strategyProperties));
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
+        strategies.add(new IntegerStrategy(proof, properties));
+        strategies.add(new StringStrategy(proof, properties));
+        strategies.add(new JavaCardDLStrategy(proof, properties));
+        this.strategyProperties = (StrategyProperties) properties.clone();
     }
 
     @Override
