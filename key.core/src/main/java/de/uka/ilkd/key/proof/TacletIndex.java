@@ -21,6 +21,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.indexing.RuleIndex;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -540,6 +541,9 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
                   %s
                 """.formatted(antecList, succList, rwList, noFindList);
     }
+
+    @Override
+    public abstract TacletIndex copy();
 
     /**
      * Inner class to track the occurrences of prefix elements in java blocks
