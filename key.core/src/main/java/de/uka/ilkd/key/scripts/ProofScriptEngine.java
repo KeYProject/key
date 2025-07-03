@@ -17,6 +17,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -70,6 +71,10 @@ public class ProofScriptEngine {
     public ProofScriptEngine(KeyAst.ProofScript script, Goal initiallySelectedGoal) {
         this.script = script;
         this.initiallySelectedGoal = initiallySelectedGoal;
+    }
+
+    public ProofScriptEngine(KeyAst.ProofScriptEntry script) {
+        this(script.code(), script.getLocation());
     }
 
     private static Map<String, ProofScriptCommand<?>> loadCommands() {

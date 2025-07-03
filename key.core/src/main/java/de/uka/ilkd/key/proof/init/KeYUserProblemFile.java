@@ -34,7 +34,11 @@ import org.jspecify.annotations.Nullable;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
+    @Nullable
     private Sequent problem = null;
+
+    @Nullable
+    private Configuration settings;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -117,6 +121,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.add(getPositionedStrings(readRules()));
 
         return warnings;
+    }
+
+    public Configuration readSettings() {
+        if (settings == null) {
+            settings = getParseContext().findSettings();
+        }
+        return settings;
     }
 
     @Override
@@ -270,4 +281,5 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     public KeYJavaType getContainerType() {
         return null;
     }
+
 }
