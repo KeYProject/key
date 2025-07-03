@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof;
+package org.key_project.prover.indexing;
 
 import java.util.Set;
 
@@ -57,7 +57,7 @@ public interface RuleIndex<Application extends RuleApp> extends Cloneable {
     /**
      * copies the index
      */
-    TacletIndex copy();
+    RuleIndex<Application> copy();
 
     /**
      * clones the index
