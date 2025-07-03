@@ -1,0 +1,7 @@
+contains:
+  - "(assert (not (= (d2u (fp #b0 #b10000000000 #b0000000000000000000000000000000000000000000000000000))\
+    \ (d2u (fp.sqrt RNE (fp #b0 #b10000000001 #b0000000000000000000000000000000000000000000000000000))))))"
+smtSettings:
+  '[NewSMT]sqrtSMTTranslation': SMT
+expected: VALID
+keySrc: "\\problem { 2.0d = sqrtDouble(4.0d) }"
