@@ -18,19 +18,18 @@
 
 <body>
 
-<div class="nav">
-	<a class="tablinks" href="#overview" id="defaultOpen">Overview</a>
-	<a class="tablinks" href="#files">Files</a>
-	<a class="tablinks" href="#contracts">Contracts</a>
-	<a class="tablinks" href="#dependencies">Dependencies</a>
+<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'overview')" id="defaultOpen">Overview</button>
+    <button class="tablinks" onclick="openTab(event, 'files')">Files</button>
+    <button class="tablinks" onclick="openTab(event, 'contracts')">Contracts</button>
+    <button class="tablinks" onclick="openTab(event, 'dependencies')">Dependencies</button>
 </div>
 
-<div id="overview" class="tabcontent default">
+<div id="overview" class="tabcontent">
 
 	<div id="bundleName">
 		Bundle: ${checkerData.pbh.bundleName!"n/a"}
 	</div>
-
 
 	<div id="checks-ran">
 		Checks run:
@@ -45,29 +44,33 @@
 
 	<div>
 		<h3>Contracts Overview</h3>
-      <#assign  total=checkerData.bundleProofCount()
-      proven=checkerData.provenCount()
-      lemmaLeft=checkerData.lemmaLeftCount()
-      unproven=checkerData.unprovenCount()
-      data=checkerData >
+      <#assign total=checkerData.bundleProofCount()
+               proven=checkerData.provenCount()
+               lemmaLeft=checkerData.lemmaLeftCount()
+               unproven=checkerData.unprovenCount()>
 
-		<div>
-			<div>
-				<span class="legend">proven</span>
-				<span style="width: calc(${proven/total*100}%); background:#4CAF50" class="bar"></span>
-					${proven} (${proven/total*100}%)
-			</div>
-			<div>
-				<span class="legend">dependencies left</span>
-				<span style="width: calc(${lemmaLeft/total*100}%); background:#f48336;" class="bar"></span>
-          ${lemmaLeft} (${lemmaLeft/total*100}%)
-			</div>
-			<div>
-				<span class="legend">unproven</span>
-				<span style="width: calc(${unproven/total*100}%); background:#f44336;" class="bar"></span>
-          ${unproven} (${unproven/total*100}%)
-			</div>
-		</div>
+		<div style="width:100%; text-align:center">
+            <#if proven gt 0>
+                <div style="width: ${proven/total*100}%; float:left;">proven</div>
+            </#if>
+            <#if lemmaLeft gt 0>
+                <div style="width: ${lemmaLeft/total*100}%; float:left; white-space:nowrap;">dependencies left</div>
+            </#if>
+            <#if unproven gt 0>
+                <div style="width: ${unproven/total*100}%; float:left;">unproven</div>
+            </#if>
+        </div>
+        <div style="width:100%; background:#f1f1f1; color:white; text-align:center">
+            <#if proven gt 0>
+                <div style="width: ${proven/total*100}%; background:#4CAF50; float:left;">${proven}</div>
+            </#if>
+            <#if lemmaLeft gt 0>
+                <div style="width: ${lemmaLeft/total*100}%; background:#f48336; float:left;">${lemmaLeft}</div>
+            </#if>
+            <#if unproven gt 0>
+                <div style="width: ${unproven/total*100}%; background:#f44336; float:left;">${unproven}</div>
+            </#if>
+        </div>
 	</div>
 
 	<div class="log-messages">

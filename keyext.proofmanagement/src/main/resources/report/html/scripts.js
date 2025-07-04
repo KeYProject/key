@@ -75,6 +75,8 @@ function openTab(evt, tabName) {
     evt.currentTarget.className += " active";
 }
 
+// ensure that the overview tab is opened when the file is loaded
+document.getElementById("defaultOpen").click()
 
 //region Toggle the visibility of log-lines using checkboxes
 let chkError = document.getElementById("errors");

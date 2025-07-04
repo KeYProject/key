@@ -2,39 +2,32 @@ body, html {
     margin: 0;
     font-family: "Arial", sans-serif;
 }
-
-div.tabcontent {
+.tab {
     overflow: hidden;
-    display: none; /* Hide all tabs */
+    background-color: #f1f1f1;
 }
 
-div.tabcontent:target, /*show tabs if targeted */
-:root:not(:has(:target)) div.tabcontent.default /*if nothing targeted at all, show the default tab*/
-{
-    display: block
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 20px;
 }
 
-.nav {
-    background-color: #ccc;
-    padding: 1em;
-    margin-bottom: 2em;
-    border-bottom: 1px solid lightblue;
+.tab button:hover {
+    background-color: #ddd;
+}
 
-    a {
-        padding: 1ex;
-        font-size: 120%;
-    }
-
-    a:hover {
-        background-color: #ddd;
-    }
-
-    a.active {
-        background-color: #ccc
-    }
+.tab button.active {
+    background-color: #ccc
 }
 
 .tabcontent {
+    display: none;
     padding: 6px 12px;
 }
 
