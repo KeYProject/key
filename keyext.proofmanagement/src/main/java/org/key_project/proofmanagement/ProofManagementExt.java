@@ -12,7 +12,6 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * @author Wolfram Pfeifer
@@ -29,7 +28,7 @@ public class ProofManagementExt implements
     private static final String MENU_PM = "Proof Management";
 
     @Override
-    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
+    public List<Action> getMainMenuActions(MainWindow mainWindow) {
 
         return List.of(new CheckAction());
     }

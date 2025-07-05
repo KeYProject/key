@@ -13,6 +13,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ class CheckConfigDialog extends JDialog {
 
     private final Component glassPane = new BlockingGlassPane();
 
-    private transient SwingWorker<Void, Void> checkWorker;
+    private transient @Nullable SwingWorker<Void, Void> checkWorker;
 
     private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
@@ -106,7 +107,9 @@ class CheckConfigDialog extends JDialog {
                             containerPoint.x,
                             containerPoint.y);
                     if (component == runButton) {
-                        checkWorker.cancel(true);
+                        if (checkWorker != null) {
+                            checkWorker.cancel(true);
+                        }
                     } else {
                         e.consume();
                     }
@@ -167,7 +170,7 @@ class CheckConfigDialog extends JDialog {
         }
     }
 
-    public CheckConfigDialog(Frame parent, String title, boolean modal) {
+    public CheckConfigDialog(@Nullable Frame parent, String title, boolean modal) {
         super(parent, title, modal);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -205,17 +208,7 @@ class CheckConfigDialog extends JDialog {
         bundleBox.add(bundleFileField);
         bundleBox.add(Box.createHorizontalStrut(5));
         runButton.setEnabled(false);
-        JButton chooseBundleButton = new JButton("Choose file...");
-        chooseBundleButton.addActionListener(e -> {
-            KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file");
-            fc.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
-            if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
-                bundleFileField.setText(fc.getSelectedFile().toString());
-                runButton.setEnabled(true);
-            }
-        });
-        chooseBundleButton.setPreferredSize(buttonDim);
-        chooseBundleButton.setMinimumSize(buttonDim);
+        JButton chooseBundleButton = getChooseBundleButton(buttonDim);
         bundleBox.add(chooseBundleButton);
         centerBox.add(bundleBox);
 
@@ -291,5 +284,20 @@ class CheckConfigDialog extends JDialog {
 
         pack();
         setLocationRelativeTo(parent);
+    }
+
+    private JButton getChooseBundleButton(Dimension buttonDim) {
+        JButton chooseBundleButton = new JButton("Choose file...");
+        chooseBundleButton.addActionListener(e -> {
+            KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file");
+            fc.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
+            if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
+                bundleFileField.setText(fc.getSelectedFile().toString());
+                runButton.setEnabled(true);
+            }
+        });
+        chooseBundleButton.setPreferredSize(buttonDim);
+        chooseBundleButton.setMinimumSize(buttonDim);
+        return chooseBundleButton;
     }
 }

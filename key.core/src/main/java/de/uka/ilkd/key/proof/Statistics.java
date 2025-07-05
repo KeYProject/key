@@ -25,7 +25,6 @@ import org.key_project.util.collection.Pair;
  * nodes, or the number of interactions.
  *
  * @author bruns
- *
  */
 public class Statistics {
     public final int nodes;
@@ -446,5 +445,77 @@ public class Statistics {
             }
             return res;
         }
+    }
+
+    public long getAutoModeTimeInMillis() {
+        return autoModeTimeInMillis;
+    }
+
+    public int getBlockLoopContractApps() {
+        return blockLoopContractApps;
+    }
+
+    public int getBranches() {
+        return branches;
+    }
+
+    public int getCachedBranches() {
+        return cachedBranches;
+    }
+
+    public int getDependencyContractApps() {
+        return dependencyContractApps;
+    }
+
+    public int getInteractiveSteps() {
+        return interactiveSteps;
+    }
+
+    public int getLoopInvApps() {
+        return loopInvApps;
+    }
+
+    public int getMergeRuleApps() {
+        return mergeRuleApps;
+    }
+
+    public int getNodes() {
+        return nodes;
+    }
+
+    public int getOperationContractApps() {
+        return operationContractApps;
+    }
+
+    public int getOssApps() {
+        return ossApps;
+    }
+
+    public int getQuantifierInstantiations() {
+        return quantifierInstantiations;
+    }
+
+    public int getSmtSolverApps() {
+        return smtSolverApps;
+    }
+
+    public List<Pair<String, String>> getSummaryList() {
+        return summaryList;
+    }
+
+    public int getSymbExApps() {
+        return symbExApps;
+    }
+
+    public long getTimeInMillis() {
+        return timeInMillis;
+    }
+
+    public float getTimePerStepInMillis() {
+        return timePerStepInMillis;
+    }
+
+    public int getTotalRuleApps() {
+        return totalRuleApps;
     }
 }
