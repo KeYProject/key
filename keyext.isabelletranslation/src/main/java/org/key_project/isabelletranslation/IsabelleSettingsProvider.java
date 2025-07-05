@@ -76,7 +76,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         setHeaderText(getDescription());
         setSubHeaderText(
             "Isabelle settings are stored in: "
-                + IsabelleTranslationSettings.SETTINGS_FILE_NEW.getAbsolutePath());
+                + IsabelleTranslationSettings.SETTINGS_FILE_NEW.toAbsolutePath());
         translationPathPanel = createTranslationPathPanel();
         isabellePathPanel = createIsabellePathPanel();
         timeoutField = createTimeoutField();
