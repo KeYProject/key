@@ -9,14 +9,6 @@ plugins {
     //https://docs.gradle.org/current/userguide/eclipse_plugin.html
     id("eclipse")  //support for Eclipse
 
-    //Checks and adds the license header of the source files:
-    // Task: `licenseMain' and `licenseFormatMain'
-    //https://github.com/hierynomus/license-gradle-plugin
-    id "com.github.hierynomus.license-base" version "0.16.1"
-    //Generates reports on the license of used packages: Task `downloadLicenses'
-    //Some Licenses requires an entry in the credits (MIT, BSD)
-    id "com.github.hierynomus.license-report" version "0.16.1"
-
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
     // id "com.github.ben-manes.versions" version "0.39.0"
 
@@ -24,7 +16,7 @@ plugins {
     id "com.diffplug.spotless" version "7.0.4"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.53"
+    id "org.checkerframework" version "0.6.55"
 
     id("org.sonarqube") version "6.2.0.5505"
 }
@@ -89,8 +81,6 @@ subprojects {
         implementation("org.slf4j:slf4j-api:2.0.17")
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
-        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
-        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
@@ -102,8 +92,10 @@ subprojects {
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
+        testImplementation("org.assertj:assertj-core:3.27.3")
+        testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
-        testImplementation(platform("org.junit:junit-bom:5.12.2"))
+        testImplementation(platform("org.junit:junit-bom:5.13.2"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
@@ -111,6 +103,11 @@ subprojects {
         testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
 
+        // test fixtures
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.1")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1")
+
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.2'
     }
 
     tasks.withType(JavaCompile) {
@@ -144,7 +141,6 @@ subprojects {
 
     tasks.withType(Test) {
         useJUnitPlatform {
-            includeEngines 'junit-vintage'
             includeEngines 'junit-jupiter'
         }
     }
@@ -214,7 +210,7 @@ subprojects {
     pmd {
         pmdTest.enabled = false
         ignoreFailures = true
-        toolVersion = "6.53.0"
+        toolVersion = "7.10.0"
         consoleOutput = false
         rulesMinimumPriority = 5
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
@@ -239,7 +235,7 @@ subprojects {
 
 
     checkstyle {
-        toolVersion = "10.6.0"
+        toolVersion = "10.26.0"
         ignoreFailures = true
         configFile = file("$rootDir/gradle/key_checks.xml")
         showViolations = false // disable console output
@@ -291,18 +287,6 @@ subprojects {
         description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
-    }
-
-    license {//configures the license file header
-        header = file("$rootDir/gradle/header")
-
-        mapping {
-            //find styles here:
-            // http://code.mycila.com/license-maven-plugin/#supported-comment-types
-            java = "SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
-            javascript = "SLASHSTAR_STYLE"
-        }
-        mapping("key", "SLASHSTAR_STYLE")
     }
 
     eclipse { //configures the generated .project and .classpath files.

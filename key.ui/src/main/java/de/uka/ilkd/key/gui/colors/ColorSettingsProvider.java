@@ -24,7 +24,6 @@ import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
  * @version 1 (10.05.19)
  */
 public class ColorSettingsProvider extends SimpleSettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = -6253991459166324512L;
     private final JTable tblColors = new JTable();
     private ColorSettingsTableModel modelColor;
 
@@ -44,7 +43,8 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     @Override
     public JPanel getPanel(MainWindow window) {
         List<ColorPropertyData> properties = ColorSettings.getInstance().getProperties()
-                .map(it -> new ColorPropertyData(it, it.get())).collect(Collectors.toList());
+                .map(it -> new ColorPropertyData(it, it.getLightValue(), it.getDarkValue()))
+                .collect(Collectors.toList());
 
         modelColor = new ColorSettingsTableModel(properties);
         tblColors.setModel(modelColor);
@@ -61,8 +61,6 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         tblColors.getColumnModel().getColumn(2).setCellEditor(HexColorCellEditor.make());
 
         tblColors.setDefaultRenderer(Color.class, new DefaultTableCellRenderer() {
-            private static final long serialVersionUID = -7602735597024671100L;
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
@@ -93,12 +91,15 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
     @Override
     public void applySettings(MainWindow window) {
-        modelColor.colorData.forEach(it -> it.property.set(it.color));
+        for (ColorPropertyData it : modelColor.colorData) {
+            it.property.setLightValue(it.lightColor);
+            it.property.setDarkValue(it.darkColor);
+        }
     }
 
     private static class ColorSettingsTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 4722928883386296559L;
-        private static final String[] COLUMNS = { "Key", "Description", "Color" };
+        private static final String[] COLUMNS =
+            { "Key", "Description", "Light Color", "Dark Color" };
         private final List<ColorPropertyData> colorData;
 
         public ColorSettingsTableModel(List<ColorPropertyData> properties) {
@@ -125,14 +126,15 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
             return switch (columnIndex) {
             case 0 -> colorData.get(rowIndex).property.getKey();
             case 1 -> colorData.get(rowIndex).property.getDescription();
-            case 2 -> colorData.get(rowIndex).color;
+            case 2 -> colorData.get(rowIndex).lightColor;
+            case 3 -> colorData.get(rowIndex).darkColor;
             default -> "";
             };
         }
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 2) {
+            if (columnIndex == 2 || columnIndex == 3) {
                 return Color.class;
             }
             return String.class;
@@ -141,7 +143,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 2) {
-                colorData.get(rowIndex).color = ColorSettings.fromHex(aValue.toString());
+                colorData.get(rowIndex).lightColor = ColorSettings.fromHex(aValue.toString());
             } else {
                 super.setValueAt(aValue, rowIndex, columnIndex);
             }
@@ -149,17 +151,20 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 2;
+            return columnIndex == 2 || columnIndex == 3;
         }
     }
 
     private static class ColorPropertyData {
         private final ColorSettings.ColorProperty property;
-        Color color;
+        Color darkColor;
+        Color lightColor;
 
-        public ColorPropertyData(ColorSettings.ColorProperty property, Color color) {
+        public ColorPropertyData(ColorSettings.ColorProperty property, Color lightColor,
+                Color darkColor) {
             this.property = property;
-            this.color = color;
+            this.lightColor = lightColor;
+            this.darkColor = darkColor;
         }
     }
 
@@ -168,8 +173,6 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
 
 class HexColorCellEditor extends DefaultCellEditor {
-    private static final long serialVersionUID = -4352607386521686931L;
-
     HexColorCellEditor(JTextField textField) {
         super(textField);
 

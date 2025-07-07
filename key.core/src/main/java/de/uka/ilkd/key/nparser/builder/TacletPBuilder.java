@@ -41,7 +41,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
-import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
@@ -820,8 +819,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             gt = new TacletGoalTemplate(addSeq, addRList, pvs);
         } else {
             if (b instanceof NoFindTacletBuilder) {
-                // there is a replacewith without a find.
-                throwEx(new RecognitionException(""));
+                throw new BuildingException(ctx, "there is a replacewith without a find");
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent rwSeq) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, rwSeq, pvs);

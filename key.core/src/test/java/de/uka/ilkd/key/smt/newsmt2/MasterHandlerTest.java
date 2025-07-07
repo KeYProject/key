@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -25,21 +26,20 @@ import de.uka.ilkd.key.smt.SmtTestUtils;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import de.uka.ilkd.key.util.LineProperties;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.Streams;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
@@ -52,10 +52,13 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  */
 public class MasterHandlerTest {
     /**
-     * If this variable is set when running this test class, then those cases with expected result
-     * "weak_valid" will raise an exception unless they can be proved using the solver.
+     * If this variable is set when running this test class, then those cases with
+     * expected result
+     * "weak_valid" will raise an exception unless they can be proved using the
+     * solver.
      * <p>
-     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal with test cases
+     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal
+     * with test cases
      * that
      * should verify but do not yet do so.
      * <p>
@@ -69,67 +72,88 @@ public class MasterHandlerTest {
                     && it.getName().equals("Z3 (Legacy Translation)"))
             .findFirst().orElse(null);
 
-    public static List<Arguments> data()
+    private static List<LoadedTestData> data = null;
+
+    public static List<LoadedTestData> data()
             throws IOException, URISyntaxException, ProblemLoaderException {
-        URL url = MasterHandlerTest.class.getResource("cases");
-        if (url == null) {
-            throw new FileNotFoundException("Cannot find resource 'cases'.");
-        }
+        if (data != null)
+            return data;
 
-        if (!url.getProtocol().equals("file")) {
-            throw new IOException("Resource should be a file URL not " + url);
-        }
+        var om = new ObjectMapper(new YAMLFactory());
+        var path = Paths.get("src/test/resources/de/uka/ilkd/key/smt/newsmt2/cases/");
+        try (var walker = Files.walk(path)) {
+            List<Path> files =
+                walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
+            data = new ArrayList<>(files.size());
 
-        Path directory = Paths.get(url.toURI());
-        assertTrue(Files.isDirectory(directory));
+            for (Path pFile : files) {
+                try {
+                    var file = pFile.toFile();
 
-        List<Path> files;
-        try (var s = Files.list(directory)) {
-            files = s.toList();
-        }
-        List<Arguments> result = new ArrayList<>(files.size());
-        for (Path file : files) {
-            try {
-                final var testData = TestData.create(file);
-                if (testData != null) {
-                    result.add(Arguments.of(testData));
+                    TestData value = om.readValue(file, TestData.class);
+
+                    if (value.state == TestDataState.IGNORE) {
+                        LOGGER.info("Test {} case has been marked ignore", file);
+                        continue;
+                    }
+
+                    System.err.println(pFile);
+                    final var testData = value.load(file.getName().replace(".yml", ""));
+                    data.add(testData);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw e;
                 }
-            } catch (Exception e) {
-                LOGGER.error("Error reading {}", file, e);
-                // make sure faulty test cases fail
-                throw e;
             }
+            System.out.println(data);
+            return data;
         }
-        return result;
     }
 
-    public record TestData(String name, Path path, LineProperties props, String translation) {
+    /**
+     * Describes the state of a test instance.
+     */
+    public enum TestDataState {
+        EMPTY, EXTENDED, IGNORE
+    }
 
-        public static @Nullable TestData create(Path path)
-                throws IOException, ProblemLoaderException {
-            var name = path.getFileName().toString();
-            var props = new LineProperties();
-            try (BufferedReader reader = Files.newBufferedReader(path)) {
-                props.read(reader);
-            }
+    /**
+     * Expected outcome of a test instance.
+     */
+    public enum Expectation {
+        VALID, FAIL, IRRELEVANT
+    }
 
-            if ("ignore".equals(props.get("state"))) {
-                LOGGER.info("Test case has been marked ignore");
-                return null;
-            }
+    /**
+     * This class contains the information about the test fixtures that is loaded
+     * via the YAML.
+     *
+     * @param contains a list of strings that are expected in the SMT translation
+     * @param smtSettings required key/values in the smt settings.
+     * @param expected expected output of Z3
+     * @param state state of the test
+     * @param javaSrc path to necessary java sources
+     * @param keySrc contents of the key file to be loaded.
+     */
+    public record TestData(List<String> contains,
+            Properties smtSettings,
+            Expectation expected,
+            TestDataState state,
+            String javaSrc,
+            String keySrc) {
 
-            List<String> sources = props.getLines("sources");
-            List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-            if (!sources.isEmpty()) {
+        private LoadedTestData load(String name) throws IOException, ProblemLoaderException {
+            var keySrc = keySrc();
+            if (javaSrc != null && !javaSrc.isEmpty()) {
                 Path srcDir = Files.createTempDirectory("SMT_key_" + name);
                 Path tmpSrc = srcDir.resolve("src.java");
-                Files.write(tmpSrc, sources);
-                lines.addFirst("\\javaSource \"" + srcDir + "\";\n");
+                Files.writeString(tmpSrc, javaSrc);
+                keySrc += "\\javaSource \"" + srcDir + "\";\n";
             }
 
-            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-            Files.write(tmpKey, lines);
+            Path tmpKey = Files.createTempFile("SMT_key_%s".formatted(name), ".key");
+            Files.writeString(tmpKey, keySrc);
 
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
@@ -140,63 +164,54 @@ public class MasterHandlerTest {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 proof.getSettings().getNewSMTSettings(), proof);
 
-            String updates = props.get("smt-settings");
-            if (updates != null) {
-                Properties map = new Properties();
-                map.load(new StringReader(updates));
-                settings.getNewSettings().readSettings(map);
+            if (smtSettings != null) {
+                settings.getNewSettings().readSettings(smtSettings);
             }
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
             var translation =
                 translator.translateProblem(sequent, env.getServices(), settings).toString();
-            return new TestData(name, path, props, translation);
-        }
-
-        @Override
-        public @NonNull String toString() {
-            return name;
+            env.dispose();
+            return new LoadedTestData(name, this, translation);
         }
     }
 
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testTranslation(TestData data) throws Exception {
+    private record LoadedTestData(String name, TestData data, String translation) {
+        @Override
+        public @NonNull String toString() {
+            return name();
+        }
+    }
+
+    @TestFactory
+    Stream<DynamicTest> testTranslation() throws Exception {
+        return data().stream()
+                .map(it -> DynamicTest.dynamicTest(it.name, () -> testTranslation(it)));
+    }
+
+    void testTranslation(LoadedTestData data) throws Exception {
         if (DUMP_SMT) {
-            Path tmpSmt = Files.createTempFile("SMT_key_" + data.name, ".smt2");
-            // FIXME This is beyond Java 8: add as soon as switched to Java 11:
-            // Files.writeString(tmpSmt, translation);
+            Path tmpSmt = Files.createTempFile("SMT_key_%s".formatted(data.name), ".smt2");
             Files.writeString(tmpSmt, data.translation);
             LOGGER.info("SMT2 for {}  saved in: {}", data.name, tmpSmt);
         }
 
-        int i = 1;
-        while (data.props.containsKey("contains." + i)) {
-            assertTrue(
-                containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
-                "Occurrence check for contains." + i);
-            i++;
-        }
-
+        Assertions.assertThat(data.translation)
+                .containsIgnoringWhitespaces(data.data.contains().toArray(new String[0]));
     }
 
-    public static boolean containsModuloSpaces(String haystack, String needle) {
-        String n = needle.replaceAll("\\s+", " ");
-        String h = haystack.replaceAll("\\s+", " ");
-        return h.contains(n);
+    @TestFactory
+    Stream<DynamicTest> testZ3() throws Exception {
+        return data().stream()
+                .map(it -> DynamicTest.dynamicTest(it.name, () -> testZ3(it)));
     }
 
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testZ3(TestData data) throws Exception {
+    void testZ3(LoadedTestData data) throws Exception {
         SmtTestUtils.assumeZ3Installed();
-
         Assumptions.assumeTrue(Z3_SOLVER != null);
 
-        String expectation = data.props.get("expected");
+        var expectation = data.data.expected;
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
-        expectation = expectation.toLowerCase().trim();
 
         // TODO Run Z3 on the SMT translation
         // FIXME This is a hack.
@@ -209,14 +224,11 @@ public class MasterHandlerTest {
         String[] response = Streams.toString(proc.getInputStream()).split(System.lineSeparator());
 
         try {
-            String lookFor = null;
-            switch (expectation) {
-            case "valid" -> lookFor = "unsat";
-            case "fail" -> lookFor = "(sat|timeout)";
-            case "irrelevant" -> {
-            }
-            default -> fail("Unexpected expectation: " + expectation);
-            }
+            String lookFor = switch (expectation) {
+            case VALID -> "unsat";
+            case FAIL -> "(sat|timeout)";
+            case IRRELEVANT -> null;
+            };
 
             if (lookFor != null) {
                 for (String line : response) {
@@ -230,7 +242,7 @@ public class MasterHandlerTest {
             }
 
             if (!STRICT_TEST) {
-                assumeFalse("extended".equals(data.props.get("state")),
+                assumeFalse(data.data.state == TestDataState.EXTENDED,
                     "This is an extended test (will be run only in strict mode)");
             }
 
@@ -243,5 +255,4 @@ public class MasterHandlerTest {
             throw t;
         }
     }
-
 }

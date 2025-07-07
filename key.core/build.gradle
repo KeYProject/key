@@ -1,6 +1,5 @@
 plugins {
-    id 'ca.coglinc.javacc' version '2.4.0'
-    id 'antlr'
+    id 'org.javacc.javacc' version '4.0.1'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
@@ -13,16 +12,13 @@ dependencies {
     api project(':key.ncore.calculus')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
-    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
-    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
+    // JavaCC
+    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 // The target directory for JavaCC (parser generation)
@@ -30,18 +26,6 @@ def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
-
-// Generate code from ANTLR grammars.
-generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-listener", "-long-messages"]
-}
-
-// Generate code from ANTLR grammars in testing.
-generateTestGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-listener", "-long-messages"]
-}
 
 // Generate code from JavaCC grammars.
 compileJavacc {
@@ -266,4 +250,4 @@ task generateRAPUnitTests(type: JavaExec) {
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
-sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc)
