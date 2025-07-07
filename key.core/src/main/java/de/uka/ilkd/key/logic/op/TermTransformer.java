@@ -4,21 +4,23 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.SortedOperator;
 
 /**
  * TermTransformer perform complex term transformation which cannot be (efficiently or at all)
  * described by taclets.
  */
-public interface TermTransformer extends org.key_project.logic.op.SortedOperator, Operator,
-        /* TODO: check */ TerminalSyntaxElement {
+public interface TermTransformer extends SortedOperator,
+        /* TODO: check */ TerminalSyntaxElement, Operator {
 
     /**
      * initiates term transformation of <tt>term</tt>. Note the top level operator of of parameter
      * <tt>term</tt> has to be <em>this</em> term transformer.
      */
-    Term transform(Term term, SVInstantiations svInst, Services services);
+    JTerm transform(JTerm term, SVInstantiations svInst, Services services);
 }

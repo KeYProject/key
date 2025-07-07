@@ -13,12 +13,12 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -100,8 +100,11 @@ public class LexPathOrdering implements TermOrdering {
             return LESS;
         }
 
+        var p__a = (JTerm) p_a;
+        var p__b = (JTerm) p_b;
+
         final int opComp =
-            compare(p_a.op(), p_a.sort(), p_a.getLabels(), p_b.op(), p_b.sort(), p_b.getLabels());
+            compare(p_a.op(), p_a.sort(), p__a.getLabels(), p_b.op(), p_b.sort(), p__b.getLabels());
         if (opComp == 0) {
             final CompRes lexComp = compareSubsLex(p_a, p_b);
             if (lexComp.eq()) {
@@ -179,7 +182,8 @@ public class LexPathOrdering implements TermOrdering {
      * @return a number negative, zero or a number positive if <code>p_a</code> is less than, equal,
      *         or greater than <code>p_b</code>
      */
-    private int compare(Operator aOp, Sort aSort, ImmutableArray<TermLabel> aLabels, Operator bOp,
+    private int compare(Operator aOp, Sort aSort,
+            ImmutableArray<TermLabel> aLabels, Operator bOp,
             Sort bSort, ImmutableArray<TermLabel> bLabels) {
         if (aOp == bOp) {
             return 0;
@@ -378,10 +382,10 @@ public class LexPathOrdering implements TermOrdering {
             if (p_op.name().equals(IntegerLDT.CHAR_ID_NAME)) {
                 return 1;
             }
-            if (p_op instanceof JFunction && ((Function) p_op).sort() instanceof NullSort) {
+            if (p_op instanceof Function && ((Function) p_op).sort() instanceof NullSort) {
                 return 2;
             }
-            if (p_op instanceof JFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
+            if (p_op instanceof Function && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
                 return 3;
             }
 
@@ -435,7 +439,7 @@ public class LexPathOrdering implements TermOrdering {
             if (opStr.equals("heap")) {
                 return 0;
             }
-            if (p_op instanceof JFunction && ((Function) p_op).isUnique()) {
+            if (p_op instanceof Function && ((Function) p_op).isUnique()) {
                 return 5;
             }
             if (opStr.equals("pair")) {

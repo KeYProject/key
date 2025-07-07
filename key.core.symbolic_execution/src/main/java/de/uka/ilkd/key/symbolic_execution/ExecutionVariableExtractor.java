@@ -6,8 +6,7 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -38,12 +38,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * An optional additional condition.
      */
-    private final Term additionalCondition;
+    private final JTerm additionalCondition;
 
     /**
      * The layout term.
      */
-    private final Term layoutTerm;
+    private final JTerm layoutTerm;
 
     /**
      * The current locations.
@@ -71,8 +71,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *        conditions.
      * @throws ProofInputException Occurred Exception
      */
-    public ExecutionVariableExtractor(Node node, PosInOccurrence modalityPio,
-            IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
+    public ExecutionVariableExtractor(Node node,
+            PosInOccurrence modalityPio,
+            IExecutionNode<?> executionNode, JTerm condition, boolean simplifyConditions)
             throws ProofInputException {
         super(node, modalityPio);
         this.executionNode = executionNode;
@@ -80,18 +81,18 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         this.simplifyConditions = simplifyConditions;
         // Path condition needs always to be simplified, because otherwise additional symbolic
         // values might be introduced.
-        Term pathCondition =
+        JTerm pathCondition =
             SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), true, false);
         pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
         // Extract locations from updates
         Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<>();
         // Contains all objects which should be ignored, like the global exc
         // variable of the proof obligation.
-        Set<Term> objectsToIgnore = computeInitialObjectsToIgnore(false, false);
+        Set<JTerm> objectsToIgnore = computeInitialObjectsToIgnore(false, false);
         // Contains all objects which are created during symbolic execution
-        Set<Term> updateCreatedObjects = new LinkedHashSet<>();
+        Set<JTerm> updateCreatedObjects = new LinkedHashSet<>();
         // Contains all objects which are the value of an update
-        Set<Term> updateValueObjects = new LinkedHashSet<>();
+        Set<JTerm> updateValueObjects = new LinkedHashSet<>();
         collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects,
             updateValueObjects, objectsToIgnore);
         objectsToIgnore.addAll(updateCreatedObjects);
@@ -166,7 +167,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @param pairs The {@link ExecutionVariableValuePair}s to represent.
      * @param childrenInfo The {@link Map} providing child content information.
      * @param parentValue The optional parent {@link IExecutionValue}.
-     * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
+     * @param alreadyVisitedObjects The value {@link JTerm}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
      * @return The created {@link IExecutionVariable}.
      * @throws ProofInputException Occurred Exception.
@@ -175,7 +176,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             List<ExecutionVariableValuePair> pairs,
             Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo,
             ExtractedExecutionValue parentValue,
-            ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+            ImmutableList<JTerm> alreadyVisitedObjects) throws ProofInputException {
         assert !pairs.isEmpty();
         // Create variable
         ExecutionVariableValuePair firstPair = pairs.get(0);
@@ -201,7 +202,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @param firstPair The first entry in the {@link ExecutionVariableValuePair}s.
      * @param contentMap The content {@link Map}.
      * @param valueListToFill The result {@link List} to fill.
-     * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
+     * @param alreadyVisitedObjects The value {@link JTerm}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
      * @throws ProofInputException Occurred Exception.
      */
@@ -210,9 +211,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             final ExecutionVariableValuePair firstPair,
             final Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> contentMap,
             final List<IExecutionValue> valueListToFill,
-            final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+            final ImmutableList<JTerm> alreadyVisitedObjects) throws ProofInputException {
         // Group pairs with same value but with different conditions
-        Map<Term, List<ExecutionVariableValuePair>> groupedPairs =
+        Map<JTerm, List<ExecutionVariableValuePair>> groupedPairs =
             new LinkedHashMap<>();
         for (ExecutionVariableValuePair pair : pairs) {
             assert firstPair.getProgramVariable() == pair.getProgramVariable();
@@ -232,7 +233,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, node,
                     variable, pair.getCondition(), pair.getValue());
                 valueListToFill.add(value);
-                Pair<Boolean, ImmutableList<Term>> cycleCheckResult =
+                Pair<Boolean, ImmutableList<JTerm>> cycleCheckResult =
                     updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
                 if (!cycleCheckResult.first) { // No cycle detected
                     ParentDef parentDef =
@@ -247,7 +248,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                     }
                 }
             } else {
-                List<Term> conditions = new LinkedList<>();
+                List<JTerm> conditions = new LinkedList<>();
                 Map<LocationDef, List<ExecutionVariableValuePair>> childContentMap =
                     new LinkedHashMap<>();
                 for (ExecutionVariableValuePair pair : group) {
@@ -266,7 +267,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                     }
                 }
                 final Services services = getServices();
-                Term compoundPathCondition = services.getTermBuilder().or(conditions);
+                JTerm compoundPathCondition = services.getTermBuilder().or(conditions);
                 if (simplifyConditions) {
                     compoundPathCondition = SymbolicExecutionUtil.simplify(
                         getProof().getInitConfig(), getProof(), compoundPathCondition);
@@ -276,7 +277,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, node,
                     variable, compoundPathCondition, group.get(0).getValue());
                 valueListToFill.add(value);
-                Pair<Boolean, ImmutableList<Term>> cycleCheckResult =
+                Pair<Boolean, ImmutableList<JTerm>> cycleCheckResult =
                     updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
                 if (!cycleCheckResult.first) { // No cycle detected
                     if (!childContentMap.isEmpty()) {
@@ -293,15 +294,15 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Updates the already visited objects list if required.
      *
-     * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
+     * @param alreadyVisitedObjects The value {@link JTerm}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
      * @param value The current value.
      * @return The new already visited objects list or the original one if the current value is not
      *         an object.
      */
-    protected Pair<Boolean, ImmutableList<Term>> updateAlreadyVisitedObjects(
-            final ImmutableList<Term> alreadyVisitedObjects, Term value) {
-        ImmutableList<Term> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
+    protected Pair<Boolean, ImmutableList<JTerm>> updateAlreadyVisitedObjects(
+            final ImmutableList<JTerm> alreadyVisitedObjects, JTerm value) {
+        ImmutableList<JTerm> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
         boolean cycleDetected = false;
         if (value != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), value)
                 && !SymbolicExecutionUtil.isNullSort(value.sort(), getServices())) {
@@ -321,7 +322,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @param goalNode The {@link Node} on which this result is based on.
      * @author Martin Hentschel
      */
-    private record ParentDef(Term parent, Node goalNode) {
+    private record ParentDef(JTerm parent, Node goalNode) {
         /**
          * Constructor.
          *
@@ -336,9 +337,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ParentDef other) {
-                return Objects.equals(parent, other.parent)
-                        && Objects.equals(goalNode, other.goalNode);
+            if (obj instanceof ParentDef(JTerm parent1, Node goalNode1)) {
+                return Objects.equals(parent, parent1)
+                        && Objects.equals(goalNode, goalNode1);
             } else {
                 return false;
             }
@@ -355,7 +356,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *        instead.
      * @author Martin Hentschel
      */
-    private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
+    private record LocationDef(ProgramVariable programVariable, JTerm arrayIndex) {
         /**
          * Constructor.
          *
@@ -372,9 +373,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof LocationDef other) {
-                return programVariable == other.programVariable
-                        && Objects.equals(arrayIndex, other.arrayIndex);
+            if (obj instanceof LocationDef(ProgramVariable variable, JTerm index)) {
+                return programVariable == variable
+                        && Objects.equals(arrayIndex, index);
             } else {
                 return false;
             }
@@ -405,8 +406,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param additionalCondition An optional additional condition to consider.
          */
         public StateExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
-                Term additionalCondition) {
+                PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, JTerm arrayIndex,
+                JTerm additionalCondition) {
             super(parentNode.getSettings(), proofNode, programVariable, null, arrayIndex,
                 additionalCondition, modalityPIO);
         }
@@ -452,7 +454,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public Term createSelectTerm() {
+        public JTerm createSelectTerm() {
             return SymbolicExecutionUtil.createSelectTerm(this);
         }
     }
@@ -471,12 +473,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * The array start index or {@code null} if not used.
          */
-        private final Term arrayStartIndex;
+        private final JTerm arrayStartIndex;
 
         /**
          * The array end index or {@code null} if not used.
          */
-        private final Term arrayEndIndex;
+        private final JTerm arrayEndIndex;
 
         /**
          * Constructor.
@@ -491,8 +493,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
-                Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
+                PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, JTerm arrayIndex,
+                JTerm arrayStartIndex, JTerm arrayEndIndex, JTerm additionalCondition,
                 ExtractedExecutionValue parentValue) {
             super(parentNode.getSettings(), proofNode, programVariable, parentValue, arrayIndex,
                 additionalCondition, modalityPIO);
@@ -521,7 +524,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public Term createSelectTerm() {
+        public JTerm createSelectTerm() {
             return SymbolicExecutionUtil.createSelectTerm(this);
         }
 
@@ -530,7 +533,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *
          * @return The array start index.
          */
-        public Term getArrayStartIndex() {
+        public JTerm getArrayStartIndex() {
             return arrayStartIndex;
         }
 
@@ -548,7 +551,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *
          * @return The array end index.
          */
-        public Term getArrayEndIndex() {
+        public JTerm getArrayEndIndex() {
             return arrayEndIndex;
         }
 
@@ -612,7 +615,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param value The value.
          */
         public ExtractedExecutionValue(IExecutionNode<?> parentNode, Node proofNode,
-                IExecutionVariable variable, Term condition, Term value) {
+                IExecutionVariable variable, JTerm condition, JTerm value) {
             super(parentNode.getSettings(), proofNode, variable, condition, value);
             this.parentNode = parentNode;
         }

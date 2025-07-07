@@ -7,15 +7,15 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
@@ -129,9 +129,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new PassiveExpression();
     }
 
-    public static void throwSortInvalid(OperatorSV sv, String s) throws ParseException {
-        throw new ParseException("Sort of declared schema variable " + sv.name().toString() + " "
-            + sv.sort().name().toString() + " does not comply with expected type " + s
+    public static void throwSortInvalid(JOperatorSV sv, String s) throws ParseException {
+        throw new ParseException("Sort of declared schema variable " + sv.name() + " "
+            + sv.sort().name() + " does not comply with expected type " + s
             + " in Java program.");
     }
 
@@ -141,17 +141,17 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             return false;
         }
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof OperatorSV asv) {
+        if (n instanceof JOperatorSV asv) {
             return asv.sort() == sort;
         }
         return false;
     }
 
 
-    public OperatorSV lookupSchemaVariable(String s) throws ParseException {
-        OperatorSV sv;
+    public JOperatorSV lookupSchemaVariable(String s) throws ParseException {
+        JOperatorSV sv;
         SchemaVariable n = svns.lookup(new Name(s));
-        if (n instanceof OperatorSV asv) {
+        if (n instanceof JOperatorSV asv) {
             sv = asv;
         } else {
             throw new ParseException("Schema variable not declared: " + s);

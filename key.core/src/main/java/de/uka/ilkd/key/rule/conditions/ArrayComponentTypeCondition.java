@@ -7,13 +7,13 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
 
@@ -53,8 +53,8 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
             return true;
         }
         Sort s = null;
-        if (candidate instanceof Term) {
-            s = ((Term) candidate).sort();
+        if (candidate instanceof JTerm) {
+            s = ((JTerm) candidate).sort();
         } else if (candidate instanceof Expression) {
             s = ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext())
                     .getSort();

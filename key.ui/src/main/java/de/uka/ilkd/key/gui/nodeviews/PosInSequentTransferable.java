@@ -9,6 +9,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -54,7 +55,7 @@ public class PosInSequentTransferable implements Transferable {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
-                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
+                ProofSaver.printTerm((JTerm) pis.getPosInOccurrence().subTerm(), serv);
         }
     }
 

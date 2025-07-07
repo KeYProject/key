@@ -8,18 +8,15 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
@@ -29,6 +26,11 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -68,7 +70,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     /**
      * @see #getLastFocusTerm()
      */
-    private Term lastFocusTerm;
+    private JTerm lastFocusTerm;
 
     /**
      * @see #getLastInstantiation()
@@ -88,19 +90,19 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param services services.
      * @return the preconditions.
      */
-    private static Term[] createPreconditions(final BlockContract contract, final Term self,
+    private static JTerm[] createPreconditions(final BlockContract contract, final JTerm self,
             final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
-        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition =
+        final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
+        final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
-        final Term reachableInCondition =
+        final JTerm reachableInCondition =
             conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
-        final Term selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
+        final JTerm selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
             contract.getMethod(), contract.getKJT(), self, services);
-        return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
+        return new JTerm[] { precondition, wellFormedHeapsCondition, reachableInCondition,
             selfConditions };
     }
 
@@ -111,17 +113,17 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
-    private static Term[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+    private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
+        final JTerm postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final JTerm wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition =
+        final JTerm reachableOutCondition =
             conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition =
+        final JTerm atMostOneFlagSetCondition =
             conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-        return new Term[] { postcondition, wellFormedAnonymisationHeapsCondition,
+        return new JTerm[] { postcondition, wellFormedAnonymisationHeapsCondition,
             reachableOutCondition, atMostOneFlagSetCondition };
     }
 
@@ -135,16 +137,16 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param services services.
      * @return the updates.
      */
-    private static Term[] createUpdates(final Term contextUpdate,
+    private static JTerm[] createUpdates(final JTerm contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final BlockContract.Variables variables,
-            final Map<LocationVariable, Term> modifiableClauses, final Services services) {
+            final Map<LocationVariable, JTerm> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
-        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate =
+        final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
+        final JTerm anonymisationUpdate =
             updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
-        return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
+        return new JTerm[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
     /**
@@ -164,16 +166,16 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
             final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
-            final Term contextUpdate,
-            final Term remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
+            final Map<LocationVariable, Function> anonymisationHeaps,
+            final JTerm contextUpdate,
+            final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
         final ImmutableList<Goal> result;
         final LocationVariable heap = heaps.get(0);
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
-            final Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
-            final Term wdUpdate =
+            final JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
+            final JTerm wdUpdate =
                 services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
             configurator.setUpWdGoal(result.tail().tail().tail().head(), contract, wdUpdate,
                 localAnonUpdate, heap, anonymisationHeaps.get(heap), localInVariables);
@@ -184,12 +186,12 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public Term getLastFocusTerm() {
+    public JTerm getLastFocusTerm() {
         return lastFocusTerm;
     }
 
     @Override
-    protected void setLastFocusTerm(Term lastFocusTerm) {
+    protected void setLastFocusTerm(JTerm lastFocusTerm) {
         this.lastFocusTerm = lastFocusTerm;
     }
 
@@ -215,47 +217,48 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractInternalBuiltInRuleApp;
         BlockContractInternalBuiltInRuleApp application =
             (BlockContractInternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
-        final Term contextUpdate = instantiation.update();
+        final JTerm contextUpdate = instantiation.update();
 
+        final var services = goal.getOverlayServices();
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JFunction> anonymisationHeaps =
+        final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Term[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
+        final JTerm[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
             localInVariables, conditionsAndClausesBuilder, services);
-        final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
-        final Map<LocationVariable, Term> modifiableClauses =
+        final JTerm freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
+        final Map<LocationVariable, JTerm> modifiableClauses =
             conditionsAndClausesBuilder.buildModifiableClauses();
-        final Map<LocationVariable, Term> freeModifiableClauses =
+        final Map<LocationVariable, JTerm> freeModifiableClauses =
             conditionsAndClausesBuilder.buildFreeModifiableClauses();
-        final Term frameCondition =
+        final JTerm frameCondition =
             conditionsAndClausesBuilder.buildFrameCondition(
                 modifiableClauses, freeModifiableClauses);
-        final Term[] assumptions =
+        final JTerm[] assumptions =
             createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
-        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
+        final JTerm freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
+        final JTerm[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, modifiableClauses, services);
 
         final GoalsConfigurator configurator =
@@ -277,7 +280,8 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            PosInOccurrence occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -286,7 +290,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             return false;
         }
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate((JTerm) occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }
@@ -322,11 +326,11 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
             final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ImmutableSet<LocationVariable> localOutVariables,
-            final BlockContract.Variables variables, final Term[] preconditions,
-            final Term[] assumptions, final Term frameCondition, final Term[] updates,
+            final BlockContract.Variables variables, final JTerm[] preconditions,
+            final JTerm[] assumptions, final JTerm frameCondition, final JTerm[] updates,
             final GoalsConfigurator configurator,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
@@ -334,14 +338,14 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final ProgramVariable exceptionParameter =
             createLocalVariable("e", variables.exception.getKeYJavaType(), services);
         if (!isInfFlow) {
-            configurator.setUpValidityGoal(validityGoal, new Term[] { updates[0], updates[1] },
-                preconditions, new Term[] { assumptions[0], frameCondition }, exceptionParameter,
+            configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
+                preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
                 conditionsAndClausesBuilder.terms);
         } else {
             validityGoal.setBranchLabel("Information Flow Validity");
 
             // clear goal
-            validityGoal.node().setSequent(Sequent.EMPTY_SEQUENT);
+            validityGoal.node().setSequent(JavaDLSequentKit.getInstance().getEmptySequent());
             validityGoal.clearAndDetachRuleAppIndex();
             final TermBuilder tb = services.getTermBuilder();
 

@@ -14,11 +14,15 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
+
 
 /**
  * <p>
  * Stores the mapping from operators to {@link Notation}s. Each {@link Notation} represents the
- * concrete syntax for some {@link de.uka.ilkd.key.logic.op.Operator}. The {@link LogicPrinter} asks
+ * concrete syntax for some {@link Operator}. The {@link LogicPrinter} asks
  * the NotationInfo to find out which Notation to use for a given term.
  * <p>
  * The Notation associated with an operator might change. New Notations can be added.
@@ -74,9 +78,6 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * </ul>
  */
 public final class NotationInfo {
-
-
-
     // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
     static final int PRIORITY_TOP = 0;
     static final int PRIORITY_EQUIVALENCE = 20;
@@ -172,22 +173,22 @@ public final class NotationInfo {
             new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX,
             new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Modality.JavaModalityKind.DIA,
+        tbl.put(JModality.JavaModalityKind.DIA,
             new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.BOX,
+        tbl.put(JModality.JavaModalityKind.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(ModalOperatorSV.class,
             new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.TOUT,
+        tbl.put(JModality.JavaModalityKind.TOUT,
             new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
                 PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.DIA_TRANSACTION,
+        tbl.put(JModality.JavaModalityKind.DIA_TRANSACTION,
             new Notation.ModalityNotation("\\diamond_transaction",
                 "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.BOX_TRANSACTION,
+        tbl.put(JModality.JavaModalityKind.BOX_TRANSACTION,
             new Notation.ModalityNotation("\\box_transaction",
                 "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.TOUT_TRANSACTION,
+        tbl.put(JModality.JavaModalityKind.TOUT_TRANSACTION,
             new Notation.ModalityNotation("\\throughout_transaction",
                 "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));

@@ -3,19 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -53,7 +55,7 @@ public class NoPosTacletApp extends TacletApp {
     /**
      * creates a NoPosTacletApp for the given taclet with some known instantiations and CHECKS
      * variable conditions as well as it resolves collisions The ifInstantiations parameter is not
-     * matched against the if sequence, but only stored. For matching use the method
+     * matched against the assumes-sequence, but only stored. For matching use the method
      * "setIfFormulaInstantiations".
      *
      * @param taclet the Taclet
@@ -64,20 +66,21 @@ public class NoPosTacletApp extends TacletApp {
         return createNoPosTacletApp(taclet, instantiations, null, services);
     }
 
-    public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
-            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+    public static NoPosTacletApp createNoPosTacletApp(org.key_project.prover.rules.Taclet taclet,
+            SVInstantiations instantiations,
+            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
-        Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
+        Debug.assertTrue(ifInstsCorrectSize(taclet, assumesInstantiations),
             "If instantiations list has wrong size");
 
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
         if (checkVarCondNotFreeIn(taclet, inst)) {
-            return new NoPosTacletApp(taclet, inst, ifInstantiations);
+            return new NoPosTacletApp(taclet, inst, assumesInstantiations);
         }
         return null;
     }
 
-    public static NoPosTacletApp createNoPosTacletApp(Taclet taclet, MatchConditions matchCond,
+    public static NoPosTacletApp createNoPosTacletApp(Taclet taclet, MatchResultInfo matchCond,
             Services services) {
         return createNoPosTacletApp(taclet, matchCond.getInstantiations(), null, services);
     }
@@ -88,7 +91,8 @@ public class NoPosTacletApp extends TacletApp {
      * to decide about introduction of metavariables. Immutable instantiations are important for the
      * "addrules" part of taclets.
      */
-    public static NoPosTacletApp createFixedNoPosTacletApp(Taclet taclet,
+    public static NoPosTacletApp createFixedNoPosTacletApp(
+            org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations, Services services) {
         NoPosTacletApp res = createNoPosTacletApp(taclet, instantiations, null, services);
         // Make the given SVs fixed
@@ -104,7 +108,7 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @param taclet the Taclet
      */
-    protected NoPosTacletApp(Taclet taclet) {
+    protected NoPosTacletApp(org.key_project.prover.rules.Taclet taclet) {
         super(taclet);
     }
 
@@ -114,8 +118,9 @@ public class NoPosTacletApp extends TacletApp {
      * @param taclet the Taclet
      * @param instantiations the SVInstantiations
      */
-    private NoPosTacletApp(Taclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+    private NoPosTacletApp(org.key_project.prover.rules.Taclet taclet,
+            SVInstantiations instantiations,
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
 
@@ -130,24 +135,24 @@ public class NoPosTacletApp extends TacletApp {
      * @param instantiations the SVInstantiations so that the find(if) matches
      * @return true iff all variable conditions x not free in y are hold
      */
-    protected static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations) {
-        final Iterator<SchemaVariable> it = instantiations.svIterator();
-        while (it.hasNext()) {
-            final SchemaVariable sv = it.next();
+    protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
+            SVInstantiations instantiations) {
+        for (var pair : instantiations.getInstantiationMap()) {
+            final var sv = pair.key();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
                     || sv instanceof SkolemTermSV) {
                 continue;
             }
 
-            final TacletPrefix prefix = taclet.getPrefix(sv);
+            final var prefix = taclet.getPrefix(sv);
             if (prefix.context()) {
                 continue;
             }
 
             final ImmutableSet<QuantifiableVariable> boundVarSet =
-                boundAtOccurrenceSet(prefix, instantiations);
-            final Term inst = (Term) instantiations.getInstantiation(sv);
+                boundAtOccurrenceSet((TacletPrefix) prefix, instantiations);
+            final JTerm inst = (JTerm) instantiations.getInstantiation(sv);
             if (!inst.freeVars().subset(boundVarSet)) {
                 return false;
             }
@@ -165,40 +170,23 @@ public class NoPosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
+    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(),
-                instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
+                instantiations().addInteresting(sv, term, services), assumesFormulaInstantiations(),
                 services);
         } else {
             return createNoPosTacletApp(taclet(), instantiations().add(sv, term, services),
-                ifFormulaInstantiations(), services);
+                assumesFormulaInstantiations(), services);
         }
     }
-
-
-
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Object[] list, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createNoPosTacletApp(taclet(),
-                instantiations().addInterestingList(sv, list, services), ifFormulaInstantiations(),
-                services);
-        } else {
-            return createNoPosTacletApp(taclet(), instantiations().addList(sv, list, services),
-                ifFormulaInstantiations(), services);
-        }
-    }
-
-
 
     /**
      * adds a new instantiation to this TacletApp
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
+     * @param pe the ProgramElement with which the SV is instantiated
      * @return the new TacletApp
      */
     @Override
@@ -206,10 +194,10 @@ public class NoPosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(), instantiations().addInteresting(sv, pe, services),
-                ifFormulaInstantiations(), services);
+                assumesFormulaInstantiations(), services);
         } else {
             return createNoPosTacletApp(taclet(), instantiations().add(sv, pe, services),
-                ifFormulaInstantiations(), services);
+                assumesFormulaInstantiations(), services);
         }
     }
 
@@ -224,7 +212,7 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
         return new NoPosTacletApp(taclet(), svi.union(instantiations(), services),
-            ifFormulaInstantiations());
+            assumesFormulaInstantiations());
     }
 
 
@@ -237,7 +225,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setInstantiation(SVInstantiations svi, Services services) {
-        return new NoPosTacletApp(taclet(), svi, ifFormulaInstantiations());
+        return new NoPosTacletApp(taclet(), svi, assumesFormulaInstantiations());
     }
 
 
@@ -246,8 +234,9 @@ public class NoPosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchConditions mc, Services services) {
-        return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifFormulaInstantiations(),
+    public TacletApp setMatchConditions(MatchResultInfo mc, Services services) {
+        return createNoPosTacletApp(taclet(), mc.getInstantiations(),
+            assumesFormulaInstantiations(),
             services);
     }
 
@@ -257,21 +246,22 @@ public class NoPosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
-        return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifInstantiations, services);
+    protected TacletApp setAllInstantiations(MatchResultInfo mc,
+            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations, Services services) {
+        return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesInstantiations,
+            services);
     }
 
 
     /**
-     * returns true iff all necessary informations are collected, so that the Taclet can be applied.
+     * returns true iff all necessary information is collected, so that the Taclet can be applied.
      *
-     * @return true iff all necessary informations are collected, so that the Taclet can be applied.
+     * @return true iff all necessary information is collected, so that the Taclet can be applied.
      */
     @Override
     public boolean complete() {
         return (uninstantiatedVars().isEmpty() && taclet() instanceof NoFindTaclet
-                && ifInstsComplete());
+                && assumesInstantionsComplete());
 
     }
 
@@ -305,8 +295,7 @@ public class NoPosTacletApp extends TacletApp {
      * @return TacletApp with the resulting instantiations or null
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
-        return result;
+        return matchFind(pos, services, null);
     }
 
 
@@ -315,23 +304,25 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
+    public NoPosTacletApp matchFind(PosInOccurrence pos,
+            Services services, JTerm t) {
         if ((t == null) && (pos != null)) {
-            t = pos.subTerm();
+            t = (JTerm) pos.subTerm();
         }
 
-        MatchConditions mc = setupMatchConditions(pos, services);
+        MatchResultInfo mc = setupMatchConditions(pos, services);
 
         if (mc == null) {
             return null;
         }
 
-        MatchConditions res;
+        MatchResultInfo res;
         if (taclet() instanceof FindTaclet) {
             res = taclet().getMatcher().matchFind(t, mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
-            if (res == null || !checkVarCondNotFreeIn(taclet(), res.getInstantiations(), pos)) {
+            if (res == null || !checkVarCondNotFreeIn(taclet(),
+                res.getInstantiations(), pos)) {
                 return null;
             }
         } else {
@@ -340,12 +331,13 @@ public class NoPosTacletApp extends TacletApp {
         return evalCheckRes(res, services);
     }
 
-    private NoPosTacletApp evalCheckRes(MatchConditions res, Services services) {
+    private NoPosTacletApp evalCheckRes(MatchResultInfo res, Services services) {
         if (res == null) {
             return null;
         }
 
-        if (updateContextFixed && !updateContextCompatible(res)) {
+        if (updateContextFixed
+                && !updateContextCompatible((de.uka.ilkd.key.rule.MatchConditions) res)) {
             /*
              * LOGGER.debug("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext
              * (), res.matchConditions().getInstantiations().getUpdateContext());
@@ -357,15 +349,16 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    protected MatchConditions setupMatchConditions(PosInOccurrence pos, TermServices services) {
-        SVInstantiations svInst = taclet() instanceof NoFindTaclet ? instantiations()
+    protected MatchResultInfo setupMatchConditions(
+            PosInOccurrence pos, TermServices services) {
+        var svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 
-        MatchConditions mc;
+        de.uka.ilkd.key.rule.MatchConditions mc;
         if (svInst.isEmpty()) {
-            mc = MatchConditions.EMPTY_MATCHCONDITIONS;
+            mc = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
         } else {
-            mc = new MatchConditions(svInst, RenameTable.EMPTY_TABLE);
+            mc = new de.uka.ilkd.key.rule.MatchConditions(svInst, RenameTable.EMPTY_TABLE);
         }
 
         if (taclet() instanceof RewriteTaclet) {
@@ -376,7 +369,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    private boolean updateContextCompatible(MatchConditions p_mc) {
+    private boolean updateContextCompatible(de.uka.ilkd.key.rule.MatchConditions p_mc) {
         return instantiations.getUpdateContext()
                 .equals(p_mc.getInstantiations().getUpdateContext());
     }

@@ -12,10 +12,10 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -45,7 +45,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param name the Name of the meta construct
      * @param body the ProgramElement contained by the meta construct
      */
-    public ProgramTransformer(Name name, ProgramElement body) {
+    protected ProgramTransformer(Name name, ProgramElement body) {
         this.name = name;
         this.body = body;
     }
@@ -56,7 +56,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param name the String with the name of the meta construct
      * @param body the ProgramElement contained by the meta construct
      */
-    public ProgramTransformer(String name, ProgramElement body) {
+    protected ProgramTransformer(String name, ProgramElement body) {
         this(new Name(name), body);
     }
 

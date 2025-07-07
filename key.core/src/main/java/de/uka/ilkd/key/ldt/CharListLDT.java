@@ -8,13 +8,13 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -35,11 +35,11 @@ public final class CharListLDT extends LDT {
     // LexPathOrdering and into CharListNotation!
 
     // functions
-    private final JFunction clIndexOfChar;
+    private final Function clIndexOfChar;
     private final Function clIndexOfCl;
-    private final JFunction clLastIndexOfChar;
+    private final Function clLastIndexOfChar;
     private final Function clLastIndexOfCl;
-    private final JFunction clReplace;
+    private final Function clReplace;
     private final Function clTranslateInt;
     private final Function clRemoveZeros;
     private final Function clHashCode;
@@ -76,7 +76,7 @@ public final class CharListLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private String translateCharTerm(Term t) {
+    private String translateCharTerm(JTerm t) {
         char charVal;
         int intVal;
         String result = printLastFirst(t.sub(0)).toString();
@@ -94,11 +94,11 @@ public final class CharListLDT extends LDT {
     }
 
 
-    private StringBuffer printLastFirst(Term t) {
+    private StringBuffer printLastFirst(JTerm t) {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printLastFirst(t.sub(0)).append(t.op().name().toString());
+            return printLastFirst(t.sub(0)).append(t.op().name());
         }
     }
 
@@ -109,7 +109,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
 
-    public JFunction getClIndexOfChar() {
+    public Function getClIndexOfChar() {
         return clIndexOfChar;
     }
 
@@ -119,7 +119,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public JFunction getClLastIndexOfChar() {
+    public Function getClLastIndexOfChar() {
         return clLastIndexOfChar;
     }
 
@@ -129,7 +129,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public JFunction getClReplace() {
+    public Function getClReplace() {
         return clReplace;
     }
 
@@ -165,34 +165,34 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final TermBuilder tb = services.getTermBuilder();
-        final Term term_empty = tb.func(seqLDT.getSeqEmpty());
+        final JTerm term_empty = tb.func(seqLDT.getSeqEmpty());
 
         char[] charArray;
-        Term result = term_empty;
+        JTerm result = term_empty;
 
         if (lit instanceof StringLiteral) {
             charArray = ((StringLiteral) lit).getValue().toCharArray();
@@ -207,7 +207,7 @@ public final class CharListLDT extends LDT {
         }
 
         for (int i = charArray.length - 2; i >= 1; i--) {
-            Term singleton =
+            JTerm singleton =
                 tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services));
             result = tb.seqConcat(singleton, result);
         }
@@ -217,7 +217,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -225,15 +225,15 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return false;
     }
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         final StringBuilder result = new StringBuilder();
-        Term term = t;
+        JTerm term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));
             term = term.sub(1);
@@ -243,13 +243,13 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }
 
     @Override
-    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
         if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");

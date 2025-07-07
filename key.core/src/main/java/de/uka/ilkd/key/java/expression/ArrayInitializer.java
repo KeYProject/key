@@ -88,6 +88,14 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         v.performActionOnArrayInitializer(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        return ((ArrayInitializer) o).kjt.equals(kjt) && super.equals(o);
+    }
 
     /**
      * Get arguments.

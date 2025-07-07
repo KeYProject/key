@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.Pair;
@@ -61,13 +62,13 @@ public class TestLinkedHashMapWrapper {
     @Test
     public void testGeneralMethods() {
         // exact property does not matter for these tests
-        LinkedHashMapWrapper<Term, Integer> wrappedMap =
+        LinkedHashMapWrapper<JTerm, Integer> wrappedMap =
             new LinkedHashMapWrapper<>(TERM_LABELS_PROPERTY);
         assertTrue(wrappedMap.isEmpty());
         assertEquals(0, wrappedMap.size());
 
-        Term t1 = tb.tt();
-        Term t2 = tb.ff();
+        JTerm t1 = tb.tt();
+        JTerm t2 = tb.ff();
 
         // add mapping t1 -> 1
         wrappedMap.put(t1, 1);
@@ -105,16 +106,16 @@ public class TestLinkedHashMapWrapper {
 
     @Test
     public void testTermLabelProperties() {
-        LinkedHashMap<Term, Integer> basicMap = new LinkedHashMap<>();
-        LinkedHashMapWrapper<Term, Integer> termLabelsMap =
+        LinkedHashMap<JTerm, Integer> basicMap = new LinkedHashMap<>();
+        LinkedHashMapWrapper<JTerm, Integer> termLabelsMap =
             new LinkedHashMapWrapper<>(TERM_LABELS_PROPERTY);
-        LinkedHashMapWrapper<Term, Integer> irrelevantTermLabelsMap =
+        LinkedHashMapWrapper<JTerm, Integer> irrelevantTermLabelsMap =
             new LinkedHashMapWrapper<>(IRRELEVANT_TERM_LABELS_PROPERTY);
 
-        Term noLabelTT = tb.tt();
+        JTerm noLabelTT = tb.tt();
 
-        Term irrelevantLabelTT = tb.label(noLabelTT, irrelevantLabel);
-        Term relevantLabelTT = tb.label(noLabelTT, relevantLabel);
+        JTerm irrelevantLabelTT = tb.label(noLabelTT, irrelevantLabel);
+        JTerm relevantLabelTT = tb.label(noLabelTT, relevantLabel);
 
         // add mappings without labels to all maps
         basicMap.put(noLabelTT, 1);
@@ -174,13 +175,13 @@ public class TestLinkedHashMapWrapper {
 
     @Test
     public void testProofIrrelevancyProperty() {
-        LinkedHashMapWrapper<Term, Integer> proofIrrelevancyMap =
+        LinkedHashMapWrapper<JTerm, Integer> proofIrrelevancyMap =
             new LinkedHashMapWrapper<>(PROOF_IRRELEVANCY_PROPERTY);
 
-        Term noLabelTT = tb.tt();
+        JTerm noLabelTT = tb.tt();
 
-        Term irrelevantLabelTT = tb.label(noLabelTT, irrelevantLabel);
-        Term relevantLabelTT = tb.label(noLabelTT, relevantLabel);
+        JTerm irrelevantLabelTT = tb.label(noLabelTT, irrelevantLabel);
+        JTerm relevantLabelTT = tb.label(noLabelTT, relevantLabel);
 
         // add mapping without label
         assertNull(proofIrrelevancyMap.put(noLabelTT, 1),
@@ -238,17 +239,17 @@ public class TestLinkedHashMapWrapper {
 
     @Test
     public void testRenamingTermProperty() {
-        LinkedHashMapWrapper<Term, Integer> renamingTermMap =
+        LinkedHashMapWrapper<JTerm, Integer> renamingTermMap =
             new LinkedHashMapWrapper<>(RENAMING_TERM_PROPERTY);
         final Sort sort = new SortImpl(new Name("sort"));
         final LogicVariable x = new LogicVariable(new Name("x"), sort);
         final LogicVariable y = new LogicVariable(new Name("y"), sort);
-        final Term tx = tf.createTerm(x);
-        final Term ty = tf.createTerm(y);
-        final JFunction f = new JFunction(new Name("f"), JavaDLTheory.FORMULA, sort, sort);
-        final Term t1 = tb.all(x, tf.createTerm(f, tx, tx));
-        final Term t2 = tb.all(y, tf.createTerm(f, ty, ty));
-        final Term t3 = tb.all(y, tf.createTerm(f, ty, tx));
+        final JTerm tx = tf.createTerm(x);
+        final JTerm ty = tf.createTerm(y);
+        final Function f = new JFunction(new Name("f"), JavaDLTheory.FORMULA, sort, sort);
+        final JTerm t1 = tb.all(x, tf.createTerm(f, tx, tx));
+        final JTerm t2 = tb.all(y, tf.createTerm(f, ty, ty));
+        final JTerm t3 = tb.all(y, tf.createTerm(f, ty, tx));
 
         // adding \forall x. x && x
         assertEquals(0, renamingTermMap.size(), "Map should be empty");
@@ -274,20 +275,21 @@ public class TestLinkedHashMapWrapper {
 
     @Test
     public void testConstructors() {
-        LinkedHashMapWrapper<Term, Integer> wrappedMap =
-            new LinkedHashMapWrapper<>(tb.tt(), 1, TERM_LABELS_PROPERTY);
+        LinkedHashMapWrapper<JTerm, Integer> wrappedMap =
+            new LinkedHashMapWrapper<JTerm, Integer>(tb.tt(), 1, TERM_LABELS_PROPERTY);
         assertFalse(wrappedMap.isEmpty(), "Map should not be empty (0)");
         assertEquals(1, wrappedMap.size(), "Map should contain one element");
         assertTrue(wrappedMap.containsKey(tb.tt()), "Map should contain key tt");
 
         // putAll is also tested with these constructor calls
-        LinkedHashMapWrapper<Term, Integer> wrappedMap2 =
-            new LinkedHashMapWrapper<>(new Term[] { tb.tt(), tb.ff() }, new Integer[] { 1, 2 },
+        LinkedHashMapWrapper<JTerm, Integer> wrappedMap2 =
+            new LinkedHashMapWrapper<JTerm, Integer>(new JTerm[] { tb.tt(), tb.ff() },
+                new Integer[] { 1, 2 },
                 TERM_LABELS_PROPERTY);
         assertFalse(wrappedMap2.isEmpty(), "Map should not be empty (1)");
         assertEquals(2, wrappedMap2.size(), "Map should contain two elements");
 
-        LinkedHashMapWrapper<Term, Integer> wrappedMap3 =
+        LinkedHashMapWrapper<JTerm, Integer> wrappedMap3 =
             new LinkedHashMapWrapper<>(new ImmutableArray<>(tb.tt(), tb.ff(), tb.tt()),
                 new ImmutableArray<>(1, 2, 3),
                 TERM_LABELS_PROPERTY);
@@ -296,7 +298,7 @@ public class TestLinkedHashMapWrapper {
         assertFalse(wrappedMap3.containsValue(1),
             "Map should not contain value 1 as it should be overwritten by 3");
 
-        Iterator<Pair<Term, Integer>> it1 = wrappedMap3.iterator();
+        Iterator<Pair<JTerm, Integer>> it1 = wrappedMap3.iterator();
         it1.forEachRemaining(pair -> {
             if (pair.first.equals(tb.tt())) {
                 assertEquals(3, pair.second, "Value for tt should be 3");
@@ -307,7 +309,7 @@ public class TestLinkedHashMapWrapper {
             }
         });
 
-        Iterator<Pair<Term, Integer>> it2 = wrappedMap2.iterator();
+        Iterator<Pair<JTerm, Integer>> it2 = wrappedMap2.iterator();
         assertTrue(it2.hasNext(), "Iterator should have next element");
         it2.next();
         assertTrue(it2.hasNext(), "Iterator should have next element");

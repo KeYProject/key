@@ -8,10 +8,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -25,6 +23,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -49,16 +49,16 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return "Finish auxiliary computation.";
     }
 
-    static Term calculateResultingTerm(Proof proof, IFProofObligationVars ifVars, Goal initGoal) {
-        final Term[] goalFormulas1 =
+    static JTerm calculateResultingTerm(Proof proof, IFProofObligationVars ifVars, Goal initGoal) {
+        final JTerm[] goalFormulas1 =
             buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1), proof.openGoals(), initGoal);
-        final Term[] goalFormulas2 =
+        final JTerm[] goalFormulas2 =
             buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2), proof.openGoals(), initGoal);
         final TermBuilder tb = proof.getServices().getTermBuilder();
-        Term composedStates = tb.ff();
+        JTerm composedStates = tb.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
             for (int j = i; j < goalFormulas2.length; j++) {
-                final Term composedState = tb.and(goalFormulas1[i], goalFormulas2[j]);
+                final JTerm composedState = tb.and(goalFormulas1[i], goalFormulas2[j]);
                 composedStates = tb.or(composedStates, composedState);
             }
         }
@@ -91,14 +91,14 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         }
     }
 
-    private static Term[] buildExecution(ProofObligationVars c, Map<Term, Term> vsMap,
+    private static JTerm[] buildExecution(ProofObligationVars c, Map<JTerm, JTerm> vsMap,
             ImmutableList<Goal> symbExecGoals, Goal initGoal) {
         Services services = initGoal.proof().getServices();
-        final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
+        final JTerm[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer = new InfFlowProgVarRenamer(goalFormulas, vsMap,
             c.postfix, initGoal, services.getOverlay(initGoal.getLocalNamespaces()));
-        final Term[] renamedGoalFormulas = renamer.renameVariablesAndSkolemConstants();
-        Term[] result = new Term[renamedGoalFormulas.length];
+        final JTerm[] renamedGoalFormulas = renamer.renameVariablesAndSkolemConstants();
+        JTerm[] result = new JTerm[renamedGoalFormulas.length];
         final TermBuilder tb = services.getTermBuilder();
         for (int i = 0; i < renamedGoalFormulas.length; i++) {
             result[i] = tb.applyElementary(c.pre.heap, renamedGoalFormulas[i]);
@@ -106,8 +106,8 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    private static Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
-        Term[] result = new Term[symbExecGoals.size()];
+    private static JTerm[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
+        JTerm[] result = new JTerm[symbExecGoals.size()];
         int i = 0;
         for (final Goal symbExecGoal : symbExecGoals) {
             result[i] = buildFormulaFromGoal(symbExecGoal);
@@ -116,15 +116,16 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    private static Term buildFormulaFromGoal(Goal symbExecGoal) {
+    private static JTerm buildFormulaFromGoal(Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
         final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
-        Term result = tb.tt();
-        for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
-            result = tb.and(result, f.formula());
+        JTerm result = tb.tt();
+        for (final SequentFormula f : symbExecGoal.sequent()
+                .antecedent()) {
+            result = tb.and(result, (JTerm) f.formula());
         }
         for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
-            result = tb.and(result, tb.not(f.formula()));
+            result = tb.and(result, tb.not((JTerm) f.formula()));
         }
         result = TermLabelManager.removeIrrelevantLabels(result, tf);
         return result;

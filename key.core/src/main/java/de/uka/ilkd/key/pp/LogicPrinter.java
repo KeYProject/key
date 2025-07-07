@@ -23,12 +23,23 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -141,7 +152,7 @@ public class LogicPrinter {
      * @param services services.
      * @return the printed term.
      */
-    public static String quickPrintTerm(Term t, Services services) {
+    public static String quickPrintTerm(JTerm t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
             NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
@@ -155,7 +166,7 @@ public class LogicPrinter {
      * @param useUnicodeSymbols whether to use unicode symbols.
      * @return the printed term.
      */
-    public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting,
+    public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
         var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         p.printTerm(t);
@@ -247,7 +258,8 @@ public class LogicPrinter {
      * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
      *        pretty-printed?
      */
-    public void printTaclet(Taclet taclet, SVInstantiations sv, boolean showWholeTaclet,
+    public void printTaclet(org.key_project.prover.rules.Taclet taclet, SVInstantiations sv,
+            boolean showWholeTaclet,
             boolean declareSchemaVars) {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
@@ -257,16 +269,23 @@ public class LogicPrinter {
             layouter.print(taclet.name().toString()).print(" {");
         }
         if (declareSchemaVars) {
-            Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+            Set<SchemaVariable> schemaVars =
+                ((de.uka.ilkd.key.rule.Taclet) taclet).collectSchemaVars();
             for (SchemaVariable schemaVar : schemaVars) {
                 layouter.nl();
-                schemaVar.layout(layouter);
+                final Notation notation;
+                if (schemaVar instanceof Operator opSV) {
+                    notation = notationInfo.getNotation(opSV);
+                } else {
+                    notation = notationInfo.getNotation(schemaVar.getClass());
+                }
+                ((Notation.SchemaVariableNotation) notation).printDeclaration(schemaVar, this);
                 layouter.print(";");
             }
             layouter.nl();
         }
-        if (!(taclet.ifSequent().isEmpty())) {
-            printTextSequent(taclet.ifSequent(), "\\assumes");
+        if (!(taclet.assumesSequent().isEmpty())) {
+            printTextSequent(taclet.assumesSequent(), "\\assumes");
         }
         if (showWholeTaclet) {
             printFind(taclet);
@@ -306,11 +325,11 @@ public class LogicPrinter {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
 
-    protected void printAttribs(Taclet taclet) {
+    protected void printAttribs(org.key_project.prover.rules.Taclet taclet) {
         // no attributes exist for non-rewrite taclets at the moment
     }
 
-    protected void printDisplayName(Taclet taclet) {
+    protected void printDisplayName(org.key_project.prover.rules.Taclet taclet) {
         final String displayName = taclet.displayName();
         if (displayName.equals(taclet.name().toString())) {
             // this means there is no special display name
@@ -322,26 +341,19 @@ public class LogicPrinter {
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) {
-        final int applicationRestriction = taclet.getApplicationRestriction();
-        if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
-            layouter.nl().print("\\sameUpdateLevel");
-        }
-        if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
-            layouter.nl().print("\\inSequentState");
-        }
-        if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
-            layouter.nl().print("\\antecedentPolarity");
-        }
-        if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
-            layouter.nl().print("\\succedentPolarity");
-        }
+        final var applicationRestriction = taclet.applicationRestriction();
+        layouter.nl().print(applicationRestriction.toString());
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<NewVarcond> varsNew = taclet.varsNew();
-        final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
-        final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
-        final ImmutableList<VariableCondition> variableConditions = taclet.getVariableConditions();
+        final ImmutableList<? extends NewVarcond> varsNew =
+            taclet.varsNew();
+        final ImmutableList<? extends NewDependingOn> varsNewDependingOn =
+            taclet.varsNewDependingOn();
+        final ImmutableList<? extends NotFreeIn> varsNotFreeIn =
+            taclet.varsNotFreeIn();
+        final ImmutableList<? extends VariableCondition> variableConditions =
+            taclet.getVariableConditions();
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
                 || !varsNewDependingOn.isEmpty()) {
@@ -357,7 +369,7 @@ public class LogicPrinter {
                 printNewVarDepOnCond(ndo);
             }
 
-            for (final NewVarcond nvc : varsNew) {
+            for (final var nvc : varsNew) {
                 if (first) {
                     first = false;
                 } else {
@@ -398,7 +410,8 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNewVarcond(NewVarcond sv) {
+    protected void printNewVarcond(NewVarcond p_sv) {
+        de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
         layouter.print("\\new(");
         printSchemaVariable(sv.getSchemaVariable());
@@ -456,23 +469,24 @@ public class LogicPrinter {
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
-        printTerm(trigger.getTerm());
+        printTerm((JTerm) trigger.trigger());
         if (trigger.hasAvoidConditions()) {
-            Iterator<Term> itTerms = trigger.avoidConditions().iterator();
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
-            while (itTerms.hasNext()) {
-                Term cond = itTerms.next();
-                printTerm(cond);
-                if (itTerms.hasNext()) {
+            boolean notFirst = false;
+            for (var cond : trigger.avoidConditions()) {
+                if (notFirst) {
                     layouter.print(", ");
+                } else {
+                    notFirst = true;
                 }
+                printTerm((JTerm) cond);
             }
         }
         layouter.print(";").end();
     }
 
-    protected void printFind(Taclet taclet) {
+    protected void printFind(org.key_project.prover.rules.Taclet taclet) {
         if (!(taclet instanceof FindTaclet)) {
             return;
         }
@@ -506,12 +520,14 @@ public class LogicPrinter {
             layouter.nl().print("\\closegoal").brk();
         }
 
-        for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
-                .hasNext();) {
-            printGoalTemplate(it.next());
-            if (it.hasNext()) {
+        boolean notFirst = false;
+        for (final var goalTemplate : taclet.goalTemplates().reverse()) {
+            if (notFirst) {
                 layouter.print(";");
+            } else {
+                notFirst = true;
             }
+            printGoalTemplate(goalTemplate);
         }
     }
 
@@ -548,10 +564,10 @@ public class LogicPrinter {
         }
     }
 
-    protected void printRules(ImmutableList<Taclet> rules) {
+    protected void printRules(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules) {
         layouter.nl().beginC().print("\\addrules(");
         SVInstantiations svi = instantiations;
-        for (Taclet rule : rules) {
+        for (org.key_project.prover.rules.Taclet rule : rules) {
             layouter.nl();
             printTaclet(rule, instantiations, true, false);
             instantiations = svi;
@@ -559,9 +575,9 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) {
+    protected void printAddProgVars(ImmutableSet<? extends SchemaVariable> apv) {
         layouter.beginC().print("\\addprogvars(");
-        Iterator<SchemaVariable> it = apv.iterator();
+        Iterator<? extends SchemaVariable> it = apv.iterator();
         if (it.hasNext()) {
             layouter.brk();
             while (true) {
@@ -586,8 +602,8 @@ public class LogicPrinter {
                 printConstant(sv.name().toString());
             }
         } else {
-            if (o instanceof Term) {
-                printTerm((Term) o);
+            if (o instanceof JTerm) {
+                printTerm((JTerm) o);
             } else if (o instanceof ProgramElement) {
                 printProgramElement((ProgramElement) o);
             } else {
@@ -637,7 +653,7 @@ public class LogicPrinter {
         printSourceElement(pe);
     }
 
-    protected void printRewrite(Term t) {
+    protected void printRewrite(JTerm t) {
         layouter.nl().beginC().print("\\replacewith(").brk(0);
         printTerm(t);
         layouter.brk(0, -2).print(")").end();
@@ -754,7 +770,7 @@ public class LogicPrinter {
      * @param cfma the constrained formula to be printed
      */
     public void printConstrainedFormula(SequentFormula cfma) {
-        printTerm(cfma.formula());
+        printTerm((JTerm) cfma.formula());
     }
 
     /**
@@ -763,7 +779,7 @@ public class LogicPrinter {
      *
      * @param t the Term to be printed
      */
-    public void printTerm(Term t) {
+    public void printTerm(JTerm t) {
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
             layouter.startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
@@ -784,24 +800,24 @@ public class LogicPrinter {
     }
 
     /**
-     * Determine the Set of labels that will be printed out for a specific {@link Term}. The class
+     * Determine the Set of labels that will be printed out for a specific {@link JTerm}. The class
      * {@link SequentViewLogicPrinter} overrides this method. {@link TermLabel} visibility can be
      * configured via GUI, see de.uka.ilkd.key.gui.actions.TermLabelMenu. Default is to
      * print all TermLabels.
      *
-     * @param t {@link Term} whose visible {@link TermLabel}s will be determined.
+     * @param t {@link JTerm} whose visible {@link TermLabel}s will be determined.
      * @return List of visible {@link TermLabel}s, i.e. labels that are syntactically added to a
-     *         {@link Term} while printing.
+     *         {@link JTerm} while printing.
      */
-    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(JTerm t) {
         return t.getLabels();
     }
 
-    public void printLabels(Term t) {
+    public void printLabels(JTerm t) {
         notationInfo.getNotation(TermLabel.class).print(t, this);
     }
 
-    void printLabels(Term t, String left, String right) {
+    void printLabels(JTerm t, String left, String right) {
 
         ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
         if (termLabelList.isEmpty()) {
@@ -837,9 +853,9 @@ public class LogicPrinter {
      *
      * @param terms the terms to be printed
      */
-    public void printTerm(ImmutableSet<Term> terms) {
+    public void printTerm(ImmutableSet<JTerm> terms) {
         layouter.print("{");
-        Iterator<Term> it = terms.iterator();
+        Iterator<JTerm> it = terms.iterator();
         while (it.hasNext()) {
             printTerm(it.next());
             if (it.hasNext()) {
@@ -869,7 +885,7 @@ public class LogicPrinter {
      *
      * @param t the Term to be printed
      */
-    public void printTermContinuingBlock(Term t) {
+    public void printTermContinuingBlock(JTerm t) {
         if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
                 && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
             layouter.print("(");
@@ -891,7 +907,7 @@ public class LogicPrinter {
      *
      * @param t the term to be printed.
      */
-    public void printFunctionTerm(Term t) {
+    public void printFunctionTerm(JTerm t) {
         boolean isKeyword = false;
         if (services != null) {
             Function measuredByEmpty = services.getTermBuilder().getMeasuredByEmpty();
@@ -959,7 +975,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printCast(String pre, String post, Term t, int ass) {
+    public void printCast(String pre, String post, JTerm t, int ass) {
         final SortDependingFunction cast = (SortDependingFunction) t.op();
 
         layouter.startTerm(t.arity());
@@ -969,7 +985,7 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass);
     }
 
-    protected boolean printEmbeddedHeapConstructorTerm(Term t) {
+    protected boolean printEmbeddedHeapConstructorTerm(JTerm t) {
 
         Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapConstructorNotation heapNotation) {
@@ -985,14 +1001,14 @@ public class LogicPrinter {
         layouter.print(className);
     }
 
-    public void printHeapConstructor(Term t, boolean closingBrace) {
+    public void printHeapConstructor(JTerm t, boolean closingBrace) {
         assert t.boundVars().isEmpty();
 
         final HeapLDT heapLDT = getHeapLDT();
 
         if (notationInfo.isPrettySyntax() && heapLDT != null) {
             layouter.startTerm(t.arity());
-            final Term heapTerm = t.sub(0);
+            final JTerm heapTerm = t.sub(0);
             final String opName = t.op().name().toString();
 
             assert heapTerm.sort() == heapLDT.targetSort();
@@ -1038,10 +1054,10 @@ public class LogicPrinter {
         }
     }
 
-    protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm) {
+    protected void printEmbeddedObserver(final JTerm heapTerm, final JTerm objectTerm) {
         Notation notation = notationInfo.getNotation(objectTerm.op());
         if (notation instanceof ObserverNotation obsNotation) {
-            Term innerheap = objectTerm.sub(0);
+            JTerm innerheap = objectTerm.sub(0);
             boolean paren = !heapTerm.equals(innerheap);
             if (paren) {
                 layouter.print("(");
@@ -1058,28 +1074,28 @@ public class LogicPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(Term t, Term tacitHeap) {
+    public void printSelect(JTerm t, JTerm tacitHeap) {
         selectPrinter.printSelect(this, t, tacitHeap);
     }
 
     /*
      * Print a term of the form: T::final(object, field).
      */
-    public void printFinal(Term t) {
+    public void printFinal(JTerm t) {
         finalPrinter.printFinal(this, t);
     }
 
     /*
      * Print a term of the form: store(heap, object, field, value).
      */
-    public void printStore(Term t, boolean closingBrace) {
+    public void printStore(JTerm t, boolean closingBrace) {
         storePrinter.printStore(this, t, closingBrace);
     }
 
     /*
      * Print a term of the form: T::seqGet(Seq, int).
      */
-    public void printSeqGet(Term t) {
+    public void printSeqGet(JTerm t) {
         if (notationInfo.isPrettySyntax()) {
             layouter.startTerm(2);
             if (!t.sort().equals(JavaDLTheory.ANY)) {
@@ -1099,7 +1115,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printPostfix(Term t, String postfix) {
+    public void printPostfix(JTerm t, String postfix) {
         if (notationInfo.isPrettySyntax()) {
             layouter.startTerm(t.arity());
 
@@ -1112,7 +1128,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printObserver(Term t, Term tacitHeap) {
+    public void printObserver(JTerm t, JTerm tacitHeap) {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
 
@@ -1165,7 +1181,7 @@ public class LogicPrinter {
                 JavaInfo javaInfo = services.getJavaInfo();
                 if (t.arity() > 1) {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
-                    Term object = t.sub(1);
+                    JTerm object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     String p;
                     try {
@@ -1211,7 +1227,7 @@ public class LogicPrinter {
             }
 
             // must the heap be printed at all: no, if default heap.
-            final Term heapTerm = t.sub(0);
+            final JTerm heapTerm = t.sub(0);
             if (!heapTerm.equals(tacitHeap)) {
                 layouter.brk(0).print("@");
                 layouter.markStartSub(0);
@@ -1229,7 +1245,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printSingleton(Term t) {
+    public void printSingleton(JTerm t) {
         assert t.arity() == 2;
         layouter.startTerm(2);
         layouter.print("{(").beginC(0);
@@ -1247,7 +1263,7 @@ public class LogicPrinter {
         layouter.print(")}").end();
     }
 
-    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) {
+    public void printSeqSingleton(JTerm t, String lDelimiter, String rDelimiter) {
         assert t.arity() == 1;
         layouter.startTerm(1);
         layouter.print(lDelimiter).beginC(0);
@@ -1257,7 +1273,7 @@ public class LogicPrinter {
         layouter.print(rDelimiter).end();
     }
 
-    public void printElementOf(Term t) {
+    public void printElementOf(JTerm t) {
         assert t.arity() == 3;
         layouter.startTerm(3);
 
@@ -1283,7 +1299,7 @@ public class LogicPrinter {
         layouter.markEndSub();
     }
 
-    public void printElementOf(Term t, String symbol) {
+    public void printElementOf(JTerm t, String symbol) {
         if (symbol == null) {
             printElementOf(t);
             return;
@@ -1321,7 +1337,7 @@ public class LogicPrinter {
      * @param sub the subterm to be printed
      * @param ass the associativity for the subterm
      */
-    public void printPrefixTerm(String name, Term t, Term sub, int ass) {
+    public void printPrefixTerm(String name, JTerm t, JTerm sub, int ass) {
         layouter.startTerm(1);
         if (t.op() == Junctor.NOT) {
             layouter.markStartKeyword();
@@ -1341,7 +1357,7 @@ public class LogicPrinter {
      * @param t the subterm to be printed
      * @param ass the associativity for the subterm
      */
-    public void printPostfixTerm(Term t, int ass, String name) {
+    public void printPostfixTerm(JTerm t, int ass, String name) {
         layouter.startTerm(1);
         maybeParens(t, ass);
         layouter.print(name);
@@ -1356,7 +1372,7 @@ public class LogicPrinter {
      * {@code p & q}
      * </pre>
      * <p>
-     * The subterms are printed using {@link #printTermContinuingBlock(Term)}.
+     * The subterms are printed using {@link #printTermContinuingBlock(JTerm)}.
      *
      * @param l the left subterm
      * @param assLeft associativity for left subterm
@@ -1365,7 +1381,7 @@ public class LogicPrinter {
      * @param r the right subterm
      * @param assRight associativity for right subterm
      */
-    public void printInfixTerm(Term l, int assLeft, String name, Term t, Term r, int assRight) {
+    public void printInfixTerm(JTerm l, int assLeft, String name, JTerm t, JTerm r, int assRight) {
         int indent = name.length() + 1;
         layouter.beginC(indent);
         printInfixTermContinuingBlock(l, assLeft, name, t, r, assRight);
@@ -1374,8 +1390,8 @@ public class LogicPrinter {
 
     /**
      * Print a binary term in infix style, continuing a containing block. See
-     * {@link #printTermContinuingBlock(Term)} for the idea. Otherwise, like
-     * {@link #printInfixTerm(Term, int, String, Term, Term, int)}.
+     * {@link #printTermContinuingBlock(JTerm)} for the idea. Otherwise, like
+     * {@link #printInfixTerm(JTerm, int, String, JTerm, JTerm, int)}.
      *
      * @param l the left subterm
      * @param assLeft associativity for left subterm
@@ -1384,7 +1400,7 @@ public class LogicPrinter {
      * @param r the right subterm
      * @param assRight associativity for right subterm
      */
-    public void printInfixTermContinuingBlock(Term l, int assLeft, String name, Term t, Term r,
+    public void printInfixTermContinuingBlock(JTerm l, int assLeft, String name, JTerm t, JTerm r,
             int assRight) {
         boolean isKeyword = false;
         if (services != null) {
@@ -1422,7 +1438,7 @@ public class LogicPrinter {
      * @param t the update term
      * @param ass3 associativity for phi
      */
-    public void printUpdateApplicationTerm(String l, String r, Term t, int ass3) {
+    public void printUpdateApplicationTerm(String l, String r, JTerm t, int ass3) {
         assert t.op() instanceof UpdateApplication && t.arity() == 2;
 
         layouter.markStartUpdate();
@@ -1448,7 +1464,7 @@ public class LogicPrinter {
      * @param asgn the assignment operator (including spaces)
      * @param ass2 associativity for the new values
      */
-    public void printElementaryUpdate(String asgn, Term t, int ass2) {
+    public void printElementaryUpdate(String asgn, JTerm t, int ass2) {
         ElementaryUpdate op = (ElementaryUpdate) t.op();
 
         assert t.arity() == 1;
@@ -1461,7 +1477,7 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass2);
     }
 
-    private void printParallelUpdateHelper(String separator, Term t, int ass) {
+    private void printParallelUpdateHelper(String separator, JTerm t, int ass) {
         assert t.arity() == 2;
         layouter.startTerm(2);
 
@@ -1486,7 +1502,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printParallelUpdate(String separator, Term t, int ass) {
+    public void printParallelUpdate(String separator, JTerm t, int ass) {
         layouter.beginC(0);
         printParallelUpdateHelper(separator, t, ass);
         layouter.end();
@@ -1520,7 +1536,7 @@ public class LogicPrinter {
         layouter.print(";");
     }
 
-    public void printIfThenElseTerm(Term t, String keyword) {
+    public void printIfThenElseTerm(JTerm t, String keyword) {
         layouter.startTerm(t.arity());
 
         layouter.beginC(0);
@@ -1573,8 +1589,8 @@ public class LogicPrinter {
      * @param phi the substituted term/formula
      * @param ass3 the int defining the associativity for phi
      */
-    public void printSubstTerm(String l, QuantifiableVariable v, Term t, int ass2, String r,
-            Term phi, int ass3) {
+    public void printSubstTerm(String l, QuantifiableVariable v, JTerm t, int ass2, String r,
+            JTerm phi, int ass3) {
         layouter.beginC().print(l);
         printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
         layouter.startTerm(2);
@@ -1602,7 +1618,7 @@ public class LogicPrinter {
      * @param ass associativity for phi
      */
     public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
-            Term phi, int ass) {
+            JTerm phi, int ass) {
         layouter.beginC();
         layouter.keyWord(name);
         layouter.print(" ");
@@ -1629,7 +1645,7 @@ public class LogicPrinter {
      * @param t constant as term to be printed
      * @param s name of the constant
      */
-    public void printConstant(Term t, String s) {
+    public void printConstant(JTerm t, String s) {
         layouter.startTerm(0);
         boolean isKeyword = false;
         if (getHeapLDT() != null) {
@@ -1664,23 +1680,23 @@ public class LogicPrinter {
      * listed between parens, like <code>&lt;Program&gt;(psi1,psi2)</code>
      */
 
-    public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass) {
+    public void printModalityTerm(String left, JavaBlock jb, String right, JTerm phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
-        if (phi.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
+        if (phi.op() instanceof JModality mod && mod.kind() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation(mod.kind());
-            if (o instanceof Modality.JavaModalityKind kind) {
+            if (o instanceof JModality.JavaModalityKind kind) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
                 } else {
-                    Term[] ta = new Term[phi.arity()];
+                    JTerm[] ta = new JTerm[phi.arity()];
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    final Modality m =
-                        Modality.getModality((Modality.JavaModalityKind) o, mod.program());
-                    final Term term = services.getTermFactory().createTerm(m, ta,
+                    final JModality m =
+                        JModality.getModality((JModality.JavaModalityKind) o, mod.programBlock());
+                    final JTerm term = services.getTermFactory().createTerm(m, ta,
                         phi.boundVars(), null);
                     notationInfo.getNotation(m).print(term, this);
                     return;
@@ -1728,16 +1744,16 @@ public class LogicPrinter {
      *
      * <p>
      * If prio and associativity are equal, the subterm is printed using
-     * {@link #printTermContinuingBlock(Term)}. This currently only makes a difference for infix
+     * {@link #printTermContinuingBlock(JTerm)}. This currently only makes a difference for infix
      * operators.
      *
      * @param t the subterm to print
      * @param ass the associativity for this subterm
      */
-    protected void maybeParens(Term t, int ass) {
+    protected void maybeParens(JTerm t, int ass) {
         if (t.op() instanceof SchemaVariable && instantiations != null
-                && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof Term) {
-            t = (Term) instantiations.getInstantiation((SchemaVariable) t.op());
+                && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof JTerm) {
+            t = (JTerm) instantiations.getInstantiation((SchemaVariable) t.op());
         }
 
         if (notationInfo.getNotation(t.op()).getPriority() < ass) {
@@ -1780,7 +1796,7 @@ public class LogicPrinter {
      * @param t the Term used as reference prefix
      * @return true if an attribute term shall be printed in short form.
      */
-    public boolean printInShortForm(String attributeProgramName, Term t) {
+    public boolean printInShortForm(String attributeProgramName, JTerm t) {
         final Sort prefixSort;
         prefixSort = t.sort();
         return printInShortForm(attributeProgramName, prefixSort);

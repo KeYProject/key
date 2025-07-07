@@ -9,13 +9,16 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
-import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -41,7 +44,7 @@ import org.key_project.util.collection.ImmutableList;
  * </p>
  *
  * @author Martin Hentschel
- * @see SymbolicExecutionGoalChooserBuilder
+ * @see SymbolicExecutionGoalChooserFactory
  */
 public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     /**
@@ -63,14 +66,14 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         if (selectedList.size() >= 2) {
             Goal goal = null;
             // Reinitialize preferred set if required: Only with the goals where the stop condition
             // accepts the next rule
             if (stopCondition != null && goalsToPrefer.isEmpty()) {
                 for (Goal goalToPrefer : selectedList) {
-                    if (stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, goalToPrefer)) {
+                    if (stopCondition.isGoalAllowed(goalToPrefer, -1, -1L, -1L, -1)) {
                         goalsToPrefer.add(goalToPrefer);
                     }
                 }
@@ -99,7 +102,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                     if (goalsToPrefer.remove(next) || goalsToPrefer.isEmpty()) {
                         // Goal is preferred, so check if next rule is allowed
                         if (stopCondition == null
-                                || stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, next)) {
+                                || stopCondition.isGoalAllowed(next, -1, -1L, -1L, -1)) {
                             // Next rule allowed, goal is preferred so return it as result
                             goal = next;
                         } else {
@@ -153,18 +156,18 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public void removeGoal(Goal p_goal) {
+    public void removeGoal(Goal goal) {
         // Update available goals in super class
-        super.removeGoal(p_goal);
+        super.removeGoal(goal);
         // Remove no longer relevant goal from preferred set
-        goalsToPrefer.remove(p_goal);
+        goalsToPrefer.remove(goal);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateGoalList(Node node, ImmutableList<Goal> newGoals) {
+    public void updateGoalList(Object node, @NonNull ImmutableList<Goal> newGoals) {
         // Update available goals in super class
         super.updateGoalList(node, newGoals);
         // Remove no longer relevant goals from preferred set

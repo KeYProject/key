@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @Disabled
 public class ParseAllKeyFilesTest {
     public static Collection<Path> getFiles() throws IOException {
-        try (var s = Files.walk(HelperClassForTests.TESTCASE_DIRECTORY.toPath())) {
+        try (var s = Files.walk(HelperClassForTests.TESTCASE_DIRECTORY)) {
             return s.filter(file -> Files.isRegularFile(file) && file.toString().endsWith(".key"))
                     .collect(Collectors.toList());
         }

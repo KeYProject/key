@@ -10,22 +10,25 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.ApplicationRestriction;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -36,16 +39,16 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTacletBuilder {
 
-    private Term[] contextUpdates;
+    private JTerm[] contextUpdates;
     private ProofObligationVars poVars;
     static final String USE_IF = InfFlowContractAppTaclet.USE_IF;
     private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
 
-    public AbstractInfFlowContractAppTacletBuilder(final Services services) {
+    protected AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
     }
 
-    public void setContextUpdate(Term... contextUpdates) {
+    public void setContextUpdate(JTerm... contextUpdates) {
         this.contextUpdates = contextUpdates;
     }
 
@@ -53,10 +56,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         this.poVars = poVars;
     }
 
-    public Term buildContractApplPredTerm() {
+    public JTerm buildContractApplPredTerm() {
         ProofObligationVars appData = poVars;
-        Term contractApplPredTerm = getContractApplPred(appData);
-        for (Term update : contextUpdates) {
+        JTerm contractApplPredTerm = getContractApplPred(appData);
+        for (JTerm update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
         }
         return contractApplPredTerm;
@@ -139,7 +142,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * @param services the services
      * @return the term
      */
-    abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services);
+    abstract JTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services);
 
     /**
      * Generate schema find term.
@@ -148,7 +151,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * @param services the services
      * @return the term
      */
-    abstract Term generateSchemaFind(ProofObligationVars schemaDataFind, Services services);
+    abstract JTerm generateSchemaFind(ProofObligationVars schemaDataFind, Services services);
 
     /**
      * Gets the contract application predicate.
@@ -156,7 +159,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * @param appData the proof obligation variables for the application data
      * @return the contract application predicate
      */
-    abstract Term getContractApplPred(ProofObligationVars appData);
+    abstract JTerm getContractApplPred(ProofObligationVars appData);
 
     /**
      * Generate application data schema variables.
@@ -169,27 +172,27 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix, ProofObligationVars appData,
             Services services) {
         // generate a new schema variable for any pre variable
-        Term selfAtPreSV = createTermSV(appData.pre.self, schemaPrefix, services);
-        ImmutableList<Term> localVarsAtPreSVs =
+        JTerm selfAtPreSV = createTermSV(appData.pre.self, schemaPrefix, services);
+        ImmutableList<JTerm> localVarsAtPreSVs =
             createTermSV(appData.pre.localVars, schemaPrefix, services);
-        Term guardAtPreSV = createTermSV(appData.pre.guard, schemaPrefix, services);
-        Term resAtPreSV = createTermSV(appData.pre.result, schemaPrefix, services);
-        Term excAtPreSV = createTermSV(appData.pre.exception, schemaPrefix, services);
-        Term heapAtPreSV = createTermSV(appData.pre.heap, schemaPrefix, services);
-        Term mbyAtPreSV = createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
+        JTerm guardAtPreSV = createTermSV(appData.pre.guard, schemaPrefix, services);
+        JTerm resAtPreSV = createTermSV(appData.pre.result, schemaPrefix, services);
+        JTerm excAtPreSV = createTermSV(appData.pre.exception, schemaPrefix, services);
+        JTerm heapAtPreSV = createTermSV(appData.pre.heap, schemaPrefix, services);
+        JTerm mbyAtPreSV = createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
         // which do not equal the corresponding pre variable; else use
         // the pre schema variable
-        Term selfAtPostSV = (appData.pre.self == appData.post.self ? selfAtPreSV
+        JTerm selfAtPostSV = (appData.pre.self == appData.post.self ? selfAtPreSV
                 : createTermSV(appData.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.nil();
-        Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
-        Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
-        for (Term appDataPostLocalVar : appData.post.localVars) {
-            Term appDataPreLocalVar = appDataPreLocalVarsIt.next();
-            Term localPreVar = schemaLocalVarsAtPreIt.next();
+        ImmutableList<JTerm> localVarsAtPostSVs = ImmutableSLList.nil();
+        Iterator<JTerm> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
+        Iterator<JTerm> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
+        for (JTerm appDataPostLocalVar : appData.post.localVars) {
+            JTerm appDataPreLocalVar = appDataPreLocalVarsIt.next();
+            JTerm localPreVar = schemaLocalVarsAtPreIt.next();
             if (appDataPostLocalVar == appDataPreLocalVar) {
                 localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
             } else {
@@ -198,13 +201,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             }
         }
 
-        Term guardAtPostSV = (appData.pre.guard == appData.post.guard ? guardAtPreSV
+        JTerm guardAtPostSV = (appData.pre.guard == appData.post.guard ? guardAtPreSV
                 : createTermSV(appData.post.guard, schemaPrefix, services));
-        Term resAtPostSV = (appData.pre.result == appData.post.result ? resAtPreSV
+        JTerm resAtPostSV = (appData.pre.result == appData.post.result ? resAtPreSV
                 : createTermSV(appData.post.result, schemaPrefix, services));
-        Term excAtPostSV = (appData.pre.exception == appData.post.exception ? excAtPreSV
+        JTerm excAtPostSV = (appData.pre.exception == appData.post.exception ? excAtPreSV
                 : createTermSV(appData.post.exception, schemaPrefix, services));
-        Term heapAtPostSV = (appData.pre.heap == appData.post.heap ? heapAtPreSV
+        JTerm heapAtPostSV = (appData.pre.heap == appData.post.heap ? heapAtPreSV
                 : createTermSV(appData.post.heap, schemaPrefix, services));
 
         // build state vararibale container for pre and post state
@@ -223,13 +226,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         Name tacletName = makeUnique(generateName(), goal);
         // generate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs("find_", appData, services);
-        Term schemaFind = generateSchemaFind(schemaDataFind, services);
+        JTerm schemaFind = generateSchemaFind(schemaDataFind, services);
         ProofObligationVars schemaDataAssumes =
             generateApplicationDataSVs("assumes_", appData, services);
-        Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
+        JTerm schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term
-        Term replaceWithTerm =
+        JTerm replaceWithTerm =
             buildContractApplications(schemaDataFind, schemaDataAssumes, services);
 
         // collect quantifiable variables of the post term and replace them
@@ -247,16 +250,19 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // create sequents
         Sequent assumesSeq =
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
+            JavaDLSequentKit.createAnteSequent(
+                ImmutableSLList.singleton(new SequentFormula(schemaAssumes)));
         Sequent replaceWithSeq =
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
+            JavaDLSequentKit.createAnteSequent(
+                ImmutableSLList.singleton(new SequentFormula(replaceWithTerm)));
 
         // create taclet
         InfFlowContractAppRewriteTacletBuilder tacletBuilder =
             new InfFlowContractAppRewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.ANTECEDENT_POLARITY));
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
             ImmutableSLList.nil(), schemaFind);
@@ -267,7 +273,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         return tacletBuilder.getTaclet();
     }
 
-    abstract Term buildContractApplications(ProofObligationVars contAppData,
+    abstract JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services);
 
     /**
@@ -294,9 +300,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
             prefixBuilder.build();
             return new InfFlowContractAppTaclet(name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
+                    varsNewDependingOn,
                     variableConditions),
-                goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+                goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),
                 choices, surviveSmbExec, tacletAnnotations);
 
         }

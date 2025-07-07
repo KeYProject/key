@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.example;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,11 +52,11 @@ public class Main {
      * @param args The start parameters.
      */
     public static void main(String[] args) {
-        File location = new File("example"); // Path to the source code folder/file or to a *.proof
-                                             // file
-        List<File> classPaths = null; // Optionally: Additional specifications for API classes
-        File bootClassPath = null; // Optionally: Different default specifications for Java API
-        List<File> includes = null; // Optionally: Additional includes to consider
+        Path location = Paths.get("example"); // Path to the source code folder/file or to a *.proof
+                                              // file
+        List<Path> classPaths = null; // Optionally: Additional specifications for API classes
+        Path bootClassPath = null; // Optionally: Different default specifications for Java API
+        List<Path> includes = null; // Optionally: Additional includes to consider
         try {
             // Ensure that Taclets are parsed
             if (!ProofSettings.isChoiceSettingInitialised()) {

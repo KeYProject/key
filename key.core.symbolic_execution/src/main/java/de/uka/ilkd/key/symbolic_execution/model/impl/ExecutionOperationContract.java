@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -49,24 +49,24 @@ import org.key_project.util.collection.ImmutableList;
 public class ExecutionOperationContract extends AbstractExecutionNode<SourceElement>
         implements IExecutionOperationContract {
     /**
-     * The exception {@link Term} used by the applied {@link Contract}.
+     * The exception {@link JTerm} used by the applied {@link Contract}.
      */
-    private Term exceptionTerm;
+    private JTerm exceptionTerm;
 
     /**
-     * The result {@link Term} used by the applied {@link Contract}.
+     * The result {@link JTerm} used by the applied {@link Contract}.
      */
-    private Term resultTerm;
+    private JTerm resultTerm;
 
     /**
-     * The self {@link Term} or {@code null} if not available.
+     * The self {@link JTerm} or {@code null} if not available.
      */
-    private Term selfTerm;
+    private JTerm selfTerm;
 
     /**
      * The current contract parameters.
      */
-    private ImmutableList<Term> contractParams;
+    private ImmutableList<JTerm> contractParams;
 
     /**
      * Constructor.
@@ -92,7 +92,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             }
             // Compute instantiation
             Instantiation inst = UseOperationContractRule.computeInstantiation(
-                getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
+                (JTerm) getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
             // Extract used result and exception variable from proof nodes
             resultTerm = searchResultTerm(contract, inst, services);
             ContractPostOrExcPostExceptionVariableResult search =
@@ -104,9 +104,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
                 HeapContext.getModifiableHeaps(services, inst.transaction);
             Map<LocationVariable, LocationVariable> atPreVars =
                 UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
-            Map<LocationVariable, Term> atPres = HeapContext.getAtPres(atPreVars, services);
+            Map<LocationVariable, JTerm> atPres = HeapContext.getAtPres(atPreVars, services);
             LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-            Term baseHeapTerm = services.getTermBuilder().getBaseHeap();
+            JTerm baseHeapTerm = services.getTermBuilder().getBaseHeap();
             if (contract.hasSelfVar()) {
                 if (inst.pm.isConstructor()) {
                     selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(),
@@ -138,14 +138,14 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     }
 
     /**
-     * Tries to find the self {@link Term} of the given {@link KeYJavaType}.
+     * Tries to find the self {@link JTerm} of the given {@link KeYJavaType}.
      *
-     * @param term The {@link Term} to start search in.
+     * @param term The {@link JTerm} to start search in.
      * @param staticType The expected {@link KeYJavaType}.
      * @param services The {@link Services} to use.
-     * @return The found self {@link Term} or {@code null} if not available.
+     * @return The found self {@link JTerm} or {@code null} if not available.
      */
-    protected Term searchConstructorSelfDefinition(Term term, KeYJavaType staticType,
+    protected JTerm searchConstructorSelfDefinition(JTerm term, KeYJavaType staticType,
             Services services) {
         if (term.op() == Junctor.NOT && term.sub(0).op() == Equality.EQUALS
                 && term.sub(0).sub(0).op() instanceof LocationVariable
@@ -153,7 +153,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
                 && services.getJavaInfo().getKeYJavaType(term.sub(0).sub(0).sort()) == staticType) {
             return term.sub(0).sub(0);
         } else {
-            Term result = null;
+            JTerm result = null;
             int i = term.arity() - 1;
             while (result == null && i >= 0) {
                 result = searchConstructorSelfDefinition(term.sub(i), staticType, services);
@@ -167,7 +167,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public Term getResultTerm() throws ProofInputException {
+    public JTerm getResultTerm() throws ProofInputException {
         synchronized (this) {
             if (!isNameComputed()) {
                 getName(); // Compute name and result term
@@ -180,7 +180,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public Term getExceptionTerm() throws ProofInputException {
+    public JTerm getExceptionTerm() throws ProofInputException {
         synchronized (this) {
             if (!isNameComputed()) {
                 getName(); // Compute name and exception term
@@ -193,7 +193,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public Term getSelfTerm() throws ProofInputException {
+    public JTerm getSelfTerm() throws ProofInputException {
         synchronized (this) {
             if (!isNameComputed()) {
                 getName(); // Compute name and self term
@@ -206,7 +206,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public ImmutableList<Term> getContractParams() throws ProofInputException {
+    public ImmutableList<JTerm> getContractParams() throws ProofInputException {
         synchronized (this) {
             if (!isNameComputed()) {
                 getName(); // Compute name and contract term
@@ -220,7 +220,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      */
     @Override
     public String getFormatedResultTerm() throws ProofInputException {
-        Term resultTerm = getResultTerm();
+        JTerm resultTerm = getResultTerm();
         return resultTerm != null ? formatTerm(resultTerm, getServices()) : null;
     }
 
@@ -229,7 +229,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      */
     @Override
     public String getFormatedExceptionTerm() throws ProofInputException {
-        Term exceptionTerm = getExceptionTerm();
+        JTerm exceptionTerm = getExceptionTerm();
         return exceptionTerm != null ? formatTerm(exceptionTerm, getServices()) : null;
     }
 
@@ -238,7 +238,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      */
     @Override
     public String getFormatedSelfTerm() throws ProofInputException {
-        Term selfTerm = getSelfTerm();
+        JTerm selfTerm = getSelfTerm();
         return selfTerm != null ? formatTerm(selfTerm, getServices()) : null;
     }
 
@@ -247,11 +247,11 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      */
     @Override
     public String getFormatedContractParams() throws ProofInputException {
-        ImmutableList<Term> contractParams = getContractParams();
+        ImmutableList<JTerm> contractParams = getContractParams();
         if (contractParams != null && !contractParams.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
-            for (Term term : contractParams) {
+            for (JTerm term : contractParams) {
                 if (afterFirst) {
                     sb.append(", ");
                 } else {
@@ -266,16 +266,16 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     }
 
     /**
-     * Searches the result {@link Term}.
+     * Searches the result {@link JTerm}.
      *
      * @param contract The {@link FunctionalOperationContract}.
      * @param inst The {@link Instantiation}.
      * @param services The {@link Services}.
-     * @return The found result {@link Term} or {@code null} otherwise.
+     * @return The found result {@link JTerm} or {@code null} otherwise.
      */
-    protected Term searchResultTerm(FunctionalOperationContract contract, Instantiation inst,
+    protected JTerm searchResultTerm(FunctionalOperationContract contract, Instantiation inst,
             Services services) {
-        Term resultTerm = null;
+        JTerm resultTerm = null;
         if (contract.hasResultVar()) {
             ProgramVariable resultVar =
                 extractResultVariableFromPostBranch(getProofNode(), services);
@@ -299,7 +299,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      */
     protected static LocationVariable extractResultVariableFromPostBranch(Node node,
             Services services) {
-        Term postModality = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node,
+        JTerm postModality = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node,
             node.getAppliedRuleApp().posInOccurrence(), node.child(0));
         postModality = TermBuilder.goBelowUpdates(postModality);
         MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);

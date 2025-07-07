@@ -31,15 +31,16 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -254,9 +255,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         iconHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
         delegateView.setUI(new CacheLessMetalTreeUI());
 
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
+        delegateView.getInputMap(WHEN_FOCUSED).getParent()
                 .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
+        delegateView.getInputMap(WHEN_FOCUSED).getParent()
                 .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
 
         delegateView.setInvokesStopCellEditing(true);
@@ -313,7 +314,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         final ActionListener keyboardAction = (ActionEvent e) -> showSearchPanel();
 
         registerKeyboardAction(keyboardAction, SEARCH_KEY_STROKE,
-            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
@@ -986,7 +987,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     var ossParentNode = ((GUIProofTreeNode) ossNode.getParent());
                     var newSequent = ossParentNode.getNode().sequent();
                     var modifiedSequent = newSequent
-                            .replaceFormula(ossNode.getFormulaNr(), pio.sequentFormula()).sequent();
+                            .replaceFormula(ossNode.getFormulaNr(),
+                                pio.sequentFormula())
+                            .sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
                         ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
                 } else {
@@ -1056,7 +1059,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * Renderer responsible for showing a single node of the proof tree.
      */
-    public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+    public class ProofRenderer extends DefaultTreeCellRenderer {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {
@@ -1175,7 +1178,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
                 String on = LogicPrinter.quickPrintTerm(
-                    pio.subTerm(), node.proof().getServices());
+                    (JTerm) pio.subTerm(), node.proof().getServices());
                 style.tooltip.addAppliedOn(cutIfTooLong(on));
             }
 
@@ -1253,7 +1256,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             RuleApp app = node.getRuleApp();
             style.text = app.rule().name().toString();
             Services services = node.getNode().proof().getServices();
-            String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
+            String on =
+                LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
             style.tooltip.addRule(style.text);
             style.tooltip.addAppliedOn(cutIfTooLong(on));
         }

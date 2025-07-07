@@ -22,8 +22,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -33,6 +31,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -45,7 +47,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The condition for this Breakpoint (set by user).
      */
-    private Term condition;
+    private JTerm condition;
 
     /**
      * The flag if the the condition for the associated Breakpoint is enabled
@@ -108,7 +110,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param methodEnd the line the containing method of this breakpoint ends at
      * @param containerType the type of the element containing the breakpoint
      */
-    public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
+    protected AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
             boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd,
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);
@@ -124,9 +126,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
-        super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
+        super.updateState(goal, maxApplications, timeout, startTime, countApplied);
         if (goal != null) {
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
@@ -184,7 +186,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param ruleApp
      * @param inScope
      */
-    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp, boolean inScope) {
+    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,
+            boolean inScope) {
         if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) && inScope) {
             toKeep.clear();
@@ -201,7 +204,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param oldMap the oldMap variableNamings
      */
     private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
-            Map<SyntaxElement, SyntaxElement> oldMap, RuleApp ruleApp) {
+            Map<SyntaxElement, SyntaxElement> oldMap,
+            RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
         // get current renaming tables
@@ -282,9 +286,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Computes the Term that can be evaluated, from the user given condition
      *
      * @param condition the condition given by the user
-     * @return the {@link Term} that represents the condition
+     * @return the {@link JTerm} that represents the condition
      */
-    private Term computeTermForCondition(String condition) {
+    private JTerm computeTermForCondition(String condition) {
         if (condition == null) {
             return getProof().getServices().getTermBuilder().tt();
         }
@@ -345,38 +349,36 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * the proof
      *
      * @param ruleApp the {@link RuleApp} to be executed next
-     * @param proof the current {@link Proof}
      * @param node the current {@link Node}
      * @return true if the condition evaluates to true
      */
-    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+    protected boolean conditionMet(RuleApp ruleApp, Node node) {
         ApplyStrategyInfo info = null;
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term term = pio.subTerm();
-            getProof().getServices().getTermBuilder();
-            term = TermBuilder.goBelowUpdates(term);
+            JTerm t = (JTerm) pio.subTerm();
+            JTerm term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
-                JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+                JavaTools.getInnermostExecutionContext(term.javaBlock(), getProof().getServices());
             // put values into map which have to be replaced
             if (ec != null) {
                 getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
             }
             // replace renamings etc.
+            final TermBuilder tb = getProof().getServices().getTermBuilder();
             OpReplacer replacer =
-                new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
-            Term termForSideProof = replacer.replace(condition);
+                new OpReplacer(getVariableNamingMap(), tb.tf());
+            JTerm termForSideProof = replacer.replace(condition);
             // start side proof
-            Term toProof = getProof().getServices().getTermBuilder()
-                    .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            JTerm toProof = tb.equals(tb.tt(), termForSideProof);
             // New OneStepSimplifier is required because it has an internal state and the default
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
             Sequent sequent =
                 SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
-            info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,
+            info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
                 StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
                 StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
             return info.getProof().closed();
@@ -392,10 +394,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
-        return (!conditionEnabled || conditionMet(ruleApp, proof, node))
-                && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+    public boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Node node) {
+        return (!conditionEnabled || conditionMet(ruleApp, node))
+                && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
     /**
@@ -453,7 +455,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the condition of the associated Breakpoint
      */
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 

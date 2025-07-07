@@ -35,12 +35,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
@@ -81,9 +81,9 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
+    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final JTerm loopTerm,
             final Services services) {
-        assert loopTerm.op() instanceof Modality;
+        assert loopTerm.op() instanceof JModality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
 
         final ProgramElement pe = loopTerm.javaBlock().program();
@@ -107,14 +107,14 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     * Checks whether the given {@link JModality.JavaModalityKind} is a
      * transaction modality.
      *
      * @param modalityKind The modality to check.
-     * @return true iff the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     * @return true iff the given {@link JModality.JavaModalityKind} is a
      *         transaction modality.
      */
-    public static boolean isTransaction(final Modality.JavaModalityKind modalityKind) {
+    public static boolean isTransaction(final JModality.JavaModalityKind modalityKind) {
         return modalityKind.transaction();
     }
 
@@ -128,7 +128,7 @@ public final class MiscTools {
      * @return The list of the applicable heaps for the given scenario.
      */
     public static List<LocationVariable> applicableHeapContexts(
-            Modality.JavaModalityKind modalityKind,
+            JModality.JavaModalityKind modalityKind,
             Services services) {
         final List<LocationVariable> result = new ArrayList<>();
 
@@ -164,7 +164,7 @@ public final class MiscTools {
      * @return the receiver term of the passed method frame, or null if the frame belongs to a
      *         static method.
      */
-    public static Term getSelfTerm(MethodFrame mf, Services services) {
+    public static JTerm getSelfTerm(MethodFrame mf, Services services) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
@@ -238,13 +238,13 @@ public final class MiscTools {
      * @param t the term for which we want to collect the observer functions.
      * @return the observers as a set of pairs with sorts and according observers
      */
-    public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
+    public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(JTerm t) {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
             result = result.add(new Pair<>(s, obs));
         }
-        for (Term sub : t.subs()) {
+        for (JTerm sub : t.subs()) {
             result = result.union(collectObservers(sub));
         }
         return result;
@@ -274,7 +274,7 @@ public final class MiscTools {
     /**
      * Combine two maps by function application. Values of <code>m0</code> which are not keys of
      * <code>m1</code> are dropped. This implementation tries to use the same implementation of
-     * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
+     * {@link Map} (provided in Java SE) as <code>m0</code>.
      *
      * @param m0 a map.
      * @param m1 another map.
@@ -290,21 +290,6 @@ public final class MiscTools {
     // =======================================================
     // Methods operating on Strings
     // =======================================================
-
-    /**
-     * Separates the single directory entries in a filename. The first element is an empty String
-     * iff the filename is absolute. (For a Windows filename, it contains a drive letter and a
-     * colon). Ignores double slashes and slashes at the end, removes references to the cwd. E.g.,
-     * "/home//daniel/./key/" yields {"","home","daniel","key"}. Tries to automatically detect UNIX
-     * or Windows directory delimiters. There is no check whether all other characters are valid for
-     * filenames.
-     *
-     * @param filename a file name.
-     * @return all directory entries in the file name.
-     */
-    static List<String> disectFilename(String filename) {
-        return Filenames.disectFilename(filename);
-    }
 
     /**
      * Returns a filename relative to another one. The second parameter needs to be absolute and is
@@ -653,11 +638,11 @@ public final class MiscTools {
         }
     }
 
-    public static ImmutableList<Term> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
+    public static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> list, TermBuilder tb) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (var pv : list) {
             if (pv != null) {
-                Term t = tb.var(pv);
+                JTerm t = tb.var(pv);
                 result = result.append(t);
             }
         }
@@ -681,10 +666,10 @@ public final class MiscTools {
         return sb.toString();
     }
 
-    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
-            ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term localIn : localIns) {
+    public static ImmutableList<JTerm> filterOutDuplicates(ImmutableList<JTerm> localIns,
+            ImmutableList<JTerm> localOuts) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        for (JTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
             }
@@ -766,7 +751,7 @@ public final class MiscTools {
      * <b>Note:</b> There is an unresolved bug in Java for JarURLs when the jar path contains a
      * directory ending with "!" ("!" should be encoded as "%21", but is not). In this case, the
      * program will crash if trying to open a resource from the url. This will not be fixed until
-     * {@link java.net.URI} supports RFC 3986 (currently, as of 02-2020, it seems like there are no
+     * {@link URI} supports RFC 3986 (currently, as of 02-2020, it seems like there are no
      * plans for this).<br>
      * <b>Workaround:</b> Don't use directory names ending with "!".
      *

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -72,15 +73,15 @@ public class RecentFileMenu {
         this.menu = new JMenu("Recent Files");
         this.lissy = e -> {
             String absPath = getAbsolutePath((JMenuItem) e.getSource());
-            File file = new File(absPath);
+            Path file = Paths.get(absPath);
 
             // special case proof bundles -> allow to select the proof to load
-            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+            if (ProofSelectionDialog.isProofBundle(file)) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
                 if (proofPath == null) {
                     // canceled by user!
                 } else {
-                    mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
+                    mediator.getUI().loadProofFromBundle(file, proofPath);
                 }
             } else {
                 mediator.getUI().loadProblem(file);

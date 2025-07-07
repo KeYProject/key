@@ -4,15 +4,17 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 
+import org.jspecify.annotations.NonNull;
 
 /**
  * Abstract superclass for conditions controlling the instantiations of generic sorts
@@ -30,31 +32,16 @@ public abstract class GenericSortCondition {
      *         are either always compatible (no generic sorts) or never compatible (non generic
      *         sorts that don't match)
      */
-    public static GenericSortCondition createCondition(SchemaVariable sv,
+    public static GenericSortCondition createCondition(
+            SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
-        if (!(p_entry instanceof TermInstantiation ti)) {
+        if (!(p_entry.getInstantiation() instanceof Term instantiation)) {
             return null;
         }
 
-        return createCondition(((OperatorSV) sv).sort(), ti.getInstantiation().sort(),
+        return createCondition(((JOperatorSV) sv).sort(), instantiation.sort(),
             !subSortsAllowed(sv));
-    }
-
-    /**
-     * Create a condition ensuring that the two given symbols become identical; "p0" may be of
-     * generic sort, "p1" not
-     *
-     * @return the resulting condition; null if the symbols are either incompatible or equal
-     */
-    public static GenericSortCondition createCondition(SortDependingFunction p0,
-            SortDependingFunction p1) {
-
-        if (!p0.isSimilar(p1)) {
-            return null;
-        }
-
-        return createCondition(p0.getSortDependingOn(), p1.getSortDependingOn(), true);
     }
 
     /**
@@ -133,7 +120,8 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated (exactly) with
      *         the given concrete sort
      */
-    public static GenericSortCondition createIdentityCondition(GenericSort p_gs, Sort p_s) {
+    public static @NonNull GenericSortCondition createIdentityCondition(GenericSort p_gs,
+            Sort p_s) {
         return new GSCIdentity(p_gs, p_s);
     }
 

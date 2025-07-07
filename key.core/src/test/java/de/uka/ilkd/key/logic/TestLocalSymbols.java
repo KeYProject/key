@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -19,6 +20,9 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Assertions;
@@ -30,16 +34,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Program variables are now introduced locally.
- *
+ * <br>
  * These tests check that this is done correctly.
  *
  * @author mulbrich
  * @since 2017-03
  */
-
 public class TestLocalSymbols {
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "localSymbols/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("localSymbols/");
 
 
     static class LocalMacro extends AbstractPropositionalExpansionMacro {
@@ -84,7 +87,7 @@ public class TestLocalSymbols {
     @Test
     public void testSkolemization() throws Exception {
 
-        Term target = TacletForTests
+        JTerm target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                     + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
@@ -122,8 +125,8 @@ public class TestLocalSymbols {
     // there was a bug.
     @Test
     public void testDoubleInstantiation() throws Exception {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, "doubleSkolem.key");
-        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
+        Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve("doubleSkolem.key");
+        Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
 
         KeYEnvironment<?> env = KeYEnvironment.load(
             JavaProfile.getDefaultInstance(), proofFile, null, null,
@@ -153,8 +156,10 @@ public class TestLocalSymbols {
         Goal goal = goals.head();
 
         TacletApp app;
-        PosInOccurrence pio = new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
-            PosInTerm.getTopLevel(), false);
+        Sequent sequentFormulas = goal.node().sequent();
+        PosInOccurrence pio =
+            new PosInOccurrence(sequentFormulas.getFormulaByNr(formulaNo),
+                PosInTerm.getTopLevel(), false);
 
         app = rule.matchFind(pio, services);
         app = app.setPosInOccurrence(pio, services);
@@ -171,13 +176,12 @@ public class TestLocalSymbols {
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, proofFileName);
-        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
+        Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve(proofFileName);
+        Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+            return KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                 proofFile, null, null, null, true);
-            return environment;
         } catch (ProblemLoaderException e) {
             Assertions.fail("Proof could not be loaded.");
             return null;

@@ -5,9 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -15,7 +13,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -24,6 +21,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * An implementation of {@link IExecutionVariable} used to query all array indices at the same time.
@@ -45,12 +46,12 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
     /**
      * The constant representing an arbitrary array index.
      */
-    private Term constant;
+    private JTerm constant;
 
     /**
      * The constant representing the fact that no value is available.
      */
-    private final Term notAValue;
+    private final JTerm notAValue;
 
     /**
      * Constructor.
@@ -65,12 +66,12 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      */
     public ExecutionAllArrayIndicesVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO, ExecutionValue parentValue,
-            IProgramVariable arrayProgramVariable, Term additionalCondition) {
+            IProgramVariable arrayProgramVariable, JTerm additionalCondition) {
         super(parentNode, proofNode, modalityPIO, parentValue, arrayProgramVariable,
             additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
-        JFunction notAValueFunction =
+        Function notAValueFunction =
             new JFunction(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
         notAValue = tb.func(notAValueFunction);
     }
@@ -104,30 +105,30 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             final Services sideServices = sideProofEnv.getServicesForEnvironment();
             final TermBuilder tb = sideServices.getTermBuilder();
             // Start site proof to extract the value of the result variable.
-            Term siteProofCondition = getAdditionalCondition() != null
+            JTerm siteProofCondition = getAdditionalCondition() != null
                     ? tb.and(getAdditionalCondition(), getParentValue().getCondition())
                     : getParentValue().getCondition();
-            Term arrayTerm = createArrayTerm();
+            JTerm arrayTerm = createArrayTerm();
             // Create index constant
-            JFunction constantFunction =
+            Function constantFunction =
                 new JFunction(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
                     sideServices.getTypeConverter().getIntegerLDT().targetSort());
             constant = tb.func(constantFunction);
             setName(lazyComputeName()); // Update name because constant has changed
-            Term arrayIndex = tb.dotArr(arrayTerm, constant);
+            JTerm arrayIndex = tb.dotArr(arrayTerm, constant);
             // Create if check
-            JFunction arrayLengthFunction =
+            Function arrayLengthFunction =
                 sideServices.getTypeConverter().getHeapLDT().getLength();
-            Term arrayRange = tb.and(tb.geq(constant, tb.zero()),
+            JTerm arrayRange = tb.and(tb.geq(constant, tb.zero()),
                 tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
-            Term resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
+            JTerm resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
 
             // Create predicate which will be used in formulas to store the value interested in.
-            JFunction resultPredicate =
+            Function resultPredicate =
                 new JFunction(new Name(tb.newName("ResultPredicate")),
                     JavaDLTheory.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.
-            Term resultTerm = tb.func(resultPredicate, resultIf);
+            JTerm resultTerm = tb.func(resultPredicate, resultIf);
             // Create Sequent to prove with new succedent.
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(
                 getProofNode(), getModalityPIO(), siteProofCondition, resultTerm, false);
@@ -154,16 +155,16 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * {@inheritDoc}
      */
     @Override
-    protected boolean isValidValue(Term value) {
+    protected boolean isValidValue(JTerm value) {
         return notAValue != value;
     }
 
     /**
-     * Creates a {@link Term} to access the array.
+     * Creates a {@link JTerm} to access the array.
      *
-     * @return The {@link Term} to access the array.
+     * @return The {@link JTerm} to access the array.
      */
-    public Term createArrayTerm() {
+    public JTerm createArrayTerm() {
         return getParentValue().getVariable().createSelectTerm();
     }
 
@@ -171,7 +172,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * {@inheritDoc}
      */
     @Override
-    public Term createSelectTerm() {
+    public JTerm createSelectTerm() {
         assert constant != null : "Call getValues() before calling createSelectTerm().";
         return getServices().getTermBuilder().dotArr(createArrayTerm(), constant);
     }
@@ -181,7 +182,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      *
      * @return The constant representing an arbitrary array index.
      */
-    public Term getConstant() {
+    public JTerm getConstant() {
         return constant;
     }
 
@@ -190,7 +191,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      *
      * @return The constant representing the fact that no value is available.
      */
-    public Term getNotAValue() {
+    public JTerm getNotAValue() {
         return notAValue;
     }
 }

@@ -7,13 +7,13 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 
 /**
@@ -47,8 +47,8 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 
             if (subst instanceof FieldReference) {
                 progvar = ((FieldReference) subst).getProgramVariable();
-            } else if (subst instanceof Term && ((Term) subst).op() instanceof ProgramVariable) {
-                progvar = (ProgramVariable) ((Term) subst).op();
+            } else if (subst instanceof JTerm && ((JTerm) subst).op() instanceof ProgramVariable) {
+                progvar = (ProgramVariable) ((JTerm) subst).op();
             } else {
                 return false;
             }

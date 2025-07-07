@@ -17,19 +17,19 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -119,13 +119,13 @@ public class InvariantConfigurator {
             private JPanel errorPanel;
             private final List<JTabbedPane> heapPanes = new ArrayList<>();
 
-            private Term variantTerm = null;
-            private final Map<LocationVariable, Term> modifiableTerm = new LinkedHashMap<>();
-            private final Map<LocationVariable, Term> freeModifiableTerm = new LinkedHashMap<>();
+            private JTerm variantTerm = null;
+            private final Map<LocationVariable, JTerm> modifiableTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, JTerm> freeModifiableTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
                 new LinkedHashMap<>();
-            private final Map<LocationVariable, Term> invariantTerm = new LinkedHashMap<>();
-            private final Map<LocationVariable, Term> freeInvariantTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, JTerm> invariantTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, JTerm> freeInvariantTerm = new LinkedHashMap<>();
 
 
             private final JButton applyButton = new JButton("Apply");
@@ -181,7 +181,7 @@ public class InvariantConfigurator {
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 
-                setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
                 parser = new KeyIO(services, nss);
@@ -237,11 +237,11 @@ public class InvariantConfigurator {
                 Map<String, String>[] loopInvTexts = new Map[IF_OO_IDX + 1];
 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<>();
-                final Map<LocationVariable, Term> atPres = loopInv.getInternalAtPres();
+                final Map<LocationVariable, JTerm> atPres = loopInv.getInternalAtPres();
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
-                    final Term invariant =
+                    final JTerm invariant =
                         loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
                     if (invariant == null) {
@@ -256,7 +256,7 @@ public class InvariantConfigurator {
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
-                    final Term modifiable =
+                    final JTerm modifiable =
                         loopInv.getModifiable(heap, loopInv.getInternalSelfTerm(), atPres,
                             services);
 
@@ -270,7 +270,7 @@ public class InvariantConfigurator {
                 }
 
                 loopInvTexts[VAR_IDX] = new LinkedHashMap<>();
-                final Term variant =
+                final JTerm variant =
                     loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (variant == null) {
                     loopInvTexts[VAR_IDX].put(DEFAULT, "");
@@ -289,7 +289,7 @@ public class InvariantConfigurator {
                         loopInvTexts[IF_PRE_IDX].put(heap.toString(), "true");
                     } else {
                         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                            for (Term t : infFlowSpec.preExpressions) {
+                            for (JTerm t : infFlowSpec.preExpressions) {
                                 loopInvTexts[IF_PRE_IDX].put(heap.toString(), printTerm(t, false));
                             }
                         }
@@ -307,7 +307,7 @@ public class InvariantConfigurator {
                         loopInvTexts[IF_POST_IDX].put(heap.toString(), "true");
                     } else {
                         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                            for (Term t : infFlowSpec.postExpressions) {
+                            for (JTerm t : infFlowSpec.postExpressions) {
                                 loopInvTexts[IF_POST_IDX].put(heap.toString(), printTerm(t, false));
                             }
                         }
@@ -325,7 +325,7 @@ public class InvariantConfigurator {
                         loopInvTexts[IF_OO_IDX].put(heap.toString(), "true");
                     } else {
                         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                            for (Term t : infFlowSpec.newObjects) {
+                            for (JTerm t : infFlowSpec.newObjects) {
                                 loopInvTexts[IF_OO_IDX].put(heap.toString(), printTerm(t, false));
                             }
                         }
@@ -356,10 +356,10 @@ public class InvariantConfigurator {
             /**
              * wrapper for the pretty printer
              *
-             * @param t the {@link Term} to be printed
+             * @param t the {@link JTerm} to be printed
              * @return the String representation of the term
              */
-            private String printTerm(Term t, boolean pretty) {
+            private String printTerm(JTerm t, boolean pretty) {
                 return OutputStreamProofSaver.printTerm(t, services, pretty);
 
             }
@@ -961,9 +961,9 @@ public class InvariantConfigurator {
              * @return invariant term
              * @throws Exception
              */
-            protected Term parseInvariant(LocationVariable heap) {
+            protected JTerm parseInvariant(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
-                Term result =
+                JTerm result =
                     parser.parseExpression(invariants.get(index)[INV_IDX].get(heap.toString()));
                 if (result.sort() != JavaDLTheory.FORMULA) {
                     throw newUnexpectedTypeException(JavaDLTheory.FORMULA, result.sort());
@@ -975,7 +975,7 @@ public class InvariantConfigurator {
                 return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
             }
 
-            protected Term parseModifiable(LocationVariable heap) {
+            protected JTerm parseModifiable(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
                 final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
                 String string = invariants.get(index)[MOD_IDX].get(heap.toString());
@@ -985,7 +985,7 @@ public class InvariantConfigurator {
                     // to enter "strictly_nothing" also in interactive mode.
                     return services.getTermBuilder().strictlyNothing();
                 }
-                Term result = parser.parseExpression(string);
+                JTerm result = parser.parseExpression(string);
                 if (result.sort() != locSetSort) {
                     throw newUnexpectedTypeException(locSetSort, result.sort());
                 }
@@ -1001,22 +1001,22 @@ public class InvariantConfigurator {
                 final String newObjectsAsString =
                     invariants.get(index)[IF_OO_IDX].get(heap.toString());
                 // TODO: allow more than one term
-                Term preExps = parser.parseExpression(preExpsAsString);
+                JTerm preExps = parser.parseExpression(preExpsAsString);
                 // TODO: allow more than one term
-                Term postExps = parser.parseExpression(postExpsAsString);
+                JTerm postExps = parser.parseExpression(postExpsAsString);
                 // TODO: allow more than one term
-                Term newObjects = parser.parseExpression(newObjectsAsString);
+                JTerm newObjects = parser.parseExpression(newObjectsAsString);
 
                 return ImmutableSLList.<InfFlowSpec>nil()
-                        .append(new InfFlowSpec(ImmutableSLList.<Term>nil().append(preExps),
-                            ImmutableSLList.<Term>nil().append(postExps),
-                            ImmutableSLList.<Term>nil().append(newObjects)));
+                        .append(new InfFlowSpec(ImmutableSLList.<JTerm>nil().append(preExps),
+                            ImmutableSLList.<JTerm>nil().append(postExps),
+                            ImmutableSLList.<JTerm>nil().append(newObjects)));
             }
 
-            protected Term parseVariant() {
+            protected JTerm parseVariant() {
                 index = inputPane.getSelectedIndex();
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                Term result = parser.parseExpression(invariants.get(index)[VAR_IDX].get(DEFAULT));
+                JTerm result = parser.parseExpression(invariants.get(index)[VAR_IDX].get(DEFAULT));
                 if (result.sort() != intSort) {
                     throw newUnexpectedTypeException(intSort, result.sort());
                 }

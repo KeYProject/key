@@ -8,7 +8,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
@@ -24,7 +24,7 @@ public final class InfFlowLoopInvariantTacletBuilder
 
     private LoopSpecification loopinvariant;
     private ExecutionContext executionContext;
-    private Term guard;
+    private JTerm guard;
 
     public InfFlowLoopInvariantTacletBuilder(final Services services) {
         super(services);
@@ -40,7 +40,7 @@ public final class InfFlowLoopInvariantTacletBuilder
     }
 
 
-    public void setGuard(Term guard) {
+    public void setGuard(JTerm guard) {
         this.guard = guard;
     }
 
@@ -51,21 +51,21 @@ public final class InfFlowLoopInvariantTacletBuilder
     }
 
     @Override
-    Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
+    JTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
         BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(loopinvariant,
             schemaDataAssumes, executionContext, guard, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
     @Override
-    Term generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
+    JTerm generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
         BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(loopinvariant,
             schemaDataFind, executionContext, guard, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
     @Override
-    Term getContractApplPred(ProofObligationVars appData) {
+    JTerm getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f = POSnippetFactory.getBasicFactory(loopinvariant, appData,
             executionContext, guard, services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
@@ -73,14 +73,14 @@ public final class InfFlowLoopInvariantTacletBuilder
 
 
     @Override
-    Term buildContractApplications(ProofObligationVars contAppData,
+    JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services) {
         LoopSpecification ifContract =
             services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
 
         InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
             contAppData2, executionContext, guard, services);
-        Term contractApplication =
+        JTerm contractApplication =
             f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
 
         return contractApplication;

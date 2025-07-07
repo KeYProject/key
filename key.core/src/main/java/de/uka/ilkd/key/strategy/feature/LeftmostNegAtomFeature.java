@@ -4,13 +4,16 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.logic.op.Operator;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Feature that returns zero if there is no atom with negative polarity on a common d-path and on
@@ -24,12 +27,12 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
     private LeftmostNegAtomFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(PosInOccurrence pos, JTerm findTerm, ServiceCaches caches) {
         final PIOPathIterator it = pos.iterator();
         boolean positive = pos.isInAntec();
 
         while (it.next() != -1) {
-            final Term subTerm = it.getSubTerm();
+            final JTerm subTerm = (JTerm) it.getSubTerm();
             final Operator op = subTerm.op();
 
             if (it.getChild() == 0) {

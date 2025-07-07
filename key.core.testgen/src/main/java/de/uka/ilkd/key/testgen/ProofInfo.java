@@ -7,8 +7,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.PosTableLayouter;
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -63,9 +64,9 @@ public class ProofInfo {
         return po.getContract();
     }
 
-    public Term getPostCondition() {
-        Term t = getPO();
-        Term post = services.getTermBuilder().tt();
+    public JTerm getPostCondition() {
+        JTerm t = getPO();
+        JTerm post = services.getTermBuilder().tt();
         try {
             post = t.sub(1).sub(1).sub(0);
         } catch (Exception e) {
@@ -75,11 +76,11 @@ public class ProofInfo {
         return post;
     }
 
-    public Term getPreConTerm() {
+    public JTerm getPreConTerm() {
         Contract c = getContract();
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
-            Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
+            JTerm post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
                 orig.params, orig.atPres, services);
             return post;
         }
@@ -87,13 +88,13 @@ public class ProofInfo {
         return services.getTermBuilder().ff();
     }
 
-    public Term getModifiable() {
+    public JTerm getModifiable() {
         Contract c = getContract();
         return c.getModifiable(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public String getCode() {
-        Term f = getPO();
+        JTerm f = getPO();
         JavaBlock block = getJavaBlock(f);
 
         PosTableLayouter l = PosTableLayouter.pure();
@@ -105,17 +106,17 @@ public class ProofInfo {
         return p.result();
     }
 
-    public void getProgramVariables(Term t, Set<Term> vars) {
+    public void getProgramVariables(JTerm t, Set<JTerm> vars) {
         if (t.op() instanceof ProgramVariable && isRelevantConstant(t)) {
             vars.add(TermLabelManager.removeIrrelevantLabels(t, services));
         }
 
-        for (Term sub : t.subs()) {
+        for (JTerm sub : t.subs()) {
             getProgramVariables(sub, vars);
         }
     }
 
-    private boolean isRelevantConstant(Term c) {
+    private boolean isRelevantConstant(JTerm c) {
         Operator op = c.op();
 
         if (isTrueConstant(op) || isFalseConstant(op)) {
@@ -145,17 +146,17 @@ public class ProofInfo {
         return o.equals(services.getTypeConverter().getBooleanLDT().getFalseConst());
     }
 
-    public Term getPO() {
-        return proof.root().sequent().succedent().get(0).formula();
+    public JTerm getPO() {
+        return (JTerm) proof.root().sequent().succedent().get(0).formula();
     }
 
 
-    public String getUpdate(Term t) {
+    public String getUpdate(JTerm t) {
         if (t.op() instanceof UpdateApplication) {
             return processUpdate(UpdateApplication.getUpdate(t));
         } else {
             StringBuilder result = new StringBuilder();
-            for (Term s : t.subs()) {
+            for (JTerm s : t.subs()) {
                 result.append(getUpdate(s));
             }
             return result.toString();
@@ -164,7 +165,7 @@ public class ProofInfo {
     }
 
 
-    private String processUpdate(Term update) {
+    private String processUpdate(JTerm update) {
         if (update.op() instanceof ElementaryUpdate up) {
             if (up.lhs().sort()
                     .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
@@ -174,18 +175,18 @@ public class ProofInfo {
                 + ";";
         }
         StringBuilder result = new StringBuilder();
-        for (Term sub : update.subs()) {
+        for (JTerm sub : update.subs()) {
             result.append(processUpdate(sub));
         }
         return result.toString();
     }
 
-    public JavaBlock getJavaBlock(Term t) {
+    public JavaBlock getJavaBlock(JTerm t) {
         if (t.containsJavaBlockRecursive()) {
             if (!t.javaBlock().isEmpty()) {
                 return t.javaBlock();
             } else {
-                for (Term s : t.subs()) {
+                for (JTerm s : t.subs()) {
                     if (s.containsJavaBlockRecursive()) {
                         return getJavaBlock(s);
                     }

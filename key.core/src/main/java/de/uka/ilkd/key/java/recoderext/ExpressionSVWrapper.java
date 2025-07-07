@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 
-import recoder.java.Expression;
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;
@@ -14,13 +13,13 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
 public class ExpressionSVWrapper extends Literal
-        implements Expression, LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
+        implements LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
 
     /**
      *
      */
     private static final long serialVersionUID = 7659491655661716390L;
-    protected final OperatorSV sv;
+    protected final JOperatorSV sv;
     protected ReferenceSuffix suff;
 
 
@@ -32,7 +31,7 @@ public class ExpressionSVWrapper extends Literal
         expressionParent = null;
     }
 
-    public ExpressionSVWrapper(OperatorSV sv) {
+    public ExpressionSVWrapper(JOperatorSV sv) {
         this.sv = sv;
         expressionParent = null;
     }
@@ -45,7 +44,7 @@ public class ExpressionSVWrapper extends Literal
 
 
     @Override
-    public OperatorSV getSV() {
+    public JOperatorSV getSV() {
         return sv;
     }
 

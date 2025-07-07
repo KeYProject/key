@@ -10,9 +10,8 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -30,7 +29,7 @@ public final class FreeLDT extends LDT {
     public static final Name NAME = new Name("Free");
 
     // neutral element, the only pre-defined function
-    private final JFunction atom;
+    private final Function atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);
@@ -38,45 +37,46 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services,
+    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
             ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
+    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+            ExecutionContext ec) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public JTerm translateLiteral(Literal lit, Services services) {
         return services.getTermBuilder().func(atom);
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         assert false;
         return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return "atom".equals(f.name().toString());
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+        if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         assert false;
@@ -84,7 +84,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }

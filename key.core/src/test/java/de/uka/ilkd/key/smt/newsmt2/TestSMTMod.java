@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -33,7 +34,8 @@ public class TestSMTMod {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSMTMod.class);
 
-    private static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final Path testCaseDirectory =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
@@ -47,15 +49,15 @@ public class TestSMTMod {
 
     /**
      * This tests if x mod y is non-negative and x mod y < |y| for y != 0
-     * thus satisfying the definition of euclidean modulo
+     * thus satisfying the definition of Euclidean modulo
      * Tests for Z3 and cvc5
      *
-     * @throws ProblemLoaderException Occured Exception during load of problem file
+     * @throws ProblemLoaderException Occurred Exception during load of problem file
      */
     @Test
     public void testModSpec() throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory, "smt/modSpec.key"));
+            KeYEnvironment.load(testCaseDirectory.resolve("smt/modSpec.key"));
         try {
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);

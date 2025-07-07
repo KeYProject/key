@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
+import recoder.java.Statement;
 import recoder.java.statement.Catch;
 
 public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrapper {
@@ -16,9 +17,9 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
      *
      */
     private static final long serialVersionUID = 6288254708744002494L;
-    protected final OperatorSV sv;
+    protected final JOperatorSV sv;
 
-    public CatchSVWrapper(OperatorSV sv) {
+    public CatchSVWrapper(JOperatorSV sv) {
         this.sv = sv;
     }
 
@@ -26,7 +27,7 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
     /**
      * returns a String name of this meta construct.
      */
-    public OperatorSV getSV() {
+    public JOperatorSV getSV() {
         return sv;
     }
 
@@ -46,11 +47,11 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public int getChildPositionCode(recoder.java.ProgramElement pe) {
+    public int getChildPositionCode(ProgramElement pe) {
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public boolean replaceChild(recoder.java.ProgramElement p1, recoder.java.ProgramElement p2) {
+    public boolean replaceChild(ProgramElement p1, ProgramElement p2) {
         return false;
     }
 
@@ -58,7 +59,7 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
         return 0;
     }
 
-    public recoder.java.Statement getStatementAt(int s) {
+    public Statement getStatementAt(int s) {
         throw new ArrayIndexOutOfBoundsException();
     }
 

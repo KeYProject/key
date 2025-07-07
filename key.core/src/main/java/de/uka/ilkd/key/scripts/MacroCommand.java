@@ -9,17 +9,19 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Varargs;
+
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
@@ -93,7 +95,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             PosInOccurrence pio = null;
 
             if (args.occ > -1) {
-                pio = new PosInOccurrence(sequent.getFormulabyNr(args.occ + 1),
+                pio = new PosInOccurrence(sequent.getFormulaByNr(args.occ + 1),
                     PosInTerm.getTopLevel(), args.occ + 1 <= sequent.antecedent().size());
             }
 
@@ -123,21 +125,22 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
      * @return
      * @throws ScriptException
      */
-    public static PosInOccurrence extractMatchingPio(final Sequent sequent, final String matchRegEx,
+    public static PosInOccurrence extractMatchingPio(
+            final Sequent sequent, final String matchRegEx,
             final Services services) throws ScriptException {
         PosInOccurrence pio = null;
         boolean matched = false;
 
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
-                LogicPrinter.quickPrintTerm(sequent.getFormulabyNr(i).formula(), services))
+                LogicPrinter.quickPrintTerm((JTerm) sequent.getFormulaByNr(i).formula(), services))
                     .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {
                     throw new ScriptException("More than one occurrence of a matching term.");
                 }
                 matched = true;
-                pio = new PosInOccurrence(sequent.getFormulabyNr(i), PosInTerm.getTopLevel(),
+                pio = new PosInOccurrence(sequent.getFormulaByNr(i), PosInTerm.getTopLevel(),
                     i <= sequent.antecedent().size());
             }
         }

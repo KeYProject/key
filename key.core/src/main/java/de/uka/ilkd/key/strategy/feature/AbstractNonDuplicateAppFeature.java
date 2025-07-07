@@ -5,19 +5,19 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -32,7 +32,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * to be decided by the subclasses
      */
     protected abstract boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            PosInOccurrence newPio, PosInOccurrence oldPio);
+            PosInOccurrence newPio,
+            PosInOccurrence oldPio);
 
     /**
      * Check whether the old rule application <code>ruleCmp</code> is a duplicate of the new
@@ -60,22 +61,22 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
 
         // compare the if-sequent instantiations
-        final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations =
-            newApp.ifFormulaInstantiations();
-        final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations =
-            cmp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> newAppIfFmlInstantiations =
+            newApp.assumesFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> cmpIfFmlInstantiations =
+            cmp.assumesFormulaInstantiations();
         if (newAppIfFmlInstantiations == null || cmpIfFmlInstantiations == null) {
             if (newAppIfFmlInstantiations != null || cmpIfFmlInstantiations != null) {
                 return false;
             }
         } else {
 
-            final Iterator<IfFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
-            final Iterator<IfFormulaInstantiation> it1 = cmpIfFmlInstantiations.iterator();
+            final Iterator<AssumesFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 = cmpIfFmlInstantiations.iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) {
+                if (it0.next().getSequentFormula() != it1.next().getSequentFormula()) {
                     return false;
                 }
             }
@@ -89,10 +90,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             return false;
         }
 
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
-            inst0.interesting();
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
-            inst1.interesting();
+        final var interesting0 = inst0.interesting();
+        final var interesting1 = inst1.interesting();
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
     }
 
@@ -121,7 +120,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean noDuplicateFindTaclet(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean noDuplicateFindTaclet(TacletApp app,
+            PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();

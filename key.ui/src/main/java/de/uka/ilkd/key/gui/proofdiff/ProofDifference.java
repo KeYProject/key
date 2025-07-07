@@ -8,10 +8,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Semisequent;
 
 /**
  * @author Alexander Weigl
@@ -28,10 +30,12 @@ public class ProofDifference {
     private final Set<String> commonAntec = new HashSet<>();
 
     public static ProofDifference create(Services services, Node left, Node right) {
-        return create(left, right, (Term t) -> LogicPrinter.quickPrintTerm(t, services));
+        return create(left, right,
+            (Term t) -> LogicPrinter.quickPrintTerm((JTerm) t, services));
     }
 
-    public static ProofDifference create(Node left, Node right, Function<Term, String> printer) {
+    public static ProofDifference create(Node left, Node right,
+            Function<Term, String> printer) {
         ProofDifference pd = new ProofDifference();
         assert left != null && right != null;
         pd.leftAntec = initialise(printer, left.sequent().antecedent());

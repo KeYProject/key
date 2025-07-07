@@ -6,16 +6,19 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
-public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm {
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+
+public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
 
     private final ProjectionToTerm leftCoefficient, polynomial;
 
@@ -25,6 +28,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         this.polynomial = polynomial;
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term coeffT = leftCoefficient.toTerm(app, pos, goal, mState);
         final Term polyT = polynomial.toTerm(app, pos, goal, mState);
@@ -38,16 +42,17 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     protected abstract Term divide(Monomial numerator, BigInteger denominator, Services services);
 
-    private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
-        final JFunction add = services.getTypeConverter().getIntegerLDT().getAdd();
+    private JTerm quotient(BigInteger monoCoeff, Term rightPoly,
+            Services services) {
+        final Function add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
-            final Term left = quotient(monoCoeff, rightPoly.sub(0), services);
-            final Term right = quotient(monoCoeff, rightPoly.sub(1), services);
+            final var left = quotient(monoCoeff, rightPoly.sub(0), services);
+            final var right = quotient(monoCoeff, rightPoly.sub(1), services);
             return services.getTermBuilder().func(add, left, right);
         }
 
         final Monomial rightMono = Monomial.create(rightPoly, services);
-        return divide(rightMono, monoCoeff, services);
+        return (JTerm) divide(rightMono, monoCoeff, services);
     }
 
 }

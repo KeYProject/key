@@ -20,22 +20,26 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
- * The DragNDropInstantiator interpretes drag'n drop actions as taclet instantiations. The behaviour
+ * The DragNDropInstantiator interprets drag-and-drop actions as taclet instantiations. The
+ * behaviour
  * is described below (excluding some "optimisation" details)
  * </p>
  * <p>
@@ -56,7 +60,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * source is merged against <tt>find</tt> part and target has to be the complete sequent. Dropping
  * on the sequent arrow is interpreted as applying an addrule(treats hide rules)</li>
  * </ol>
- * The DragNDropInstantiator now determines all taclets, which have a valid drag'n drop
+ * The DragNDropInstantiator now determines all taclets, which have a valid drag-and-drop
  * instantiation for a given (source, target) position pair. If there is only one taclet with a
  * valid dnd-instantiation this one is executed otherwise the user is presented a list of possible
  * taclets from which she/he can select one.
@@ -79,7 +83,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             Transferable transferable = event.getTransferable();
             if (transferable
                     .isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
-                interpreteDragAndDropInstantiation(event, dropLocation, transferable);
+                interpretDragAndDropInstantiation(event, dropLocation, transferable);
             } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 try {
                     event.acceptDrop(event.getSourceActions());
@@ -87,7 +91,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                         (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     for (Object file : files) {
                         File f = (File) file;
-                        MainWindow.getInstance().loadProblem(f);
+                        MainWindow.getInstance().loadProblem(f.toPath());
                     }
                     event.dropComplete(true);
                 } catch (ClassCastException ex) {
@@ -105,18 +109,20 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     }
 
     @Override
-    public void dragOver(DropTargetDragEvent dtde) {
-        seqView.autoscroll(dtde.getLocation());
-        seqView.paintHighlights(dtde.getLocation());
+    public void dragOver(DropTargetDragEvent event) {
+        seqView.autoscroll(event.getLocation());
+        seqView.paintHighlights(event.getLocation());
     }
 
     /**
-     * Interpretes the drag and drop gesture. Checks which taclets could be meant by the drag'n drop
+     * Interprets the drag-and-drop gesture. Checks which taclets could be meant by the
+     * 'drag-and-drop'
      * and applies if the app can be uniquely determined, otherwise a selection menu is presented to
-     * the user
+     * the user.
      */
-    private void interpreteDragAndDropInstantiation(DropTargetDropEvent event, Point dropLocation,
-            Transferable transferable) throws UnsupportedFlavorException, IOException {
+    private void interpretDragAndDropInstantiation(DropTargetDropEvent event, Point dropLocation,
+            Transferable transferable)
+            throws UnsupportedFlavorException, IOException {
 
         final PosInSequent sourcePos = (PosInSequent) transferable
                 .getTransferData(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
@@ -142,16 +148,16 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         }
 
         // in case of an equal source and target position the selection list is shown
-        // even if only one rule is applicable in order to avoid an accidently
-        // rule appliciation of replace_knwon_* rules and entering
-        // the hell of non-confluence..
+        // even if only one rule is applicable in order to avoid an accidental
+        // rule application of replace_known_* rules and entering
+        // the hell of non-confluence...
         final boolean equalTargetPosition =
             sourcePos.getPosInOccurrence().equals(targetPos.getPosInOccurrence());
 
         if (!equalTargetPosition && applicableApps.size() == 1) {
             execute(applicableApps.head());
-        } else if (applicableApps.size() >= 1) {
-            // open a pop up menu for user selection
+        } else if (!applicableApps.isEmpty()) {
+            // open a pop-up menu for user selection
             SimpleTacletSelectionMenu menu = new SimpleTacletSelectionMenu(applicableApps,
                 seqView.getMediator().getNotationInfo(), new PopupListener(), services);
 
@@ -169,9 +175,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * retrieves all drag'n drop instantiable taclet applications
      *
      * @param sourcePos the PosInSequent where the drag started
-     * @param targetPos the PosInSequent where the drop occured
+     * @param targetPos the PosInSequent where the drop occurred
      * @param services theServices providing access to the program model
-     * @return all drag'n drop instantiable taclet applications
+     * @return all drag-and-drop instantiable taclet applications
      */
     private ImmutableList<PosTacletApp> getAllApplicableApps(final PosInSequent sourcePos,
             final PosInSequent targetPos, final Services services) {
@@ -185,7 +191,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             applicableApps = applicableApps
                     .prepend(completeIfInstantiations(
                         getApplicableTaclets(sourcePos,
-                            TacletFilter.TACLET_WITH_NO_IF_FIND_AND_ADDRULE, services),
+                            TacletFilter.TACLET_WITH_NO_ASSUMES_FIND_AND_ADDRULE, services),
                         sequent, targetPos.getPosInOccurrence(), services));
         } else {
             // if (ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isDndDirectionSensitive()) {
@@ -203,13 +209,13 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     }
 
     /**
-     * returns all applicable apps respecting direction information in drag an drop
+     * returns all applicable apps respecting direction information in drag-and-drop
      *
      * @param sourcePos PosInSequent where the drag gesture started
      * @param targetPos PosInSequent where the drop action took place
      * @param services the Services
      * @param sequent the Sequent
-     * @return all applicable apps respecting direction information in drag an drop
+     * @return all applicable apps respecting direction information in drag-and-drop
      */
     private ImmutableList<PosTacletApp> getDirectionDependentApps(final PosInSequent sourcePos,
             final PosInSequent targetPos, final Services services, final Sequent sequent) {
@@ -222,7 +228,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         applicableApps = applicableApps
                 .prepend(completeIfInstantiations(
                     getApplicableTaclets(sourcePos,
-                        TacletFilter.TACLET_WITH_IF_FIND_AND_NO_REPLACEWITH, services),
+                        TacletFilter.TACLET_WITH_ASSUMES_FIND_AND_NO_REPLACEWITH, services),
                     sequent, targetPos.getPosInOccurrence(), services));
 
         // switch source and target interpretation
@@ -232,27 +238,27 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         applicableApps = applicableApps
                 .prepend(completeIfInstantiations(
                     getApplicableTaclets(targetPos,
-                        TacletFilter.TACLET_WITH_IF_FIND_AND_REPLACEWITH, services),
+                        TacletFilter.TACLET_WITH_ASSUMES_FIND_AND_REPLACEWITH, services),
                     sequent, sourcePos.getPosInOccurrence(), services));
 
         // get those without an if sequent, in these we will try to apply this rule
         // if: * one sv instantiation is missing
         // * the term dropped on is a legal instantiation for this sv
         applicableApps = applicableApps.prepend(completeInstantiations(
-            getApplicableTaclets(sourcePos, TacletFilter.TACLET_WITH_NO_IF, services),
+            getApplicableTaclets(sourcePos, TacletFilter.TACLET_WITH_NO_ASSUMES, services),
             targetPos.getPosInOccurrence(), services));
 
         return applicableApps;
     }
 
     /**
-     * returns all applicable apps without respecting direction information in drag an drop
+     * returns all applicable apps without respecting direction information in drag-and-drop
      *
      * @param sourcePos PosInSequent where the drag gesture started
      * @param targetPos PosInSequent where the drop action took place
      * @param services the Services
      * @param sequent the Sequent
-     * @return all applicable apps respecting direction information in drag an drop
+     * @return all applicable apps respecting direction information in drag-and-drop
      */
     private ImmutableList<PosTacletApp> getDirectionIndependentApps(PosInSequent sourcePos,
             PosInSequent targetPos, final Services services, final Sequent sequent) {
@@ -287,7 +293,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         KeYMediator r = seqView.getMediator();
 
         // if in replaceWithMode only apps that contain at least one replacewith
-        // are collected. Otherwise only those without a replacewith.
+        // are collected. Otherwise, only those without a replacewith.
         for (final TacletApp app : r.getUI().getProofControl().getFindTaclet(r.getSelectedGoal(),
             findPos.getPosInOccurrence())) {
             if (filter.satisfiesFilterCondition(app.taclet())) {
@@ -325,55 +331,60 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     }
 
     /**
-     * tries to complete the (partial) taclet instantantiation of the applications given in
+     * tries to complete the (partial) taclet instantiation of the applications given in
      * <tt>apps</tt>. The resulting applications are returned. The given apps must have either all
      * an if part or none of them.
      *
-     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be
-     *        matched
-     *        against the formula specified by the pair <tt>seq</tt> and <tt>ifPIO</tt>
-     * @param seq the Sequent to which the position information in <tt>ifPIO</tt> is relative to
-     * @param ifPIO the PosInOccurrence describing the position of the term to be matched against
-     *        the if sequent of the taclets
+     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose assumes-sequent has
+     *        to be
+     *        matched against the formula specified by the pair <tt>seq</tt> and <tt>assumesPIO</tt>
+     * @param seq the Sequent to which the position information in <tt>assumesPIO</tt> is relative
+     *        to
+     * @param assumesPIO the PosInOccurrence describing the position of the term to be matched
+     *        against
+     *        the assumes-sequent of the taclets
      * @param services the Services
      * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
-            Sequent seq, PosInOccurrence ifPIO, Services services) {
+            Sequent seq, PosInOccurrence assumesPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
 
-        final ImmutableList<IfFormulaInstantiation> ifFmlInst;
+        final ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations;
 
-        if (ifPIO == null || !ifPIO.isTopLevel()) {
+        if (assumesPIO == null || !assumesPIO.isTopLevel()) {
             // if formula have to be top level formulas
             // TODO: should update prefix be allowed?
-            ifFmlInst = null;
+            assumesFormulaInstantiations = null;
         } else {
-            final IfFormulaInstSeq ifInst =
-                new IfFormulaInstSeq(seq, ifPIO.isInAntec(), ifPIO.sequentFormula());
-            ifFmlInst = ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifInst);
+            final AssumesFormulaInstSeq assumesInstantiationInSeq =
+                new AssumesFormulaInstSeq(seq, assumesPIO.isInAntec(),
+                    assumesPIO.sequentFormula());
+            assumesFormulaInstantiations = ImmutableSLList.<AssumesFormulaInstantiation>nil()
+                    .prepend(assumesInstantiationInSeq);
         }
 
         for (PosTacletApp app1 : apps) {
             PosTacletApp app = app1;
 
-            final Sequent ifSequent = app.taclet().ifSequent();
-            if (ifSequent != null && !ifSequent.isEmpty()) {
-                if (ifSequent.size() != 1) {
+            final Sequent assumesSequent = app.taclet().assumesSequent();
+            if (assumesSequent != null && !assumesSequent.isEmpty()) {
+                if (assumesSequent.size() != 1) {
                     // currently dnd is only supported for taclets with exact one formula
-                    // in the if sequent
+                    // in the assumes-sequent
                     app = null;
-                } else if (ifFmlInst == null) {
-                    // as either all taclets have an if sequent or none
+                } else if (assumesFormulaInstantiations == null) {
+                    // as either all taclets have an assumes-sequent or none
                     // we can exit here
                     return ImmutableSLList.nil();
                 } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
-                    if (((IfFormulaInstSeq) ifFmlInst.head())
-                            .inAntec() == (ifSequent.succedent().size() == 0)) {
-                        app = (PosTacletApp) app.setIfFormulaInstantiations(ifFmlInst, services);
+                    if (((AssumesFormulaInstSeq) assumesFormulaInstantiations.head())
+                            .inAntecedent() == assumesSequent.succedent().isEmpty()) {
+                        app = (PosTacletApp) app
+                                .setIfFormulaInstantiations(assumesFormulaInstantiations, services);
                     }
                 }
             }
@@ -387,14 +398,15 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
 
     /**
-     * tries to complete the (partial) taclet instantantiation of the applications given in
+     * tries to complete the (partial) taclet instantiation of the applications given in
      * <tt>apps</tt>. The resulting applications are returned.
      *
-     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be
-     *        matched
-     *        against the formula specified by the pair <tt>seq</tt> and <tt>ifPIO</tt> is relative
-     *        to
-     * @param missingSVPIO the PosInOccurrence describing the position of the term an uninstantiated
+     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose assumes sequent has
+     *        to be
+     *        matched against the formula specified by the pair <tt>seq</tt> and <tt>assumesPIO</tt>
+     *        is relative to
+     * @param missingSVPIO the PosInOccurrence describing the position of the term a noy yet
+     *        instantiated
      *        SV will be matched against
      * @param services the Services
      * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
@@ -411,9 +423,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             PosTacletApp app = app1;
 
             final SchemaVariable missingSV;
-            final Sequent ifSequent = app.taclet().ifSequent();
+            final Sequent assumesSequent = app.taclet().assumesSequent();
 
-            if ((ifSequent != null && !ifSequent.isEmpty())
+            if ((assumesSequent != null && !assumesSequent.isEmpty())
                     || app.uninstantiatedVars().size() != 1) {
                 continue;
             } else {
@@ -422,7 +434,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             if (app.isInstantiationRequired(missingSV)) {
                 try {
                     app = (PosTacletApp) app.addCheckedInstantiation(missingSV,
-                        missingSVPIO.subTerm(), services, true);
+                        (JTerm) missingSVPIO.subTerm(), services, true);
                 } catch (IllegalInstantiationException ie) {
                     app = null;
                 }
@@ -461,16 +473,15 @@ public class DragNDropInstantiator extends DropTargetAdapter {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() instanceof DefaultTacletMenuItem) {
-                final TacletMenuItem item = (TacletMenuItem) e.getSource();
+            if (e.getSource() instanceof DefaultTacletMenuItem item) {
                 DragNDropInstantiator.this.execute((PosTacletApp) item.connectedTo());
             }
         }
     }
 
     /**
-     * This interface is impemented by filters selecting certain kinds of taclets depending on their
-     * syntactic structure
+     * This interface is implemented by filters selecting taclets based on their
+     * syntactic structure.
      */
     protected interface TacletFilter {
 
@@ -478,29 +489,30 @@ public class DragNDropInstantiator extends DropTargetAdapter {
          * This filter selects all Taclet which have an <tt>assumes</tt>, <tt>find</tt> and at least
          * one <tt>replacewith</tt> part.
          */
-        TacletFilter TACLET_WITH_IF_FIND_AND_REPLACEWITH = new TacletWithIfFindAndReplacewith();
+        TacletFilter TACLET_WITH_ASSUMES_FIND_AND_REPLACEWITH =
+            new TacletWithIfFindAndReplacewith();
 
         /**
          * This filter selects all Taclet which have an <tt>assumes</tt>, <tt>find</tt> and
          * <em>no</em> <tt>replacewith</tt> part.
          */
-        TacletFilter TACLET_WITH_IF_FIND_AND_NO_REPLACEWITH =
+        TacletFilter TACLET_WITH_ASSUMES_FIND_AND_NO_REPLACEWITH =
             new TacletWithIfFindAndNoReplacewith();
 
         /**
          * This filter selects all Taclet which have an <tt>assumes</tt>, <tt>find</tt> and
          * <em>no</em> <tt>replacewith</tt> part.
          */
-        TacletFilter TACLET_WITH_NO_IF_FIND_AND_ADDRULE = new TacletWithNoIfFindAndAddrule();
+        TacletFilter TACLET_WITH_NO_ASSUMES_FIND_AND_ADDRULE = new TacletWithNoIfFindAndAddrule();
 
         /**
          * This filter selects all Taclets which have no <tt>assumes</tt>, sequent but a
          * <tt>find</tt>part.
          */
-        TacletFilter TACLET_WITH_NO_IF = new TacletWithNoIf();
+        TacletFilter TACLET_WITH_NO_ASSUMES = new TacletWithNoAssumes();
 
         /**
-         * checks if the taclet satisfies certain syntactic criterias
+         * Checks whether the taclet satisfies certain syntactic criteria
          *
          * @param taclet the Taclet to be tested
          * @return true if filter condition is fulfilled
@@ -522,7 +534,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              * <tt>replacewith</tt> part and returns true if the test is positive
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
-                return taclet.ifSequent() != null && !taclet.ifSequent().isEmpty()
+                return taclet.assumesSequent() != null && !taclet.assumesSequent().isEmpty()
                         && taclet instanceof FindTaclet && taclet.hasReplaceWith();
             }
         }
@@ -541,7 +553,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              * <em>no</em> <tt>replacewith</tt> part and returns true if the test is positive
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
-                return taclet.ifSequent() != null && !taclet.ifSequent().isEmpty()
+                return taclet.assumesSequent() != null && !taclet.assumesSequent().isEmpty()
                         && taclet instanceof FindTaclet && !taclet.hasReplaceWith();
             }
         }
@@ -565,11 +577,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             private boolean goalTemplatesContainAddrules(
                     ImmutableList<TacletGoalTemplate> goalDescriptions) {
                 for (final TacletGoalTemplate tgt : goalDescriptions) {
-                    if (tgt.rules().size() >= 1) {
+                    if (!tgt.rules().isEmpty()) {
                         return true;
                     }
                 }
-
                 return false;
             }
 
@@ -578,8 +589,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              * <em>no</em> <tt>replacewith</tt> part and returns true if the test is positive
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
-                // TODO: the null checks should be unneccessary
-                return (taclet.ifSequent() == null || taclet.ifSequent().isEmpty())
+                // TODO: the null checks should be unnecessary
+                return (taclet.assumesSequent() == null || taclet.assumesSequent().isEmpty())
                         && taclet instanceof FindTaclet
                         && goalTemplatesContainAddrules(taclet.goalTemplates());
             }
@@ -589,17 +600,17 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         /**
          * This filter selects all Taclet which have no <tt>assume</tt>, but a <tt>find</tt>.
          */
-        class TacletWithNoIf implements TacletFilter {
+        class TacletWithNoAssumes implements TacletFilter {
 
-            private TacletWithNoIf() {
+            private TacletWithNoAssumes() {
             }
 
             /**
              * checks if the taclet has a find part and no assumes sequent
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
-                // TODO: the null checks should be unneccessary
-                final Sequent ifSequent = taclet.ifSequent();
+                // TODO: the null checks should be unnecessary
+                final Sequent ifSequent = taclet.assumesSequent();
                 return ((ifSequent == null || ifSequent.isEmpty()) && taclet instanceof FindTaclet);
 
             }

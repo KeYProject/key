@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.proof.Node;
@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,8 +27,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     /**
-     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
-     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
+     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)}
      */
     @Test
     public void testReferenceComputation_ExpandAndContract() throws Exception {
@@ -39,12 +39,11 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
             new ExpectedProofReferences(IProofReference.INLINE_METHOD,
                 "UseOperationContractTest::main"),
             new ExpectedProofReferences(IProofReference.USE_CONTRACT,
-                "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result_magic42,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
+                "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result_magic42,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}free post: {heap=true, savedHeap=null}; modifiable: {heap=allLocs, savedHeap=null}; hasModifiable: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
     }
 
     /**
-     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
-     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
+     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)}
      */
     @Test
     public void testReferenceComputation_NoAnalysts() throws Exception {
@@ -53,8 +52,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     }
 
     /**
-     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
-     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
+     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)}
      */
     @Test
     public void testReferenceComputation_ContractOnly() throws Exception {
@@ -64,8 +62,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     }
 
     /**
-     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)} and
-     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
+     * Tests {@link ProofReferenceUtil#computeProofReferences(Proof, ImmutableList)}
      */
     @Test
     public void testReferenceComputation_ExpandOnly() throws Exception {
@@ -106,7 +103,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
-    protected void doAPITest(File baseDir, String javaPathInBaseDir, String containerTypeName,
+    protected void doAPITest(@Nullable Path baseDir, String javaPathInBaseDir,
+            String containerTypeName,
             String methodFullName, boolean useContracts,
             final ImmutableList<IProofReferencesAnalyst> analysts,
             final ExpectedProofReferences... expectedReferences) throws Exception {

@@ -128,7 +128,7 @@ public class Configuration {
      * Returns an integer from the configuration.
      *
      * @param name property name
-     * @throws ClassCastException if the entry is not a {@link java.lang.Long}
+     * @throws ClassCastException if the entry is not a {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public int getInt(String name) {

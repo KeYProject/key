@@ -31,7 +31,6 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -341,6 +341,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * @see de.uka.ilkd.key.proof.ProofTreeListener#proofExpanded(de.uka.
              * ilkd.key.proof.ProofTreeEvent)
              */
+            @Override
             public void proofExpanded(ProofTreeEvent e) {
                 // nothing, this is not important for the list of goals
             }
@@ -348,11 +349,13 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if all goals of the proof are closed
              */
+            @Override
             public void proofClosed(ProofTreeEvent e) {
                 setAttentive(true);
                 clear();
             }
 
+            @Override
             public void proofIsBeingPruned(ProofTreeEvent e) {
                 pruningInProcess = true;
             }
@@ -362,6 +365,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * other words, that node should no longer have any children now. Any nodes that were
              * not descendants of that node are unaffected.
              */
+            @Override
             public void proofPruned(ProofTreeEvent e) {
                 clear();
                 add(e.getSource().openGoals());
@@ -371,6 +375,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if the list of goals changed (goals were added, removed etc.)
              */
+            @Override
             public void proofGoalRemoved(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -381,6 +386,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if the current goal of the proof changed
              */
+            @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -391,6 +397,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             /**
              * invoked if the current goal of the proof changed
              */
+            @Override
             public void proofGoalsChanged(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -399,6 +406,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 add(e.getGoals());
             }
 
+            @Override
             public void proofStructureChanged(ProofTreeEvent e) {
                 if (pruningInProcess) {
                     return;
@@ -781,7 +789,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     }
 
-    private class IconCellRenderer extends DefaultListCellRenderer implements java.io.Serializable {
+    private class IconCellRenderer extends DefaultListCellRenderer {
         @Serial
         private static final long serialVersionUID = -8178991338906184819L;
 

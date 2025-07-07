@@ -5,7 +5,6 @@ package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
@@ -16,7 +15,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -31,13 +29,18 @@ import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -100,14 +103,13 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * creates a Vector with the row entries of the table
      */
-    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
-        ArrayList<Pair<SchemaVariable, String>> rowVec = new ArrayList<>();
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            tacletApp.instantiations().pairIterator();
+    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(
+            TacletApp tacletApp) {
+        ArrayList<Pair<SchemaVariable, String>> rowVec =
+            new ArrayList<>();
         int count = 0;
 
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
+        for (var entry : tacletApp.instantiations().getInstantiationMap()) {
             rowVec.add(new Pair<>(entry.key(),
                 ProofSaver.printAnything(entry.value(), services)));
             count++;
@@ -119,12 +121,13 @@ public class TacletFindModel extends AbstractTableModel {
 
         for (SchemaVariable var : tacletApp.uninstantiatedVars()) {
 
-            if (!tacletApp.taclet().getIfFindVariables().contains(var)) {
+            if (!tacletApp.taclet().getAssumesAndFindVariables().contains(var)) {
                 // create an appropriate and unique proposal for the name ...
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<SchemaVariable, String> pair = new Pair<>(var, proposal);
+                Pair<SchemaVariable, String> pair =
+                    new Pair<>(var, proposal);
 
                 if (proposal != null) {
                     // A proposal is available ...
@@ -176,8 +179,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> functNS) throws ParserException {
+    private JTerm parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -209,7 +212,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         final int icol = 1;
 
-        if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).length() == 0)
+        if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).isEmpty())
                 && !originalApp.complete()) {
             throw new MissingInstantiationException(String.valueOf(getValueAt(irow, 0)),
                 createPosition(irow),
@@ -221,7 +224,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return true iff this row is not empty (i.e. a string of data is available)
      */
     private boolean isInputAvailable(int irow) {
-        return getValueAt(irow, 1) != null && ((String) getValueAt(irow, 1)).length() != 0;
+        return getValueAt(irow, 1) != null && !((String) getValueAt(irow, 1)).isEmpty();
     }
 
     /**
@@ -232,8 +235,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> functNS)
+    private JTerm parseRow(int irow, Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -257,7 +260,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the indicated row and returns a identifier declaration corresponding to the entry in
+     * parses the indicated row and returns an identifier declaration corresponding to the entry in
      * the row
      *
      * @param irow the row to be parsed
@@ -286,7 +289,7 @@ public class TacletFindModel extends AbstractTableModel {
         }
     }
 
-    private Term addOrigin(Term term) {
+    private JTerm addOrigin(JTerm term) {
         return services.getTermBuilder().addLabelToAllSubs(
             OriginTermLabel.removeOriginLabels(term, services),
             new NodeOrigin(SpecType.USER_INTERACTION,
@@ -304,7 +307,7 @@ public class TacletFindModel extends AbstractTableModel {
         String instantiation = (String) getValueAt(irow, 1);
         ProgramSV sv = (ProgramSV) getValueAt(irow, 0);
 
-        ContextInstantiationEntry contextInstantiation =
+        final ContextStatementBlockInstantiation contextInstantiation =
             originalApp.instantiations().getContextInstantiation();
 
         final PosInProgram prefix;
@@ -353,7 +356,7 @@ public class TacletFindModel extends AbstractTableModel {
                     sort = idd.sort();
                     if (sort == null) {
                         try {
-                            sort = result.getRealSort((OperatorSV) sv, services);
+                            sort = result.getRealSort((JOperatorSV) sv, services);
                         } catch (SortException e) {
                             throw new MissingSortException(String.valueOf(sv),
                                 createPosition(irow));
@@ -408,13 +411,13 @@ public class TacletFindModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else {
                     if (isInputAvailable(irow)) {
-                        final Namespace<QuantifiableVariable> extVarNS =
+                        final Namespace<@NonNull QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<JFunction> functNS =
+                        Namespace<@NonNull Function> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
-                        final Term instance = parseRow(irow, extVarNS, functNS);
+                        final JTerm instance = parseRow(irow, extVarNS, functNS);
                         sort = instance.sort();
 
                         try {
@@ -466,7 +469,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;
-        for (Pair<SchemaVariable, String> pair : entries) {
+        for (final var pair : entries) {
             if (pair.first.equals(sv)) {
                 return rowIndex;
             }

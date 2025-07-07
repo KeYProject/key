@@ -12,10 +12,11 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -77,7 +78,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        Term recTerm = receiver.getTerm();
+        JTerm recTerm = receiver.getTerm();
 
         // <inv> and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
@@ -107,7 +108,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
-                        final JFunction thisFieldSymbol =
+                        final Function thisFieldSymbol =
                             heapLDT.getFieldSymbolForPV(et, services);
                         recTerm =
                             services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
@@ -130,9 +131,9 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     attribute.getKeYJavaType());
             } else {
                 try {
-                    final JFunction fieldSymbol =
+                    final Function fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
-                    Term attributeTerm;
+                    JTerm attributeTerm;
                     if (attribute.isStatic()) {
                         if (attribute.isFinal() &&
                                 FinalHeapResolution.recallIsFinalEnabled()) {

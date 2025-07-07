@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionMethodReturnValue}.
@@ -21,7 +22,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * The return value.
      */
-    private final Term returnValue;
+    private final JTerm returnValue;
 
     /**
      * The {@link PosInOccurrence} of the modality of interest.
@@ -36,7 +37,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * The optional condition.
      */
-    private final Term condition;
+    private final JTerm condition;
 
     /**
      * The optional condition as human readable {@link String}.
@@ -53,7 +54,8 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * @param condition The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
-            PosInOccurrence modalityPIO, Term returnValue, Term condition) {
+            PosInOccurrence modalityPIO, JTerm returnValue,
+            JTerm condition) {
         super(settings, proofNode);
         assert returnValue != null;
         assert modalityPIO != null;
@@ -86,7 +88,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public Term getReturnValue() throws ProofInputException {
+    public JTerm getReturnValue() throws ProofInputException {
         return returnValue;
     }
 
@@ -123,7 +125,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public Term getCondition() throws ProofInputException {
+    public JTerm getCondition() throws ProofInputException {
         return condition;
     }
 

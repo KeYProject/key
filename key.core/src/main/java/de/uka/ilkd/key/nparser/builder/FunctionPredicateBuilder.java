@@ -7,7 +7,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -54,7 +55,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
-        var dtNamespace = new Namespace<JFunction>();
+        var dtNamespace = new Namespace<Function>();
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
@@ -70,11 +71,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                                 || !alreadyDefinedFn.argSort(0).equals(sort))) {
                     throw new RuntimeException("Name already in namespace: " + argName);
                 }
-                JFunction fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
+                Function fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
                     false, false);
                 dtNamespace.add(fn);
             }
-            JFunction function = new JFunction(name, sort, args, null, true, false);
+            Function function = new JFunction(name, sort, args, null, true, false);
             namespaces().functions().addSafely(function);
         }
         namespaces().functions().addSafely(dtNamespace.allElements());
@@ -90,7 +91,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        JFunction p = null;
+        Function p = null;
 
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
@@ -133,7 +134,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        JFunction f = null;
+        Function f = null;
         assert funcName != null;
         int separatorIndex = funcName.indexOf("::");
         if (separatorIndex > 0) {

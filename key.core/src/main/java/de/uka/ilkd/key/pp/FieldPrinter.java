@@ -9,8 +9,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.Function;
@@ -39,7 +38,7 @@ class FieldPrinter {
      *
      * Example default: object.field Example hidden field: object.(package.class::field)
      */
-    protected String getPrettySyntaxForFieldConstant(Term objectTerm, Term fieldTerm) {
+    protected String getPrettySyntaxForFieldConstant(JTerm objectTerm, JTerm fieldTerm) {
         JavaInfo javaInfo = services.getJavaInfo();
 
         if (isCanonicField(objectTerm, fieldTerm, javaInfo)) {
@@ -70,7 +69,7 @@ class FieldPrinter {
      *
      * (Kai Wallisch 09/2014)
      */
-    private boolean isCanonicField(Term objectTerm, Term fieldTerm, JavaInfo javaInfo) {
+    private boolean isCanonicField(JTerm objectTerm, JTerm fieldTerm, JavaInfo javaInfo) {
         Sort sort = objectTerm.sort();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
@@ -96,8 +95,8 @@ class FieldPrinter {
     /*
      * Determine whether a term is a constant function symbol of type field.
      */
-    protected static boolean isFieldConstant(Term fieldTerm, HeapLDT heapLDT) {
-        return fieldTerm.op() instanceof JFunction && ((Function) fieldTerm.op()).isUnique()
+    protected static boolean isFieldConstant(JTerm fieldTerm, HeapLDT heapLDT) {
+        return fieldTerm.op() instanceof Function && ((Function) fieldTerm.op()).isUnique()
                 && fieldTerm.sort() == heapLDT.getFieldSort() && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
     }
@@ -108,7 +107,7 @@ class FieldPrinter {
      * @return Returns the attribute program variable for the given field term.
      * @param fieldTerm The field term to analyse.
      */
-    protected static @NonNull ProgramVariable getJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
+    protected static @NonNull ProgramVariable getJavaFieldConstant(JTerm fieldTerm, HeapLDT heapLDT,
             Services services) {
         String name = fieldTerm.op().name().toString();
         if (name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
@@ -123,12 +122,12 @@ class FieldPrinter {
     }
 
     /**
-     * Find out whether a {@link Term} represents a field symbol, declared in a Java class.
+     * Find out whether a {@link JTerm} represents a field symbol, declared in a Java class.
      *
      * @return Returns true iff the given parameter represents a field constant.
      * @param fieldTerm The target field.
      */
-    protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
+    protected static boolean isJavaFieldConstant(JTerm fieldTerm, HeapLDT heapLDT,
             Services services) {
         try {
             // the called method either returns a ProgramVariable or throws an exception
@@ -143,7 +142,7 @@ class FieldPrinter {
         }
     }
 
-    protected boolean isJavaFieldConstant(Term fieldTerm) {
+    protected boolean isJavaFieldConstant(JTerm fieldTerm) {
         return isJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
     }
 
@@ -151,7 +150,7 @@ class FieldPrinter {
      * Determine whether the field constant is a generic object property. Those are surrounded by
      * angle brackets, e.g. o.<created>
      */
-    protected boolean isBuiltinObjectProperty(Term fieldTerm) {
+    protected boolean isBuiltinObjectProperty(JTerm fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")
                 && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
@@ -159,7 +158,7 @@ class FieldPrinter {
     /*
      * Determine whether a field constant is static.
      */
-    protected boolean isStaticFieldConstant(Term fieldTerm) {
+    protected boolean isStaticFieldConstant(JTerm fieldTerm) {
         try {
             ProgramVariable pv =
                 getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
@@ -172,7 +171,7 @@ class FieldPrinter {
     /*
      * Determine whether a field constant is declared final.
      */
-    protected boolean isFinalFieldConstant(Term fieldTerm) {
+    protected boolean isFinalFieldConstant(JTerm fieldTerm) {
         try {
             ProgramVariable pv =
                 getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);

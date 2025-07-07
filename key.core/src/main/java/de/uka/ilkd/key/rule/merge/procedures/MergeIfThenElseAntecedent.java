@@ -6,15 +6,15 @@ package de.uka.ilkd.key.rule.merge.procedures;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -54,18 +54,18 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
-        JFunction newSkolemConst = MergeRuleUtils
+        Function newSkolemConst = MergeRuleUtils
                 .getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConst.name());
 
-        ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
+        ImmutableSet<JTerm> newConstraints = DefaultImmutableSet.nil();
         newConstraints = newConstraints.union(getIfThenElseConstraints(tb.func(newSkolemConst),
             valueInState1, valueInState2, state1, state2, distinguishingFormula, services));
 
@@ -94,25 +94,25 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
      * @return A list of if-then-else constraints for the given constrained term, states and if/else
      *         terms.
      */
-    private static ImmutableSet<Term> getIfThenElseConstraints(Term constrained, Term ifTerm,
-            Term elseTerm, SymbolicExecutionState state1, SymbolicExecutionState state2,
-            Term distinguishingFormula, Services services) {
+    private static ImmutableSet<JTerm> getIfThenElseConstraints(JTerm constrained, JTerm ifTerm,
+            JTerm elseTerm, SymbolicExecutionState state1, SymbolicExecutionState state2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableSet<Term> result = DefaultImmutableSet.nil();
+        ImmutableSet<JTerm> result = DefaultImmutableSet.nil();
 
         if (distinguishingFormula == null) {
             final MergeByIfThenElse.DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
                     elseTerm, services);
 
-            final Term cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
-            final Term ifForm = distFormAndRightSidesForITEUpd.ifTerm();
-            final Term elseForm = distFormAndRightSidesForITEUpd.elseTerm();
+            final JTerm cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            final JTerm ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            final JTerm elseForm = distFormAndRightSidesForITEUpd.elseTerm();
             final boolean isSwapped = distFormAndRightSidesForITEUpd.sideCommuted();
 
-            final Term varEqualsIfForm = tb.equals(constrained, ifForm);
-            final Term varEqualsElseForm = tb.equals(constrained, elseForm);
+            final JTerm varEqualsIfForm = tb.equals(constrained, ifForm);
+            final JTerm varEqualsElseForm = tb.equals(constrained, elseForm);
 
             if (!(ifTerm.equals(constrained) && !isSwapped
                     || elseTerm.equals(constrained) && isSwapped)) {
@@ -124,8 +124,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
                 result = result.add(tb.or(cond, varEqualsElseForm));
             }
         } else {
-            final Term varEqualsIfForm = tb.equals(constrained, ifTerm);
-            final Term varEqualsElseForm = tb.equals(constrained, elseTerm);
+            final JTerm varEqualsIfForm = tb.equals(constrained, ifTerm);
+            final JTerm varEqualsElseForm = tb.equals(constrained, elseTerm);
 
             result = result.add(tb.imp(distinguishingFormula, varEqualsIfForm));
             result = result.add(tb.or(distinguishingFormula, varEqualsElseForm));

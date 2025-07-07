@@ -6,10 +6,13 @@ package org.key_project.logic;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-/**
- * A cursor (or walker) for navigating {@link SyntaxElement}s in pre-order. *
- */
+/// A cursor (or walker) for navigating [SyntaxElement]s in pre-order.
 public class SyntaxElementCursor {
+
+    public boolean hasNext() {
+        return !path.isEmpty() || node.getChildCount() > 0;
+    }
+
     private record ParentAndPosition(SyntaxElement parent, int index) {
     }
 
@@ -25,12 +28,10 @@ public class SyntaxElementCursor {
         return node;
     }
 
-    /**
-     * Advance the cursor to the current node's first child if possible.
-     * Otherwise, no changes to the state occur.
-     *
-     * @return true iff the current node has at least one child.
-     */
+    /// Advance the cursor to the current node's first child if possible.
+    /// Otherwise, no changes to the state occur.
+    ///
+    /// @return true iff the current node has at least one child.
     public boolean gotoFirstChild() {
         if (node.getChildCount() <= 0)
             return false;
@@ -39,13 +40,11 @@ public class SyntaxElementCursor {
         return true;
     }
 
-    /**
-     * Advance the cursor to the current node's next sibling if possible.
-     * Otherwise, no changes to the state occur.
-     *
-     * @return true iff the current node has at least one sibling not yet visited.
-     */
-    public boolean gotoNextSibling() {
+    /// Advance the cursor to the current node's next sibling if possible.
+    /// Otherwise, no changes to the state occur.
+    ///
+    /// @return true iff the current node has at least one sibling not yet visited.
+    public boolean gotoNextDirectSibling() {
         if (path.isEmpty())
             return false;
         var pnp = path.pop();
@@ -60,12 +59,31 @@ public class SyntaxElementCursor {
         return true;
     }
 
-    /**
-     * Advance the cursor to the current node's parent if possible.
-     * Otherwise, no changes to the state occur.
-     *
-     * @return true iff the current node is not the root.
-     */
+    /// Advance the cursor to the current node's next sibling if possible.
+    /// If no direct sibling exists, go up one step and try again.
+    /// Otherwise, no changes to the state occur.
+    ///
+    /// @return true iff the current node has at least one sibling not yet visited.
+    public boolean gotoNextSibling() {
+        if (gotoNextDirectSibling())
+            return true;
+        var ancestors = new ArrayDeque<ParentAndPosition>();
+        while (!path.isEmpty()) {
+            ancestors.add(path.pop());
+            if (gotoNextDirectSibling())
+                return true;
+        }
+        // Nothing found; re-build stack
+        for (var ancestor : ancestors) {
+            path.push(ancestor);
+        }
+        return false;
+    }
+
+    /// Advance the cursor to the current node's parent if possible.
+    /// Otherwise, no changes to the state occur.
+    ///
+    /// @return true iff the current node is not the root.
     public boolean gotoParent() {
         if (path.isEmpty())
             return false;
@@ -73,24 +91,22 @@ public class SyntaxElementCursor {
         return true;
     }
 
-    /**
-     * Advance cursor to the next node.
-     * If the node has children, the cursor advances to the first child.
-     * Otherwise, if the node has unvisited siblings, the cursor advances to the next unvisited
-     * sibling.
-     * Otherwise, no changes to the state.
-     *
-     * @return true iff the node has children or an unvisited sibling.
-     */
+    /// Advance cursor to the next node.
+    /// If the node has children, the cursor advances to the first child.
+    /// Otherwise, if the node has unvisited siblings, the cursor advances to the next unvisited
+    /// sibling.
+    /// Otherwise, no changes to the state.
+    ///
+    /// @return true iff the node has children or an unvisited sibling.
     public boolean goToNext() {
         var ancestors = new ArrayDeque<ParentAndPosition>();
         if (gotoFirstChild())
             return true;
-        if (gotoNextSibling())
+        if (gotoNextDirectSibling())
             return true;
         while (!path.isEmpty()) {
             ancestors.add(path.pop());
-            if (gotoNextSibling())
+            if (gotoNextDirectSibling())
                 return true;
         }
         // Nothing found; re-build stack

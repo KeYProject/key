@@ -5,8 +5,9 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+
+import org.key_project.logic.op.Operator;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParserHeap.class);
-    private Term h, a, f, next;
+    private JTerm h, a, f, next;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -45,9 +46,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         f = parseTerm("testTermParserHeap.A::$f");
     }
 
-    private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
+    private JTerm getSelectTerm(String sort, JTerm heap, JTerm object, JTerm field) {
         Operator op = lookup_func(sort + "::select");
-        Term[] params = new Term[] { heap, object, field };
+        JTerm[] params = { heap, object, field };
         return tf.createTerm(op, params);
     }
 
@@ -65,7 +66,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
 
         pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
-        Term expected = parseTerm(
+        JTerm expected = parseTerm(
             "union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
         verifyParsing(expected, pp);
     }
@@ -139,7 +140,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testAtOperator_4() throws Exception {
-        Term expectedParseResult = getSelectTerm("testTermParserHeap.A", h, a, next);
+        JTerm expectedParseResult = getSelectTerm("testTermParserHeap.A", h, a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
@@ -150,8 +151,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testAtOperator_5() throws Exception {
-        Term h2 = parseTerm("h2");
-        Term expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, a, next);
+        JTerm h2 = parseTerm("h2");
+        JTerm expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
@@ -161,25 +162,27 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testAtOperator_6() throws Exception {
-        Term aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
-        Term aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
-        Term expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
+        JTerm aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
+        JTerm aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
+        JTerm expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f]@h", expectedParseResult);
     }
 
     @Test
     public void testAtOperator_7() throws Exception {
-        Term aDotF = getSelectTerm("int", h, a, f); // a.f
-        Term aDotArray =
+        JTerm aDotF = getSelectTerm("int", h, a, f); // a.f
+        JTerm aDotArray =
             getSelectTerm("int[]", tb.getBaseHeap(), a, parseTerm("testTermParserHeap.A::$array")); // a.array
-        Term expectedParseResult = getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
+        JTerm expectedParseResult =
+            getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f@h]", expectedParseResult);
 
     }
 
     @Test
     public void testAtOperator_8() throws Exception {
-        Term expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
+        JTerm expectedParseResult =
+            getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         compareStringRepresentationAgainstTermRepresentation("(a.next@heap).next.f@h",
@@ -202,7 +205,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
             @NonNull
-            Term t = io.parseExpression("(a.f + a.f)@h2");
+            JTerm t = io.parseExpression("(a.f + a.f)@h2");
             LOGGER.info("Out: {}", t);
             fail();
         } catch (Exception e) {
@@ -235,7 +238,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     private void comparePrettyPrintAgainstToString(String quantification, String expectedToString)
             throws Exception {
-        Term t = parseTerm(quantification);
+        JTerm t = parseTerm(quantification);
         assertEquals(expectedToString, t.toString());
         assertEqualsIgnoreWhitespaces(quantification, printTerm(t));
     }
@@ -469,7 +472,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * @throws IOException
      */
     private void parseAndPrint(String s) throws Exception {
-        Term t = parseTerm(s);
+        JTerm t = parseTerm(s);
         String printedSyntax = printTerm(t);
         assertEqualsIgnoreWhitespaces(s, printedSyntax);
     }

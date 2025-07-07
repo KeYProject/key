@@ -12,11 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.builder.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -24,6 +21,10 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -75,7 +76,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @NonNull Term parseExpression(@NonNull String expr) {
+    public @NonNull JTerm parseExpression(@NonNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
@@ -86,18 +87,18 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @NonNull Term parseExpression(@NonNull CharStream stream) {
+    public @NonNull JTerm parseExpression(@NonNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         return interpretExpression(ctx);
     }
 
-    private Term interpretExpression(KeyAst.Term ctx) {
+    private JTerm interpretExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
         }
-        Term t = (Term) ctx.accept(visitor);
+        JTerm t = (JTerm) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return t;
     }
@@ -358,7 +359,7 @@ public class KeyIO {
             return taclets;
         }
 
-        public Term getProblem() {
+        public JTerm getProblem() {
             // TODO weigl tbd
             return null;
         }

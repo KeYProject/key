@@ -14,15 +14,18 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -71,14 +74,16 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+            ProverTaskListener listener)
             throws InterruptedException {
         this.uic = uic;
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -152,7 +157,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     private boolean hasBreakPoint(Semisequent succedent) {
         for (SequentFormula formula : succedent.asList()) {
             if (blockElems.contains(JavaTools
-                    .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula.formula())))) {
+                    .getActiveStatement(
+                        MergeRuleUtils.getJavaBlockRecursive((JTerm) formula.formula())))) {
                 return true;
             }
         }
@@ -180,7 +186,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             if (!modalityCache.hasModality(goal.node().sequent())) {
                 return false;
             }
@@ -194,7 +201,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
+                JavaBlock theJavaBlock =
+                    MergeRuleUtils.getJavaBlockRecursive((JTerm) pio.subTerm());
                 SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
 
                 if (!(theJavaBlock.program() instanceof StatementBlock)

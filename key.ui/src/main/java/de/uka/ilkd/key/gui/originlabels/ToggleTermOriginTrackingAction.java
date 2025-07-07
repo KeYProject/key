@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.QuickLoadAction;
 import de.uka.ilkd.key.gui.actions.QuickSaveAction;
@@ -38,8 +37,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
 
         setMenuPath("Origin Tracking");
-        putValue(Action.LONG_DESCRIPTION, "Toggle Term Origin Tracking");
-        putValue(KeyAction.CHECKBOX, true);
+        putValue(LONG_DESCRIPTION, "Toggle Term Origin Tracking");
+        putValue(CHECKBOX, true);
         lookupAcceleratorKey();
     }
 

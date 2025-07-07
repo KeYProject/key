@@ -10,9 +10,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -24,7 +29,7 @@ class TacletDescriber {
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable psv) {
         boolean started = false;
-        if (psv instanceof OperatorSV sv) {
+        if (psv instanceof JOperatorSV sv) {
             if (sv.isRigid() && !(sv instanceof VariableSV)) {
                 if (!started) {
                     out.append("[");
@@ -81,13 +86,13 @@ class TacletDescriber {
          */
         if (schemaVar instanceof TermSV || schemaVar instanceof VariableSV
                 || schemaVar instanceof SkolemTermSV || schemaVar instanceof ProgramSV) {
-            out.append(" ").append(((OperatorSV) schemaVar).sort().declarationString());
+            out.append(" ").append(((JOperatorSV) schemaVar).sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
     }
 
     private static void writeTacletSchemaVariablesHelper(StringBuffer out, final Taclet t) {
-        ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
+        ImmutableSet<SchemaVariable> schemaVars = t.getAssumesAndFindVariables();
 
         for (final NewVarcond nvc : t.varsNew()) {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
@@ -130,11 +135,11 @@ class TacletDescriber {
 
         if (app != null) {
             s.append("The following rule was applied on this node: \n\n");
-            if (app.rule() instanceof Taclet) {
+            if (app.rule() instanceof de.uka.ilkd.key.rule.Taclet taclet) {
                 SequentViewLogicPrinter logicPrinter =
                     SequentViewLogicPrinter.purePrinter(width, mediator.getNotationInfo(),
                         mediator.getServices(), getVisibleTermLabels());
-                logicPrinter.printTaclet((Taclet) (app.rule()));
+                logicPrinter.printTaclet(taclet);
                 s.append(logicPrinter.result());
             } else {
                 s.append(app.rule());

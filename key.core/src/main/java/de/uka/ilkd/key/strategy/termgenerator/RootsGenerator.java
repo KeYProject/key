@@ -8,19 +8,20 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -33,19 +34,20 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * addition or multiplication) and {@code l} is a literal. The generator will then produce at most
  * one formula that describes the solutions of the formula using linear (in)equations.
  */
-public class RootsGenerator implements TermGenerator {
+public class RootsGenerator implements TermGenerator<Goal> {
 
-    private final ProjectionToTerm powerRelation;
+    private final ProjectionToTerm<Goal> powerRelation;
 
     private final TermBuilder tb;
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static TermGenerator create(ProjectionToTerm powerRelation, TermServices services) {
+    public static TermGenerator<Goal> create(ProjectionToTerm<Goal> powerRelation,
+            TermServices services) {
         return new RootsGenerator(powerRelation, services.getTermBuilder());
     }
 
-    private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {
+    private RootsGenerator(ProjectionToTerm<Goal> powerRelation, TermBuilder tb) {
         this.powerRelation = powerRelation;
         this.tb = tb;
     }
@@ -58,7 +60,7 @@ public class RootsGenerator implements TermGenerator {
 
         final Term powerRel = powerRelation.toTerm(app, pos, goal, mState);
 
-        final Operator op = powerRel.op();
+        final var op = powerRel.op();
 
         assert op.arity() == 2;
 
@@ -77,11 +79,11 @@ public class RootsGenerator implements TermGenerator {
         }
 
         if (op == numbers.getLessOrEquals()) {
-            return toIterator(breakDownLeq(var, lit, pow, services));
+            return toIterator(breakDownLeq(var, lit, pow));
         } else if (op == numbers.getGreaterOrEquals()) {
-            return toIterator(breakDownGeq(var, lit, pow, services));
+            return toIterator(breakDownGeq(var, lit, pow));
         } else if (op == Equality.EQUALS) {
-            return toIterator(breakDownEq(var, lit, pow, services));
+            return toIterator(breakDownEq(var, lit, pow));
         }
 
         return emptyIterator();
@@ -92,14 +94,16 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY)) {
+        if (IRRELEVANT_TERM_LABELS_PROPERTY.equalsModThisProperty((JTerm) res,
+            tb.ff())) {
             return emptyIterator();
         }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
     }
 
-    private Term breakDownEq(Term var, BigInteger lit, int pow, TermServices services) {
-        final Term zero = tb.zero();
+    private Term breakDownEq(Term p_var, BigInteger lit, int pow) {
+        final var var = (JTerm) p_var;
+        final var zero = tb.zero();
 
         if ((pow % 2 == 0)) {
             // the even case
@@ -112,8 +116,8 @@ public class RootsGenerator implements TermGenerator {
                 final BigInteger r = root(lit, pow);
                 if (power(r, pow).equals(lit)) {
                     // two solutions
-                    final Term rTerm = tb.zTerm(r.toString());
-                    final Term rNegTerm = tb.zTerm(r.negate().toString());
+                    final var rTerm = tb.zTerm(r.toString());
+                    final var rNegTerm = tb.zTerm(r.negate().toString());
                     yield tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
                         tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
                 } else {
@@ -128,7 +132,7 @@ public class RootsGenerator implements TermGenerator {
             final BigInteger r = root(lit, pow);
             if (power(r, pow).equals(lit)) {
                 // one solution
-                final Term rTerm = tb.zTerm(r.toString());
+                final var rTerm = tb.zTerm(r.toString());
                 return tb.equals(var, rTerm);
             } else {
                 // no solution
@@ -137,7 +141,8 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private Term breakDownGeq(Term var, BigInteger lit, int pow, TermServices services) {
+    private Term breakDownGeq(Term p_var, BigInteger lit, int pow) {
+        final var var = (JTerm) p_var;
         if ((pow % 2 == 0)) {
             // the even case
 
@@ -146,8 +151,8 @@ public class RootsGenerator implements TermGenerator {
                 tb.ff();
             case 1 -> {
                 final BigInteger r = rootRoundingUpwards(lit, pow);
-                final Term rTerm = tb.zTerm(r.toString());
-                final Term rNegTerm = tb.zTerm(r.negate().toString());
+                final var rTerm = tb.zTerm(r.toString());
+                final var rNegTerm = tb.zTerm(r.negate().toString());
                 yield tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
             }
             default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
@@ -158,7 +163,8 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private Term breakDownLeq(Term var, BigInteger lit, int pow, TermServices services) {
+    private Term breakDownLeq(Term p_var, BigInteger lit, int pow) {
+        final var var = (JTerm) p_var;
         if ((pow % 2 == 0)) {
             // the even case
 
@@ -168,8 +174,8 @@ public class RootsGenerator implements TermGenerator {
             case 0 -> tb.equals(var, tb.zero());
             case 1 -> {
                 final BigInteger r = root(lit, pow);
-                final Term rTerm = tb.zTerm(r.toString());
-                final Term rNegTerm = tb.zTerm(r.negate().toString());
+                final var rTerm = tb.zTerm(r.toString());
+                final var rNegTerm = tb.zTerm(r.negate().toString());
                 yield tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
             }
             default -> throw new IllegalStateException("Unexpected value: " + lit.signum());

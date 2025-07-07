@@ -3,19 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
+
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 
 class DataRecordingTestFile extends TestFile {
     public final ProfilingDirectories directories;
@@ -42,14 +44,15 @@ class DataRecordingTestFile extends TestFile {
     }
 
     @Override
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success) {
+    protected void reload(boolean verbose, Path proofFile, Proof loadedProof, boolean success) {
         // we skip reloading for these test cases
     }
 
     private static ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(
-            proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create())
+            proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
+                    .create())
                 .start(proof, proof.openGoals().head());
     }
 

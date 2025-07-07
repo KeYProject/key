@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -47,7 +47,7 @@ public class SimplePredicateAbstractionDomainElement
     }
 
     @Override
-    protected Term combinePredicates(Term preds, Term newPred, Services services) {
+    protected JTerm combinePredicates(JTerm preds, JTerm newPred, Services services) {
         throw new RuntimeException(
             "In the simple predicate abstraction lattice, " + "elements should not be combined.");
     }

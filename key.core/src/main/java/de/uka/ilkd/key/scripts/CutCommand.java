@@ -6,14 +6,14 @@ package de.uka.ilkd.key.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
@@ -61,13 +61,14 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, args.formula, state.getProof().getServices(), true);
+        app = app.addCheckedInstantiation(sv, args.formula,
+            state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
     public static class Parameters {
         @Option("#2")
-        public Term formula;
+        public JTerm formula;
     }
 
 }

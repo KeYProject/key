@@ -35,7 +35,7 @@ public abstract class SearchBar extends JPanel {
     private final ColorSettings.ColorProperty ALERT_COLOR =
         ColorSettings.define("[searchBar]alert", "", new Color(255, 178, 178));
 
-    public SearchBar() {
+    protected SearchBar() {
         prev = new JButton(IconFactory.previous(16));
         next = new JButton(IconFactory.next(16));
         close = new JButton(IconFactory.close(16));
@@ -55,11 +55,11 @@ public abstract class SearchBar extends JPanel {
         });
 
         searchField.registerKeyboardAction(e -> searchNext(),
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED);
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), WHEN_FOCUSED);
 
         registerKeyboardAction(e -> setVisible(false),
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {

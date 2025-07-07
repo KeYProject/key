@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -41,7 +41,7 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return this loop contract's decreases clause.
      */
-    Term getDecreases();
+    JTerm getDecreases();
 
     /**
      *
@@ -50,7 +50,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param services services.
      * @return this loop contract's decreases clause on the specified heap.
      */
-    Term getDecreases(Term heap, Term self, Services services);
+    JTerm getDecreases(JTerm heap, JTerm self, Services services);
 
     /**
      *
@@ -58,7 +58,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param services services.
      * @return this loop contract's decreases clause.
      */
-    Term getDecreases(Variables variables, Services services);
+    JTerm getDecreases(Variables variables, Services services);
 
     /**
      * <p>
@@ -118,14 +118,14 @@ public interface LoopContract extends AuxiliaryContract {
      * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
-    LoopContract update(StatementBlock newBlock, Map<LocationVariable, Term> newPreconditions,
-            Map<LocationVariable, Term> newFreePreconditions,
-            Map<LocationVariable, Term> newPostconditions,
-            Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiableClauses,
-            Map<LocationVariable, Term> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
-            Term newDecreases);
+    LoopContract update(StatementBlock newBlock, Map<LocationVariable, JTerm> newPreconditions,
+            Map<LocationVariable, JTerm> newFreePreconditions,
+            Map<LocationVariable, JTerm> newPostconditions,
+            Map<LocationVariable, JTerm> newFreePostconditions,
+            Map<LocationVariable, JTerm> newModifiableClauses,
+            Map<LocationVariable, JTerm> newFreeModifiableClauses,
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
+            JTerm newDecreases);
 
     /**
      *
@@ -140,20 +140,20 @@ public interface LoopContract extends AuxiliaryContract {
      * @param newDecreases the new decreases clause.
      * @return a new loop contract with the specified attributes.
      */
-    LoopContract update(LoopStatement newLoop, Map<LocationVariable, Term> newPreconditions,
-            Map<LocationVariable, Term> newFreePreconditions,
-            Map<LocationVariable, Term> newPostconditions,
-            Map<LocationVariable, Term> newFreePostconditions,
-            Map<LocationVariable, Term> newModifiableClauses,
-            Map<LocationVariable, Term> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
-            Term newDecreases);
+    LoopContract update(LoopStatement newLoop, Map<LocationVariable, JTerm> newPreconditions,
+            Map<LocationVariable, JTerm> newFreePreconditions,
+            Map<LocationVariable, JTerm> newPostconditions,
+            Map<LocationVariable, JTerm> newFreePostconditions,
+            Map<LocationVariable, JTerm> newModifiableClauses,
+            Map<LocationVariable, JTerm> newFreeModifiableClauses,
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
+            JTerm newDecreases);
 
     /**
      *
      * @return the index variable if {@link #getLoop()} is an enhanced for-loop, {@code null}
      *         otherwise.
-     * @see EnhancedForElimination#getIndexVariable()
+     * @see EnhancedForElimination.TransformationData#indexVariable()
      */
     ProgramVariable getIndexVariable();
 
@@ -161,7 +161,7 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return the values variable if {@link #getLoop()} is an enhanced for-loop, {@code null}
      *         otherwise.
-     * @see EnhancedForElimination#getValuesVariable()
+     * @see EnhancedForElimination.TransformationData#valuesVariable()
      */
     ProgramVariable getValuesVariable();
 
@@ -181,7 +181,7 @@ public interface LoopContract extends AuxiliaryContract {
     LoopContract setBlock(StatementBlock newBlock);
 
     @Override
-    LoopContract map(UnaryOperator<Term> op, Services services);
+    LoopContract map(UnaryOperator<JTerm> op, Services services);
 
     /**
      * @param newLoop the new loop.

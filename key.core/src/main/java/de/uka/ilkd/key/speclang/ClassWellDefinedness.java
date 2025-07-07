@@ -8,13 +8,14 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -29,16 +30,16 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     private final ClassInvariant inv;
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
-            Term accessible, Condition ensures, Term mby, Term rep, ClassInvariant inv,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, ClassInvariant inv,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;
     }
 
-    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, Term accessible,
-            Term mby, Services services) {
+    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, JTerm accessible,
+            JTerm mby, Services services) {
         super(inv.getKJT().getFullName() + "." + "JML class invariant", 0, target,
             inv.getOrigVars(), Type.CLASS_INVARIANT, services);
         assert inv != null;
@@ -51,7 +52,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public ClassWellDefinedness map(UnaryOperator<Term> op, Services services) {
+    public ClassWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
         return new ClassWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
             op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
@@ -59,12 +60,12 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    JFunction generateMbyAtPreFunc(Services services) {
+    Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 
     @Override
-    ImmutableList<Term> getRest() {
+    ImmutableList<JTerm> getRest() {
         return super.getRest();
     }
 
@@ -79,23 +80,23 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
         final TermBuilder TB = services.getTermBuilder();
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
-        final String prefix = WellDefinednessCheck.INV_TACLET;
+        final String prefix = INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final TermSV heapSV =
             SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
         final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
-        final Term var = TB.var(sv);
-        final Term wdSelf = TB.wd(var);
-        final Term[] heaps = new Term[] { TB.var(heapSV) };
-        final Term staticInvTerm = TB.staticInv(heaps, kjt);
-        final Term invTerm = TB.inv(heaps, var);
-        final Term wdHeaps = TB.and(TB.wd(heaps));
-        final Term wellFormed = TB.wellFormed(TB.var(heapSV));
-        final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
-        final Term staticPre = TB.and(wdHeaps, wellFormed);
+        final JTerm var = TB.var(sv);
+        final JTerm wdSelf = TB.wd(var);
+        final JTerm[] heaps = { TB.var(heapSV) };
+        final JTerm staticInvTerm = TB.staticInv(heaps, kjt);
+        final JTerm invTerm = TB.inv(heaps, var);
+        final JTerm wdHeaps = TB.and(TB.wd(heaps));
+        final JTerm wellFormed = TB.wellFormed(TB.var(heapSV));
+        final JTerm pre = TB.and(wdSelf, wdHeaps, wellFormed);
+        final JTerm staticPre = TB.and(wdHeaps, wellFormed);
         final RewriteTaclet inv =
-            WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
-        final RewriteTaclet staticInv = WellDefinednessCheck.createTaclet(prefix + "_Static", var,
+            createTaclet(prefix, var, invTerm, pre, false, services);
+        final RewriteTaclet staticInv = createTaclet(prefix + "_Static", var,
             staticInvTerm, staticPre, true, services);
         return DefaultImmutableSet.<RewriteTaclet>nil().add(inv).add(staticInv);
     }
@@ -104,7 +105,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return this.inv;
     }
 
-    public void addInv(Term inv) {
+    public void addInv(JTerm inv) {
         addRequires(inv);
         addEnsures(inv);
     }
@@ -163,12 +164,12 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public Term getGlobalDefs() {
+    public JTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public Term getAxiom() {
+    public JTerm getAxiom() {
         return null;
     }
 }

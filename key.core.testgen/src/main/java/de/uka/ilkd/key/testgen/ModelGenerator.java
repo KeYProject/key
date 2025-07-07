@@ -8,10 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -28,6 +25,9 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -130,7 +130,7 @@ public class ModelGenerator implements SolverLauncherListener {
     private boolean addModelToTerm(Model m) {
         TermBuilder tb = services.getTermBuilder();
         Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
-        Term tmodel = tb.tt();
+        JTerm tmodel = tb.tt();
         for (String c : m.getConstants().keySet()) {
 
             SMTSort sort = m.getTypes().getTypeForConstant(c);
@@ -139,16 +139,16 @@ public class ModelGenerator implements SolverLauncherListener {
                 String val = m.getConstants().get(c);
                 int value = Integer.parseInt(val);
                 ProgramVariable v = (ProgramVariable) variables.lookup(c);
-                Term termConst = tb.var(v);
-                Term termVal = tb.zTerm(value);
-                Term termEquals = tb.equals(termConst, termVal);
+                JTerm termConst = tb.var(v);
+                JTerm termVal = tb.zTerm(value);
+                JTerm termEquals = tb.equals(termConst, termVal);
                 tmodel = tb.and(tmodel, termEquals);
             }
         }
 
 
         if (!tmodel.equals(tb.tt())) {
-            Term notTerm = tb.not(tmodel);
+            JTerm notTerm = tb.not(tmodel);
             SequentFormula sf = new SequentFormula(notTerm);
             goal.addFormula(sf, true, true);
             return true;
@@ -169,20 +169,20 @@ public class ModelGenerator implements SolverLauncherListener {
             SolverLauncher launcher) {
     }
 
-    public Term sequentToTerm(Sequent s) {
+    public JTerm sequentToTerm(Sequent s) {
 
-        ImmutableList<Term> ante = ImmutableSLList.nil();
+        ImmutableList<JTerm> ante = ImmutableSLList.nil();
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
+        for (final SequentFormula f : s.antecedent()) {
+            ante = ante.append((JTerm) f.formula());
         }
 
-        ImmutableList<Term> succ = ImmutableSLList.nil();
+        ImmutableList<JTerm> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
+        for (final SequentFormula f : s.succedent()) {
+            succ = succ.append((JTerm) f.formula());
         }
 
         return tb.imp(tb.and(ante), tb.or(succ));

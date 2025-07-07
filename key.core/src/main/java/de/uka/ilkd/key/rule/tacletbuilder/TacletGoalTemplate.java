@@ -4,14 +4,13 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -19,19 +18,8 @@ import org.key_project.util.collection.ImmutableSet;
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public class TacletGoalTemplate {
-
-    /** stores sequent that is one of the new goals */
-    private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
-
-    /** stores list of Taclet which are introduced */
-    private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();
-
-    /** program variables added by this taclet to the namespace */
-    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
-
-    private String name = null;
-
+public class TacletGoalTemplate
+        extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate {
 
     /**
      * creates new Goaldescription
@@ -42,13 +30,12 @@ public class TacletGoalTemplate {
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+    public TacletGoalTemplate(Sequent addedSeq,
+            ImmutableList<Taclet> addedRules,
             ImmutableSet<SchemaVariable> addedProgVars) {
-        TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
-
-        this.addedRules = addedRules;
-        this.addedSeq = addedSeq;
-        this.addedProgVars = addedProgVars;
+        super(addedSeq, addedRules, addedProgVars);
+        TacletBuilder.checkContainsFreeVarSV(addedSeq,
+            null, "add sequent");
     }
 
     /**
@@ -77,31 +64,13 @@ public class TacletGoalTemplate {
 
 
     /**
-     * a Taclet may add a new Sequent as Goal. Use this method to get this Sequent
-     *
-     * @return Sequent to be added as Goal or Sequent.EMPTY_SEQUENT if no such Sequent exists
-     */
-    public Sequent sequent() {
-        return addedSeq;
-    }
-
-    /**
      * the goal of a Taclet may introduce new rules. Call this method to get them
      *
      * @return IList<Taclet> contains new introduced rules
      */
-    public ImmutableList<Taclet> rules() {
-        return addedRules;
+    public final ImmutableList<Taclet> rules() {
+        return (ImmutableList<Taclet>) super.rules();
     }
-
-
-    /**
-     * returns the set of schemavaroable whose instantiations will be added to the sequent namespace
-     */
-    public ImmutableSet<SchemaVariable> addedProgVars() {
-        return addedProgVars;
-    }
-
 
     /**
      * retrieves and returns all variables that are bound in the goal template
@@ -109,7 +78,8 @@ public class TacletGoalTemplate {
      * @return all variables that occur bound in this goal template
      */
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
+        ImmutableSet<QuantifiableVariable> result =
+            DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {
             result = result.union(taclet.getBoundVariables());
@@ -121,58 +91,4 @@ public class TacletGoalTemplate {
         return result.union(bvv.getBoundVariables());
     }
 
-
-    public void setName(String s) {
-        name = s;
-    }
-
-
-    public String name() {
-        return name;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (o == null) {
-            return false;
-        }
-        if (o == this) {
-            return true;
-        }
-
-        if (getClass() != o.getClass()) {
-            return false;
-        }
-
-        TacletGoalTemplate other = (TacletGoalTemplate) o;
-
-        return addedSeq.equals(other.addedSeq) && addedRules.equals(other.addedRules);
-    }
-
-
-    @Override
-    public int hashCode() {
-        int result = 17;
-        result = 37 * result + addedSeq.hashCode();
-        result = 37 * result + addedRules.hashCode();
-        return result;
-    }
-
-
-    @Override
-    public String toString() {
-        String result = "";
-        if (!sequent().isEmpty()) {
-            result += "\\add " + sequent() + " ";
-        }
-        if (!rules().isEmpty()) {
-            result += "\\addrules " + rules() + " ";
-        }
-        if (!addedProgVars().isEmpty()) {
-            result += "\\addprogvars " + addedProgVars() + " ";
-        }
-        return result;
-    }
 }
