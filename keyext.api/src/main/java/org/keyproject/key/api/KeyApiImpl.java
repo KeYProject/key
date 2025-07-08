@@ -21,24 +21,26 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.scripts.ProofScriptCommand;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -64,7 +66,7 @@ public final class KeyApiImpl implements KeyApi {
     private ClientApi clientApi;
     private final ProverTaskListener clientListener = new ProverTaskListener() {
         @Override
-        public void taskStarted(TaskStartedInfo info) {
+        public void taskStarted(org.key_project.prover.engine.TaskStartedInfo info) {
             clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
@@ -138,11 +140,12 @@ public final class KeyApiImpl implements KeyApi {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
-            var pe = new ProofScriptEngine(scriptLine, Location.UNDEFINED);
+            var script = ParsingFacade.parseScript(scriptLine);
+            var pe = new ProofScriptEngine(script);
 
             try {
                 pe.execute((AbstractUserInterfaceControl) env.getProofControl(), proof);
-                return null;
+                return new MacroStatistic(proofId, scriptLine, -1, -1);
             } catch (IOException | InterruptedException | ScriptException e) {
                 throw new RuntimeException(e);
             }
@@ -407,7 +410,8 @@ public final class KeyApiImpl implements KeyApi {
                 KeYEnvironment<?> env = null;
                 try {
                     var loader = control.load(JavaProfile.getDefaultProfile(),
-                        ex.getObligationFile(), null, null, null, null, true, null);
+                        ex.getObligationFile().toPath(),
+                        null, null, null, null, true, null);
                     InitConfig initConfig = loader.getInitConfig();
 
                     env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
@@ -459,7 +463,7 @@ public final class KeyApiImpl implements KeyApi {
                 final var tempFile = File.createTempFile("json-rpc-", ".key");
                 Files.writeString(tempFile.toPath(), content);
                 var loader = control.load(JavaProfile.getDefaultProfile(),
-                    tempFile, null, null, null, null, true, null);
+                    tempFile.toPath(), null, null, null, null, true, null);
                 InitConfig initConfig = loader.getInitConfig();
                 env = new KeYEnvironment<>(control, initConfig, loader.getProof(),
                     loader.getProofScript(), loader.getResult());
@@ -514,7 +518,7 @@ public final class KeyApiImpl implements KeyApi {
 
     private class MyDefaultUserInterfaceControl extends DefaultUserInterfaceControl {
         @Override
-        public void taskStarted(TaskStartedInfo info) {
+        public void taskStarted(org.key_project.prover.engine.TaskStartedInfo info) {
             clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
@@ -524,12 +528,12 @@ public final class KeyApiImpl implements KeyApi {
         }
 
         @Override
-        public void taskFinished(TaskFinishedInfo info) {
+        public void taskFinished(org.key_project.prover.engine.TaskFinishedInfo info) {
             clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
 
         @Override
-        protected void macroStarted(TaskStartedInfo info) {
+        protected void macroStarted(org.key_project.prover.engine.TaskStartedInfo info) {
             clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
