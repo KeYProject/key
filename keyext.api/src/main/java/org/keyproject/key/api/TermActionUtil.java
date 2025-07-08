@@ -9,13 +9,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -36,6 +36,7 @@ public class TermActionUtil {
             new Name("obsolete"),
             new Name("pullOutQuantifierAll"),
             new Name("pullOutQuantifierEx"));
+
     private static final Set<Name> CLUTTER_RULES = Set.of(
         new Name("cut_direct_r"),
         new Name("cut_direct_l"),
