@@ -18,8 +18,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 
 import edu.kit.iti.formal.keyextclientjava.rpc.KeyRemote;
 import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
@@ -29,6 +27,8 @@ import org.keyproject.key.api.KeyApiImpl;
 import org.keyproject.key.api.StartServer;
 import org.keyproject.key.api.data.KeyIdentifications;
 import org.keyproject.key.api.data.LoadParams;
+import org.keyproject.key.api.data.TaskFinishedInfo;
+import org.keyproject.key.api.data.TaskStartedInfo;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteapi.PrintOptions;
 import org.keyproject.key.api.remoteclient.*;
@@ -102,26 +102,20 @@ public class MyKeyClient {
         if (sel != null) {
             try {
                 loadedProof = keyApi.load(
-                    new LoadParams(sel, null, null, null, null))
+                    new LoadParams(sel.toPath(), null, null, null))
                         .get().getRight();
                 var root = keyApi.root(loadedProof).get();
                 var sequent =
                     keyApi.print(root.nodeid(), new PrintOptions(true, 80, 4, true, false))
                             .get();
                 txtSequentView.setText(sequent.result());
-            } catch (ProblemLoaderException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
+            } catch (ProblemLoaderException | ExecutionException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-
         }
     }
 
-    private class SimpleClient implements ClientApi {
+    private static class SimpleClient implements ClientApi {
         @Override
         public void sayHello(String e) {
 
