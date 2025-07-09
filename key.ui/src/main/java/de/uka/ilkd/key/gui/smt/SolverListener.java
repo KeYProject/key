@@ -17,7 +17,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
+import de.uka.ilkd.key.gui.actions.useractions.SMTProofApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
@@ -211,7 +211,7 @@ public class SolverListener implements SolverLauncherListener {
         // ensure that the goal closing does not lag the UI
         mediator.stopInterface(true);
         try {
-            new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
+            new SMTProofApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
             // switch to new open goal

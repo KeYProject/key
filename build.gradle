@@ -9,14 +9,6 @@ plugins {
     //https://docs.gradle.org/current/userguide/eclipse_plugin.html
     id("eclipse")  //support for Eclipse
 
-    //Checks and adds the license header of the source files:
-    // Task: `licenseMain' and `licenseFormatMain'
-    //https://github.com/hierynomus/license-gradle-plugin
-    id "com.github.hierynomus.license-base" version "0.16.1"
-    //Generates reports on the license of used packages: Task `downloadLicenses'
-    //Some Licenses requires an entry in the credits (MIT, BSD)
-    id "com.github.hierynomus.license-report" version "0.16.1"
-
     // Gives `gradle dependencyUpdate` to show which dependency has a newer version
     // id "com.github.ben-manes.versions" version "0.39.0"
 
@@ -295,18 +287,6 @@ subprojects {
         description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
-    }
-
-    license {//configures the license file header
-        header = file("$rootDir/gradle/header")
-
-        mapping {
-            //find styles here:
-            // http://code.mycila.com/license-maven-plugin/#supported-comment-types
-            java = "SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
-            javascript = "SLASHSTAR_STYLE"
-        }
-        mapping("key", "SLASHSTAR_STYLE")
     }
 
     eclipse { //configures the generated .project and .classpath files.
