@@ -118,7 +118,6 @@ public abstract class SMTTestCommons {
      * @param file problem file.
      * @param pro determines the profile that should be used.
      * @return ProofAggregate of the problem file.
-     * @profile determines the profile that should be used.
      */
     protected ProofAggregate parse(Path file, Profile pro) {
         assertTrue(Files.exists(file));

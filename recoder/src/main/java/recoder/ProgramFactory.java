@@ -1717,7 +1717,7 @@ public interface ProgramFactory extends Service {
     Volatile createVolatile();
 
     /**
-     * Creates a new {@ling Annotation}.
+     * Creates a new {@link AnnotationUseSpecification}.
      *
      * @return a new instance of Annotation
      */
@@ -1873,7 +1873,7 @@ public interface ProgramFactory extends Service {
 
 
     /**
-     * Creates a new {@ling EnhancedFor}.
+     * Creates a new {@link EnhancedFor}.
      *
      * @return a new instance of EnhancedFor.
      */
