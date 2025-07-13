@@ -14,6 +14,9 @@ plugins {
     id "org.checkerframework" version "0.6.61"
 
     id("org.sonarqube") version "7.2.2.6593"
+
+    // Plugin for publishing via the new Nexus API
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
 
@@ -56,9 +59,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url = 'https://git.key-project.org/api/v4/projects/35/packages/maven'
-        }
     }
 
     dependencies {
@@ -92,7 +92,7 @@ subprojects {
         testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0")
         testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.0")
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -325,41 +325,51 @@ subprojects {
             }
             repositories {
                 maven {
-                    /**
-                     * To be able to publish things on Maven Central, you need two things:
-                     *
-                     * (1) a JIRA account with permission on group-id `org.key-project`
-                     * (2) a keyserver-published GPG (w/o sub-keys)
-                     *
-                     * Your `$HOME/.gradle/gradle.properties` should like this:
-                     * ```
-                     * signing.keyId=YourKeyId
-                     * signing.password=YourPublicKeyPassword
-                     * ossrhUsername=your-jira-id
-                     * ossrhPassword=your-jira-password
-                     * ```
-                     *
-                     * You can test signing with `gradle sign`, and publish with `gradle publish`.
-                     * https://central.sonatype.org/publish/publish-guide/
-                     */
-                    if (project.version.endsWith("-SNAPSHOT")) {
-                        name = "mavenSnapshot"
-                        url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                        credentials(PasswordCredentials) {
-                            username = project.properties.getOrDefault("ossrhUsername", "")
-                            password = project.properties.getOrDefault("ossrhPassword", "")
-                        }
-                    } else {
-                        name = "mavenStaging"
-                        url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                        credentials(PasswordCredentials) {
-                            username = project.properties.getOrDefault("ossrhUsername", "")
-                            password = project.properties.getOrDefault("ossrhPassword", "")
-                        }
-                    }
+                    name = "keylocal"
+                    url= uri("$rootDir/local")
                 }
+            }
+        }
 
-                /*
+        signing {
+            useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
+            sign publishing.publications.mavenJava
+        }
+    }
+}
+
+
+nexusPublishing {
+    repositories {
+        central {
+            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
+            snapshotRepositoryUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
+
+            stagingProfileId.set("org.key-project")
+
+            /**
+             * To be able to publish things on Maven Central, you need two things:
+             *
+             * (1) a JIRA account with permission on group-id `org.key-project`
+             * (2) a keyserver-published GPG (w/o sub-keys)
+             *
+             * Your `$HOME/.gradle/gradle.properties` should like this:
+             * ```
+             * signing.keyId=YourKeyId
+             * signing.password=YourPublicKeyPassword
+             * ossrhUsername=your-jira-id
+             * ossrhPassword=your-jira-password
+             * ```
+             *
+             * You can test signing with `gradle sign`, and publish with `gradle publish`.
+             * https://central.sonatype.org/publish/publish-guide/
+             */
+            username = project.properties.getOrDefault("ossrhUsername", "")
+            password = project.properties.getOrDefault("ossrhPassword", "")
+        }
+    }
+}
+
             maven { // deployment to git.key-project.org
                 name = "GitlabPackages"
                 url "https://git.key-project.org/api/v4/projects/35/packages/maven"
@@ -376,7 +386,6 @@ subprojects {
                     header(HttpHeaderAuthentication)
                 }
             }
-            */
             }
         }
 
