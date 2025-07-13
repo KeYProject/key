@@ -19,7 +19,7 @@ import recoder.list.generic.ASTList;
 
 /**
  * Syntactic transformation returning a mutable statement list that contains the given statement,
- * and creating a new {@linkrecoder.java.StatementBlock} if necessary. It is necessary to create a
+ * and creating a new {@link recoder.java.StatementBlock} if necessary. It is necessary to create a
  * new block, if {@link recoder.kit.StatementKit#getStatementMutableList}returns <CODE>null
  * </CODE>. This is the case if the statement container allows only a single statement and the given
  * statement is not inside a {@link recoder.java.StatementBlock}. If the statement has no parent, it
@@ -145,11 +145,6 @@ public class PrepareStatementList extends TwoPassTransformation {
      * Problem report indicating that a parent is not suited for a given child.
      */
     public static class IllegalParentContext extends Conflict {
-
-        /**
-         * serialization id
-         */
-        private static final long serialVersionUID = -1995165154877949565L;
         private final NonTerminalProgramElement parent;
 
         public IllegalParentContext(NonTerminalProgramElement parent) {
