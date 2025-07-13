@@ -1,0 +1,43 @@
+[versions]
+slf4j = "2.0.17"
+logback = "1.5.18"
+jspecify = "1.0.0"
+eisop = "3.49.3-eisop1"
+junit-bom = "5.13.2"
+assertj = "3.27.3"
+jackson-yaml = "2.19.1"
+jackson-jsr310 = "2.19.1"
+antlr4 = "4.13.2"
+javacc = "4.0"
+
+[libraries]
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+eisop-qual = { module = "io.github.eisop:checker-qual", version.ref = "eisop" }
+eisop-util = { module = "io.github.eisop:checker-util", version.ref = "eisop" }
+eisop-checker = { module = "io.github.eisop:checker", version.ref = "eisop" }
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson-yaml" }
+jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson-jsr310" }
+antlr4 = { module = "org.antlr:antlr4", version.ref = "antlr4" }
+antlr4-runtime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr4" }
+javacc = { module = "net.java.dev.javacc:javacc", version.ref = "javacc" }
+
+
+
+# JUnit 5 dependencies, controlled by the JUnit BOM
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[bundles]
+junit-compile =[junit-api, junit-params]
+junit-runtime = [junit-engine, junit-launcher]
+
+[plugins]
+javacc = { id = "org.javacc.javacc", version = "4.0.1" }
+
+[platforms]
+junit = { module = "org.junit:junit-bom", version.ref = "junit-bom" }

@@ -77,9 +77,8 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.17")
-        implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.18")
+        implementation(libs.slf4j.api)
+        testImplementation(libs.logback.classic)
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
@@ -95,12 +94,9 @@ subprojects {
         testImplementation("org.assertj:assertj-core:3.27.3")
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
-        testImplementation(platform("org.junit:junit-bom:5.13.2"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation(libs.junit.compile)
+        testRuntimeOnly(libs.junit.runtime)
+
         testImplementation project(':key.util')
 
         // test fixtures

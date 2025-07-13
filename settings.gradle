@@ -22,3 +22,10 @@ include 'keyext.isabelletranslation'
 // This flag is activated to enable the checker framework.
 // System.setProperty("ENABLE_NULLNESS", "true")
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            from(files("$rootDir/gradle/libs.versions.toml"))
+        }
+    }
+}
