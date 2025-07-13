@@ -3,7 +3,7 @@ slf4j = "2.0.17"
 logback = "1.5.18"
 jspecify = "1.0.0"
 eisop = "3.49.3-eisop1"
-junit-bom = "5.13.2"
+junit = "5.13.2"
 assertj = "3.27.3"
 jackson-yaml = "2.19.1"
 jackson-jsr310 = "2.19.1"
@@ -27,17 +27,15 @@ javacc = { module = "net.java.dev.javacc:javacc", version.ref = "javacc" }
 
 
 # JUnit 5 dependencies, controlled by the JUnit BOM
-junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }
-junit-params = { module = "org.junit.jupiter:junit-jupiter-params" }
-junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
-junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 
 [bundles]
-junit-compile =[junit-api, junit-params]
-junit-runtime = [junit-engine, junit-launcher]
+junit-compile = ["junit-api", "junit-params"]
+junit-runtime = ["junit-engine", "junit-launcher"]
 
 [plugins]
 javacc = { id = "org.javacc.javacc", version = "4.0.1" }
 
-[platforms]
-junit = { module = "org.junit:junit-bom", version.ref = "junit-bom" }

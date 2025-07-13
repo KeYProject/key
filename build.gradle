@@ -1,5 +1,3 @@
-import groovy.transform.Memoized
-
 plugins {
     //Support for IntelliJ IDEA
     //https://docs.gradle.org/current/userguide/idea_plugin.html
@@ -77,43 +75,45 @@ subprojects {
     }
 
     dependencies {
-        implementation(libs.slf4j.api)
-        testImplementation(libs.logback.classic)
+        implementation(libs.slf4j)
+
+        compileOnly(libs.jspecify)
+        testCompileOnly(libs.jspecify)
 
 
-        compileOnly("org.jspecify:jspecify:1.0.0")
-        testCompileOnly("org.jspecify:jspecify:1.0.0")
-        def eisop_version = "3.49.3-eisop1"
-        compileOnly "io.github.eisop:checker-qual:$eisop_version"
-        compileOnly "io.github.eisop:checker-util:$eisop_version"
-        testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
-        checkerFramework "io.github.eisop:checker-qual:$eisop_version"
-        checkerFramework "io.github.eisop:checker:$eisop_version"
+        compileOnly(libs.eisop.qual)
+        compileOnly(libs.eisop.util)
+        testCompileOnly(libs.eisop.qual)
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.18")
-        testImplementation("org.assertj:assertj-core:3.27.3")
-        testImplementation("ch.qos.logback:logback-classic:1.5.18")
+        checkerFramework(libs.eisop.qual)
+        checkerFramework(libs.eisop.checker)
 
-        testImplementation(libs.junit.compile)
-        testRuntimeOnly(libs.junit.runtime)
+        testImplementation(libs.logback)
+        testImplementation(libs.assertj)
+
+        testImplementation(libs.bundles.junit.compile)
+        testRuntimeOnly(libs.bundles.junit.runtime)
+        testRuntimeOnly(libs.junit.engine)
 
         testImplementation project(':key.util')
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.1")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1")
+        testImplementation(libs.jackson.yaml)
+        testImplementation(libs.jackson.jsr310)
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.2'
+        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation('org.junit.jupiter:junit-jupiter-engine:5.13.2')
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         failOnError = false
         options.addBooleanOption 'Xdoclint:none', true
         //options.verbose()
@@ -121,7 +121,7 @@ subprojects {
         options.addBooleanOption('html5', true)
     }
 
-    tasks.withType(Test) {//Configure all tests
+    tasks.withType(Test).configureEach {//Configure all tests
         systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
@@ -131,13 +131,13 @@ subprojects {
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
 
+        enableAssertions = true
+
         forkEvery = 0 //default
         maxParallelForks = 1 // weigl: test on master
-    }
 
-    tasks.withType(Test) {
         useJUnitPlatform {
-            includeEngines 'junit-jupiter'
+            //includeEngines 'junit-jupiter'
         }
     }
 
@@ -162,7 +162,7 @@ subprojects {
         }
     }
 
-    task testFast(type: Test) {
+    tasks.register('testFast', Test) {
         group = "verification"
         useJUnitPlatform {
             excludeTags "slow", "performance", "interactive"
@@ -188,98 +188,27 @@ subprojects {
     // The following two tasks can be used to execute main methods from the project
     // The main class is set via "gradle -DmainClass=... execute --args ..."
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
-    task execute(type: JavaExec) {
+    tasks.register('execute', JavaExec) {
         description = 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group = "application"
         mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.main.runtimeClasspath
     }
 
-    task executeInTests(type: JavaExec) {
+    tasks.register('executeInTests', JavaExec) {
         description = 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group = "application"
         mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.test.runtimeClasspath
     }
 
-    // findbugs { findbugsTest.enabled = false; ignoreFailures = true }
-    pmd {
-        pmdTest.enabled = false
-        ignoreFailures = true
-        toolVersion = "7.10.0"
-        consoleOutput = false
-        rulesMinimumPriority = 5
-        ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
-    }
-
-    task pmdMainChanged(type: Pmd) {
-        // Specify all files that should be checked
-        def changedFiles = getChangedFiles()
-        source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
-        classpath = checkstyleMain.classpath
-        reports {
-            html {
-                required = true
-                outputLocation = file("build/reports/pmd/main_diff.html")
-            }
-            xml {
-                required = true
-                outputLocation = file("build/reports/pmd/main_diff.xml")
-            }
-        }
-    }
-
-
-    checkstyle {
-        toolVersion = "10.26.0"
-        ignoreFailures = true
-        configFile = file("$rootDir/gradle/key_checks.xml")
-        showViolations = false // disable console output
-    }
-
-
-    task checkstyleMainChanged(type: Checkstyle) {
-        // Specify all files that should be checked
-        def changedFiles = getChangedFiles()
-        source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
-        classpath = checkstyleMain.classpath
-
-        //println(source.getFiles())
-
-        // Define the output folder of the generated reports
-        reports {
-            html {
-                required = true
-                outputLocation = file("build/reports/checkstyle/main_diff.html")
-            }
-            xml {
-                required = true
-                outputLocation = file("build/reports/checkstyle/main_diff.xml")
-            }
-        }
-    }
-
-
-    // tasks.withType(FindBugs) {
-    //     reports {
-    //         xml.enabled = false
-    //         html.enabled = true
-    //     }
-    // }
-    tasks.withType(Pmd) {
-        reports {
-            xml.getRequired().set(true)
-            html.getRequired().set(true)
-        }
-    }
-
-    task sourcesJar(type: Jar) {
+    tasks.register('sourcesJar', Jar) {
         description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
         archiveClassifier = 'sources'
     }
 
-    task javadocJar(type: Jar) {
+    tasks.register('javadocJar', Jar) {
         description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
@@ -359,19 +288,6 @@ subprojects {
             }
         }
     }
-
-//    checkerFramework {
-//        checkers = [
-//            "org.checkerframework.checker.nullness.NullnessChecker",
-//        ]
-//        extraJavacArgs = [
-//            "-AonlyDefs=^org\\.key_project\\.util",
-//            "-Xmaxerrs", "10000",
-//            "-Astubs=$projectDir/src/main/checkerframework",
-//            "-Werror",
-//            "-Aversion",
-//        ]
-//    }
 
     afterEvaluate { // required so project.description is non-null as set by sub build.gradle
         publishing {
@@ -472,7 +388,7 @@ subprojects {
     }
 }
 
-task start {
+tasks.register('start'){
     description = "Use :key.ui:run instead"
     doFirst {
         println "Use :key.ui:run instead"
@@ -480,7 +396,7 @@ task start {
 }
 
 // Generation of a JavaDoc across sub projects.
-task alldoc(type: Javadoc) {
+tasks.register('alldoc', Javadoc){
     group = "documentation"
     description = "Generate a JavaDoc across sub projects"
     def projects = subprojects
@@ -504,15 +420,13 @@ task alldoc(type: Javadoc) {
         docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
         bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
-        links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
-        links += "http://www.antlr2.org/javadoc/"
-        links += "http://www.antlr3.org/api/Java/"
+        links += "https://docs.oracle.com/en/java/javase/21/docs/api/"
         links += "https://www.antlr.org/api/Java/"
     }
 }
 
 // Creates a jar file with the javadoc over all sub projects.
-task alldocJar(type: Zip) {
+tasks.register('alldocJar', Zip){
     dependsOn alldoc
     description = 'Create a jar file with the javadoc over all sub projects'
     from alldoc
@@ -525,28 +439,4 @@ def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
 if (jacocoEnabled.toBoolean()) {
     project.logger.lifecycle("Jacoco enabled. Test performance will be slower.")
     apply from: rootProject.file("scripts/jacocokey.gradle")
-}
-
-
-@Memoized
-def getChangedFiles() {
-    // Get the target and source branch
-    def anchor = "git merge-base HEAD origin/main".execute().getText()
-
-    // Get list of all changed files including status
-    def allFiles = "git diff --name-status --diff-filter=dr $anchor".execute().getText().split("\n")
-    //println("Found ${allFiles.length} changed files")
-
-    // Remove the status prefix
-    def files = new TreeSet<String>()
-    for (file in allFiles) {
-        if (file.length() > 1) {
-            def a = file.substring(1).trim()
-            if (!a.isBlank()) {
-                files.add(("$rootDir/" + a).toString())
-            }
-        }
-    }
-    // Return the list of touched files
-    files
 }
