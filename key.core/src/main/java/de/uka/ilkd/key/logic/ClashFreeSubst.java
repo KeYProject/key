@@ -186,7 +186,7 @@ public class ClashFreeSubst {
      * application of this substitution. This is the case, if <code>v</code> occurrs free in
      * <code>subTerm</code>, but does not occurr in <code>boundVars</code>.
      *
-     * @returns true if <code>subTerm</code> bound by <code>boundVars</code> would change under
+     * @return true if <code>subTerm</code> bound by <code>boundVars</code> would change under
      *          application of this substitution
      */
     protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
