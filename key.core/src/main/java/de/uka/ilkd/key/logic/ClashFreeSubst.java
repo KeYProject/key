@@ -187,7 +187,7 @@ public class ClashFreeSubst {
      * <code>subTerm</code>, but does not occurr in <code>boundVars</code>.
      *
      * @return true if <code>subTerm</code> bound by <code>boundVars</code> would change under
-     *          application of this substitution
+     *         application of this substitution
      */
     protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
             JTerm subTerm) {

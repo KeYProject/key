@@ -23,10 +23,10 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      * Constructor declaration.
      *
      * @param children an ExtList with the children. May include: a TypeReference (as a reference to
-     *       the return type), a de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
-     *       several ParameterDeclaration (as parameters of the declared method), a StatementBlock
-     *       (as body of the declared method), several Modifier (taken as modifiers of the
-     *       declaration), a Comment
+     *        the return type), a de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
+     *        several ParameterDeclaration (as parameters of the declared method), a StatementBlock
+     *        (as body of the declared method), several Modifier (taken as modifiers of the
+     *        declaration), a Comment
      * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
      */
     public ConstructorDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
