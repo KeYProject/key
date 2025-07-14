@@ -387,7 +387,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Strategy getActiveStrategy() {
+    public Strategy<Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -395,7 +395,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public void setActiveStrategy(Strategy activeStrategy) {
+    public void setActiveStrategy(Strategy<Goal> activeStrategy) {
         this.activeStrategy = activeStrategy;
         getSettings().getStrategySettings().setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
@@ -407,7 +407,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
 
     private void updateStrategyOnGoals() {
-        Strategy ourStrategy = getActiveStrategy();
+        Strategy<Goal> ourStrategy = getActiveStrategy();
 
         for (Goal goal : openGoals()) {
             goal.setGoalStrategy(ourStrategy);

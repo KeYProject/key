@@ -11,6 +11,7 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+
 /**
  * This macro does nothing and is not applicable. It can be used to create compound macros, e.g. as
  * an alternative macro for {@link DoWhileFinallyMacro}.

@@ -17,6 +17,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.
  *
