@@ -5,6 +5,8 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -14,7 +16,9 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
@@ -36,9 +40,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     @Override
     protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        return strategies.stream().map(s -> s.instantiateApp(app, pio, goal, mState)).reduce(
-            longConst(0).computeCost(app, pio, goal, mState),
-            RuleAppCost::add);
+        return reduceTillMax(app, NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
+            RuleAppCost::add, s -> s.instantiateApp(app, pio, goal, mState));
     }
 
     @Override
@@ -49,7 +52,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return strategies.stream().allMatch(s -> s.isApprovedApp(app, pio, goal));
+        return reduceTillMax(app, true, false, Boolean::logicalAnd,
+            s -> s.isApprovedApp(app, pio, goal));
     }
 
     @Override
@@ -57,11 +61,36 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return NAME;
     }
 
+    private <R> R reduceTillMax(RuleApp app, R init, R max, BiFunction<R, R, R> accumulator,
+            Function<AbstractFeatureStrategy, R> mapper) {
+        for (AbstractFeatureStrategy strategy : strategies) {
+            var isResponsible = false;
+            var ruleSets = app.rule().ruleSets();
+            if (!ruleSets.hasNext()) isResponsible = true;
+            else {
+                while (ruleSets.hasNext()) {
+                    var rs = ruleSets.next();
+                    if (strategy.isResponsibleFor(rs)) {
+                        isResponsible = true;
+                        break;
+                    }
+                }
+            }
+            if (!isResponsible) {
+                continue;
+            }
+            init = accumulator.apply(init, mapper.apply(strategy));
+            if (init == max) {
+                break;
+            }
+        }
+        return init;
+    }
+
     @Override
     public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, GOAL goal, MutableState mState) {
-        return strategies.stream().map(s -> s.computeCost(app, pos, goal, mState)).reduce(
-            longConst(0).computeCost(app, pos, goal, mState),
-            RuleAppCost::add);
+        return reduceTillMax(app, NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
+            RuleAppCost::add, s -> s.computeCost(app, pos, goal, mState));
     }
 }

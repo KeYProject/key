@@ -20,6 +20,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -64,21 +65,26 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
 
         // determine configuration
         nonLinearArithmeticEnabled = StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-                strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
+            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
 
         divAndModuloReasoningEnabled =
-                nonLinearArithmeticEnabled || StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(
-                        strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
+            nonLinearArithmeticEnabled || StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(
+                strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY));
 
         stopAtFirstNonCloseableGoal =
-                strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
 
         // setup cost computations
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
         instantiationDispatcher = setupInstantiationF();
 
+    }
+
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
     }
 
     private RuleSetDispatchFeature setupInstantiationF() {
