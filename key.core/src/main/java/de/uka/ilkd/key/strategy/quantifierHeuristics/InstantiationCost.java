@@ -41,7 +41,7 @@ public class InstantiationCost implements Feature {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final Term formula = pos.sequentFormula().formula();
-        final var instance = varInst.toTerm(app, pos, goal, mState);
+        final var instance = varInst.toTerm(app, pos, (de.uka.ilkd.key.proof.Goal) goal, mState);
 
         return Instantiation.computeCost(instance, formula, goal.sequent(),
             (Services) goal.proof().getServices());
