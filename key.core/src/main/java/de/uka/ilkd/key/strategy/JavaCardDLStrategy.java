@@ -34,6 +34,7 @@ import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -99,6 +100,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     protected final RuleSetDispatchFeature getInstantiationDispatcher() {
         return instantiationDispatcher;
+    }
+
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null || approvalDispatcher.get(rs) != null;
     }
 
     protected Feature setupGlobalF(Feature dispatcher) {
@@ -779,6 +785,27 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         applyTF(right, tf.polynomial),
                                         MonomialsSmallerThanFeature.create(right, left, numbers)),
                                     TermSmallerThanFeature.create(right, left)))))))),
+                longConst(-4000)));
+
+        bindRuleSet(d, "int_apply_equations",
+            SumFeature.createSum(ifZero(applyTF(FocusProjection.create(0), tf.intF),
+                add(applyTF(FocusProjection.create(0), tf.monomial),
+                    ScaleFeature.createScaled(FindRightishFeature.create(numbers), 5.0)),
+                inftyConst()),
+                ifZero(MatchedAssumesFeature.INSTANCE,
+                    add(CheckApplyEqFeature.INSTANCE, let(equation, AssumptionProjection.create(0),
+                        add(not(applyTF(equation, ff.update)),
+                            // there might be updates in
+                            // front of the assumption
+                            // formula; in this case we wait
+                            // until the updates have
+                            // been applied
+                            let(left, sub(equation, 0),
+                                let(right, sub(equation, 1), ifZero(applyTF(left, tf.intF),
+                                    add(applyTF(left, tf.nonNegOrNonCoeffMonomial),
+                                        applyTF(right, tf.polynomial),
+                                        MonomialsSmallerThanFeature.create(right, left, numbers)),
+                                    inftyConst()))))))),
                 longConst(-4000)));
     }
 
