@@ -205,12 +205,11 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
         // are there old array types which need to be recycled? This happens if
         // ct was actually renamed
-        ArrayList al = removedArrayCache.get(ct);
+        ArrayList<ArrayType> al = removedArrayCache.get(ct);
         if (al != null) {
-            for (Object o : al) {
-                ArrayType at = (ArrayType) o;
-                at.makeNames();
-                name2type.put(at.getFullName(), at);
+            for (ArrayType o : al) {
+                o.makeNames();
+                name2type.put(o.getFullName(), o);
             }
         }
     }

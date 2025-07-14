@@ -134,7 +134,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
     private long autoModeTime = 0;
 
-    private @Nullable Strategy activeStrategy;
+    private @Nullable Strategy<@NonNull Goal> activeStrategy;
 
     private PropertyChangeListener settingsListener;
 
@@ -387,7 +387,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Strategy getActiveStrategy() {
+    public Strategy<@NonNull Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -395,7 +395,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public void setActiveStrategy(Strategy activeStrategy) {
+    public void setActiveStrategy(Strategy<@NonNull Goal> activeStrategy) {
         this.activeStrategy = activeStrategy;
         getSettings().getStrategySettings().setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
@@ -407,7 +407,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
 
     private void updateStrategyOnGoals() {
-        Strategy ourStrategy = getActiveStrategy();
+        Strategy<@NonNull Goal> ourStrategy = getActiveStrategy();
 
         for (Goal goal : openGoals()) {
             goal.setGoalStrategy(ourStrategy);

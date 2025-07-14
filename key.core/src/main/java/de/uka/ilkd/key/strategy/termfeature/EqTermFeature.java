@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
+import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -21,13 +23,13 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  */
 public class EqTermFeature extends BinaryTermFeature {
 
-    private final TermBuffer pattern;
+    private final TermBuffer<Goal> pattern;
 
-    public static TermFeature create(TermBuffer pattern) {
+    public static TermFeature create(TermBuffer<Goal> pattern) {
         return new EqTermFeature(pattern);
     }
 
-    private EqTermFeature(TermBuffer pattern) {
+    private EqTermFeature(TermBuffer<Goal> pattern) {
         this.pattern = pattern;
     }
 

@@ -881,7 +881,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * focused node has changed
          */
         @Override
-        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
+        public synchronized void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             if (!ignoreNodeSelectionChange) {
                 ThreadUtilities.invokeOnEventQueue(
                     () -> makeSelectedNodeVisible(mediator.getSelectedNode()));
@@ -892,7 +892,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+        public synchronized void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             LOGGER.debug("ProofTreeView: initialize with new proof");
             ThreadUtilities.invokeOnEventQueue(() -> {
                 lastGoalNode = null;

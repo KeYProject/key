@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
@@ -21,13 +22,13 @@ import org.jspecify.annotations.NonNull;
  */
 public class InstantiationCost implements Feature {
 
-    final private ProjectionToTerm varInst;
+    final private ProjectionToTerm<Goal> varInst;
 
-    private InstantiationCost(ProjectionToTerm var) {
+    private InstantiationCost(ProjectionToTerm<Goal> var) {
         varInst = var;
     }
 
-    public static Feature create(ProjectionToTerm varInst) {
+    public static Feature create(ProjectionToTerm<Goal> varInst) {
         return new InstantiationCost(varInst);
     }
 

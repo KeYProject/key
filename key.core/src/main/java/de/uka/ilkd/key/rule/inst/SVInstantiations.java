@@ -143,7 +143,7 @@ public class SVInstantiations
 
     public <T> SVInstantiations add(SchemaVariable sv, ImmutableArray<T> pes, Class<T> type,
             LogicServices services) {
-        return add(sv, new ListInstantiation(pes, type), services);
+        return add(sv, new ListInstantiation<>(pes, type), services);
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
@@ -319,7 +319,7 @@ public class SVInstantiations
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
-        return replace(sv, new ListInstantiation(pes, ProgramElement.class), services);
+        return replace(sv, new ListInstantiation<>(pes, ProgramElement.class), services);
     }
 
     /**

@@ -559,14 +559,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * focused node has changed
          */
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             selectSelectedGoal();
         }
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             LOGGER.debug("GoalList: initialize with new proof");
             selectingListModel.setProof(e.getSource().getSelectedProof());
             validate();

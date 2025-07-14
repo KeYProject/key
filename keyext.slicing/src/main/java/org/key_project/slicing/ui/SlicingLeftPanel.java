@@ -530,7 +530,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         currentProof = e.getSource().getSelectedProof();
         resetLabels();
         resetGraphLabels();
