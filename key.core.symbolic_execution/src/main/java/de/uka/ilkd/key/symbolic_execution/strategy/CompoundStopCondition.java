@@ -14,6 +14,7 @@ import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -22,6 +23,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class CompoundStopCondition implements StopCondition<Goal> {
     /**
      * The child {@link StopCondition}s to use.
@@ -34,13 +36,13 @@ public class CompoundStopCondition implements StopCondition<Goal> {
      * will provide the reason via
      * {@link StopCondition#getGoalNotAllowedMessage}.
      */
-    private StopCondition<Goal> lastGoalAllowedChild;
+    private @Nullable StopCondition<Goal> lastGoalAllowedChild = null;
 
     /**
      * The last {@link StopCondition} treated in {@link StopCondition#shouldStop},
      * which will provide the reason via {@link StopCondition#getStopMessage}.
      */
-    private StopCondition<Goal> lastShouldStopChild;
+    private @Nullable StopCondition<Goal> lastShouldStopChild;
 
     /**
      * Constructor.
@@ -85,7 +87,8 @@ public class CompoundStopCondition implements StopCondition<Goal> {
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+    public boolean isGoalAllowed(@Nullable Goal goal, int maxApplications, long timeout,
+            long startTime,
             int countApplied) {
         boolean allowed = true;
         Iterator<StopCondition<Goal>> childIter = children.iterator();
@@ -101,10 +104,12 @@ public class CompoundStopCondition implements StopCondition<Goal> {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
+    public String getGoalNotAllowedMessage(@Nullable Goal goal, int maxApplications, long timeout,
             long startTime, int countApplied) {
-        return lastGoalAllowedChild != null ? lastGoalAllowedChild.getGoalNotAllowedMessage(
-            goal, maxApplications, timeout, startTime, countApplied) : null;
+        return lastGoalAllowedChild != null
+                ? lastGoalAllowedChild.getGoalNotAllowedMessage(goal, maxApplications, timeout,
+                    startTime, countApplied)
+                : "Internal state. Method getGoalNotAllowedMessage called, but last allowed goal is null";
     }
 
     /**
