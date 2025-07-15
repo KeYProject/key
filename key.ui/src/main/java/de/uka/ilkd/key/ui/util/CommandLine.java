@@ -12,8 +12,6 @@ import de.uka.ilkd.key.core.Main;
 
 import org.jspecify.annotations.Nullable;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * A small framework to handle command lines.
  *
