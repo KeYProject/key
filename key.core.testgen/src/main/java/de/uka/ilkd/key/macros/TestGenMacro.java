@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
 
 public class TestGenMacro extends StrategyProofMacro {
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new TestGenStrategy(proof.getActiveStrategy());
     }
 
@@ -77,7 +77,7 @@ class TestGenStrategy extends FilterStrategy {
         return unwindRules.contains(name);
     }
 
-    public TestGenStrategy(Strategy delegate) {
+    public TestGenStrategy(Strategy<@NonNull Goal> delegate) {
         super(delegate);
         limit = TestGenerationSettings.getInstance().getMaximalUnwinds();
     }

@@ -62,7 +62,7 @@ public class Modify extends TwoPassTransformation {
         this.modifier = code;
     }
 
-    private static boolean containsModifier(Declaration decl, Class mod) {
+    private static boolean containsModifier(Declaration decl, Class<?> mod) {
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
         if (mods == null) {
             return false;

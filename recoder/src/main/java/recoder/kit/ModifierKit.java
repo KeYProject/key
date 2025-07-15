@@ -116,7 +116,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
         return null;
     }
 
-    private static boolean containsModifier(Declaration decl, Class mod) {
+    private static boolean containsModifier(Declaration decl, Class<?> mod) {
         Debug.assertNonnull(decl, mod);
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
         if (mods == null) {

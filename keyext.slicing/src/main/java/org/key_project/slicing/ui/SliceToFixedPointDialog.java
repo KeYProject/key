@@ -231,7 +231,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         if (e.getSource().getSelectedProof() != null
                 && e.getSource().getSelectedProof().closed()) {
             if (e.getSource().getSelectedProof() == worker.getSlicedProof()) {

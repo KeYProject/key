@@ -55,6 +55,7 @@ import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.FeatureSettings;
@@ -1777,7 +1778,7 @@ public final class MainWindow extends JFrame {
          * focused node has changed
          */
         @Override
-        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
+        public synchronized void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             if (disableCurrentGoalView) {
                 return;
             }
@@ -1788,7 +1789,7 @@ public final class MainWindow extends JFrame {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+        public synchronized void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             if (disableCurrentGoalView) {
                 return;
             }
@@ -1843,19 +1844,21 @@ public final class MainWindow extends JFrame {
         }
 
         @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+            handleProof(e.getSource().getSelectedProof());
+        }
 
-            if (e.getSource().getSelectedProof() != null) {
-                enable(!e.getSource().getSelectedProof().closed());
+        private void handleProof(Proof p) {
+            if (p != null) {
+                enable(!p.closed());
             } else {
                 enable(false);
             }
-
         }
 
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-            selectedProofChanged(e);
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
+            handleProof(e.getSource().getSelectedProof());
         }
 
     }

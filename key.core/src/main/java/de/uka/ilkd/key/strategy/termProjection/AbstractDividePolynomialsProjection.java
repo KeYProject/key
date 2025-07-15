@@ -19,11 +19,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
+    private final ProjectionToTerm<Goal> leftCoefficient, polynomial;
 
-    private final ProjectionToTerm leftCoefficient, polynomial;
-
-    protected AbstractDividePolynomialsProjection(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial) {
+    protected AbstractDividePolynomialsProjection(ProjectionToTerm<Goal> leftCoefficient,
+            ProjectionToTerm<Goal> polynomial) {
         this.leftCoefficient = leftCoefficient;
         this.polynomial = polynomial;
     }

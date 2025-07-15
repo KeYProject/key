@@ -47,7 +47,7 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
      * Proceed to the next occurrance of an object of the given class or a subclass thereof. If
      * there is no such object, the walk is finished.
      */
-    public boolean next(Class c) {
+    public boolean next(Class<?> c) {
         while (next()) {
             if (c.isInstance(current)) {
                 return true;

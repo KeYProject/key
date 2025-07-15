@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.proof.Goal;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.prover.proof.ProofGoal;
@@ -32,9 +34,9 @@ public class ContainsTermFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    private final ProjectionToTerm proj1;
+    private final ProjectionToTerm<Goal> proj1;
 
-    private final ProjectionToTerm proj2;
+    private final ProjectionToTerm<Goal> proj2;
 
 
     /**
@@ -45,23 +47,23 @@ public class ContainsTermFeature implements Feature {
      * @param proj2 the ProjectionToTerm resolving to the term to be checked whether it is a subterm
      *        of the first one
      */
-    private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    private ContainsTermFeature(ProjectionToTerm<Goal> proj1, ProjectionToTerm<Goal> proj2) {
         this.proj1 = proj1;
         this.proj2 = proj2;
     }
 
 
-    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    public static Feature create(ProjectionToTerm<Goal> proj1, ProjectionToTerm<Goal> proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, G goal,
             MutableState mState) {
-        final Term t1 = proj1.toTerm(app, pos, goal, mState);
-        final Term t2 = proj2.toTerm(app, pos, goal, mState);
+        final Term t1 = proj1.toTerm(app, pos, (Goal) goal, mState);
+        final Term t2 = proj2.toTerm(app, pos, (Goal) goal, mState);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);
         t1.execPreOrder(visitor);
         if (visitor.found) {
@@ -72,7 +74,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private static class ContainsTermVisitor implements Visitor<Term> {
+    private static class ContainsTermVisitor implements Visitor<@NonNull Term> {
         boolean found = false;
         final Term term;
 
