@@ -23,9 +23,7 @@ import org.jspecify.annotations.NullMarked;
     exports de.uka.ilkd.key.gui.keyshortcuts;
 
     requires org.slf4j;
-    requires java.desktop;
     requires key.core;
-    requires java.prefs;
     requires org.jspecify;
     requires org.key_project.util;
     requires key.ncore;
@@ -41,6 +39,10 @@ import org.jspecify.annotations.NullMarked;
     requires key.prover;
     requires org.antlr.antlr4.runtime;
     requires java.management;
+    requires org.checkerframework.checker.qual;
+    requires com.formdev.flatlaf;
+    requires java.desktop;
+    requires java.prefs;
 
     provides de.uka.ilkd.key.gui.extension.api.KeYGuiExtension with
             de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt,
