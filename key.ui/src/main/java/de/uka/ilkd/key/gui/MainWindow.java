@@ -69,8 +69,6 @@ import de.uka.ilkd.key.ui.util.PreferenceSaver;
 import de.uka.ilkd.key.ui.util.ThreadUtilities;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.dockingframes.common.common.CControl;
 import org.key_project.dockingframes.common.common.SingleCDockable;
@@ -81,11 +79,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
-import bibliothek.gui.dock.StackDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
