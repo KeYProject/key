@@ -288,7 +288,7 @@ public interface ImmutableList<T extends @Nullable Object>
      *        predicate to apply to each element to determine if it
      *        should be included
      *
-     * @returns the filtered list
+     * @return the filtered list
      */
     default ImmutableList<T> filter(Predicate<? super T> predicate) {
         return Immutables.filter(this, predicate);
