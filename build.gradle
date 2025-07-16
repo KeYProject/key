@@ -18,17 +18,7 @@ plugins {
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.55"
 
-    id("org.sonarqube") version "6.2.0.5505"
-
     id("checkstyle")
-}
-
-sonar {
-    properties {
-        property "sonar.projectKey", "KeYProject_key"
-        property "sonar.organization", "keyproject"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
 }
 
 
@@ -107,11 +97,11 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
         testImplementation(platform("org.junit:junit-bom:5.13.2"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-params")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
 
         // test fixtures
@@ -278,19 +268,7 @@ subprojects {
             xml {
                 required = true
                 outputLocation = file("build/reports/checkstyle/main_diff.xml")
-        }
-    }
-
-    // tasks.withType(FindBugs) {
-    //     reports {
-    //         xml.enabled = false
-    //         html.enabled = true
-    //     }
-    // }
-    tasks.withType(Pmd).configureEach {
-        reports {
-            xml.getRequired().set(true)
-            html.getRequired().set(true)
+            }
         }
     }
 
@@ -397,19 +375,6 @@ subprojects {
             }
         }
     }
-
-//    checkerFramework {
-//        checkers = [
-//            "org.checkerframework.checker.nullness.NullnessChecker",
-//        ]
-//        extraJavacArgs = [
-//            "-AonlyDefs=^org\\.key_project\\.util",
-//            "-Xmaxerrs", "10000",
-//            "-Astubs=$projectDir/src/main/checkerframework",
-//            "-Werror",
-//            "-Aversion",
-//        ]
-//    }
 
     afterEvaluate { // required so project.description is non-null as set by sub build.gradle
         publishing {
@@ -592,7 +557,6 @@ tasks.register('alldocJar', Zip){
     archiveFileName = "key-api-doc-${project.version}.zip"
     destinationDirectory = layout.buildDirectory.dir("distribution")
 }
-
 
 @Memoized
 def getChangedFiles() {
