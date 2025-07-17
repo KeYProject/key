@@ -166,22 +166,25 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
-    // it is possible to turn off the method <code>instantiate</code>,
-    // which can be useful in order to use the same feature definitions both for
-    // cost computation and instantiation
-
-    private boolean instantiateActive = false;
+    /// It is possible to turn off the method <code>instantiate</code>,
+    /// which can be useful in order to use the same feature definitions both for
+    /// cost computation and instantiation.
+    ///
+    /// Counts nesting depth of instantiation activation to avoid premature deactivation.
+    private short instantiateActive = 0;
 
     protected void enableInstantiate() {
-        instantiateActive = true;
+        instantiateActive++;
+        assert instantiateActive >= 0 : "overflow occurred";
     }
 
     protected void disableInstantiate() {
-        instantiateActive = false;
+        instantiateActive--;
+        assert instantiateActive >= 0;
     }
 
     protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
-        if (instantiateActive) {
+        if (instantiateActive != 0) {
             return SVInstantiationCP.create(sv, value);
         } else {
             return longConst(0);
@@ -189,7 +192,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     }
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
-        if (instantiateActive) {
+        if (instantiateActive != 0) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
             return longConst(0);
