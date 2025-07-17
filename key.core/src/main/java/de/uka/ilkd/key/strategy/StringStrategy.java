@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.termProjection.*;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -49,6 +50,11 @@ public class StringStrategy extends AbstractFeatureStrategy {
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
+    }
+
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null;
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
@@ -149,12 +155,10 @@ public class StringStrategy extends AbstractFeatureStrategy {
         return stopAtFirstNonCloseableGoal;
     }
 
-
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         return !(NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
             new MutableState()) == TopRuleAppCost.INSTANCE);
-
     }
 
     @Override
