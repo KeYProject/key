@@ -643,13 +643,17 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
         // the rule application in <code>isApprovedApp</code>). This is not
         // perfect, because it is not possible to distinguish between the
         // re-cost-computation delay and the normal costs for a rule application
-        bindRuleSet(d, "inEqSimp_nonLin_multiply", add(applyTF("multLeft", tf.nonNegMonomial),
-            applyTF("multRight", tf.polynomial),
-            ifZero(MatchedAssumesFeature.INSTANCE,
-                SumFeature.createSum(applyTF("multFacLeft", tf.nonNegMonomial),
-                    ifZero(applyTF("multRight", tf.literal), longConst(-100)),
-                    ifZero(applyTF("multFacRight", tf.literal), longConst(-100),
-                        applyTF("multFacRight", tf.polynomial)),
+        bindRuleSet(d, "inEqSimp_nonLin_multiply", print("nonLin_mult", add(
+            applyTF("multLeft", tf.nonNegMonomial),
+            print("multRight", applyTF("multRight", tf.polynomial)),
+            ifZero(print("assumes", MatchedAssumesFeature.INSTANCE),
+                SumFeature.createSum(
+                    print("multFacLeft", applyTF("multFacLeft", tf.nonNegMonomial)),
+                    print("mult.multRight-ifZero",
+                        ifZero(applyTF("multRight", tf.literal), longConst(-100))),
+                    print("mult.multFacRight-ifZero",
+                        ifZero(applyTF("multFacRight", tf.literal), longConst(-100),
+                            applyTF("multFacRight", tf.polynomial))),
                     /*
                      * ifZero ( applyTF ( "multRight", tf.literal ), longConst ( -100 ), applyTF (
                      * "multRight", tf.polynomial ) ), ifZero ( applyTF ( "multFacRight", tf.literal
@@ -668,7 +672,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
                  * rec ( tf.addF, longTermConst ( 4 ) ) ), applyTF ( "multFacRight", rec ( tf.addF,
                  * longTermConst ( 4 ) ) ),
                  */
-                ), notAllowedF)));
+                ), notAllowedF))));
     }
 
     private void setupInEqSimpInstantiation(RuleSetDispatchFeature d) {
@@ -779,7 +783,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
                     // longTermConst ( 5 ) ) )
                     ))));
 
-        bindRuleSet(d, "inEqSimp_signCases", posNegSplitting);
+        bindRuleSet(d, "inEqSimp_signCases", print("signCases", posNegSplitting));
 
         final Feature strengthening = forEach(intRel, SequentFormulasGenerator.antecedent(),
             SumFeature.createSum(

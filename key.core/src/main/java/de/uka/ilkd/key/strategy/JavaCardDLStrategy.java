@@ -104,11 +104,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null || approvalDispatcher.get(rs) != null;
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
+                || approvalDispatcher.get(rs) != null;
     }
 
     protected Feature setupGlobalF(Feature dispatcher) {
-        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
 
         final Feature methodSpecF;
         final String methProp =
@@ -202,14 +202,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // final Feature smtF = smtFeature(inftyConst());
 
-        return SumFeature.createSum(AutomatedRuleFeature.getInstance(),
-            NonDuplicateAppFeature.INSTANCE,
+        return SumFeature.createSum(
             // splitF,
             // strengthenConstraints,
-            AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+            oneStepSimplificationF, mergeRuleF,
             // smtF,
             methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
-            loopBlockApplyHeadFeature, ifMatchedF, dispatcher);
+            loopBlockApplyHeadFeature, dispatcher);
     }
 
     private Feature oneStepSimplificationFeature(Feature cost) {
