@@ -40,7 +40,7 @@ dependencies {
 
 task createExamplesZip(type: Zip) {
     description = 'Create "examples.zip" containing all KeY examples'
-    destinationDirectory = file("$buildDir/resources/main/")
+    destinationDirectory = layout.buildDirectory.dir("resources/main/").getOrNull()
     archiveFileName = "examples.zip"
     from "examples"
     include scanReadmeFiles()  // see end of file

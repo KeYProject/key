@@ -22,7 +22,7 @@ dependencies {
 }
 
 // The target directory for JavaCC (parser generation)
-def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
+def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
@@ -243,11 +243,14 @@ task debugJmlLexer(type: JavaExec) {
 
 task ptest(type: Test) { group = "verification" }
 
+def rapDir = layout.buildDirectory.dir("generated-src/rap/").getOrNull()
+
 task generateRAPUnitTests(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests")
-    args("$buildDir/generated-src/rap/")
+    args(rapDir)
 }
-sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
+
+sourceSets.test.java.srcDirs(rapDir)
 
 sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc)

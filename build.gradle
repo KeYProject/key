@@ -126,11 +126,15 @@ subprojects {
     }
 
     tasks.withType(Test) {//Configure all tests
+
+        def examplesDir = rootProject.layout.projectDirectory.dir("key.ui/examples").getAsFile()
+        def runAllProofsReportDir = layout.buildDirectory.dir("report/runallproves/").get().getAsFile()
+
         systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
-        systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
-        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+        systemProperty "EXAMPLES_DIR", "$examplesDir"
+        systemProperty "RUNALLPROOFS_DIR", "$runAllProofsReportDir"
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
@@ -491,7 +495,7 @@ task alldoc(type: Javadoc) {
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
-    destinationDir = file("${buildDir}/docs/javadoc")
+    destinationDir = layout.buildDirectory.dir("docs/javadoc").getOrNull().getAsFile()
 
     if (JavaVersion.current().isJava9Compatible()) {
         //notworking on jenkins
@@ -521,7 +525,7 @@ task alldocJar(type: Zip) {
     description = 'Create a jar file with the javadoc over all sub projects'
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
-    destinationDirectory = file("$buildDir/distribution")
+    destinationDirectory = layout.buildDirectory.dir("distribution").getOrNull()
 }
 
 //conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
