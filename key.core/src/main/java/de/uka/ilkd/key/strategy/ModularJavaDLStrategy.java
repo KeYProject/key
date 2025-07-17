@@ -28,7 +28,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.jspecify.annotations.NonNull;
 
 public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
-
     public static final Name NAME = new Name("Modular JavaDL Strategy");
 
     private final List<AbstractFeatureStrategy> strategies = new ArrayList<>();
@@ -41,20 +40,21 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         strategies.add(new IntegerStrategy(proof, properties));
         strategies.add(new StringStrategy(proof, properties));
         strategies.add(new JavaCardDLStrategy(proof, properties));
-        reduceCostTillMaxF = new ReduceCostTillMaxFeature();
-        reduceInstTillMaxF = new ReduceInstTillMaxFeature();
+        reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost);
+        reduceInstTillMaxF = new ReduceTillMaxFeature(AbstractFeatureStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
     }
 
     @Override
     protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        // TODO: enable
+        enableInstantiate();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
         Feature totalCost =
             add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
                 reduceInstTillMaxF,
                 AgeFeature.INSTANCE, ifMatchedF);
+        disableInstantiate();
         return totalCost.computeCost(app, pio, goal, mState);
     }
 
@@ -116,21 +116,24 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return totalCost.computeCost(app, pos, goal, mState);
     }
 
-    private class ReduceCostTillMaxFeature implements Feature {
-        @Override
-        public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
-                PosInOccurrence pos, GOAL goal, MutableState mState) {
-            return reduceTillMax(app, NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
-                RuleAppCost::add, s -> s.computeCost(app, pos, goal, mState));
-        }
+    @FunctionalInterface
+    private interface StrategyCostFunction {
+        RuleAppCost compute(AbstractFeatureStrategy strategy, RuleApp app,
+                PosInOccurrence pos, Goal goal, MutableState mState);
     }
 
-    private class ReduceInstTillMaxFeature implements Feature {
+    private class ReduceTillMaxFeature implements Feature {
+        private final StrategyCostFunction mapper;
+
+        ReduceTillMaxFeature(StrategyCostFunction mapper) {
+            this.mapper = mapper;
+        }
+
         @Override
         public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
                 PosInOccurrence pos, GOAL goal, MutableState mState) {
             return reduceTillMax(app, NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
-                RuleAppCost::add, s -> s.instantiateApp(app, pos, (Goal) goal, mState));
+                RuleAppCost::add, s -> mapper.compute(s, app, pos, (Goal) goal, mState));
         }
     }
 }
