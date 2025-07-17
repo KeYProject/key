@@ -520,4 +520,12 @@ public abstract class StaticFeatureCollection {
         return TermPredicateTermFeature
                 .create(term -> term.op() instanceof Function && term.arity() == 0);
     }
+
+    protected static Feature print(Feature f) {
+        return new PrintFeature(f);
+    }
+
+    protected static Feature print(String msg, Feature f) {
+        return new PrintFeature(msg, f);
+    }
 }
