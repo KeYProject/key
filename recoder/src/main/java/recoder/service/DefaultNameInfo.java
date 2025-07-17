@@ -140,20 +140,20 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         searchMode = new int[prop.length()];
         for (int i = 0; i < searchMode.length; i++) {
             switch (prop.charAt(i)) {
-            case 's':
-            case 'S':
-                searchMode[i] = SEARCH_SOURCE;
-                break;
-            case 'c':
-            case 'C':
-                searchMode[i] = SEARCH_CLASS;
-                break;
-            case 'r':
-            case 'R':
-                searchMode[i] = SEARCH_REFLECT;
-                break;
-            default:
-                searchMode[i] = NO_SEARCH;
+                case 's':
+                case 'S':
+                    searchMode[i] = SEARCH_SOURCE;
+                    break;
+                case 'c':
+                case 'C':
+                    searchMode[i] = SEARCH_CLASS;
+                    break;
+                case 'r':
+                case 'R':
+                    searchMode[i] = SEARCH_REFLECT;
+                    break;
+                default:
+                    searchMode[i] = NO_SEARCH;
             }
         }
     }
@@ -580,26 +580,26 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         boolean result = false;
         for (int i = 0; !result && i < searchMode.length; i += 1) {
             switch (searchMode[i]) {
-            case SEARCH_SOURCE:
-                if (DEBUG) {
-                    Debug.log("Searching source code: " + classname);
-                }
-                result = loadClassFromSourceCode(classname);
-                break;
-            case SEARCH_CLASS:
-                if (DEBUG) {
-                    Debug.log("Searching class file: " + classname);
-                }
-                result = loadClassFromPrecompiledCode(classname);
-                break;
-            case SEARCH_REFLECT:
-                if (DEBUG) {
-                    Debug.log("Searching class: " + classname);
-                }
-                result = loadClassByReflection(classname);
-                break;
-            default:
-                break;
+                case SEARCH_SOURCE:
+                    if (DEBUG) {
+                        Debug.log("Searching source code: " + classname);
+                    }
+                    result = loadClassFromSourceCode(classname);
+                    break;
+                case SEARCH_CLASS:
+                    if (DEBUG) {
+                        Debug.log("Searching class file: " + classname);
+                    }
+                    result = loadClassFromPrecompiledCode(classname);
+                    break;
+                case SEARCH_REFLECT:
+                    if (DEBUG) {
+                        Debug.log("Searching class: " + classname);
+                    }
+                    result = loadClassByReflection(classname);
+                    break;
+                default:
+                    break;
             }
         }
         return result;

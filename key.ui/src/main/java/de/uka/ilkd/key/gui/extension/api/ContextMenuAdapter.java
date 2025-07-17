@@ -26,10 +26,10 @@ public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu 
             @NonNull ContextMenuKind kind,
             @NonNull Object underlyingObject) {
         return switch ((DefaultContextMenuKind) kind) {
-        case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
-        case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
-        case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
-        case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
+            case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
+            case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
+            case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
+            case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
         };
     }
 

@@ -114,10 +114,10 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         return switch (polarity) {
-        case 0 -> tb.equals(find, replace);
-        case 1 -> tb.imp(replace, find);
-        case -1 -> tb.imp(find, replace);
-        default -> throw new IllegalArgumentException();
+            case 0 -> tb.equals(find, replace);
+            case 1 -> tb.imp(replace, find);
+            case -1 -> tb.imp(find, replace);
+            default -> throw new IllegalArgumentException();
         };
     }
 

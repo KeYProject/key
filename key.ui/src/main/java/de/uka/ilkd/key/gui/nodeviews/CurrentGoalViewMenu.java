@@ -541,77 +541,81 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 PosInOccurrence occ = getPos().getPosInOccurrence();
 
                 switch (((JMenuItem) e.getSource()).getText()) {
-                case DISABLE_ABBREVIATION -> {
-                    if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled((JTerm) occ.subTerm(),
-                            false);
-                        getSequentView().printSequent();
+                    case DISABLE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            mediator.getNotationInfo().getAbbrevMap().setEnabled(
+                                (JTerm) occ.subTerm(),
+                                false);
+                            getSequentView().printSequent();
+                        }
                     }
-                }
-                case ENABLE_ABBREVIATION -> {
-                    if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled((JTerm) occ.subTerm(),
-                            true);
-                        getSequentView().printSequent();
+                    case ENABLE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            mediator.getNotationInfo().getAbbrevMap().setEnabled(
+                                (JTerm) occ.subTerm(),
+                                true);
+                            getSequentView().printSequent();
+                        }
                     }
-                }
-                case CREATE_ABBREVIATION -> {
-                    if (occ != null && occ.posInTerm() != null) {
-                        // trim string, otherwise window gets too large (bug #1430)
-                        final String oldTerm = occ.subTerm().toString();
-                        final String term =
-                            oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
-                        String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
-                            "Enter abbreviation for term: \n" + term, "New Abbreviation",
-                            JOptionPane.QUESTION_MESSAGE, null, null, "");
+                    case CREATE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            // trim string, otherwise window gets too large (bug #1430)
+                            final String oldTerm = occ.subTerm().toString();
+                            final String term =
+                                oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
+                            String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
+                                "Enter abbreviation for term: \n" + term, "New Abbreviation",
+                                JOptionPane.QUESTION_MESSAGE, null, null, "");
 
-                        try {
-                            if (abbreviation != null) {
-                                if (!validAbbreviation(abbreviation)) {
-                                    JOptionPane.showMessageDialog(new JFrame(),
-                                        "Only letters, numbers and '_' are allowed for Abbreviations",
-                                        "Sorry", JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    mediator.getNotationInfo().getAbbrevMap().put(
-                                        (JTerm) occ.subTerm(),
-                                        abbreviation, true);
-                                    getSequentView().printSequent();
+                            try {
+                                if (abbreviation != null) {
+                                    if (!validAbbreviation(abbreviation)) {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                            "Only letters, numbers and '_' are allowed for Abbreviations",
+                                            "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        mediator.getNotationInfo().getAbbrevMap().put(
+                                            (JTerm) occ.subTerm(),
+                                            abbreviation, true);
+                                        getSequentView().printSequent();
+                                    }
                                 }
+                            } catch (AbbrevException sce) {
+                                JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(),
+                                    "Sorry",
+                                    JOptionPane.INFORMATION_MESSAGE);
                             }
-                        } catch (AbbrevException sce) {
-                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
-                                JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
-                }
-                case CHANGE_ABBREVIATION -> {
-                    if (occ != null && occ.posInTerm() != null) {
-                        String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
-                            "Enter abbreviation for term: \n" + occ.subTerm().toString(),
-                            "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                            mediator.getNotationInfo().getAbbrevMap()
-                                    .getAbbrev((JTerm) occ.subTerm())
-                                    .substring(1));
-                        try {
-                            if (abbreviation != null) {
-                                if (!validAbbreviation(abbreviation)) {
-                                    JOptionPane.showMessageDialog(new JFrame(),
-                                        "Only letters, numbers and '_'"
-                                            + "are allowed for Abbreviations",
-                                        "Sorry", JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    mediator.getNotationInfo().getAbbrevMap()
-                                            .changeAbbrev((JTerm) occ.subTerm(), abbreviation);
-                                    getSequentView().printSequent();
+                    case CHANGE_ABBREVIATION -> {
+                        if (occ != null && occ.posInTerm() != null) {
+                            String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
+                                "Enter abbreviation for term: \n" + occ.subTerm().toString(),
+                                "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
+                                mediator.getNotationInfo().getAbbrevMap()
+                                        .getAbbrev((JTerm) occ.subTerm())
+                                        .substring(1));
+                            try {
+                                if (abbreviation != null) {
+                                    if (!validAbbreviation(abbreviation)) {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                            "Only letters, numbers and '_'"
+                                                + "are allowed for Abbreviations",
+                                            "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        mediator.getNotationInfo().getAbbrevMap()
+                                                .changeAbbrev((JTerm) occ.subTerm(), abbreviation);
+                                        getSequentView().printSequent();
+                                    }
                                 }
+                            } catch (AbbrevException sce) {
+                                JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(),
+                                    "Sorry",
+                                    JOptionPane.INFORMATION_MESSAGE);
                             }
-                        } catch (AbbrevException sce) {
-                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
-                                JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
-                }
-                default -> super.actionPerformed(e);
+                    default -> super.actionPerformed(e);
                 }
             }
         }

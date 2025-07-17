@@ -108,24 +108,24 @@ public class RootsGenerator implements TermGenerator<Goal> {
         if ((pow % 2 == 0)) {
             // the even case
             return switch (lit.signum()) {
-            case -1 -> // no solutions
-                tb.ff();
-            case 0 -> // exactly one solution
-                tb.equals(var, zero);
-            case 1 -> {
-                final BigInteger r = root(lit, pow);
-                if (power(r, pow).equals(lit)) {
-                    // two solutions
-                    final var rTerm = tb.zTerm(r.toString());
-                    final var rNegTerm = tb.zTerm(r.negate().toString());
-                    yield tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
-                        tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
-                } else {
-                    // no solution
-                    yield tb.ff();
+                case -1 -> // no solutions
+                    tb.ff();
+                case 0 -> // exactly one solution
+                    tb.equals(var, zero);
+                case 1 -> {
+                    final BigInteger r = root(lit, pow);
+                    if (power(r, pow).equals(lit)) {
+                        // two solutions
+                        final var rTerm = tb.zTerm(r.toString());
+                        final var rNegTerm = tb.zTerm(r.negate().toString());
+                        yield tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
+                            tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
+                    } else {
+                        // no solution
+                        yield tb.ff();
+                    }
                 }
-            }
-            default -> null;
+                default -> null;
             };
         } else {
             // the odd case
@@ -147,15 +147,15 @@ public class RootsGenerator implements TermGenerator<Goal> {
             // the even case
 
             return switch (lit.signum()) {
-            case -1, 0 -> // the inequation is no restriction
-                tb.ff();
-            case 1 -> {
-                final BigInteger r = rootRoundingUpwards(lit, pow);
-                final var rTerm = tb.zTerm(r.toString());
-                final var rNegTerm = tb.zTerm(r.negate().toString());
-                yield tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
-            }
-            default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
+                case -1, 0 -> // the inequation is no restriction
+                    tb.ff();
+                case 1 -> {
+                    final BigInteger r = rootRoundingUpwards(lit, pow);
+                    final var rTerm = tb.zTerm(r.toString());
+                    final var rNegTerm = tb.zTerm(r.negate().toString());
+                    yield tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
             };
         } else {
             // the odd case
@@ -169,16 +169,16 @@ public class RootsGenerator implements TermGenerator<Goal> {
             // the even case
 
             return switch (lit.signum()) {
-            case -1 -> // no solutions
-                tb.ff();
-            case 0 -> tb.equals(var, tb.zero());
-            case 1 -> {
-                final BigInteger r = root(lit, pow);
-                final var rTerm = tb.zTerm(r.toString());
-                final var rNegTerm = tb.zTerm(r.negate().toString());
-                yield tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
-            }
-            default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
+                case -1 -> // no solutions
+                    tb.ff();
+                case 0 -> tb.equals(var, tb.zero());
+                case 1 -> {
+                    final BigInteger r = root(lit, pow);
+                    final var rTerm = tb.zTerm(r.toString());
+                    final var rNegTerm = tb.zTerm(r.negate().toString());
+                    yield tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
             };
         } else {
             // the odd case

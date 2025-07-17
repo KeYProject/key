@@ -265,23 +265,23 @@ public class Java5Test {
 
             public void reportError(Exception e) throws RuntimeException {
                 switch (errNum++) {
-                case 0:
-                    assertInstanceOf(AmbiguousStaticFieldImportException.class, e);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                    assertInstanceOf(UnresolvedReferenceException.class, e);
-                    break;
-                default:
-                    System.err.println("failing:\n" + "    " + e.getMessage());
-                    fail("Too many errors");
+                    case 0:
+                        assertInstanceOf(AmbiguousStaticFieldImportException.class, e);
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                        assertInstanceOf(UnresolvedReferenceException.class, e);
+                        break;
+                    default:
+                        System.err.println("failing:\n" + "    " + e.getMessage());
+                        fail("Too many errors");
                 }
                 if (!silent) {
                     System.out.print("ok: ");

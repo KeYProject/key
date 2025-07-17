@@ -415,23 +415,23 @@ public class Recoder2KeYConverter {
      */
     private Literal getLiteralFor(ConstantEvaluator.EvaluationResult p_er) {
         return switch (p_er.getTypeCode()) {
-        case ConstantEvaluator.BOOLEAN_TYPE ->
-            BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
-        case ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
-        case ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
-        case ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
-        case ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
-        case ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
-        case ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
-        case ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
-        case ConstantEvaluator.STRING_TYPE -> {
-            if (p_er.getString() == null) {
-                yield NullLiteral.NULL;
+            case ConstantEvaluator.BOOLEAN_TYPE ->
+                BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
+            case ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
+            case ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
+            case ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
+            case ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
+            case ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
+            case ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
+            case ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
+            case ConstantEvaluator.STRING_TYPE -> {
+                if (p_er.getString() == null) {
+                    yield NullLiteral.NULL;
+                }
+                yield new StringLiteral("\"" + p_er.getString() + "\"");
             }
-            yield new StringLiteral("\"" + p_er.getString() + "\"");
-        }
-        default -> throw new ConvertException(
-            "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
+            default -> throw new ConvertException(
+                "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
         };
     }
 

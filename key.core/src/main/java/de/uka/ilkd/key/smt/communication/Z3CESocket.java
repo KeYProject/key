@@ -34,46 +34,46 @@ public class Z3CESocket extends AbstractSolverSocket {
         }
 
         switch (sc.getState()) {
-        case WAIT_FOR_RESULT -> {
-            if (msg.equals("unsat")) {
-                sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                pipe.sendMessage("(exit)");
-                sc.setState(WAIT_FOR_DETAILS);
-            }
-            if (msg.equals("sat")) {
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-                pipe.sendMessage("(get-model)");
-                pipe.sendMessage("(echo \"endmodel\")");
-                sc.setState(WAIT_FOR_MODEL);
-            }
-            if (msg.equals("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
-                sc.setState(WAIT_FOR_DETAILS);
-                pipe.sendMessage("(exit)");
-            }
-        }
-        case WAIT_FOR_DETAILS -> {
-        }
-        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-        // not work in future, it may be that we have to forcibly close the pipe.
-        case WAIT_FOR_QUERY -> {
-            if (!msg.equals("success")) {
-                getQuery().messageIncoming(pipe, msg);
-            }
-        }
-        case WAIT_FOR_MODEL -> {
-            if (msg.equals("endmodel")) {
-                if (getQuery() != null && getQuery().getState() == ModelExtractor.DEFAULT) {
-                    getQuery().getModel().setEmpty(false);
-                    getQuery().start(pipe);
-                    sc.setState(WAIT_FOR_QUERY);
-                } else {
-                    pipe.sendMessage("(exit)\n");
+            case WAIT_FOR_RESULT -> {
+                if (msg.equals("unsat")) {
+                    sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
+                    pipe.sendMessage("(exit)");
                     sc.setState(WAIT_FOR_DETAILS);
                 }
+                if (msg.equals("sat")) {
+                    sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
+                    pipe.sendMessage("(get-model)");
+                    pipe.sendMessage("(echo \"endmodel\")");
+                    sc.setState(WAIT_FOR_MODEL);
+                }
+                if (msg.equals("unknown")) {
+                    sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
+                    sc.setState(WAIT_FOR_DETAILS);
+                    pipe.sendMessage("(exit)");
+                }
             }
-        }
-        default -> throw new IllegalStateException("Unexpected value: " + sc.getState());
+            case WAIT_FOR_DETAILS -> {
+            }
+            // Currently we rely on the solver to terminate after receiving "(exit)". If this does
+            // not work in future, it may be that we have to forcibly close the pipe.
+            case WAIT_FOR_QUERY -> {
+                if (!msg.equals("success")) {
+                    getQuery().messageIncoming(pipe, msg);
+                }
+            }
+            case WAIT_FOR_MODEL -> {
+                if (msg.equals("endmodel")) {
+                    if (getQuery() != null && getQuery().getState() == ModelExtractor.DEFAULT) {
+                        getQuery().getModel().setEmpty(false);
+                        getQuery().start(pipe);
+                        sc.setState(WAIT_FOR_QUERY);
+                    } else {
+                        pipe.sendMessage("(exit)\n");
+                        sc.setState(WAIT_FOR_DETAILS);
+                    }
+                }
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + sc.getState());
         }
     }
 

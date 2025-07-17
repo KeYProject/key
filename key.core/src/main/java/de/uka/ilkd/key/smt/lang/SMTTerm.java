@@ -292,8 +292,8 @@ public abstract class SMTTerm {
 
     public SMTTerm unaryOp(SMTTermUnaryOp.Op op) {
         return switch (op) {
-        case NOT -> this.not();
-        default -> new SMTTermUnaryOp(op, this);
+            case NOT -> this.not();
+            default -> new SMTTermUnaryOp(op, this);
         };
     }
 
@@ -325,24 +325,24 @@ public abstract class SMTTerm {
 
     public SMTTerm multOp(SMTTermMultOp.Op op, SMTTerm t) {
         return switch (op) {
-        case AND -> this.and(t);
-        case OR -> this.or(t);
-        case IMPLIES -> this.implies(t);
-        case IFF -> this.iff(t);
-        case EQUALS -> this.equal(t);
-        case LT -> this.lt(t);
-        case LTE -> this.lte(t);
-        case DIV -> this.div(t);
-        case GT -> this.gt(t);
-        case GTE -> this.gte(t);
-        case MINUS -> this.minus(t);
-        case MUL -> this.mul(t);
-        case PLUS -> this.plus(t);
-        case REM -> this.rem(t);
-        default -> defaultMultOp(op, t);
-        // TODO implement bitvec cases if necessary
-        // throw new
-        // RuntimeException("Unexpected: binOp as arg for the method binOp(): "+op);
+            case AND -> this.and(t);
+            case OR -> this.or(t);
+            case IMPLIES -> this.implies(t);
+            case IFF -> this.iff(t);
+            case EQUALS -> this.equal(t);
+            case LT -> this.lt(t);
+            case LTE -> this.lte(t);
+            case DIV -> this.div(t);
+            case GT -> this.gt(t);
+            case GTE -> this.gte(t);
+            case MINUS -> this.minus(t);
+            case MUL -> this.mul(t);
+            case PLUS -> this.plus(t);
+            case REM -> this.rem(t);
+            default -> defaultMultOp(op, t);
+            // TODO implement bitvec cases if necessary
+            // throw new
+            // RuntimeException("Unexpected: binOp as arg for the method binOp(): "+op);
         };
 
     }
@@ -690,16 +690,16 @@ public abstract class SMTTerm {
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars) {
         return switch (quant) {
-        case FORALL -> this.forall(bindVars);
-        case EXISTS -> this.exists(bindVars);
+            case FORALL -> this.forall(bindVars);
+            case EXISTS -> this.exists(bindVars);
         };
     }
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars,
             List<List<SMTTerm>> pats) {
         return switch (quant) {
-        case FORALL -> this.forall(bindVars, pats);
-        case EXISTS -> this.exists(bindVars, pats);
+            case FORALL -> this.forall(bindVars, pats);
+            case EXISTS -> this.exists(bindVars, pats);
         };
     }
 

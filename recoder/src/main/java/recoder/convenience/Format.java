@@ -130,124 +130,125 @@ public class Format {
                     c = formatText.charAt(i);
                 }
                 switch (c) {
-                case 'n':
-                    if (e instanceof NamedModelElement) {
-                        res.append(((NamedModelElement) e).getName());
-                    } else if (e instanceof Identifier) {
-                        res.append(((Identifier) e).getText());
-                    } else if (e instanceof CompilationUnit) {
-                        res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
-                    }
-                    break;
-                case 'N':
-                    if (e instanceof NamedModelElement) {
-                        if (e instanceof ProgramModelElement) {
-                            res.append(((ProgramModelElement) e).getFullName());
+                    case 'n':
+                        if (e instanceof NamedModelElement) {
+                            res.append(((NamedModelElement) e).getName());
+                        } else if (e instanceof Identifier) {
+                            res.append(((Identifier) e).getText());
+                        } else if (e instanceof CompilationUnit) {
+                            res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
+                        }
+                        break;
+                    case 'N':
+                        if (e instanceof NamedModelElement) {
+                            if (e instanceof ProgramModelElement) {
+                                res.append(((ProgramModelElement) e).getFullName());
+                                if (e instanceof Method) {
+                                    res.append(toString("%N", ((Method) e).getSignature()));
+                                }
+                            } else if (e instanceof ReferencePrefix) {
+                                res.append(Naming.toPathName((ReferencePrefix) e));
+                            } else {
+                                res.append(((NamedModelElement) e).getName());
+                            }
+                        } else if (e instanceof Identifier) {
+                            res.append(((Identifier) e).getText());
+                        } else if (e instanceof CompilationUnit) {
+                            res.append(Naming.toCanonicalName((CompilationUnit) e));
+                        }
+                        break;
+                    case 'm':
+                        if (e instanceof NamedModelElement) {
+                            res.append(((NamedModelElement) e).getName());
                             if (e instanceof Method) {
                                 res.append(toString("%N", ((Method) e).getSignature()));
                             }
-                        } else if (e instanceof ReferencePrefix) {
-                            res.append(Naming.toPathName((ReferencePrefix) e));
+                        } else if (e instanceof Identifier) {
+                            res.append(((Identifier) e).getText());
+                        } else if (e instanceof CompilationUnit) {
+                            res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
+                        }
+                        break;
+                    case 's':
+                        if (e instanceof SourceElement) {
+                            res.append(((SourceElement) e).toSource().trim());
+                        }
+                        break;
+                    case 'c':
+                        if (e == null) {
+                            res.append("null");
                         } else {
-                            res.append(((NamedModelElement) e).getName());
+                            String name = e.getClass().getName();
+                            res.append(name.substring(name.lastIndexOf('.') + 1));
                         }
-                    } else if (e instanceof Identifier) {
-                        res.append(((Identifier) e).getText());
-                    } else if (e instanceof CompilationUnit) {
-                        res.append(Naming.toCanonicalName((CompilationUnit) e));
-                    }
-                    break;
-                case 'm':
-                    if (e instanceof NamedModelElement) {
-                        res.append(((NamedModelElement) e).getName());
-                        if (e instanceof Method) {
-                            res.append(toString("%N", ((Method) e).getSignature()));
-                        }
-                    } else if (e instanceof Identifier) {
-                        res.append(((Identifier) e).getText());
-                    } else if (e instanceof CompilationUnit) {
-                        res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
-                    }
-                    break;
-                case 's':
-                    if (e instanceof SourceElement) {
-                        res.append(((SourceElement) e).toSource().trim());
-                    }
-                    break;
-                case 'c':
-                    if (e == null) {
-                        res.append("null");
-                    } else {
-                        String name = e.getClass().getName();
-                        res.append(name.substring(name.lastIndexOf('.') + 1));
-                    }
-                    break;
-                case 'C':
-                    if (e == null) {
-                        res.append("null");
-                    } else {
-                        res.append(e.getClass().getName());
-                    }
-                    break;
-                case 'i':
-                    if (e != null) {
-                        int id = System.identityHashCode(e);
-                        if (id < 0) {
-                            res.append(Long.toString((long) (id & 0x7FFFFFFF) | 0x80000000L, 16));
+                        break;
+                    case 'C':
+                        if (e == null) {
+                            res.append("null");
                         } else {
-                            res.append(Integer.toString(id, 16));
+                            res.append(e.getClass().getName());
                         }
-                    }
-                    break;
-                case 'p':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
-                        se = se.getFirstElement();
-                        if (se != null) {
-                            append(se.getStartPosition(), columns, res);
+                        break;
+                    case 'i':
+                        if (e != null) {
+                            int id = System.identityHashCode(e);
+                            if (id < 0) {
+                                res.append(
+                                    Long.toString((long) (id & 0x7FFFFFFF) | 0x80000000L, 16));
+                            } else {
+                                res.append(Integer.toString(id, 16));
+                            }
                         }
-                    }
-                    break;
-                case 'P':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
-                        SourceElement se2 = se.getFirstElement();
-                        if (se2 != null) {
-                            append(se2.getStartPosition(), columns, res);
-                            res.append('-');
-                            se2 = se.getLastElement();
-                            append(se2.getEndPosition(), columns, res);
+                        break;
+                    case 'p':
+                        if (e instanceof SourceElement) {
+                            SourceElement se = (SourceElement) e;
+                            se = se.getFirstElement();
+                            if (se != null) {
+                                append(se.getStartPosition(), columns, res);
+                            }
                         }
-                    }
-                    break;
-                case 'r':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
-                        se = se.getFirstElement();
-                        if (se != null) {
-                            append(se.getRelativePosition(), columns, res);
+                        break;
+                    case 'P':
+                        if (e instanceof SourceElement) {
+                            SourceElement se = (SourceElement) e;
+                            SourceElement se2 = se.getFirstElement();
+                            if (se2 != null) {
+                                append(se2.getStartPosition(), columns, res);
+                                res.append('-');
+                                se2 = se.getLastElement();
+                                append(se2.getEndPosition(), columns, res);
+                            }
                         }
-                    }
-                    break;
-                case 'u':
-                    if (e instanceof ProgramElement) {
-                        CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
-                        if (cu != null) {
-                            res.append(Naming.toCanonicalName(cu));
+                        break;
+                    case 'r':
+                        if (e instanceof SourceElement) {
+                            SourceElement se = (SourceElement) e;
+                            se = se.getFirstElement();
+                            if (se != null) {
+                                append(se.getRelativePosition(), columns, res);
+                            }
                         }
-                    }
-                    break;
-                case 'f':
-                    if (e instanceof ProgramElement) {
-                        CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
-                        if (cu != null) {
-                            res.append(cu.getDataLocation());
+                        break;
+                    case 'u':
+                        if (e instanceof ProgramElement) {
+                            CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
+                            if (cu != null) {
+                                res.append(Naming.toCanonicalName(cu));
+                            }
                         }
-                    }
-                    break;
-                default:
-                    res.append('%').append(c);
-                    break;
+                        break;
+                    case 'f':
+                        if (e instanceof ProgramElement) {
+                            CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
+                            if (cu != null) {
+                                res.append(cu.getDataLocation());
+                            }
+                        }
+                        break;
+                    default:
+                        res.append('%').append(c);
+                        break;
                 }
             }
         }

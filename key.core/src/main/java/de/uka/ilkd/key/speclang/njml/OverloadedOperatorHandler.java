@@ -182,14 +182,14 @@ public class OverloadedOperatorHandler {
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
                 return switch (op) {
-                case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
-                case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
-                case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
-                case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
-                case LTE -> new SLExpression(tb.subset(l, r));
-                case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
-                case GTE -> new SLExpression(tb.subset(r, l));
-                default -> null;
+                    case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
+                    case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
+                    case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
+                    case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
+                    case LTE -> new SLExpression(tb.subset(l, r));
+                    case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
+                    case GTE -> new SLExpression(tb.subset(r, l));
+                    default -> null;
                 };
             }
             return null;
@@ -214,11 +214,11 @@ public class OverloadedOperatorHandler {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
                 return switch (op) {
-                case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
-                case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
-                case BITWISE_XOR -> new SLExpression(
-                    tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
-                default -> null;
+                    case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
+                    case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
+                    case BITWISE_XOR -> new SLExpression(
+                        tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
+                    default -> null;
                 };
             }
             return null;
