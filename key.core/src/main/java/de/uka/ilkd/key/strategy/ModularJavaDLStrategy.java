@@ -35,11 +35,10 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final Feature reduceCostTillMaxF;
     private final Feature reduceInstTillMaxF;
 
-    public ModularJavaDLStrategy(Proof proof, StrategyProperties properties) {
+    public ModularJavaDLStrategy(Proof proof, List<AbstractFeatureStrategy> componentStrategies,
+            StrategyProperties properties) {
         super(proof);
-        strategies.add(new IntegerStrategy(proof, properties));
-        strategies.add(new StringStrategy(proof, properties));
-        strategies.add(new JavaCardDLStrategy(proof, properties));
+        strategies.addAll(componentStrategies);
         reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost);
         reduceInstTillMaxF = new ReduceTillMaxFeature(AbstractFeatureStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
