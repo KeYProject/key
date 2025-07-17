@@ -134,6 +134,11 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         } while (btManager.backtrack());
     }
 
+    /**
+     * returns the service instance for access to {@link de.uka.ilkd.key.ldt.LDT}s
+     *
+     * @return the services for access to the meta logic
+     */
     protected final Services getServices() {
         return getProof().getServices();
     }
