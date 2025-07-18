@@ -22,7 +22,7 @@ dependencies {
 }
 
 // The target directory for JavaCC (parser generation)
-def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
+def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
@@ -52,7 +52,7 @@ compileJavacc {
     }
 }
 
-task generateSMTListings {
+tasks.register('generateSMTListings') {
     def pack = "de/uka/ilkd/key/smt/newsmt2"
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
@@ -77,7 +77,7 @@ task generateSMTListings {
     }
 }
 
-task generateSolverPropsList {
+tasks.register('generateSolverPropsList') {
     def pack = "de/uka/ilkd/key/smt/solvertypes"
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
@@ -114,14 +114,14 @@ tasks.withType(Test) {
 }
 
 
-task testProveRules(type: Test) {
+tasks.register('testProveRules', Test) {
     description = 'Proves KeY taclet rules tagged as lemma'
     group = "verification"
     filter { includeTestsMatching "ProveRulesTest" }
     //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
-task testRunAllFunProofs(type: Test) {
+tasks.register('testRunAllFunProofs', Test) {
     description = 'Prove/reload all keyfiles tagged for regression testing'
     group = "verification"
     filter {
@@ -129,7 +129,7 @@ task testRunAllFunProofs(type: Test) {
     }
 }
 
-task testRunAllInfProofs(type: Test) {
+tasks.register('testRunAllInfProofs', Test) {
     description = 'Prove/reload all keyfiles tagged for regression testing'
     group = "verification"
     filter {
@@ -138,7 +138,7 @@ task testRunAllInfProofs(type: Test) {
 }
 
 
-task testProveSMTLemmas(type: Test) {
+tasks.register('testProveSMTLemmas', Test) {
     description = 'Prove (or load proofs for) lemmas used in the SMT translation'
     group = "verification"
     filter {
@@ -148,7 +148,7 @@ task testProveSMTLemmas(type: Test) {
 
 // Run the tests for the new smt translation in strict mode
 // where "unknown" is less accepted
-task testStrictSMT(type: Test) {
+tasks.register('testStrictSMT', Test) {
     description = 'Run the tests for the new smt translation in strict mode'
     group = 'verification'
     systemProperty("key.newsmt2.stricttests", "true")
@@ -158,7 +158,7 @@ task testStrictSMT(type: Test) {
 }
 
 //Generation of the three version files within the resources by executing `git'.
-task generateVersionFiles() {
+tasks.register('generateVersionFiles') {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
     def sha1 = new File(outputFolder, "sha1")
     def branch = new File(outputFolder, "branch")
@@ -191,7 +191,7 @@ static def gitRevParse(String args) {
 processResources.dependsOn generateVersionFiles, generateSolverPropsList, generateSMTListings
 
 def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
-task runAntlr4Key(type: JavaExec) {
+tasks.register('runAntlr4Key', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
     outputs.dir antlr4OutputKey
@@ -208,7 +208,7 @@ task runAntlr4Key(type: JavaExec) {
 }
 compileJava.dependsOn runAntlr4Key
 
-task debugKeyLexer(type: JavaExec) {
+tasks.register('debugKeyLexer', JavaExec) {
     mainClass.set("de.uka.ilkd.key.nparser.DebugKeyLexer")
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -218,7 +218,7 @@ task debugKeyLexer(type: JavaExec) {
 processResources.dependsOn generateVersionFiles
 
 def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
-task runAntlr4Jml(type: JavaExec) {
+tasks.register('runAntlr4Jml', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.files "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"
     outputs.dir antlr4OutputJml
@@ -235,19 +235,22 @@ task runAntlr4Jml(type: JavaExec) {
 }
 compileJava.dependsOn runAntlr4Jml
 
-task debugJmlLexer(type: JavaExec) {
+tasks.register('debugJmlLexer', JavaExec) {
     mainClass.set("de.uka.ilkd.key.speclang.njml.DebugJmlLexer")
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
 
-task ptest(type: Test) { group = "verification" }
+tasks.register('ptest', Test) { group = "verification" }
 
-task generateRAPUnitTests(type: JavaExec) {
+def rapDir = layout.buildDirectory.dir("generated-src/rap/").getOrNull()
+
+tasks.register('generateRAPUnitTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests")
-    args("$buildDir/generated-src/rap/")
+    args(rapDir)
 }
-sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
+
+sourceSets.test.java.srcDirs(rapDir)
 
 sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc)
