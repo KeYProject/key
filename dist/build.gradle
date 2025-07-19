@@ -1,0 +1,33 @@
+plugins {
+    id 'application'
+    id 'java-library'
+    id 'com.gradleup.shadow' version "8.3.8"
+}
+
+def mainClasses = [
+        removegenerics: 'de.uka.ilkd.key.util.removegenerics.Main',
+        key           : "de.uka.ilkd.key.core.Main",
+        pm            : "org.key_project.proofmanagement.Main",
+        rifltrans     : "de.uka.ilkd.key.util.rifl.RIFLTransformer",
+]
+
+mainClasses.each { name, mainClass ->
+    def task = tasks.register("create${name.capitalize()}StartScripts", CreateStartScripts) {
+        mainClassName = mainClass
+        applicationName = name
+        outputDir = file("$buildDir/scripts")
+        classpath = sourceSets.main.runtimeClasspath
+    }
+    installDist.dependsOn(task)
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":key.ui"))
+    implementation(project(":key.core.rifl"))
+    implementation(project(":key.removegenerics"))
+    implementation(project(":keyext.proofmanagement"))
+}
