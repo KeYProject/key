@@ -49,6 +49,8 @@ group = "org.key-project"
 version = "2.12.4$build"
 
 subprojects {
+    if (it.name == 'dist') return
+
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
@@ -500,8 +502,11 @@ tasks.register('alldoc', Javadoc){
     description = "Generate a JavaDoc across sub projects"
     def projects = subprojects
     //key.ui javadoc is broken
-    source projects.collect { it.sourceSets.main.allJava }
-    classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
+    source projects.findAll { it.name != "dist" }.collect { it.sourceSets.main.allJava }
+    classpath = files(projects
+            .findAll { it.name != "dist" }
+            .collect { it.sourceSets.main.compileClasspath }
+    )
     destinationDir = layout.buildDirectory.dir("docs/javadoc").getOrNull().getAsFile()
 
     if (JavaVersion.current().isJava9Compatible()) {
