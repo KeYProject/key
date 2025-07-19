@@ -22,11 +22,11 @@ plugins {
 }
 
 sonar {
-  properties {
-    property "sonar.projectKey", "KeYProject_key"
-    property "sonar.organization", "keyproject"
-    property "sonar.host.url", "https://sonarcloud.io"
-  }
+    properties {
+        property "sonar.projectKey", "KeYProject_key"
+        property "sonar.organization", "keyproject"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 
@@ -49,6 +49,8 @@ group = "org.key-project"
 version = "2.12.4$build"
 
 subprojects {
+    if (it.name == 'dist') return
+
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
@@ -96,11 +98,11 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
         testImplementation(platform("org.junit:junit-bom:5.13.2"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-params")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
 
         // test fixtures
@@ -493,8 +495,11 @@ tasks.register('alldoc', Javadoc){
     description = "Generate a JavaDoc across sub projects"
     def projects = subprojects
     //key.ui javadoc is broken
-    source projects.collect { it.sourceSets.main.allJava }
-    classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
+    source projects.findAll { it.name != "dist" }.collect { it.sourceSets.main.allJava }
+    classpath = files(projects
+            .findAll { it.name != "dist" }
+            .collect { it.sourceSets.main.compileClasspath }
+    )
     destinationDir = layout.buildDirectory.dir("docs/javadoc").getOrNull().getAsFile()
 
     if (JavaVersion.current().isJava9Compatible()) {
