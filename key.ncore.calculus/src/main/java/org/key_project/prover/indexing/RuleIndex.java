@@ -13,6 +13,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public interface RuleIndex<Application extends RuleApp> extends Cloneable {
@@ -64,6 +65,12 @@ public interface RuleIndex<Application extends RuleApp> extends Cloneable {
      */
     Object clone();
 
+    /**
+     * retrieves all {@link RuleApp}s managed by this index
+     *
+     * @return all {@link RuleApp}s managed by this index
+     */
+    @NonNull
     Set<Application> allNoPosTacletApps();
 
     /**

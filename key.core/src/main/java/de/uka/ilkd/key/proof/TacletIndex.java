@@ -250,7 +250,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
     }
 
     @Override
-    public Set<NoPosTacletApp> allNoPosTacletApps() {
+    public @NonNull Set<NoPosTacletApp> allNoPosTacletApps() {
         Set<NoPosTacletApp> result = new LinkedHashSet<>();
         for (ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) {
             tacletApps.forEach(result::add);
