@@ -23,6 +23,8 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
  *
@@ -118,18 +120,19 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(final Optional<String> maybeMatchesRegEx,
-            final Optional<String> breakpointArg, final Goal goal, final ProverCore proverCore,
+            final Optional<String> breakpointArg, final Goal goal,
+            final ProverCore<@NonNull Proof, Goal> proverCore,
             final Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
                     maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
-        final RuleApplicationManager realManager = //
+        final RuleApplicationManager<Goal> realManager = //
             goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
-        final RuleApplicationManager focusManager = //
+        final RuleApplicationManager<Goal> focusManager = //
             new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 

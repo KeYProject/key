@@ -72,14 +72,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     /**
-     * determines whether or not the given element is part of a tree node of the given type.
+     * determines whether the given element is part of a tree node of the given type.
      * Especially, this is true if the program element is itself an object of the given class.
      *
      * @param pe the program element to be checked
      * @param c the class type of the expected parent
      * @return true iff any tree parent (including pe itself) is an instance of c
      */
-    static boolean isPartOf(ProgramElement pe, Class c) {
+    static boolean isPartOf(ProgramElement pe, Class<?> c) {
         while (pe != null && !c.isInstance(pe)) {
             pe = pe.getASTParent();
         }

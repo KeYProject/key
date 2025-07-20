@@ -29,6 +29,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
  * merge point is reached (i.e. a point where a {@link MergeRule} can be applied) or there is no
@@ -82,7 +84,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
@@ -176,7 +178,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
-        public FilterSymbexStrategy(Strategy delegate) {
+        public FilterSymbexStrategy(Strategy<@NonNull Goal> delegate) {
             super(delegate);
         }
 

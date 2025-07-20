@@ -80,7 +80,7 @@ public class UnitKit {
     }
 
     private static boolean isNecessaryMultiTypeImport(CrossReferenceSourceInfo xrsi, Import imp,
-            Set coveredTypes) {
+            Set<ClassType> coveredTypes) {
         if (!imp.isMultiImport()) {
             return false;
         }

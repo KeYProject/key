@@ -50,7 +50,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         Properties props = new Properties(); // defaults
         props.load(in);
         ProjectSettings ps = getProjectSettings();
-        Enumeration enum2 = props.propertyNames();
+        Enumeration<?> enum2 = props.propertyNames();
         while (enum2.hasMoreElements()) {
             String key = (String) enum2.nextElement();
             String oldValue = ps.getProperty(key);
@@ -74,7 +74,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
             List<String> v = new ArrayList<>();
             while (unitNames.hasMoreTokens()) {
                 String filename = unitNames.nextToken();
-                if (filename != null && filename.length() > 0) {
+                if (filename != null && !filename.isEmpty()) {
                     filename = filename.replace('/', File.separatorChar);
                     // filename = resolveFilename(parentDir, filename);
                     v.add(filename);
@@ -87,7 +87,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
     }
 
     private String resolveFilename(String parentDir, String relativePath) {
-        if (parentDir == null || parentDir.length() == 0 || new File(relativePath).isAbsolute()) {
+        if (parentDir == null || parentDir.isEmpty() || new File(relativePath).isAbsolute()) {
             return relativePath;
         }
         String result = parentDir + File.separatorChar + relativePath;

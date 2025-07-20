@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,6 +27,8 @@ import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -83,7 +86,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
         if (suspendOnTrue) {
             return super.conditionMet(ruleApp, node);
         } else {
-            ApplyStrategyInfo info = null;
+            ApplyStrategyInfo<@NonNull Proof, Goal> info = null;
             try {
                 final TermBuilder tb = getProof().getServices().getTermBuilder();
                 JTerm negatedCondition = tb.not(getCondition());

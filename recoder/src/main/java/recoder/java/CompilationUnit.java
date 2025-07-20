@@ -32,7 +32,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * Undefined scope tag.
      */
 
-    protected final static Map UNDEFINED_SCOPE = new HashMap(1);
+    protected final static Map<String, ClassType> UNDEFINED_SCOPE = new HashMap<>(1);
     /**
      *
      */

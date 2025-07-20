@@ -56,7 +56,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new RemovePostStrategy(proof);
     }

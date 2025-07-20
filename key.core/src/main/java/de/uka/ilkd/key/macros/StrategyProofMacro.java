@@ -21,6 +21,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The abstract class StrategyProofMacro can be used to define proof macros which use their own
  * strategy.
@@ -102,7 +104,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         // set a new strategy.
-        Strategy oldStrategy = proof.getActiveStrategy();
+        Strategy<@NonNull Goal> oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(proof, posInOcc));
 
         ProofMacroFinishedInfo info;

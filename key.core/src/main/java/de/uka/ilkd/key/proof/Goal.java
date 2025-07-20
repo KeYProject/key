@@ -46,6 +46,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -89,11 +90,11 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * the strategy object that determines automated application of rules
      */
-    private Strategy goalStrategy = null;
+    private @Nullable Strategy<@NonNull Goal> goalStrategy = null;
     /**
      * This is the object which keeps book about all applicable rules.
      */
-    private RuleApplicationManager<Goal> ruleAppManager;
+    private @Nullable RuleApplicationManager<Goal> ruleAppManager;
     /**
      * goal listeners
      */
@@ -105,7 +106,7 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * Marks this goal as linked (-> {@link MergeRule})
      */
-    private Goal linkedGoal = null;
+    private @Nullable Goal linkedGoal = null;
     /**
      * The namespaces local to this goal. This may evolve over time.
      */
@@ -116,7 +117,7 @@ public final class Goal implements ProofGoal<Goal> {
      */
     private Goal(Node node, RuleAppIndex ruleAppIndex,
             ImmutableList<RuleApp> appliedRuleApps,
-            FormulaTagManager tagManager, RuleApplicationManager<Goal> ruleAppManager,
+            @Nullable FormulaTagManager tagManager, RuleApplicationManager<Goal> ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex.copy(this);
@@ -164,14 +165,14 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * @return the strategy that determines automated rule applications for this goal
      */
-    public Strategy getGoalStrategy() {
+    public Strategy<@NonNull Goal> getGoalStrategy() {
         if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
         }
         return goalStrategy;
     }
 
-    public void setGoalStrategy(Strategy p_goalStrategy) {
+    public void setGoalStrategy(Strategy<@NonNull Goal> p_goalStrategy) {
         goalStrategy = p_goalStrategy;
         ruleAppManager.clearCache();
     }
@@ -181,7 +182,7 @@ public final class Goal implements ProofGoal<Goal> {
         return ruleAppManager;
     }
 
-    public void setRuleAppManager(RuleApplicationManager<Goal> manager) {
+    public void setRuleAppManager(@Nullable RuleApplicationManager<Goal> manager) {
         if (ruleAppManager != null) {
             ruleAppIndex.setNewRuleListener(null);
             ruleAppManager.setGoal(null);

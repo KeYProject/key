@@ -60,7 +60,7 @@ public class VariableKit {
         Debug.assertNonnull(si, context, guess);
         String result = guess;
         int i = 0;
-        Set vars = collectInnerVariables(context);
+        Set<String> vars = collectInnerVariables(context);
         while (si.getVariable(result, context) != null || vars.contains(result)) {
             result = guess + (i++);
         }
@@ -164,7 +164,7 @@ public class VariableKit {
     public static String getNewVariableName(SourceInfo si, Type type, ProgramElement context) {
         Debug.assertNonnull(si, type, context);
         NameGenerator generator = new NameGenerator(type);
-        Set vars = collectInnerVariables(context);
+        Set<String> vars = collectInnerVariables(context);
         String result;
         for (result = generator.getNextCandidate(); si.getVariable(result, context) != null
                 || vars.contains(result); result = generator.getNextCandidate()) {
