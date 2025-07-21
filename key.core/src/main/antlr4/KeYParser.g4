@@ -123,7 +123,7 @@ oneof_sorts
 
 keyjavatype
 :
-    type = simple_ident_dots (EMPTYBRACKETS)*
+    type = simple_ident_dots (LBRACKET RBRACKET)*
 ;
 
 prog_var_decls
@@ -304,7 +304,7 @@ transform_decls:
 ;
 
 arrayopid:
-        EMPTYBRACKETS LPAREN componentType=keyjavatype RPAREN
+        LBRACKET RBRACKET LPAREN componentType=keyjavatype RPAREN
 ;
 
 arg_sorts:
@@ -326,7 +326,7 @@ ruleset_decls
 
 sortId
 :
-    id=simple_ident_dots (EMPTYBRACKETS)*
+    id=simple_ident_dots (LBRACKET RBRACKET)*
 ;
 
 id_declaration
@@ -477,9 +477,18 @@ term
  */
 accessterm
 :
+	// Bad because it needs to tentative parse a list of keyword until "::" is found.
   // OLD
-  (sortId DOUBLECOLON)?
-  firstName=simple_ident
+  //(sortId DOUBLECOLON)?
+  //firstName=simple_ident
+
+
+	first=simple_ident
+	(
+	    DOUBLECOLON sname=simple_ident
+	  | (DOT id+=simple_ident)+ (LBRACKET RBRACKET)* DOUBLECOLON sname=simple_ident
+	)?
+
 
   /*Faster version
   simple_ident_dots

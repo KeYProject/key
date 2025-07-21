@@ -310,10 +310,6 @@ RBRACKET
 :	']'
 	;
 
-EMPTYBRACKETS
-:	'[' ']'
-	;
-
 AT
 :	'@'
 	;
