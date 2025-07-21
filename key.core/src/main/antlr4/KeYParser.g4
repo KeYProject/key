@@ -363,8 +363,8 @@ literals:
 ;
 
 emptyset: UTF_EMPTY;
-term: parallel_term; // weigl: should normally be equivalence_term
-//labeled_term: a=parallel_term (LGUILLEMETS labels=label RGUILLEMETS)?;
+term: equivalence_term | update_inside_term;
+update_inside_term: UPDATE_TERM LPAREN parallel_term RPAREN;
 parallel_term: a=elementary_update_term (PARALLEL b=elementary_update_term)*;
 elementary_update_term: a=equivalence_term (ASSIGN b=equivalence_term)?;
 equivalence_term: a=implication_term (EQV b+=implication_term)*;

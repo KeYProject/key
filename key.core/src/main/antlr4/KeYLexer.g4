@@ -79,6 +79,8 @@ EXTENDS : '\\extends';
 ONEOF : '\\oneof';
 ABSTRACT : '\\abstract';
 
+UPDATE_TERM: '\\updateTerm';
+
 // Keywords used in schema variable declarations
 SCHEMAVARIABLES : '\\schemaVariables';
 SCHEMAVAR : '\\schemaVar';
