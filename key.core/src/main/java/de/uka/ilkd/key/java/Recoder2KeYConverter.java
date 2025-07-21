@@ -629,6 +629,11 @@ public class Recoder2KeYConverter {
     public NewArray convert(recoder.java.expression.operator.NewArray newArr) {
         // first we need to collect all children
         ExtList children = collectChildren(newArr);
+
+        // annotations are collected separatly as they are not tracked
+        var annots = newArr.getAnnotations();
+        for (int i = annots.size() - 1; i >= 0; i--) children.add(convert(annots.get(i)));
+
         // now we have to extract the array initializer
         // is stored separately and must not appear in the children list
         ArrayInitializer arrInit = children.get(ArrayInitializer.class);
@@ -1750,6 +1755,18 @@ public class Recoder2KeYConverter {
             }
         }
 
+        // annotations are collected separatly as they are not tracked
+        var annots = n.getAnnotations();
+        ImmutableArray<AnnotationUseSpecification> immutableAnnots = null;
+        if (annots != null) {
+            var annotArr = new AnnotationUseSpecification[annots.size()];
+            assert annots.size() >= 1;
+            for (int i = annots.size() - 1; i >= 0; i--) {
+                annotArr[i] = convert(annots.get(i));
+            }
+            immutableAnnots = new ImmutableArray<>(annotArr);
+        }
+
         TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
         if (n.getClassDeclaration() != null) {
             callConvert(n.getClassDeclaration());
@@ -1758,9 +1775,9 @@ public class Recoder2KeYConverter {
         }
 
         if (rp == null) {
-            return new New(arguments, maybeAnonClass, null);
+            return new New(arguments, maybeAnonClass, null, immutableAnnots);
         } else {
-            return new New(arguments, maybeAnonClass, (ReferencePrefix) callConvert(rp));
+            return new New(arguments, maybeAnonClass, (ReferencePrefix) callConvert(rp), immutableAnnots);
         }
     }
 

@@ -159,6 +159,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         if (arrayInitializer != null) {
             result++;
         }
+        if (annotations != null) {
+            result += annotations.size();
+        }
         return result;
     }
 
@@ -188,6 +191,13 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         if (arrayInitializer != null) {
             if (index == 0) {
                 return arrayInitializer;
+            }
+            index--;
+        }
+        if (annotations != null) {
+            len = annotations.size();
+            if (len > index) {
+                return annotations.get(index);
             }
         }
         throw new ArrayIndexOutOfBoundsException();

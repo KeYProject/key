@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.expression.operator.TypeOperator;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -37,7 +38,13 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
 
         var inst = svInst.getInstantiation(variable);
 
-        if (!(inst instanceof Term)) return false;
+        if (inst instanceof TypeOperator) {
+            var out = ((TypeOperator)inst)
+                .getAnnotations()
+                .stream()
+                .anyMatch(a -> a.getTypeReferenceAt(0).getName().equals(annot));
+            return out;
+        } else if (!(inst instanceof Term)) return false;
         var op = ((Term) inst).op();
 
         if (op.arity() != 0) return false;

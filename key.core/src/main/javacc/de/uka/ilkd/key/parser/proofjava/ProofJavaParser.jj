@@ -3581,10 +3581,15 @@ TypeOperator AllocationExpression() :
     ClassDeclaration cd = null;
     NewArray na;
     ASTList<TypeArgumentDeclaration> typeArgs;
+    ASTList<AnnotationUseSpecification> annotations = new ASTArrayList<AnnotationUseSpecification>();
+    AnnotationUseSpecification annot;
 }
 {
     "new"
-    (AnnotationUse())*
+    (annot = AnnotationUse() { 
+	annot.makeParentRoleValid();
+	annotations.add(annot); 
+     })*
 (
   LOOKAHEAD(2)
     tr = PrimitiveType()
@@ -3631,6 +3636,8 @@ TypeOperator AllocationExpression() :
   )
 )
   {
+    result.setAnnotations(annotations);
+    result.makeParentRoleValid();
     checkConstruction(result);
     setPostfixInfo(result);
     return result;

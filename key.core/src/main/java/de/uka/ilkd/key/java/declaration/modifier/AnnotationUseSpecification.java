@@ -20,7 +20,7 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
     }
 
     protected String getSymbol() {
-        return "@" + tr.toString();
+        return "@" + tr.getName();
     }
 
     public TypeReference getTypeReferenceAt(int index) {
