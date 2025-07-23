@@ -151,6 +151,6 @@ public class ModularJavaDLStrategyFactory implements StrategyFactory {
             componentSettings.toArray(new AbstractStrategyPropertyDefinition[0]);
 
         // Model
-        return new StrategySettingsDefinition("Global Options", properties);
+        return new StrategySettingsDefinition("JavaDL Options", properties);
     }
 }
