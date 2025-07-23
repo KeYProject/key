@@ -10,7 +10,14 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 
+import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AnnotationUseSpecification extends Modifier implements TypeReferenceContainer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationUseSpecification.class);
 
     protected final TypeReference tr;
 
@@ -50,4 +57,15 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
         return 1;
     }
 
+    @Override
+    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+        final ProgramElement pe = source.getSource();
+        matchCond = super.match(source, matchCond);
+
+        if (matchCond != null && !tr.getName().equals(((AnnotationUseSpecification)pe).tr.getName())) {
+            return null;
+        }
+
+        return matchCond;
+    }
 }

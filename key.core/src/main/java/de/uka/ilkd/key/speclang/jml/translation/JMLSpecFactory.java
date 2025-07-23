@@ -62,11 +62,15 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.REQUIRES;
 import static java.lang.String.format;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A factory for creating class invariants and operation contracts from textual JML specifications.
  * This is the public interface to the jml.translation package.
  */
 public class JMLSpecFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JMLSpecFactory.class);
 
     public static final String AT_PRE = "AtPre";
     protected final TermBuilder tb;
@@ -965,6 +969,14 @@ public class JMLSpecFactory {
             ProgramVariableCollection progVars, ContractClauses clauses,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> axioms) {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
+
+        var right = pm.getName().equals("client");
+        if (right) {
+            LOGGER.info("we arrived! {}", pm.getName());
+            LOGGER.info("{}", pm);
+            LOGGER.info("{}", progVars);
+            LOGGER.info("{}", clauses);
+        }
 
         Term abbrvLhs = null;
         if (!clauses.abbreviations.isEmpty()) {

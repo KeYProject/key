@@ -39,6 +39,9 @@ import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * <p>
  * The proof obligation for operation contracts.
@@ -62,6 +65,7 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </p>
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FunctionalOperationContractPO.class);
     public static final Map<Boolean, @NonNull String> TRANSACTION_TAGS =
         new LinkedHashMap<>();
 
