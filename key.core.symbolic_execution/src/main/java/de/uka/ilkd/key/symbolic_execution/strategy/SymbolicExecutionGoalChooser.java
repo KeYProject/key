@@ -60,7 +60,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     /**
      * The optional custom stop condition used in the current proof.
      */
-    private StopCondition stopCondition;
+    private StopCondition<Goal> stopCondition;
 
     /**
      * {@inheritDoc}

@@ -680,7 +680,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Stack holding all variable references that have already been followed. This is used to detect
      * cycles
      */
-    private final Stack visitedVariableReferences = new Stack();
+    private final Stack<Expression> visitedVariableReferences = new Stack<>();
 
     /**
      * Create a new constant evaluator.

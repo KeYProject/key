@@ -395,14 +395,14 @@ public class TaskTree extends JPanel {
 
     class TaskTreeSelectionListener implements KeYSelectionListener {
         /** focused node has changed */
-        public void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             // empty
         }
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
-        public void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             if (e.getSource().getSelectedProof() == null) {
                 return;
             }

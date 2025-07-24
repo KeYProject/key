@@ -122,7 +122,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
         return null;
     }
 
-    final boolean containsModifier(Class type) {
+    final boolean containsModifier(Class<?> type) {
         int s = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
         for (int i = 0; i < s; i += 1) {
             if (type.isInstance(declarationSpecifiers.get(i))) {

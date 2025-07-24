@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -13,6 +14,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.jspecify.annotations.NonNull;
 
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
@@ -63,7 +66,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     private void updateStrategySettings(StrategyProperties p) {
         final Proof proof = state.getProof();
-        final Strategy strategy = getStrategy(p);
+        final Strategy<@NonNull Goal> strategy = getStrategy(p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
@@ -74,7 +77,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         proof.setActiveStrategy(strategy);
     }
 
-    private Strategy getStrategy(StrategyProperties properties) {
+    private Strategy<@NonNull Goal> getStrategy(StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
 
         //

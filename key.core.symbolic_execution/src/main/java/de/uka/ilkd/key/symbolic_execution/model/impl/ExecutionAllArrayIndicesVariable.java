@@ -9,7 +9,9 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -25,6 +27,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * An implementation of {@link IExecutionVariable} used to query all array indices at the same time.
@@ -133,9 +137,11 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(
                 getProofNode(), getModalityPIO(), siteProofCondition, resultTerm, false);
             // Perform side proof
-            ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
-                sideProofEnv, sequent, StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_DELAYED);
+            ApplyStrategyInfo<@NonNull Proof, Goal> info =
+                SymbolicExecutionSideProofUtil.startSideProof(getProof(),
+                    sideProofEnv, sequent, StrategyProperties.METHOD_NONE,
+                    StrategyProperties.LOOP_NONE,
+                    StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_DELAYED);
             try {
                 return instantiateValuesFromSideProof(initConfig, sideServices, tb, info,
                     resultPredicate, arrayTerm, // Pass array to ensure that unknown values are

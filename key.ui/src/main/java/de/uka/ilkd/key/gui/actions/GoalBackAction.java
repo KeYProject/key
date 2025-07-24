@@ -65,7 +65,7 @@ public final class GoalBackAction extends MainWindowAction {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
 
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
                 if (proof == null) {
                     // no proof loaded
@@ -79,8 +79,8 @@ public final class GoalBackAction extends MainWindowAction {
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                selectedNodeChanged(null);
             }
         };
 
@@ -103,7 +103,7 @@ public final class GoalBackAction extends MainWindowAction {
                 selListener.selectedNodeChanged(null);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
     }
 
     /**

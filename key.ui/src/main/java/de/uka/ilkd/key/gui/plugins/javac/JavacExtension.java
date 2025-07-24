@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.slf4j.Logger;
@@ -218,12 +219,12 @@ public class JavacExtension
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         /* ignored */
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         loadProof(e.getSource().getSelectedProof());
     }
 }

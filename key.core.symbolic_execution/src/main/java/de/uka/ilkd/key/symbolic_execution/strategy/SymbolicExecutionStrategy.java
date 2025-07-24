@@ -286,7 +286,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Strategy create(Proof proof, StrategyProperties sp) {
+        public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties sp) {
             return new SymbolicExecutionStrategy(proof, sp);
         }
 

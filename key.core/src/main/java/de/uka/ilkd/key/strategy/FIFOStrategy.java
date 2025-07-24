@@ -64,7 +64,7 @@ public class FIFOStrategy implements Strategy<Goal> {
         return NAME;
     }
 
-    public static final Strategy INSTANCE = new FIFOStrategy();
+    public static final Strategy<Goal> INSTANCE = new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
         @Override
@@ -73,7 +73,7 @@ public class FIFOStrategy implements Strategy<Goal> {
         }
 
         @Override
-        public Strategy create(Proof proof, StrategyProperties properties) {
+        public Strategy<Goal> create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }
 

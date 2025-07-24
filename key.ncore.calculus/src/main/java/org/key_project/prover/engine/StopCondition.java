@@ -67,7 +67,6 @@ public interface StopCondition<G extends @Nullable ProofGoal<G>> {
     /// computed via [#currentTimeMillis()]
     /// @param countApplied The number of already applied rules.
     /// @return description of the reason why automatic proof search has stopped
-    @NonNull
     String getGoalNotAllowedMessage(G goal, int maxApplications, long timeout,
             long startTime, int countApplied);
 
