@@ -5,3 +5,13 @@ dependencies {
     implementation project(':key.ui')
     implementation("de.unruh:scala-isabelle_2.13:0.4.3")
 }
+
+/*
+    scala-isabelle uses slf4j-simple. As KeY is currently using logback, this would result in two slf4j providers.
+    The code below excludes this module, thereby causing a fallback to logback.
+
+    ! If KeY switches to slf4j-simple, this code needs to be removed !
+ */
+configurations.configureEach {
+    exclude group: 'org.slf4j', module: 'slf4j-simple'
+}
