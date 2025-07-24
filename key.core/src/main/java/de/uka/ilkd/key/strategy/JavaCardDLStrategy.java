@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -74,7 +73,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
     protected JavaCardDLStrategy(Proof proof, StrategyProperties strategyProperties) {
-
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();
 
@@ -91,7 +89,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
         approvalF = add(setupApprovalF(), approvalDispatcher);
-
     }
 
     protected final RuleSetDispatchFeature getCostComputationDispatcher() {
@@ -109,7 +106,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     protected Feature setupGlobalF(Feature dispatcher) {
-
         final Feature methodSpecF;
         final String methProp =
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
@@ -298,9 +294,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupReplaceKnown(d);
 
-        bindRuleSet(d, "confluence_restricted",
-            ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE));
-
         setupApplyEq(d, numbers);
 
         bindRuleSet(d, "insert_eq_nonrigid",
@@ -338,23 +331,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "try_apply_subst",
             add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
 
-        final TermBuffer superFor = new TermBuffer();
-        bindRuleSet(d, "split_if",
-            add(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                applyTF(superFor, not(ff.program))), longConst(50)));
-
-        final String[] exceptionsWithPenalty = { "java.lang.NullPointerException",
-            "java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayStoreException",
-            "java.lang.ClassCastException" };
-
-        bindRuleSet(d, "simplify_prog",
-            ifZero(ThrownExceptionFeature.create(exceptionsWithPenalty, getServices()),
-                longConst(500),
-                ifZero(isBelow(add(ff.forF, not(ff.atom))), longConst(200), longConst(-100))));
-
-        bindRuleSet(d, "simplify_prog_subset", longConst(-4000));
-        bindRuleSet(d, "modal_tautology", longConst(-10000));
-
         // features influenced by the strategy options
 
         boolean useLoopExpand = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
@@ -369,7 +345,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
          * boolean useBlockExpand = strategyProperties.getProperty(
          * StrategyProperties.BLOCK_OPTIONS_KEY). equals(StrategyProperties.BLOCK_EXPAND);
          */
-        boolean programsToRight = true; // XXX
 
         final String methProp =
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
@@ -442,21 +417,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "limitObserver",
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-200)));
 
-        if (programsToRight) {
-            bindRuleSet(d, "boxDiamondConv",
-                SumFeature.createSum(
-                    new FindPrefixRestrictionFeature(
-                        FindPrefixRestrictionFeature.PositionModifier.ALLOW_UPDATE_AS_PARENT,
-                        FindPrefixRestrictionFeature.PrefixChecker.ANTEC_POLARITY),
-                    longConst(-1000)));
-        } else {
-            bindRuleSet(d, "boxDiamondConv", inftyConst());
-        }
-
         bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
 
         setupUserTaclets(d);
-
 
         setupSystemInvariantSimp(d);
 
