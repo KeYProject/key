@@ -106,20 +106,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     protected Feature setupGlobalF(Feature dispatcher) {
-        final Feature methodSpecF;
-        final String methProp =
-            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
-        switch (methProp) {
-            case StrategyProperties.METHOD_CONTRACT ->
-                methodSpecF = methodSpecFeature(longConst(-20));
-            case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
-                methodSpecFeature(inftyConst());
-            default -> {
-                methodSpecF = null;
-                assert false;
-            }
-        }
-
         final String queryProp =
             strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
@@ -147,65 +133,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
 
-        // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
-        // as taclets. The strategy settings for those are handled further
-        // down in this class.
-        Feature loopInvF;
-        final String loopProp = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
-        if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
-            loopInvF = loopInvFeature(longConst(0));
-            /*
-             * NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule since we now have the
-             * loop scope taclets which are based on the same theory, but offer several advantages.
-             */
-            // } else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
-            // loopInvF = loopInvFeature(inftyConst(), longConst(0));
-        } else {
-            loopInvF = loopInvFeature(inftyConst());
-        }
-
-        final Feature blockFeature;
-        final Feature loopBlockFeature;
-        final Feature loopBlockApplyHeadFeature;
-        final String blockProperty =
-            strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
-        if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
-            blockFeature = blockContractInternalFeature(longConst(Long.MIN_VALUE));
-            loopBlockFeature = loopContractInternalFeature(longConst(Long.MIN_VALUE));
-            loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
-        } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
-            blockFeature = blockContractExternalFeature(longConst(Long.MIN_VALUE));
-            loopBlockFeature =
-                SumFeature.createSum(loopContractExternalFeature(longConst(Long.MIN_VALUE)),
-                    loopContractInternalFeature(longConst(42)));
-            loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
-        } else {
-            blockFeature = blockContractInternalFeature(inftyConst());
-            loopBlockFeature = loopContractExternalFeature(inftyConst());
-            loopBlockApplyHeadFeature = loopContractApplyHead(inftyConst());
-        }
-
         final Feature oneStepSimplificationF =
             oneStepSimplificationFeature(longConst(-11000));
-
-        final Feature mergeRuleF;
-        final String mpsProperty =
-            strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
-        if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
-            mergeRuleF = mergeRuleFeature(longConst(-4000));
-        } else {
-            mergeRuleF = mergeRuleFeature(inftyConst());
-        }
 
         // final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum(
             // splitF,
             // strengthenConstraints,
-            oneStepSimplificationF, mergeRuleF,
+            oneStepSimplificationF,
             // smtF,
-            methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
-            loopBlockApplyHeadFeature, dispatcher);
+            queryF, depSpecF, dispatcher);
     }
 
     private Feature oneStepSimplificationFeature(Feature cost) {
@@ -257,9 +195,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // always give infinite cost to obsolete rules
         bindRuleSet(d, "obsolete", inftyConst());
-
-        // taclets for special invariant handling
-        bindRuleSet(d, "loopInvariant", -20000);
 
         setupSelectSimplification(d);
 
@@ -333,53 +268,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
 
         // features influenced by the strategy options
-
-        boolean useLoopExpand = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
-                .equals(StrategyProperties.LOOP_EXPAND);
-        boolean useLoopInvTaclets =
-            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
-                    .equals(StrategyProperties.LOOP_SCOPE_INV_TACLET);
-        boolean useLoopScopeExpand =
-            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
-                    .equals(StrategyProperties.LOOP_SCOPE_EXPAND);
         /*
          * boolean useBlockExpand = strategyProperties.getProperty(
          * StrategyProperties.BLOCK_OPTIONS_KEY). equals(StrategyProperties.BLOCK_EXPAND);
          */
-
-        final String methProp =
-            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
-
-        switch (methProp) {
-            case StrategyProperties.METHOD_CONTRACT ->
-                /*
-                 * If method treatment by contracts is chosen, this does not mean that method
-                 * expansion
-                 * is disabled. The original cost was 200 and is now increased to 2000 in order to
-                 * repress method expansion stronger when method treatment by contracts is chosen.
-                 */
-                bindRuleSet(d, "method_expand", longConst(2000));
-            case StrategyProperties.METHOD_EXPAND ->
-                bindRuleSet(d, "method_expand", longConst(100));
-            case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
-            default -> throw new RuntimeException("Unexpected strategy property " + methProp);
-        }
-
-        final String mpsProp = strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
-
-        switch (mpsProp) {
-            case StrategyProperties.MPS_MERGE ->
-                /*
-                 * For this case, we use a special feature, since deleting merge points should only
-                 * be
-                 * done after a merge rule application.
-                 */
-                bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
-            case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
-            case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
-            default -> throw new RuntimeException("Unexpected strategy property " + methProp);
-        }
-
 
         final String queryAxProp =
             strategyProperties.getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
@@ -395,10 +287,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
-
-        bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0) : inftyConst());
-        bindRuleSet(d, "loop_scope_inv_taclet", useLoopInvTaclets ? longConst(0) : inftyConst());
-        bindRuleSet(d, "loop_scope_expand", useLoopScopeExpand ? longConst(1000) : inftyConst());
 
         /*
          * bindRuleSet ( d, "block_expand", useBlockExpand ? longConst ( 0 ) : inftyConst () );
@@ -1004,7 +892,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
 
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
