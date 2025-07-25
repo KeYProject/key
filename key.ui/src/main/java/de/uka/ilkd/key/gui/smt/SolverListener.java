@@ -382,18 +382,18 @@ public class SolverListener implements SolverLauncherListener {
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         return switch (state) {
-        case Running -> {
-            running(problem);
-            yield true;
-        }
-        case Stopped -> {
-            stopped(problem);
-            yield false;
-        }
-        case Waiting -> {
-            waiting(problem);
-            yield true;
-        }
+            case Running -> {
+                running(problem);
+                yield true;
+            }
+            case Stopped -> {
+                stopped(problem);
+                yield false;
+            }
+            case Waiting -> {
+                waiting(problem);
+                yield true;
+            }
         };
 
     }
@@ -459,17 +459,18 @@ public class SolverListener implements SolverLauncherListener {
         int x = problem.getSolverIndex();
         int y = problem.getProblemIndex();
         switch (reason) {
-        case Exception -> {
-            progressModel.setProgress(0, x, y);
-            progressModel.setTextColor(RED.get(), x, y);
-            progressModel.setText("Exception!", x, y);
-        }
-        case NoInterruption -> throw new RuntimeException("This position should not be reachable!");
-        case Timeout -> {
-            progressModel.setProgress(0, x, y);
-            progressModel.setText("Timeout.", x, y);
-        }
-        case User -> progressModel.setText("Interrupted by user.", x, y);
+            case Exception -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setTextColor(RED.get(), x, y);
+                progressModel.setText("Exception!", x, y);
+            }
+            case NoInterruption ->
+                throw new RuntimeException("This position should not be reachable!");
+            case Timeout -> {
+                progressModel.setProgress(0, x, y);
+                progressModel.setText("Timeout.", x, y);
+            }
+            case User -> progressModel.setText("Interrupted by user.", x, y);
         }
     }
 

@@ -212,27 +212,27 @@ public class PrettyPrinter implements Visitor {
         if (children != null) {
             layouter.beginC();
             switch (x.getArity()) {
-            case 2 -> {
-                children.get(0).visit(this);
-                layouter.print(" ");
-                layouter.print(symbol);
-                layouter.brk();
-                children.get(1).visit(this);
-            }
-            case 1 -> {
-                switch (x.getNotation()) {
-                case Operator.PREFIX -> {
-                    layouter.print(symbol);
+                case 2 -> {
                     children.get(0).visit(this);
-                }
-                case Operator.POSTFIX -> {
-                    children.get(0).visit(this);
+                    layouter.print(" ");
                     layouter.print(symbol);
+                    layouter.brk();
+                    children.get(1).visit(this);
                 }
-                default -> {
+                case 1 -> {
+                    switch (x.getNotation()) {
+                        case Operator.PREFIX -> {
+                            layouter.print(symbol);
+                            children.get(0).visit(this);
+                        }
+                        case Operator.POSTFIX -> {
+                            children.get(0).visit(this);
+                            layouter.print(symbol);
+                        }
+                        default -> {
+                        }
+                    }
                 }
-                }
-            }
             }
             layouter.end();
         }

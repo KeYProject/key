@@ -13,7 +13,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "7.0.4"
+    id "com.diffplug.spotless" version "7.1.0"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.55"

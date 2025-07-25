@@ -239,13 +239,13 @@ public class OracleGenerator {
             OracleTerm right = generateOracle(term.sub(1), initialSelect);
             String javaOp = ops.get(op);
             return switch (javaOp) {
-            case EQUALS -> eq(left, right);
-            case AND -> and(left, right);
-            case OR -> or(left, right);
-            default ->
-                // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
-                // usages
-                new OracleBinTerm(javaOp, left, right);
+                case EQUALS -> eq(left, right);
+                case AND -> and(left, right);
+                case OR -> or(left, right);
+                default ->
+                    // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
+                    // usages
+                    new OracleBinTerm(javaOp, left, right);
             };
 
         } // negation

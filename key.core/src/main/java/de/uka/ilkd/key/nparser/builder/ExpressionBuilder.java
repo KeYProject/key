@@ -350,12 +350,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             String opname = "";
             switch (ctx.op.get(i).getType()) {
-            case KeYLexer.UTF_INTERSECT -> opname = LocSetLDT.INTERSECT_STRING;
-            case KeYLexer.UTF_SETMINUS -> opname = LocSetLDT.SETMINUS_STRING;
-            case KeYLexer.UTF_UNION -> opname = LocSetLDT.UNION_STRING;
-            case KeYLexer.PLUS -> opname = IntegerLDT.ADD_STRING;
-            case KeYLexer.MINUS -> opname = IntegerLDT.SUB_STRING;
-            default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
+                case KeYLexer.UTF_INTERSECT -> opname = LocSetLDT.INTERSECT_STRING;
+                case KeYLexer.UTF_SETMINUS -> opname = LocSetLDT.SETMINUS_STRING;
+                case KeYLexer.UTF_UNION -> opname = LocSetLDT.UNION_STRING;
+                case KeYLexer.PLUS -> opname = IntegerLDT.ADD_STRING;
+                case KeYLexer.MINUS -> opname = IntegerLDT.SUB_STRING;
+                default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
             }
             JTerm cur = terms.get(i);
             last = binaryLDTSpecificTerm(ctx, opname, last, cur);
@@ -773,15 +773,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '\\' && i < chars.length - 1) {
                 switch (chars[++i]) {
-                case 'n' -> sb.append("\n");
-                case 'f' -> sb.append("\f");
-                case 'r' -> sb.append("\r");
-                case 't' -> sb.append("\t");
-                case 'b' -> sb.append("\b");
-                case ':' -> sb.append("\\:");
-                // this is so in KeY ...
-                default -> sb.append(chars[i]);
-                // this more relaxed than before, \a becomes a ...
+                    case 'n' -> sb.append("\n");
+                    case 'f' -> sb.append("\f");
+                    case 'r' -> sb.append("\r");
+                    case 't' -> sb.append("\t");
+                    case 'b' -> sb.append("\b");
+                    case ':' -> sb.append("\\:");
+                    // this is so in KeY ...
+                    default -> sb.append(chars[i]);
+                    // this more relaxed than before, \a becomes a ...
                 }
             } else {
                 sb.append(chars[i]);

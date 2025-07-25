@@ -248,9 +248,9 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private String getProgressMode(ProgressMode index) {
         return switch (index) {
-        case USER -> PROGRESS_MODE_USER;
-        case CLOSE -> PROGRESS_MODE_CLOSE;
-        case CLOSE_FIRST -> PROGRESS_MODE_CLOSE_FIRST;
+            case USER -> PROGRESS_MODE_USER;
+            case CLOSE -> PROGRESS_MODE_CLOSE;
+            case CLOSE_FIRST -> PROGRESS_MODE_CLOSE_FIRST;
         };
     }
 

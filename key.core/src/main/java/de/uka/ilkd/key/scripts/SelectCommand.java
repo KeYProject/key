@@ -107,23 +107,23 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
 
             switch (childCount) {
-            case 0 -> node = choices.pollLast();
-            case 1 -> node = node.child(0);
-            default -> {
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
+                case 0 -> node = choices.pollLast();
+                case 1 -> node = node.child(0);
+                default -> {
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
+                    assert next != null;
+                    node = next;
                 }
-                assert next != null;
-                node = next;
-            }
             }
         }
 

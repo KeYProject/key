@@ -42,17 +42,17 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
 
         final var op = t.op();
         switch (op) {
-        case Quantifier ignored -> {
-            return false;
-        }
-        case Modality ignored -> {
-            return true;
-        }
-        case IProgramMethod ignored when considerQueries -> {
-            return true;
-        }
-        default -> {
-        }
+            case Quantifier ignored -> {
+                return false;
+            }
+            case Modality ignored -> {
+                return true;
+            }
+            case IProgramMethod ignored when considerQueries -> {
+                return true;
+            }
+            default -> {
+            }
         }
 
         for (int i = 0; i != op.arity(); ++i) {

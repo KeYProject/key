@@ -2733,29 +2733,29 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<Statement> list = new ArrayList<>();
         if (s instanceof LoopStatement loop) {
             switch (getBooleanStatus(loop.getGuard())) {
-            case CONSTANT_TRUE:
-                if (loop.getBody() != null) {
-                    list.add(loop.getBody());
-                }
-                break;
-            case CONSTANT_FALSE:
-                if (loop.isCheckedBeforeIteration()) {
-                    // while, for
-                    addSequentialFollower(s, list);
-                } else {
-                    // do
+                case CONSTANT_TRUE:
+                    if (loop.getBody() != null) {
+                        list.add(loop.getBody());
+                    }
+                    break;
+                case CONSTANT_FALSE:
+                    if (loop.isCheckedBeforeIteration()) {
+                        // while, for
+                        addSequentialFollower(s, list);
+                    } else {
+                        // do
+                        if (loop.getBody() != null) {
+                            list.add(loop.getBody());
+                        }
+                        addSequentialFollower(s, list);
+                    }
+                    break;
+                case NOT_CONSTANT:
                     if (loop.getBody() != null) {
                         list.add(loop.getBody());
                     }
                     addSequentialFollower(s, list);
-                }
-                break;
-            case NOT_CONSTANT:
-                if (loop.getBody() != null) {
-                    list.add(loop.getBody());
-                }
-                addSequentialFollower(s, list);
-                break;
+                    break;
             }
         } else if (s instanceof LabeledStatement) {
             list.add(((LabeledStatement) s).getBody());
