@@ -13,11 +13,14 @@ import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.FindDepthFeature;
+import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
@@ -54,6 +57,12 @@ public class SymExStrategy extends AbstractFeatureStrategy {
         approvalF = NonDuplicateAppFeature.INSTANCE;
     }
 
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
+                || approvalDispatcher.get(rs) != null;
+    }
+
     private Feature setupGlobalF(Feature dispatcher) {
         final Feature methodSpecF;
         final String methProp =
@@ -68,19 +77,10 @@ public class SymExStrategy extends AbstractFeatureStrategy {
         }
         }
 
-        // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
-        // as taclets. The strategy settings for those are handled further
-        // down in this class.
         Feature loopInvF;
         final String loopProp = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
             loopInvF = loopInvFeature(longConst(0));
-            /*
-             * NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule since we now have the
-             * loop scope taclets which are based on the same theory, but offer several advantages.
-             */
-            // } else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
-            // loopInvF = loopInvFeature(inftyConst(), longConst(0));
         } else {
             loopInvF = loopInvFeature(inftyConst());
         }
@@ -135,8 +135,13 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "simplify_expression", -100);
 
-        // simplify
-        // concrete
+        bindRuleSet(d, "simplify_java", -4500);
+
+        final Feature findDepthFeature =
+            FindDepthFeature.getInstance();
+        bindRuleSet(d, "concrete",
+            add(longConst(-11000),
+                ScaleFeature.createScaled(findDepthFeature, 10.0)));
 
         // taclets for special invariant handling
         bindRuleSet(d, "loopInvariant", -20000);
