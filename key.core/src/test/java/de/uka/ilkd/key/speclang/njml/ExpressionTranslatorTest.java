@@ -50,7 +50,6 @@ public class ExpressionTranslatorTest {
         LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
         LocationVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
         JmlLexer lexer = JmlFacade.createLexer(expr);
-        lexer._mode = JmlLexer.expr;
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
