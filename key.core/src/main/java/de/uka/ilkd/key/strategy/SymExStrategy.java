@@ -5,10 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
-import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
@@ -19,6 +16,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
@@ -29,14 +28,97 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
     private final FormulaTermFeatures ff;
 
-    public SymExStrategy(Proof proof) {
+    private final StrategyProperties strategyProperties;
+
+    private final RuleSetDispatchFeature costComputationDispatcher;
+    private final Feature costComputationF;
+    private final RuleSetDispatchFeature approvalDispatcher;
+    private final Feature approvalF;
+    private final RuleSetDispatchFeature instantiationDispatcher;
+    private final Feature instantiationF;
+
+    public SymExStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
 
+        this.strategyProperties = strategyProperties;
         var tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         ff = new FormulaTermFeatures(tf);
+
+        costComputationDispatcher = setupCostComputationF();
+        // TODO: necessary?
+        approvalDispatcher = new RuleSetDispatchFeature();
+        instantiationDispatcher = new RuleSetDispatchFeature();
+
+        costComputationF = setupGlobalF(costComputationDispatcher);
+        instantiationF = setupGlobalF(instantiationDispatcher);
+        approvalF = NonDuplicateAppFeature.INSTANCE;
     }
 
-    private RuleSetDispatchFeature setUpCostComputationF() {
+    private Feature setupGlobalF(Feature dispatcher) {
+        final Feature methodSpecF;
+        final String methProp =
+            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
+        switch (methProp) {
+        case StrategyProperties.METHOD_CONTRACT -> methodSpecF = methodSpecFeature(longConst(-20));
+        case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
+            methodSpecFeature(inftyConst());
+        default -> {
+            methodSpecF = null;
+            assert false;
+        }
+        }
+
+        // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
+        // as taclets. The strategy settings for those are handled further
+        // down in this class.
+        Feature loopInvF;
+        final String loopProp = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
+        if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
+            loopInvF = loopInvFeature(longConst(0));
+            /*
+             * NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule since we now have the
+             * loop scope taclets which are based on the same theory, but offer several advantages.
+             */
+            // } else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
+            // loopInvF = loopInvFeature(inftyConst(), longConst(0));
+        } else {
+            loopInvF = loopInvFeature(inftyConst());
+        }
+
+        final Feature blockFeature;
+        final Feature loopBlockFeature;
+        final Feature loopBlockApplyHeadFeature;
+        final String blockProperty =
+            strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+        if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
+            blockFeature = blockContractInternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockFeature = loopContractInternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
+        } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
+            blockFeature = blockContractExternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockFeature =
+                SumFeature.createSum(loopContractExternalFeature(longConst(Long.MIN_VALUE)),
+                    loopContractInternalFeature(longConst(42)));
+            loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
+        } else {
+            blockFeature = blockContractInternalFeature(inftyConst());
+            loopBlockFeature = loopContractExternalFeature(inftyConst());
+            loopBlockApplyHeadFeature = loopContractApplyHead(inftyConst());
+        }
+
+        final Feature mergeRuleF;
+        final String mpsProperty =
+            strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+        if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
+            mergeRuleF = mergeRuleFeature(longConst(-4000));
+        } else {
+            mergeRuleF = mergeRuleFeature(inftyConst());
+        }
+        return SumFeature.createSum(mergeRuleF, methodSpecF, loopInvF, blockFeature,
+            loopBlockFeature, loopBlockApplyHeadFeature, dispatcher);
+    }
+
+    private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         boolean programsToRight = true; // XXX
 
@@ -55,8 +137,51 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
         // simplify
         // concrete
-        // method_expand
-        // merge_point
+
+        // taclets for special invariant handling
+        bindRuleSet(d, "loopInvariant", -20000);
+
+        boolean useLoopExpand = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
+                .equals(StrategyProperties.LOOP_EXPAND);
+        boolean useLoopInvTaclets =
+            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
+                    .equals(StrategyProperties.LOOP_SCOPE_INV_TACLET);
+        boolean useLoopScopeExpand =
+            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
+                    .equals(StrategyProperties.LOOP_SCOPE_EXPAND);
+
+        bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0) : inftyConst());
+        bindRuleSet(d, "loop_scope_inv_taclet", useLoopInvTaclets ? longConst(0) : inftyConst());
+        bindRuleSet(d, "loop_scope_expand", useLoopScopeExpand ? longConst(1000) : inftyConst());
+
+
+        final String methProp =
+            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
+        switch (methProp) {
+        case StrategyProperties.METHOD_CONTRACT ->
+            /*
+             * If method treatment by contracts is chosen, this does not mean that method expansion
+             * is disabled. The original cost was 200 and is now increased to 2000 in order to
+             * repress method expansion stronger when method treatment by contracts is chosen.
+             */
+            bindRuleSet(d, "method_expand", longConst(2000));
+        case StrategyProperties.METHOD_EXPAND -> bindRuleSet(d, "method_expand", longConst(100));
+        case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
+        default -> throw new RuntimeException("Unexpected strategy property " + methProp);
+        }
+
+        final String mpsProp = strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+        switch (mpsProp) {
+        case StrategyProperties.MPS_MERGE ->
+            /*
+             * For this case, we use a special feature, since deleting merge points should only be
+             * done after a merge rule application.
+             */
+            bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+        case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
+        case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
+        default -> throw new RuntimeException("Unexpected strategy property " + mpsProp);
+        }
 
         bindRuleSet(d, "modal_tautology", longConst(-10000));
 
@@ -85,7 +210,7 @@ public class SymExStrategy extends AbstractFeatureStrategy {
     @Override
     protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        return null;
+        return instantiationF.computeCost(app, pio, goal, mState);
     }
 
     @Override
@@ -95,7 +220,7 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return false;
+        return approvalF.computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE;
     }
 
     @Override
@@ -106,6 +231,6 @@ public class SymExStrategy extends AbstractFeatureStrategy {
     @Override
     public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, GOAL goal, MutableState mState) {
-        return null;
+        return costComputationF.computeCost(app, pos, goal, mState);
     }
 }
