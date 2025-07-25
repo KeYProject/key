@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -23,7 +24,8 @@ import org.junit.jupiter.api.Test;
  * Tests for the unsat core saving infrastructure.
  */
 class TestUnsatCore {
-    private static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final Path testCaseDirectory =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     @Test
     void testUnsatCore() throws ProblemLoaderException {
