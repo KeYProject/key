@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.indexing.FormulaTagManager;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleAbortException;
@@ -237,10 +238,9 @@ public final class Goal implements ProofGoal<Goal> {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    private void fireSequentChanged(
-            SequentChangeInfo sci) {
+    private void fireSequentChanged(SequentChangeInfo sci) {
         var time = System.nanoTime();
-        getFormulaTagManager().sequentChanged(this, sci);
+        getFormulaTagManager().sequentChanged(sci, getTime());
         var time1 = System.nanoTime();
         PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
         ruleAppIndex.sequentChanged(sci);
