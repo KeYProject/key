@@ -113,9 +113,19 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 } else {
                     return new KeyAst.ProofScript(pctx.proofScript());
                 }
+        /**
+         * Returns the raw settings within a {@link de.uka.ilkd.key.proof.io.KeYFile}.
+         */
+        public Configuration findSettings() {
+            final var cfg = new ConfigurationBuilder();
+            if (ctx.preferences() == null || ctx.preferences().cvalue() == null) {
+                return new Configuration();
             }
-            return null;
+
+            var c = ctx.preferences().cvalue();
+            return (Configuration) c.accept(cfg);
         }
+
 
         public Includes getIncludes(URL base) {
             IncludeFinder finder = new IncludeFinder(base);
