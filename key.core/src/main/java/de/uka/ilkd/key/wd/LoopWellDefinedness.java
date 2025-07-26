@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.speclang;
+package de.uka.ilkd.key.wd;
 
 import java.util.function.UnaryOperator;
 
@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
