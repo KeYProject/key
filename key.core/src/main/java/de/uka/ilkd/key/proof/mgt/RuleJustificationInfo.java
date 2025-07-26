@@ -51,6 +51,7 @@ public class RuleJustificationInfo {
     }
 
     public void removeJustificationFor(Rule rule) {
+        // weigl: Unclear why this is needed
         if (InfFlowContractAppTaclet.hasType(rule)) {
             InfFlowContractAppTaclet.unregister(rule.name());
         }

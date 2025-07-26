@@ -5,7 +5,6 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.macros.PrepareInfFlowContractPreBranchesMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SequentialProofMacro;
 import de.uka.ilkd.key.proof.Goal;
