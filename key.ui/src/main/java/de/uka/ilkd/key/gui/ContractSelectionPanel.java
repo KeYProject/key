@@ -11,11 +11,12 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionListener;
 
-import de.uka.ilkd.key.infflow.impl.InformationFlowContractImpl;
+import de.uka.ilkd.key.informationflow.impl.InformationFlowContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.wd.DependencyContractImpl;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
