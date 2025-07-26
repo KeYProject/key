@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
@@ -17,20 +16,24 @@ import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Rule application class for close-after-merge rule applications.
  *
  * @author Dominic Scheurer
  */
-public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<CloseAfterMerge> {
 
-    private Node partnerNode, correspondingMergeNode;
-    private SymbolicExecutionState mergeNodeState;
-    private SymbolicExecutionState partnerState;
-    private JTerm pc;
-    private Set<Name> newNames;
+    private @Nullable Node partnerNode, correspondingMergeNode;
+    private @Nullable SymbolicExecutionState mergeNodeState;
+    private @Nullable SymbolicExecutionState partnerState;
+    private @Nullable JTerm pc;
+    private @Nullable Set<Name> newNames;
 
-    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
+    public CloseAfterMergeRuleBuiltInRuleApp(CloseAfterMerge builtInRule, PosInOccurrence pio,
             Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
         this(builtInRule, pio);
@@ -42,12 +45,12 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         setNewNames(newNames);
     }
 
-    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
+    public CloseAfterMergeRuleBuiltInRuleApp(CloseAfterMerge builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public @Nullable CloseAfterMergeRuleBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
     }
 
@@ -59,7 +62,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public CloseAfterMergeRuleBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
 

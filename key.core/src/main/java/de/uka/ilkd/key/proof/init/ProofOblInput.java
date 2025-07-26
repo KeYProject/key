@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 
 /**
@@ -38,4 +40,10 @@ public interface ProofOblInput {
      *         if not available.
      */
     KeYJavaType getContainerType();
+
+
+    ///
+    default void prepareSave(StrategyProperties strategyProperties, Proof proof) {
+
+    }
 }

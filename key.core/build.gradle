@@ -19,6 +19,8 @@ dependencies {
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
+
+    compileOnly "com.google.auto.service:auto-service:1.1.1"
 }
 
 // The target directory for JavaCC (parser generation)

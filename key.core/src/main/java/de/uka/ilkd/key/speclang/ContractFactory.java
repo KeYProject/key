@@ -13,11 +13,15 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContractInfo;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContractSupplier;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.wd.DependencyContractImpl;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
@@ -236,10 +240,18 @@ public class ContractFactory {
         final ImmutableList<JTerm> params = tb.var(progVars.paramVars);
         final JTerm result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
         final JTerm exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
-        return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
+        var info = new InformationFlowContractInfo(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
             specifiedIn, modalityKind, requires, requiresFree, measuredBy, modifiable,
-            hasModifiable, self,
-            params, result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
+            hasModifiable, self, params, result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
+
+        var supplier = ServiceLoader.load(InformationFlowContractSupplier.class)
+                .findFirst();
+
+        if (supplier.isPresent()) {
+            return supplier.get().create(info);
+        } else {
+            throw new IllegalStateException("No InformationFlowContractSupplier found");
+        }
     }
 
     @Override
