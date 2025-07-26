@@ -1,38 +1,42 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.informationflow.rule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
+import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
-import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.prover.rules.RuleAbortException;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ArrayUtil;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -52,17 +56,18 @@ import org.jspecify.annotations.NonNull;
  *
  * @author wacker, lanzinger
  */
-public class BlockContractInternalRule extends AbstractBlockContractRule {
+public class InfFlowBlockContractInternalRule extends BlockContractInternalRule {
 
     /**
      * The only instance of this class.
      */
-    public static final BlockContractInternalRule INSTANCE = new BlockContractInternalRule();
+    public static final InfFlowBlockContractInternalRule INSTANCE =
+        new InfFlowBlockContractInternalRule();
 
     /**
      * This rule's name.
      */
-    private static final Name NAME = new Name("Block Contract (Internal)");
+    private static final Name NAME = new Name("InfFlow Block Contract (Internal)");
 
     /**
      * @see #getLastFocusTerm()
@@ -74,7 +79,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      */
     private Instantiation lastInstantiation;
 
-    protected BlockContractInternalRule() {
+    private InfFlowBlockContractInternalRule() {
+        super();
     }
 
     /**
@@ -168,7 +174,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
         final ImmutableList<Goal> result;
-        final LocationVariable heap = heaps.get(0);
+        final LocationVariable heap = heaps.getFirst();
         if (WellDefinednessCheck.isOn()) {
             result = goal.split(4);
             final JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
@@ -213,92 +219,6 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         return new BlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 
-    @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
-            final RuleApp ruleApp) throws RuleAbortException {
-        assert ruleApp instanceof BlockContractInternalBuiltInRuleApp;
-        BlockContractInternalBuiltInRuleApp application =
-            (BlockContractInternalBuiltInRuleApp) ruleApp;
-
-        final Instantiation instantiation =
-            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
-        final BlockContract contract = application.getContract();
-        contract.setInstantiationSelf(instantiation.self());
-        assert contract.getBlock().equals(instantiation.statement());
-        final JTerm contextUpdate = instantiation.update();
-
-        final var services = goal.getOverlayServices();
-        final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<LocationVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement(), services);
-        final ImmutableSet<LocationVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, Function> anonymisationHeaps =
-            createAndRegisterAnonymisationVariables(heaps, contract, services);
-        final BlockContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
-                    .createAndRegister(instantiation.self(), true);
-
-        final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
-                services);
-        final JTerm[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
-            localInVariables, conditionsAndClausesBuilder, services);
-        final JTerm freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
-        final Map<LocationVariable, JTerm> modifiableClauses =
-            conditionsAndClausesBuilder.buildModifiableClauses();
-        final Map<LocationVariable, JTerm> freeModifiableClauses =
-            conditionsAndClausesBuilder.buildFreeModifiableClauses();
-        final JTerm frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(
-                modifiableClauses, freeModifiableClauses);
-        final JTerm[] assumptions =
-            createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
-        final JTerm freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
-        final JTerm[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
-            variables, modifiableClauses, services);
-
-        final GoalsConfigurator configurator =
-            new GoalsConfigurator(application, new TermLabelState(), instantiation,
-                contract.getLabels(), variables, application.posInOccurrence(), services, this);
-        final ImmutableList<Goal> result = splitIntoGoals(goal, contract, heaps, localInVariables,
-            anonymisationHeaps, updates[0], updates[1], localOutVariables, configurator, services);
-
-        configurator.setUpPreconditionGoal(result.tail().head(), contextUpdate, preconditions);
-        configurator.setUpUsageGoal(result.head(), updates,
-            ArrayUtil.add(assumptions, freePostcondition));
-
-        final boolean isInfFlow = InfFlowCheckInfo.isInfFlow(goal);
-        setUpValidityGoal(result, isInfFlow, contract, application, instantiation, heaps,
-            anonymisationHeaps, localInVariables, localOutVariables, variables,
-            ArrayUtil.add(preconditions, freePrecondition), assumptions, frameCondition, updates,
-            configurator, conditionsAndClausesBuilder, services);
-        return result;
-    }
-
-    @Override
-    public boolean isApplicable(Goal goal,
-            PosInOccurrence occurrence) {
-        if (occursNotAtTopLevelInSuccedent(occurrence)) {
-            return false;
-        }
-        // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) {
-            return false;
-        }
-        final Instantiation instantiation =
-            instantiate((JTerm) occurrence.subTerm(), goal);
-        if (instantiation == null) {
-            return false;
-        }
-        final ImmutableSet<BlockContract> contracts =
-            getApplicableContracts(instantiation, goal, goal.proof().getServices());
-
-        // If we are using internal rules, we can apply the respective loop contract directly,
-        // without first applying this block contract.
-        return !contracts.isEmpty() && contracts.stream().allMatch(c -> c.toLoopContract() == null);
-    }
-
     /**
      * Sets up the validity goal as the first goal in the list.
      *
@@ -320,6 +240,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
      * @param services services.
      */
+    @Override
     protected void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
             final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
@@ -332,10 +253,112 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         Goal validityGoal = result.tail().tail().head();
+        assert validityGoal != null;
+
         final ProgramVariable exceptionParameter =
             createLocalVariable("e", variables.exception.getKeYJavaType(), services);
-        configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
-            preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
-            conditionsAndClausesBuilder.terms);
+        validityGoal.setBranchLabel("Information Flow Validity");
+
+        // clear goal
+        validityGoal.node().setSequent(JavaDLSequentKit.getInstance().getEmptySequent());
+        validityGoal.clearAndDetachRuleAppIndex();
+        final TermBuilder tb = services.getTermBuilder();
+
+        if (contract.hasModifiableClause(heaps.getFirst()) && contract.hasInfFlowSpecs()) {
+            // set up information flow validity goal
+            InfFlowValidityData infFlowValidityData = setUpInfFlowValidityGoal(validityGoal,
+                contract, anonymisationHeaps, services, variables, exceptionParameter, heaps,
+                localInVariables, localOutVariables, application, instantiation);
+            // do additional inf flow preparations on the usage goal
+            setUpInfFlowPartOfUsageGoal(Objects.requireNonNull(result.head()), infFlowValidityData,
+                updates[0],
+                updates[1], updates[2], tb);
+        } else {
+            // nothing to prove -> set up trivial goal
+            validityGoal.addFormula(new SequentFormula(tb.tt()), false, true);
+        }
+    }
+
+    protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
+            final BlockContract contract,
+            final Map<LocationVariable, Function> anonymisationHeaps,
+            final Services services, final AuxiliaryContract.Variables variables,
+            final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables,
+            final BlockContractInternalBuiltInRuleApp application,
+            final Instantiation instantiation) {
+        assert heaps.size() == 1 && anonymisationHeaps.size() <= 1
+                : "information flow extension is at the moment not "
+                    + "compatible with the non-base-heap setting";
+        // prepare information flow analysis
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final TermBuilder tb = services.getTermBuilder();
+        assert infFlowGoal.proof() instanceof InfFlowProof;
+        final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
+
+        final ImmutableList<JTerm> localIns = MiscTools.toTermList(localInVariables, tb);
+        final ImmutableList<JTerm> localOuts = MiscTools.toTermList(localOutVariables, tb);
+        final ImmutableList<JTerm> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
+        final ImmutableList<JTerm> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
+        final ImmutableList<JTerm> localInsWithoutOutDuplicates =
+            MiscTools.filterOutDuplicates(localIns, localOuts);
+        final ImmutableList<JTerm> localVarsAtPre =
+            localInsWithoutOutDuplicates.append(localOutsAtPre);
+        final ImmutableList<JTerm> localVarsAtPost =
+            localInsWithoutOutDuplicates.append(localOutsAtPost);
+        final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
+            exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
+        final IFProofObligationVars ifVars = new IFProofObligationVars(instantiationVars, services);
+        application.update(ifVars, instantiation.context());
+
+        // generate information flow contract application predicate and associated taclet
+        final InfFlowBlockContractTacletBuilder ifContractBuilder =
+            new InfFlowBlockContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setExecutionContext(instantiation.context());
+        ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
+        ifContractBuilder.setProofObligationVars(instantiationVars);
+        final JTerm contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet(infFlowGoal);
+
+        // get infFlowAssumptions
+        final JTerm infFlowPreAssumption = buildInfFlowPreAssumption(instantiationVars, localOuts,
+            localOutsAtPre, tb.var(baseHeap), tb);
+        final JTerm infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
+            localOutsAtPost, tb.var(baseHeap), contractApplTerm, tb);
+        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context(), services);
+
+        proof.addIFSymbol(contractApplTerm);
+        proof.addIFSymbol(informationFlowContractApp);
+        proof.addGoalTemplates(informationFlowContractApp);
+        return new InfFlowValidityData(infFlowPreAssumption, infFlowPostAssumption,
+            informationFlowContractApp);
+    }
+
+    protected void setUpInfFlowPartOfUsageGoal(final Goal usageGoal,
+            InfFlowValidityData infFlowValitidyData, final JTerm contextUpdate,
+            final JTerm remembranceUpdate, final JTerm anonymisationUpdate, final TermBuilder tb) {
+        usageGoal.addTaclet(infFlowValitidyData.taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
+            true);
+        final JTerm uAssumptions =
+            tb.applySequential(new JTerm[] { contextUpdate, remembranceUpdate },
+                tb.and(infFlowValitidyData.preAssumption,
+                    tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
+        usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
+    }
+
+
+    protected static class InfFlowValidityData {
+        final JTerm preAssumption;
+        final JTerm postAssumption;
+        final Taclet taclet;
+
+        public InfFlowValidityData(final JTerm preAssumption, final JTerm postAssumption,
+                final Taclet taclet) {
+            this.preAssumption = preAssumption;
+            this.postAssumption = postAssumption;
+            this.taclet = taclet;
+        }
     }
 }

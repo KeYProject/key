@@ -6,6 +6,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.EnumMap;
 import java.util.List;
 
+import de.uka.ilkd.key.informationflow.InformationFlowContract;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;

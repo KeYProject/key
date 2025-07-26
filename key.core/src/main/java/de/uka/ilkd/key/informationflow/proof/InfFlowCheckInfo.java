@@ -9,10 +9,8 @@ import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
 
-/**
- *
- * @author christoph
- */
+/// Helper class to access Information Flow information in the [StrategySettings]
+/// @author christoph
 public class InfFlowCheckInfo {
     public static final Properties.Property<Boolean> INF_FLOW_CHECK_PROPERTY =
         new Properties.Property<>(Boolean.class, "information flow check property");
@@ -36,10 +34,11 @@ public class InfFlowCheckInfo {
         // String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
         // String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
 
-        boolean isOriginalIF =
-            (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp));
         // For loaded proofs, InfFlowCheckInfo is not correct without the following
         // boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
-        return isOriginalIF/* || isLoadedIF */;
+        return (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp))/*
+                                                                                      * ||
+                                                                                      * isLoadedIF
+                                                                                      */;
     }
 }

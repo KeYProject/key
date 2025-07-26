@@ -87,7 +87,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             public String getDescription() { return "Anonymous Macro"; }
         };
 
-        final AlternativeMacro alternativesMacro = new AlternativeMacro() {
+        return new AlternativeMacro() {
             @Override
             public String getName() { return ""; }
 
@@ -103,8 +103,6 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
                     finishMainCompMacro };
             }
         };
-
-        return alternativesMacro;
     }
 
     @Override

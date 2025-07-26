@@ -5,6 +5,8 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.*;
 
+import de.uka.ilkd.key.informationflow.InformationFlowContract;
+import de.uka.ilkd.key.informationflow.impl.InformationFlowContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.wd.DependencyContractImpl;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistr
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
