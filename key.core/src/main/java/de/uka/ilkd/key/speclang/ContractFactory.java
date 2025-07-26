@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
@@ -322,6 +324,10 @@ public class ContractFactory {
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             boolean toBeSaved) {
+
+        // add the conditions for the universe types to the pre- and post-conditions
+        addUniverseConds(pm, freePres, freePosts, selfVar, paramVars, resultVar);
+
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
             modalityKind, pres, freePres, mby, posts, freePosts, axioms, modifiables,
             freeModifiables, accs,
@@ -331,6 +337,80 @@ public class ContractFactory {
             toBeSaved,
             modifiables.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
             services);
+    }
+
+    private void addUniverseConds(IProgramMethod pm, 
+            Map<LocationVariable, Term> freePres, Map<LocationVariable, Term> freePosts, 
+            LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar) {
+
+        var heap = services.getTypeConverter().getHeapLDT().getHeap();
+        final TermBuilder tb = services.getTermBuilder();
+        final var owner = services.getNamespaces().functions().lookup("owner");
+
+        int i = 0;
+
+        var change = false;
+        var pres = freePres.get(heap);
+        for (var param : pm.getMethodDeclaration().getParameters()) {
+            var modifiers = param.getModifiers();
+            for (var modifier : modifiers) {
+                if (!(modifier instanceof AnnotationUseSpecification)) continue;
+                var specifier = (AnnotationUseSpecification)modifier;
+                if (specifier.getTypeReferenceAt(0).getName().equals("Rep")) {
+                    change = true;
+                    pres = tb.and(pres, 
+                            tb.imp(
+                                tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())), 
+                                tb.equals(tb.var(selfVar), tb.func(owner, tb.var(paramVars.get(i))))));
+                    break;
+                } else if (specifier.getTypeReferenceAt(0).getName().equals("Peer")) {
+                    change = true;
+                    pres = tb.and(pres, 
+                            tb.imp(
+                                tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())), 
+                                tb.equals(tb.func(owner, tb.var(selfVar)), tb.func(owner, tb.var(paramVars.get(i))))));
+                    break;
+                } else if (specifier.getTypeReferenceAt(0).getName().equals("Payload")) {
+                    change = true;
+                    break;
+                }
+            }
+
+            i++;
+        }
+
+        if (change) freePres.put(heap, pres);
+        change = false;
+
+        var posts = freePosts.get(heap);
+        if (resultVar != null) {
+            var modifiers = pm.getMethodDeclaration().getModifiers();
+            for (var modifier : modifiers) {
+                if (!(modifier instanceof AnnotationUseSpecification)) continue;
+                var specifier = (AnnotationUseSpecification)modifier;
+                if (specifier.getTypeReferenceAt(0).getName().equals("Rep")) {
+                    change = true;
+                    posts = tb.and(posts, 
+                            tb.imp(
+                                tb.not(tb.equals(tb.var(resultVar), tb.NULL())), 
+                                tb.equals(tb.var(selfVar), tb.func(owner, tb.var(resultVar)))));
+                    break;
+                } else if (specifier.getTypeReferenceAt(0).getName().equals("Peer")) {
+                    change = true;
+                    posts = tb.and(posts, 
+                            tb.imp(
+                                tb.not(tb.equals(tb.var(resultVar), tb.NULL())), 
+                                tb.equals(tb.func(owner, tb.var(selfVar)), tb.func(owner, tb.var(resultVar)))));
+                    break;
+                } else if (specifier.getTypeReferenceAt(0).getName().equals("Payload")) {
+                    change = true;
+                    break;
+                }
+            }
+        }
+
+        if (change) freePosts.put(heap, posts);
     }
 
     /**
@@ -400,6 +480,9 @@ public class ContractFactory {
             Map<LocationVariable, Boolean> hasModifiable,
             Map<LocationVariable, Boolean> hasFreeModifiable,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
+        // add the conditions for the universe types to the pre- and post-conditions
+        addUniverseConds(pm, freePres, freePosts, progVars.selfVar, progVars.paramVars, progVars.resultVar);
+
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
             pm.getContainerType(), modalityKind, pres, freePres, mby, posts, freePosts, axioms,
             modifiables,

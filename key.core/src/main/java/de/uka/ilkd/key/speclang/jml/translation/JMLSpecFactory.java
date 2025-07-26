@@ -970,13 +970,6 @@ public class JMLSpecFactory {
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> axioms) {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
 
-        var right = pm.getName().equals("client");
-        if (right) {
-            LOGGER.info("we arrived! {}", pm.getName());
-            LOGGER.info("{}", pm);
-            LOGGER.info("{}", progVars);
-            LOGGER.info("{}", clauses);
-        }
 
         Term abbrvLhs = null;
         if (!clauses.abbreviations.isEmpty()) {
