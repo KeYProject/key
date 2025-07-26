@@ -14,11 +14,11 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
+import de.uka.ilkd.key.wd.ClassWellDefinedness;
+import de.uka.ilkd.key.wd.WellDefinednessCheck;
+import de.uka.ilkd.key.wd.WellDefinednessCheck.POTerms;
+import de.uka.ilkd.key.wd.WellDefinednessCheck.TermAndFunc;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
