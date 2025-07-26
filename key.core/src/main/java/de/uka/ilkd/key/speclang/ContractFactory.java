@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.wd.DependencyContractImpl;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
