@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author christoph
  */
-public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacro {
+abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {

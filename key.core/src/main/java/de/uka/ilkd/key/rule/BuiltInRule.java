@@ -12,18 +12,21 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Built-in rule interface. As applications of this rule kind may not be successful in each case one
+ * Built-in rule interface. As applications of this rule kind may not be successful, in each case
+ * one
  * has to ensure that the goal split is done only iff the application was successful.
  */
+@NullMarked
 public interface BuiltInRule extends Rule, RuleExecutor<@NonNull Goal> {
 
     /**
-     * returns true iff a rule is applicable at the given position. This does not necessarily mean
-     * that a rule application will change the goal (this decision is made due to performance
-     * reasons)
+     * Returning true iff a rule is applicable at the given position.
+     * This does not necessarily mean that a rule application will change the goal
+     * (this decision is made due to performance reasons)
      */
     boolean isApplicable(Goal goal, PosInOccurrence pio);
 
@@ -32,10 +35,10 @@ public interface BuiltInRule extends Rule, RuleExecutor<@NonNull Goal> {
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 
     @Override
-    ImmutableList<@NonNull Goal> apply(@NonNull Goal goal, @NonNull RuleApp ruleApp);
+    ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
 
     @Override
-    default @NonNull RuleExecutor<@NonNull Goal> getExecutor() {
+    default RuleExecutor<Goal> getExecutor() {
         return this;
     }
 

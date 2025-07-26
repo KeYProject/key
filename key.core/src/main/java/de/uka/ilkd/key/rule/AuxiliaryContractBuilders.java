@@ -35,10 +35,10 @@ import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.AuxiliaryContract.Variables;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.wd.BlockWellDefinedness;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;

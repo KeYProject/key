@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;

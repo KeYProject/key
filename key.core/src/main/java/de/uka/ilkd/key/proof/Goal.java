@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -543,7 +541,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @param n number of goals to create
      * @return the list of new created goals.
      */
-    public @NonNull ImmutableList<Goal> split(int n) {
+    public @NonNull ImmutableList<@NonNull Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
@@ -577,6 +575,20 @@ public final class Goal implements ProofGoal<Goal> {
         fireGoalReplaced(this, parent, goalList);
 
         return goalList;
+    }
+
+    /// Creates new nodes as children of the referenced node and apply each given
+    /// non-null goal transformer to each proof.
+    ///
+    /// @return the list of new created goals, manipulated by funcs
+    public @NonNull ImmutableList<Goal> split(List<@Nullable Consumer<Goal>> funcs) {
+        final var nonNullFuncs = funcs.stream().filter(Objects::nonNull).toList();
+        var n = nonNullFuncs.size();
+        var goals = split(n);
+        for (int i = 0; i < n; i++) {
+            nonNullFuncs.get(i).accept(goals.get(i));
+        }
+        return goals;
     }
 
     public void setBranchLabel(String s) {
