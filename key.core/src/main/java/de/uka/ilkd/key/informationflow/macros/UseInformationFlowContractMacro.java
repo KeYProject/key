@@ -8,14 +8,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.informationflow.FocusIsSubFormulaOfInfFlowContractAppFeature;
+import de.uka.ilkd.key.informationflow.InfFlowContractAppFeature;
 import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
-import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;

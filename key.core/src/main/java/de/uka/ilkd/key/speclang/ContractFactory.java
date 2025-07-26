@@ -5,6 +5,8 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.*;
 
+import de.uka.ilkd.key.informationflow.InformationFlowContract;
+import de.uka.ilkd.key.informationflow.impl.InformationFlowContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
