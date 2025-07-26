@@ -1,15 +1,16 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.macros;
+package de.uka.ilkd.key.informationflow.macros;
 
+import de.uka.ilkd.key.informationflow.FocusIsSubFormulaOfInfFlowContractAppFeature;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;

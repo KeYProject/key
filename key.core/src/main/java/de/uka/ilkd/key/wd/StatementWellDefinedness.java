@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.speclang;
+package de.uka.ilkd.key.wd;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
+import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.SpecificationElement;
 
 import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.SequentFormula;

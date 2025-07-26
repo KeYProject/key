@@ -6,12 +6,12 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 
+import de.uka.ilkd.key.informationflow.InformationFlowContract;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.TermCreationException;

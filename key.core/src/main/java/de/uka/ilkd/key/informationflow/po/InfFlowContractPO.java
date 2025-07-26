@@ -6,6 +6,7 @@ package de.uka.ilkd.key.informationflow.po;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.informationflow.InformationFlowContract;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
@@ -19,7 +20,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;

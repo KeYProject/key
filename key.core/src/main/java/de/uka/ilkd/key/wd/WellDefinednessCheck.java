@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.speclang;
+package de.uka.ilkd.key.wd;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 

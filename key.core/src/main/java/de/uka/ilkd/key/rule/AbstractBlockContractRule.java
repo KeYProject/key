@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
@@ -16,7 +15,6 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
-import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -35,10 +33,8 @@ import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -310,7 +306,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return new SequentFormula(finalTerm);
     }
 
-    private static ProofObligationVars generateProofObligationVariables(
+    protected static ProofObligationVars generateProofObligationVariables(
             final AuxiliaryContract.Variables variables, final ProgramVariable exceptionParameter,
             final LocationVariable baseHeap, final ImmutableList<JTerm> localVarsAtPre,
             final ImmutableList<JTerm> localVarsAtPost, final Services services,
@@ -343,7 +339,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return instantiationVars;
     }
 
-    private static void addProofObligation(final Goal infFlowGoal, final InfFlowProof proof,
+    protected static void addProofObligation(final Goal infFlowGoal, final InfFlowProof proof,
             final BlockContract contract, final IFProofObligationVars ifVars,
             final ExecutionContext ec, final Services services) {
         // create proof obligation
@@ -389,89 +385,6 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             setLastFocusTerm(formula);
             setLastInstantiation(result);
             return result;
-        }
-    }
-
-    protected void setUpInfFlowPartOfUsageGoal(final Goal usageGoal,
-            InfFlowValidityData infFlowValitidyData, final JTerm contextUpdate,
-            final JTerm remembranceUpdate, final JTerm anonymisationUpdate, final TermBuilder tb) {
-        usageGoal.addTaclet(infFlowValitidyData.taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-            true);
-        final JTerm uAssumptions =
-            tb.applySequential(new JTerm[] { contextUpdate, remembranceUpdate },
-                tb.and(infFlowValitidyData.preAssumption,
-                    tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
-        usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
-    }
-
-    protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
-            final BlockContract contract,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final Services services, final AuxiliaryContract.Variables variables,
-            final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
-            final ImmutableSet<LocationVariable> localInVariables,
-            final ImmutableSet<LocationVariable> localOutVariables,
-            final BlockContractInternalBuiltInRuleApp application,
-            final Instantiation instantiation) {
-        assert heaps.size() == 1 && anonymisationHeaps.size() <= 1
-                : "information flow extension is at the moment not "
-                    + "compatible with the non-base-heap setting";
-        // prepare information flow analysis
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        final TermBuilder tb = services.getTermBuilder();
-        assert infFlowGoal.proof() instanceof InfFlowProof;
-        final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
-
-        final ImmutableList<JTerm> localIns = MiscTools.toTermList(localInVariables, tb);
-        final ImmutableList<JTerm> localOuts = MiscTools.toTermList(localOutVariables, tb);
-        final ImmutableList<JTerm> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
-        final ImmutableList<JTerm> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
-        final ImmutableList<JTerm> localInsWithoutOutDuplicates =
-            MiscTools.filterOutDuplicates(localIns, localOuts);
-        final ImmutableList<JTerm> localVarsAtPre =
-            localInsWithoutOutDuplicates.append(localOutsAtPre);
-        final ImmutableList<JTerm> localVarsAtPost =
-            localInsWithoutOutDuplicates.append(localOutsAtPost);
-        final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
-            exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
-        final IFProofObligationVars ifVars = new IFProofObligationVars(instantiationVars, services);
-        application.update(ifVars, instantiation.context());
-
-        // generate information flow contract application predicate
-        // and associated taclet
-        final InfFlowBlockContractTacletBuilder ifContractBuilder =
-            new InfFlowBlockContractTacletBuilder(services);
-        ifContractBuilder.setContract(contract);
-        ifContractBuilder.setExecutionContext(instantiation.context());
-        ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
-        ifContractBuilder.setProofObligationVars(instantiationVars);
-        final JTerm contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
-        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet(infFlowGoal);
-
-        // get infFlowAssumptions
-        final JTerm infFlowPreAssumption = buildInfFlowPreAssumption(instantiationVars, localOuts,
-            localOutsAtPre, tb.var(baseHeap), tb);
-        final JTerm infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
-            localOutsAtPost, tb.var(baseHeap), contractApplTerm, tb);
-        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context(), services);
-
-        proof.addIFSymbol(contractApplTerm);
-        proof.addIFSymbol(informationFlowContractApp);
-        proof.addGoalTemplates(informationFlowContractApp);
-        return new InfFlowValidityData(infFlowPreAssumption, infFlowPostAssumption,
-            informationFlowContractApp);
-    }
-
-    protected static class InfFlowValidityData {
-        final JTerm preAssumption;
-        final JTerm postAssumption;
-        final Taclet taclet;
-
-        public InfFlowValidityData(final JTerm preAssumption, final JTerm postAssumption,
-                final Taclet taclet) {
-            this.preAssumption = preAssumption;
-            this.postAssumption = postAssumption;
-            this.taclet = taclet;
         }
     }
 
