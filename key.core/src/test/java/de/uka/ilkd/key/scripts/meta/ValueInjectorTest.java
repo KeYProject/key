@@ -3,19 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.AbstractCommand;
-import de.uka.ilkd.key.scripts.EngineState;
-import de.uka.ilkd.key.scripts.ScriptCommandAst;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.scripts.AbstractCommand;
+import de.uka.ilkd.key.scripts.EngineState;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -92,10 +93,12 @@ public class ValueInjectorTest {
         @Option(value = "i")
         int i;
 
-        @Option(value = "s") @Nullable
+        @Option(value = "s")
+        @Nullable
         String s;
 
-        @Option("q") @MonotonicNonNull
+        @Option("q")
+        @MonotonicNonNull
         String required;
     }
 
@@ -107,8 +110,8 @@ public class ValueInjectorTest {
 
         @Override
         public void execute(AbstractUserInterfaceControl uiControl,
-                            ScriptCommandAst args,
-                            EngineState stateMap) {
+                ScriptCommandAst args,
+                EngineState stateMap) {
 
         }
 
