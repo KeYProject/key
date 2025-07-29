@@ -35,20 +35,19 @@ public class SaveNewNameCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
-            EngineState stateMap) throws ScriptException, InterruptedException {
+    public void execute(  ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var params = state().getValueInjector().inject(new Parameters(), arguments);
         if (!params.abbreviation.startsWith("@")) {
             throw new ScriptException(
                 "Unexpected parameter to saveNewName, only @var allowed: " + params.abbreviation);
         }
 
-        final AbbrevMap abbrMap = stateMap.getAbbreviations();
+        final AbbrevMap abbrMap = state().getAbbreviations();
         final String key = params.abbreviation.substring(1);
         final String stringToMatch = params.matches;
 
         try {
-            final Goal goal = stateMap.getFirstOpenAutomaticGoal();
+            final Goal goal = state().getFirstOpenAutomaticGoal();
             final Node node = goal.node().parent();
             final List<String> matches =
                 node.getNameRecorder().getProposals().stream().map(Name::toString)
@@ -67,7 +66,7 @@ public class SaveNewNameCommand extends AbstractCommand {
 
             // Should be a function or program variable
             final TermBuilder tb = //
-                stateMap.getProof().getServices().getTermBuilder();
+                state().getProof().getServices().getTermBuilder();
             final JTerm t;
             if (lookupResult instanceof Function) {
                 t = tb.func((Function) lookupResult);

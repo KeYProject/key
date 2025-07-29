@@ -45,7 +45,7 @@ public record ScriptCommandAst(
 
     public String asCommandLine() {
         return commandName + ' ' +
-                namedArgs.entrySet().stream().map(it -> it.getKey() + ": " + it.getValue())
+                namedArgs.entrySet().stream().map(it -> it.getKey() + ": " + humanString(it.getValue()))
                         .collect(joining(" "))
                 + ' '
                 + positionalArgs.stream().map(ScriptCommandAst::humanString).collect(joining(" "))

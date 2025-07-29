@@ -177,6 +177,8 @@ public class ProofScriptEngine {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
                 proof.getSubtreeGoals(stateMap.getProof().root())
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
+
+
                 throw new ScriptException(
                     String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
                         e.getMessage(), ast.asCommandLine(), ast.location()),

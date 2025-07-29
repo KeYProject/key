@@ -23,11 +23,10 @@ public class SetEchoCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-            EngineState state)
+    public void execute(ScriptCommandAst args)
             throws ScriptException, InterruptedException {
-        Parameters parameters = state.getValueInjector().inject(new Parameters(), args);
-        state.setEchoOn("on".equalsIgnoreCase(parameters.command));
+        Parameters parameters = state().getValueInjector().inject(new Parameters(), args);
+        state().setEchoOn("on".equalsIgnoreCase(parameters.command));
     }
 
     public static class Parameters {

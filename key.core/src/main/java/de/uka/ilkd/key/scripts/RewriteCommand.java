@@ -76,26 +76,25 @@ public class RewriteCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
-            EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
-        Proof proof = state.getProof();
+        Proof proof = state().getProof();
         assert proof != null;
 
-        ImmutableList<TacletApp> allApps = findAllTacletApps(args, state);
+        ImmutableList<TacletApp> allApps = findAllTacletApps(args, state());
 
         // filter all taclets for being applicable on the find term
         List<PosInOccurrence> failposInOccs =
-            findAndExecReplacement(args, allApps, state);
+            findAndExecReplacement(args, allApps, state());
 
         // if not all find terms successfully replaced, apply cut
         if (!failposInOccs.isEmpty()) {
 
             CutCommand.Parameters param = new CutCommand.Parameters();
             param.formula = args.replace;
-            CutCommand.execute(state, param);
+            CutCommand.execute(state(), param);
         }
 
     }
@@ -152,7 +151,7 @@ public class RewriteCommand extends AbstractCommand {
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                if (pta.taclet() instanceof RewriteTaclet) {
+                if (pta.taclet() instanceof RewriteTaclet rw) {
                     if (pta.taclet().displayName().equals("cut_direct")) {
                         continue;
                     }
@@ -164,8 +163,6 @@ public class RewriteCommand extends AbstractCommand {
 
                         try { // Term not already successfully replaced
                             Goal goalold = state.getFirstOpenAutomaticGoal();
-
-                            RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
                                 SequentFormula rewriteResult =
                                     ((RewriteTacletExecutor) rw.getExecutor()).getRewriteResult(

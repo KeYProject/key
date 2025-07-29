@@ -30,11 +30,10 @@ public class SetFailOnClosedCommand extends AbstractCommand {
 
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
-            EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new Parameters(), arguments);
-        state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+        state().setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
     public static class Parameters {

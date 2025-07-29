@@ -181,7 +181,7 @@ public class ValueInjector {
             if (val == null) {
                 if (meta.isRequired() && meta.getField().get(obj) == null) {
                     throw new ArgumentRequiredException(String.format(
-                        "Argument %s:%s is required, but %s was given. For command class: '%s'",
+                        "Argument %s (of type %s) is required, but %s was given. For command class: '%s'",
                         meta.getName(), meta.getField().getType(), null,
                         meta.getField().getDeclaringClass()));
                 }
@@ -283,6 +283,9 @@ public class ValueInjector {
      */
     @SuppressWarnings("unchecked")
     public <R, T> Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
+        if(ret == arg) {
+            return (T it) -> (R) it;
+        }
         return (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
     }
 

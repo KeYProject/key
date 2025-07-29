@@ -109,9 +109,7 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public void execute(AbstractUserInterfaceControl uiControl,
-                ScriptCommandAst args,
-                EngineState stateMap) {
+        public void execute(ScriptCommandAst args) {
 
         }
 

@@ -23,12 +23,11 @@ public class EchoCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-            EngineState state)
+    public void execute(ScriptCommandAst args)
             throws ScriptException, InterruptedException {
-        var params = state.getValueInjector().inject(new Parameters(), args);
+        var params = state().getValueInjector().inject(new Parameters(), args);
 
-        var obs = state.getObserver();
+        var obs = state().getObserver();
         if (obs != null) {
             obs.accept(new ProofScriptEngine.EchoMessage(params.message));
         }

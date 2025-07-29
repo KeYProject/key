@@ -61,7 +61,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
 
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+    public final void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap)
             throws ScriptException, InterruptedException {
         proof = stateMap.getProof();

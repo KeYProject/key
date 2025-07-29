@@ -54,12 +54,11 @@ public class MacroCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
-            EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
-        final Services services = state.getProof().getServices();
+        final Services services = state().getProof().getServices();
         // look up macro name
         ProofMacro macro = macroMap.get(args.macroName);
         if (macro == null) {

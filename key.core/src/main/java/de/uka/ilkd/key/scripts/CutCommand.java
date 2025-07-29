@@ -41,11 +41,9 @@ public class CutCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
-            EngineState state)
-            throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new Parameters(), arguments);
-        execute(state, args);
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+        execute(state(), args);
     }
 
     static void execute(EngineState state, Parameters args) throws ScriptException {

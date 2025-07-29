@@ -77,13 +77,12 @@ public class RuleCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst params,
-            EngineState state)
+    public void execute(  ScriptCommandAst params)
             throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new Parameters(), params);
+        var args = state().getValueInjector().inject(new Parameters(), params);
 
-        RuleApp theApp = makeRuleApp(args, state);
-        Goal g = state.getFirstOpenAutomaticGoal();
+        RuleApp theApp = makeRuleApp(args, state());
+        Goal g = state().getFirstOpenAutomaticGoal();
 
         if (theApp instanceof TacletApp tacletApp) {
 

@@ -3,17 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
-
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletApp;
-
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
+
+import java.util.Map;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the
@@ -31,10 +29,9 @@ public class SaveInstCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-            EngineState stateMap) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
 
-        AbbrevMap abbrMap = stateMap.getAbbreviations();
+        AbbrevMap abbrMap = state().getAbbreviations();
         for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
             final var value = entry.getValue();
@@ -56,7 +53,7 @@ public class SaveInstCommand extends AbstractCommand {
             }
 
             try {
-                var parentNode = stateMap.getFirstOpenAutomaticGoal().node().parent();
+                var parentNode = state().getFirstOpenAutomaticGoal().node().parent();
                 if (parentNode != null) {
                     final RuleApp ruleApp = parentNode.getAppliedRuleApp();
                     if (ruleApp instanceof TacletApp tacletApp) {
