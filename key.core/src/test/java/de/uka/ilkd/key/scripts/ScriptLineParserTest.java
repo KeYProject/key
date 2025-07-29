@@ -27,7 +27,7 @@ public class ScriptLineParserTest {
                  with="line breaks in\s
                  values";\s
                 select formula="a;b";\s
-                hyphened-command;
+                hyphenedCommand;
                 """;
 
         var script = ParsingFacade.parseScript(arg);

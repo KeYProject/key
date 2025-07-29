@@ -1,22 +1,21 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.macros.scripts.meta;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+package de.uka.ilkd.key.scripts.meta;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.AbstractCommand;
 import de.uka.ilkd.key.scripts.EngineState;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
-import de.uka.ilkd.key.scripts.meta.*;
-
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,13 +32,13 @@ public class ValueInjectorTest {
             null, null);
         args.put("b", true);
         args.put("i", 42);
-        args.put("s", "blubb");
+        args.put("q", "blubb");
 
         ValueInjector.injection(new PPCommand(), pp, ast);
 
         assertTrue(pp.b);
         assertEquals(42, pp.i);
-        assertEquals("blubb", pp.s);
+        assertEquals("blubb", pp.required);
 
     }
 
@@ -58,10 +57,10 @@ public class ValueInjectorTest {
     @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
         List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class);
-        assertEquals(3, meta.size());
+        assertEquals(4, meta.size());
 
         {
-            ProofScriptArgument b = meta.get(0);
+            ProofScriptArgument b = meta.getFirst();
             assertEquals("b", b.getName());
             assertEquals(PP.class.getDeclaredField("b"), b.getField());
             assertEquals(Boolean.TYPE, b.getType());
@@ -89,11 +88,15 @@ public class ValueInjectorTest {
     public static class PP {
         @Option("b")
         boolean b;
+
         @Option(value = "i")
         int i;
-        @Option(value = "s")
-        @Nullable
+
+        @Option(value = "s") @Nullable
         String s;
+
+        @Option("q") @MonotonicNonNull
+        String required;
     }
 
     @NullMarked
@@ -103,8 +106,10 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-                EngineState stateMap) {
+        public void execute(AbstractUserInterfaceControl uiControl,
+                            ScriptCommandAst args,
+                            EngineState stateMap) {
+
         }
 
         @Override
