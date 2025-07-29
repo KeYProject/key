@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 03 18:42:58 CET 2025
+# Date: Tue Jul 29 22:37:48 CEST 2025
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -8,7 +8,7 @@ abortJavaCardTransactionAPI {
 ... }}| (post))
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #abortJavaCardTransaction;
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -61,7 +61,7 @@ activeUseAddition {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left + #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -74,7 +74,7 @@ activeUseBitwiseAnd {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left & #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -87,7 +87,7 @@ activeUseBitwiseNegation {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = ~#left;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -100,7 +100,7 @@ activeUseBitwiseOr {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left | #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -113,7 +113,7 @@ activeUseBitwiseXOr {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left ^ #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -126,7 +126,7 @@ activeUseByteCast {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = (byte) #seShortIntLong;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -139,7 +139,7 @@ activeUseCharCast {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = (char) #seByteShortIntLong;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -152,7 +152,7 @@ activeUseDivision {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left / #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -165,7 +165,7 @@ activeUseIntCast {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = (int) #seLong;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -178,7 +178,7 @@ activeUseModulo {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left % #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -191,7 +191,7 @@ activeUseMultiplication {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left * #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -204,7 +204,7 @@ activeUseShiftLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left << #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -217,7 +217,7 @@ activeUseShiftRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left >> #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -230,7 +230,7 @@ activeUseShortCast {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = (short) #seIntLong;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -241,7 +241,7 @@ activeUseStaticFieldReadAccess {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = @(#sv);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -252,7 +252,7 @@ activeUseStaticFieldReadAccess2 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = @(#sv);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -265,7 +265,7 @@ activeUseStaticFieldWriteAccess {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v0 = #e;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -278,7 +278,7 @@ activeUseStaticFieldWriteAccess2 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#e) #v0 = #e;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -291,7 +291,7 @@ activeUseStaticFieldWriteAccess3 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #arr[#idx];
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -304,7 +304,7 @@ activeUseStaticFieldWriteAccess4 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #arr[#idx];
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -317,7 +317,7 @@ activeUseStaticFieldWriteAccess5 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#a) #v0 = #v1.#a;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -330,7 +330,7 @@ activeUseStaticFieldWriteAccess6 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#a) #v0 = #v1.#a;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -343,7 +343,7 @@ activeUseSubtraction {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left - #right;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -356,7 +356,7 @@ activeUseUnaryMinus {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = -#left;
   @(#sv) = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -368,7 +368,7 @@ activeUseUnsignedShiftRight {
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#sv) #v0 = #left >>> #right;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -581,7 +581,7 @@ allFieldsUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseObj) #vObjNew = #nseObj;
   #v = \all_fields(#vObjNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -704,6 +704,13 @@ Choices: Strings:on}
 andJIntDef {
 \find(andJint(left,right))
 \replacewith(moduloInt(binaryAnd(left,right))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== andJLongDef (andJLongDef) =========================================
+andJLongDef {
+\find(andJlong(left,right))
+\replacewith(moduloLong(binaryAnd(left,right))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -1083,7 +1090,7 @@ arrayCreation {
   #typeof(#na) #v0;
   init-array-creation(#na)
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1097,7 +1104,7 @@ arrayCreationWithInitializers {
   #typeof(#lhs) #v0;
   init-array-creation(#arrayinitializer)
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1132,7 +1139,7 @@ array_post_declaration {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   array-post-declaration(#arraypost)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1228,7 +1235,7 @@ Choices: (programRules:Java & assertions:safe)}
 assignableDefinition {
 \find(assignable(heapNew,heapOld,locs))
 \varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (LocSet term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (LocSet term)))
-\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(boolean::select(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(any::select(heapNew,o,f),any::select(heapOld,o,f))))))
+\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(boolean::select(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(any::select(heapNew,o,f),any::select(heapOld,o,f)))))) 
 \heuristics(delayedExpansion)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1304,7 +1311,7 @@ assignmentAdditionInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 + #seCharByteShortInt1;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1313,7 +1320,7 @@ assignmentAdditionLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt + #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seCharByteShortInt,#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1322,7 +1329,7 @@ assignmentAdditionLong2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong + #seCharByteShortInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong,#seCharByteShortInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1331,7 +1338,7 @@ assignmentAdditionLong3 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 + #seLong1;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong0,#seLong1)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaAddLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1644,7 +1651,7 @@ assignmentMultiplicationInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 * #seCharByteShortInt1;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1653,7 +1660,7 @@ assignmentMultiplicationLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt * #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seCharByteShortInt,#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1662,7 +1669,7 @@ assignmentMultiplicationLong2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong * #seCharByteShortInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong,#seCharByteShortInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1671,7 +1678,7 @@ assignmentMultiplicationLong3 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 * #seLong1;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong0,#seLong1)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaMulLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1680,7 +1687,7 @@ assignmentShiftLeftInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 << #se;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftInt(#seCharByteShortInt0,#se)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1689,7 +1696,7 @@ assignmentShiftLeftLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 << #se;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftLong(#seLong0,#se)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftLeftLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1698,7 +1705,7 @@ assignmentShiftRightInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 >> #se;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1707,7 +1714,7 @@ assignmentShiftRightLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 >> #se;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightLong(#seLong0,#se)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaShiftRightLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1774,7 +1781,7 @@ assignmentSubtractionInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 - #seCharByteShortInt1;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubInt(#seCharByteShortInt0,#seCharByteShortInt1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1783,7 +1790,7 @@ assignmentSubtractionLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt - #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seCharByteShortInt,#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seCharByteShortInt,#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1792,7 +1799,7 @@ assignmentSubtractionLong2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong - #seCharByteShortInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong,#seCharByteShortInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong,#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1801,7 +1808,7 @@ assignmentSubtractionLong3 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 - #seLong1;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong0,#seLong1)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaSubLong(#seLong0,#seLong1)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1810,7 +1817,7 @@ assignmentUnsignedShiftRightInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt0 >>> #se;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightInt(#seCharByteShortInt0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1819,7 +1826,7 @@ assignmentUnsignedShiftRightLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong0 >>> #se;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightLong(#seLong0,#se)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnsignedShiftRightLong(#seLong0,#se)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1853,7 +1860,7 @@ assignment_read_attribute_final {
 ... }}| (post))
 \varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), \final(#a (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::final(#v,#memberPVToField(#a))),#allmodal(post))])
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::final(#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
@@ -1873,7 +1880,7 @@ assignment_read_attribute_this_final {
   #v0 = #v.#a;
 ... }}| (post))
 \varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), \final(#a (program Variable)))
-\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::final(#v,#memberPVToField(#a))),#allmodal(post))])
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::final(#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
@@ -1914,7 +1921,7 @@ assignment_read_static_attribute_final {
   #v0 = @(#sv);
 ... }}| (post))
 \sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G), \final(#sv (program StaticVariable)))
-\replacewith(update-application(elem-update(#v0 (program Variable))(G::final(null,#memberPVToField(#sv))),#allmodal(post)))
+\replacewith(update-application(elem-update(#v0 (program Variable))(G::final(null,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & finalFields:immutable)}
 -----------------------------------------------------
@@ -2336,7 +2343,7 @@ beginJavaCardTransactionAPI {
 ... }}| (post))
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #beginJavaCardTransaction;
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -2461,14 +2468,14 @@ bitwiseNegationInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = ~#seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#se)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
 == bitwiseNegationLong (invertBits) =========================================
 bitwiseNegationLong {
 \find(#normalassign ((modal operator))|{{ ..
-  #loc = ~#se;
+  #loc = ~#seLong;
 ... }}| (post))
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
@@ -2484,7 +2491,7 @@ blockBreak {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2500,7 +2507,7 @@ blockBreakLabel {
 \replacewith(#allmodal ((modal operator))|{{ ..
   do-break(#lb0:
   break;)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2514,7 +2521,7 @@ blockBreakLabeled {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2528,7 +2535,7 @@ blockBreakNoLabel {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2542,7 +2549,7 @@ blockContinue {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2556,7 +2563,7 @@ blockContinueLabeled {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2577,7 +2584,7 @@ blockEmptyLabel {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {}
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2591,7 +2598,7 @@ blockReturn {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   return #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2603,7 +2610,7 @@ blockReturnLabel1 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   return #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2618,7 +2625,7 @@ blockReturnLabel2 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   return #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2632,7 +2639,7 @@ blockReturnNoValue {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   return;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2646,7 +2653,7 @@ blockThrow {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   throw #e;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2710,7 +2717,7 @@ boxToDiamondTransaction {
 ... }}| (post))
 \replacewith(not(diamond_transaction|{{ ..
   #s
-... }}| (not(post))))
+... }}| (not(post)))) 
 \heuristics(boxDiamondConv)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2723,7 +2730,7 @@ box_and_left {
   #s
 ... }}| (post),#box ((modal operator))|{{ ..
   #s
-... }}| (post1))]==>[])
+... }}| (post1))]==>[]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2737,7 +2744,7 @@ box_and_right {
 ... }}| (post1)]) ;
 \replacewith([]==>[#box ((modal operator))|{{ ..
   #s
-... }}| (post)])
+... }}| (post)]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2750,7 +2757,7 @@ box_or_left {
   #s
 ... }}| (post),#box ((modal operator))|{{ ..
   #s
-... }}| (post1))]==>[])
+... }}| (post1))]==>[]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2763,7 +2770,7 @@ box_or_right {
   #s
 ... }}| (post),#box ((modal operator))|{{ ..
   #s
-... }}| (post1))])
+... }}| (post1))]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -2947,7 +2954,7 @@ break {
 \replacewith(#allmodal ((modal operator))|{{ ..
   do-break(#lb0:
   break;)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3485,7 +3492,7 @@ castToBoolean {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #exBool;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3617,7 +3624,7 @@ commitJavaCardTransactionAPI {
 ... }}| (post))
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #commitJavaCardTransaction;
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -3711,7 +3718,7 @@ compound_addition_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v + #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3725,7 +3732,7 @@ compound_addition_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 + #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3747,7 +3754,7 @@ compound_assignment_2 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #v = #nseBool;
   #lhs = !#v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3760,7 +3767,7 @@ compound_assignment_3_mixed {
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #v0 = #nseBool0;
   #lhs = #v0 && #seBool1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3772,7 +3779,7 @@ compound_assignment_3_nonsimple {
 \replacewith(#allmodal ((modal operator))|{{ ..
   if (!#exBool0) #lhs = false;
   else #lhs = #nseBool1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(split_if, simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3795,7 +3802,7 @@ compound_assignment_4_nonsimple {
   boolean #v0 = #nseBool0;
   boolean #v1 = #exBool1;
   #lhs = #v0 & #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3817,7 +3824,7 @@ compound_assignment_5_mixed {
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #v0 = #nseBool0;
   #lhs = #v0 || #seBool1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3829,7 +3836,7 @@ compound_assignment_5_nonsimple {
 \replacewith(#allmodal ((modal operator))|{{ ..
   if (#exBool0) #lhs = true;
   else #lhs = #nseBool1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(split_if, simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3852,7 +3859,7 @@ compound_assignment_6_nonsimple {
   boolean #v0 = #nseBool0;
   boolean #v1 = #exBool1;
   #lhs = #v0 | #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3872,7 +3879,7 @@ compound_assignment_op_and {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs & (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3886,7 +3893,7 @@ compound_assignment_op_and_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] & #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3900,7 +3907,7 @@ compound_assignment_op_and_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute &
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3911,7 +3918,7 @@ compound_assignment_op_div {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs / (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3925,7 +3932,7 @@ compound_assignment_op_div_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] / #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3939,7 +3946,7 @@ compound_assignment_op_div_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute /
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3950,7 +3957,7 @@ compound_assignment_op_minus {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs - (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3964,7 +3971,7 @@ compound_assignment_op_minus_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] - #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3978,7 +3985,7 @@ compound_assignment_op_minus_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3989,7 +3996,7 @@ compound_assignment_op_mod {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs % (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4003,7 +4010,7 @@ compound_assignment_op_mod_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] % #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4017,7 +4024,7 @@ compound_assignment_op_mod_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute %
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4028,7 +4035,7 @@ compound_assignment_op_mul {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs * (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4042,7 +4049,7 @@ compound_assignment_op_mul_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] * #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4056,7 +4063,7 @@ compound_assignment_op_mul_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute *
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4067,7 +4074,7 @@ compound_assignment_op_or {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs | (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4081,7 +4088,7 @@ compound_assignment_op_or_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] | #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4095,7 +4102,7 @@ compound_assignment_op_or_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute |
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4106,7 +4113,7 @@ compound_assignment_op_plus {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs + (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4120,7 +4127,7 @@ compound_assignment_op_plus_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] + #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4134,7 +4141,7 @@ compound_assignment_op_plus_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4145,7 +4152,7 @@ compound_assignment_op_shiftleft {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs << (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4159,7 +4166,7 @@ compound_assignment_op_shiftleft_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] << #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4173,7 +4180,7 @@ compound_assignment_op_shiftleft_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute <<
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4184,7 +4191,7 @@ compound_assignment_op_shiftright {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs >> (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4198,7 +4205,7 @@ compound_assignment_op_shiftright_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >> #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4212,7 +4219,7 @@ compound_assignment_op_shiftright_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute >>
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4223,7 +4230,7 @@ compound_assignment_op_unsigned_shiftright {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs >>> (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4237,7 +4244,7 @@ compound_assignment_op_unsigned_shiftright_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >>> #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4251,7 +4258,7 @@ compound_assignment_op_unsigned_shiftright_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute >>>
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4262,7 +4269,7 @@ compound_assignment_op_xor {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = (#typeof(#lhs)) (#lhs ^ (#e));
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4276,7 +4283,7 @@ compound_assignment_op_xor_array {
   #typeof(#e0) #v0 = #e0;
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] ^ #e1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4290,7 +4297,7 @@ compound_assignment_op_xor_attr {
   #typeof(#e0) #v = #e0;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute ^
                                            #e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4304,7 +4311,7 @@ compound_assignment_xor_nonsimple {
   boolean #v0 = #nseBool0;
   boolean #v1 = #exBool1;
   #lhs = #v0 ^ #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4326,7 +4333,7 @@ compound_binary_AND_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v & #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4340,7 +4347,7 @@ compound_binary_AND_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 & #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4353,7 +4360,7 @@ compound_binary_OR_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v | #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4367,7 +4374,7 @@ compound_binary_OR_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 | #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4380,7 +4387,7 @@ compound_binary_XOR_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v ^ #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4394,7 +4401,7 @@ compound_binary_XOR_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 ^ #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4407,7 +4414,7 @@ compound_binary_neg {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   #lhs = ~#v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4420,7 +4427,7 @@ compound_byte_cast_expression {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (byte) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4433,7 +4440,7 @@ compound_division_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v / #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4447,7 +4454,7 @@ compound_division_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 / #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4460,7 +4467,7 @@ compound_double_cast_expression {
 \replacewith(#normalassign ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #loc = (double) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4473,7 +4480,7 @@ compound_equality_comparison_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 == #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4487,7 +4494,7 @@ compound_equality_comparison_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 == #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4500,7 +4507,7 @@ compound_float_cast_expression {
 \replacewith(#normalassign ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #loc = (float) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4513,7 +4520,7 @@ compound_greater_equal_than_comparison_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 >= #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4527,7 +4534,7 @@ compound_greater_equal_than_comparison_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 >= #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4540,7 +4547,7 @@ compound_greater_than_comparison_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 > #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4554,7 +4561,7 @@ compound_greater_than_comparison_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 > #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4567,7 +4574,7 @@ compound_inequality_comparison_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 != #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4581,7 +4588,7 @@ compound_inequality_comparison_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 != #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4594,7 +4601,7 @@ compound_int_cast_expression {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (int) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4607,7 +4614,7 @@ compound_invert_bits {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v1 = #nse;
   #lhs = ~#v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4620,7 +4627,7 @@ compound_less_equal_than_comparison_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 <= #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4634,7 +4641,7 @@ compound_less_equal_than_comparison_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 <= #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4647,7 +4654,7 @@ compound_less_than_comparison_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 < #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4661,7 +4668,7 @@ compound_less_than_comparison_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 < #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4674,7 +4681,7 @@ compound_long_cast_expression {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (long) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4687,7 +4694,7 @@ compound_modulo_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v % #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4701,7 +4708,7 @@ compound_modulo_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 % #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4714,7 +4721,7 @@ compound_multiplication_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v * #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4728,7 +4735,7 @@ compound_multiplication_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 * #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4741,7 +4748,7 @@ compound_reference_cast_expression {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (#npit) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4754,7 +4761,7 @@ compound_reference_cast_expression_primitive {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (#pit) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4767,7 +4774,7 @@ compound_shiftleft_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v << #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4781,7 +4788,7 @@ compound_shiftleft_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 << #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4794,7 +4801,7 @@ compound_shiftright_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v >> #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4808,7 +4815,7 @@ compound_shiftright_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 >> #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4821,7 +4828,7 @@ compound_short_cast_expression {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = (short) #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4834,7 +4841,7 @@ compound_subtraction_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v - #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4848,7 +4855,7 @@ compound_subtraction_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 - #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4861,7 +4868,7 @@ compound_unary_minus_eval {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   #lhs = -#v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4872,7 +4879,7 @@ compound_unary_plus_assignment {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #e;
-... }}| (post))
+... }}| (post)) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4885,7 +4892,7 @@ compound_unsigned_shiftright_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v = #nse;
   #lhs = #v >>> #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -4899,7 +4906,7 @@ compound_unsigned_shiftright_2 {
   #typeof(#e) #v0 = #e;
   #typeof(#nse) #v1 = #nse;
   #lhs = #v0 >>> #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5061,7 +5068,7 @@ condition {
   } else {
     #lhs = #e2;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(split_if, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5074,7 +5081,7 @@ condition_not_simple {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   #lhs = #v0 ? #se1 : #se2;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5431,7 +5438,7 @@ Choices: sequences:on}
 defOfSeqUpd {
 \find(seqUpd(seq,idx,value))
 \varcond(\notFreeIn(uSub (variable), seq (Seq term)), \notFreeIn(uSub (variable), value (any term)), \notFreeIn(uSub (variable), idx (int term)))
-\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub))))
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,any::seqGet(seq,uSub)))) 
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5569,7 +5576,7 @@ diamondToBoxTransaction {
 ... }}| (post))
 \replacewith(not(box_transaction|{{ ..
   #s
-... }}| (not(post))))
+... }}| (not(post)))) 
 \heuristics(boxDiamondConv)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5582,7 +5589,7 @@ diamond_and_left {
   #s
 ... }}| (post),#diamond ((modal operator))|{{ ..
   #s
-... }}| (post1))]==>[])
+... }}| (post1))]==>[]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5596,7 +5603,7 @@ diamond_and_right {
 ... }}| (post1)]) ;
 \replacewith([]==>[#diamond ((modal operator))|{{ ..
   #s
-... }}| (post)])
+... }}| (post)]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5618,7 +5625,7 @@ diamond_or_left {
   #s
 ... }}| (post),#diamond ((modal operator))|{{ ..
   #s
-... }}| (post1))]==>[])
+... }}| (post1))]==>[]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5631,7 +5638,7 @@ diamond_or_right {
   #s
 ... }}| (post),#diamond ((modal operator))|{{ ..
   #s
-... }}| (post1))])
+... }}| (post1))]) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6202,7 +6209,7 @@ doWhileUnwind {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #unwind-loop(do #s
   while (#e);)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6321,7 +6328,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == elementOfInfiniteUnion2VarsEQ (elementOfInfiniteUnion2VarsEQ) =========================================
 elementOfInfiniteUnion2VarsEQ {
-\assumes ([equals(infiniteUnion{av (variable),bv (variable)}(s),EQ)]==>[])
+\assumes ([equals(infiniteUnion{av (variable),bv (variable)}(s),EQ)]==>[]) 
 \find(elementOf(o,f,EQ))
 \sameUpdateLevel\varcond(\notFreeIn(bv (variable), f (Field term)), \notFreeIn(bv (variable), o (java.lang.Object term)), \notFreeIn(av (variable), f (Field term)), \notFreeIn(av (variable), o (java.lang.Object term)))
 \replacewith(exists{av (variable)}(exists{bv (variable)}(elementOf(o,f,s)))) 
@@ -6457,7 +6464,7 @@ elim_double_block {
 }}| (post))
 \replacewith(#allmodal ((modal operator))|{{
   #slist
-}}| (post))
+}}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6474,7 +6481,7 @@ elim_double_block_2 {
   {
     #slist
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6487,7 +6494,7 @@ elim_double_block_3 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   while (#e) #s
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6500,7 +6507,7 @@ elim_double_block_4 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   for (#loopInit; #guard; #forupdates) #s
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6513,7 +6520,7 @@ elim_double_block_5 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   for (; #guard; #forupdates) #s
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6526,7 +6533,7 @@ elim_double_block_6 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   for (#loopInit; #guard; ) #s
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6539,7 +6546,7 @@ elim_double_block_7 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   for (; #guard; ) #s
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6554,7 +6561,7 @@ elim_double_block_8 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   do #s
   while (#e);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6577,7 +6584,7 @@ elim_double_block_9 {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7032,7 +7039,7 @@ enhancedfor_iterable {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   enhancedfor-elim(for (#ty #id : #e) #stm)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7281,7 +7288,7 @@ Choices: true}
 == equalityOfSingleton (equalityOfSingleton) =========================================
 equalityOfSingleton {
 \find(equals(singleton(o1,f1),singleton(o2,f2)))
-\replacewith(and(equals(o1,o2),equals(f1,f2)))
+\replacewith(and(equals(o1,o2),equals(f1,f2))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7351,7 +7358,7 @@ equality_comparison_new {
   #lhs = false;
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #lhs = true;
-... }}| (post)))
+... }}| (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7406,7 +7413,7 @@ eval_array_this_access {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   this[#v0] = #se0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7419,7 +7426,7 @@ eval_order_access1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nv) #v0 = #nv;
   #v0.#attribute = #e;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7432,7 +7439,7 @@ eval_order_access2 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nv) #v0 = #nv;
   #v = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7446,7 +7453,7 @@ eval_order_access4 {
   #typeof(#v) #v0 = #v;
   #typeof(#nse) #v1 = #nse;
   #v0.#a = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7459,7 +7466,7 @@ eval_order_access4_this {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v1 = #nse;
   #v.#a = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7472,7 +7479,7 @@ eval_order_array_access1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nv) #v0 = #nv;
   #v0[#e] = #e0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7486,7 +7493,7 @@ eval_order_array_access2 {
   #typeof(#v) #ar1 = #v;
   #typeof(#nse) #v0 = #nse;
   #ar1[#v0] = #e;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7501,7 +7508,7 @@ eval_order_array_access3 {
   #typeof(#se) #v2 = #se;
   #typeof(#nse) #v1 = #nse;
   #v0[#v2] = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7514,7 +7521,7 @@ eval_order_array_access4 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nv) #v0 = #nv;
   #v = #v0[#e];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7528,7 +7535,7 @@ eval_order_array_access5 {
   #typeof(#v0) #ar1 = #v0;
   #typeof(#nse) #v1 = #nse;
   #v = #ar1[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7541,7 +7548,7 @@ eval_order_array_access6 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nv) #v0 = #nv;
   #v = #v0.#length;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7556,7 +7563,7 @@ eval_order_iterated_assignments_0_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = #e1;
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7570,7 +7577,7 @@ eval_order_iterated_assignments_0_1 {
   #typeof(#e0) #v0 = #e0;
   #v0.#attribute = #e;
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7585,7 +7592,7 @@ eval_order_iterated_assignments_10_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] | #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7600,7 +7607,7 @@ eval_order_iterated_assignments_10_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute |
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7615,7 +7622,7 @@ eval_order_iterated_assignments_11_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] ^ #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7630,7 +7637,7 @@ eval_order_iterated_assignments_11_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute ^
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7645,7 +7652,7 @@ eval_order_iterated_assignments_1_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] * #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7660,7 +7667,7 @@ eval_order_iterated_assignments_1_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute *
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7675,7 +7682,7 @@ eval_order_iterated_assignments_2_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] / #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7690,7 +7697,7 @@ eval_order_iterated_assignments_2_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute /
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7705,7 +7712,7 @@ eval_order_iterated_assignments_3_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] % #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7720,7 +7727,7 @@ eval_order_iterated_assignments_3_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute %
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7735,7 +7742,7 @@ eval_order_iterated_assignments_4_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] + #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7750,7 +7757,7 @@ eval_order_iterated_assignments_4_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute +
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7765,7 +7772,7 @@ eval_order_iterated_assignments_5_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] - #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7780,7 +7787,7 @@ eval_order_iterated_assignments_5_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute -
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7795,7 +7802,7 @@ eval_order_iterated_assignments_6_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] << #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7810,7 +7817,7 @@ eval_order_iterated_assignments_6_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute <<
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7825,7 +7832,7 @@ eval_order_iterated_assignments_7_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >> #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7840,7 +7847,7 @@ eval_order_iterated_assignments_7_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute >>
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7855,7 +7862,7 @@ eval_order_iterated_assignments_8_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >>> #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7870,7 +7877,7 @@ eval_order_iterated_assignments_8_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute >>>
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7885,7 +7892,7 @@ eval_order_iterated_assignments_9_0 {
   #typeof(#e) #v1 = #e;
   #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] & #e1);
   #lhs0 = #v0[#v1];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7900,7 +7907,7 @@ eval_order_iterated_assignments_9_1 {
   #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute &
                                             #e);
   #lhs0 = #v0.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8038,7 +8045,7 @@ execBreak {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8056,7 +8063,7 @@ execBreakEliminateBreakLabel {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8074,7 +8081,7 @@ execBreakEliminateBreakLabelWildcard {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8092,7 +8099,7 @@ execBreakEliminateContinue {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8110,7 +8117,7 @@ execBreakEliminateContinueLabel {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8128,7 +8135,7 @@ execBreakEliminateContinueLabelWildcard {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8146,7 +8153,7 @@ execBreakEliminateExcCcatch {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8164,7 +8171,7 @@ execBreakEliminateReturn {
   exec {
     break;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8182,7 +8189,7 @@ execBreakEliminateReturnVal {
   exec {
     break;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8200,7 +8207,7 @@ execBreakLabelEliminateBreak {
   exec {
     break;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8219,7 +8226,7 @@ execBreakLabelEliminateBreakLabelNoMatch {
   exec {
     break;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8237,7 +8244,7 @@ execBreakLabelEliminateContinue {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8255,7 +8262,7 @@ execBreakLabelEliminateContinueLabel {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8273,7 +8280,7 @@ execBreakLabelEliminateContinueLabelWildcard {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8291,7 +8298,7 @@ execBreakLabelEliminateExcCcatch {
   {
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8309,7 +8316,7 @@ execBreakLabelEliminateReturn {
   exec {
     break;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8327,7 +8334,7 @@ execBreakLabelEliminateReturnVal {
   exec {
     break;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8345,7 +8352,7 @@ execBreakLabelMatch {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8363,7 +8370,7 @@ execBreakLabelWildcard {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8391,7 +8398,7 @@ execCatchThrow {
   } else {
     throw #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8409,7 +8416,7 @@ execContinue {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8427,7 +8434,7 @@ execContinueEliminateBreak {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8445,7 +8452,7 @@ execContinueEliminateBreakLabel {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8463,7 +8470,7 @@ execContinueEliminateBreakLabelWildcard {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8481,7 +8488,7 @@ execContinueEliminateExcCcatch {
   {
     continue;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8499,7 +8506,7 @@ execContinueEliminateReturn {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8517,7 +8524,7 @@ execContinueEliminateReturnVal {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8535,7 +8542,7 @@ execContinueLabelEliminateBreak {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8553,7 +8560,7 @@ execContinueLabelEliminateBreakLabel {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8571,7 +8578,7 @@ execContinueLabelEliminateBreakLabelWildcard {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8589,7 +8596,7 @@ execContinueLabelEliminateContinue {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8608,7 +8615,7 @@ execContinueLabelEliminateContinueLabelNoMatch {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8626,7 +8633,7 @@ execContinueLabelEliminateExcCcatch {
   {
     continue;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8644,7 +8651,7 @@ execContinueLabelEliminateReturn {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8662,7 +8669,7 @@ execContinueLabelEliminateReturnVal {
   exec {
     continue;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8680,7 +8687,7 @@ execContinueLabelMatch {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8698,7 +8705,7 @@ execContinueLabelWildcard {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8743,7 +8750,7 @@ execMultipleCatchThrow {
       #slist3
     }#cs
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8758,7 +8765,7 @@ execNoCcatch {
   {
     #slist
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8776,7 +8783,7 @@ execReturn {
   {
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8794,7 +8801,7 @@ execReturnEliminateBreak {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8812,7 +8819,7 @@ execReturnEliminateBreakLabel {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8830,7 +8837,7 @@ execReturnEliminateBreakLabelWildcard {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8848,7 +8855,7 @@ execReturnEliminateContinue {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8866,7 +8873,7 @@ execReturnEliminateContinueLabel {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8884,7 +8891,7 @@ execReturnEliminateContinueLabelWildcard {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8902,7 +8909,7 @@ execReturnEliminateExcCcatch {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8920,7 +8927,7 @@ execReturnEliminateReturnVal {
   {
     return;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8941,7 +8948,7 @@ execReturnVal {
     #v = (#t) #se;
     #slist1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8959,7 +8966,7 @@ execReturnValEliminateBreak {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8977,7 +8984,7 @@ execReturnValEliminateBreakLabel {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8995,7 +9002,7 @@ execReturnValEliminateBreakLabelWildcard {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9013,7 +9020,7 @@ execReturnValEliminateContinue {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9031,7 +9038,7 @@ execReturnValEliminateContinueLabel {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9049,7 +9056,7 @@ execReturnValEliminateContinueLabelWildcard {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9067,7 +9074,7 @@ execReturnValEliminateExcCcatch {
   {
     return #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9085,7 +9092,7 @@ execReturnValEliminateReturn {
   exec {
     return #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9105,7 +9112,7 @@ execReturnValNonMatchingType {
     return #se;
     #slist
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9123,7 +9130,7 @@ execThrowEliminateBreak {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9141,7 +9148,7 @@ execThrowEliminateBreakLabel {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9159,7 +9166,7 @@ execThrowEliminateBreakLabelWildcard {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9177,7 +9184,7 @@ execThrowEliminateContinue {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9195,7 +9202,7 @@ execThrowEliminateContinueLabel {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9213,7 +9220,7 @@ execThrowEliminateContinueLabelWildcard {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9231,7 +9238,7 @@ execThrowEliminateReturn {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9249,7 +9256,7 @@ execThrowEliminateReturnVal {
   exec {
     throw #se;
   }#cs
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9277,28 +9284,28 @@ Choices: true}
 == expandInByte (expandInByte) =========================================
 expandInByte {
 \find(inByte(i))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInChar (expandInChar) =========================================
 expandInChar {
 \find(inChar(i))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInInt (expandInInt) =========================================
 expandInInt {
 \find(inInt(i))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == expandInLong (expandInLong) =========================================
 expandInLong {
 \find(inLong(i))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
@@ -9340,7 +9347,7 @@ Choices: true}
 == expandInShort (expandInShort) =========================================
 expandInShort {
 \find(inShort(i))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
@@ -9512,7 +9519,7 @@ forInitUnfold {
     forInitUnfoldTransformer(#loopInit)
     for (; #guard; #forupdates) #s
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(loop_expand)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9524,7 +9531,7 @@ for_to_while {
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #for-to-while(#forloop)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9735,7 +9742,7 @@ Choices: sequences:on}
 == getOfSeqUpd (getOfSeqUpd) =========================================
 getOfSeqUpd {
 \find(alpha::seqGet(seqUpd(seq,idx,value),jdx))
-\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx)))
+\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),alpha::cast(value),alpha::seqGet(seq,jdx))) 
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9770,7 +9777,7 @@ greater_equal_than_comparison_new {
   #lhs = true;
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #lhs = false;
-... }}| (post)))
+... }}| (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9817,7 +9824,7 @@ greater_than_comparison_new {
   #lhs = true;
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #lhs = false;
-... }}| (post)))
+... }}| (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9936,7 +9943,7 @@ identityCastDouble {
 ... }}| (post))
 \replacewith(#normalassign ((modal operator))|{{ ..
   #loc = #seDouble;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9947,7 +9954,7 @@ identityCastFloat {
 ... }}| (post))
 \replacewith(#normalassign ((modal operator))|{{ ..
   #loc = #seFloat;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9958,7 +9965,7 @@ if {
 ... }}| (post))
 \replacewith(if-then-else(equals(#se,TRUE),#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post),#allmodal(post)))
+... }}| (post),#allmodal(post))) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9972,7 +9979,7 @@ ifElse {
   #s0
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #s1
-... }}| (post)))
+... }}| (post))) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9985,7 +9992,7 @@ ifElseFalse {
 ... }}| (post))
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #s1
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9999,7 +10006,7 @@ ifElseSkipElse {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #loc = true;
   #s0
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10017,7 +10024,7 @@ ifElseSkipElseConditionInBlock {
     #loc = true;
   }
   #s0
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10031,7 +10038,7 @@ ifElseSkipThen {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #loc = false;
   #s1
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10049,7 +10056,7 @@ ifElseSkipThenConditionInBlock {
     #loc = false;
   }
   #s1
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10064,7 +10071,7 @@ ifElseSplit {
 ... }}| (post)]) ;
 \add [equals(#se,TRUE)]==>[] \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(split_if)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10079,7 +10086,7 @@ ifElseSplitLeft {
 ... }}| (post)]==>[]) ;
 \add [equals(#se,TRUE)]==>[] \replacewith([#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post)]==>[])
+... }}| (post)]==>[]) 
 \heuristics(split_if)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10092,7 +10099,7 @@ ifElseTrue {
 ... }}| (post))
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10110,7 +10117,7 @@ ifElseUnfold {
   else {
     #s1
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10123,7 +10130,7 @@ ifEnterThen {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #loc = true;
   #s0
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10140,7 +10147,7 @@ ifEnterThenConditionInBlock {
     #loc = true;
   }
   #s0
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10329,7 +10336,7 @@ ifSkipThen {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #loc = false;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10345,7 +10352,7 @@ ifSkipThenConditionInBlock {
   {
     #loc = false;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10357,7 +10364,7 @@ ifSplit {
 \add [equals(#se,FALSE)]==>[] \replacewith([]==>[#allmodal(post)]) ;
 \add [equals(#se,TRUE)]==>[] \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(split_if)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10369,7 +10376,7 @@ ifSplitLeft {
 \add [equals(#se,FALSE)]==>[] \replacewith([#allmodal(post)]==>[]) ;
 \add [equals(#se,TRUE)]==>[] \replacewith([#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post)]==>[])
+... }}| (post)]==>[]) 
 \heuristics(split_if)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10381,7 +10388,7 @@ ifTrue {
 ... }}| (post))
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #s0
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10395,7 +10402,7 @@ ifUnfold {
   boolean #boolv;
   #boolv = #nse;
   if (#boolv) #s0
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11249,7 +11256,7 @@ inequality_comparison_new {
   #lhs = true;
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #lhs = false;
-... }}| (post)))
+... }}| (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11384,7 +11391,7 @@ instanceCreation {
   #typeof(#v0) #v0 = create-object(#n);
   constructor-call(#n)
   post-work(#v0)
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11399,7 +11406,7 @@ instanceCreationAssignment {
   constructor-call(#n)
   post-work(#v0)
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11410,7 +11417,7 @@ instanceCreationAssignmentUnfoldArguments {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #evaluate-arguments(#lhs = #nsn)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11421,8 +11428,17 @@ instanceCreationUnfoldArguments {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #evaluate-arguments(#nsn)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== instance_for_final_types (instance_for_final_types) =========================================
+instance_for_final_types {
+\assumes ([]==>[equals(J::exactInstance(a),TRUE)]) 
+\find(equals(J::instance(a),TRUE)==>)
+\varcond(\isFinal (J))
+\replacewith([equals(a,null)]==>[]) 
+\heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == instanceof_eval (instanceof_eval) =========================================
@@ -11434,7 +11450,7 @@ instanceof_eval {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   #v = #v0 instanceof #t;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11680,7 +11696,7 @@ iterated_assignments_0 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = #e;
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11692,7 +11708,7 @@ iterated_assignments_1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 * #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11704,7 +11720,7 @@ iterated_assignments_10 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 | #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11716,7 +11732,7 @@ iterated_assignments_11 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 ^ #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11728,7 +11744,7 @@ iterated_assignments_2 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 / #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11740,7 +11756,7 @@ iterated_assignments_3 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 % #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11752,7 +11768,7 @@ iterated_assignments_4 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 + #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11764,7 +11780,7 @@ iterated_assignments_5 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 - #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11776,7 +11792,7 @@ iterated_assignments_6 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 << #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11788,7 +11804,7 @@ iterated_assignments_7 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 >> #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11800,7 +11816,7 @@ iterated_assignments_8 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 >>> #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11812,7 +11828,7 @@ iterated_assignments_9 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 & #e);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12173,7 +12189,7 @@ Choices: sequences:on}
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
 lenOfSeqUpd {
 \find(seqLen(seqUpd(seq,idx,value)))
-\replacewith(seqLen(seq))
+\replacewith(seqLen(seq)) 
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -12330,7 +12346,7 @@ less_equal_than_comparison_new {
   #lhs = true;
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #lhs = false;
-... }}| (post)))
+... }}| (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12434,7 +12450,7 @@ less_than_comparison_new {
   #lhs = true;
 ... }}| (post),#allmodal ((modal operator))|{{ ..
   #lhs = false;
-... }}| (post)))
+... }}| (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12673,7 +12689,7 @@ loopUnwind {
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #unwind-loop(while (#e) #s)
-... }}| (post))
+... }}| (post)) 
 \heuristics(loop_expand)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12687,7 +12703,7 @@ lsBreak {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12716,7 +12732,7 @@ lsLblBreak {
     #lhs = true;
     break;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12750,7 +12766,7 @@ lsLblContinueNoMatch1 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12767,7 +12783,7 @@ lsLblContinueNoMatch2 {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12782,7 +12798,7 @@ lsReturnNonVoid {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
   return #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12797,7 +12813,7 @@ lsReturnVoid {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
   return;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12812,7 +12828,7 @@ lsThrow {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = true;
   throw #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12949,7 +12965,7 @@ methodBodyExpand {
 ... }}| (post))
 \replacewith(#introAtPreDefs(#allmodal ((modal operator))|{{ ..
   expand-method-body(#mb)
-... }}| (post)))
+... }}| (post))) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12962,7 +12978,7 @@ methodCall {
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   method-call(#se.#mn(#selist))
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(method_expand)
 Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
@@ -13007,7 +13023,7 @@ methodCallParamThrow {
 \varcond(\isLocalVariable (#se (program SimpleExpression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   throw #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13023,7 +13039,7 @@ methodCallReturn {
   method-frame (#ex) {
     #v0 = #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13046,7 +13062,7 @@ methodCallSuper {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   method-call(super.#mn(#elist))
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand, simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13061,7 +13077,7 @@ methodCallThrow {
 \varcond(\isLocalVariable (#se (program SimpleExpression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   throw #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13072,7 +13088,7 @@ methodCallUnfoldArguments {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #evaluate-arguments(#nsmr)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13086,7 +13102,7 @@ methodCallUnfoldTarget {
   #typeof(#nse) #v0;
   #v0 = #nse;
   #v0.#mn(#elist);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13101,7 +13117,7 @@ methodCallWithAssignment {
   #typeof(#lhs) #v0;
   method-call(#se.#mn(#selist))
   #lhs = #v0;
-... }}| (post)])
+... }}| (post)]) 
 \heuristics(method_expand)
 Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
@@ -13115,7 +13131,7 @@ methodCallWithAssignmentSuper {
   #typeof(#lhs) #v0;
   method-call(super.#mn(#elist))
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand, simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13126,7 +13142,7 @@ methodCallWithAssignmentUnfoldArguments {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #evaluate-arguments(#lhs = #nsmr)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13140,7 +13156,7 @@ methodCallWithAssignmentUnfoldTarget {
   #typeof(#nse) #v0;
   #v0 = #nse;
   #lhs = #v0.#mn(#elist);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13154,7 +13170,7 @@ methodCallWithAssignmentWithinClass {
   #typeof(#lhs) #v0;
   method-call(#mn(#elist))
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -13166,7 +13182,7 @@ methodCallWithinClass {
 \varcond(\mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   method-call(#mn(#elist))
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -13526,10 +13542,10 @@ Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == narrowFinalArrayType (narrowFinalArrayType) =========================================
 narrowFinalArrayType {
-\assumes ([]==>[equals(o,null)])
+\assumes ([]==>[equals(o,null)]) 
 \find(beta::final(o,arr(idx)))
 \sameUpdateLevel\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \strict\sub(alpha, beta))
-\replacewith(alpha::final(o,arr(idx)))
+\replacewith(alpha::final(o,arr(idx))) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13555,7 +13571,7 @@ Choices: programRules:Java}
 narrowTypeFinal {
 \find(beta::final(o,f))
 \varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
-\replacewith(alpha::final(o,f))
+\replacewith(alpha::final(o,f)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13573,7 +13589,7 @@ narrowingByteCastInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (byte) #seInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13582,7 +13598,7 @@ narrowingByteCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (byte) #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13591,7 +13607,7 @@ narrowingByteCastShort {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (byte) #seShort;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seShort)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastByte(#seShort)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13627,7 +13643,7 @@ narrowingCharCastByte {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seByte;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seByte)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seByte)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13636,7 +13652,7 @@ narrowingCharCastInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13645,7 +13661,7 @@ narrowingCharCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13654,7 +13670,7 @@ narrowingCharCastShort {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (char) #seShort;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seShort)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastChar(#seShort)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13672,7 +13688,7 @@ narrowingIntCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (int) #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastInt(#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastInt(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13699,7 +13715,7 @@ narrowingShortCastInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (short) #seInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13708,7 +13724,7 @@ narrowingShortCastLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (short) #seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaCastShort(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13966,23 +13982,23 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSetsEQ {
 \assumes ([wellFormed(h),equals(LocSet::select(h,o,f),EQ)]==>[]) 
 \find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[]
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsEQFinal (onlyCreatedObjectsAreInLocSetsEQFinal) =========================================
 onlyCreatedObjectsAreInLocSetsEQFinal {
-\assumes ([wellFormed(h),equals(LocSet::final(o,f),EQ)]==>[])
+\assumes ([wellFormed(h),equals(LocSet::final(o,f),EQ)]==>[]) 
 \find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[]
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsFinal (onlyCreatedObjectsAreInLocSetsFinal) =========================================
 onlyCreatedObjectsAreInLocSetsFinal {
-\assumes ([wellFormed(h)]==>[])
+\assumes ([wellFormed(h)]==>[]) 
 \find(elementOf(o2,f2,LocSet::final(o,f))==>)
-\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[]
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14021,9 +14037,9 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreReferencedFinal (onlyCreatedObjectsAreReferencedFinal) =========================================
 onlyCreatedObjectsAreReferencedFinal {
-\assumes ([wellFormed(h),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)]==>[])
+\assumes ([wellFormed(h),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)]==>[]) 
 \find(deltaObject::final(o,f))
-\sameUpdateLevel\add [or(equals(deltaObject::final(o,f),null),equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))]==>[]
+\sameUpdateLevel\add [or(equals(deltaObject::final(o,f),null),equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14053,6 +14069,13 @@ Choices: Strings:on}
 orJIntDef {
 \find(orJint(left,right))
 \replacewith(moduloInt(binaryOr(left,right))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== orJLongDef (orJLongDef) =========================================
+orJLongDef {
+\find(orJlong(left,right))
+\replacewith(moduloLong(binaryOr(left,right))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -14360,7 +14383,7 @@ postdecrement {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) #lhs1 - 1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14374,7 +14397,7 @@ postdecrement_array {
   #typeof(#e) #v = #e;
   #typeof(#e0) #v0 = #e0;
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14388,7 +14411,7 @@ postdecrement_assignment {
   #typeof(#lhs0) #v = #lhs1;
   #lhs1 = (#typeof(#lhs1)) (#lhs1 - 1);
   #lhs0 = #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14404,7 +14427,7 @@ postdecrement_assignment_array {
   #typeof(#lhs0) #v1 = #v[#v0];
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
   #lhs0 = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14420,7 +14443,7 @@ postdecrement_assignment_attribute {
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
                                            1);
   #lhs0 = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14434,7 +14457,7 @@ postdecrement_attribute {
   #typeof(#e) #v = #e;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
                                            1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14445,7 +14468,7 @@ postincrement {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14459,7 +14482,7 @@ postincrement_array {
   #typeof(#e) #v = #e;
   #typeof(#e0) #v0 = #e0;
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14473,7 +14496,7 @@ postincrement_assignment {
   #typeof(#lhs0) #v = #lhs1;
   #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
   #lhs0 = #v;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14489,7 +14512,7 @@ postincrement_assignment_array {
   #typeof(#lhs0) #v1 = #v[#v0];
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
   #lhs0 = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14505,7 +14528,7 @@ postincrement_assignment_attribute {
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
                                            1);
   #lhs0 = #v1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14519,7 +14542,7 @@ postincrement_attribute {
   #typeof(#e) #v = #e;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
                                            1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14756,7 +14779,7 @@ predecrement {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 - 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14770,7 +14793,7 @@ predecrement_array {
   #typeof(#e) #v = #e;
   #typeof(#e0) #v0 = #e0;
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14782,7 +14805,7 @@ predecrement_assignment {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 - 1);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14797,7 +14820,7 @@ predecrement_assignment_array {
   #typeof(#e0) #v0 = #e0;
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
   #lhs0 = #v[#v0];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14812,7 +14835,7 @@ predecrement_assignment_attribute {
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
                                            1);
   #lhs = #v.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14826,7 +14849,7 @@ predecrement_attribute {
   #typeof(#e) #v = #e;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
                                            1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14837,7 +14860,7 @@ preincrement {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14851,7 +14874,7 @@ preincrement_array {
   #typeof(#e) #v = #e;
   #typeof(#e0) #v0 = #e0;
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14863,7 +14886,7 @@ preincrement_assignment {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
   #lhs0 = #lhs1;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14878,7 +14901,7 @@ preincrement_assignment_array {
   #typeof(#e0) #v0 = #e0;
   #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
   #lhs0 = #v[#v0];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14893,7 +14916,7 @@ preincrement_assignment_attribute {
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
                                            1);
   #lhs0 = #v.#attribute;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14907,7 +14930,7 @@ preincrement_attribute {
   #typeof(#e) #v = #e;
   #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
                                            1);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15159,9 +15182,9 @@ Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
 == referencedObjectIsCreatedRighFinalEQ (referencedObjectIsCreatedRighFinalEQ) =========================================
 referencedObjectIsCreatedRighFinalEQ {
-\assumes ([equals(deltaObject::final(o,f),EQ)]==>[equals(EQ,null)])
+\assumes ([equals(deltaObject::final(o,f),EQ)]==>[equals(EQ,null)]) 
 \find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
-\add []==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]
+\add []==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))] 
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15183,9 +15206,9 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == referencedObjectIsCreatedRightFinal (referencedObjectIsCreatedRightFinal) =========================================
 referencedObjectIsCreatedRightFinal {
-\assumes ([]==>[equals(deltaObject::final(o,f),null)])
+\assumes ([]==>[equals(deltaObject::final(o,f),null)]) 
 \find(==>equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))
-\replacewith([]==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))])
+\replacewith([]==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]) 
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15276,7 +15299,7 @@ remove_parentheses_attribute_left {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #e.#attribute = #e0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15287,7 +15310,7 @@ remove_parentheses_lhs_left {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #e;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15298,7 +15321,7 @@ remove_parentheses_right {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #e;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15549,7 +15572,7 @@ returnUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   return #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15769,7 +15792,7 @@ seqConcatUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \singleton(#vLeftNew, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15782,7 +15805,7 @@ seqConcatUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \singleton(#seLeft, #vRightNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15898,7 +15921,7 @@ seqGetUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = #vLeftNew[#eRight];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15911,7 +15934,7 @@ seqGetUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = #seLeft[#vRightNew];
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15932,7 +15955,7 @@ seqIndexOfUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \indexOf(#vLeftNew, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15945,7 +15968,7 @@ seqIndexOfUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \indexOf(#seLeft, #vRightNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15958,7 +15981,7 @@ seqLengthUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #vNew = #nse;
   #v = #vNew.length;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15985,7 +16008,7 @@ seqReverseUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #vNew = #nse;
   #v = \seq_reverse(#vNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16014,7 +16037,7 @@ seqSingletonUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #vNew = #nse;
   #v = \seq_singleton(#vNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16027,7 +16050,7 @@ seqSubUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \seq_sub(#vLeftNew, #eMiddle, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16040,7 +16063,7 @@ seqSubUnfoldMiddle {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseMiddle) #vMiddleNew = #nseMiddle;
   #v = \seq_sub(#seLeft, #vMiddleNew, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16053,7 +16076,7 @@ seqSubUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \seq_sub(#seLeft, #seMiddle, #vRightNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16087,7 +16110,7 @@ setIntersectUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \intersect(#vLeftNew, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16100,7 +16123,7 @@ setIntersectUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \intersect(#seLeft, #vRightNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16153,7 +16176,7 @@ setMinusUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \set_minus(#vLeftNew, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16166,7 +16189,7 @@ setMinusUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \set_minus(#seLeft, #vRightNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16200,7 +16223,7 @@ setUnionUnfoldLeft {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \set_union(#vLeftNew, #eRight);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16213,7 +16236,7 @@ setUnionUnfoldRight {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \set_union(#seLeft, #vRightNew);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16510,7 +16533,7 @@ singletonUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nseObj) #vObjNew = #nseObj;
   #v = \singleton(#vObjNew.#a);
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16580,7 +16603,7 @@ special_constructor_call {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   special-constructor-call(#scr)
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16652,7 +16675,7 @@ Choices: true}
 == ssubsortDirect (ssubsortDirect) =========================================
 ssubsortDirect {
 \find(ssubsort(alphSub::ssort,alph::ssort))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -16660,14 +16683,14 @@ Choices: true}
 ssubsortSup {
 \find(ssubsort(alph::ssort,alphSub::ssort))
 \varcond(\not\same(alphSub, alph))
-\replacewith(false)
+\replacewith(false) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == ssubsortTop (ssubsortTop) =========================================
 ssubsortTop {
 \find(ssubsort(s,anySORT))
-\replacewith(true)
+\replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -16686,7 +16709,7 @@ staticMethodCall {
 \varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   method-call(#se.#mn(#elist))
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -16697,7 +16720,7 @@ staticMethodCallStaticViaTypereference {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   method-call(#t.#mn(#elist))
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -16711,7 +16734,7 @@ staticMethodCallStaticWithAssignmentViaTypereference {
   #typeof(#lhs) #v0;
   method-call(#t.#mn(#elist))
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -16725,7 +16748,7 @@ staticMethodCallWithAssignment {
   #typeof(#lhs) #v0;
   method-call(#se.#mn(#elist))
   #lhs = #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
 -----------------------------------------------------
@@ -16809,7 +16832,7 @@ stringConcatObjectLeft {
 \sameUpdateLevel\add [equals(#seLeft,null),equals(strContent(sk),seqConcat(strContent(null),strContent(#sstrRight)))]==>[equals(sk,null)] \replacewith(update-application(elem-update(#v (program Variable))(sk),update-application(elem-update(heap)(create(heap,sk)),#normalassign(post)))) ;
 \add []==>[equals(#seLeft,null)] \replacewith(#normalassign ((modal operator))|{{ ..
   #v = #seLeft.toString() + #sstrRight;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: true}
 -----------------------------------------------------
@@ -16821,7 +16844,7 @@ stringConcatObjectRight {
 \sameUpdateLevel\add [equals(#seRight,null),equals(strContent(sk),seqConcat(strContent(#sstrLeft),strContent(null)))]==>[equals(sk,null)] \replacewith(update-application(elem-update(#v (program Variable))(sk),update-application(elem-update(heap)(create(heap,sk)),#normalassign(post)))) ;
 \add []==>[equals(#seRight,null)] \replacewith(#normalassign ((modal operator))|{{ ..
   #v = #sstrLeft + #seRight.toString();
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: true}
 -----------------------------------------------------
@@ -17168,8 +17191,8 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == subsortTrans (subsortTrans) =========================================
 subsortTrans {
-\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[])
-\add [ssubsort(s1,s3)]==>[]
+\assumes ([ssubsort(s1,s2),ssubsort(s2,s3)]==>[]) 
+\add [ssubsort(s1,s3)]==>[] 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -17237,7 +17260,7 @@ switch {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   switch-to-if(#sw)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17288,7 +17311,7 @@ synchronizedBlockEvalSync {
   synchronized(#loc) {
     #slist
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17342,7 +17365,7 @@ throwLabel {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   throw #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17357,7 +17380,7 @@ throwLabelBlock {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   throw #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17368,7 +17391,7 @@ throwNull {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   throw new java.lang.NullPointerException();
-... }}| (post))
+... }}| (post)) 
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17381,7 +17404,7 @@ throwUnfold {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   throw #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17394,7 +17417,7 @@ throwUnfoldMore {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#se) #v0 = #se;
   throw #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17898,7 +17921,7 @@ tryBreak {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17912,7 +17935,7 @@ tryBreakLabel {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17952,7 +17975,7 @@ tryCatchFinallyThrow {
       #slist2
     }
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -17980,7 +18003,7 @@ tryCatchThrow {
   } else {
     throw #se;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18008,7 +18031,7 @@ tryFinallyBreak {
     #slist2
   }
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18027,7 +18050,7 @@ tryFinallyBreakLabel {
     #slist2
   }
   break;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18042,7 +18065,7 @@ tryFinallyEmpty {
   {
     #slist2
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18063,7 +18086,7 @@ tryFinallyReturn {
     #slist2
   }
   return #v0;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18082,7 +18105,7 @@ tryFinallyReturnNoValue {
     #slist2
   }
   return;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18110,7 +18133,7 @@ tryFinallyThrow {
     }
     throw #v0;
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18146,7 +18169,7 @@ tryMultipleCatchThrow {
       #slist3
     }#cs
   }
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18160,7 +18183,7 @@ tryReturn {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   return #se;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18174,7 +18197,7 @@ tryReturnNoValue {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   return;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18188,7 +18211,7 @@ try_continue_1 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18202,7 +18225,7 @@ try_continue_2 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18221,7 +18244,7 @@ try_finally_continue_1 {
     #slist2
   }
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18240,7 +18263,7 @@ try_finally_continue_2 {
     #slist2
   }
   continue;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18306,7 +18329,7 @@ unaryMinusInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = -#seCharByteShortInt;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusInt(#seCharByteShortInt)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusInt(#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18315,7 +18338,7 @@ unaryMinusLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = -#seLong;
 ... }}| (post))
-\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusLong(#seLong)),#normalassign(post)))
+\sameUpdateLevel\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18432,6 +18455,13 @@ unsignedShiftRightJintDef {
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
+== unsignedShiftRightJlongDef (unsignedShiftRightJlongDef) =========================================
+unsignedShiftRightJlongDef {
+\find(unsignedshiftrightJlong(left,right))
+\replacewith(if-then-else(geq(left,Z(0(#))),shiftrightJlong(left,right),addJlong(shiftrightJlong(left,right),shiftleftJlong(Z(2(#)),sub(Z(3(6(#))),mod(right,Z(4(6(#))))))))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
 == unusedLabel (unusedLabel) =========================================
 unusedLabel {
 \find(#allmodal ((modal operator))|{{ ..
@@ -18441,7 +18471,7 @@ unusedLabel {
 \varcond(\not\freeLabelIn (#lb,#s))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #s
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18463,7 +18493,7 @@ unwindLoopScope {
   }
 ... }}| (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),#allmodal ((modal operator))|{{ ..
   #reattachLoopInvariant(while (#nse) #body)
-... }}| (post)))))
+... }}| (post))))) 
 \heuristics(loop_scope_expand)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18484,7 +18514,7 @@ variableDeclarationAssign {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #t #v0;
   #v0 = #vi;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18505,7 +18535,7 @@ variableDeclarationFinalAssign {
 \replacewith(#allmodal ((modal operator))|{{ ..
   final #t #v0;
   #v0 = #vi;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18526,7 +18556,7 @@ variableDeclarationGhostAssign {
 \replacewith(#allmodal ((modal operator))|{{ ..
   ghost #t #v0;
   #v0 = #vi;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18537,7 +18567,7 @@ variableDeclarationMult {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   multiple-var-decl(#multvardecl)
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18670,7 +18700,7 @@ widening_identity_cast_1 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seByte;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18681,7 +18711,7 @@ widening_identity_cast_10 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seByteShortInt;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18692,7 +18722,7 @@ widening_identity_cast_11 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seLong;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18703,7 +18733,7 @@ widening_identity_cast_12 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seChar;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18714,7 +18744,7 @@ widening_identity_cast_13 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seChar;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18725,7 +18755,7 @@ widening_identity_cast_2 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seByte;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18736,7 +18766,7 @@ widening_identity_cast_3 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seChar;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18747,7 +18777,7 @@ widening_identity_cast_4 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seShort;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18758,7 +18788,7 @@ widening_identity_cast_5 {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seByteShortInt;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18769,7 +18799,7 @@ widening_identity_cast_bigint {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #lhs = #seAny;
-... }}| (post))
+... }}| (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & bigint:on)}
 -----------------------------------------------------
@@ -18791,6 +18821,13 @@ Choices: permissions:off}
 xorJIntDef {
 \find(xorJint(left,right))
 \replacewith(moduloInt(binaryXOr(left,right))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== xorJLongDef (xorJLongDef) =========================================
+xorJLongDef {
+\find(xorJlong(left,right))
+\replacewith(moduloLong(binaryXOr(left,right))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
