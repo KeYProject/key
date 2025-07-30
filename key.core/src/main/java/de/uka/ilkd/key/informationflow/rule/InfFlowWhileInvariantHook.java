@@ -53,7 +53,7 @@ import com.google.auto.service.AutoService;
 public class InfFlowWhileInvariantHook implements WhileInvariantRule.WhileInvariantHook {
     @Override
     public void rewriteStandardGoals(Services services, Goal init, Goal preserve, Goal terminate,
-            Instantiation inst, LoopInvariantBuiltInRuleApp loopRuleApp,
+            Instantiation inst, InfFlowLoopInvariantBuiltInRuleApp<?> loopRuleApp,
             JavaBlock guardJb,
             ImmutableSet<LocationVariable> localIns,
             ImmutableSet<LocationVariable> localOuts,
@@ -74,7 +74,7 @@ public class InfFlowWhileInvariantHook implements WhileInvariantRule.WhileInvari
     }
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
-            LoopInvariantBuiltInRuleApp ruleApp, Instantiation inst,
+            InfFlowLoopInvariantBuiltInRuleApp<?> ruleApp, Instantiation inst,
             JavaBlock guardJb,
             ImmutableSet<LocationVariable> localIns,
             ImmutableSet<LocationVariable> localOuts,

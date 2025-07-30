@@ -23,6 +23,6 @@ public class JavaInfFlowProfile extends JavaProfile {
                 return InfFlowBlockContractInternalRule.INSTANCE;
             }
             return it;
-        });
+        }).filter(it -> it != BlockContractExternalRule.INSTANCE);
     }
 }

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
@@ -76,7 +77,7 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars(StateVars pre, StateVars post, JTerm exceptionParameter,
-            ImmutableList<JTerm> formalParams, TermBuilder tb) {
+                               @Nullable ImmutableList<JTerm> formalParams, TermBuilder tb) {
         this.pre = pre;
         this.post = post;
         this.exceptionParameter = exceptionParameter;

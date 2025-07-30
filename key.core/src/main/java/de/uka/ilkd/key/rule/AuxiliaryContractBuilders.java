@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -38,8 +37,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.wd.BlockWellDefinedness;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -1363,9 +1362,9 @@ public final class AuxiliaryContractBuilders {
          * @param localIns all free local variables in the block.
          * @return the well-definedness formula.
          */
-        public JTerm setUpWdGoal(final Goal goal, final BlockContract contract, final JTerm update,
-                final JTerm anonUpdate, final LocationVariable heap, final Function anonHeap,
-                final ImmutableSet<LocationVariable> localIns) {
+        public JTerm setUpWdGoal(final @Nullable Goal goal, final BlockContract contract, final JTerm update,
+                                 final JTerm anonUpdate, final LocationVariable heap, final Function anonHeap,
+                                 final ImmutableSet<LocationVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
             final BlockWellDefinedness bwd =

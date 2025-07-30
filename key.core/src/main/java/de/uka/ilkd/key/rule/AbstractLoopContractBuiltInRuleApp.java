@@ -19,18 +19,20 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Application of {@link AbstractLoopContractRule}.
  *
  * @author lanzinger
  */
-public abstract class AbstractLoopContractBuiltInRuleApp
-        extends AbstractAuxiliaryContractBuiltInRuleApp {
+public abstract class AbstractLoopContractBuiltInRuleApp<T extends BuiltInRule>
+        extends AbstractAuxiliaryContractBuiltInRuleApp<T> {
 
     /**
      * @see #getContract()
      */
-    protected LoopContract contract;
+    protected @Nullable LoopContract contract;
 
     /**
      *
@@ -38,13 +40,13 @@ public abstract class AbstractLoopContractBuiltInRuleApp
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
      */
-    protected AbstractLoopContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<PosInOccurrence> ifInstantiations) {
+    protected AbstractLoopContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
+            @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
     @Override
-    public LoopContract getContract() {
+    public @Nullable LoopContract getContract() {
         return contract;
     }
 
@@ -54,7 +56,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
      * @param rule the rule being applied.
      * @return this.
      */
-    public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal,
+    public AbstractLoopContractBuiltInRuleApp<T> tryToInstantiate(final Goal goal,
             final AbstractLoopContractRule rule) {
         if (complete() || cannotComplete(goal)) {
             return this;
