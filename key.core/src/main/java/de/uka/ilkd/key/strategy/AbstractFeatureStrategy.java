@@ -202,4 +202,6 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
+
+    protected abstract RuleSetDispatchFeature getCostDispatcher();
 }

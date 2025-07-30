@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -13,10 +14,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
@@ -34,6 +37,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final StrategyProperties strategyProperties;
     private final Feature reduceCostTillMaxF;
     private final Feature reduceInstTillMaxF;
+    private final ArithTermFeatures tf;
+    private final RuleSetDispatchFeature conflictCostDispatcher;
 
     public ModularJavaDLStrategy(Proof proof, List<AbstractFeatureStrategy> componentStrategies,
             StrategyProperties properties) {
@@ -42,6 +47,51 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost);
         reduceInstTillMaxF = new ReduceTillMaxFeature(AbstractFeatureStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
+        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        conflictCostDispatcher = resolveConflicts();
+    }
+
+    @Override
+    protected RuleSetDispatchFeature getCostDispatcher() {
+        return null;
+    }
+
+    private record StratAndDispatcher(AbstractFeatureStrategy strategy,
+            RuleSetDispatchFeature dispatcher) {
+    }
+
+    private RuleSetDispatchFeature resolveConflicts() {
+        var dis = new RuleSetDispatchFeature();
+        var dispatchers =
+            strategies.stream().map(s -> new StratAndDispatcher(s, s.getCostDispatcher())).toList();
+        var map = new HashMap<RuleSet, List<AbstractFeatureStrategy>>();
+        for (var d : dispatchers) {
+            var s = d.strategy;
+            for (var rs : d.dispatcher.ruleSets()) {
+                var lst = map.computeIfAbsent(rs, r -> new ArrayList<>());
+                lst.add(s);
+            }
+        }
+        for (var e : map.entrySet()) {
+            if (e.getValue().size() > 1) {
+                resolveConflict(dis, e.getKey(), e.getValue());
+            }
+        }
+        return dis;
+    }
+
+    private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs,
+            List<AbstractFeatureStrategy> value) {
+        switch (rs.name().toString()) {
+        case "order_terms" -> {
+            var intStrat = value.getFirst();
+            var javaDLStrat = value.get(1);
+            bindRuleSet(d, "order_terms",
+                ifZero(applyTF("commEqLeft", tf.intF),
+                    intStrat.getCostDispatcher().remove(rs),
+                    javaDLStrat.getCostDispatcher().remove(rs)));
+        }
+        }
     }
 
     @Override
@@ -78,7 +128,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private <R> R reduceTillMax(RuleApp app, R init, R max, BiFunction<R, R, R> accumulator,
-            Function<AbstractFeatureStrategy, R> mapper) {
+            Function<AbstractFeatureStrategy, R> mapper, Object... conflict) {
         for (AbstractFeatureStrategy strategy : strategies) {
             var isResponsible = false;
             var ruleSets = app.rule().ruleSets();
@@ -108,9 +158,10 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, GOAL goal, MutableState mState) {
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
+        // TODO: This could be inefficient. Maybe we can simplify conflict resolution
         Feature totalCost =
             add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
-                reduceCostTillMaxF,
+                reduceCostTillMaxF, conflictCostDispatcher,
                 AgeFeature.INSTANCE, ifMatchedF);
         return totalCost.computeCost(app, pos, goal, mState);
     }
