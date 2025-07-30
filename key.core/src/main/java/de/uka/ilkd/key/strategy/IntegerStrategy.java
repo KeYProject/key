@@ -147,6 +147,10 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
 
         setupDefOpsPrimaryCategories(d);
 
+        bindRuleSet(d, "order_terms",
+            add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
+                monSmallerThan("commEqLeft", "commEqRight", numbers), longConst(-5000)));
+
         // For taclets that need instantiation, but where the instantiation is
         // deterministic and does not have to be repeated at a later point, we
         // setup the same feature terms as in the instantiation method. The
@@ -968,5 +972,10 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
+    }
+
+    @Override
+    protected RuleSetDispatchFeature getCostDispatcher() {
+        return costComputationDispatcher;
     }
 }

@@ -177,4 +177,9 @@ public class StringStrategy extends AbstractFeatureStrategy {
             PosInOccurrence pos, Goal goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
+
+    @Override
+    protected RuleSetDispatchFeature getCostDispatcher() {
+        return costComputationDispatcher;
+    }
 }

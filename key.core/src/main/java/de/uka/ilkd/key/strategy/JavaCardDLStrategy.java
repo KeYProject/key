@@ -233,10 +233,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             applyTF(FocusProjection.create(0), IsNonRigidTermFeature.INSTANCE));
 
         bindRuleSet(d, "order_terms",
-            add(ifZero(applyTF("commEqLeft", tf.intF),
-                add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
-                    monSmallerThan("commEqLeft", "commEqRight", numbers)),
-                termSmallerThan("commEqLeft", "commEqRight")), longConst(-5000)));
+            add(termSmallerThan("commEqLeft", "commEqRight"), longConst(-5000)));
 
         bindRuleSet(d, "simplify_literals",
             // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
@@ -1068,5 +1065,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public boolean isStopAtFirstNonCloseableGoal() {
         return strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                 .equals(StrategyProperties.STOPMODE_NONCLOSE);
+    }
+
+    @Override
+    protected RuleSetDispatchFeature getCostDispatcher() {
+        return costComputationDispatcher;
     }
 }

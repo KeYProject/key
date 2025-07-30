@@ -234,4 +234,9 @@ public class SymExStrategy extends AbstractFeatureStrategy {
             PosInOccurrence pos, GOAL goal, MutableState mState) {
         return costComputationF.computeCost(app, pos, goal, mState);
     }
+
+    @Override
+    protected RuleSetDispatchFeature getCostDispatcher() {
+        return costComputationDispatcher;
+    }
 }
