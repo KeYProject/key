@@ -10,20 +10,22 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The rule application for {@link de.uka.ilkd.key.java.statement.SetStatement}
  *
  * @author Julian Wiesler
  */
-public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp<SetStatementRule> {
     /**
      * @param rule the rule being applied
      * @param occurrence the position at which the rule is applied
      */
-    public SetStatementBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence occurrence) {
+    public SetStatementBuiltInRuleApp(SetStatementRule rule, PosInOccurrence occurrence) {
         super(rule, Objects.requireNonNull(occurrence, "rule application needs a position"), null);
-        if (!(rule instanceof SetStatementRule)) {
+        if (rule == null) {
             throw new IllegalArgumentException(String.format(
                 "can only create an application for SetStatementRule, not for %s", rule));
         }
@@ -35,8 +37,7 @@ public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setAssumesInsts(
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         // XXX: This is overridden in all subclasses to allow making ifInsts final
         // when all usages of setIfInsts are corrected to use the result.
         // Then a new instance has to be returned here.
@@ -45,7 +46,7 @@ public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public SetStatementBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
 }
