@@ -402,7 +402,7 @@ public final class CommandLine {
 
             File tmp = new File(fileArg);
             if (tmp.exists()) {
-                ret.add(tmp.toPath());
+                ret.add(tmp.toPath().toAbsolutePath());
             } else {
                 Main.printUsageAndExit(false, "File not found: " + fileArg, -4);
             }
