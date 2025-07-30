@@ -35,8 +35,6 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
     private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
-    private final RuleSetDispatchFeature approvalDispatcher;
-    private final Feature approvalF;
     private final RuleSetDispatchFeature instantiationDispatcher;
     private final Feature instantiationF;
 
@@ -48,19 +46,15 @@ public class SymExStrategy extends AbstractFeatureStrategy {
         ff = new FormulaTermFeatures(tf);
 
         costComputationDispatcher = setupCostComputationF();
-        // TODO: necessary?
-        approvalDispatcher = new RuleSetDispatchFeature();
         instantiationDispatcher = new RuleSetDispatchFeature();
 
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
-        approvalF = NonDuplicateAppFeature.INSTANCE;
     }
 
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
-                || approvalDispatcher.get(rs) != null;
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
     }
 
     private Feature setupGlobalF(Feature dispatcher) {
@@ -139,7 +133,7 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
         final Feature findDepthFeature =
             FindDepthFeature.getInstance();
-        bindRuleSet(d, "concrete",
+        bindRuleSet(d, "concrete_java",
             add(longConst(-11000),
                 ScaleFeature.createScaled(findDepthFeature, 10.0)));
 
@@ -225,7 +219,7 @@ public class SymExStrategy extends AbstractFeatureStrategy {
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return approvalF.computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE;
+        return true;
     }
 
     @Override
