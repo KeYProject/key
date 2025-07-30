@@ -74,9 +74,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         String id = ctx.IDENT().getText();
         RuleSet h = ruleSets().lookup(new Name(id));
         if (h == null) {
-            h = new RuleSet(new Name(id));
-            ruleSets().add(h);
-            addWarning(ctx, String.format("Rule set %s was not previous defined.", ctx.getText()));
+            semanticError(ctx, "Rule set %s was not previous defined.", id);
         }
         return h;
     }
