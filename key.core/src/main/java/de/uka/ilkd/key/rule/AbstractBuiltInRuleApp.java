@@ -16,25 +16,28 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
-public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
+@NullMarked
+public abstract class AbstractBuiltInRuleApp<T extends BuiltInRule> implements IBuiltInRuleApp {
     public static final AtomicLong PERF_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
 
-    protected final BuiltInRule builtInRule;
+    protected final T builtInRule;
 
     protected final PosInOccurrence pio;
-    protected ImmutableList<PosInOccurrence> ifInsts;
+    protected @Nullable ImmutableList<PosInOccurrence> ifInsts;
 
-    protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts) {
+    protected AbstractBuiltInRuleApp(T rule, PosInOccurrence pio,
+            @Nullable ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
         this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
     }
 
-    protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    protected AbstractBuiltInRuleApp(T rule, PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
@@ -51,7 +54,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * returns the rule of this rule application
      */
     @Override
-    public BuiltInRule rule() {
+    public T rule() {
         return builtInRule;
     }
 
@@ -75,7 +78,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     @Override
     public void registerSkolemConstants(Namespace<@NonNull Function> fns) {}
 
-    public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
+    public abstract AbstractBuiltInRuleApp<T> replacePos(PosInOccurrence newPos);
 
     @Override
     public abstract IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
@@ -91,10 +94,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#tryToInstantiate(de.uka.ilkd.key.proof.Goal)
      */
     @Override
-    public abstract AbstractBuiltInRuleApp tryToInstantiate(Goal goal);
+    public abstract AbstractBuiltInRuleApp<T> tryToInstantiate(Goal goal);
 
     @Override
-    public AbstractBuiltInRuleApp forceInstantiate(Goal goal) {
+    public AbstractBuiltInRuleApp<T> forceInstantiate(Goal goal) {
         return tryToInstantiate(goal);
     }
 
@@ -125,7 +128,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public String toString() {
-        return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
+        return "BuiltInRule: %s at pos %s".formatted(rule().name(), pio.subTerm());
     }
 
 }
