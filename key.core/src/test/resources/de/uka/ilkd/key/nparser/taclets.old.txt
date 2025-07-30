@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Mar 03 18:42:58 CET 2025
+# Date: Tue Jul 29 22:37:48 CEST 2025
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -704,6 +704,13 @@ Choices: Strings:on}
 andJIntDef {
 \find(andJint(left,right))
 \replacewith(moduloInt(binaryAnd(left,right))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== andJLongDef (andJLongDef) =========================================
+andJLongDef {
+\find(andJlong(left,right))
+\replacewith(moduloLong(binaryAnd(left,right))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -2461,14 +2468,14 @@ bitwiseNegationInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = ~#seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#se)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#seCharByteShortInt)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
 == bitwiseNegationLong (invertBits) =========================================
 bitwiseNegationLong {
 \find(#normalassign ((modal operator))|{{ ..
-  #loc = ~#se;
+  #loc = ~#seLong;
 ... }}| (post))
 \replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
@@ -11425,6 +11432,15 @@ instanceCreationUnfoldArguments {
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
+== instance_for_final_types (instance_for_final_types) =========================================
+instance_for_final_types {
+\assumes ([]==>[equals(J::exactInstance(a),TRUE)]) 
+\find(equals(J::instance(a),TRUE)==>)
+\varcond(\isFinal (J))
+\replacewith([equals(a,null)]==>[]) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
 == instanceof_eval (instanceof_eval) =========================================
 instanceof_eval {
 \find(#allmodal ((modal operator))|{{ ..
@@ -14053,6 +14069,13 @@ Choices: Strings:on}
 orJIntDef {
 \find(orJint(left,right))
 \replacewith(moduloInt(binaryOr(left,right))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== orJLongDef (orJLongDef) =========================================
+orJLongDef {
+\find(orJlong(left,right))
+\replacewith(moduloLong(binaryOr(left,right))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -18432,6 +18455,13 @@ unsignedShiftRightJintDef {
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
+== unsignedShiftRightJlongDef (unsignedShiftRightJlongDef) =========================================
+unsignedShiftRightJlongDef {
+\find(unsignedshiftrightJlong(left,right))
+\replacewith(if-then-else(geq(left,Z(0(#))),shiftrightJlong(left,right),addJlong(shiftrightJlong(left,right),shiftleftJlong(Z(2(#)),sub(Z(3(6(#))),mod(right,Z(4(6(#))))))))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
 == unusedLabel (unusedLabel) =========================================
 unusedLabel {
 \find(#allmodal ((modal operator))|{{ ..
@@ -18791,6 +18821,13 @@ Choices: permissions:off}
 xorJIntDef {
 \find(xorJint(left,right))
 \replacewith(moduloInt(binaryXOr(left,right))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== xorJLongDef (xorJLongDef) =========================================
+xorJLongDef {
+\find(xorJlong(left,right))
+\replacewith(moduloLong(binaryXOr(left,right))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
