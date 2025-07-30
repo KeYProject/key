@@ -8,6 +8,7 @@ include "key.ncore"
 include 'key.ncore.calculus'
 include "key.core"
 include "key.core.rifl"
+include "key.core.infflow"
 include "key.core.symbolic_execution"
 include "key.core.testgen"
 include "key.removegenerics"

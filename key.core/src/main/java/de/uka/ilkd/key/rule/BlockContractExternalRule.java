@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
@@ -33,7 +32,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * <p>
@@ -57,6 +56,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author lanzinger
  */
+@NullMarked
 public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
     /**
@@ -183,23 +183,11 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         return new BlockContractExternalBuiltInRuleApp(this, pos);
     }
 
+    /// Not applicable for information, but this is excluded by using the right profile.
     @Override
-    public boolean isApplicable(final Goal goal,
-            final PosInOccurrence occurrence) {
-        return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
-    }
-
-    @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
-            final RuleApp ruleApp) throws RuleAbortException {
-        assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
-        BlockContractExternalBuiltInRuleApp application =
-            (BlockContractExternalBuiltInRuleApp) ruleApp;
-
-        if (InfFlowCheckInfo.isInfFlow(goal)) {
-            throw new RuleAbortException(
-                "BlockContractExternalRule does not support information flow goals!");
-        }
+    public ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
+            throws RuleAbortException {
+        var application = (BlockContractExternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
@@ -230,11 +218,10 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final JTerm[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
             variables, conditionsAndClausesBuilder, services);
 
-        final ImmutableList<Goal> result;
+        final ImmutableList<Goal> result = goal.split(2);
         final GoalsConfigurator configurator =
             new GoalsConfigurator(application, new TermLabelState(), instantiation,
                 contract.getLabels(), variables, application.posInOccurrence(), services, this);
-        result = goal.split(2);
         configurator.setUpPreconditionGoal(result.tail().head(), updates[0], preconditions);
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(assumptions, freePostcondition));
