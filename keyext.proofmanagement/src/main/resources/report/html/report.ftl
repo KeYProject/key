@@ -51,6 +51,40 @@
       unproven=checkerData.unprovenCount()
       data=checkerData >
 
+      <#assign provenPercent=proven/total*100
+      depsLeftPercent=lemmaLeft/total*100
+      unprovenPercent=unproven/total*100 >
+
+		<svg version="1.1"
+		     width="500" height="200"
+		     xmlns="http://www.w3.org/2000/svg">
+
+			<g transform="translate(0,0)">
+				<g transform="scale(5,1)">
+					<rect x="0" y="0" width="${provenPercent}" height="25" stroke-width="0" fill="#4CAF50"/>
+					<rect x="${provenPercent}" y="0" width="${depsLeftPercent}" height="25" stroke-width="0" fill="#f48336"/>
+					<rect x="${depsLeftPercent+provenPercent}" y="0" width="${unprovenPercent}" height="25" stroke-width="0"
+					      fill="#f44336"/>
+				</g>
+
+				<g transform="translate(35,40)">
+					<g transform="translate(0,0)">
+						<rect x="0" y="0" width="10" height="10" stroke-width="0" fill="#4CAF50"/>
+						<text x="15" y="10" alignment-baseline="middle">proven (${proven})</text>
+					</g>
+					<g transform="translate(120,0)">
+						<rect x="0" y="0" width="10" height="10" stroke-width="0" fill="#f48336"/>
+						<text x="15" y="10">dependencies left (${lemmaLeft})</text>
+					</g>
+					<g transform="translate(320,0)">
+						<rect x="0" y="0" width="10" height="10" fill="#f44336"/>
+						<text x="15" y="10">unproven (${unproven})</text>
+					</g>
+				</g>
+			</g>
+		</svg>
+
+		<!--
 		<div>
 			<div>
 				<span class="legend">proven</span>
@@ -68,6 +102,9 @@
           ${unproven} (${unproven/total*100}%)
 			</div>
 		</div>
+        -->
+
+
 	</div>
 
 	<div class="log-messages">
