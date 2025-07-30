@@ -1,0 +1,13 @@
+plugins {
+    id "application"
+}
+
+dependencies {
+    implementation(project(":keyext.api"))
+    implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.1")
+    implementation("info.picocli:picocli:4.7.6")
+}
+
+application {
+    mainClass.set("org.key_project.key.api.doc.Main")
+}

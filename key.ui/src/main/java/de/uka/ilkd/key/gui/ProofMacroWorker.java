@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.InteractionListener;
@@ -70,6 +72,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     private Exception exception;
     private final List<InteractionListener> interactionListeners = new ArrayList<>();
 
+    private final Condition finish;
+
     /**
      * Instantiates a new proof macro worker.
      *
@@ -86,6 +90,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         this.macro = macro;
         this.mediator = mediator;
         this.posInOcc = posInOcc;
+
+        finish = new ReentrantLock().newCondition();
     }
 
     @Override
@@ -106,6 +112,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         } catch (final Exception exception) {
             // This should actually never happen.
             this.exception = exception;
+        } finally {
+            finish.signalAll();
         }
 
         return info;
@@ -121,8 +129,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         synchronized (macro) {
             mediator.removeInterruptedListener(this);
             if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not
-                                                       // report this
-                // This should actually never happen.
+                // report this // This should actually never happen.
                 LOGGER.error("", exception);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
             }
@@ -168,5 +175,12 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
                 n = n.parent();
             }
         }
+    }
+
+    /**
+     * @return a condition for waiting on this thread to be finished
+     */
+    public Condition getFinish() {
+        return finish;
     }
 }
