@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
@@ -21,7 +20,6 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -160,26 +158,14 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param services services.
      * @return a list containing the new goals.
      */
-    private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
+    protected ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
             final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final JTerm contextUpdate,
             final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
-        final ImmutableList<Goal> result;
-        final LocationVariable heap = heaps.get(0);
-        if (WellDefinednessCheck.isOn()) {
-            result = goal.split(4);
-            final JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
-            final JTerm wdUpdate =
-                services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
-            configurator.setUpWdGoal(result.tail().tail().tail().head(), contract, wdUpdate,
-                localAnonUpdate, heap, anonymisationHeaps.get(heap), localInVariables);
-        } else {
-            result = goal.split(3);
-        }
-        return result;
+        return goal.split(3);
     }
 
     @Override
@@ -268,8 +254,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(assumptions, freePostcondition));
 
-        final boolean isInfFlow = InfFlowCheckInfo.isInfFlow(goal);
-        setUpValidityGoal(result, isInfFlow, contract, application, instantiation, heaps,
+        final boolean isInfFlow = false;// InfFlowCheckInfo.isInfFlow(goal);
+        setUpValidityGoal(result, contract, application, instantiation, heaps,
             anonymisationHeaps, localInVariables, localOutVariables, variables,
             ArrayUtil.add(preconditions, freePrecondition), assumptions, frameCondition, updates,
             configurator, conditionsAndClausesBuilder, services);
@@ -303,7 +289,6 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      * Sets up the validity goal as the first goal in the list.
      *
      * @param result the new goals.
-     * @param isInfFlow whether or not this is an information flow proof.
      * @param contract the block contract being applied.
      * @param application the rule application.
      * @param instantiation the instantiation.
@@ -320,7 +305,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
      * @param services services.
      */
-    protected void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
+    protected void setUpValidityGoal(final ImmutableList<Goal> result,
             final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
