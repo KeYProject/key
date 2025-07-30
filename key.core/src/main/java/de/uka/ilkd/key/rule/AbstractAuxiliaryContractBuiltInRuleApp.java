@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -15,27 +14,27 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Application for {@link AbstractAuxiliaryContractRule}.
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
+public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInRule>
+        extends AbstractBuiltInRuleApp<T> {
 
     /**
      * @see #getStatement()
      */
-    private JavaStatement statement;
+    private @Nullable JavaStatement statement;
 
     /**
      * @see #getHeapContext()
+     *      FIXME weigl: should this not be {@link ImmutableList}?
      */
-    protected List<LocationVariable> heaps;
+    protected @Nullable List<LocationVariable> heaps;
 
-    /**
-     * @see #getInformationFlowProofObligationVars()
-     */
-    protected IFProofObligationVars infFlowVars;
 
     /**
      * @see #getExecutionContext()
@@ -48,8 +47,8 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
      */
-    protected AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<PosInOccurrence> ifInstantiations) {
+    protected AbstractAuxiliaryContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
+            @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
@@ -57,7 +56,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
      *
      * @param s the statement (block or loop) which the applied contract belongs to.
      */
-    public void setStatement(JavaStatement s) {
+    public void setStatement(@Nullable JavaStatement s) {
         this.statement = s;
     }
 
@@ -75,13 +74,6 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
      */
     public abstract AuxiliaryContract getContract();
 
-    /**
-     *
-     * @return set of four sets of ProofObligationVars necessary for information flow proofs.
-     */
-    public IFProofObligationVars getInformationFlowProofObligationVars() {
-        return infFlowVars;
-    }
 
     /**
      *
@@ -114,14 +106,5 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
         return !builtInRule.isApplicable(goal, pio);
     }
 
-    /**
-     * Sets the proof obligation variables and execution context to new values.
-     *
-     * @param vars new proof obligation variables.
-     * @param context new execution context.
-     */
-    public void update(IFProofObligationVars vars, ExecutionContext context) {
-        this.infFlowVars = vars;
-        this.context = context;
-    }
+
 }
