@@ -3,25 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * This annotation is used for annotation of proof scripts arguments.
- *
  * @author Alexander Weigl
- * @version 1
- * @see Flag
+ * @version 1 (6/14/25)
  */
-@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Option {
+public @interface Argument {
     /**
      * Name of the command line argument.
      *
      * @return a non-null string
      */
-    String value();
+    int value() default 0;
 }

@@ -9,19 +9,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used for annotation of proof scripts arguments.
- *
  * @author Alexander Weigl
- * @version 1
- * @see Flag
+ * @version 1 (02.05.17)
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Option {
-    /**
-     * Name of the command line argument.
-     *
-     * @return a non-null string
-     */
-    String value();
+public @interface PositionalVarargs {
+    Class<?> as() default String.class;
+
+    int startIndex() default 0;
 }

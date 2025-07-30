@@ -5,6 +5,12 @@ package de.uka.ilkd.key.scripts.meta;
 
 // Need to switch spotless off for the comment because it replaces @Flag with &#64;Flag
 // spotless:off
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Currently not implemented in {@link ArgumentsLifter}
  * <p>
@@ -29,6 +35,8 @@ package de.uka.ilkd.key.scripts.meta;
  * @see Option
  */
 //spotless:on
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Flag {
     /**
      * Name of the command line argument.
@@ -43,12 +51,4 @@ public @interface Flag {
      * @return true iff this field is required (not null)
      */
     boolean defValue() default false;
-
-    /**
-     * A help message for this argument.
-     *
-     * @return a non-null string
-     */
-    String help() default "";
-
 }
