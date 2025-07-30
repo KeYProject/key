@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
+import java.net.URL;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -11,17 +17,13 @@ import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
-import java.net.URL;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
