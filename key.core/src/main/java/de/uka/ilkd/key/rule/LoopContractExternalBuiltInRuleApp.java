@@ -13,19 +13,25 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Application of {@link LoopContractExternalRule}.
  *
  * @author lanzinger
  */
-public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuiltInRuleApp {
+@NullMarked
+public class LoopContractExternalBuiltInRuleApp<T extends LoopContractExternalRule>
+        extends AbstractLoopContractBuiltInRuleApp<T> {
 
     /**
      *
      * @param rule the rule being applied.
      * @param occurrence the position at which the rule is applied.
      */
-    public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
+    public LoopContractExternalBuiltInRuleApp(final T rule,
             final PosInOccurrence occurrence) {
         this(rule, occurrence, null, null, null, null);
     }
@@ -39,14 +45,14 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
      * @param contract the contract being applied.
      * @param heaps the heap context.
      */
-    public LoopContractExternalBuiltInRuleApp(final BuiltInRule rule,
+    public LoopContractExternalBuiltInRuleApp(final T rule,
             final PosInOccurrence occurrence,
-            final ImmutableList<PosInOccurrence> ifInstantiations,
-            final JavaStatement statement, final LoopContract contract,
-            final List<LocationVariable> heaps) {
+            final @Nullable ImmutableList<PosInOccurrence> ifInstantiations,
+            final @Nullable JavaStatement statement,
+            final @Nullable LoopContract contract,
+            final @Nullable List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
         assert rule != null;
-        assert rule instanceof LoopContractExternalRule;
         assert occurrence != null;
         setStatement(statement);
         this.contract = contract;
@@ -54,21 +60,22 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
-        return new LoopContractExternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
+    public @NonNull LoopContractExternalBuiltInRuleApp<T> replacePos(
+            final PosInOccurrence newOccurrence) {
+        return new LoopContractExternalBuiltInRuleApp<>(builtInRule, newOccurrence, ifInsts,
             getStatement(), contract, heaps);
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp setAssumesInsts(
+    public @NonNull LoopContractExternalBuiltInRuleApp<T> setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
-        return (LoopContractExternalBuiltInRuleApp) super.tryToInstantiate(goal,
+    public LoopContractExternalBuiltInRuleApp<T> tryToInstantiate(final Goal goal) {
+        return (LoopContractExternalBuiltInRuleApp<T>) super.tryToInstantiate(goal,
             LoopContractExternalRule.INSTANCE);
     }
 }
