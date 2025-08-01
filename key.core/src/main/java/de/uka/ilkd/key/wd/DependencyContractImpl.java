@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.speclang;
+package de.uka.ilkd.key.wd;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +20,9 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.DependencyContract;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
@@ -48,7 +51,8 @@ public final class DependencyContractImpl implements DependencyContract {
     // constructors
     // -------------------------------------------------------------------------
 
-    DependencyContractImpl(String baseName, String name, KeYJavaType kjt, IObserverFunction target,
+    public DependencyContractImpl(String baseName, String name, KeYJavaType kjt,
+            IObserverFunction target,
             KeYJavaType specifiedIn, Map<LocationVariable, JTerm> pres, JTerm mby,
             Map<LocationVariable, JTerm> deps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,

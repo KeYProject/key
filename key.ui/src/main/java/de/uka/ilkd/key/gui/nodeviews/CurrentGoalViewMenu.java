@@ -280,7 +280,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 "Applies a known and complete loop specification immediately.",
                 ENTER_LOOP_SPECIFICATION,
                 "Allows to modify an existing or to enter a new loop specification.", builtInRule);
-        } else if (builtInRule == BlockContractInternalRule.INSTANCE) {
+        } else if (builtInRule instanceof BlockContractInternalRule) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "Applies a known and complete block specification immediately.",

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -121,8 +122,8 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm result, JTerm exception,
-            JTerm heap) {
+    public StateVars(@Nullable @Nullable JTerm self, ImmutableList<JTerm> localVars, @Nullable @Nullable JTerm result, @Nullable @Nullable JTerm exception,
+                     JTerm heap) {
         this(self, localVars, result, exception, heap, null);
     }
 
