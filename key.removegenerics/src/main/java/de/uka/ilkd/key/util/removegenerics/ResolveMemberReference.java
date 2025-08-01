@@ -150,12 +150,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      * return true iff the reference is a lhs of an assignment: Either an assignment operator or
      * ???.
      *
-     * @todo
-     *
      * @param reference
      * @return true iff the reference is a lhs of an assignment: Either an assignment operator or
      *         ???.
-     *
      */
     private static boolean isLHS(Reference reference) {
         NonTerminalProgramElement parent = reference.getASTParent();
@@ -229,7 +226,7 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      * <li>MethodReference as parameter</li>
      * </ul>
      *
-     * @todo DAS IST JA WOHL NOCH NICHT
+     * todo DAS IST JA WOHL NOCH NICHT
      *
      * @return the resolved type
      */

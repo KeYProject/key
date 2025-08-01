@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -252,16 +253,14 @@ public class ValueInjector {
         converters.put(new ConverterKey<>(m.getReturnType(), m.getParameterTypes()[0]), conv);
     }
 
-    /**
-     * Finds a converter for the given class.
-     *
-     * @param <T> an arbitrary type
-     * @param ret a non-null class
-     * @param arg
-     * @return null or a suitable converter (registered) converter for the requested class.
-     */
+    /// Finds a converter for the conversion of `arg` classes to `ret` classes.
+    ///
+    /// @param <T> an arbitrary type
+    /// @param ret target class from which `arg` should be translated
+    /// @param arg class of original class
+    /// @return null or a suitable converter (registered) converter for the requested class.
     @SuppressWarnings("unchecked")
-    public <R, T> Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
+    public <R, T> @Nullable Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
         return (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
     }
 

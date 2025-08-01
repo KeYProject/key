@@ -57,7 +57,7 @@ public class Main {
      *
      * @param location the Path with the path to the source directory of the Java project
      *        to be verified
-     * @return the {@KeYEnvironment} that provides the context for all following verification tasks
+     * @return the {@link KeYEnvironment} that provides the context for all following verification tasks
      * @throws ProblemLoaderException if the setup fails
      */
     private static KeYEnvironment<?> setupEnvironment(Path location) throws ProblemLoaderException {
