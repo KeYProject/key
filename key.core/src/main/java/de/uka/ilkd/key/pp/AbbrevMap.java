@@ -159,6 +159,10 @@ public class AbbrevMap {
 
     }
 
+    public void remove(JTerm prevTerm) {
+        setEnabled(prevTerm, false);
+    }
+
     public record AbbrevWrapper(JTerm t) {
 
         @Override
