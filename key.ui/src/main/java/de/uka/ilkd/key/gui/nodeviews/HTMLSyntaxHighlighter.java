@@ -169,14 +169,14 @@ public class HTMLSyntaxHighlighter {
 
 
     static {
-        light.addRule("""
-                .prop_logic_highlight { color: #%6X; font-weight: bold; }
-                .dynamic_logic_highlight { color: #%6X; font-weight: bold; }
-                .java_highlight { color: #%6X; font-weight: bold; }
-                .progvar_highlight { color: #%6X; }
-                .comment_highlight { color: #%6X; }
-                .jml_highlight { color: #%6X; }
-                .sequent_arrow_highlight { color: #%6X; font-size: 1.7em }
+        final var lightString = """
+                .prop_logic_highlight { color: #%06X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%06X; font-weight: bold; }
+                .java_highlight { color: #%06X; font-weight: bold; }
+                .progvar_highlight { color: #%06X; }
+                .comment_highlight { color: #%06X; }
+                .jml_highlight { color: #%06X; }
+                .sequent_arrow_highlight { color: #%06X; font-size: 1.7em }
                 """.formatted(
             PROP_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
             DYN_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
@@ -184,16 +184,17 @@ public class HTMLSyntaxHighlighter {
             PROG_VAR_COLOR.getLightValue().getRGB() & 0xFFFFFF,
             COMMENT_COLOR.getLightValue().getRGB() & 0xFFFFFF,
             JML_COLOR.getLightValue().getRGB() & 0xFFFFFF,
-            SEQUENT_ARROW_COLOR.getLightValue().getRGB() & 0xFFFFFF));
+            SEQUENT_ARROW_COLOR.getLightValue().getRGB() & 0xFFFFFF);
+        light.addRule(lightString);
 
-        dark.addRule("""
-                .prop_logic_highlight { color: %6X; font-weight: bold; }
-                .dynamic_logic_highlight { color: %6X; font-weight: bold; }
-                .java_highlight { color: %6X; font-weight: bold; }
-                .progvar_highlight { color: %6X; }
-                .comment_highlight { color: %6X; }
-                .jml_highlight { color: %6X; }
-                .sequent_arrow_highlight { color: %6X; font-size: 1.7em }
+        final var darkString = """
+                .prop_logic_highlight { color: #%06X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%06X; font-weight: bold; }
+                .java_highlight { color: #%06X; font-weight: bold; }
+                .progvar_highlight { color: #%06X; }
+                .comment_highlight { color: #%06X; }
+                .jml_highlight { color: #%06X; }
+                .sequent_arrow_highlight { color: #%06X; font-size: 1.7em }
                 """.formatted(
             PROP_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
             DYN_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
@@ -201,7 +202,8 @@ public class HTMLSyntaxHighlighter {
             PROG_VAR_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
             COMMENT_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
             JML_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
-            SEQUENT_ARROW_COLOR.getDarkValue().getRGB() & 0xFFFFFF));
+            SEQUENT_ARROW_COLOR.getDarkValue().getRGB() & 0xFFFFFF);
+        dark.addRule(darkString);
     }
 
 
