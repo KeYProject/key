@@ -16,7 +16,7 @@ dependencies {
     implementation project(":key.core")
     implementation project(":key.core.rifl")
 
-    implementation("com.formdev:flatlaf:3.6")
+    implementation("com.formdev:flatlaf:3.6.1")
 
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
