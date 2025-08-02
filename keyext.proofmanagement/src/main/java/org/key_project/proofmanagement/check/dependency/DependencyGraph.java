@@ -3,15 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check.dependency;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.key_project.proofmanagement.io.Logger;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a graph of dependencies between contracts/proofs, i.e. which proof depends on
@@ -21,7 +18,7 @@ import org.key_project.proofmanagement.io.Logger;
  */
 public class DependencyGraph {
     /**
-     * indicates the type of a contract application (if termination has to be considered or not)
+     * indicates the type of contract application (if termination has to be considered or not)
      */
     public enum EdgeType {
         /**
@@ -118,7 +115,7 @@ public class DependencyGraph {
      * <code>null</code> indicates that it is invalid an has to be (re-)computed by calling
      * {@link #recalculateSCCs()}.
      */
-    private Set<SCC> allSCCs = null;
+    private @Nullable Set<SCC> allSCCs;
 
     /** maps each dependency node to the SCC it corresponds to */
     private final Map<DependencyNode, SCC> node2SCC = new HashMap<>();
@@ -138,6 +135,10 @@ public class DependencyGraph {
 
     public Map<DependencyNode, SCC> getNode2SCC() {
         return node2SCC;
+    }
+
+    public SCC getSCCofNode(DependencyNode node) {
+        return node2SCC.get(node);
     }
 
     public Set<DependencyNode> getNodes() {
@@ -171,7 +172,7 @@ public class DependencyGraph {
         if (allSCCs == null) {
             recalculateSCCs();
         }
-        return allSCCs;
+        return Objects.requireNonNull(allSCCs);
     }
 
     /**
@@ -180,7 +181,7 @@ public class DependencyGraph {
      * @param contractName the contract name to search for (only exact matches will be found)
      * @return the DependencyNode for the given contractName or null, if none found
      */
-    public DependencyNode getNodeByName(String contractName) {
+    public @Nullable DependencyNode getNodeByName(String contractName) {
         return name2Node.get(contractName);
     }
 
@@ -235,6 +236,7 @@ public class DependencyGraph {
         }
 
         if (node.getLowLink() == node.getIndex()) { // back to "root" of SCC? -> store SCC
+            assert allSCCs != null;
             SCC scc = new SCC(allSCCs.size());
             DependencyNode w;
             do {
