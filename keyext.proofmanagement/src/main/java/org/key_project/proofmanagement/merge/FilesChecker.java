@@ -21,6 +21,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Wolfram Pfeifer
  */
+@SuppressWarnings("CallToPrintStackTrace")
 public class FilesChecker {
     @FunctionalInterface
     public interface CheckedFunction<T, R> {
@@ -29,7 +30,7 @@ public class FilesChecker {
 
     static boolean listOfPathsConsistent(@NonNull List<Path> paths) {
         boolean res = true;
-        Path reference = paths.get(0);
+        Path reference = paths.getFirst();
         for (int i = 1; i < paths.size(); i++) {
             Path p = paths.get(i);
             res &= sourcesConsistent(p, reference);

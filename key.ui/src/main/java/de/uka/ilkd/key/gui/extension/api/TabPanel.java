@@ -7,8 +7,9 @@ import java.util.Collection;
 import java.util.Collections;
 import javax.swing.*;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.intern.DefaultCDockable;
+import org.key_project.dockingframes.common.common.action.CAction;
+import org.key_project.dockingframes.common.common.intern.DefaultCDockable;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
