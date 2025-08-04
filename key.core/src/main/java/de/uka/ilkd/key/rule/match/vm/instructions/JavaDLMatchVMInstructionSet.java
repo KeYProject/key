@@ -94,6 +94,11 @@ public final class JavaDLMatchVMInstructionSet {
         return new SimilarSortDependingFunctionInstruction(sortDependingFunction);
     }
 
+    public static SimilarParametricFunctionInstruction getSimilarParametricFunctionInstruction(
+            ParametricFunctionInstance psi) {
+        return new SimilarParametricFunctionInstruction(psi);
+    }
+
     public static MatchIdentityInstruction getMatchIdentityInstruction(
             SyntaxElement syntaxElement) {
         return new MatchIdentityInstruction(syntaxElement);
