@@ -305,4 +305,16 @@ public class CollectionUtil {
             list.add(index, toInsert);
         }
     }
+
+    public static <T extends @Nullable Object> List<T> findDuplicates(
+            Iterable<T> it) {
+        List<T> result = new ArrayList<>();
+        Set<T> alreadySeen = new HashSet<>();
+        for (T element : it) {
+            if (!alreadySeen.add(element)) {
+                result.add(element);
+            }
+        }
+        return result;
+    }
 }

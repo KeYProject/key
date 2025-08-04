@@ -94,8 +94,14 @@ one_sort_decl
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
     | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
+    | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
   )
+;
+
+parametric_sort_decl
+:
+    simple_ident_dots
+    formal_sort_param_decls
 ;
 
 simple_ident_dots
@@ -243,7 +249,7 @@ datatype_decl:
   doc=DOC_COMMENT?
   // weigl: all datatypes are free!
   // FREE?
-  name=simple_ident
+  name=simple_ident formal_sort_param_decls?
   EQUALS
   datatype_constructor (OR datatype_constructor)*
   SEMI
@@ -258,6 +264,17 @@ datatype_constructor:
     )?
     RPAREN
   )?
+;
+
+formal_sort_param_decls
+: OPENTYPEPARAMS
+      formal_sort_param_decl (COMMA formal_sort_param_decl)*
+      CLOSETYPEPARAMS
+;
+
+formal_sort_param_decl
+:
+    (PLUS | MINUS)? simple_ident
 ;
 
 func_decls
@@ -326,7 +343,14 @@ ruleset_decls
 
 sortId
 :
-    id=simple_ident_dots (EMPTYBRACKETS)*
+    id=simple_ident_dots formal_sort_args? (EMPTYBRACKETS)*
+;
+
+formal_sort_args
+:
+    OPENTYPEPARAMS
+    sortId (COMMA sortId)*
+    CLOSETYPEPARAMS
 ;
 
 id_declaration
@@ -480,6 +504,7 @@ accessterm
   // OLD
   (sortId DOUBLECOLON)?
   firstName=simple_ident
+  formal_sort_args?
 
   /*Faster version
   simple_ident_dots

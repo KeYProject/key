@@ -4,15 +4,18 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.JOperatorSV;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -32,7 +35,7 @@ public abstract class GenericSortCondition {
      *         are either always compatible (no generic sorts) or never compatible (non generic
      *         sorts that don't match)
      */
-    public static GenericSortCondition createCondition(
+    public static ImmutableList<GenericSortCondition> createCondition(
             SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
@@ -40,7 +43,7 @@ public abstract class GenericSortCondition {
             return null;
         }
 
-        return createCondition(((JOperatorSV) sv).sort(), instantiation.sort(),
+        return createCondition(sv.sort(), instantiation.sort(),
             !subSortsAllowed(sv));
     }
 
@@ -54,16 +57,18 @@ public abstract class GenericSortCondition {
     }
 
     /**
-     * Create the condition to make a generic sort (s0) (or a collection sort of a generic sort) and
+     * Create the conditions to make a generic sort (s0) (or a collection sort of a generic sort)
+     * and
      * a concrete sort (s1) equal
      *
      * @param p_identity true iff an identity condition should be generated (otherwise: a supersort
      *        condition is generated)
-     * @return the resulting condition, if "s0" is of generic sort; null, if the sorts are either
+     * @return the resulting conditions, if "s0" is of generic sort; null, if the sorts are either
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
      *         don't match)
      */
-    protected static GenericSortCondition createCondition(Sort s0, Sort s1, boolean p_identity) {
+    protected static ImmutableList<GenericSortCondition> createCondition(Sort s0, Sort s1,
+            boolean p_identity) {
         while (s0 instanceof ArraySort) {
             // Currently the sort hierarchy is not inherited by
             // collection sorts; therefore identity has to be ensured
@@ -77,16 +82,35 @@ public abstract class GenericSortCondition {
             s1 = ((ArraySort) s1).elementSort();
         }
 
-        if (!(s0 instanceof GenericSort gs) || s1 == JavaDLTheory.FORMULA
+        if (!(s0 instanceof GenericSort || s0 instanceof ParametricSortInstance)
+                || s1 == JavaDLTheory.FORMULA
                 || s1 == JavaDLTheory.UPDATE) {
             return null;
         }
 
-        if (p_identity) {
-            return createIdentityCondition(gs, s1);
-        } else {
-            return createSupersortCondition(gs, s1);
+        if (s0 instanceof GenericSort gs) {
+            if (p_identity) {
+                return ImmutableList.of(createIdentityCondition(gs, s1));
+            } else {
+                return ImmutableList.of(createSupersortCondition(gs, s1));
+            }
         }
+        var psi = (ParametricSortInstance) s0;
+        if (!(s1 instanceof ParametricSortInstance ps1) || ps1.getBase() != psi.getBase()) {
+            return null;
+        }
+        ImmutableList<GenericSortCondition> conds = ImmutableSLList.nil();
+        for (int i = psi.getArgs().size() - 1; i >= 0; i--) {
+            var a0 = psi.getArgs().get(i);
+            var a1 = ps1.getArgs().get(i);
+            if (a0 instanceof GenericArgument(Sort sort)) {
+                var c = createCondition(sort, a1.sort(), p_identity);
+                if (c != null) {
+                    conds = conds.prepend(c);
+                }
+            }
+        }
+        return conds;
     }
 
     /**
