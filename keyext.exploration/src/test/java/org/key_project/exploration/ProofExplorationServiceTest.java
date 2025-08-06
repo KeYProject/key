@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.*;
@@ -14,6 +16,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.AfterEach;
@@ -26,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProofExplorationServiceTest {
     ProofExplorationService expService;
     Proof currentProof;
-    File location;
+    Path location;
     KeYEnvironment<?> env;
 
     @BeforeEach
     public void setup() throws ProblemLoaderException {
-        location = new File("src/test/resources//org/key_project/exploration/testAdditions.key");
-        Assumptions.assumeTrue(location.exists(), "File testAdditions.key not found.");
+        location = Paths.get("src/test/resources//org/key_project/exploration/testAdditions.key");
+        Assumptions.assumeTrue(Files.exists(location), "File testAdditions.key not found.");
         env = KeYEnvironment.load(location);
         currentProof = env.getLoadedProof();
         expService = new ProofExplorationService(currentProof, env.getServices());
@@ -53,7 +59,7 @@ public class ProofExplorationServiceTest {
      */
     @Test
     public void testAdditionAntec() {
-        Term add = parseTerm("p");
+        JTerm add = parseTerm("p");
         expService.soundAddition(currentProof.getOpenGoal(currentProof.root()), add, true);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
@@ -98,7 +104,7 @@ public class ProofExplorationServiceTest {
      */
     @Test
     public void testAdditionSucc() {
-        Term added = parseTerm("q");
+        JTerm added = parseTerm("q");
         expService.soundAddition(currentProof.getOpenGoal(currentProof.root()), added, false);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
@@ -144,13 +150,14 @@ public class ProofExplorationServiceTest {
      */
     @Test
     public void testChangeFormula() {
-        Term change = parseTerm("p->p");
+        JTerm change = parseTerm("p->p");
         ImmutableList<Goal> goals = currentProof.openGoals();
         assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
         PosInOccurrence pio =
             new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
-        expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(),
+        expService.applyChangeFormula(goals.head(), pio,
+            (JTerm) sequent.succedent().get(0).formula(),
             change);
         ImmutableList<Goal> newCreatedGoals = currentProof.openGoals();
 
@@ -182,7 +189,7 @@ public class ProofExplorationServiceTest {
     /**
      * Tests that sizes are as expected after addition
      */
-    private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
+    private void testAddition(Goal withAddedTerm, Goal justification, JTerm added, boolean antec) {
         Semisequent semiSeqAdded =
             antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
         Semisequent parentSemiSeqOfAdded =
@@ -234,7 +241,7 @@ public class ProofExplorationServiceTest {
 
     }
 
-    private Term parseTerm(String term) {
+    private JTerm parseTerm(String term) {
         KeyIO io = new KeyIO(env.getServices());
         return io.parseExpression(term);
     }

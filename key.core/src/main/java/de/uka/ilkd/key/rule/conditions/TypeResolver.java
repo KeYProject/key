@@ -6,12 +6,10 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
 
@@ -147,9 +147,9 @@ public abstract class TypeResolver {
             if (inst instanceof ProgramVariable) {
                 s = ((ProgramVariable) inst).sort();
             } else {
-                Term gsTerm = null;
-                if (inst instanceof Term) {
-                    gsTerm = (Term) inst;
+                JTerm gsTerm = null;
+                if (inst instanceof JTerm) {
+                    gsTerm = (JTerm) inst;
                 } else if (inst instanceof ProgramElement) {
                     gsTerm = services.getTypeConverter().convertToLogicElement(
                         (ProgramElement) inst, instMap.getExecutionContext());
@@ -200,8 +200,8 @@ public abstract class TypeResolver {
                             .convertToLogicElement((Expression) inst, instMap.getExecutionContext())
                             .op(),
                         services);
-                } else if (inst instanceof Term) {
-                    result = getContainerSort(((Term) inst).op(), services);
+                } else if (inst instanceof JTerm) {
+                    result = getContainerSort(((JTerm) inst).op(), services);
                 } else {
                     Debug.fail("Unexpected instantiation for SV " + memberSV + ":" + inst);
                     result = null;
@@ -216,7 +216,7 @@ public abstract class TypeResolver {
                 result = ((ProgramVariable) op).getContainerType().getSort();
             } else if (op instanceof IObserverFunction) {
                 result = ((IObserverFunction) op).getContainerType().getSort();
-            } else if (op instanceof Function func && ((Function) op).isUnique()
+            } else if (op instanceof Function func && func.isUnique()
                     && op.name().toString().contains("::")) {
                 // Heap
                 String funcName = func.name().toString();

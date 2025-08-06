@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
@@ -20,6 +19,8 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -290,12 +291,12 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         ReasonOfInterruption reason = getReasonOfInterruption();
         setReasonOfInterruption(ReasonOfInterruption.Exception, e);
         switch (reason) {
-        case Exception, NoInterruption -> {
-            setReasonOfInterruption(ReasonOfInterruption.Exception, e);
-            listener.processInterrupted(this, problem, e);
-        }
-        case Timeout -> listener.processTimeout(this, problem);
-        case User -> listener.processUser(this, problem);
+            case Exception, NoInterruption -> {
+                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+                listener.processInterrupted(this, problem, e);
+            }
+            case Timeout -> listener.processTimeout(this, problem);
+            case User -> listener.processUser(this, problem);
         }
     }
 

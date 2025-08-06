@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * this class implements a TreeModel that can be displayed using the JTree class framework
  */
-class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
+class GUIBranchNode extends GUIAbstractTreeNode {
 
     private final Object label;
 

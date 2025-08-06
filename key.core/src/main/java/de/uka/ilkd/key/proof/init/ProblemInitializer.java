@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
@@ -15,13 +17,9 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
@@ -41,7 +39,12 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -203,29 +206,18 @@ public final class ProblemInitializer {
      * get a vector of Strings containing all .java file names in the cfile directory. Helper for
      * readJava().
      */
-    private List<String> getClasses(String f) throws ProofInputException {
-        File cfile = new File(f);
-        List<String> v = new ArrayList<>();
-        if (cfile.isDirectory()) {
-            String[] list = cfile.list();
-            // mu(2008-jan-28): if the directory is not readable for the current user
-            // list is set to null, which results in a NullPointerException.
-            if (list != null) {
-                for (String s : list) {
-                    String fullName = cfile.getPath() + File.separator + s;
-                    File n = new File(fullName);
-                    if (n.isDirectory()) {
-                        v.addAll(getClasses(fullName));
-                    } else if (s.endsWith(".java")) {
-                        v.add(fullName);
-                    }
-                }
+    private Collection<Path> getClasses(Path javaRoot) throws ProofInputException {
+        if (Files.isDirectory(javaRoot)) {
+            try (var walker = Files.walk(javaRoot)) {
+                return walker.filter(it -> it.getFileName().toString().endsWith(".java")).toList();
+            } catch (IOException e) {
+                throw new ProofInputException(
+                    "Reading java model path " + javaRoot + " resulted into an error.", e);
             }
-            return v;
         } else {
-            throw new ProofInputException("Java model path " + f + " not found.");
+            throw new ProofInputException(
+                "Java model path " + javaRoot + " not found or is not a directory.");
         }
-
     }
 
 
@@ -239,11 +231,9 @@ public final class ProblemInitializer {
 
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
-        final String javaPath = envInput.readJavaPath();
-        final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath;
-        bootClassPath = envInput.readBootClassPath();
-
+        final Path javaPath = envInput.readJavaPath();
+        final List<Path> classPath = envInput.readClassPath();
+        final Path bootClassPath = envInput.readBootClassPath();
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
@@ -256,8 +246,9 @@ public final class ProblemInitializer {
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
         // this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
-            KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
-                envInput.getProfile(), fileRepo);
+            KeYFile keyFile =
+                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -271,18 +262,19 @@ public final class ProblemInitializer {
             final ProjectSettings settings = initConfig.getServices().getJavaInfo()
                     .getKeYProgModelInfo().getServConf().getProjectSettings();
             final PathList searchPathList = settings.getSearchPathList();
-            if (searchPathList.find(javaPath) == null) {
-                searchPathList.add(javaPath);
+            if (searchPathList.find(javaPath.toString()) == null) {
+                searchPathList.add(javaPath.toString());
             }
-            Collection<String> var = getClasses(javaPath);
+            Collection<Path> var = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
-                String file = envInput.getJavaFile();
+                Path file = envInput.getJavaFile();
                 if (var.contains(file)) {
                     var = Collections.singletonList(file);
                 }
             }
             // support for single file loading
-            final String[] cus = var.toArray(new String[0]);
+            final String[] cus = var.stream().map(Objects::toString).toList()
+                    .toArray(String[]::new);
             try {
                 r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
@@ -292,7 +284,7 @@ public final class ProblemInitializer {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);
         }
-        File initialFile = envInput.getInitialFile();
+        var initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
             JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
     }
@@ -306,13 +298,13 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<JFunction> newFuncNS = new Namespace<>();
+        Namespace<Function> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (JFunction n : initConfig.funcNS().allElements()) {
+        for (Function n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
                     && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -340,25 +332,25 @@ public final class ProblemInitializer {
         }
     }
 
-    private void populateNamespaces(Term term, NamespaceSet namespaces, Goal rootGoal) {
+    private void populateNamespaces(Term term, NamespaceSet namespaces,
+            Goal rootGoal) {
         for (int i = 0; i < term.arity(); i++) {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
 
-        if (term.op() instanceof JFunction) {
-            namespaces.functions().add((JFunction) term.op());
-        } else if (term.op() instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) term.op();
+        if (term.op() instanceof Function fn) {
+            namespaces.functions().add(fn);
+        } else if (term.op() instanceof ProgramVariable pv) {
             if (namespaces.programVariables().lookup(pv.name()) == null) {
                 rootGoal.addProgramVariable((ProgramVariable) term.op());
             }
-        } else if (term.op() instanceof ElementaryUpdate) {
-            final ProgramVariable pv = (ProgramVariable) ((ElementaryUpdate) term.op()).lhs();
+        } else if (term.op() instanceof ElementaryUpdate eu) {
+            final ProgramVariable pv = (ProgramVariable) eu.lhs();
             if (namespaces.programVariables().lookup(pv.name()) == null) {
                 rootGoal.addProgramVariable(pv);
             }
-        } else if (term.javaBlock() != null && !term.javaBlock().isEmpty()) {
-            final ProgramElement pe = term.javaBlock().program();
+        } else if (term.op() instanceof JModality mod) {
+            final ProgramElement pe = mod.programBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =
                 MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
@@ -536,8 +528,7 @@ public final class ProblemInitializer {
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<JFunction> functions =
-            initConfig.getServices().getNamespaces().functions();
+        final Namespace<Function> functions = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
@@ -582,7 +573,6 @@ public final class ProblemInitializer {
         try {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
-
 
 
             // read problem
@@ -669,6 +659,7 @@ public final class ProblemInitializer {
 
         void reportException(Object sender, ProofOblInput input, Exception e);
 
-        default void showIssueDialog(Collection<PositionedString> issues) {}
+        default void showIssueDialog(Collection<PositionedString> issues) {
+        }
     }
 }

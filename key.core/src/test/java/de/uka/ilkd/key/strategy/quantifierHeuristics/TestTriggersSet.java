@@ -6,12 +6,15 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +32,7 @@ public class TestTriggersSet {
 
     private final Namespace<QuantifiableVariable> variables = new Namespace<>();
 
-    private final Namespace<JFunction> functions = new Namespace<>();
+    private final Namespace<Function> functions = new Namespace<>();
 
     private final Namespace<Sort> sorts = new Namespace<>();
 
@@ -41,47 +44,47 @@ public class TestTriggersSet {
 
 
     // constant function
-    private JFunction r_a;
-    private JFunction r_b;
-    private JFunction r_c;
+    private Function r_a;
+    private Function r_b;
+    private Function r_c;
 
-    private JFunction s_a;
-    private JFunction s_b;
-    private JFunction s_c;
+    private Function s_a;
+    private Function s_b;
+    private Function s_c;
 
-    private JFunction t_a;
-    private JFunction t_b;
-    private JFunction t_c;
+    private Function t_a;
+    private Function t_b;
+    private Function t_c;
 
     // Rigid function
-    private JFunction frr; // r->r
-    private JFunction f2rr; // r->r
-    private JFunction fsr; // s-> r
-    private JFunction ftr; // t->r
-    private JFunction fstr;// s->t->r
-    private JFunction frstr;// r->s->t->r;
+    private Function frr; // r->r
+    private Function f2rr; // r->r
+    private Function fsr; // s-> r
+    private Function ftr; // t->r
+    private Function fstr;// s->t->r
+    private Function frstr;// r->s->t->r;
 
-    private JFunction gss; // s->s
-    private JFunction grs; // r->s
-    private JFunction gts; // t->s
-    private JFunction grts; // r->t->s
-    private JFunction grsts;// r->s->t->s
+    private Function gss; // s->s
+    private Function grs; // r->s
+    private Function gts; // t->s
+    private Function grts; // r->t->s
+    private Function grsts;// r->s->t->s
 
-    private JFunction htt; // t->t
-    private JFunction hrt; // r -> t
-    private JFunction hst; // s->t
-    private JFunction hrst;// r->s->t
-    private JFunction hrstt;// t->s->t->t
+    private Function htt; // t->t
+    private Function hrt; // r -> t
+    private Function hst; // s->t
+    private Function hrst;// r->s->t
+    private Function hrstt;// t->s->t->t
 
     // Formular function
-    private JFunction pp;// Formula->Formula
-    private JFunction pr;// r->Formula
-    private JFunction ps;// s->Formula
-    private JFunction pt;// t->Formula
-    private JFunction prs;// r->s->Formula
-    private JFunction pst;// s->t->Formula
-    private JFunction prt;// r->t->Formula
-    private JFunction prst;// r->s->t->Formula
+    private Function pp;// Formula->Formula
+    private Function pr;// r->Formula
+    private Function ps;// s->Formula
+    private Function pt;// t->Formula
+    private Function prs;// r->s->Formula
+    private Function pst;// s->t->Formula
+    private Function prt;// r->t->Formula
+    private Function prst;// r->s->t->Formula
     // private Function pi;//ints->Formula
     private Goal g;
 
@@ -185,7 +188,7 @@ public class TestTriggersSet {
         // functions.add(pi);
 
         proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
-        g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
+        g = new Goal(new Node(proof, JavaDLSequentKit.getInstance().getEmptySequent()),
             TacletIndexKit.getKit().createTacletIndex(),
             new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         proof.setRoot(g.node());
@@ -196,7 +199,7 @@ public class TestTriggersSet {
 
     }
 
-    private Term parseTerm(String termstr) {
+    private JTerm parseTerm(String termstr) {
         return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
             new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
@@ -204,12 +207,12 @@ public class TestTriggersSet {
     @Test
     public void testTrigger1() {
         String term1 = "\\forall s x;(ps(x))";
-        Term allterm = parseTerm(term1);
-        Term trigger1 = allterm.sub(0);
+        JTerm allterm = parseTerm(term1);
+        JTerm trigger1 = allterm.sub(0);
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
-        Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+        var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
     }
 
@@ -217,12 +220,12 @@ public class TestTriggersSet {
     @Disabled("See Issues #1499")
     public void testTrigger2() {
         String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
-        Term allterm = parseTerm(term1);
-        Term trigger1 = allterm.sub(0).sub(1);
+        JTerm allterm = parseTerm(term1);
+        JTerm trigger1 = allterm.sub(0).sub(1);
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
-        Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+        var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
     }
 }

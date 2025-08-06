@@ -6,18 +6,21 @@ package de.uka.ilkd.key.rule;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -43,7 +46,8 @@ public final class SetStatementRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -52,7 +56,7 @@ public final class SetStatementRule implements BuiltInRule {
             return false;
         }
 
-        Term target = occurrence.subTerm();
+        JTerm target = (JTerm) occurrence.subTerm();
         if (target.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(target);
         }
@@ -71,20 +75,21 @@ public final class SetStatementRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof SetStatementBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply SetStatementBuiltInRuleApp");
         }
 
+        final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
-        final Term formula = occurrence.subTerm();
+        final JTerm formula = (JTerm) occurrence.subTerm();
         assert formula.op() instanceof UpdateApplication
                 : "Currently, this can only be applied if there is an update application in front of the modality";
 
-        Term update = UpdateApplication.getUpdate(formula);
-        Term target = UpdateApplication.getTarget(formula);
+        JTerm update = UpdateApplication.getUpdate(formula);
+        JTerm target = UpdateApplication.getTarget(formula);
 
         SetStatement setStatement =
             Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
@@ -92,7 +97,7 @@ public final class SetStatementRule implements BuiltInRule {
                     .orElseThrow(() -> new RuleAbortException("not a JML set statement."));
 
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
-        final Term self = MiscTools.getSelfTerm(frame, services);
+        final JTerm self = MiscTools.getSelfTerm(frame, services);
 
         var spec = services.getSpecificationRepository().getStatementSpec(setStatement);
 
@@ -104,13 +109,13 @@ public final class SetStatementRule implements BuiltInRule {
         var targetTerm = spec.getTerm(services, self, SetStatement.INDEX_TARGET);
         var valueTerm = spec.getTerm(services, self, SetStatement.INDEX_VALUE);
 
-        Term newUpdate = tb.elementary(targetTerm, valueTerm);
+        JTerm newUpdate = tb.elementary(targetTerm, valueTerm);
 
         JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
 
-        Term term =
+        JTerm term =
             tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), target.getLabels());
-        Term newTerm = tb.apply(update, tb.apply(newUpdate, term));
+        JTerm newTerm = tb.apply(update, tb.apply(newUpdate, term));
 
         ImmutableList<Goal> result = goal.split(1);
         result.head().changeFormula(new SequentFormula(newTerm), occurrence);

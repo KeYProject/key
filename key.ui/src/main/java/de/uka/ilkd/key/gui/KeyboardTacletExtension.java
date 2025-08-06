@@ -27,13 +27,14 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -63,7 +64,7 @@ public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension
             @NonNull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 panel.setGoal(mediator.getSelectedGoal());
             }
         });
@@ -315,7 +316,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         LOGGER.debug("Found {} taclets\n", taclets.size());
 
         if (actionOnlyCompleteTaclets.isSelected()) {
-            taclets = taclets.stream().filter(RuleApp::complete).collect(Collectors.toList());
+            taclets = taclets.stream().filter(RuleApp::complete)
+                    .collect(Collectors.toList());
         }
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
@@ -403,7 +405,8 @@ class KeyboardTacletModel {
         for (RuleApp t : taclets) {
             String n = t.rule().name().toString();
             seq.add(n);
-            List<RuleApp> appSeq = this.taclets.computeIfAbsent(n, it -> (new ArrayList<>(5)));
+            List<RuleApp> appSeq =
+                this.taclets.computeIfAbsent(n, it -> (new ArrayList<>(5)));
             appSeq.add(t);
         }
 
@@ -451,23 +454,23 @@ class KeyboardTacletModel {
 
     public void processChar(char c) {
         switch (c) {
-        case '\u001B' -> // escape
-            reset();
-        case '\b' -> {
-            if (currentPrefix.length() <= 1) {
-                setCurrentPrefix("");
-            } else {
-                setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
+            case '\u001B' -> // escape
+                reset();
+            case '\b' -> {
+                if (currentPrefix.length() <= 1) {
+                    setCurrentPrefix("");
+                } else {
+                    setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
+                }
             }
-        }
-        default -> {
-            if ('0' <= c && c <= '9') {
-                setCurrentPos(c - '0');
+            default -> {
+                if ('0' <= c && c <= '9') {
+                    setCurrentPos(c - '0');
+                }
+                if (charValid(c)) {
+                    setCurrentPrefix(currentPrefix + c);
+                }
             }
-            if (charValid(c)) {
-                setCurrentPrefix(currentPrefix + c);
-            }
-        }
         }
     }
 

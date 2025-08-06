@@ -1,0 +1,17 @@
+---
+contains:
+  - |-
+    (declare-fun u_f (U) U)
+    (declare-fun u_c () U)
+  - |-
+    (assert (forall ((var_0 U)) (! (instanceof (u_f var_0) sort_int) :pattern ((u_f var_0)))))
+    (assert (instanceof u_c sort_int))
+  - |-
+    ; --- Sequent
+
+    (assert (not (= (u_f (i2u (* 2 (u2i u_c)))) (u_f (i2u (+ (u2i u_c) (u2i u_c)))))))
+expected: VALID
+keySrc: |-
+  \functions { int f(int); int c; }
+
+  \problem { f(2*c) = f(c+c) }

@@ -47,7 +47,7 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
 
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = JMLParserExceptionTest.class.getResource("exceptional");
-        return ParserExceptionTest.getFiles(FIX_FILE, fileURL, ".java");
+        return getFiles(FIX_FILE, fileURL, ".java");
     }
 
 
@@ -60,7 +60,7 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
     @Override
     protected void tryLoadFile(Path file) throws Exception {
         ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-        AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
+        AbstractProblemLoader pl = new SingleThreadProblemLoader(file, null, null,
             null, AbstractProfile.getDefaultProfile(), false,
             control, false, new Properties());
         pl.setLoadSingleJavaFile(true);

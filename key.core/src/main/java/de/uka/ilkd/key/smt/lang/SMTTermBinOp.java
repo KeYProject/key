@@ -54,13 +54,13 @@ public class SMTTermBinOp extends SMTTerm {
 
     public static OpProperty getProperty(SMTTermBinOp.Op op) {
         return switch (op) {
-        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
-        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
-        case IMPLIES -> OpProperty.RIGHTASSOC;
-        case EQUALS ->
-            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
-        case DISTINCT -> OpProperty.PAIRWISE;
-        default -> OpProperty.NONE;
+            case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+            case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+            case IMPLIES -> OpProperty.RIGHTASSOC;
+            case EQUALS ->
+                /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+            case DISTINCT -> OpProperty.PAIRWISE;
+            default -> OpProperty.NONE;
         };
     }
 
@@ -158,20 +158,20 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public SMTSort sort() {
         return switch (operator) {
-        case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
-            if (!left.sort().equals(right.sort())) {
+            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
+                if (!left.sort().equals(right.sort())) {
 
-                String error = "Unexpected: binary operation with two diff. arg sorts";
-                error += "\n";
-                error += this.toSting() + "\n";
-                error += "Left sort: " + left.sort() + "\n";
-                error += "Right sort: " + right.sort() + "\n";
-                throw new RuntimeException(error);
+                    String error = "Unexpected: binary operation with two diff. arg sorts";
+                    error += "\n";
+                    error += this.toSting() + "\n";
+                    error += "Left sort: " + left.sort() + "\n";
+                    error += "Right sort: " + right.sort() + "\n";
+                    throw new RuntimeException(error);
 
+                }
+                yield left.sort();
             }
-            yield left.sort();
-        }
-        default -> SMTSort.BOOL;
+            default -> SMTSort.BOOL;
         };
     }
 
@@ -429,7 +429,7 @@ public class SMTTermBinOp extends SMTTerm {
         for (; i < args.size(); ++i) {
             SMTTerm arg = args.get(i);
             if (arg instanceof SMTTermBinOp binarg
-                    && ((SMTTermBinOp) arg).getOperator().equals(op)) {
+                    && binarg.getOperator().equals(op)) {
                 if (binarg.getLeft().equals(chain.get(chain.size() - 1))) {
                     chain.add(binarg.getRight());
                     chainables.add(arg);

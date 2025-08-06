@@ -35,7 +35,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      *        (the referred type) 2 of Expression (the first Expression as left hand side, the
      *        second as right hand side), Comments
      */
-    public TypeOperator(ExtList children) {
+    protected TypeOperator(ExtList children) {
         super(children);
         typeReference = children.get(TypeReference.class);
     }
@@ -47,22 +47,22 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      *        (the referred type) 2 of Expression (the first Expression as left hand side, the
      *        second as right hand side), Comments
      */
-    public TypeOperator(ExtList children, PositionInfo pi) {
+    protected TypeOperator(ExtList children, PositionInfo pi) {
         super(children);
         typeReference = children.get(TypeReference.class);
     }
 
-    public TypeOperator(Expression unaryChild, TypeReference typeref) {
+    protected TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
         typeReference = typeref;
     }
 
-    public TypeOperator(Expression[] arguments, TypeReference typeref) {
+    protected TypeOperator(Expression[] arguments, TypeReference typeref) {
         super(arguments);
         typeReference = typeref;
     }
 
-    public TypeOperator() {
+    protected TypeOperator() {
         typeReference = null;
     }
 

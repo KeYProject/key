@@ -1,0 +1,5 @@
+---
+contains:
+  - (assert (not (> (* 42 23) 0)))
+expected: VALID
+keySrc: "\\problem { 42 * 23 > 0 }"

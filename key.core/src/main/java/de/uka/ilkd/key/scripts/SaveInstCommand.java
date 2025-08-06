@@ -6,14 +6,14 @@ package de.uka.ilkd.key.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the
@@ -61,18 +61,20 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
             }
 
             try {
-                final RuleApp ruleApp =
-                    stateMap.getFirstOpenAutomaticGoal().node().parent().getAppliedRuleApp();
-                if (ruleApp instanceof TacletApp tacletApp) {
-                    final Object inst = tacletApp.matchConditions().getInstantiations()
-                            .lookupValue(new Name(value.toString()));
-                    if (inst != null && ((Term) inst).op() instanceof JFunction) {
-                        abbrMap.put((Term) inst, key, true);
-                    } else {
-                        throw new ScriptException(String.format(
-                            "Tried to remember instantiation of schema variable %s "
-                                + "as \"%s\", but instantiation is \"%s\" and not a function",
-                            value, key, inst == null ? "null" : inst.toString()));
+                var parentNode = stateMap.getFirstOpenAutomaticGoal().node().parent();
+                if (parentNode != null) {
+                    final RuleApp ruleApp = parentNode.getAppliedRuleApp();
+                    if (ruleApp instanceof TacletApp tacletApp) {
+                        final Object inst = tacletApp.matchConditions().getInstantiations()
+                                .lookupValue(new Name(value.toString()));
+                        if (inst != null && ((JTerm) inst).op() instanceof Function) {
+                            abbrMap.put((JTerm) inst, key, true);
+                        } else {
+                            throw new ScriptException(String.format(
+                                "Tried to remember instantiation of schema variable %s "
+                                    + "as \"%s\", but instantiation is \"%s\" and not a function",
+                                value, key, inst == null ? "null" : inst.toString()));
+                        }
                     }
                 }
             } catch (Exception e) {

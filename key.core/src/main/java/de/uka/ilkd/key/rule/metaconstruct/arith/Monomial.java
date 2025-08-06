@@ -8,13 +8,14 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -36,7 +37,8 @@ public class Monomial {
 
     public static Monomial create(Term monoTerm, Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
-        monoTerm = TermLabelManager.removeIrrelevantLabels(monoTerm, services);
+        monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
+            services);
         Monomial res;
 
         synchronized (monomialCache) {
@@ -204,16 +206,18 @@ public class Monomial {
         if (it.hasNext()) {
             res = it.next();
             while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(mul, res, it.next());
+                res = services.getTermFactory().createTerm(mul, (JTerm) res,
+                    (JTerm) it.next());
             }
         }
 
-        final Term cTerm = services.getTermBuilder().zTerm(coefficient.toString());
+        final var cTerm = services.getTermBuilder().zTerm(coefficient.toString());
 
         if (res == null) {
             res = cTerm;
         } else if (!BigInteger.ONE.equals(coefficient)) {
-            res = services.getTermFactory().createTerm(mul, res, cTerm);
+            res = services.getTermFactory().createTerm(mul,
+                (JTerm) res, cTerm);
         }
 
         return res;

@@ -314,7 +314,7 @@ public class ReflectionClassCreator {
         r.append(NEW_LINE);
         r.append("  public static ").append(sort).append(" new").append(cleanTypeName(sort))
                 .append("(int dim){").append(NEW_LINE);
-        r.append("    return new ").append(sort.substring(0, sort.length() - 2)).append("[dim];")
+        r.append("    return new ").append(sort, 0, sort.length() - 2).append("[dim];")
                 .append(NEW_LINE);
         r.append("  }").append(NEW_LINE);
         return r;
@@ -430,12 +430,12 @@ public class ReflectionClassCreator {
         int edged = 0;
         for (int i = 0; i < buf.length(); i++) {
             switch (buf.charAt(i)) {
-            case '{' -> curly++;
-            case '}' -> curly--;
-            case '(' -> round++;
-            case ')' -> round--;
-            case '[' -> edged++;
-            case ']' -> edged--;
+                case '{' -> curly++;
+                case '}' -> curly--;
+                case '(' -> round++;
+                case ')' -> round--;
+                case '[' -> edged++;
+                case ']' -> edged--;
             }
         }
         if (curly == 0 && round == 0 && edged == 0) {

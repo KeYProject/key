@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public class UnbindVariablesInstruction implements MatchInstruction {
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+public class UnbindVariablesInstruction implements VMInstruction {
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
-        return matchConditions.shrinkRenameTable();
+    public MatchResultInfo match(PoolSyntaxElementCursor cursor,
+            MatchResultInfo matchConditions,
+            LogicServices services) {
+        return ((MatchConditions) matchConditions).shrinkRenameTable();
     }
-
 }

@@ -151,7 +151,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     private static class ShortcutsTableModel extends AbstractTableModel {
         @Serial
         private static final long serialVersionUID = -2854179933936417703L;
-        private static final String[] COLUMNS = new String[] { "Name", "Description", "Shortcut" };
+        private static final String[] COLUMNS = { "Name", "Description", "Shortcut" };
         private final List<String> actionName;
         private final List<String> shortcut;
         private final List<Action> actions;
@@ -181,22 +181,22 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
-            case 0 -> {
-                return actionName.get(rowIndex)
-                        // remove common package prefixes
-                        .replaceAll("([a-z]\\w*\\.)*", "");
-            }
-            case 1 -> {
-                Action a = actions.get(rowIndex);
-                if (a == null) {
-                    return "";
+                case 0 -> {
+                    return actionName.get(rowIndex)
+                            // remove common package prefixes
+                            .replaceAll("([a-z]\\w*\\.)*", "");
                 }
-                Object val = a.getValue(Action.SHORT_DESCRIPTION);
-                return val != null ? val.toString() : "";
-            }
-            case 2 -> {
-                return shortcut.get(rowIndex);
-            }
+                case 1 -> {
+                    Action a = actions.get(rowIndex);
+                    if (a == null) {
+                        return "";
+                    }
+                    Object val = a.getValue(Action.SHORT_DESCRIPTION);
+                    return val != null ? val.toString() : "";
+                }
+                case 2 -> {
+                    return shortcut.get(rowIndex);
+                }
             }
             return "";
         }

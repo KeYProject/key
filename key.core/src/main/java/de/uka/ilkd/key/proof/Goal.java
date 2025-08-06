@@ -10,29 +10,42 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -46,7 +59,7 @@ import org.jspecify.annotations.NonNull;
  * methods for setting back several proof steps. The sequent has to be changed using the methods of
  * Goal.
  */
-public final class Goal {
+public final class Goal implements ProofGoal<Goal> {
 
     public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
@@ -67,7 +80,8 @@ public final class Goal {
     /**
      * list of all applied rule applications at this branch
      */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.nil();
+    private ImmutableList<RuleApp> appliedRuleApps =
+        ImmutableSLList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -75,11 +89,11 @@ public final class Goal {
     /**
      * the strategy object that determines automated application of rules
      */
-    private Strategy goalStrategy = null;
+    private @Nullable Strategy<@NonNull Goal> goalStrategy = null;
     /**
      * This is the object which keeps book about all applicable rules.
      */
-    private AutomatedRuleApplicationManager ruleAppManager;
+    private @Nullable RuleApplicationManager<Goal> ruleAppManager;
     /**
      * goal listeners
      */
@@ -91,7 +105,7 @@ public final class Goal {
     /**
      * Marks this goal as linked (-> {@link MergeRule})
      */
-    private Goal linkedGoal = null;
+    private @Nullable Goal linkedGoal = null;
     /**
      * The namespaces local to this goal. This may evolve over time.
      */
@@ -100,8 +114,9 @@ public final class Goal {
     /**
      * copy constructor
      */
-    private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
-            FormulaTagManager tagManager, AutomatedRuleApplicationManager ruleAppManager,
+    private Goal(Node node, RuleAppIndex ruleAppIndex,
+            ImmutableList<RuleApp> appliedRuleApps,
+            @Nullable FormulaTagManager tagManager, RuleApplicationManager<Goal> ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex.copy(this);
@@ -149,23 +164,24 @@ public final class Goal {
     /**
      * @return the strategy that determines automated rule applications for this goal
      */
-    public Strategy getGoalStrategy() {
+    public Strategy<@NonNull Goal> getGoalStrategy() {
         if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
         }
         return goalStrategy;
     }
 
-    public void setGoalStrategy(Strategy p_goalStrategy) {
+    public void setGoalStrategy(Strategy<@NonNull Goal> p_goalStrategy) {
         goalStrategy = p_goalStrategy;
         ruleAppManager.clearCache();
     }
 
-    public AutomatedRuleApplicationManager getRuleAppManager() {
+    @Override
+    public RuleApplicationManager<Goal> getRuleAppManager() {
         return ruleAppManager;
     }
 
-    public void setRuleAppManager(AutomatedRuleApplicationManager manager) {
+    public void setRuleAppManager(@Nullable RuleApplicationManager<Goal> manager) {
         if (ruleAppManager != null) {
             ruleAppIndex.setNewRuleListener(null);
             ruleAppManager.setGoal(null);
@@ -221,7 +237,8 @@ public final class Goal {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    private void fireSequentChanged(SequentChangeInfo sci) {
+    private void fireSequentChanged(
+            SequentChangeInfo sci) {
         var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
         var time1 = System.nanoTime();
@@ -299,6 +316,7 @@ public final class Goal {
      *
      * @return the Proof the goal belongs to
      */
+    @Override
     public Proof proof() {
         return node().proof();
     }
@@ -308,7 +326,8 @@ public final class Goal {
      *
      * @return the Sequent to be proved
      */
-    public Sequent sequent() {
+    @Override
+    public @NonNull Sequent sequent() {
         return node().sequent();
     }
 
@@ -394,7 +413,8 @@ public final class Goal {
      *        (succedent)
      * @param first boolean true if at the front, if false then cf is added at the back
      */
-    public void addFormula(SequentFormula cf, boolean inAntec, boolean first) {
+    public void addFormula(SequentFormula cf, boolean inAntec,
+            boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
@@ -577,7 +597,7 @@ public final class Goal {
         for (IProgramVariable pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (JFunction op : node.getLocalFunctions()) {
+        for (Function op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
@@ -593,7 +613,8 @@ public final class Goal {
      * @param ruleApp the rule app
      * @return new goal(s)
      */
-    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+    @Override
+    public ImmutableList<Goal> apply(@NonNull final RuleApp ruleApp) {
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
@@ -605,18 +626,19 @@ public final class Goal {
          * wrap the services object into an overlay such that any addition to local symbols is
          * caught.
          */
-        NamespaceSet originalNamespaces = getLocalNamespaces();
-        Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
+        ruleApp.checkApplicability();
+        ruleApp.registerSkolemConstants(localNamespaces.functions());
+        addAppliedRuleApp(ruleApp);
         try {
-            goalList = ruleApp.execute(this, overlayServices);
+            goalList = ruleApp.rule().<Goal>getExecutor().apply(this, ruleApp);
+        } catch (RuleAbortException rae) {
+            removeLastAppliedRuleApp();
+            node().setAppliedRuleApp(null);
+            return null;
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
-        }
-        // can be null when the taclet failed to apply (RuleAbortException)
-        if (goalList == null) {
-            return null;
         }
 
         proof.getServices().saveNameRecorder(n);
@@ -638,6 +660,10 @@ public final class Goal {
         return goalList;
     }
 
+    public Services getOverlayServices() {
+        return proof().getServices().getOverlay(getLocalNamespaces());
+    }
+
     /*
      * when the new goals are created during splitting, their namespaces cannot be fixed yet as new
      * symbols may still be added.
@@ -648,7 +674,7 @@ public final class Goal {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<JFunction> newFunctions = localNamespaces.functions().elements();
+        Collection<Function> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 

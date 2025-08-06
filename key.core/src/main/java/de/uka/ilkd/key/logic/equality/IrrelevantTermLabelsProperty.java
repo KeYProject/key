@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 
+import org.key_project.logic.Property;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -19,7 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Tobias Reinhold
  */
-public class IrrelevantTermLabelsProperty implements Property<Term> {
+public class IrrelevantTermLabelsProperty implements Property<JTerm> {
     /**
      * The single instance of this property.
      */
@@ -47,7 +48,7 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
-    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
+    public <V> boolean equalsModThisProperty(JTerm term1, JTerm term2, V... v) {
         if (term2 == term1) {
             return true;
         }
@@ -70,8 +71,8 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
             }
         }
 
-        final ImmutableArray<Term> termSubs = term1.subs();
-        final ImmutableArray<Term> term2Subs = term2.subs();
+        final ImmutableArray<JTerm> termSubs = term1.subs();
+        final ImmutableArray<JTerm> term2Subs = term2.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!termSubs.get(i).equalsModProperty(term2Subs.get(i),
@@ -90,11 +91,11 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      * @return the hash code
      */
     @Override
-    public int hashCodeModThisProperty(Term term) {
+    public int hashCodeModThisProperty(JTerm term) {
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();
         hashcode = hashcode * 17 + EqualityUtils
-                .hashCodeModPropertyOfIterable(IRRELEVANT_TERM_LABELS_PROPERTY, term.subs());
+                .hashCodeModPropertyOfIterable(term.subs(), this::hashCodeModThisProperty);
         hashcode = hashcode * 17 + term.boundVars().hashCode();
         hashcode = hashcode * 17 + term.javaBlock().hashCode();
 

@@ -125,7 +125,7 @@ public final class FindResources {
      * @param candidates
      * @return
      */
-    public static @Nullable File findFolder(String property, String... candidates) {
+    public static @Nullable Path findFolder(String property, String... candidates) {
         return findFolder(true, property, candidates);
     }
 
@@ -142,41 +142,40 @@ public final class FindResources {
      * @param exists flag whether the folder should exists
      * @param candidates a list of candidates, used if <code>propertyName</code> is not set by the
      *        user
-     * @return
      */
-    public static @Nullable File findFolder(boolean exists, String property, String... candidates) {
+    public static @Nullable Path findFolder(boolean exists, String property, String... candidates) {
         if (System.getProperty(property) != null) {
-            File f = new File(System.getProperty(property));
-            if (f.exists() || !exists) {
+            var f = Paths.get(System.getProperty(property));
+            if (Files.exists(f) || !exists) {
                 return f;
             }
         }
         for (String c : candidates) {
-            File f = new File(c);
-            if (f.exists() || !exists) {
+            var f = Paths.get(c);
+            if (Files.exists(f) || !exists) {
                 return f;
             }
         }
         return null;
     }
 
-    public static @Nullable File getExampleDirectory() {
+    public static @Nullable Path getExampleDirectory() {
         return findFolder("KEY_EXAMPLES_DIR", "key.ui/examples", "../key.ui/examples", "examples");
     }
 
-    public static @Nullable File getTestResultForRunAllProofs() {
+    public static @Nullable Path getTestResultForRunAllProofs() {
         return findFolder(false, "KEY_TESTRESULT_RUNALLPROOFS", "build/reports/runallproofs");
     }
 
-    public static @Nullable File getTestCasesDirectory() {
+    public static @Nullable Path getTestCasesDirectory() {
         return findFolder("TEST_CASES", "src/test/resources/testcase");
     }
 
-    public static @Nullable File getTestResourcesDirectory() {
+    public static @Nullable Path getTestResourcesDirectory() {
         return findFolder("TEST_RESOURCES", "src/test/resources/");
     }
 
-    public static @Nullable File getTacletProofsDirectory() {
+    public static @Nullable Path getTacletProofsDirectory() {
         return findFolder("TACLET_PROOFS", "key.core/tacletProofs", "../key.core/tacletProofs",
             "tacletProofs");
     }

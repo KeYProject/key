@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -26,7 +28,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
         ImmutableMap<QuantifiableVariable, Term> res =
             DefaultImmutableMap.nilMap();
         Term t = allTerm;
-        Operator op = t.op();
+        var op = t.op();
         while (op instanceof Quantifier) {
             QuantifiableVariable q = t.varsBoundHere(0).get(0);
             Term m;
@@ -34,7 +36,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());
                 m = services.getTermBuilder().var(mv);
             } else {
-                JFunction f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
+                Function f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
                 m = services.getTermBuilder().func(f);
             }
             res = res.put(q, m);

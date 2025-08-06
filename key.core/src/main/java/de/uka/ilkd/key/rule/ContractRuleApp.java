@@ -6,17 +6,17 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -62,12 +62,12 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                    .computeInstantiation((JTerm) posInOccurrence().subTerm(), services),
                 services);
         if (contracts.size() != 1) {
             return this; // incomplete app;
         }
-        var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
+        var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
         heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         return setContract(contracts.iterator().next());
     }
@@ -80,9 +80,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                    .computeInstantiation((JTerm) posInOccurrence().subTerm(), services),
                 services);
-        var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
+        var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
         heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         final FunctionalOperationContract combinedContract =
             services.getSpecificationRepository().combineOperationContracts(contracts);
@@ -90,7 +90,8 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public ContractRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         super.setMutable(ifInsts);
         return this;
     }
@@ -100,16 +101,16 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         return heapContext;
     }
 
-    public Term programTerm() {
+    public JTerm programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }
         return null;
     }
 
     @Override
     public IObserverFunction getObserverFunction(Services services) {
-        return UseOperationContractRule.computeInstantiation(posInOccurrence().subTerm(),
+        return UseOperationContractRule.computeInstantiation((JTerm) posInOccurrence().subTerm(),
             services).pm;
     }
 

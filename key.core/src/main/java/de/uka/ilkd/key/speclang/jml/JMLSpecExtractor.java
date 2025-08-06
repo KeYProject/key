@@ -325,12 +325,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     if (c instanceof TextualJMLClassInv textualInv) {
                         ClassInvariant inv = jsf.createJMLClassInvariant(kjt, textualInv);
                         result = result.add(inv);
-                    } else if (c instanceof TextualJMLInitially) {
-                        TextualJMLInitially textualRep = (TextualJMLInitially) c;
+                    } else if (c instanceof TextualJMLInitially textualRep) {
                         InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, textualRep);
                         result = result.add(inc);
-                    } else if (c instanceof TextualJMLRepresents) {
-                        TextualJMLRepresents textualRep = (TextualJMLRepresents) c;
+                    } else if (c instanceof TextualJMLRepresents textualRep) {
                         ClassAxiom rep = jsf.createJMLRepresents(kjt, textualRep);
                         result = result.add(rep);
                     } else if (c instanceof TextualJMLDepends textualDep) {

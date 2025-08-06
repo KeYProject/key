@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -50,7 +50,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile) {
+    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -63,7 +63,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, File file, ProgressMonitor monitor, Profile profile,
+    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
@@ -78,7 +78,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
+    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
@@ -212,13 +212,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             return false;
         }
         final KeYUserProblemFile kf = (KeYUserProblemFile) o;
-        return kf.file.file().getAbsolutePath().equals(file.file().getAbsolutePath());
+        return kf.file.file().toAbsolutePath().equals(file.file().toAbsolutePath());
     }
 
 
     @Override
     public int hashCode() {
-        return file.file().getAbsolutePath().hashCode();
+        return file.file().toAbsolutePath().hashCode();
     }
 
     /**

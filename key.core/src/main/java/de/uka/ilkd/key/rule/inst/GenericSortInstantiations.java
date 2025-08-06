@@ -8,22 +8,22 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
 
 /**
  * This class handles the instantiation of generic sorts (used for generic taclets), i.e. the class
@@ -32,7 +32,6 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * this class is immutable
  */
-
 public final class GenericSortInstantiations {
 
     public static final GenericSortInstantiations EMPTY_INSTANTIATIONS =
@@ -57,7 +56,7 @@ public final class GenericSortInstantiations {
      */
     public static GenericSortInstantiations create(
             Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> p_instantiations,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         ImmutableList<GenericSort> sorts = ImmutableSLList.nil();
         GenericSortCondition c;
@@ -93,7 +92,7 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException if no instantiations has been found
      */
     public static GenericSortInstantiations create(ImmutableList<GenericSort> p_sorts,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         if (p_sorts.isEmpty()) {
             return EMPTY_INSTANTIATIONS;
@@ -109,7 +108,7 @@ public final class GenericSortInstantiations {
      *         choosing the right generic sort instantiations
      */
     public Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
-        if (!(p_entry instanceof TermInstantiation) || sv instanceof ProgramSV) {
+        if (sv instanceof ProgramSV || !(p_entry.getInstantiation() instanceof JTerm term)) {
             return Boolean.TRUE;
         }
 
@@ -117,8 +116,6 @@ public final class GenericSortInstantiations {
         if (c != null) {
             return checkCondition(c);
         }
-
-        final Term term = ((TermInstantiation) p_entry).getInstantiation();
 
         if (GenericSortCondition.subSortsAllowed(sv)) {
             return term.sort().extendsTrans(sv.sort());
@@ -210,7 +207,7 @@ public final class GenericSortInstantiations {
      * @return the/a found solution
      */
     private static ImmutableMap<GenericSort, Sort> solve(ImmutableList<GenericSort> p_sorts,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         ImmutableMap<GenericSort, Sort> res;
 
@@ -251,7 +248,7 @@ public final class GenericSortInstantiations {
     private static ImmutableMap<GenericSort, Sort> solveHelp(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
-            ImmutableList<GenericSort> p_pushedBack, Services services) {
+            ImmutableList<GenericSort> p_pushedBack, LogicServices services) {
 
         if (p_remainingSorts.isEmpty()) {
             return solveForcedInst(p_pushedBack, p_curRes, p_conditions, services);
@@ -318,7 +315,8 @@ public final class GenericSortInstantiations {
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, GenericSort p_gs,
-            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList, Services services) {
+            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList,
+            LogicServices services) {
         for (Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
                     || !p_gs.isPossibleInstantiation(chosen)) {
@@ -402,7 +400,7 @@ public final class GenericSortInstantiations {
      */
     private static ImmutableMap<GenericSort, Sort> solveForcedInst(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         if (p_remainingSorts.isEmpty()) {
             return p_curRes; // nothing further to be done
@@ -432,7 +430,7 @@ public final class GenericSortInstantiations {
      */
     private static ImmutableMap<GenericSort, Sort> solveForcedInstHelp(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
-            Services services) {
+            LogicServices services) {
 
         if (p_remainingSorts.isEmpty()) {
             // we're done
@@ -547,7 +545,7 @@ public final class GenericSortInstantiations {
      * PRECONDITION: !p_sorts.isEmpty ()
      */
     private static ImmutableList<Sort> minimalSupersorts(ImmutableList<Sort> p_sorts,
-            Services services) {
+            LogicServices services) {
 
         // if the list only consists of a single sort, return this sort
         if (p_sorts.size() == 1) {

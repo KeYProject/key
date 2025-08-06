@@ -7,11 +7,12 @@ import java.io.IOException;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -28,10 +29,10 @@ public class TestTermParser extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
 
     private Sort elem, list;
-    private JFunction head, tail, nil, cons, isempty;
+    private Function head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
-    private Term t_x, t_y, t_z, t_xs, t_ys;
-    private Term t_headxs, t_tailys, t_nil;
+    private JTerm t_x, t_y, t_z, t_xs, t_ys;
+    private JTerm t_headxs, t_tailys, t_nil;
     private final Recoder2KeY r2k;
 
     public TestTermParser() {
@@ -91,8 +92,8 @@ public class TestTermParser extends AbstractTestTermParser {
         ys = declareVar("ys", list);
         t_ys = tf.createTerm(ys);
 
-        t_headxs = tf.createTerm(head, new Term[] { t_xs }, null, null);
-        t_tailys = tf.createTerm(tail, new Term[] { t_ys }, null, null);
+        t_headxs = tf.createTerm(head, new JTerm[] { t_xs }, null, null);
+        t_tailys = tf.createTerm(tail, new JTerm[] { t_ys }, null, null);
         t_nil = tf.createTerm(nil);
 
         assertNotNull(head);
@@ -121,15 +122,16 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void test3() throws Exception {
-        Term t = tf.createTerm(cons, t_headxs, t_tailys);
+        JTerm t = tf.createTerm(cons, t_headxs, t_tailys);
 
         assertEquals(t, parseTerm("cons(head(xs),tail(ys))"), "parse cons(head(xs),tail(ys))");
     }
 
     @Test
     public void test5() throws Exception {
-        Term t = tf.createTerm(Equality.EQUALS, tf.createTerm(head, tf.createTerm(cons, t_x, t_xs)),
-            tf.createTerm(head, tf.createTerm(cons, t_x, t_nil)));
+        JTerm t =
+            tf.createTerm(Equality.EQUALS, tf.createTerm(head, tf.createTerm(cons, t_x, t_xs)),
+                tf.createTerm(head, tf.createTerm(cons, t_x, t_nil)));
 
         assertEquals(t, parseFormula("head(cons(x,xs))=head(cons(x,nil))"),
             "parse head(cons(x,xs))=head(cons(x,nil))");
@@ -139,7 +141,7 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void testNotEqual() throws Exception {
-        Term t = tf.createTerm(Junctor.NOT,
+        JTerm t = tf.createTerm(Junctor.NOT,
             tf.createTerm(Equality.EQUALS, tf.createTerm(head, tf.createTerm(cons, t_x, t_xs)),
                 tf.createTerm(head, tf.createTerm(cons, t_x, t_nil))));
 
@@ -149,8 +151,8 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void test6() throws Exception {
-        Term t = tf.createTerm(Equality.EQV,
-            new Term[] {
+        JTerm t = tf.createTerm(Equality.EQV,
+            new JTerm[] {
                 tf.createTerm(Junctor.IMP,
                     tf.createTerm(Junctor.OR, tf.createTerm(Equality.EQUALS, t_x, t_x),
                         tf.createTerm(Equality.EQUALS, t_y, t_y)),
@@ -172,12 +174,12 @@ public class TestTermParser extends AbstractTestTermParser {
          */
 
         String s = "\\forall list x; \\forall list l1; ! x = l1";
-        Term t = parseFormula(s);
+        JTerm t = parseFormula(s);
 
         LogicVariable thisx = (LogicVariable) t.varsBoundHere(0).get(0);
         LogicVariable l1 = (LogicVariable) t.sub(0).varsBoundHere(0).get(0);
 
-        Term t1 = tb.all(thisx, tb.all(l1, tf.createTerm(Junctor.NOT,
+        JTerm t1 = tb.all(thisx, tb.all(l1, tf.createTerm(Junctor.NOT,
             tf.createTerm(Equality.EQUALS, tf.createTerm(thisx), tf.createTerm(l1)))));
 
         assertNotSame(thisx, x, "new variable in quantifier");
@@ -190,14 +192,14 @@ public class TestTermParser extends AbstractTestTermParser {
         /* A bit like test7, but for a substitution term */
         // String s = "{\\subst elem xs; head(xs)} cons(xs,ys)"; weigl: not well-typed
         String s = "{\\subst list y; tail(y)} head(xs)";
-        Term t = parseTerm(s);
-        Term xs = parseTerm("xs");
+        JTerm t = parseTerm(s);
+        JTerm xs = parseTerm("xs");
 
         LogicVariable thisxs = (LogicVariable) t.varsBoundHere(1).get(0);
 
-        Term inner = tf.createTerm(head, xs); // head(xs)
-        Term replacement = tf.createTerm(tail, tf.createTerm(thisxs)); // tail(xs)
-        Term subst = tf.createTerm(WarySubstOp.SUBST, new Term[] { replacement, inner },
+        JTerm inner = tf.createTerm(head, xs); // head(xs)
+        JTerm replacement = tf.createTerm(tail, tf.createTerm(thisxs)); // tail(xs)
+        JTerm subst = tf.createTerm(WarySubstOp.SUBST, new JTerm[] { replacement, inner },
             new ImmutableArray<>(thisxs), null);
 
         assertNotSame(thisxs, xs);
@@ -208,12 +210,12 @@ public class TestTermParser extends AbstractTestTermParser {
     public void test9() throws Exception {
         /* Try something with a prediate */
         String s = "\\exists list x; !isempty(x)";
-        Term t = parseFormula(s);
+        JTerm t = parseFormula(s);
 
         LogicVariable thisx = (LogicVariable) t.varsBoundHere(0).get(0);
 
-        Term t1 = tb.ex(thisx, tf.createTerm(Junctor.NOT,
-            tf.createTerm(isempty, new Term[] { tf.createTerm(thisx) }, null, null)));
+        JTerm t1 = tb.ex(thisx, tf.createTerm(Junctor.NOT,
+            tf.createTerm(isempty, new JTerm[] { tf.createTerm(thisx) }, null, null)));
 
         assertNotSame(thisx, x, "new variable in quantifier");
         assertEquals(t1, t, "parse \\forall list x; \\forall list l1; ! x = l1");
@@ -226,14 +228,14 @@ public class TestTermParser extends AbstractTestTermParser {
         // <{ int x = 2; {String x = "\"}";} }> true
         // String s = "< { int x = 1; {String s = \"\\\"}\";} } > true";
         String s = "\\<{ int x = 1; {int s = 2;} }\\> x=x";
-        Term t = parseTerm(s);
+        JTerm t = parseTerm(s);
         LOGGER.info("Out: {}", t);
     }
 
     @Test
     public void test11() throws Exception {
         String s = "\\[{ int x = 2; {String s = \"\\\"}\";} }\\] true";
-        Term t = parseTerm(s);
+        JTerm t = parseTerm(s);
         LOGGER.info("Out: {}", t);
     }
 
@@ -242,23 +244,23 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void test12() throws Exception {
         String s = "\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
-        Term t = parseTerm(s);
+        JTerm t = parseTerm(s);
         LOGGER.info("Out: {}", t);
     }
 
     @Test
     public void test13() throws Exception {
-        Term t1 = parseTerm(
+        JTerm t1 = parseTerm(
             "\\exists elem x; \\forall list ys; \\forall list xs; ( xs =" + " cons(x,ys))");
-        Term t2 = parseTerm(
+        JTerm t2 = parseTerm(
             "\\exists elem y; \\forall list xs; \\forall list ys; ( ys =" + " cons(y,xs))");
-        Term t3 =
+        JTerm t3 =
             parseTerm("\\exists int_sort bi; (\\<{ int p_x = 1;" + " {int s = 2;} }\\>" + " true ->"
                 + "\\<{ int p_x = 1;boolean p_y=2<1;" + " while(p_y){ int s=3 ;} }\\>" + " true)");
-        Term t4 =
+        JTerm t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
                 + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
-        assertTrue(t3.equalsModProperty(t4, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(t3, t4),
             "Terms should be equalModRenaming");
         assertEquals(t3.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             t4.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -268,7 +270,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void test14() throws Exception {
         String s = "\\<{int[] i;i=new int[5];}\\>true";
-        Term t = parseTerm(s);
+        JTerm t = parseTerm(s);
         s = "\\<{int[] i;}\\>\\<{}\\>true";
         t = parseTerm(s);
         LOGGER.info("Out: {}", t);
@@ -278,7 +280,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Disabled
     public void xtestBindingUpdateTermOldBindingAlternative() throws Exception {
         String s = "\\<{int i,j;}\\> {i:=j} i = j";
-        Term t = parseTerm(s);
+        JTerm t = parseTerm(s);
         assertTrue(t.sub(0).op() instanceof UpdateApplication,
             "expected {i:=j}(i=j) but is ({i:=j}i)=j)");
     }
@@ -287,8 +289,8 @@ public class TestTermParser extends AbstractTestTermParser {
     public void testBindingUpdateTerm() throws Exception {
         String s = "\\forall int j; {globalIntPV:=j} globalIntPV = j";
         String exp = "\\forall int j; ({globalIntPV:=j} globalIntPV) = j";
-        Term t = parseTerm(s);
-        Term u = parseTerm(exp);
+        JTerm t = parseTerm(s);
+        JTerm u = parseTerm(exp);
         assertFalse(t.sub(0).op() instanceof UpdateApplication,
             "expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)");
     }
@@ -332,8 +334,8 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     private void assertTermEquals(String actual, String expected) throws Exception {
-        Term t = parseTerm(actual);
-        Term u = parseTerm(expected);
+        JTerm t = parseTerm(actual);
+        JTerm u = parseTerm(expected);
         LOGGER.debug("Actual: {}", t);
         LOGGER.debug("Expected: {}", u);
         assertEquals(u.toString(), t.toString());
@@ -383,7 +385,7 @@ public class TestTermParser extends AbstractTestTermParser {
         + "public static T staticQ(T p){} " + "public static T staticQ() {}}";
 
 
-    public Term testParseQueriesAndAttributes(String expr) throws Exception {
+    public JTerm testParseQueriesAndAttributes(String expr) throws Exception {
         TacletForTests.getJavaInfo().readJavaBlock("{}");
         // r2k.readCompilationUnit(COMPILATION_UNIT);
         return parseTerm("\\forall T t; " + expr);
@@ -454,7 +456,7 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testNegativeLiteralParsing1() throws Exception {
         String s1 = "-1234";
-        Term t = parseTerm(s1);
+        JTerm t = parseTerm(s1);
         assertEquals("Z", t.op().name().toString());
         assertEquals("neglit", t.sub(0).op().name().toString());
     }
@@ -462,20 +464,20 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testNegativeLiteralParsing2() throws Exception {
         String s2 = "-(1+1) ";
-        Term t = parseTerm(s2);
+        JTerm t = parseTerm(s2);
         assertEquals("neg", t.op().name().toString(), "Failed parsing negative complex term");
     }
 
     @Test
     public void testNegativeLiteralParsing3() throws Exception {
         String s3 = "\\forall int i; -i = 0 ";
-        Term t = parseTerm(s3);
+        JTerm t = parseTerm(s3);
         assertEquals("neg", t.sub(0).sub(0).op().name().toString());
     }
 
     @Test
     public void testIfThenElse() throws Exception {
-        Term t = null, t2 = null;
+        JTerm t = null, t2 = null;
 
         String s1 = "\\if (3=4) \\then (1) \\else (2)";
         try {
@@ -531,8 +533,8 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testInfix4() throws Exception {
         // Test: Multiplication/Modulo/Div should be left associative
-        Term termInfix = parseTerm("aa%bb*cc < -123");
-        Term termPrefix = parseTerm("lt(mul(mod(aa,bb),cc),-123)");
+        JTerm termInfix = parseTerm("aa%bb*cc < -123");
+        JTerm termPrefix = parseTerm("lt(mul(mod(aa,bb),cc),-123)");
         assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),Z(neglit(3(2(1(#))))))",
             termInfix.toString());
         assertEqualsIgnoreWhitespaces("lt(mul(mod(aa,bb),cc),Z(neglit(3(2(1(#))))))",

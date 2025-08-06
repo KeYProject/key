@@ -44,7 +44,7 @@ public class ProofSettings {
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
 
-    public static final ProofSettings DEFAULT_SETTINGS = ProofSettings.loadedSettings();
+    public static final ProofSettings DEFAULT_SETTINGS = loadedSettings();
 
 
     private static ProofSettings loadedSettings() {
@@ -273,7 +273,7 @@ public class ProofSettings {
      * @return {@code true} settings are initialized, {@code false} settings are not initialized.
      */
     public static boolean isChoiceSettingInitialised() {
-        return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
+        return !DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
     }
 
     /**

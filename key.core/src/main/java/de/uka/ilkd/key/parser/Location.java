@@ -59,13 +59,14 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
             Position.fromToken(token));
     }
 
-    public Optional<URI> getFileURI() {
-        return Optional.ofNullable(fileUri);
-    }
+    public URI getFileUri() { return fileUri; }
 
-    public Position getPosition() {
-        return position;
-    }
+    /// @deprecated weigl: Usage of {@link Optional} is discourage.
+    /// @see [#getFileUri()]
+    @Deprecated
+    public Optional<URI> getFileURI() { return Optional.ofNullable(fileUri); }
+
+    public Position getPosition() { return position; }
 
     /**
      * Internal string representation. Do not rely on format!
@@ -88,9 +89,7 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(fileUri, position);
-    }
+    public int hashCode() { return Objects.hash(fileUri, position); }
 
     @Override
     public int compareTo(@NonNull Location o) {

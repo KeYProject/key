@@ -62,7 +62,7 @@ public class Modify extends TwoPassTransformation {
         this.modifier = code;
     }
 
-    private static boolean containsModifier(Declaration decl, Class mod) {
+    private static boolean containsModifier(Declaration decl, Class<?> mod) {
         List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
         if (mods == null) {
             return false;
@@ -102,73 +102,73 @@ public class Modify extends TwoPassTransformation {
             return setProblemReport(IDENTITY);
         }
         switch (modifier) {
-        case ModifierKit.PACKAGE:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            break;
-        case ModifierKit.PUBLIC:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Public) {
+            case ModifierKit.PACKAGE:
+                remove = ModifierKit.getVisibilityModifier(decl);
                 break;
-            }
-            insert = getProgramFactory().createPublic();
-            break;
-        case ModifierKit.PROTECTED:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Protected) {
+            case ModifierKit.PUBLIC:
+                remove = ModifierKit.getVisibilityModifier(decl);
+                if (remove instanceof Public) {
+                    break;
+                }
+                insert = getProgramFactory().createPublic();
                 break;
-            }
-            insert = getProgramFactory().createProtected();
-            break;
-        case ModifierKit.PRIVATE:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Private) {
+            case ModifierKit.PROTECTED:
+                remove = ModifierKit.getVisibilityModifier(decl);
+                if (remove instanceof Protected) {
+                    break;
+                }
+                insert = getProgramFactory().createProtected();
                 break;
-            }
-            insert = getProgramFactory().createPrivate();
-            break;
-        case ModifierKit.STATIC:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            insert = getProgramFactory().createStatic();
-            break;
-        case ModifierKit.FINAL:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            if (containsModifier(decl, Static.class)) {
-                insertPosition += 1;
-            }
-            insert = getProgramFactory().createFinal();
-            break;
-        case ModifierKit.ABSTRACT:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            insert = getProgramFactory().createAbstract();
-            break;
-        case ModifierKit.SYNCHRONIZED:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createSynchronized();
-            break;
-        case ModifierKit.TRANSIENT:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createTransient();
-            break;
-        case ModifierKit.STRICT:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createStrictFp();
-            break;
-        case ModifierKit.VOLATILE:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createVolatile();
-            break;
-        case ModifierKit.NATIVE:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createNative();
-            break;
-        default:
-            throw new IllegalArgumentException("Unsupported modifier code " + modifier);
+            case ModifierKit.PRIVATE:
+                remove = ModifierKit.getVisibilityModifier(decl);
+                if (remove instanceof Private) {
+                    break;
+                }
+                insert = getProgramFactory().createPrivate();
+                break;
+            case ModifierKit.STATIC:
+                if (ModifierKit.getVisibilityModifier(decl) != null) {
+                    insertPosition += 1;
+                }
+                insert = getProgramFactory().createStatic();
+                break;
+            case ModifierKit.FINAL:
+                if (ModifierKit.getVisibilityModifier(decl) != null) {
+                    insertPosition += 1;
+                }
+                if (containsModifier(decl, Static.class)) {
+                    insertPosition += 1;
+                }
+                insert = getProgramFactory().createFinal();
+                break;
+            case ModifierKit.ABSTRACT:
+                if (ModifierKit.getVisibilityModifier(decl) != null) {
+                    insertPosition += 1;
+                }
+                insert = getProgramFactory().createAbstract();
+                break;
+            case ModifierKit.SYNCHRONIZED:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createSynchronized();
+                break;
+            case ModifierKit.TRANSIENT:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createTransient();
+                break;
+            case ModifierKit.STRICT:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createStrictFp();
+                break;
+            case ModifierKit.VOLATILE:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createVolatile();
+                break;
+            case ModifierKit.NATIVE:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createNative();
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported modifier code " + modifier);
         }
         return setProblemReport(NO_PROBLEM);
     }

@@ -9,8 +9,7 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -43,7 +43,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private SymbolicExecutionStateWithProgCnt thisSEState = null;
     private ImmutableList<SymbolicExecutionState> mergePartnerStates = null;
-    private Term distForm = null;
+    private JTerm distForm = null;
 
     private ArrayList<MergeRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
             ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
             ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
-            ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
+            ImmutableList<SymbolicExecutionState> mergePartnerStates, JTerm distForm,
             ArrayList<MergeRuleProgressListener> progressListeners) {
         super(rule, pio, ifInsts);
         this.mergeNode = mergeNode;
@@ -78,7 +78,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -98,7 +99,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         }
 
         final MergePointStatement mps = (MergePointStatement) JavaTools
-                .getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
+                .getActiveStatement(TermBuilder.goBelowUpdates((JTerm) pio.subTerm()).javaBlock());
 
         final Services services = goal.proof().getServices();
         final MergeContract mc =
@@ -184,7 +185,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
             MergeRuleUtils.sequentToSETriple(mergeNode, super.pio, mergeNode.proof().getServices());
     }
 
-    public void setDistinguishingFormula(Term distForm) {
+    public void setDistinguishingFormula(JTerm distForm) {
         // null is OK: In this case, we generate the distinguishing
         // formula automatically. Otherwise, the term must indeed be
         // a formula.
@@ -193,7 +194,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.distForm = distForm;
     }
 
-    public Term getDistinguishingFormula() {
+    public JTerm getDistinguishingFormula() {
         return distForm;
     }
 

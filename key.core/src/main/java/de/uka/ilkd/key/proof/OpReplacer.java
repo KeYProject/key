@@ -6,13 +6,13 @@ package de.uka.ilkd.key.proof;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -83,7 +83,7 @@ public class OpReplacer {
      *
      * <p>
      * If there is a proof currently loaded, you may want to use
-     * {@link OpReplacer#replace(Operator, Operator, Term, TermFactory, Proof)} as it correctly
+     * {@link OpReplacer#replace(Operator, Operator, JTerm, TermFactory, Proof)} as it correctly
      * deals with {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent
      * features.
      * </p>
@@ -94,7 +94,7 @@ public class OpReplacer {
      * @param tf a term factory.
      * @return a term with all occurences of the sub-term replaced.
      */
-    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf) {
+    public static JTerm replace(JTerm toReplace, JTerm with, JTerm in, TermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -105,7 +105,7 @@ public class OpReplacer {
      *
      * <p>
      * If there is a proof currently loaded, you may want to use
-     * {@link OpReplacer#replace(Term, Term, ImmutableList, TermFactory, Proof)} as it correctly
+     * {@link OpReplacer#replace(JTerm, JTerm, ImmutableList, TermFactory, Proof)} as it correctly
      * deals with {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent
      * features.
      * </p>
@@ -116,7 +116,7 @@ public class OpReplacer {
      * @param tf a term factory.
      * @return the terms with all occurences of the sub-term replaced.
      */
-    public static ImmutableList<Term> replace(Term toReplace, Term with, ImmutableList<Term> in,
+    public static ImmutableList<JTerm> replace(JTerm toReplace, JTerm with, ImmutableList<JTerm> in,
             TermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
@@ -128,7 +128,7 @@ public class OpReplacer {
      *
      * <p>
      * If there is a proof currently loaded, you may want to use
-     * {@link OpReplacer#replace(Operator, Operator, Term, TermFactory, Proof)} as it correctly
+     * {@link OpReplacer#replace(Operator, Operator, JTerm, TermFactory, Proof)} as it correctly
      * deals with {@link de.uka.ilkd.key.logic.label.OriginTermLabel}s and other proof-dependent
      * features.
      * </p>
@@ -139,7 +139,7 @@ public class OpReplacer {
      * @param tf a term factory.
      * @return a term with all occurences of the operator replaced.
      */
-    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf) {
+    public static JTerm replace(Operator toReplace, Operator with, JTerm in, TermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -155,8 +155,9 @@ public class OpReplacer {
      * @param proof the currently loaded proof.
      * @return a term with all occurences of the sub-term replaced.
      */
-    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf, Proof proof) {
-        Map<Term, Term> map = new LinkedHashMap<>();
+    public static JTerm replace(JTerm toReplace, JTerm with, JTerm in, TermFactory tf,
+            Proof proof) {
+        Map<JTerm, JTerm> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -174,9 +175,9 @@ public class OpReplacer {
      * @param proof the currently loaded proof.
      * @return the terms with all occurences of the sub-term replaced.
      */
-    public static ImmutableList<Term> replace(Term toReplace, Term with, ImmutableList<Term> in,
+    public static ImmutableList<JTerm> replace(JTerm toReplace, JTerm with, ImmutableList<JTerm> in,
             TermFactory tf, Proof proof) {
-        Map<Term, Term> map = new LinkedHashMap<>();
+        Map<JTerm, JTerm> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -194,7 +195,7 @@ public class OpReplacer {
      * @param proof the currently loaded proof.
      * @return a term with all occurences of the operator replaced.
      */
-    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf,
+    public static JTerm replace(Operator toReplace, Operator with, JTerm in, TermFactory tf,
             Proof proof) {
         Map<Operator, Operator> map = new LinkedHashMap<>();
         map.put(toReplace, with);
@@ -225,28 +226,28 @@ public class OpReplacer {
      * @param term the term in which to perform the replacement.
      * @return the transformed term.
      */
-    public Term replace(Term term) {
+    public JTerm replace(JTerm term) {
         if (term == null) {
             return null;
         }
-        final Term newTerm = (Term) map.get(term);
+        final JTerm newTerm = (JTerm) map.get(term);
         if (newTerm != null) {
             return newTerm;
         }
 
         for (SyntaxElement svs : map.keySet()) {
-            if (term.equalsModProperty(svs, TERM_LABELS_PROPERTY)) {
-                return (Term) map.get(svs);
+            if (svs instanceof JTerm t && TERM_LABELS_PROPERTY.equalsModThisProperty(term, t)) {
+                return (JTerm) map.get(svs);
             }
         }
 
         final Operator newOp = replace(term.op());
 
         final int arity = term.arity();
-        final Term[] newSubTerms = new Term[arity];
+        final JTerm[] newSubTerms = new JTerm[arity];
         boolean changedSubTerm = false;
         for (int i = 0; i < arity; i++) {
-            Term subTerm = term.sub(i);
+            JTerm subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
 
             if (newSubTerms[i] != subTerm) {
@@ -255,10 +256,11 @@ public class OpReplacer {
         }
         final ImmutableArray<QuantifiableVariable> newBoundVars = replace(term.boundVars());
 
-        final Term result;
+        final JTerm result;
         if (newOp != term.op() || changedSubTerm || newBoundVars != term.boundVars()) {
             result =
-                tf.createTerm(newOp, newSubTerms, newBoundVars, term.getLabels());
+                tf.createTerm(newOp, newSubTerms, newBoundVars,
+                    term.getLabels());
         } else {
             result = term;
         }
@@ -272,9 +274,9 @@ public class OpReplacer {
      * @param terms the terms in which to perform the replacement.
      * @return the list of transformed terms.
      */
-    public ImmutableList<Term> replace(ImmutableList<Term> terms) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
-        for (final Term term : terms) {
+    public ImmutableList<JTerm> replace(ImmutableList<JTerm> terms) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        for (final JTerm term : terms) {
             result = result.append(replace(term));
         }
         return result;
@@ -293,9 +295,9 @@ public class OpReplacer {
         }
 
         for (final InfFlowSpec infFlowSpec : terms) {
-            final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
-            final ImmutableList<Term> postExpressions = replace(infFlowSpec.postExpressions);
-            final ImmutableList<Term> newObjects = replace(infFlowSpec.newObjects);
+            final ImmutableList<JTerm> preExpressions = replace(infFlowSpec.preExpressions);
+            final ImmutableList<JTerm> postExpressions = replace(infFlowSpec.postExpressions);
+            final ImmutableList<JTerm> newObjects = replace(infFlowSpec.newObjects);
             result = result.append(new InfFlowSpec(preExpressions, postExpressions, newObjects));
         }
         return result;
@@ -308,9 +310,9 @@ public class OpReplacer {
      * @param terms the terms in which to perform the replacement.
      * @return the set of transformed terms.
      */
-    public ImmutableSet<Term> replace(ImmutableSet<Term> terms) {
-        ImmutableSet<Term> result = DefaultImmutableSet.nil();
-        for (final Term term : terms) {
+    public ImmutableSet<JTerm> replace(ImmutableSet<JTerm> terms) {
+        ImmutableSet<JTerm> result = DefaultImmutableSet.nil();
+        for (final JTerm term : terms) {
             result = result.add(replace(term));
         }
         return result;
@@ -323,11 +325,11 @@ public class OpReplacer {
      * @param myMap the map in which to perform the replacement.
      * @return the transformed map.
      */
-    public Map<Operator, Term> replace(Map<Operator, Term> myMap) {
+    public Map<Operator, JTerm> replace(Map<Operator, JTerm> myMap) {
 
-        Map<Operator, Term> result = new LinkedHashMap<>();
+        Map<Operator, JTerm> result = new LinkedHashMap<>();
 
-        for (Map.Entry<Operator, Term> entry : myMap.entrySet()) {
+        for (Map.Entry<Operator, JTerm> entry : myMap.entrySet()) {
             result.put(replace(entry.getKey()), replace(entry.getValue()));
         }
         return result;
@@ -340,7 +342,8 @@ public class OpReplacer {
      * @param vars the array in which to perform the replacement.
      * @return the list of transformed variables.
      */
-    public ImmutableArray<QuantifiableVariable> replace(ImmutableArray<QuantifiableVariable> vars) {
+    public ImmutableArray<QuantifiableVariable> replace(
+            ImmutableArray<QuantifiableVariable> vars) {
         QuantifiableVariable[] result = new QuantifiableVariable[vars.size()];
         boolean changed = false;
         for (int i = 0, n = vars.size(); i < n; i++) {

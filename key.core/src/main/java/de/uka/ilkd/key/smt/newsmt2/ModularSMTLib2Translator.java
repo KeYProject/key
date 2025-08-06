@@ -12,13 +12,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -227,7 +229,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             res.add(sf.formula());
         }
         for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not(sf.formula()));
+            res.add(tb.not((JTerm) sf.formula()));
         }
         return res;
     }

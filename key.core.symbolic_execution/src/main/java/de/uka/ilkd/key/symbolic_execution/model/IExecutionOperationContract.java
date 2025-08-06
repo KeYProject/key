@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.Contract;
@@ -64,32 +64,32 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
     boolean isNotNullCheckComplied();
 
     /**
-     * Returns the result {@link Term} in which the result of the applied {@link Contract} is
+     * Returns the result {@link JTerm} in which the result of the applied {@link Contract} is
      * stored.
      *
-     * @return The result {@link Term} in which the result of the applied {@link Contract} is
+     * @return The result {@link JTerm} in which the result of the applied {@link Contract} is
      *         stored.
      * @throws ProofInputException Occurred Exception.
      */
-    Term getResultTerm() throws ProofInputException;
+    JTerm getResultTerm() throws ProofInputException;
 
     /**
-     * Returns the exception {@link Term} in which a by the {@link Contract} thrown
+     * Returns the exception {@link JTerm} in which a by the {@link Contract} thrown
      * {@link Exception} is stored.
      *
-     * @return The exception {@link Term} in which a by the {@link Contract} thrown
+     * @return The exception {@link JTerm} in which a by the {@link Contract} thrown
      *         {@link Exception} is stored.
      * @throws ProofInputException Occurred Exception.
      */
-    Term getExceptionTerm() throws ProofInputException;
+    JTerm getExceptionTerm() throws ProofInputException;
 
     /**
-     * Returns the self {@link Term} of the called method for which a {@link Contract} is applied.
+     * Returns the self {@link JTerm} of the called method for which a {@link Contract} is applied.
      *
-     * @return The self {@link Term} or {@code null} if not available.
+     * @return The self {@link JTerm} or {@code null} if not available.
      * @throws ProofInputException Occurred Exception.
      */
-    Term getSelfTerm() throws ProofInputException;
+    JTerm getSelfTerm() throws ProofInputException;
 
     /**
      * Returns the parameters of the called method for which a {@link Contract} is applied.
@@ -97,33 +97,33 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * @return The parameters of the called method for which a {@link Contract} is applied.
      * @throws ProofInputException Occurred Exception.
      */
-    ImmutableList<Term> getContractParams() throws ProofInputException;
+    ImmutableList<JTerm> getContractParams() throws ProofInputException;
 
     /**
-     * Returns the human readable result {@link Term} in which the result of the applied
+     * Returns the human readable result {@link JTerm} in which the result of the applied
      * {@link Contract} is stored.
      *
-     * @return The human readable result {@link Term} in which the result of the applied
+     * @return The human readable result {@link JTerm} in which the result of the applied
      *         {@link Contract} is stored.
      * @throws ProofInputException Occurred Exception.
      */
     String getFormatedResultTerm() throws ProofInputException;
 
     /**
-     * Returns the human readable exception {@link Term} in which a by the {@link Contract} thrown
+     * Returns the human readable exception {@link JTerm} in which a by the {@link Contract} thrown
      * {@link Exception} is stored.
      *
-     * @return The human readable exception {@link Term} in which a by the {@link Contract} thrown
+     * @return The human readable exception {@link JTerm} in which a by the {@link Contract} thrown
      *         {@link Exception} is stored.
      * @throws ProofInputException Occurred Exception.
      */
     String getFormatedExceptionTerm() throws ProofInputException;
 
     /**
-     * Returns the human readable self {@link Term} of the called method for which a
+     * Returns the human readable self {@link JTerm} of the called method for which a
      * {@link Contract} is applied.
      *
-     * @return The human readable self {@link Term} or {@code null} if not available.
+     * @return The human readable self {@link JTerm} or {@code null} if not available.
      * @throws ProofInputException Occurred Exception.
      */
     String getFormatedSelfTerm() throws ProofInputException;

@@ -11,16 +11,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -40,7 +39,7 @@ public abstract class LDT implements Named {
     private final Sort sort;
 
     /** the namespace of functions this LDT feels responsible for */
-    private final Namespace<Operator> functions = new Namespace<>();
+    private final Namespace<Function> functions = new Namespace<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -74,7 +73,7 @@ public abstract class LDT implements Named {
      *
      * @return the added function (for convenience reasons)
      */
-    protected final JFunction addFunction(JFunction f) {
+    protected final Function addFunction(Function f) {
         functions.addSafely(f);
         return f;
     }
@@ -85,14 +84,14 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final JFunction addFunction(TermServices services, String funcName) {
-        final Namespace<JFunction> funcNS = services.getNamespaces().functions();
-        final JFunction f = funcNS.lookup(new Name(funcName));
+    protected final <F extends Function> F addFunction(TermServices services, String funcName) {
+        final Namespace<Function> funcNS = services.getNamespaces().functions();
+        final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
-        return addFunction(f);
+        return (F) addFunction(f);
     }
 
     protected final SortDependingFunction addSortDependingFunction(TermServices services,
@@ -109,7 +108,7 @@ public abstract class LDT implements Named {
      *
      * @return the basic functions of the model
      */
-    protected final Namespace<Operator> functions() {
+    protected final Namespace<Function> functions() {
         return functions;
     }
 
@@ -164,7 +163,7 @@ public abstract class LDT implements Named {
     }
 
     public boolean containsFunction(Function op) {
-        Named n = functions.lookup(op.name());
+        final Operator n = functions.lookup(op.name());
         return (n == op);
     }
 
@@ -182,7 +181,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
             Services services, ExecutionContext ec);
 
 
@@ -197,8 +196,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left,
-            Term right, Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+            JTerm right, Services services, ExecutionContext ec);
 
 
     /**
@@ -211,7 +210,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
             TermServices services, ExecutionContext ec);
 
 
@@ -221,7 +220,7 @@ public abstract class LDT implements Named {
      * @param lit the Literal to be translated
      * @return the Term that represents the given literal in its logic form
      */
-    public abstract Term translateLiteral(Literal lit, Services services);
+    public abstract JTerm translateLiteral(Literal lit, Services services);
 
     /**
      * returns the function symbol for the given <em>Java</em> operator.
@@ -229,15 +228,15 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services, ExecutionContext ec);
 
     /**
      * get the function in this LDT for an operation identified by generic operationName. If the LDT
      * does not support this named function, it should return null.
-     *
+     * <p>
      * This is used to resolve overloaded symbols.
-     *
+     * <p>
      * For example: "+" may map to "add" for integers, and to "addFloat" for floats.
      *
      * @param operationName non-null operationName for a generic function
@@ -245,15 +244,15 @@ public abstract class LDT implements Named {
      * @return reference to the respective LDT-specific function for the operation, null if not
      *         available
      */
-    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
         // by default an LDT does not support overloaded symbols
         return null;
     }
 
-    public abstract boolean hasLiteralFunction(JFunction f);
+    public abstract boolean hasLiteralFunction(Function f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract Expression translateTerm(Term t, ExtList children, Services services);
+    public abstract Expression translateTerm(JTerm t, ExtList children, Services services);
 
-    public abstract Type getType(Term t);
+    public abstract Type getType(JTerm t);
 }

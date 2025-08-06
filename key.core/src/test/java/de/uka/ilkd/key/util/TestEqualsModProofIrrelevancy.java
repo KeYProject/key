@@ -3,36 +3,40 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link org.key_project.util.EqualsModProofIrrelevancy}.
+ * Tests for equality modulo proof irrelevancy.
  *
  * @author Arne Keller
  */
 class TestEqualsModProofIrrelevancy {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     @Test
     void testJavaProof() throws Exception {
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Assertions.assertNotNull(env.getLoadedProof());
         Assertions.assertTrue(env.getLoadedProof().closed());
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Assertions.assertNotNull(env2.getLoadedProof());
         Assertions.assertTrue(env2.getLoadedProof().closed());
@@ -48,13 +52,19 @@ class TestEqualsModProofIrrelevancy {
             Assertions.assertNotNull(node1);
             Assertions.assertNotNull(node2);
             for (int j = 1; j <= node1.sequent().size(); j++) {
-                SequentFormula sf1 = node1.sequent().getFormulabyNr(j);
-                SequentFormula sf2 = node2.sequent().getFormulabyNr(j);
-                Assertions.assertTrue(sf1.equalsModProofIrrelevancy(sf2));
+                Sequent sequentFormulas1 = node1.sequent();
+                SequentFormula sf1 =
+                    sequentFormulas1.getFormulaByNr(j);
+                Sequent sequentFormulas = node2.sequent();
+                SequentFormula sf2 =
+                    sequentFormulas.getFormulaByNr(j);
+                Assertions.assertTrue((Object) sf2 instanceof SequentFormula that
+                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf1, that));
             }
             if (node1.getAppliedRuleApp() != null) {
                 Assertions.assertTrue(
-                    node1.getAppliedRuleApp().equalsModProofIrrelevancy(node2.getAppliedRuleApp()));
+                    EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(
+                        node1.getAppliedRuleApp(), node2.getAppliedRuleApp()));
             }
         }
         env.dispose();

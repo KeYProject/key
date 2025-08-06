@@ -16,17 +16,15 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -36,6 +34,9 @@ import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -71,7 +72,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     /**
      * caching matching results
      */
-    private static Term lastFocusTerm;
+    private static JTerm lastFocusTerm;
     private static Union<Instantiation, ModelFieldInstantiation> lastInstantiation;
 
     // -------------------------------------------------------------------------
@@ -130,7 +131,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // instantiation must succeed
         Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate(pio.subTerm(), goal.proof().getServices());
+            instantiate((JTerm) pio.subTerm(), goal.proof().getServices());
         if (inst == null) {
             return false;
         }
@@ -142,21 +143,21 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 return false;
             }
 
-            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) {
-                return false;
-            }
+            return inst.getFirst().actualResult instanceof ProgramVariable;
         }
 
         return true;
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal,
+            RuleApp ruleApp) {
+        final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate(ruleApp.posInOccurrence().subTerm(), services);
+            instantiate((JTerm) ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";
         if (inst.isFirst()) {
-            return applyForMethods(goal, inst.getFirst(), services, ruleApp);
+            return applyForMethods(goal, inst.getFirst(), ruleApp);
         } else {
             return applyForModelFields(goal, inst.getSecond(), services, ruleApp);
         }
@@ -193,7 +194,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
-            final Term actualSelfNotNull = tb.not(tb.equals(inst.receiver, tb.NULL()));
+            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.receiver, tb.NULL()));
             nullGoal.changeFormula(
                 new SequentFormula(tb.apply(inst.update, actualSelfNotNull, null)),
                 ruleApp.posInOccurrence());
@@ -203,19 +204,19 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Modality modality =
-            Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
-        Term modalityTerm =
+        JModality modality =
+            JModality.getModality(((JModality) inst.modality.op()).kind(), postJavaBlock);
+        JTerm modalityTerm =
             tb.prog(modality.kind(), postJavaBlock, inst.modality.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
                     tb.tf().createTerm(modality, inst.modality.subs(), null,
                         inst.modality.getLabels())));
-        Term lhs = tb.var(inst.assignmentTarget);
+        JTerm lhs = tb.var(inst.assignmentTarget);
 
-        Term update = tb.elementary(lhs,
+        JTerm update = tb.elementary(lhs,
             makeCall(services, inst.observerSymbol, inst.receiver, ImmutableList.of()));
-        Term normalPost = tb.apply(update, modalityTerm);
+        JTerm normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.update, normalPost, null)),
             ruleApp.posInOccurrence());
 
@@ -230,10 +231,11 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      * Turn an assignment {U}[ x = obj.modelMethod(params); ... ]post into
      * {U}{ x := modelMethod(heap, obj, params) }[...]post.
      */
-    private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst, Services services,
+    private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst,
             RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         final JavaBlock jb = inst.progPost.javaBlock();
+        final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
 
         // split goal into branches
@@ -255,7 +257,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
-            final Term actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
+            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
             nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
                 ruleApp.posInOccurrence());
         }
@@ -263,17 +265,17 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // ---- create "Assignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Modality modality = Modality.getModality(inst.modality.kind(), postJavaBlock);
-        Term modalityTerm =
+        JModality modality = JModality.getModality(inst.modality.kind(), postJavaBlock);
+        JTerm modalityTerm =
             tb.prog(inst.modality.kind(), postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
                     tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost.sub(0)), null,
                         inst.progPost.getLabels())));
-        Term lhs = tb.var((ProgramVariable) inst.actualResult);
-        Term update =
+        JTerm lhs = tb.var((ProgramVariable) inst.actualResult);
+        JTerm update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));
-        Term normalPost = tb.apply(update, modalityTerm);
+        JTerm normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
             ruleApp.posInOccurrence());
 
@@ -283,10 +285,10 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return result;
     }
 
-    private Term makeCall(Services services, IObserverFunction op, Term receiver,
-            ImmutableList<Term> methodArgs) {
+    private JTerm makeCall(Services services, IObserverFunction op, JTerm receiver,
+            ImmutableList<JTerm> methodArgs) {
 
-        Term[] args = new Term[op.arity()];
+        JTerm[] args = new JTerm[op.arity()];
         int idx = 0;
 
         if (op.argSort(0) == services.getTypeConverter().getHeapLDT().targetSort()) {
@@ -315,24 +317,24 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      */
     private static class ModelFieldInstantiation {
         public FieldReference fieldReference;
-        public Term update;
+        public JTerm update;
         public ProgramVariable modelField;
-        public Term receiver;
+        public JTerm receiver;
         public ObserverFunction observerSymbol;
         LocationVariable assignmentTarget;
-        Term modality;
+        JTerm modality;
     }
 
     /*
      * Fill a ModelFieldInstantiation by inspecting the focussed term.
      */
-    private static ModelFieldInstantiation matchModelField(Term focusTerm, Services services) {
+    private static ModelFieldInstantiation matchModelField(JTerm focusTerm, Services services) {
 
         // see UseOperationContractRule.doInstantiation
         ModelFieldInstantiation result = new ModelFieldInstantiation();
 
         // leading update?
-        final Term mainFml;
+        final JTerm mainFml;
         final TermBuilder tb = services.getTermBuilder();
         if (focusTerm.op() instanceof UpdateApplication) {
             result.update = UpdateApplication.getUpdate(focusTerm);
@@ -343,7 +345,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (!(mainFml.op() instanceof Modality)) {
+        if (!(mainFml.op() instanceof JModality)) {
             return null;
         }
         result.modality = mainFml;
@@ -400,7 +402,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
     }
 
-    private static Union<Instantiation, ModelFieldInstantiation> instantiate(Term focusTerm,
+    private static Union<Instantiation, ModelFieldInstantiation> instantiate(JTerm focusTerm,
             Services services) {
         // result cached?
         if (focusTerm == lastFocusTerm) {

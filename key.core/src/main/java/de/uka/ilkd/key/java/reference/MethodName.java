@@ -4,10 +4,12 @@
 package de.uka.ilkd.key.java.reference;
 
 
+import de.uka.ilkd.key.java.TerminalProgramElement;
+
 /**
  * Method name.
  */
-public interface MethodName extends de.uka.ilkd.key.java.TerminalProgramElement {
+public interface MethodName extends TerminalProgramElement {
 
 
 

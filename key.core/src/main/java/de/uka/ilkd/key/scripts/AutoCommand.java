@@ -9,17 +9,21 @@ import java.util.Optional;
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.scripts.meta.*;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
@@ -59,8 +63,8 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         final Profile profile = services.getProfile();
 
         // create the rule application engine
-        final ProverCore applyStrategy =
-            new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+        final ProverCore<Proof, Goal> applyStrategy =
+            new ApplyStrategy(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create());
 
         // find the targets
         final ImmutableList<Goal> goals;
@@ -116,18 +120,19 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(final Optional<String> maybeMatchesRegEx,
-            final Optional<String> breakpointArg, final Goal goal, final ProverCore proverCore,
+            final Optional<String> breakpointArg, final Goal goal,
+            final ProverCore<@NonNull Proof, Goal> proverCore,
             final Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
                     maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
-        final AutomatedRuleApplicationManager realManager = //
+        final RuleApplicationManager<Goal> realManager = //
             goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
-        final AutomatedRuleApplicationManager focusManager = //
+        final RuleApplicationManager<Goal> focusManager = //
             new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 

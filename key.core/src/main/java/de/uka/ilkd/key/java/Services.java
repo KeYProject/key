@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofServices;
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -28,7 +29,7 @@ import org.key_project.util.lookup.Lookup;
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices, LogicServices {
+public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * the proof
      */
@@ -399,12 +400,12 @@ public class Services implements TermServices, LogicServices {
 
     /**
      *
-     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.
+     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link JTerm}s.
      * Usually the cache backed version is the intended one. The non-cached version is for use cases
      * where a lot of intermediate terms are created of which most exist only for a very short time.
      * To avoid polluting the cache it is then recommended to use the non-cache version
      *
-     * @return The {@link TermBuilder} used to create {@link Term}s.
+     * @return The {@link TermBuilder} used to create {@link JTerm}s.
      */
     @Override
     public TermBuilder getTermBuilder(boolean withCache) {
@@ -412,10 +413,10 @@ public class Services implements TermServices, LogicServices {
     }
 
     /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
+     * Returns the {@link TermBuilder} used to create {@link JTerm}s. Same as
      * <code>getTermBuilder(true)</code>>.
      *
-     * @return The {@link TermBuilder} used to create {@link Term}s.
+     * @return The {@link TermBuilder} used to create {@link JTerm}s.
      */
     @Override
     public TermBuilder getTermBuilder() {
@@ -423,9 +424,9 @@ public class Services implements TermServices, LogicServices {
     }
 
     /**
-     * Returns the {@link TermFactory} used to create {@link Term}s.
+     * Returns the {@link TermFactory} used to create {@link JTerm}s.
      *
-     * @return The {@link TermFactory} used to create {@link Term}s.
+     * @return The {@link TermFactory} used to create {@link JTerm}s.
      */
     @Override
     public TermFactory getTermFactory() {

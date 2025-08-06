@@ -3,16 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -29,9 +34,9 @@ public class ContainsTermFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    private final ProjectionToTerm proj1;
+    private final ProjectionToTerm<Goal> proj1;
 
-    private final ProjectionToTerm proj2;
+    private final ProjectionToTerm<Goal> proj2;
 
 
     /**
@@ -42,22 +47,23 @@ public class ContainsTermFeature implements Feature {
      * @param proj2 the ProjectionToTerm resolving to the term to be checked whether it is a subterm
      *        of the first one
      */
-    private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    private ContainsTermFeature(ProjectionToTerm<Goal> proj1, ProjectionToTerm<Goal> proj2) {
         this.proj1 = proj1;
         this.proj2 = proj2;
     }
 
 
-    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    public static Feature create(ProjectionToTerm<Goal> proj1, ProjectionToTerm<Goal> proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, G goal,
             MutableState mState) {
-        final Term t1 = proj1.toTerm(app, pos, goal, mState);
-        final Term t2 = proj2.toTerm(app, pos, goal, mState);
+        final Term t1 = proj1.toTerm(app, pos, (Goal) goal, mState);
+        final Term t2 = proj2.toTerm(app, pos, (Goal) goal, mState);
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);
         t1.execPreOrder(visitor);
         if (visitor.found) {
@@ -68,7 +74,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private static class ContainsTermVisitor implements Visitor<Term> {
+    private static class ContainsTermVisitor implements Visitor<@NonNull Term> {
         boolean found = false;
         final Term term;
 
@@ -84,7 +90,7 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            found = found || visited.equalsModProperty(term, RENAMING_TERM_PROPERTY);
+            found = found || RENAMING_TERM_PROPERTY.equalsModThisProperty(visited, term);
         }
 
         @Override

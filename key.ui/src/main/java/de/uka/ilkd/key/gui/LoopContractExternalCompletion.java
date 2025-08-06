@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
@@ -44,7 +45,7 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = LoopContractExternalRule.INSTANCE
-                .instantiate(application.posInOccurrence().subTerm(), goal, services);
+                .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<LoopContract> contracts =
             LoopContractExternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator =

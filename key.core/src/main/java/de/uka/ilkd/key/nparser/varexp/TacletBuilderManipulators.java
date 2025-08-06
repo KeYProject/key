@@ -10,16 +10,16 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
 
 import org.jspecify.annotations.NonNull;
 
@@ -310,7 +310,7 @@ public class TacletBuilderManipulators {
         @Override
         public VariableCondition build(Object[] arguments, List<String> parameters,
                 boolean negated) {
-            var v = (OperatorSV) arguments[0];
+            var v = (JOperatorSV) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
                 throw new IllegalArgumentException("Generic sort is expected. Got: " + s);
@@ -336,7 +336,8 @@ public class TacletBuilderManipulators {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                return new StoreTermInCondition((SchemaVariable) arguments[0], (Term) arguments[1]);
+                return new StoreTermInCondition((SchemaVariable) arguments[0],
+                    (JTerm) arguments[1]);
             }
         };
 

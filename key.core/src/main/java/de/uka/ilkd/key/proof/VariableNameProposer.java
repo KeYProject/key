@@ -10,18 +10,18 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -46,6 +46,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * Returns an instantiation proposal for the schema variable var. Currently supports names for
      * skolemterm SVs, variable SVs, and labels.
      */
+    @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
@@ -105,8 +106,8 @@ public class VariableNameProposer implements InstantiationProposer {
 
             final Object inst = p_app.instantiations().getInstantiation(v);
 
-            if (inst instanceof Term) {
-                result = ((Term) inst).op().name().toString();
+            if (inst instanceof JTerm) {
+                result = ((JTerm) inst).op().name().toString();
             } else {
                 result = String.valueOf(inst);
             }
@@ -199,7 +200,7 @@ public class VariableNameProposer implements InstantiationProposer {
             Node undoAnchor, ImmutableList<String> previousProposals) {
 
         ProgramElement contextProgram =
-            app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
+            app.matchConditions().getInstantiations().getContextInstantiation().program();
 
         if (contextProgram == null) {
             contextProgram = new StatementBlock();

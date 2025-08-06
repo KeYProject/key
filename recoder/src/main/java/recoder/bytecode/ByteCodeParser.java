@@ -84,39 +84,39 @@ public class ByteCodeParser {
         }
         String type = null;
         switch (c) {
-        case 'B':
-            type = "byte";
-            break;
-        case 'C':
-            type = "char";
-            break;
-        case 'D':
-            type = "double";
-            break;
-        case 'F':
-            type = "float";
-            break;
-        case 'I':
-            type = "int";
-            break;
-        case 'J':
-            type = "long";
-            break;
-        case 'S':
-            type = "short";
-            break;
-        case 'Z':
-            type = "boolean";
-            break;
-        case 'V':
-            type = "void";
-            break;
-        case 'L':
-            int j = in.indexOf(';', i);
-            type = in.substring(i + 1, j).replace('/', '.').replace('$', '.');
-            break;
-        default:
-            throw new ByteCodeFormatException("Illegal type code");
+            case 'B':
+                type = "byte";
+                break;
+            case 'C':
+                type = "char";
+                break;
+            case 'D':
+                type = "double";
+                break;
+            case 'F':
+                type = "float";
+                break;
+            case 'I':
+                type = "int";
+                break;
+            case 'J':
+                type = "long";
+                break;
+            case 'S':
+                type = "short";
+                break;
+            case 'Z':
+                type = "boolean";
+                break;
+            case 'V':
+                type = "void";
+                break;
+            case 'L':
+                int j = in.indexOf(';', i);
+                type = in.substring(i + 1, j).replace('/', '.').replace('$', '.');
+                break;
+            default:
+                throw new ByteCodeFormatException("Illegal type code");
         }
         return Naming.toArrayTypeName(type, dim);
     }
@@ -230,40 +230,40 @@ public class ByteCodeParser {
             int j;
             byte tag = in.readByte();
             switch (tag) {
-            case CLASS:
-            case STRING:
-                j = in.readUnsignedShort();
-                if (pool[j] != null) {
-                    pool[i] = pool[j];
-                } else {
-                    targetIndex[i] = j;
-                }
-                break;
-            case FIELD_REF:
-            case METHOD_REF:
-            case INTERFACE_METHOD_REF:
-            case NAME_AND_TYPE:
-                in.skipBytes(4);
-                break;
-            case INTEGER:
-                pool[i] = String.valueOf(in.readInt());
-                break;
-            case FLOAT:
-                pool[i] = String.valueOf(in.readFloat());
-                break;
-            case LONG:
-                pool[i] = String.valueOf(in.readLong());
-                i += 1; // strange, but true
-                break;
-            case DOUBLE:
-                pool[i] = String.valueOf(in.readDouble());
-                i += 1; // strange, but true
-                break;
-            case UTF8:
-                pool[i] = in.readUTF();
-                break;
-            default:
-                throw new ByteCodeFormatException("Bad Constant Pool Type " + tag);
+                case CLASS:
+                case STRING:
+                    j = in.readUnsignedShort();
+                    if (pool[j] != null) {
+                        pool[i] = pool[j];
+                    } else {
+                        targetIndex[i] = j;
+                    }
+                    break;
+                case FIELD_REF:
+                case METHOD_REF:
+                case INTERFACE_METHOD_REF:
+                case NAME_AND_TYPE:
+                    in.skipBytes(4);
+                    break;
+                case INTEGER:
+                    pool[i] = String.valueOf(in.readInt());
+                    break;
+                case FLOAT:
+                    pool[i] = String.valueOf(in.readFloat());
+                    break;
+                case LONG:
+                    pool[i] = String.valueOf(in.readLong());
+                    i += 1; // strange, but true
+                    break;
+                case DOUBLE:
+                    pool[i] = String.valueOf(in.readDouble());
+                    i += 1; // strange, but true
+                    break;
+                case UTF8:
+                    pool[i] = in.readUTF();
+                    break;
+                default:
+                    throw new ByteCodeFormatException("Bad Constant Pool Type " + tag);
             }
         }
         // 2nd pass
@@ -302,52 +302,52 @@ public class ByteCodeParser {
             }
             String type = null;
             switch (c) {
-            case 'B':
-                type = "byte";
-                i += 1;
-                break;
-            case 'C':
-                type = "char";
-                i += 1;
-                break;
-            case 'D':
-                type = "double";
-                i += 1;
-                break;
-            case 'F':
-                type = "float";
-                i += 1;
-                break;
-            case 'I':
-                type = "int";
-                i += 1;
-                break;
-            case 'J':
-                type = "long";
-                i += 1;
-                break;
-            case 'S':
-                type = "short";
-                i += 1;
-                break;
-            case 'Z':
-                type = "boolean";
-                i += 1;
-                break;
-            case 'V':
-                if (!returnValue) {
-                    throw new ByteCodeFormatException("Void parameter type");
-                }
-                type = "void";
-                i += 1;
-                break;
-            case 'L':
-                int j = inStr.indexOf(';', i);
-                type = inStr.substring(i + 1, j).replace('/', '.').replace('$', '.');
-                i = j + 1;
-                break;
-            default:
-                throw new ByteCodeFormatException("Illegal type code " + c);
+                case 'B':
+                    type = "byte";
+                    i += 1;
+                    break;
+                case 'C':
+                    type = "char";
+                    i += 1;
+                    break;
+                case 'D':
+                    type = "double";
+                    i += 1;
+                    break;
+                case 'F':
+                    type = "float";
+                    i += 1;
+                    break;
+                case 'I':
+                    type = "int";
+                    i += 1;
+                    break;
+                case 'J':
+                    type = "long";
+                    i += 1;
+                    break;
+                case 'S':
+                    type = "short";
+                    i += 1;
+                    break;
+                case 'Z':
+                    type = "boolean";
+                    i += 1;
+                    break;
+                case 'V':
+                    if (!returnValue) {
+                        throw new ByteCodeFormatException("Void parameter type");
+                    }
+                    type = "void";
+                    i += 1;
+                    break;
+                case 'L':
+                    int j = inStr.indexOf(';', i);
+                    type = inStr.substring(i + 1, j).replace('/', '.').replace('$', '.');
+                    i = j + 1;
+                    break;
+                default:
+                    throw new ByteCodeFormatException("Illegal type code " + c);
             }
             longRes[count++] = Naming.toArrayTypeName(type, dim);
         }
@@ -680,56 +680,56 @@ public class ByteCodeParser {
         Object res;
         int tag = in.readByte();
         switch (tag) {
-        case 'B':
-            res = Byte.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 'C':
-            // TODO this needs to be verified !!!!
-            res = pool[in.readUnsignedShort()].toCharArray()[0];
-            break;
-        case 'D':
-            res = Double.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 'F':
-            res = Float.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 'I':
-            res = Integer.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 'J':
-            res = Long.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 'S':
-            res = Short.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 'Z':
-            res = Boolean.valueOf(pool[in.readUnsignedShort()]);
-            break;
-        case 's':
-            res = pool[in.readUnsignedShort()];
-            break;
-        case 'e':
-            String typename = pool[in.readUnsignedShort()];
-            String constname = pool[in.readUnsignedShort()];
-            res = new EnumConstantReferenceInfo(typename, constname);
-            break;
-        case 'c':
-            String tr = pool[in.readUnsignedShort()];
-            tr = tr.replace('/', '.').replace('$', '.');
-            res = new TypeNameReferenceInfo(tr);
-            break;
-        case '@':
-            res = readAnnotation();
-            break;
-        case '[':
-            int num = in.readUnsignedShort();
-            res = new Object[num];
-            for (int i = 0; i < num; i++) {
-                ((Object[]) res)[i] = readElementValue();
-            }
-            break;
-        default:
-            throw new ByteCodeFormatException("Illegal tag in element-value: " + tag);
+            case 'B':
+                res = Byte.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 'C':
+                // TODO this needs to be verified !!!!
+                res = pool[in.readUnsignedShort()].toCharArray()[0];
+                break;
+            case 'D':
+                res = Double.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 'F':
+                res = Float.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 'I':
+                res = Integer.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 'J':
+                res = Long.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 'S':
+                res = Short.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 'Z':
+                res = Boolean.valueOf(pool[in.readUnsignedShort()]);
+                break;
+            case 's':
+                res = pool[in.readUnsignedShort()];
+                break;
+            case 'e':
+                String typename = pool[in.readUnsignedShort()];
+                String constname = pool[in.readUnsignedShort()];
+                res = new EnumConstantReferenceInfo(typename, constname);
+                break;
+            case 'c':
+                String tr = pool[in.readUnsignedShort()];
+                tr = tr.replace('/', '.').replace('$', '.');
+                res = new TypeNameReferenceInfo(tr);
+                break;
+            case '@':
+                res = readAnnotation();
+                break;
+            case '[':
+                int num = in.readUnsignedShort();
+                res = new Object[num];
+                for (int i = 0; i < num; i++) {
+                    ((Object[]) res)[i] = readElementValue();
+                }
+                break;
+            default:
+                throw new ByteCodeFormatException("Illegal tag in element-value: " + tag);
         }
         return res;
     }
@@ -821,21 +821,21 @@ public class ByteCodeParser {
                 }
                 String typeName;
                 switch (sig.charAt(lpos)) {
-                case ':':
-                    typeName = "java.lang.Object"; // allowed for class bound only, but
-                    // we assume that bytecode isn't corrupted.
-                    break;
-                case 'L':
-                    while (sig.charAt(rpos) != ';') {
-                        rpos++;
-                    }
-                    typeName = sig.substring(lpos + 1, rpos).replace('/', '.');
-                    rpos++; // skip ';'
-                    break;
-                case 'T':
-                    throw new UnsupportedOperationException("TODO");
-                default:
-                    throw new ByteCodeFormatException();
+                    case ':':
+                        typeName = "java.lang.Object"; // allowed for class bound only, but
+                        // we assume that bytecode isn't corrupted.
+                        break;
+                    case 'L':
+                        while (sig.charAt(rpos) != ';') {
+                            rpos++;
+                        }
+                        typeName = sig.substring(lpos + 1, rpos).replace('/', '.');
+                        rpos++; // skip ';'
+                        break;
+                    case 'T':
+                        throw new UnsupportedOperationException("TODO");
+                    default:
+                        throw new ByteCodeFormatException();
                 }
                 int idx = typeName.indexOf('<');
                 List<TypeArgumentInfo> typeArgs = null;
@@ -866,21 +866,21 @@ public class ByteCodeParser {
             WildcardMode wm;
             String typeName = null;
             switch (tn.charAt(pos)) {
-            case '+':
-                wm = WildcardMode.Extends; // TODO check !!
-                pos++;
-                break;
-            case '-':
-                wm = WildcardMode.Super; // TODO check!!
-                pos++;
-                break;
-            case '*':
-                wm = WildcardMode.Any;
-                pos++;
-                break;
-            default:
-                wm = WildcardMode.None;
-                break;
+                case '+':
+                    wm = WildcardMode.Extends; // TODO check !!
+                    pos++;
+                    break;
+                case '-':
+                    wm = WildcardMode.Super; // TODO check!!
+                    pos++;
+                    break;
+                case '*':
+                    wm = WildcardMode.Any;
+                    pos++;
+                    break;
+                default:
+                    wm = WildcardMode.None;
+                    break;
             }
             if (wm != WildcardMode.Any) {
                 boolean isTypeVariable = false;
@@ -891,103 +891,104 @@ public class ByteCodeParser {
                 }
                 int rpos = pos;
                 switch (tn.charAt(pos)) {
-                case 'L':
-                    int o = 1;
-                    while (rpos < tn.length() && o > 0 && !(tn.charAt(rpos) == ';' && o == 1)) {
-                        if (tn.charAt(rpos) == '<') {
-                            o++;
+                    case 'L':
+                        int o = 1;
+                        while (rpos < tn.length() && o > 0 && !(tn.charAt(rpos) == ';' && o == 1)) {
+                            if (tn.charAt(rpos) == '<') {
+                                o++;
+                            }
+                            if (tn.charAt(rpos) == '>') {
+                                o--;
+                            }
+                            rpos++;
                         }
-                        if (tn.charAt(rpos) == '>') {
-                            o--;
+                        typeName = tn.substring(pos + 1, rpos).replace('/', '.');
+                        if (typeName.isEmpty()) {
+                            typeName = "java.lang.Object"; // allowed for class bound only, but
                         }
+                        // we assume that bytecode isn't corrupted.
+                        while (typeName.endsWith(";") || typeName.endsWith(">")) {
+                            typeName = typeName.substring(0, typeName.length() - 1);
+                        }
+                        typeName = Naming.toArrayTypeName(typeName, dim);
+                        rpos++; // skip ';'
+                        break;
+                    case 'T':
+                        while (rpos < tn.length()
+                                && Character.isJavaIdentifierPart(tn.charAt(rpos))) {
+                            rpos++;
+                        }
+                        typeName = tn.substring(pos + 1, rpos);
+                        typeName = Naming.toArrayTypeName(typeName, dim);
+                        isTypeVariable = true;
                         rpos++;
-                    }
-                    typeName = tn.substring(pos + 1, rpos).replace('/', '.');
-                    if (typeName.isEmpty()) {
-                        typeName = "java.lang.Object"; // allowed for class bound only, but
-                    }
-                    // we assume that bytecode isn't corrupted.
-                    while (typeName.endsWith(";") || typeName.endsWith(">")) {
-                        typeName = typeName.substring(0, typeName.length() - 1);
-                    }
-                    typeName = Naming.toArrayTypeName(typeName, dim);
-                    rpos++; // skip ';'
-                    break;
-                case 'T':
-                    while (rpos < tn.length() && Character.isJavaIdentifierPart(tn.charAt(rpos))) {
+                        break;
+                    case 'B':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "byte";
                         rpos++;
-                    }
-                    typeName = tn.substring(pos + 1, rpos);
-                    typeName = Naming.toArrayTypeName(typeName, dim);
-                    isTypeVariable = true;
-                    rpos++;
-                    break;
-                case 'B':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "byte";
-                    rpos++;
-                    break;
-                case 'C':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "char";
-                    rpos++;
-                    break;
-                case 'D':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "double";
-                    rpos++;
-                    break;
-                case 'F':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "float";
-                    rpos++;
-                    break;
-                case 'I':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "int";
-                    rpos++;
-                    break;
-                case 'J':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "long";
-                    rpos++;
-                    break;
-                case 'S':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "short";
-                    rpos++;
-                    break;
-                case 'Z':
-                    if (dim == 0) {
-                        throw new ByteCodeFormatException(
-                            "primitive type not allowed as type argument");
-                    }
-                    typeName = "boolean";
-                    rpos++;
-                    break;
-                default:
-                    throw new ByteCodeFormatException();
+                        break;
+                    case 'C':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "char";
+                        rpos++;
+                        break;
+                    case 'D':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "double";
+                        rpos++;
+                        break;
+                    case 'F':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "float";
+                        rpos++;
+                        break;
+                    case 'I':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "int";
+                        rpos++;
+                        break;
+                    case 'J':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "long";
+                        rpos++;
+                        break;
+                    case 'S':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "short";
+                        rpos++;
+                        break;
+                    case 'Z':
+                        if (dim == 0) {
+                            throw new ByteCodeFormatException(
+                                "primitive type not allowed as type argument");
+                        }
+                        typeName = "boolean";
+                        rpos++;
+                        break;
+                    default:
+                        throw new ByteCodeFormatException();
                 }
                 int idx = typeName.indexOf('<');
                 List<TypeArgumentInfo> typeArgs = null;
@@ -1019,53 +1020,54 @@ public class ByteCodeParser {
             rpos++;
         }
         switch (sig.charAt(rpos)) {
-        case 'L':
-            int lpos = rpos;
-            while (sig.charAt(rpos) != ';') {
-                if (sig.charAt(rpos) == '<') {
-                    int talpos = rpos;
-                    int o = 1;
-                    while (o > 0) {
-                        rpos++;
-                        if (sig.charAt(rpos) == '<') {
-                            o++;
+            case 'L':
+                int lpos = rpos;
+                while (sig.charAt(rpos) != ';') {
+                    if (sig.charAt(rpos) == '<') {
+                        int talpos = rpos;
+                        int o = 1;
+                        while (o > 0) {
+                            rpos++;
+                            if (sig.charAt(rpos) == '<') {
+                                o++;
+                            }
+                            if (sig.charAt(rpos) == '>') {
+                                o--;
+                            }
                         }
-                        if (sig.charAt(rpos) == '>') {
-                            o--;
-                        }
+                        String targs = sig.substring(talpos, rpos);
+                        emptyListForTypeArgs.addAll(makeTypeArgs(targs));
                     }
-                    String targs = sig.substring(talpos, rpos);
-                    emptyListForTypeArgs.addAll(makeTypeArgs(targs));
+                    rpos++;
                 }
+                // String typeName = sig.substring(lpos+1,rpos).replace('/','.');
+                int idx = sig.indexOf('<');
+                res = Naming.toArrayTypeName(
+                    sig.substring(lpos + 1, idx == -1 ? sig.length() - 1 : idx).replace('/', '.'),
+                    dim);
+                rpos++; // skip ';'
+                break;
+            case 'T':
+                lpos = rpos;
+                while (sig.charAt(rpos) != ';') {
+                    rpos++;
+                }
+                res = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
                 rpos++;
-            }
-            // String typeName = sig.substring(lpos+1,rpos).replace('/','.');
-            int idx = sig.indexOf('<');
-            res = Naming.toArrayTypeName(
-                sig.substring(lpos + 1, idx == -1 ? sig.length() - 1 : idx).replace('/', '.'), dim);
-            rpos++; // skip ';'
-            break;
-        case 'T':
-            lpos = rpos;
-            while (sig.charAt(rpos) != ';') {
+                break;
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'F':
+            case 'I':
+            case 'J':
+            case 'S':
+            case 'Z':
+                rpos++; // base types are already properly read
+                break;
+            default:
                 rpos++;
-            }
-            res = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
-            rpos++;
-            break;
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'F':
-        case 'I':
-        case 'J':
-        case 'S':
-        case 'Z':
-            rpos++; // base types are already properly read
-            break;
-        default:
-            rpos++;
-            // throw new ByteCodeFormatException();
+                // throw new ByteCodeFormatException();
         }
         return res;
     }
@@ -1093,51 +1095,51 @@ public class ByteCodeParser {
                 rpos++;
             }
             switch (sig.charAt(rpos)) {
-            case 'L':
-                int lpos = rpos;
-                while (sig.charAt(rpos) != ';') {
-                    if (sig.charAt(rpos) == '<') {
-                        int talpos = rpos;
-                        int o = 1;
-                        while (o > 0) {
-                            rpos++;
-                            if (sig.charAt(rpos) == '<') {
-                                o++;
+                case 'L':
+                    int lpos = rpos;
+                    while (sig.charAt(rpos) != ';') {
+                        if (sig.charAt(rpos) == '<') {
+                            int talpos = rpos;
+                            int o = 1;
+                            while (o > 0) {
+                                rpos++;
+                                if (sig.charAt(rpos) == '<') {
+                                    o++;
+                                }
+                                if (sig.charAt(rpos) == '>') {
+                                    o--;
+                                }
                             }
-                            if (sig.charAt(rpos) == '>') {
-                                o--;
-                            }
+                            String targs = sig.substring(talpos, rpos);
+                            res[cur] = makeTypeArgs(targs);
                         }
-                        String targs = sig.substring(talpos, rpos);
-                        res[cur] = makeTypeArgs(targs);
+                        rpos++;
                     }
-                    rpos++;
-                }
-                // String typeName = sig.substring(lpos+1,rpos).replace('/','.');
-                rpos++; // skip ';'
-                break;
-            case 'T':
-                lpos = rpos;
-                while (sig.charAt(rpos) != ';') {
-                    rpos++;
-                }
+                    // String typeName = sig.substring(lpos+1,rpos).replace('/','.');
+                    rpos++; // skip ';'
+                    break;
+                case 'T':
+                    lpos = rpos;
+                    while (sig.charAt(rpos) != ';') {
+                        rpos++;
+                    }
 
-                prereadParams[cur] = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
-                rpos++;
-                break;
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'F':
-            case 'I':
-            case 'J':
-            case 'S':
-            case 'Z':
-                rpos++; // base types are already properly read
-                break;
-            default:
-                rpos++;
-                // throw new ByteCodeFormatException();
+                    prereadParams[cur] = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
+                    rpos++;
+                    break;
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'F':
+                case 'I':
+                case 'J':
+                case 'S':
+                case 'Z':
+                    rpos++; // base types are already properly read
+                    break;
+                default:
+                    rpos++;
+                    // throw new ByteCodeFormatException();
             }
         }
 

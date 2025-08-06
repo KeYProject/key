@@ -14,16 +14,23 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.ApplicationRestriction;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -51,11 +58,11 @@ public class TacletGenerator {
     }
 
 
-    private TacletGoalTemplate createAxiomGoalTemplate(Term goalTerm) {
+    private TacletGoalTemplate createAxiomGoalTemplate(JTerm goalTerm) {
         final SequentFormula axiomSf = new SequentFormula(goalTerm);
-        final Semisequent axiomSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(axiomSf).semisequent();
-        final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
+        final ImmutableList<SequentFormula> axiomSemiSeq =
+            ImmutableSLList.singleton(axiomSf);
+        final Sequent axiomSeq = JavaDLSequentKit.createAnteSequent(axiomSemiSeq);
         final TacletGoalTemplate axiomTemplate =
             new TacletGoalTemplate(axiomSeq, ImmutableSLList.nil());
         return axiomTemplate;
@@ -66,11 +73,11 @@ public class TacletGenerator {
      * Returns a no-find taclet to the passed axiom. If the axiom expression does not contain
      * reference to self, it is considered as if it were static.
      */
-    public Taclet generateAxiomTaclet(Name tacletName, Term originalAxiom,
+    public Taclet generateAxiomTaclet(Name tacletName, JTerm originalAxiom,
             ImmutableList<LocationVariable> programVars, KeYJavaType kjt, RuleSet ruleSet,
             TermServices services) {
         // create schema terms
-        final ImmutableList<OperatorSV> schemaVars = createSchemaVariables(programVars);
+        final ImmutableList<JOperatorSV> schemaVars = createSchemaVariables(programVars);
         final TermAndBoundVarPair schemaAxiom =
             createSchemaTerm(originalAxiom, programVars, schemaVars, services);
 
@@ -84,10 +91,10 @@ public class TacletGenerator {
     }
 
 
-    public Taclet generateRewriteTaclet(Name tacletName, Term originalFind, Term originalAxiom,
+    public Taclet generateRewriteTaclet(Name tacletName, JTerm originalFind, JTerm originalAxiom,
             ImmutableList<LocationVariable> programVars, RuleSet ruleSet, TermServices services) {
         // create schema terms
-        final ImmutableList<OperatorSV> schemaVars = createSchemaVariables(programVars);
+        final ImmutableList<JOperatorSV> schemaVars = createSchemaVariables(programVars);
         final TermAndBoundVarPair schemaFind =
             createSchemaTerm(originalFind, programVars, schemaVars, services);
         final TermAndBoundVarPair schemaAxiom =
@@ -105,7 +112,7 @@ public class TacletGenerator {
     }
 
 
-    public Taclet generateRelationalRepresentsTaclet(Name tacletName, Term originalAxiom,
+    public Taclet generateRelationalRepresentsTaclet(Name tacletName, JTerm originalAxiom,
             KeYJavaType kjt, IObserverFunction target, List<LocationVariable> heaps,
             LocationVariable self, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, boolean satisfiabilityGuard,
@@ -117,7 +124,7 @@ public class TacletGenerator {
 
         // create schema terms
         ImmutableList<LocationVariable> pvs = ImmutableSLList.nil();
-        ImmutableList<OperatorSV> svs = ImmutableSLList.nil();
+        ImmutableList<JOperatorSV> svs = ImmutableSLList.nil();
         List<TermSV> heapSVs = new ArrayList<>();
         for (LocationVariable heap : heaps) {
             if (target.getStateCount() >= 1) {
@@ -134,9 +141,9 @@ public class TacletGenerator {
             }
         }
 
-        final OperatorSV selfSV = createSchemaVariable(self);
+        final JOperatorSV selfSV = createSchemaVariable(self);
 
-        ImmutableList<OperatorSV> paramSVs = ImmutableSLList.nil();
+        ImmutableList<JOperatorSV> paramSVs = ImmutableSLList.nil();
         for (LocationVariable paramVar : paramVars) {
             paramSVs = paramSVs.append(createSchemaVariable(paramVar));
         }
@@ -148,19 +155,19 @@ public class TacletGenerator {
         // create goal template
         SequentFormula guardedSchemaAxiom = generateGuard(kjt, target, services, selfSV, heapSVs,
             paramSVs, schemaAxiom.term, tacletBuilder, satisfiabilityGuard);
-        final Sequent addedSeq = Sequent.createAnteSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
-        ImmutableList<Term> vars = ImmutableSLList.nil();
+        final Sequent addedSeq = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(guardedSchemaAxiom));
+        ImmutableList<JTerm> vars = ImmutableSLList.nil();
         for (TermSV heapSV : heapSVs) {
             vars = vars.append(tb.var(heapSV));
         }
         if (!target.isStatic()) {
             vars = vars.append(tb.var(selfSV));
         }
-        for (OperatorSV sv : paramSVs) {
+        for (JOperatorSV sv : paramSVs) {
             vars = vars.append(tb.var(sv));
         }
-        final Term findTerm = tb.func(target, vars.toArray(new Term[0]));
+        final JTerm findTerm = tb.func(target, vars.toArray(new JTerm[0]));
 
         final RewriteTacletGoalTemplate axiomTemplate =
             new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), findTerm);
@@ -191,8 +198,9 @@ public class TacletGenerator {
     }
 
 
-    public ImmutableSet<Taclet> generateFunctionalRepresentsTaclets(Name name, Term originalPreTerm,
-            Term originalRepresentsTerm, KeYJavaType kjt, IObserverFunction target,
+    public ImmutableSet<Taclet> generateFunctionalRepresentsTaclets(Name name,
+            JTerm originalPreTerm,
+            JTerm originalRepresentsTerm, KeYJavaType kjt, IObserverFunction target,
             List<LocationVariable> heaps, LocationVariable self,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars,
@@ -203,7 +211,7 @@ public class TacletGenerator {
 
         // instantiate axiom with schema variables
         ImmutableList<LocationVariable> pvs = ImmutableSLList.nil();
-        ImmutableList<OperatorSV> svs = ImmutableSLList.nil();
+        ImmutableList<JOperatorSV> svs = ImmutableSLList.nil();
         List<TermSV> heapSVs = new ArrayList<>();
         for (var heap : heaps) {
             if (target.getStateCount() >= 1) {
@@ -221,7 +229,7 @@ public class TacletGenerator {
         }
 
         final TermSV selfSV = createSchemaVariable(self);
-        ImmutableList<OperatorSV> paramSVs = ImmutableSLList.nil();
+        ImmutableList<JOperatorSV> paramSVs = ImmutableSLList.nil();
         for (ProgramVariable paramVar : paramVars) {
             paramSVs = paramSVs.append(createSchemaVariable(paramVar));
         }
@@ -230,12 +238,12 @@ public class TacletGenerator {
         final TermAndBoundVarPair schemaRepresents =
             createSchemaTerm(originalRepresentsTerm, pvs, svs, services);
         assert schemaRepresents.term.op() instanceof Equality;
-        final Term schemaLhs = schemaRepresents.term.sub(0);
-        final Term schemaRhs = schemaRepresents.term.sub(1);
+        final JTerm schemaLhs = schemaRepresents.term.sub(0);
+        final JTerm schemaRhs = schemaRepresents.term.sub(1);
 
         // limit observers
-        final Pair<Term, ImmutableSet<Taclet>> limited = limitTerm(schemaRhs, toLimit, services);
-        final Term limitedRhs = limited.first;
+        final Pair<JTerm, ImmutableSet<Taclet>> limited = limitTerm(schemaRhs, toLimit, services);
+        final JTerm limitedRhs = limited.first;
         result = result.union(limited.second);
 
         // create if sequent
@@ -250,36 +258,32 @@ public class TacletGenerator {
              * \assumes ( ==> self = null )
              */
             // ifSeq = null;
-            final Term ifFormula = TB.equals(TB.var(selfSV), TB.NULL());
+            final JTerm ifFormula = TB.equals(TB.var(selfSV), TB.NULL());
             final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-            ifSeq = Sequent.createSuccSequent(ifSemiSeq);
+            ifSeq = JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(ifCf));
         } else {
             /* \assumes ( Sort.exactInstance(self) ==> ) */
-            final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
+            final JTerm ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-            ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+            ifSeq = JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(ifCf));
         }
 
-        Term addForumlaTerm = originalPreTerm;
+        JTerm addForumlaTerm = originalPreTerm;
         // The presence of the precondition term means we are dealing with a model method definition
         // taclet, an \add section to check preconditions has to be added
         // FIXME does this also affect the satisfiability branches?
         if (addForumlaTerm != null) {
-            Term wfFormula = null;
-            Term createdFormula = null;
+            JTerm wfFormula = null;
+            JTerm createdFormula = null;
             for (var heapSV : heapSVs) {
-                final Term wf = TB.wellFormed(TB.var(heapSV));
+                final JTerm wf = TB.wellFormed(TB.var(heapSV));
                 if (wfFormula == null) {
                     wfFormula = wf;
                 } else {
                     wfFormula = TB.and(wfFormula, wf);
                 }
                 if (!target.isStatic()) {
-                    final Term crf = TB.created(TB.var(heapSV), TB.var(selfSV));
+                    final JTerm crf = TB.created(TB.var(heapSV), TB.var(selfSV));
                     if (createdFormula == null) {
                         createdFormula = crf;
                     } else {
@@ -287,7 +291,7 @@ public class TacletGenerator {
                     }
                 }
             }
-            final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
+            final JTerm selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
             if (wfFormula != null) {
                 addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
             }
@@ -303,8 +307,9 @@ public class TacletGenerator {
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setFind(schemaLhs);
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-            ImmutableSLList.nil(), limitedRhs));
+        tacletBuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
+                ImmutableSLList.nil(), limitedRhs));
 
         // FIXME - there is a chance this will have to go along with all the other associated
         // changes
@@ -340,7 +345,8 @@ public class TacletGenerator {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs, selfSV, paramSVs,
                 schemaRepresents, tacletBuilder);
         }
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         result = result.add(tacletBuilder.getTaclet());
         // return
         return result;
@@ -348,15 +354,14 @@ public class TacletGenerator {
 
 
     private void functionalRepresentsAddSatisfiabilityBranch(IObserverFunction target,
-            TermServices services, List<TermSV> heapSVs, final OperatorSV selfSV,
-            ImmutableList<OperatorSV> paramSVs, final TermAndBoundVarPair schemaRepresents,
+            TermServices services, List<TermSV> heapSVs, final JOperatorSV selfSV,
+            ImmutableList<JOperatorSV> paramSVs, final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
-        final Term axiomSatisfiable = functionalRepresentsSatisfiability(target, services, heapSVs,
+        final JTerm axiomSatisfiable = functionalRepresentsSatisfiability(target, services, heapSVs,
             selfSV, paramSVs, schemaRepresents, tacletBuilder);
         SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createSuccSequent(addedSemiSeq);
+        final Sequent addedSeq =
+            JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(addedCf));
         final var skolemSV =
             SchemaVariableFactory.createSkolemTermSV(new Name("sk"), target.sort());
         for (SchemaVariable heapSV : heapSVs) {
@@ -375,11 +380,12 @@ public class TacletGenerator {
     }
 
 
-    private Term functionalRepresentsSatisfiability(IObserverFunction target, TermServices services,
-            List<TermSV> heapSVs, final OperatorSV selfSV,
-            ImmutableList<OperatorSV> paramSVs, final TermAndBoundVarPair schemaRepresents,
+    private JTerm functionalRepresentsSatisfiability(IObserverFunction target,
+            TermServices services,
+            List<TermSV> heapSVs, final JOperatorSV selfSV,
+            ImmutableList<JOperatorSV> paramSVs, final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder) {
-        ImmutableList<Term> vars = ImmutableSLList.nil();
+        ImmutableList<JTerm> vars = ImmutableSLList.nil();
         TermBuilder TB = services.getTermBuilder();
         for (var heapSV : heapSVs) {
             vars = vars.append(TB.var(heapSV));
@@ -390,9 +396,9 @@ public class TacletGenerator {
         for (var sv : paramSVs) {
             vars = vars.append(TB.var(sv));
         }
-        final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
+        final JTerm targetTerm = TB.func(target, vars.toArray(new JTerm[0]));
 
-        final Term axiomSatisfiable;
+        final JTerm axiomSatisfiable;
         if (target.sort() == JavaDLTheory.FORMULA) {
             axiomSatisfiable = TB.or(
                 OpReplacer.replace(targetTerm, TB.tt(), schemaRepresents.term,
@@ -402,10 +408,10 @@ public class TacletGenerator {
         } else {
             final VariableSV targetSV = SchemaVariableFactory.createVariableSV(
                 new Name(target.sort().name().toString().substring(0, 1)), target.sort());
-            Term targetSVReachable = null;
+            JTerm targetSVReachable = null;
             for (var heapSV : heapSVs) {
                 tacletBuilder.addVarsNotFreeIn(targetSV, heapSV);
-                final Term tReach =
+                final JTerm tReach =
                     TB.reachableValue(TB.var(heapSV), TB.var(targetSV), target.getType());
                 if (targetSVReachable == null) {
                     targetSVReachable = tReach;
@@ -430,8 +436,8 @@ public class TacletGenerator {
         return axiomSatisfiable;
     }
 
-    public ImmutableSet<Taclet> generateContractAxiomTaclets(Name name, Term originalPre,
-            Term originalFreePre, Term originalPost, Term originalFreePost, Term originalMby,
+    public ImmutableSet<Taclet> generateContractAxiomTaclets(Name name, JTerm originalPre,
+            JTerm originalFreePre, JTerm originalPost, JTerm originalFreePost, JTerm originalMby,
             KeYJavaType kjt, IObserverFunction target, List<LocationVariable> heaps,
             LocationVariable originalSelfVar, LocationVariable originalResultVar,
             Map<LocationVariable, LocationVariable> atPreVars,
@@ -440,19 +446,19 @@ public class TacletGenerator {
             TermServices services) {
 
         ImmutableList<LocationVariable> pvs = ImmutableSLList.nil();
-        ImmutableList<OperatorSV> svs = ImmutableSLList.nil();
+        ImmutableList<JOperatorSV> svs = ImmutableSLList.nil();
         final List<TermSV> heapSVs = new ArrayList<>();
         for (var heap : heaps) {
             if (target.getStateCount() >= 1) {
                 pvs = pvs.append(heap);
                 var sv = SchemaVariableFactory.createTermSV(
-                    new Name("sv_" + heap.name().toString()), heap.sort(), false, false);
+                    new Name("sv_" + heap.name()), heap.sort(), false, false);
                 svs = svs.append(sv);
                 heapSVs.add(sv);
                 if (target.getStateCount() == 2) {
                     pvs = pvs.append(atPreVars.get(heap));
                     sv = SchemaVariableFactory.createTermSV(
-                        new Name("sv_" + atPreVars.get(heap).name().toString()), heap.sort(), false,
+                        new Name("sv_" + atPreVars.get(heap).name()), heap.sort(), false,
                         false);
                     svs = svs.append(sv);
                     heapSVs.add(sv);
@@ -462,7 +468,7 @@ public class TacletGenerator {
         final var selfSV = target.isStatic() ? null
                 : SchemaVariableFactory.createTermSV(new Name("sv_self"), kjt.getSort(), false,
                     false);
-        final OperatorSV[] paramSVs = new OperatorSV[target.getNumParams()];
+        final JOperatorSV[] paramSVs = new JOperatorSV[target.getNumParams()];
         for (int i = 0; i < paramSVs.length; i++) {
             paramSVs[i] = SchemaVariableFactory.createTermSV(new Name("sv_p" + i),
                 target.getParamType(i).getSort(), false, false);
@@ -472,18 +478,18 @@ public class TacletGenerator {
 
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
 
-        Term wfFormula = null;
-        Term createdFormula = null;
+        JTerm wfFormula = null;
+        JTerm createdFormula = null;
         TermBuilder TB = services.getTermBuilder();
         for (var heapSV : heapSVs) {
-            final Term wf = TB.wellFormed(TB.var(heapSV));
+            final JTerm wf = TB.wellFormed(TB.var(heapSV));
             if (wfFormula == null) {
                 wfFormula = wf;
             } else {
                 wfFormula = TB.and(wfFormula, wf);
             }
             if (!target.isStatic()) {
-                final Term crf = TB.created(TB.var(heapSV), TB.var(selfSV));
+                final JTerm crf = TB.created(TB.var(heapSV), TB.var(selfSV));
                 if (createdFormula == null) {
                     createdFormula = crf;
                 } else {
@@ -491,11 +497,11 @@ public class TacletGenerator {
                 }
             }
         }
-        final Term selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
-        final Term mbyOK = originalMby != null ? TB.measuredByCheck(originalMby) : null;
+        final JTerm selfNull = target.isStatic() ? null : TB.equals(TB.var(selfSV), TB.NULL());
+        final JTerm mbyOK = originalMby != null ? TB.measuredByCheck(originalMby) : null;
 
         // create find
-        final Term[] subs = new Term[target.arity()];
+        final JTerm[] subs = new JTerm[target.arity()];
         int i = 0;
         for (var heapSV : heapSVs) {
             subs[i++] = TB.var(heapSV);
@@ -506,10 +512,10 @@ public class TacletGenerator {
         for (int j = 0; j < paramSVs.length; j++) {
             subs[j + i] = TB.var(paramSVs[j]);
         }
-        final Term find = TB.func(target, subs);
+        final JTerm find = TB.func(target, subs);
 
         // build taclet
-        Term addFormulaTerm = originalPre;
+        JTerm addFormulaTerm = originalPre;
         if (wfFormula != null) {
             addFormulaTerm = TB.and(addFormulaTerm, wfFormula);
         }
@@ -531,11 +537,10 @@ public class TacletGenerator {
                     TB.and(originalPost, originalFreePost), services.getTermFactory())),
             pvs, svs, services);
 
-        final Term addedFormula = schemaAdd.term;
+        final JTerm addedFormula = schemaAdd.term;
         final SequentFormula addedCf = new SequentFormula(addedFormula);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+        final Sequent addedSeq = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(addedCf));
 
         for (VariableSV boundSV : schemaAdd.boundVars) {
             for (SchemaVariable heapSV : heapSVs) {
@@ -551,7 +556,8 @@ public class TacletGenerator {
         }
 
         tacletBuilder.setFind(find);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         tacletBuilder.addTacletGoalTemplate(
             new TacletGoalTemplate(addedSeq, ImmutableSLList.nil()));
         tacletBuilder.setName(name);
@@ -598,21 +604,21 @@ public class TacletGenerator {
         final var modalitySV =
             SchemaVariableFactory.createModalOperatorSV(new Name("#allModal_sv"),
                 JavaDLTheory.FORMULA,
-                DefaultImmutableSet.<Modality.JavaModalityKind>nil()
-                        .add(Modality.JavaModalityKind.DIA)
-                        .add(Modality.JavaModalityKind.BOX)
-                        .add(Modality.JavaModalityKind.DIA_TRANSACTION)
-                        .add(Modality.JavaModalityKind.BOX_TRANSACTION));
+                DefaultImmutableSet.<JModality.JavaModalityKind>nil()
+                        .add(JModality.JavaModalityKind.DIA)
+                        .add(JModality.JavaModalityKind.BOX)
+                        .add(JModality.JavaModalityKind.DIA_TRANSACTION)
+                        .add(JModality.JavaModalityKind.BOX_TRANSACTION));
         var postSV = SchemaVariableFactory.createFormulaSV(new Name("#post_sv"));
 
-        final Term findTerm =
-            TB.tf().createTerm(Modality.getModality(modalitySV, findBlock),
-                new Term[] { TB.var(postSV) }, null, null);
+        final JTerm findTerm =
+            TB.tf().createTerm(JModality.getModality(modalitySV, findBlock),
+                new JTerm[] { TB.var(postSV) }, null, null);
 
         final JavaBlock replaceBlock =
             JavaBlock.createJavaBlock(new ContextStatementBlock(new StatementBlock(), null));
 
-        final Term[] updateSubs = new Term[target.arity()];
+        final JTerm[] updateSubs = new JTerm[target.arity()];
         int i = 0;
         updateSubs[i++] = TB.var(services.getTypeConverter().getHeapLDT().getHeap());
         if (target.getStateCount() == 2) {
@@ -625,16 +631,17 @@ public class TacletGenerator {
             updateSubs[j + i] = TB.var(paramProgSVs[j]);
         }
 
-        final Term replaceTerm =
+        final JTerm replaceTerm =
             TB.apply(TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
-                TB.tf().createTerm(Modality.getModality(modalitySV, replaceBlock),
-                    new Term[] { TB.var(postSV) }, null, null));
+                TB.tf().createTerm(JModality.getModality(modalitySV, replaceBlock),
+                    new JTerm[] { TB.var(postSV) }, null, null));
 
         final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder =
             new RewriteTacletBuilder<>();
 
         replaceTacletBuilder.setFind(findTerm);
-        replaceTacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        replaceTacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         replaceTacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceTerm));
         replaceTacletBuilder.setName(name);
         replaceTacletBuilder.addRuleSet(new RuleSet(new Name("simplify_prog"))); // TODO ?
@@ -645,12 +652,12 @@ public class TacletGenerator {
 
 
     public ImmutableSet<Taclet> generatePartialInvTaclet(Name name, List<TermSV> heapSVs,
-            OperatorSV selfSV, OperatorSV eqSV, Term term, KeYJavaType kjt,
+            JOperatorSV selfSV, JOperatorSV eqSV, JTerm term, KeYJavaType kjt,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean isStatic, boolean isFree,
             boolean eqVersion, Services services) {
         TermBuilder TB = services.getTermBuilder();
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
-        Map<Term, Term> replace = new LinkedHashMap<>();
+        Map<JTerm, JTerm> replace = new LinkedHashMap<>();
         int i = 0;
         for (ProgramVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
@@ -658,29 +665,28 @@ public class TacletGenerator {
         final OpReplacer replacer = new OpReplacer(replace, services.getTermFactory());
         // TB.getBaseHeap(services), TB.var(heapSV)
         // instantiate axiom with schema variables
-        final Term rawAxiom = replacer.replace(term);
+        final JTerm rawAxiom = replacer.replace(term);
         final TermAndBoundVarPair schemaAxiom = replaceBoundLogicVars(rawAxiom, services);
 
         // limit observers
-        final Pair<Term, ImmutableSet<Taclet>> limited =
+        final Pair<JTerm, ImmutableSet<Taclet>> limited =
             limitTerm(schemaAxiom.term, toLimit, services);
-        final Term limitedAxiom = limited.first;
+        final JTerm limitedAxiom = limited.first;
         result = result.union(limited.second);
 
         // create added sequent
         final SequentFormula addedCf = new SequentFormula(limitedAxiom);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+        final Sequent addedSeq =
+            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(addedCf));
 
-        final Term[] hs = new Term[heapSVs.size()];
+        final JTerm[] hs = new JTerm[heapSVs.size()];
         i = 0;
         for (var heapSV : heapSVs) {
             hs[i++] = TB.var(heapSV);
         }
         // create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
-        final Term invTerm;
+        final JTerm invTerm;
         if (isStatic && isFree) {
             invTerm = TB.staticInvFree(hs, kjt);
         } else if (isStatic) {
@@ -711,23 +717,22 @@ public class TacletGenerator {
         if (eqVersion) {
             assert !isStatic;
             // \assumes( self = EQ ==> EQ = null )
-            final Term selfEQ = TB.equals(TB.var(selfSV), TB.var(eqSV));
-            final Term eqNull = TB.equals(TB.var(eqSV), TB.NULL());
+            final JTerm selfEQ = TB.equals(TB.var(selfSV), TB.var(eqSV));
+            final JTerm eqNull = TB.equals(TB.var(eqSV), TB.NULL());
             final SequentFormula selfEQSF = new SequentFormula(selfEQ);
             final SequentFormula eqNullSF = new SequentFormula(eqNull);
-            final Semisequent succ =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(selfEQSF).semisequent();
-            final Semisequent ant =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(eqNullSF).semisequent();
-            final Sequent ifSeq = Sequent.createSequent(succ, ant);
+            final var antec =
+                ImmutableSLList.singleton(selfEQSF);
+            final var succ =
+                ImmutableSLList.singleton(eqNullSF);
+            final Sequent ifSeq = JavaDLSequentKit.createSequent(antec, succ);
             tacletBuilder.setIfSequent(ifSeq);
         } else if (!isStatic) {
             // \assumes( ==> self = null )
-            final Term selfNull = TB.equals(TB.var(selfSV), TB.NULL());
+            final JTerm selfNull = TB.equals(TB.var(selfSV), TB.NULL());
             final SequentFormula selfNullSF = new SequentFormula(selfNull);
-            final Semisequent succ =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(selfNullSF).semisequent();
-            final Sequent ifSeq = Sequent.createSuccSequent(succ);
+            final Sequent ifSeq =
+                JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(selfNullSF));
             tacletBuilder.setIfSequent(ifSeq);
         }
 
@@ -737,11 +742,11 @@ public class TacletGenerator {
 
 
     @SuppressWarnings("unused")
-    private TermAndBoundVarPair createSchemaTerm(Term term, TermServices services,
-            Pair<LocationVariable, OperatorSV>... varPairs) {
+    private TermAndBoundVarPair createSchemaTerm(JTerm term, TermServices services,
+            Pair<LocationVariable, JOperatorSV>... varPairs) {
         ImmutableList<LocationVariable> progVars = ImmutableSLList.nil();
-        ImmutableList<OperatorSV> schemaVars = ImmutableSLList.nil();
-        for (Pair<LocationVariable, OperatorSV> varPair : varPairs) {
+        ImmutableList<JOperatorSV> schemaVars = ImmutableSLList.nil();
+        for (Pair<LocationVariable, JOperatorSV> varPair : varPairs) {
             progVars = progVars.append(varPair.first);
             schemaVars = schemaVars.append(varPair.second);
         }
@@ -749,11 +754,11 @@ public class TacletGenerator {
     }
 
 
-    private TermAndBoundVarPair createSchemaTerm(Term term,
-            ImmutableList<LocationVariable> programVars, ImmutableList<OperatorSV> schemaVars,
+    private TermAndBoundVarPair createSchemaTerm(JTerm term,
+            ImmutableList<LocationVariable> programVars, ImmutableList<JOperatorSV> schemaVars,
             TermServices services) {
         final OpReplacer or = createOpReplacer(programVars, schemaVars, services);
-        final Term rawTerm = or.replace(term);
+        final JTerm rawTerm = or.replace(term);
         final TermAndBoundVarPair schemaTerm = replaceBoundLogicVars(rawTerm, services);
         return schemaTerm;
     }
@@ -763,7 +768,7 @@ public class TacletGenerator {
         if (programVar == null) {
             return null;
         } else {
-            Name name = new Name("sv_" + programVar.name().toString());
+            Name name = new Name("sv_" + programVar.name());
             var schemaVar =
                 SchemaVariableFactory.createTermSV(name, programVar.getKeYJavaType().getSort());
             return schemaVar;
@@ -771,11 +776,11 @@ public class TacletGenerator {
     }
 
 
-    private ImmutableList<OperatorSV> createSchemaVariables(
+    private ImmutableList<JOperatorSV> createSchemaVariables(
             ImmutableList<LocationVariable> programVars) {
-        ImmutableList<OperatorSV> schemaVars = ImmutableSLList.nil();
+        ImmutableList<JOperatorSV> schemaVars = ImmutableSLList.nil();
         for (LocationVariable progVar : programVars) {
-            OperatorSV schemaVar = createSchemaVariable(progVar);
+            JOperatorSV schemaVar = createSchemaVariable(progVar);
             schemaVars = schemaVars.append(schemaVar);
         }
         return schemaVars;
@@ -783,13 +788,13 @@ public class TacletGenerator {
 
 
     private OpReplacer createOpReplacer(ImmutableList<LocationVariable> programVars,
-            ImmutableList<OperatorSV> schemaVars, TermServices services) {
+            ImmutableList<JOperatorSV> schemaVars, TermServices services) {
         assert programVars.size() == schemaVars.size();
-        final Map<LocationVariable, OperatorSV> map =
+        final Map<LocationVariable, JOperatorSV> map =
             new LinkedHashMap<>();
-        Iterator<OperatorSV> schemaIt = schemaVars.iterator();
+        Iterator<JOperatorSV> schemaIt = schemaVars.iterator();
         for (LocationVariable progVar : programVars) {
-            OperatorSV schemaVar = schemaIt.next();
+            JOperatorSV schemaVar = schemaIt.next();
             if (progVar != null) {
                 map.put(progVar, schemaVar);
             }
@@ -804,7 +809,7 @@ public class TacletGenerator {
      *
      * @param services TODO
      */
-    private TermAndBoundVarPair replaceBoundLogicVars(Term t, TermServices services) {
+    private TermAndBoundVarPair replaceBoundLogicVars(JTerm t, TermServices services) {
         // recursive replacement process
         final TermAndBoundVarPair intermediateRes = replaceBoundLVsWithSVsHelper(t, services);
 
@@ -817,7 +822,7 @@ public class TacletGenerator {
         final OpCollector oc = new OpCollector();
         oc.visit(t);
         final Set<Name> usedNames = new LinkedHashSet<>();
-        for (Operator op : oc.ops()) {
+        for (final var op : oc.ops()) {
             usedNames.add(op.name());
         }
 
@@ -847,13 +852,13 @@ public class TacletGenerator {
             }
         }
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        final Term newTerm = or.replace(intermediateRes.term);
+        final JTerm newTerm = or.replace(intermediateRes.term);
 
         return new TermAndBoundVarPair(newTerm, newSVs);
     }
 
 
-    private TermAndBoundVarPair replaceBoundLVsWithSVsHelper(Term t, TermServices services) {
+    private TermAndBoundVarPair replaceBoundLVsWithSVsHelper(JTerm t, TermServices services) {
         ImmutableSet<VariableSV> svs = DefaultImmutableSet.nil();
 
         // prepare op replacer, new bound vars
@@ -874,7 +879,7 @@ public class TacletGenerator {
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
 
         // handle subterms
-        final Term[] newSubs = new Term[t.arity()];
+        final JTerm[] newSubs = new JTerm[t.arity()];
         boolean changedSub = false;
         for (int i = 0; i < newSubs.length; i++) {
             if (t.op().bindVarsAt(i)) {
@@ -891,7 +896,7 @@ public class TacletGenerator {
         }
 
         // build overall term
-        final Term newTerm;
+        final JTerm newTerm;
         if (map.isEmpty() && !changedSub) {
             newTerm = t;
         } else {
@@ -903,14 +908,14 @@ public class TacletGenerator {
     }
 
 
-    private Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t,
+    private Pair<JTerm, ImmutableSet<Taclet>> limitTerm(JTerm t,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
 
         // recurse to subterms
-        Term[] subs = new Term[t.arity()];
+        JTerm[] subs = new JTerm[t.arity()];
         for (int i = 0; i < subs.length; i++) {
-            Pair<Term, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit, services);
+            Pair<JTerm, ImmutableSet<Taclet>> pair = limitTerm(t.sub(i), toLimit, services);
             subs[i] = pair.first;
             taclets = taclets.union(pair.second);
         }
@@ -930,37 +935,37 @@ public class TacletGenerator {
         }
 
         // reassemble, return
-        final Term term =
+        final JTerm term =
             services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), null);
         return new Pair<>(term, taclets);
     }
 
 
     private SequentFormula generateGuard(KeYJavaType kjt, IObserverFunction target,
-            TermServices services, final OperatorSV selfSV, List<TermSV> heapSVs,
-            ImmutableList<OperatorSV> paramSVs, final Term schemaAxiom,
+            TermServices services, final JOperatorSV selfSV, List<TermSV> heapSVs,
+            ImmutableList<JOperatorSV> paramSVs, final JTerm schemaAxiom,
             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder, boolean addGuard) {
         final TermBuilder TB = services.getTermBuilder();
-        final Term exactInstance = prepareExactInstanceGuard(kjt, target, services, selfSV);
-        final Term axiomSatisfiable = addGuard
+        final JTerm exactInstance = prepareExactInstanceGuard(kjt, target, services, selfSV);
+        final JTerm axiomSatisfiable = addGuard
                 ? prepareSatisfiabilityGuard(target, heapSVs, selfSV, paramSVs, schemaAxiom,
                     tacletBuilder, services)
                 : TB.tt();
         // assemble formula
-        final Term guardedAxiom = TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
+        final JTerm guardedAxiom = TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
         final SequentFormula guardedAxiomCf = new SequentFormula(guardedAxiom);
         return guardedAxiomCf;
     }
 
 
-    private Term prepareSatisfiabilityGuard(IObserverFunction target, List<TermSV> heapSVs,
-            final OperatorSV selfSV, ImmutableList<OperatorSV> paramSVs,
-            final Term schemaAxiom,
+    private JTerm prepareSatisfiabilityGuard(IObserverFunction target, List<TermSV> heapSVs,
+            final JOperatorSV selfSV, ImmutableList<JOperatorSV> paramSVs,
+            final JTerm schemaAxiom,
             final RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
             TermServices services) {
 
         final TermBuilder TB = services.getTermBuilder();
-        ImmutableList<Term> vars = ImmutableSLList.nil();
+        ImmutableList<JTerm> vars = ImmutableSLList.nil();
         for (TermSV heapSV : heapSVs) {
             vars = vars.append(TB.var(heapSV));
         }
@@ -970,9 +975,9 @@ public class TacletGenerator {
         for (var sv : paramSVs) {
             vars = vars.append(TB.var(sv));
         }
-        final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
+        final JTerm targetTerm = TB.func(target, vars.toArray(new JTerm[0]));
 
-        final Term axiomSatisfiable;
+        final JTerm axiomSatisfiable;
         if (target.sort() == JavaDLTheory.FORMULA) {
             axiomSatisfiable = TB.or(
                 OpReplacer.replace(targetTerm, TB.tt(), schemaAxiom, services.getTermFactory()),
@@ -990,9 +995,9 @@ public class TacletGenerator {
             for (var paramSV : paramSVs) {
                 tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
             }
-            Term targetLVReachable = null;
+            JTerm targetLVReachable = null;
             for (var heapSV : heapSVs) {
-                final Term targetReachable =
+                final JTerm targetReachable =
                     TB.reachableValue(TB.var(heapSV), TB.var(targetSV), target.getType());
                 if (targetLVReachable == null) {
                     targetLVReachable = targetReachable;
@@ -1009,19 +1014,19 @@ public class TacletGenerator {
     }
 
 
-    private Term prepareExactInstanceGuard(KeYJavaType kjt, IObserverFunction target,
-            TermServices services, final OperatorSV selfSV) {
+    private JTerm prepareExactInstanceGuard(KeYJavaType kjt, IObserverFunction target,
+            TermServices services, final JOperatorSV selfSV) {
         final boolean finalClass = kjt.getJavaType() instanceof ClassDeclaration
                 && ((ClassDeclaration) kjt.getJavaType()).isFinal();
         // TODO: exact instance necessary?
         // or better: instance(finalClass, selfSV, services)?
         final TermBuilder TB = services.getTermBuilder();
-        final Term exactInstance = target.isStatic() || finalClass ? TB.tt()
+        final JTerm exactInstance = target.isStatic() || finalClass ? TB.tt()
                 : TB.exactInstance(kjt.getSort(), TB.var(selfSV));
         return exactInstance;
     }
 
 
-    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {
+    private record TermAndBoundVarPair(JTerm term, ImmutableSet<VariableSV> boundVars) {
     }
 }

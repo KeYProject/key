@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,6 +19,11 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kin
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -73,7 +77,8 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -82,7 +87,7 @@ public final class JmlAssertRule implements BuiltInRule {
             return false;
         }
 
-        Term target = occurrence.subTerm();
+        JTerm target = (JTerm) occurrence.subTerm();
         if (target.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(target);
         }
@@ -102,18 +107,19 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof JmlAssertBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply JmlAssertBuiltInRuleApp");
         }
+        final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
 
-        final Term formula = occurrence.subTerm();
-        final Term update = UpdateApplication.getUpdate(formula);
+        final JTerm formula = (JTerm) occurrence.subTerm();
+        final JTerm update = UpdateApplication.getUpdate(formula);
 
-        Term target = formula;
+        JTerm target = formula;
         if (formula.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(formula);
         }
@@ -124,7 +130,7 @@ public final class JmlAssertRule implements BuiltInRule {
                     .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
-        final Term self = MiscTools.getSelfTerm(frame, services);
+        final JTerm self = MiscTools.getSelfTerm(frame, services);
 
         final var spec = services.getSpecificationRepository().getStatementSpec(jmlAssert);
 
@@ -133,7 +139,7 @@ public final class JmlAssertRule implements BuiltInRule {
                 "No specification found for JmlAssert. Internal Error. Not your fault");
         }
 
-        Term condition =
+        JTerm condition =
             tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
 
         condition = tb.addLabel(condition, new OriginTermLabel.Origin(
@@ -155,17 +161,19 @@ public final class JmlAssertRule implements BuiltInRule {
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
-            Term condition, TermBuilder tb) {
+    private void setUpValidityRule(Goal goal,
+            PosInOccurrence occurrence, JTerm update,
+            JTerm condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target,
-            Term condition, TermBuilder tb, Services services) {
+    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
+            JTerm update, JTerm target,
+            JTerm condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
-        final Term newTerm = tb.apply(update,
+        final JTerm newTerm = tb.apply(update,
             tb.imp(condition,
                 tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
 

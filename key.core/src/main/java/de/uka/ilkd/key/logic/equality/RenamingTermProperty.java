@@ -6,9 +6,14 @@ package de.uka.ilkd.key.logic.equality;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.logic.Property;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -142,11 +147,11 @@ public class RenamingTermProperty implements Property<Term> {
 
         final Operator op1 = t1.op();
 
-        if (op0 instanceof Modality mod0 && op1 instanceof Modality mod1) {
+        if (op0 instanceof JModality mod0 && op1 instanceof JModality mod1) {
             if (mod0.kind() != mod1.kind()) {
                 return false;
             }
-            nat = handleJava(mod0.program(), mod1.program(), nat);
+            nat = handleJava(mod0.programBlock(), mod1.programBlock(), nat);
             if (nat == FAILED) {
                 return false;
             }
@@ -322,7 +327,7 @@ public class RenamingTermProperty implements Property<Term> {
         final Operator op = term.op();
         if (op instanceof QuantifiableVariable qv) {
             hashCode = 17 * hashCode + hashQuantifiableVariable(qv, nameAbstractionList);
-        } else if (op instanceof Modality mod) {
+        } else if (op instanceof JModality mod) {
             hashCode = 17 * hashCode + mod.kind().hashCode();
             hashCode = 17 * hashCode + hashJavaBlock(mod);
         } else if (op instanceof ProgramVariable pv) {
@@ -357,11 +362,11 @@ public class RenamingTermProperty implements Property<Term> {
      * <p>
      * The hash code is computed based on the hash code of the program element of the Java block.
      *
-     * @param mod the {@link Modality} to compute the hash code for
+     * @param mod the {@link JModality} to compute the hash code for
      * @return the hash code
      */
-    private int hashJavaBlock(Modality mod) {
-        final JavaBlock jb = mod.program();
+    private int hashJavaBlock(JModality mod) {
+        final JavaBlock jb = mod.programBlock();
         if (!jb.isEmpty()) {
             final JavaProgramElement jpe = jb.program();
             return jpe != null ? jpe.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY) : 0;

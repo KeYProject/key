@@ -13,13 +13,17 @@ import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.strategy.feature.Feature;
+
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.junit.jupiter.api.*;
 
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
- * {@link Feature#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.strategy.feature.MutableState)}
+ * {@link Feature#computeCost(RuleApp, PosInOccurrence, de.uka.ilkd.key.proof.Goal, MutableState)}
  * so that statistical data about that method can be recorded (time duration, number of invocations
  * and potentially other stuff).
  */
@@ -36,7 +40,7 @@ public class RunAllProofsTestWithComputeCostProfiling {
      * mode of runallproofs re-executes static initialisation blocks in each created subprocess. Be
      * aware of that in case you intend to change or move this block.
      */
-    static void initDirectories(Date runStart) {
+    static void initDirectories(Date runStart) throws IOException {
         directories = new ProfilingDirectories(runStart);
     }
 

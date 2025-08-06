@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
@@ -74,9 +74,9 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
             // Should be a function or program variable
             final TermBuilder tb = //
                 stateMap.getProof().getServices().getTermBuilder();
-            final Term t;
-            if (lookupResult instanceof JFunction) {
-                t = tb.func((JFunction) lookupResult);
+            final JTerm t;
+            if (lookupResult instanceof Function) {
+                t = tb.func((Function) lookupResult);
             } else if (lookupResult instanceof ProgramVariable) {
                 t = tb.var((ProgramVariable) lookupResult);
             } else {

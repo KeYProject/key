@@ -14,14 +14,13 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -67,7 +67,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     private final FunctionalOperationContract contract;
 
-    protected Term mbyAtPre;
+    protected JTerm mbyAtPre;
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -173,9 +173,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+    protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
-        final Term mbyAtPreDef;
+        final JTerm mbyAtPreDef;
         if (contract.hasMby()) {
             /*
              * final Function mbyAtPreFunc = new Function(new Name(TB.newName(services,
@@ -183,7 +183,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
              * services.getTypeConverter().getIntegerLDT().targetSort()); register(mbyAtPreFunc);
              * mbyAtPre = TB.func(mbyAtPreFunc);
              */
-            final Term mby = contract.getMby(selfVar, paramVars, services);
+            final JTerm mby = contract.getMby(selfVar, paramVars, services);
             // mbyAtPreDef = TB.equals(mbyAtPre, mby);
             mbyAtPreDef = tb.measuredBy(mby);
         } else {
@@ -197,12 +197,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
+    protected JTerm getPre(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        final Term freePre =
+        final JTerm freePre =
             contract.getFreePre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
-        final Term pre = contract.getPre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
+        final JTerm pre = contract.getPre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
         return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
     }
 
@@ -210,7 +210,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
+    protected JTerm getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
@@ -220,8 +220,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
     }
 
@@ -229,12 +229,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected @Nullable Term buildFrameClause(List<LocationVariable> modifiableHeaps,
-            Map<Term, Term> heapToAtPre, LocationVariable selfVar,
+    protected @Nullable JTerm buildFrameClause(List<LocationVariable> modifiableHeaps,
+            Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
-        Term frameTerm = null;
+        JTerm frameTerm = null;
         for (LocationVariable heap : modifiableHeaps) {
-            final Term ft;
+            final JTerm ft;
             if (!getContract().hasModifiable(heap)) {
                 if (!getContract().hasFreeModifiable(heap)) {
                     ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
@@ -267,7 +267,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected JModality.JavaModalityKind getTerminationMarker() {
         return getContract().getModalityKind();
     }
 
@@ -275,13 +275,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildUpdate(ImmutableList<LocationVariable> paramVars,
+    protected JTerm buildUpdate(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        Term update = null;
+        JTerm update = null;
         for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
             final LocationVariable heap = atPreEntry.getKey();
-            final Term u = tb.elementary(atPreEntry.getValue(),
+            final JTerm u = tb.elementary(atPreEntry.getValue(),
                 heap == getSavedHeap(services) ? tb.getBaseHeap() : tb.var(heap));
             if (update == null) {
                 update = u;
@@ -292,7 +292,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
         Iterator<LocationVariable> paramIt = paramVars.iterator();
         while (formalParamIt.hasNext()) {
-            Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
+            JTerm paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
             update = tb.parallel(update, paramUpdate);
         }
         return update;
@@ -318,7 +318,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    public Term getMbyAtPre() {
+    public JTerm getMbyAtPre() {
         return mbyAtPre;
     }
 

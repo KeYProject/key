@@ -4,10 +4,9 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -101,7 +100,7 @@ public class TestFile implements Serializable {
      *
      * @throws IOException Is thrown in case given .key-file is not a directory or does not exist.
      */
-    public File getKeYFile() throws IOException {
+    public Path getKeYFile() throws IOException {
         File baseDirectory = settings.getGroupDirectory();
         File keyFile = getAbsoluteFile(baseDirectory, path);
 
@@ -116,7 +115,7 @@ public class TestFile implements Serializable {
             throw new IOException(exceptionMessage);
         }
 
-        return keyFile;
+        return keyFile.toPath();
     }
 
     private TestResult getRunAllProofsTestResult(OutputCatcher catcher, boolean success)
@@ -149,12 +148,12 @@ public class TestFile implements Serializable {
             ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(lks);
 
             // Name resolution for the available KeY file.
-            File keyFile = getKeYFile();
+            Path keyFile = getKeYFile();
             if (verbose) {
                 LOGGER.info("Now processing file {}", keyFile);
             }
             // File that the created proof will be saved to.
-            File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
+            var proofFile = Paths.get(keyFile.toAbsolutePath() + ".proof");
 
             KeYEnvironment<DefaultUserInterfaceControl> env = null;
             Proof loadedProof = null;
@@ -204,7 +203,7 @@ public class TestFile implements Serializable {
 
                 if (testProperty == TestProperty.PROVABLE
                         || testProperty == TestProperty.NOTPROVABLE) {
-                    ProofSaver.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"),
+                    ProofSaver.saveToFile(new File(keyFile.toAbsolutePath() + ".save.proof"),
                         loadedProof);
                 }
                 boolean closed = loadedProof.closed();
@@ -216,7 +215,7 @@ public class TestFile implements Serializable {
                 // Write statistics.
                 StatisticsFile statisticsFile = settings.getStatisticsFile();
                 if (statisticsFile != null) {
-                    statisticsFile.appendStatistics(loadedProof, keyFile);
+                    statisticsFile.appendStatistics(loadedProof, keyFile.toFile());
                 }
 
                 /*
@@ -245,7 +244,7 @@ public class TestFile implements Serializable {
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+    protected void reload(boolean verbose, Path proofFile, Proof loadedProof, boolean success)
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
@@ -277,7 +276,7 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile)
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(Path keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -289,7 +288,7 @@ public class TestFile implements Serializable {
      *
      * @param proofFile File that contains the proof that will be (re-)loaded.
      */
-    private void reloadProof(File proofFile) throws Exception {
+    private void reloadProof(Path proofFile) throws Exception {
         /*
          * Reload proof and dispose corresponding KeY environment immediately afterwards. If no
          * exception is thrown it is assumed that loading works properly.

@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
@@ -17,47 +18,35 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
-import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.ConstFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
-import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
-import de.uka.ilkd.key.strategy.feature.LetFeature;
-import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
-import de.uka.ilkd.key.strategy.feature.ShannonFeature;
-import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
-import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termProjection.TermConstructionProjection;
-import de.uka.ilkd.key.strategy.termProjection.TriggerVariableInstantiationProjection;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
+import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.PrintTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.RecSubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ShannonTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SortExtendsTransTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
-import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.CompareCostsFeature;
+import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
+import org.key_project.prover.strategy.costbased.feature.ConstFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.LetFeature;
+import org.key_project.prover.strategy.costbased.feature.ShannonFeature;
+import org.key_project.prover.strategy.costbased.feature.SortComparisonFeature;
+import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termfeature.*;
+import org.key_project.prover.strategy.costbased.termfeature.ApplyTFFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
+import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a
@@ -152,27 +141,28 @@ public abstract class StaticFeatureCollection {
         return not(SeqContainsExecutableCodeFeature.PROGRAMS);
     }
 
-    protected static Feature countOccurrences(ProjectionToTerm cutFormula) {
-        TermBuffer sf = new TermBuffer();
-        TermBuffer sub = new TermBuffer();
+    protected static Feature countOccurrences(ProjectionToTerm<Goal> cutFormula) {
+        final TermBuffer sf = new TermBuffer();
+        final TermBuffer sub = new TermBuffer();
 
-        Feature countOccurrencesInSeq = sum(sf, SequentFormulasGenerator.sequent(),
+        return sum(sf, SequentFormulasGenerator.sequent(),
             sum(sub, SubtermGenerator.leftTraverse(sf, any()),
                 // instead of any a condition which stops traversal when
                 // depth(cutF) > depth(sub) would be better
                 ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
-        return countOccurrencesInSeq;
     }
 
     protected static Feature termSmallerThan(String smaller, String bigger) {
         return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
     }
 
-    protected static Feature monSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
+    protected static Feature monSmallerThan(String smaller, String bigger,
+            IntegerLDT numbers) {
         return MonomialsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
-    protected static Feature atomSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
+    protected static Feature atomSmallerThan(String smaller, String bigger,
+            IntegerLDT numbers) {
         return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
@@ -182,7 +172,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature longConst(long a) {
-        return ConstFeature.createConst(c(a));
+        return ConstFeature.createConst(cost(a));
     }
 
     protected static Feature inftyConst() {
@@ -194,7 +184,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static TermFeature longTermConst(long a) {
-        return ConstTermFeature.createConst(c(a));
+        return ConstTermFeature.createConst(cost(a));
     }
 
     protected static TermFeature inftyTermConst() {
@@ -209,6 +199,7 @@ public abstract class StaticFeatureCollection {
         return SumFeature.createSum(a, b, c);
     }
 
+    @SafeVarargs
     protected static Feature add(Feature... features) {
         return SumFeature.createSum(features);
     }
@@ -246,6 +237,7 @@ public abstract class StaticFeatureCollection {
         return or(a, or(b, c));
     }
 
+    @SafeVarargs
     protected static Feature or(Feature... features) {
         Feature orFeature = inftyConst();
         for (Feature f : features) {
@@ -258,7 +250,8 @@ public abstract class StaticFeatureCollection {
         return ShannonFeature.createConditionalBinary(cond, thenFeature);
     }
 
-    protected static Feature ifZero(Feature cond, Feature thenFeature, Feature elseFeature) {
+    protected static Feature ifZero(Feature cond, Feature thenFeature,
+            Feature elseFeature) {
         return ShannonFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
@@ -291,7 +284,7 @@ public abstract class StaticFeatureCollection {
         return CompareCostsFeature.leq(a, b);
     }
 
-    protected static RuleAppCost c(long p) {
+    protected static RuleAppCost cost(long p) {
         return NumberRuleAppCost.create(p);
     }
 
@@ -306,7 +299,7 @@ public abstract class StaticFeatureCollection {
      *
      * @return projection of taclet applications
      */
-    protected static ProjectionToTerm instOfTriggerVariable() {
+    protected static ProjectionToTerm<Goal> instOfTriggerVariable() {
         return new TriggerVariableInstantiationProjection();
     }
 
@@ -318,7 +311,7 @@ public abstract class StaticFeatureCollection {
      * @param schemaVar schema variable
      * @return projection of taclet applications
      */
-    protected static ProjectionToTerm instOf(String schemaVar) {
+    protected static ProjectionToTerm<Goal> instOf(String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), true);
     }
 
@@ -330,28 +323,33 @@ public abstract class StaticFeatureCollection {
      * @param schemaVar schema variable
      * @return projection of taclet applications
      */
-    protected static ProjectionToTerm instOfNonStrict(String schemaVar) {
+    protected static ProjectionToTerm<Goal> instOfNonStrict(String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), false);
     }
 
-    protected static ProjectionToTerm subAt(ProjectionToTerm t, PosInTerm pit) {
+    protected static ProjectionToTerm<Goal> subAt(ProjectionToTerm<Goal> t, PosInTerm pit) {
         return SubtermProjection.create(t, pit);
     }
 
-    protected static ProjectionToTerm sub(ProjectionToTerm t, int index) {
+    protected static ProjectionToTerm<Goal> sub(ProjectionToTerm<Goal> t, int index) {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static ProjectionToTerm opTerm(Operator op, ProjectionToTerm[] subTerms) {
+    protected static ProjectionToTerm<Goal> opTerm(Operator op,
+            ProjectionToTerm<Goal>[] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
-    protected static ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm) {
+    protected static ProjectionToTerm<Goal> opTerm(Operator op,
+            ProjectionToTerm<Goal> subTerm) {
+        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
-    protected static ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm0,
-            ProjectionToTerm subTerm1) {
+    protected static ProjectionToTerm<Goal> opTerm(Operator op,
+            ProjectionToTerm<Goal> subTerm0,
+            ProjectionToTerm<Goal> subTerm1) {
+        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 
@@ -391,17 +389,33 @@ public abstract class StaticFeatureCollection {
         return EqTermFeature.create(t);
     }
 
-    protected static Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
+    protected static Feature eq(ProjectionToTerm<Goal> t1, ProjectionToTerm<Goal> t2) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, t1, applyTF(t2, eq(buf)));
     }
 
-    protected static Feature contains(ProjectionToTerm bigTerm, ProjectionToTerm searchedTerm) {
+
+    protected static Feature directlyBelowSymbolAtIndex(Operator symbol, int index) {
+        return directlyBelowSymbolAtIndex(op(symbol), index);
+    }
+
+    protected static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
+        final var oneUp = FocusProjection.create(1);
+        if (index == -1) {
+            return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
+        }
+        return add(not(TopLevelFindFeature.ANTEC_OR_SUCC),
+            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.INSTANCE),
+                inftyConst()));
+    }
+
+    protected static Feature contains(ProjectionToTerm<Goal> bigTerm,
+            ProjectionToTerm<Goal> searchedTerm) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, searchedTerm, applyTF(bigTerm, not(rec(any(), not(eq(buf))))));
     }
 
-    protected static Feature println(ProjectionToTerm t) {
+    protected static Feature println(ProjectionToTerm<Goal> t) {
         return applyTF(t, PrintTermFeature.INSTANCE);
     }
 
@@ -444,7 +458,7 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature applyTF(ProjectionToTerm term, TermFeature tf) {
+    protected static Feature applyTF(ProjectionToTerm<Goal> term, TermFeature tf) {
         return ApplyTFFeature.create(term, tf);
     }
 
@@ -457,24 +471,53 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature applyTFNonStrict(ProjectionToTerm term, TermFeature tf) {
+    protected static Feature applyTFNonStrict(ProjectionToTerm<Goal> term, TermFeature tf) {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }
 
-    protected static Feature sum(TermBuffer x, TermGenerator gen, Feature body) {
+    protected static Feature sum(TermBuffer x, TermGenerator<Goal> gen, Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 
-    protected static Feature let(TermBuffer x, ProjectionToTerm value, Feature body) {
+    protected static Feature let(TermBuffer x, ProjectionToTerm<Goal> value,
+            Feature body) {
         return LetFeature.create(x, value, body);
     }
 
-    protected static Feature isSubSortFeature(ProjectionToTerm s1, ProjectionToTerm s2) {
+    protected static Feature isSubSortFeature(ProjectionToTerm<Goal> s1,
+            ProjectionToTerm<Goal> s2) {
         return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }
 
-    protected static Feature implicitCastNecessary(ProjectionToTerm s1) {
+    // Specific features
+
+    protected static Feature implicitCastNecessary(ProjectionToTerm<Goal> s1) {
         return ImplicitCastNecessary.create(s1);
     }
 
+    protected static Feature isSelectSkolemConstantTerm(String svName) {
+        return applyTF(svName, selectSkolemConstantTermFeature());
+    }
+
+    protected static TermFeature selectSkolemConstantTermFeature() {
+        return add(OperatorClassTF.create(Function.class),
+            constantTermFeature(),
+            hasLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL));
+    }
+
+    public static TermFeature hasLabel(TermLabel label) {
+        return TermPredicateTermFeature.create(
+            (t -> t instanceof JTerm jTerm &&
+                    jTerm.containsLabel(label)));
+    }
+
+    protected static TermFeature anonHeapTermFeature() {
+        return add(OperatorClassTF.create(Function.class),
+            constantTermFeature(), hasLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
+    }
+
+    protected static TermFeature constantTermFeature() {
+        return TermPredicateTermFeature
+                .create(term -> term.op() instanceof Function && term.arity() == 0);
+    }
 }

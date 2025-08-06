@@ -1,0 +1,7 @@
+contains:
+  - (assert (not (= (b2u (instanceof (b2u false) sort_any)) (b2u true))))
+expected: VALID
+keySrc: |-
+  \problem {
+     any::instance(FALSE) = TRUE
+  }

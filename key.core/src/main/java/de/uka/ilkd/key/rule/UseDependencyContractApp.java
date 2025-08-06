@@ -7,16 +7,15 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -36,7 +35,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
     public UseDependencyContractApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, Contract contract, PosInOccurrence step) {
+            ImmutableList<PosInOccurrence> ifInsts, Contract contract,
+            PosInOccurrence step) {
         super(rule, pio, ifInsts, contract);
         this.step = step;
 
@@ -58,7 +58,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         assert this.step == null;
         final List<PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(this.getHeapContext(), this.posInOccurrence(), seq, services);
-        PosInOccurrence l_step = UseDependencyContractRule.findStepInIfInsts(steps, this, services);
+        PosInOccurrence l_step =
+            UseDependencyContractRule.findStepInIfInsts(steps, this, services);
         assert l_step != null;/*
                                * : "The strategy failed to properly " +
                                * "instantiate the base heap!\n" + "at: " +
@@ -75,7 +76,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp setStep(PosInOccurrence p_step) {
         assert this.step == null;
-        return new UseDependencyContractApp(rule(), posInOccurrence(), ifInsts(), instantiation,
+        return new UseDependencyContractApp(rule(), posInOccurrence(), assumesInsts(),
+            instantiation,
             p_step);
     }
 
@@ -109,7 +111,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
-        final Term focus = posInOccurrence().subTerm();
+        final var focus = posInOccurrence().subTerm();
         if (!(focus.op() instanceof IObserverFunction target))
         // TODO: find more appropriate exception
         {
@@ -133,7 +135,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         ImmutableSet<Contract> contracts =
             UseDependencyContractRule.getApplicableContracts(services, kjt, target);
 
-        if (contracts.size() > 0) {
+        if (!contracts.isEmpty()) {
             UseDependencyContractApp r = setContract(contracts.iterator().next());
             if (r.getHeapContext() == null) {
                 r.heapContext = HeapContext.getModifiableHeaps(services, false);
@@ -150,14 +152,15 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     @Override
     public IObserverFunction getObserverFunction(Services services) {
-        final Operator op = posInOccurrence().subTerm().op();
+        final var op = posInOccurrence().subTerm().op();
         return (IObserverFunction) (op instanceof IObserverFunction ? op : null);
     }
 
 
 
     @Override
-    public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public UseDependencyContractApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
         // return new UseDependencyContractApp(builtInRule, pio, ifInsts, instantiation, step);
