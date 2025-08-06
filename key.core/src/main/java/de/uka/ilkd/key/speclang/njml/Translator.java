@@ -2392,11 +2392,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitMbody_block(JmlParser.Mbody_blockContext ctx) {
         resolverManager.pushLocalVariablesNamespace();
-        List<Pair<LogicVariable, Term>> substList = new ArrayList<>();
+        List<Pair<LogicVariable, JTerm>> substList = new ArrayList<>();
         for (JmlParser.Mbody_varContext varCtx : ctx.mbody_var()) {
             String name = varCtx.IDENT().getText();
             SLExpression expr = accept(varCtx.expression());
-            Term term = expr.getTerm();
+            JTerm term = expr.getTerm();
             LogicVariable logVar;
             Optional<LogicVariable> existingVar = substList.stream()
                     .map(p -> p.first)
@@ -2423,8 +2423,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         SLExpression stmExpr = accept(ctx.mbody_statement());
-        Term term = stmExpr.getTerm();
-        for (Pair<LogicVariable, Term> lv : substList.reversed()) {
+        JTerm term = stmExpr.getTerm();
+        for (Pair<LogicVariable, JTerm> lv : substList.reversed()) {
             term = tb.subst(lv.first, lv.second, term);
         }
         resolverManager.popLocalVariablesNamespace();
