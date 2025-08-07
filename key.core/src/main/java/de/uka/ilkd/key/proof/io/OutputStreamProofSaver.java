@@ -10,9 +10,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
-import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
-import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -59,6 +56,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,14 +88,14 @@ public class OutputStreamProofSaver {
      * @param proof the Proof
      * @return the location of the java source code or null if no such exists
      */
-    public static File getJavaSourceLocation(Proof proof) {
+    public static @Nullable File getJavaSourceLocation(Proof proof) {
         final String header = proof.header();
         final int i = header.indexOf("\\javaSource");
         if (i >= 0) {
             final int begin = header.indexOf('\"', i);
             final int end = header.indexOf('\"', begin + 1);
             final String sourceLocation = header.substring(begin + 1, end);
-            if (sourceLocation.length() > 0) {
+            if (!sourceLocation.isEmpty()) {
                 return new File(sourceLocation);
             }
         }
@@ -174,47 +172,37 @@ public class OutputStreamProofSaver {
             final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
             final StrategyProperties strategyProperties =
                 strategySettings.getActiveStrategyProperties();
-            if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
-                    || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                    StrategyProperties.INF_FLOW_CHECK_TRUE);
-                strategySettings.setActiveStrategyProperties(strategyProperties);
-                for (final SequentFormula s : proof.root().sequent()
-                        .succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm((JTerm) s.formula());
-                }
-            } else {
-                strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                    StrategyProperties.INF_FLOW_CHECK_FALSE);
-                strategySettings.setActiveStrategyProperties(strategyProperties);
-            }
+
+            po.prepareSave(strategyProperties, proof);
+
+            // strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+            // StrategyProperties.INF_FLOW_CHECK_FALSE);
+            strategySettings.setActiveStrategyProperties(strategyProperties);
             ps.println(writeSettings(proof.getSettings()));
 
-            if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
-                    || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                    StrategyProperties.INF_FLOW_CHECK_FALSE);
-                strategySettings.setActiveStrategyProperties(strategyProperties);
-            }
+            /*
+             * if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
+             * || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
+             * strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+             * StrategyProperties.INF_FLOW_CHECK_FALSE);
+             * strategySettings.setActiveStrategyProperties(strategyProperties);
+             * }
+             */
 
             // declarations of symbols, sorts
+            // FIXME this should rather be an AST rewrite, than a bunch of regex.
             String header = proof.header();
             header = makePathsRelative(header);
             ps.print(header);
 
+            proof.printSymbols(ps);
+
             // \problem or \proofObligation
-            if (po instanceof IPersistablePO ppo
-                    && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO)
-                            && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
-                var loadingConfig = ppo.createLoaderConfig();
-                ps.println("\\proofObligation ");
-                loadingConfig.save(ps, "");
-                ps.println("\n");
-            } else {
-                if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
-                        || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                    ps.print(((InfFlowProof) proof).printIFSymbols());
-                }
+            var hasProofObligation =
+                po instanceof IPersistablePO ppo && ppo.printProofObligation(ps, proof);
+
+
+            if (!hasProofObligation) {
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
                 if (problemSeq.antecedent().isEmpty() && problemSeq.succedent().size() == 1) {
@@ -239,7 +227,7 @@ public class OutputStreamProofSaver {
         }
     }
 
-    protected Path getBasePath() throws IOException {
+    protected @Nullable Path getBasePath() throws IOException {
         File javaSourceLocation = getJavaSourceLocation(proof);
         if (javaSourceLocation != null) {
             return javaSourceLocation.toPath().toAbsolutePath();
@@ -472,7 +460,7 @@ public class OutputStreamProofSaver {
 
         // Predicates for merges with predicate abstraction.
         if (concreteRule instanceof MergeWithPredicateAbstraction
-                && ((MergeWithPredicateAbstraction) concreteRule).getPredicates().size() > 0) {
+                && !((MergeWithPredicateAbstraction) concreteRule).getPredicates().isEmpty()) {
 
             printPredicatesForSingleMergeRuleApp((MergeWithPredicateAbstraction) concreteRule,
                 output);

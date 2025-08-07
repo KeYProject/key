@@ -6,12 +6,7 @@ package de.uka.ilkd.key.rule;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
@@ -116,7 +111,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * <strong>NOTE:</strong> The {@link LoopScopeInvariantRule} currently doesn't support Java Card
      * transactions and information flow proof obligations.
      * </p>
-     *
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -129,10 +124,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             splitUpdates((JTerm) pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((JModality) progPost.op()).<JModality.JavaModalityKind>kind();
 
-        return !InfFlowCheckInfo.isInfFlow(goal) && !WellDefinednessCheck.isOn()
-        // TODO: Remove when wd goal is integrated, otherwise loop invariant rule
-        // would be unsound w.r.t. well-definedness
-                && !(kind.transaction());
+        return !kind.transaction();
     }
 
     @Override
@@ -172,6 +164,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     // -------------------------------------------------------------------------
     // helper methods for apply()
     // -------------------------------------------------------------------------
+
     /**
      * Sets the content of the "initially valid" goal.
      *
