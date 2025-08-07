@@ -64,8 +64,9 @@ public abstract class AbstractLoopContractBuiltInRuleApp<T extends BuiltInRule>
         final Services services = goal.proof().getServices();
         final AbstractLoopContractRule.Instantiation instantiation =
             rule.instantiate((JTerm) posInOccurrence().subTerm(), goal);
+        final var lcir = LoopContractInternalRule.INSTANCE;
         final ImmutableSet<LoopContract> contracts =
-            AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
+            lcir.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement());
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.nil();
         for (LoopContract cont : contracts) {

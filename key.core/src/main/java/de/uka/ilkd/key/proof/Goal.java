@@ -711,7 +711,7 @@ public final class Goal implements ProofGoal<Goal> {
         return lp.result();
     }
 
-    public <T> T getStrategyInfo(Property<T> property) {
+    public <T> @Nullable T getStrategyInfo(Property<T> property) {
         return strategyInfos.get(property);
     }
 

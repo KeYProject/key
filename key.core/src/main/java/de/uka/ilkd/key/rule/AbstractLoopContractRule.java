@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -13,11 +14,12 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
 
@@ -46,7 +48,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param services services.
      * @return all applicable loop contracts for the instantiation.
      */
-    public static ImmutableSet<LoopContract> getApplicableContracts(
+    public ImmutableSet<LoopContract> getApplicableContracts(
             final Instantiation instantiation, final Goal goal, final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
@@ -62,7 +64,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
-    public static ImmutableSet<LoopContract> getApplicableContracts(
+    public ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
             final JModality.JavaModalityKind modalityKind, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
@@ -103,7 +105,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
-    protected static ImmutableSet<LoopContract> filterAppliedContracts(
+    protected ImmutableSet<LoopContract> filterAppliedContracts(
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         for (LoopContract contract : collectedContracts) {
@@ -120,19 +122,20 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return {@code true} if the contract has already been applied.
      */
-    protected static boolean contractApplied(final LoopContract contract, final Goal goal) {
+    protected boolean contractApplied(final LoopContract contract, final Goal goal) {
         Node selfOrParentNode = goal.node();
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof LoopContractInternalBuiltInRuleApp blockRuleApp) {
-                if ((contract.isOnBlock() && blockRuleApp.getStatement().equals(contract.getBlock())
+            if (app instanceof LoopContractInternalBuiltInRuleApp<?> blockRuleApp) {
+                if ((contract.isOnBlock()
+                        && Objects.equals(blockRuleApp.getStatement(), contract.getBlock())
                         || !contract.isOnBlock()
-                                && blockRuleApp.getStatement().equals(contract.getLoop()))
+                                && Objects.equals(blockRuleApp.getStatement(), contract.getLoop()))
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
-                    // but not in other branches, e.g., do-while
-                    // loops might need to apply the same contract
+                    // but not in other branches, e.g., do-while loops might need to apply the same
+                    // contract
                     // twice in its usage branch
                     return true;
                 }
@@ -141,15 +144,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             selfOrParentNode = selfOrParentNode.parent();
         }
 
-        Services services = goal.proof().getServices();
-        Proof proof = goal.proof();
-        ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
-        if (po instanceof SymbolicExecutionPO) {
-            Goal initiatingGoal = ((SymbolicExecutionPO) po).getInitiatingGoal();
-            return contractApplied(contract, initiatingGoal);
-        } else {
-            return false;
-        }
+        return false;
     }
 
     @Override
@@ -229,8 +224,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     /**
      * A builder for {@link Instantiation}s.
      */
-    protected static final class Instantiator extends AbstractAuxiliaryContractRule.Instantiator {
-
+    public final class Instantiator extends AbstractAuxiliaryContractRule.Instantiator {
         /**
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
