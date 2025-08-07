@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * <p>
@@ -57,6 +57,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author lanzinger
  */
+@NullMarked
 public final class LoopContractExternalRule extends AbstractLoopContractRule {
 
     /**
@@ -178,16 +179,15 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopContractExternalBuiltInRuleApp(this, pos);
+    public LoopContractExternalBuiltInRuleApp<?> createApp(PosInOccurrence pos,
+            TermServices services) {
+        return new LoopContractExternalBuiltInRuleApp<>(this, pos);
     }
 
     @Override
     public boolean isApplicable(final Goal goal,
             final PosInOccurrence occurrence) {
-        if (InfFlowCheckInfo.isInfFlow(goal)) {
-            return false;
-        } else if (occursNotAtTopLevelInSuccedent(occurrence)) {
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         } else if (Transformer.inTransformer(occurrence)) {
             return false;
@@ -212,11 +212,11 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+    public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractExternalBuiltInRuleApp;
-        LoopContractExternalBuiltInRuleApp application =
-            (LoopContractExternalBuiltInRuleApp) ruleApp;
+        LoopContractExternalBuiltInRuleApp<?> application =
+            (LoopContractExternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
