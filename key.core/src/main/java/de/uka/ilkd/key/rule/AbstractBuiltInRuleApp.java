@@ -27,17 +27,17 @@ public abstract class AbstractBuiltInRuleApp<T extends BuiltInRule> implements I
 
     protected final T builtInRule;
 
-    protected final PosInOccurrence pio;
+    protected final @Nullable PosInOccurrence pio;
     protected @Nullable ImmutableList<PosInOccurrence> ifInsts;
 
-    protected AbstractBuiltInRuleApp(T rule, PosInOccurrence pio,
+    protected AbstractBuiltInRuleApp(T rule, @Nullable PosInOccurrence pio,
             @Nullable ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
         this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
     }
 
-    protected AbstractBuiltInRuleApp(T rule, PosInOccurrence pio) {
+    protected AbstractBuiltInRuleApp(T rule, @Nullable PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
@@ -63,20 +63,21 @@ public abstract class AbstractBuiltInRuleApp<T extends BuiltInRule> implements I
      * corresponding formula) of this rule application
      */
     @Override
-    public PosInOccurrence posInOccurrence() {
+    public @Nullable PosInOccurrence posInOccurrence() {
         return pio;
     }
 
     /**
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
-     *
      */
     @Override
-    public void checkApplicability() {}
+    public void checkApplicability() {
+    }
 
     @Override
-    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {}
+    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {
+    }
 
     public abstract AbstractBuiltInRuleApp<T> replacePos(PosInOccurrence newPos);
 
