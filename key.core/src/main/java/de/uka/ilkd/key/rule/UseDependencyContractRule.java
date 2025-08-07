@@ -38,6 +38,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -311,9 +312,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
 
 
-    public static PosInOccurrence findStepInIfInsts(
-            List<PosInOccurrence> steps,
-            UseDependencyContractApp app, TermServices services) {
+    public static @Nullable PosInOccurrence findStepInIfInsts(List<PosInOccurrence> steps,
+            UseDependencyContractApp<?> app) {
         for (PosInOccurrence pio : app.assumesInsts()) {
             if (steps.contains(pio)) {
                 return pio;

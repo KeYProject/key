@@ -27,6 +27,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -51,6 +53,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author lanzinger
  */
+@NullMarked
 public class LoopApplyHeadRule implements BuiltInRule {
 
     /**
@@ -120,12 +123,12 @@ public class LoopApplyHeadRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
         return new LoopApplyHeadBuiltInRuleApp(this, pos);
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
         }
@@ -135,14 +138,15 @@ public class LoopApplyHeadRule implements BuiltInRule {
             return false;
         }
 
+        final var lcir = LoopContractInternalRule.INSTANCE;
         final AbstractLoopContractRule.Instantiation instantiation =
-            new AbstractLoopContractRule.Instantiator((JTerm) pio.subTerm(), goal).instantiate();
+            lcir.new Instantiator((JTerm) pio.subTerm(), goal).instantiate();
 
         if (instantiation == null) {
             return false;
         }
 
-        final ImmutableSet<LoopContract> contracts = AbstractLoopContractRule
+        final ImmutableSet<LoopContract> contracts = lcir
                 .getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
         for (LoopContract contract : contracts) {
@@ -158,5 +162,4 @@ public class LoopApplyHeadRule implements BuiltInRule {
     public boolean isApplicableOnSubTerms() {
         return false;
     }
-
 }
