@@ -47,7 +47,7 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
         final Instantiation instantiation = LoopContractInternalRule.INSTANCE
                 .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<LoopContract> contracts =
-            LoopContractInternalRule.getApplicableContracts(instantiation, goal, services);
+            LoopContractInternalRule.INSTANCE.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator =
             new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
                 new LoopContractSelectionPanel(services, true), mainWindow, services,

@@ -11,7 +11,6 @@ import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -21,18 +20,18 @@ import org.jspecify.annotations.Nullable;
  * has to ensure that the goal split is done only iff the application was successful.
  */
 @NullMarked
-public interface BuiltInRule extends Rule, RuleExecutor<@NonNull Goal> {
+public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
 
     /**
      * Returning true iff a rule is applicable at the given position.
      * This does not necessarily mean that a rule application will change the goal
      * (this decision is made due to performance reasons)
      */
-    boolean isApplicable(Goal goal, PosInOccurrence pio);
+    boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio);
 
     boolean isApplicableOnSubTerms();
 
-    IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
+    IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services);
 
     @Override
     ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);

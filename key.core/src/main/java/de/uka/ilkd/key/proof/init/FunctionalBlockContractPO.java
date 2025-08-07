@@ -28,7 +28,6 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistr
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -80,7 +79,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param tb the TermBuilder to be used
      * @return an anonymizing update for the specified variables.
      */
-    private static JTerm createLocalAnonUpdate(
+    protected static JTerm createLocalAnonUpdate(
             final ImmutableSet<LocationVariable> localOutVariables,
             final Services services, final TermBuilder tb) {
         JTerm localAnonUpdate = null;
@@ -199,7 +198,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param tb a term builder.
      * @return the validity formula for the contract.
      */
-    private static JTerm setUpValidityTerm(final List<LocationVariable> heaps,
+    protected JTerm setUpValidityTerm(final List<LocationVariable> heaps,
             Map<LocationVariable, Function> anonHeaps,
             Map<LocationVariable, Function> anonOutHeaps,
             final ImmutableSet<LocationVariable> localInVariables,
@@ -212,46 +211,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             exceptionParameter, conditionsAndClausesBuilder.getTerms());
         JTerm wellFormedAnonymisationHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonHeaps);
-        validity = tb.imp(tb.and(assumptions[1], wellFormedAnonymisationHeapsCondition), validity);
-
-        return addWdToValidityTerm(validity, updates, heaps, anonOutHeaps, localInVariables,
-            localOutVariables, bc, configurator, services, tb);
-    }
-
-    /**
-     *
-     * @param validity the validity formula.
-     * @param updates the updates.
-     * @param heaps the heaps.
-     * @param anonOutHeaps the heaps used in the anonOut update.
-     * @param localInVariables the free local variables in the block.
-     * @param localOutVariables the free local variables modifiable by the block.
-     * @param bc the contract being applied.
-     * @param configurator a goal configurator
-     * @param services services.
-     * @param tb a term builder.
-     * @return the conjunction of the well-definedness formula and the validity formula.
-     */
-    private static JTerm addWdToValidityTerm(JTerm validity, final JTerm[] updates,
-            final List<LocationVariable> heaps, Map<LocationVariable, Function> anonOutHeaps,
-            final ImmutableSet<LocationVariable> localInVariables,
-            final ImmutableSet<LocationVariable> localOutVariables, final BlockContract bc,
-            final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
-        if (WellDefinednessCheck.isOn()) {
-            final JTerm wdUpdate = services.getTermBuilder().parallel(updates[1], updates[2]);
-
-            JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services, tb);
-
-            if (localAnonUpdate == null) {
-                localAnonUpdate = tb.skip();
-            }
-
-            JTerm wellDefinedness = configurator.setUpWdGoal(null, bc, wdUpdate, localAnonUpdate,
-                heaps.get(0), anonOutHeaps.get(heaps.get(0)), localInVariables);
-
-            validity = tb.and(wellDefinedness, validity);
-        }
-        return validity;
+        return tb.imp(tb.and(assumptions[1], wellFormedAnonymisationHeapsCondition), validity);
     }
 
     @Override

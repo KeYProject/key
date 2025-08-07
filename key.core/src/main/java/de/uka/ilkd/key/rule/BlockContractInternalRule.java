@@ -194,17 +194,16 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp createApp(final PosInOccurrence occurrence,
-            TermServices services) {
-        return new BlockContractInternalBuiltInRuleApp(this, occurrence);
+    public BlockContractInternalBuiltInRuleApp<BlockContractInternalRule> createApp(
+            final PosInOccurrence occurrence, TermServices services) {
+        return new BlockContractInternalBuiltInRuleApp<>(this, occurrence);
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
-            final RuleApp ruleApp) throws RuleAbortException {
-        assert ruleApp instanceof BlockContractInternalBuiltInRuleApp;
-        BlockContractInternalBuiltInRuleApp application =
-            (BlockContractInternalBuiltInRuleApp) ruleApp;
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
+            throws RuleAbortException {
+        assert ruleApp instanceof BlockContractInternalBuiltInRuleApp<?>;
+        var application = (BlockContractInternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
@@ -306,7 +305,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param services services.
      */
     protected void setUpValidityGoal(final ImmutableList<Goal> result,
-            final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
+            final BlockContract contract, final BlockContractInternalBuiltInRuleApp<?> application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final ImmutableSet<LocationVariable> localInVariables,

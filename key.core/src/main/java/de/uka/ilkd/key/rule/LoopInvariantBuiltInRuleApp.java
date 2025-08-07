@@ -34,12 +34,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * The built in rule app for the loop invariant rule.
  */
-public class LoopInvariantBuiltInRuleApp<T extends AbstractLoopInvariantRule>
+@NullMarked
+public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         extends AbstractBuiltInRuleApp<T> {
 
     private final While loop;
@@ -51,8 +53,7 @@ public class LoopInvariantBuiltInRuleApp<T extends AbstractLoopInvariantRule>
 
     private final TermServices services;
 
-    public LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pos,
-            TermServices services) {
+    public LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pos, TermServices services) {
         this(rule, pos, null, null, null, services);
     }
 

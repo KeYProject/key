@@ -23,10 +23,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
@@ -38,7 +36,6 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -1116,7 +1113,7 @@ public final class AuxiliaryContractBuilders {
         /**
          * The rule application.
          */
-        private final AbstractAuxiliaryContractBuiltInRuleApp application;
+        private final AbstractAuxiliaryContractBuiltInRuleApp<?> application;
 
         /**
          * The term label state.
@@ -1136,17 +1133,17 @@ public final class AuxiliaryContractBuilders {
         /**
          * @see AuxiliaryContract#getVariables()
          */
-        private final AuxiliaryContract.Variables variables;
+        public final AuxiliaryContract.Variables variables;
 
         /**
          * The position at which the rule is applied.
          */
-        private final PosInOccurrence occurrence;
+        public final PosInOccurrence occurrence;
 
         /**
          * Services.
          */
-        private final Services services;
+        public final Services services;
 
         /**
          * The rule being applied.
@@ -1178,21 +1175,6 @@ public final class AuxiliaryContractBuilders {
             this.occurrence = occurrence;
             this.services = services;
             this.rule = rule;
-        }
-
-        /**
-         * Adds information flow properties to the specified goal.
-         *
-         * @param goal a goal.
-         */
-        private static void addInfFlow(final Goal goal) {
-            final boolean oldInfFlowCheckInfoValue =
-                goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                        && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
-            StrategyInfoUndoMethod undo =
-                strategyInfos -> strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY,
-                    oldInfFlowCheckInfoValue);
-            goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
         }
 
         /**
@@ -1353,39 +1335,6 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param goal If this is not {@code null}, the returned formula is added to this goal.
-         * @param contract the contract being applied.
-         * @param update the update.
-         * @param anonUpdate the anonymization update.
-         * @param heap the heap.
-         * @param anonHeap the anonymization heap.
-         * @param localIns all free local variables in the block.
-         * @return the well-definedness formula.
-         */
-        public JTerm setUpWdGoal(final @Nullable Goal goal, final BlockContract contract, final JTerm update,
-                                 final JTerm anonUpdate, final LocationVariable heap, final Function anonHeap,
-                                 final ImmutableSet<LocationVariable> localIns) {
-            // FIXME: Handling of \old-references needs to be investigated,
-            // however only completeness is lost, soundness is guaranteed
-            final BlockWellDefinedness bwd =
-                new BlockWellDefinedness(contract, variables, localIns, services);
-            services.getSpecificationRepository().addWdStatement(bwd);
-            final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
-            final JTerm anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(
-                variables.self, variables.exception,
-                variables.result, heap, heapAtPre, anon, localIns, update, anonUpdate, services);
-
-            if (goal != null) {
-                goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
-                goal.changeFormula(wdBlock, occurrence);
-            }
-
-            return (JTerm) wdBlock.formula();
-        }
-
-        /**
-         *
          * @param goal If this is not {@code null}, the returned term is added to this goal.
          * @param updates the updates.
          * @param assumptions the preconditions.
@@ -1429,7 +1378,8 @@ public final class AuxiliaryContractBuilders {
                 goal.changeFormula(new SequentFormula(term), occurrence);
                 TermLabelManager.refactorGoal(termLabelState, services, occurrence,
                     application.rule(), goal, null, null);
-                addInfFlow(goal);
+                // TODO: FOR REVIEW (weigl): Following seems strange:
+                // addInfFlow(goal);
             } else {
                 JTerm pre = tb.and(assumptions);
                 JTerm prog =
@@ -1530,7 +1480,8 @@ public final class AuxiliaryContractBuilders {
                 notAbrupt, tb);
             if (goal != null) {
                 goal.setBranchLabel("Validity");
-                addInfFlow(goal);
+                // TODO: FOR REVIEW (weigl): Following line seems odd:
+                // addInfFlow(goal);
                 goal.changeFormula(new SequentFormula(term), occurrence);
             }
             return term;

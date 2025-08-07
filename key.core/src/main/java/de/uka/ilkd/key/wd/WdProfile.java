@@ -6,6 +6,8 @@ package de.uka.ilkd.key.wd;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -22,8 +24,11 @@ public class WdProfile extends JavaProfile {
         return javaRules.map(it -> {
             if (it == BlockContractInternalRule.INSTANCE) {
                 return WdBlockContractInternalRule.INSTANCE;
-            }
-            return it;
-        });
+            } else if (it == WhileInvariantRule.INSTANCE) {
+                return WdWhileInvariantRule.INSTANCE;
+            } else
+                return it;
+        })
+                .filter(it -> !(it instanceof LoopScopeInvariantRule));
     }
 }

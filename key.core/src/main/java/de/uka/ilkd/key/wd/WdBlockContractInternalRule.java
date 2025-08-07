@@ -32,17 +32,16 @@ public class WdBlockContractInternalRule extends BlockContractInternalRule {
             JTerm contextUpdate, JTerm remembranceUpdate,
             ImmutableSet<LocationVariable> localOutVariables,
             GoalsConfigurator configurator, Services services) {
-        if (WellDefinednessCheck.isOn()) {
-            LocationVariable heap = heaps.getFirst();
-            var result = goal.split(4);
-            JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
-            JTerm wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
-            configurator.setUpWdGoal(result.tail().tail().tail().head(), contract, wdUpdate,
-                localAnonUpdate, heap, anonymisationHeaps.get(heap), localInVariables);
-            return result;
-        } else {
-            return super.splitIntoGoals(goal, contract, heaps, localInVariables, anonymisationHeaps,
-                contextUpdate, remembranceUpdate, localOutVariables, configurator, services);
-        }
+        LocationVariable heap = heaps.getFirst();
+        var result = goal.split(4);
+        JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
+        JTerm wdUpdate = services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
+        WdFunctionalBlockContractPO.setUpWdGoal(
+            result.get(3), contract, wdUpdate,
+            localAnonUpdate, heap, anonymisationHeaps.get(heap), localInVariables,
+            configurator.services,
+            configurator.variables,
+            configurator.occurrence);
+        return result;
     }
 }
