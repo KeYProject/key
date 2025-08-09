@@ -61,6 +61,12 @@ application {
     mainClass.set("de.uka.ilkd.key.core.Main")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["slf4j.detectLoggerNameMismatch"] = true
