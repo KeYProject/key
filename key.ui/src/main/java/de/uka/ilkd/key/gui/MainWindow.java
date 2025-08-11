@@ -65,21 +65,20 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.util.PreferenceSaver;
+import de.uka.ilkd.key.ui.util.ThreadUtilities;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.dockingframes.common.common.CControl;
+import org.key_project.dockingframes.common.common.SingleCDockable;
+import org.key_project.dockingframes.common.common.intern.CDockable;
+import org.key_project.dockingframes.core.gui.dock.StackDockStation;
+import org.key_project.dockingframes.core.gui.dock.station.stack.tab.layouting.TabPlacement;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
-import bibliothek.gui.dock.StackDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
-import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -433,7 +432,7 @@ public final class MainWindow extends JFrame {
             UIManager.setLookAndFeel(laf);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
-            FlatLightLaf.setup();
+            com.formdev.flatlaf.FlatLightLaf.setup();
         }
 
         if (SystemInfo.isLinux) {

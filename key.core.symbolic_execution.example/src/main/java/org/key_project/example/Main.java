@@ -113,7 +113,8 @@ public class Main {
                 // Optionally, add a more advanced stop conditions like breakpoints
                 CompoundStopCondition stopCondition = new CompoundStopCondition();
                 // Stop after 100 nodes have been explored on each branch.
-                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100));
+                stopCondition.addChildren(
+                    new ExecutedSymbolicExecutionTreeNodesStopCondition(100));
                 // stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
                 // // Perform only a step over
                 // stopCondition.addChildren(new

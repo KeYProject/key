@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.naming.NameAlreadyBoundException;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -204,7 +203,6 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * @param localNamespaces The local {@link NamespaceSet}.
      * @return The parsed {@link String}.
      * @throws ParserException If there is a syntax error.
-     * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
      */
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {

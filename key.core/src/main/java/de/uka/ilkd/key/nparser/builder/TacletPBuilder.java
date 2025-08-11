@@ -819,6 +819,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             gt = new TacletGoalTemplate(addSeq, addRList, pvs);
         } else {
             if (b instanceof NoFindTacletBuilder) {
+                // there is a replacewith without a find.
                 throw new BuildingException(ctx, "there is a replacewith without a find");
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent rwSeq) {

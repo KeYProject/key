@@ -17,8 +17,8 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
+import de.uka.ilkd.key.ui.proof.io.ProblemLoader;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

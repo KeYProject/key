@@ -16,8 +16,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.util.CommandLine;
-import de.uka.ilkd.key.util.CommandLineException;
+import de.uka.ilkd.key.ui.util.CommandLine;
+import de.uka.ilkd.key.ui.util.CommandLineException;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
@@ -77,7 +77,7 @@ public final class Main {
      */
     public static void main(String[] args) {
         try {
-            var cl = createCommandLine();
+            CommandLine cl = createCommandLine();
             cl.parse(args);
             Log.configureLogging(2);
             evaluateOptions(cl);

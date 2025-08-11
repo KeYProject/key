@@ -20,10 +20,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
 
+import org.key_project.dockingframes.common.common.action.CAction;
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
-import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

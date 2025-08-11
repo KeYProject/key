@@ -63,7 +63,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     /**
      * Internally used to register a subtype link.
      */
-    void registerSubtype(ClassType subtype, ClassType supertype) {
+    protected void registerSubtype(ClassType subtype, ClassType supertype) {
         ProgramModelInfo pmi = supertype.getProgramModelInfo();
         if (pmi != this) {
             ((DefaultProgramModelInfo) pmi).registerSubtype(subtype, supertype);

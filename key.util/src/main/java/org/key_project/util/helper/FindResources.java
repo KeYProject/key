@@ -168,7 +168,9 @@ public final class FindResources {
     }
 
     public static @Nullable Path getTestCasesDirectory() {
-        return findFolder("TEST_CASES", "src/test/resources/testcase");
+        return findFolder("TEST_CASES",
+            "src/test/resources/testcase",
+            "../key.core/src/test/resources/testcase");
     }
 
     public static @Nullable Path getTestResourcesDirectory() {
