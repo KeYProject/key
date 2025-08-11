@@ -44,6 +44,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
+import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -900,8 +901,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (ctx.SUPER() != null) {
             raiseError("\"super\" is currently not supported", ctx);
         }
-        appendToFullyQualifiedName(ctx.getText());
-        return lookupIdentifier(ctx.getText(), null, null, ctx);
+        var id = StringUtil.trim(ctx.getText(), '`'); // weigl: remove '`' from quoted identifiers
+        appendToFullyQualifiedName(id);
+        return lookupIdentifier(id, null, null, ctx);
     }
 
     @Override
@@ -985,6 +987,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         if (ctx.IDENT() != null) {
             String id = ctx.IDENT().getText();
+            id = StringUtil.trim(id, '`'); // weigl: remove '`' from quoted identifiers
+
             if (receiver == null) {
                 // Receiver was only a package/classname prefix
                 lookupName = fullyQualifiedName + "." + id;
@@ -1753,7 +1757,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitOldexpression(JmlParser.OldexpressionContext ctx) {
         KeYJavaType typ;
         SLExpression result = accept(ctx.expression());
-        @Nullable
         String id = accept(ctx.IDENT());
 
         if (atPres == null || atPres.get(getBaseHeap()) == null) {

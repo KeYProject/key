@@ -66,14 +66,14 @@ PUBLIC: 'public';
 PURE: 'pure';
 RETURN_BEHAVIOR: 'return_' BEHAVIOR;
 FINAL: 'final';
-MODEL: 'model'/*  -> pushMode(expr)*/;
+MODEL: 'model'/* */;
 
 fragment Pred: '_redundantly'?; //suffix
 fragment Pfree: '_free'?;       //suffix
 
-ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
-ASSERT: 'assert' Pred  -> pushMode(expr);
-ASSUME: 'assume' Pred -> pushMode(expr);
+ACCESSIBLE: 'accessible' Pred;
+ASSERT: 'assert' Pred;
+ASSUME: 'assume' Pred;
 /**
  * The name 'assignable' is kept here for legacy reasons.
  * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
@@ -81,7 +81,7 @@ ASSUME: 'assume' Pred -> pushMode(expr);
 ASSIGNABLE
     : ('assignable' | 'assigns'  | 'assigning' |
        'modifiable' | 'modifies' | 'modifying' |
-       'writable'   | 'writes'   | 'writing') (Pfree|Pred) -> pushMode(expr);
+       'writable'   | 'writes'   | 'writing') (Pfree|Pred);
 /**
  * The name 'assignable' is kept here for legacy reasons.
  * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
@@ -89,82 +89,59 @@ ASSIGNABLE
 LOOP_ASSIGNABLE
     : ('loop_assignable' | 'loop_assigns' | 'loop_assigning' |
        'loop_modifiable' | 'loop_modifies' | 'loop_modifying' |
-       'loop_writable' | 'loop_writes' | 'loop_writing') (Pfree|Pred) -> pushMode(expr);
-AXIOM: 'axiom' -> pushMode(expr);
-BREAKS: 'breaks' -> pushMode(expr);
-CAPTURES: 'captures' Pred -> pushMode(expr);
+       'loop_writable' | 'loop_writes' | 'loop_writing') (Pfree|Pred);
+AXIOM: 'axiom';
+BREAKS: 'breaks';
+CAPTURES: 'captures' Pred;
 CODE: 'code'; //?
-CONSTRAINT: 'constraint' Pred -> pushMode(expr);
-CONTINUES: 'continues' -> pushMode(expr);
+CONSTRAINT: 'constraint' Pred;
+CONTINUES: 'continues';
 DEBUG: 'debug'; //?
-DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred -> pushMode(expr);
-DETERMINES: 'determines' -> pushMode(expr);
-DIVERGES: 'diverges' Pred -> pushMode(expr);
-//DURATION: 'duration' Pred -> pushMode(expr);
-ENSURES: ('ensures' | 'post') (Pfree|Pred) -> pushMode(expr);
-FOR_EXAMPLE: 'for_example' -> pushMode(expr);
-//FORALL: 'forall' -> pushMode(expr); //?
+DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred;
+DETERMINES: 'determines';
+DIVERGES: 'diverges' Pred;
+DURATION: 'duration' Pred;
+ENSURES: ('ensures' | 'post') (Pfree|Pred);
+FOR_EXAMPLE: 'for_example';
+//FORALL: 'forall'; //?
 HELPER: 'helper';
-IMPLIES_THAT: 'implies_that' -> pushMode(expr);
-IN: 'in' Pred -> pushMode(expr);
-INITIALLY: 'initially' -> pushMode(expr);
+IMPLIES_THAT: 'implies_that';
+IN: 'in' Pred;
+INITIALLY: 'initially';
 INSTANCE: 'instance';
-INVARIANT: 'invariant' (Pfree|Pred) -> pushMode(expr);
+INVARIANT: 'invariant' (Pfree|Pred);
 LOOP_CONTRACT: 'loop_contract';
-LOOP_INVARIANT: ('loop_invariant' | 'maintaining') (Pfree|Pred) -> pushMode(expr);
+LOOP_INVARIANT: ('loop_invariant' | 'maintaining') (Pfree|Pred);
 LOOP_DETERMINES: 'loop_determines';  // internal translation for 'determines' in loop invariants
 LOOP_SEPARATES: 'loop_separates';  //KeY extension, deprecated
-MAPS: 'maps' Pred -> pushMode(expr);
-MEASURED_BY: 'measured_by' Pred -> pushMode(expr);
+MAPS: 'maps' Pred;
+MEASURED_BY: 'measured_by' Pred;
 MERGE_POINT: 'merge_point';
 MERGE_PROC: 'merge_proc';
-MERGE_PARAMS: 'merge_params' -> pushMode(expr);
-MONITORED: 'monitored' -> pushMode(expr);
-MONITORS_FOR: 'monitors_for' -> pushMode(expr);
-//OLD: 'old' -> pushMode(expr);
-//POST: 'post'Pred -> pushMode(expr);
-//PRE: 'pre' Pred -> pushMode(expr);
+MERGE_PARAMS: 'merge_params';
+MONITORED: 'monitored';
+MONITORS_FOR: 'monitors_for';
 READABLE: 'readable';
-REPRESENTS: 'represents' Pred -> pushMode(expr);
-REQUIRES: ('requires'| 'pre') (Pfree|Pred) -> pushMode(expr);
-RETURN: 'return' -> pushMode(expr);
-RETURNS: 'returns' -> pushMode(expr);
-RESPECTS: 'respects' -> pushMode(expr);
-SEPARATES: 'separates' -> pushMode(expr);
-SET: 'set' -> pushMode(expr);
-SIGNALS: ('signals' Pred | 'exsures' Pred) -> pushMode(expr);
-SIGNALS_ONLY: 'signals_only' Pred -> pushMode(expr);
-WHEN: 'when' Pred -> pushMode(expr);
-WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
-WRITABLE: 'writable' -> pushMode(expr);
-
+REPRESENTS: 'represents' Pred;
+REQUIRES: ('requires'| 'pre') (Pfree|Pred);
+RETURN: 'return';
+RETURNS: 'returns';
+RESPECTS: 'respects';
+SEPARATES: 'separates';
+SET: 'set';
+SIGNALS: ('signals' Pred | 'exsures' Pred);
+SIGNALS_ONLY: 'signals_only' Pred;
+WHEN: 'when' Pred;
+WORKING_SPACE: 'working_space' Pred;
+WRITABLE: 'writable';
 JML_ML_END: '*/' -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
 NEST_START: '{|' ;
 NEST_END: '|}' ;
-C_RBRACKET: ']' -> type(RBRACKET);
-C_LBRACKET: '[' -> type(LBRACKET);
-SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
-C_LBRACE: '{' -> type(LBRACE);
-C_RBRACE: '}' -> type(RBRACE);
-C_EQUAL: '=' -> type(EQUAL_SINGLE), pushMode(expr);
-C_LPAREN: '(' -> type(LPAREN);
-C_RPAREN: ')' -> type(RPAREN);
 C_STRING_LITERAL: '"' -> pushMode(string), more;
-C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
-C_COLON: ':' -> type(COLON);
-C_DOT: '.' -> type(DOT);
-C_COMMA: ',' -> type(COMMA);
-
-SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
-ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
-
-JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
-JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
-
-ERROR_CHAR: .;
-
-mode expr;
+COLON: ':';
+DOT: '.';
+COMMA: ',';
 
 /* Java keywords */
 BOOLEAN: 'boolean';
@@ -181,32 +158,7 @@ THIS: 'this';
 TRUE: 'true';
 VOID: 'void';
 
-E_NULLABLE: 'nullable'->type(NULLABLE);
-E_NONNULL: 'non_null' -> type(NON_NULL);
-
-
 DEPENDS: 'depends';  // internal translation for 'accessible' on model fields
-
-/* JML and JML* keywords */
-/*ACCESSIBLE: 'accessible';
-MODIFIABLE: 'modifiable';
-BREAKS: 'breaks';
-CONTINUES: 'continues';
-DECREASES: 'decreases'; // internal translation for 'measured_by'
-DETERMINES: 'determines';  //KeY extension, not official JML
-ENSURES: 'ensures';
-ENSURES_FREE: 'ensures_free';
-MODEL_METHOD_AXIOM: 'model_method_axiom';  //KeY extension, not official JML
-MERGE_PARAMS: 'merge_params';  //KeY extension, not official JML
-NON_NULL: 'non_null';
-NULLABLE: 'nullable';
-REPRESENTS: 'represents';
-REQUIRES: 'requires';
-REQUIRES_FREE: 'requires_free';
-RETURNS: 'returns';  //KeY extension, not official JML
-SEPARATES: 'separates';  //KeY extension, not official JML
-SIGNALS: 'signals';
-SIGNALS_ONLY: 'signals_only';*/
 
 /* JML keywords prefixed with a backslash */
 ALLFIELDS: '\\all_fields';  //KeY extension, not official JML
@@ -219,7 +171,7 @@ BY: '\\by';  //KeY extension, not official JML
 DECLASSIFIES: '\\declassifies';  //KeY extension, not official JML
 DISJOINT: '\\disjoint';  //KeY extension, not official JML
 DOMAIN_IMPLIES_CREATED: '\\domain_implies_created';  //KeY extension, not official JML
-DURATION: '\\duration';
+ESC_DURATION: '\\duration';
 ELEMTYPE: '\\elemtype';
 EMPTYSET: '\\empty';
 ERASES: '\\erases';  //KeY extension, not official JML
@@ -320,22 +272,19 @@ WORKINGSPACE: '\\working_space';
 // ONLY_CALLED: '\\only_called';
 // ONLY_CAPTURED: '\\only_captured';
 
-E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
-E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
-E_JML_ML_END: '*/' -> channel(HIDDEN);
-E_SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
-E_ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
+SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
+ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
+
+JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 
 AND: '&';
 BITWISENOT: '~';
-COLON: ':';
-COMMA: ',';
 DIV: '/';
-DOT: '.';
 DOTDOT: '..';
-EQUAL_SINGLE: '=';
 EQV_ANTIV: '<==>' | '<=!=>';
 EQ_NEQ: '==' | '!=';
+EQUAL_SINGLE: '=';
 GEQ: '>=';
 IMPLIES: '==>';
 IMPLIESBACKWARD: '<==';
@@ -368,8 +317,7 @@ LBRACE:               '{' {incrBrace();};
 RBRACE:               '}' {decrBrace();};
 LBRACKET:             '[' {incrBracket();};
 RBRACKET:             ']' {decrBracket();};
-SEMI_TOPLEVEL:        {   semicolonOnToplevel()}? ';' -> popMode; //jump back to contract mode
-SEMI:                 { ! semicolonOnToplevel()}? ';';
+SEMI:                 ';';
 
 fragment LETTER: 'a'..'z' | 'A'..'Z' | '_' | '$';
 
@@ -446,9 +394,12 @@ DOUBLE_LITERAL
 fragment
 LETTERORDIGIT: LETTER | DIGIT;
 
+ESCAPED_IDENTIFIER: '`' IDENT '`' -> type(IDENT);
 IDENT: LETTER (LETTERORDIGIT)*;
-JML_IDENT: '\\' IDENT ;
+JML_IDENT: '\\' IDENT;
+JML_ESCAPED_IDENT: '`' JML_IDENT '`' -> type(JML_IDENT);
 SPECIAL_IDENT: '<'IDENT'>';
+
 
 //DL_ESCAPE: '\\dl_'  LETTER  ( LETTERORDIGIT )*  ;
 
@@ -483,10 +434,9 @@ STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
 
-DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 
-E_ERROR_CHAR: . -> type(ERROR_CHAR);
+ERROR_CHAR: .;
 
 mode mlComment;
 ML_COMMENT_END: ('*/'|EOF) -> type(COMMENT), channel(HIDDEN), popMode;

@@ -78,7 +78,6 @@ public final class JmlFacade {
     }
 
     private static ParserRuleContext getExpressionContext(JmlLexer lexer) {
-        lexer._mode = JmlLexer.expr;
         JmlParser parser = createParser(lexer);
         JmlParser.ExpressionEOFContext ctx = parser.expressionEOF();
         ParserRuleContext c;
