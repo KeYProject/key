@@ -7,6 +7,7 @@
         "Strings" : "Strings:on",
         "assertions" : "assertions:on",
         "bigint" : "bigint:on",
+        "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
         "initialisation" : "initialisation:disableStaticInitialisation",
         "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
@@ -75,10 +76,9 @@
      }
  } 
 
-\javaSource "src";
 
-\proofObligation 
-// Proof-Obligation settings
+\javaSource "src";\proofObligation 
+// 
 { 
     "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
     "contract" : "BoyerMoore[BoyerMoore::monoLemma([I,int,int)].JML normal_behavior operation contract.0",
@@ -86,9 +86,9 @@
  }
 
 \proof {
-(keyLog "0" (keyUser "ulbrich" ) (keyVersion "92806e432315c51255ca3313bf825dfd4f10662c"))
+(keyLog "0" (keyUser "ulbrich" ) (keyVersion "947da2060bf662ceb5ca270943291196724c7fa3"))
 
-(autoModeTime "1229")
+(autoModeTime "1173")
 
 (branch "dummy ID"
  (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,o,f"))
@@ -145,11 +145,11 @@
       (rule "tryEmpty" (formula "12") (term "1"))
       (rule "emptyModality" (formula "12") (term "1"))
       (rule "andRight" (formula "12"))
-      (branch "Case 1"
+      (branch
          (rule "andRight" (formula "12"))
-         (branch "Case 1"
+         (branch
             (rule "andRight" (formula "12"))
-            (branch "Case 1"
+            (branch
                 (builtin "One Step Simplification" (formula "12"))
                (rule "inEqSimp_geqRight" (formula "12"))
                (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
@@ -167,17 +167,17 @@
                (rule "leq_literals" (formula "1"))
                (rule "closeFalse" (formula "1"))
             )
-            (branch "Case 2"
+            (branch
                 (builtin "One Step Simplification" (formula "12") (ifInst ""  (formula "9")))
                (rule "closeTrue" (formula "12"))
             )
          )
-         (branch "Case 2"
+         (branch
              (builtin "One Step Simplification" (formula "12"))
             (rule "closeTrue" (formula "12"))
          )
       )
-      (branch "Case 2"
+      (branch
           (builtin "One Step Simplification" (formula "12"))
          (rule "closeTrue" (formula "12"))
       )
@@ -220,8 +220,6 @@
                (rule "andRight" (formula "16"))
                (branch "Case 1"
                   (rule "Definition_axiom_for_count_in_BoyerMoore" (formula "12") (term "1") (inst "last=last") (ifseqformula "3") (userinteraction))
-                  (rule "unlimit_BoyerMoore_count[I\bigint\bigint" (formula "12") (term "1,1,2,1") (userinteraction))
-                  (rule "unlimit_BoyerMoore_count[I\bigint\bigint" (formula "12") (term "2,2,1") (userinteraction))
                    (builtin "One Step Simplification" (formula "16"))
                   (rule "polySimp_elimSub" (formula "12") (term "0,2,0,0,2,1"))
                   (rule "mul_literals" (formula "12") (term "1,0,2,0,0,2,1"))
@@ -265,6 +263,8 @@
                    (builtin "One Step Simplification" (formula "14"))
                   (rule "false_right" (formula "14"))
                   (rule "limit_BoyerMoore_count[I\bigint\bigint" (formula "1") (term "1,1"))
+                  (rule "applyEq" (formula "14") (term "1,1,0") (ifseqformula "1"))
+                  (rule "applyEq" (formula "14") (term "2,0") (ifseqformula "1"))
                   (rule "ifthenelse_split" (formula "14") (term "0"))
                   (branch "a[k] = v TRUE"
                      (rule "inEqSimp_commuteLeq" (formula "15"))
@@ -302,17 +302,17 @@
                      (rule "closeFalse" (formula "2"))
                   )
                )
-               (branch "Case 2"
+               (branch
                    (builtin "One Step Simplification" (formula "16") (ifInst ""  (formula "8")))
                   (rule "closeTrue" (formula "16"))
                )
             )
-            (branch "Case 2"
+            (branch
                 (builtin "One Step Simplification" (formula "16"))
                (rule "closeTrue" (formula "16"))
             )
          )
-         (branch "Case 2"
+         (branch
              (builtin "One Step Simplification" (formula "16"))
             (rule "closeTrue" (formula "16"))
          )
