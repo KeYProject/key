@@ -54,7 +54,10 @@ jobs:
       - run: git diff -U0 $(git merge-base HEAD origin/main)
 
       - name: Build with Gradle
-        run: ./gradlew --parallel --continue checkstyleMain sarifCopy
+        run: ./gradlew --parallel --continue checkstyleMain
+
+      - name: Copy Sarif
+        run: ./gradlew --parallel --continue sarifCopy
 
       - name: "Job summary"
         run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
