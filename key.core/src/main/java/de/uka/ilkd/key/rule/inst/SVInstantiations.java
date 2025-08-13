@@ -150,11 +150,6 @@ public class SVInstantiations
         return add(sv, new ListInstantiation<>(pes, type), services);
     }
 
-    public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
-            LogicServices services) {
-        return addInteresting(sv, new InstantiationEntry<>(pe), services);
-    }
-
     /**
      * adds the given pair to the instantiations for the context.If the context has been
      * instantiated already, the new pair is taken without a warning.
