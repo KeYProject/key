@@ -40,7 +40,8 @@ public final class SortDependingFunction extends JFunction {
 
     private SortDependingFunction(SortDependingFunctionTemplate template, Sort sortDependingOn) {
         super(instantiateName(template.kind, sortDependingOn),
-            ParametricSortInstance.instantiate(template.sortDependingOn, sortDependingOn, template.sort),
+            ParametricSortInstance.instantiate(template.sortDependingOn, sortDependingOn,
+                template.sort),
             instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
         this.sortDependingOn = sortDependingOn;
@@ -57,7 +58,7 @@ public final class SortDependingFunction extends JFunction {
 
 
     private static Sort instantiateSort(SortDependingFunctionTemplate template,
-                                        Sort sortDependingOn) {
+            Sort sortDependingOn) {
         return template.sort == template.sortDependingOn ? sortDependingOn : template.sort;
     }
 
@@ -66,7 +67,8 @@ public final class SortDependingFunction extends JFunction {
             Sort sortDependingOn) {
         Sort[] result = new Sort[template.argSorts.size()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = ParametricSortInstance.instantiate(template.sortDependingOn, sortDependingOn, template.argSorts.get(i));
+            result[i] = ParametricSortInstance.instantiate(template.sortDependingOn,
+                sortDependingOn, template.argSorts.get(i));
         }
         return new ImmutableArray<>(result);
     }

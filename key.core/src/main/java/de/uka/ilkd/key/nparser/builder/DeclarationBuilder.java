@@ -26,7 +26,6 @@ import org.key_project.util.collection.Immutables;
 import org.key_project.util.java.CollectionUtil;
 
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,41 +223,16 @@ public class DeclarationBuilder extends DefaultBuilder {
             }
             String name = declCtx.simple_ident_dots().getText();
             Name sortName = new Name(name);
+            if (sorts().lookup(sortName) != null) {
+                semanticError(declCtx,
+                    "Cannot declare parametric sort %s, as a sort of the same name has already been declared",
+                    sortName);
+            }
             var sortDecl = new ParametricSortDecl(sortName, isAbstractSort, ext, params,
                 documentation, BuilderHelpers.getPosition(declCtx));
-            namespaces().parametricSorts().add(sortDecl);
+            namespaces().parametricSorts().addSafely(sortDecl);
         }
         return createdSorts;
-    }
-
-    @Override
-    public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
-            KeYParser.Formal_sort_param_declsContext ctx) {
-        return mapOf(ctx.formal_sort_param_decl());
-    }
-
-    @Override
-    public @Nullable GenericParameter visitFormal_sort_param_decl(
-            KeYParser.Formal_sort_param_declContext ctx) {
-
-        GenericParameter.Variance variance;
-        if (ctx.PLUS() != null) {
-            variance = GenericParameter.Variance.COVARIANT;
-        } else if (ctx.MINUS() != null) {
-            variance = GenericParameter.Variance.CONTRAVARIANT;
-        } else {
-            variance = GenericParameter.Variance.INVARIANT;
-        }
-
-        var name = ctx.simple_ident().getText();
-        Sort paramSort = sorts().lookup(name);
-        if (paramSort == null) {
-            semanticError(ctx, "Parameter sort %s not found", name);
-        }
-        if (!(paramSort instanceof GenericSort)) {
-            semanticError(ctx, "Parameter sort %s is not a generic sort", name);
-        }
-        return new GenericParameter((GenericSort) paramSort, variance);
     }
 
     @Override

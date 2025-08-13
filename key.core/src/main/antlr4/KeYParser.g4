@@ -215,6 +215,7 @@ pred_decl
 :
   doc=DOC_COMMENT?
   pred_name = funcpred_name
+  formal_sort_param_decls?
   (whereToBind=where_to_bind)?
   argSorts=arg_sorts
   SEMI
@@ -231,7 +232,8 @@ func_decl
   (UNIQUE)?
   retSort = sortId
   func_name = funcpred_name
-	whereToBind=where_to_bind?
+  formal_sort_param_decls?
+  whereToBind=where_to_bind?
   argSorts = arg_sorts
   SEMI
 ;

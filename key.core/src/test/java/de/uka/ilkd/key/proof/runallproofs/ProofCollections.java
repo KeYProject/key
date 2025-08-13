@@ -996,6 +996,9 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_color.proof");
         g.loadable("standard_key/adt/dt_list_deconstruct.key");
 
+        g = c.group("PolymorphicSorts");
+        g.loadable("standard_key/polymorphic/pseq.key");
+
         // use for debugging purposes.
         // c.keep("VSTTE10");
         String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
