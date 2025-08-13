@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -73,7 +72,6 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
-        final LocSetLDT locSetLDT = getServices().getTypeConverter().getLocSetLDT();
         final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
@@ -146,7 +144,7 @@ public class FOLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
 
         if (quantifierInstantiatedEnabled()) {
-            setupFormulaNormalisation(d, numbers, locSetLDT);
+            setupFormulaNormalisation(d, numbers);
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
             bindRuleSet(d, "moveQuantToLeft", inftyConst());
@@ -249,12 +247,10 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private void setupFormulaNormalisation(RuleSetDispatchFeature d, IntegerLDT numbers,
-            LocSetLDT locSetLDT) {
-
+    private void setupFormulaNormalisation(RuleSetDispatchFeature d, IntegerLDT numbers) {
         bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.getInstance(),
             longConst(-500),
-            ScaleFeature.createScaled(FindDepthFeature.<Goal>getInstance(), 10.0)));
+            ScaleFeature.createScaled(FindDepthFeature.getInstance(), 10.0)));
 
         bindRuleSet(d, "moveQuantToLeft",
             add(quantifiersMightSplit() ? longConst(0)
@@ -266,14 +262,12 @@ public class FOLStrategy extends AbstractFeatureStrategy {
                 add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
                     NotInScopeOfModalityFeature.INSTANCE),
                 add(longConst(-150),
-                    ScaleFeature.createScaled(FindDepthFeature.<Goal>getInstance(), 20)),
+                    ScaleFeature.createScaled(FindDepthFeature.getInstance(), 20)),
                 inftyConst()));
 
         bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
 
-        bindRuleSet(d, "cnf_setComm",
-            add(SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
-                NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
+
 
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);

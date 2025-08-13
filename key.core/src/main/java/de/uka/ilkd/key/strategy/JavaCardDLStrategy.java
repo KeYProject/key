@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -158,6 +159,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
         bindRuleSet(d, "test_gen_quan", inftyConst());
         bindRuleSet(d, "test_gen_quan_num", inftyConst());
+
+        // This is moved here instead of FOLStrategy, because it deals only w/ loc sets
+        if (!StrategyProperties.QUANTIFIERS_NONE
+                .equals(
+                    strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
+            final LocSetLDT locSetLDT = getServices().getTypeConverter().getLocSetLDT();
+            bindRuleSet(d, "cnf_setComm",
+                add(SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"),
+                    locSetLDT),
+                    NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
+        } else {
+            bindRuleSet(d, "cnf_setComm", inftyConst());
+        }
 
         bindRuleSet(d, "simplify_literals",
             // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
