@@ -159,27 +159,27 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     @Override
     public @Nullable Function getFunctionFor(String op, Services services) {
         return switch (op) {
-        case "gt" -> getGreaterThan();
-        case "geq" -> getGreaterOrEquals();
-        case "lt" -> getLessThan();
-        case "leq" -> getLessOrEquals();
-        case "div" -> getDiv();
-        case "mul" -> getMul();
-        case "add" -> getAdd();
-        case "sub" -> getSub();
-        case "neg" -> getNeg();
+            case "gt" -> getGreaterThan();
+            case "geq" -> getGreaterOrEquals();
+            case "lt" -> getLessThan();
+            case "leq" -> getLessOrEquals();
+            case "div" -> getDiv();
+            case "mul" -> getMul();
+            case "add" -> getAdd();
+            case "sub" -> getSub();
+            case "neg" -> getNeg();
 
-        // Floating point extensions with "\fp_"
-        case "nan" -> getIsNaN();
-        case "zero" -> getIsZero();
-        case "infinite" -> getIsInfinite();
-        case "nice" -> getIsNice();
-        case "abs" -> getAbs();
-        case "negative" -> getIsNegative();
-        case "positive" -> getIsPositive();
-        case "subnormal" -> getIsSubnormal();
-        case "normal" -> getIsNormal();
-        default -> null;
+            // Floating point extensions with "\fp_"
+            case "nan" -> getIsNaN();
+            case "zero" -> getIsZero();
+            case "infinite" -> getIsInfinite();
+            case "nice" -> getIsNice();
+            case "abs" -> getAbs();
+            case "negative" -> getIsNegative();
+            case "positive" -> getIsPositive();
+            case "subnormal" -> getIsSubnormal();
+            case "normal" -> getIsNormal();
+            default -> null;
         };
     }
 

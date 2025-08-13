@@ -205,48 +205,48 @@ class RIFLHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
         switch (localName) {
-        case "sourcedompair", "source" -> startSources();
-        case "sinkdompair", "sink" -> startSinks();
-        case "category" -> // TODO: different semantics in "domains" and "sinkdompair"
-            setCategory(attributes);
-        case "assign" -> assignHandle(attributes);
+            case "sourcedompair", "source" -> startSources();
+            case "sinkdompair", "sink" -> startSinks();
+            case "category" -> // TODO: different semantics in "domains" and "sinkdompair"
+                setCategory(attributes);
+            case "assign" -> assignHandle(attributes);
 
-        // case "domainassignment":
-        case "domains" -> startDomains();
-        case "domain" -> putDomain(attributes);
-        case "modifiable" -> setModifiable(attributes);
-        case "field" -> putField(attributes);
-        case "parameter" -> putParam(attributes);
-        case "returnvalue" -> putReturn(attributes);
-        case "flowrelation" -> startFlow();
-        case "flow" -> putFlow(attributes);
+            // case "domainassignment":
+            case "domains" -> startDomains();
+            case "domain" -> putDomain(attributes);
+            case "modifiable" -> setModifiable(attributes);
+            case "field" -> putField(attributes);
+            case "parameter" -> putParam(attributes);
+            case "returnvalue" -> putReturn(attributes);
+            case "flowrelation" -> startFlow();
+            case "flow" -> putFlow(attributes);
 
-        // a lot of elements without their own semantics
-        // case "riflspec":
-        // case "attackerio":
-        // case "top":
-        // case "bottom":
-        // case "source":
-        // case "sink":
-        // TODO
-        // case "domainhierarchy":
-        // TODO
-        // case "flowpolicy":
-        default -> {
-        }
+            // a lot of elements without their own semantics
+            // case "riflspec":
+            // case "attackerio":
+            // case "top":
+            // case "bottom":
+            // case "source":
+            // case "sink":
+            // TODO
+            // case "domainhierarchy":
+            // TODO
+            // case "flowpolicy":
+            default -> {
+            }
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) {
         switch (localName) {
-        case "modifiable" -> unsetModifiable();
-        case "category" -> unsetCategory();
-        case "domains" -> checkDomains();
-        case "domainassignment" -> checkDomainAssignmentsWithFlows();
-        case "flowrelation" -> checkFlows();
-        default -> {
-        }
+            case "modifiable" -> unsetModifiable();
+            case "category" -> unsetCategory();
+            case "domains" -> checkDomains();
+            case "domainassignment" -> checkDomainAssignmentsWithFlows();
+            case "flowrelation" -> checkFlows();
+            default -> {
+            }
         }
     }
 

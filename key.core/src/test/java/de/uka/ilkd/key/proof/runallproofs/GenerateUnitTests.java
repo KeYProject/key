@@ -165,18 +165,18 @@ public class GenerateUnitTests {
             // "// This tests is based on").append(keyFile.toAbsolutePath()).append("\n");
 
             switch (file.getTestProperty()) {
-            case PROVABLE -> methods.append("assertProvability(\"")
-                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
-                    .append("\");");
-            case NOTPROVABLE -> methods.append("assertUnProvability(\"")
-                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
-                    .append("\");");
-            case LOADABLE -> methods.append("assertLoadability(\"")
-                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
-                    .append("\");");
-            case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
-                    .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
-                    .append("\");");
+                case PROVABLE -> methods.append("assertProvability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                        .append("\");");
+                case NOTPROVABLE -> methods.append("assertUnProvability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                        .append("\");");
+                case LOADABLE -> methods.append("assertLoadability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                        .append("\");");
+                case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
+                        .append(keyFile.toAbsolutePath().toString().replaceAll("\\\\", "/"))
+                        .append("\");");
             }
             methods.append("}");
         }

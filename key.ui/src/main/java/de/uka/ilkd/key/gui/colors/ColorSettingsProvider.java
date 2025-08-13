@@ -124,11 +124,11 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             return switch (columnIndex) {
-            case 0 -> colorData.get(rowIndex).property.getKey();
-            case 1 -> colorData.get(rowIndex).property.getDescription();
-            case 2 -> colorData.get(rowIndex).lightColor;
-            case 3 -> colorData.get(rowIndex).darkColor;
-            default -> "";
+                case 0 -> colorData.get(rowIndex).property.getKey();
+                case 1 -> colorData.get(rowIndex).property.getDescription();
+                case 2 -> colorData.get(rowIndex).lightColor;
+                case 3 -> colorData.get(rowIndex).darkColor;
+                default -> "";
             };
         }
 

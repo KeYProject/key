@@ -1856,16 +1856,16 @@ public class ExecutionNodeReader {
         @Override
         public String getElementType() {
             switch (getTerminationKind()) {
-            case EXCEPTIONAL:
-                return "Exceptional Termination";
-            case LOOP_BODY:
-                return "Loop Body Termination";
-            case BLOCK_CONTRACT_EXCEPTIONAL:
-                return "Block Contract Exceptional Termination";
-            case BLOCK_CONTRACT_NORMAL:
-                return "Block Contract Termination";
-            default:
-                return "Termination";
+                case EXCEPTIONAL:
+                    return "Exceptional Termination";
+                case LOOP_BODY:
+                    return "Loop Body Termination";
+                case BLOCK_CONTRACT_EXCEPTIONAL:
+                    return "Block Contract Exceptional Termination";
+                case BLOCK_CONTRACT_NORMAL:
+                    return "Block Contract Termination";
+                default:
+                    return "Termination";
             }
         }
 

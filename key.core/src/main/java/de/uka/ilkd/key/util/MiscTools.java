@@ -716,27 +716,27 @@ public final class MiscTools {
 
         try {
             return switch (loc.getType()) {
-            case "URL" -> // URLDataLocation
-                Optional.of(((URLDataLocation) loc).url().toURI());
-            case "ARCHIVE" -> { // ArchiveDataLocation
-                // format: "ARCHIVE:<filename>?<itemname>"
-                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+                case "URL" -> // URLDataLocation
+                    Optional.of(((URLDataLocation) loc).url().toURI());
+                case "ARCHIVE" -> { // ArchiveDataLocation
+                    // format: "ARCHIVE:<filename>?<itemname>"
+                    ArchiveDataLocation adl = (ArchiveDataLocation) loc;
 
-                // extract item name and zip file
-                int qmindex = adl.toString().lastIndexOf('?');
-                String itemName = adl.toString().substring(qmindex + 1);
-                ZipFile zip = adl.getFile();
+                    // extract item name and zip file
+                    int qmindex = adl.toString().lastIndexOf('?');
+                    String itemName = adl.toString().substring(qmindex + 1);
+                    ZipFile zip = adl.getFile();
 
-                // use special method to ensure that path separators are correct
-                yield Optional.of(getZipEntryURI(zip, itemName));
-            }
-            case "FILE" -> // DataFileLocation
-                // format: "FILE:<path>"
-                Optional.of(((DataFileLocation) loc).getFile().toURI());
-            default -> // SpecDataLocation
-                // format "<type>://<location>"
-                // wrap into URN to ensure URI encoding is correct (no spaces!)
-                Optional.empty();
+                    // use special method to ensure that path separators are correct
+                    yield Optional.of(getZipEntryURI(zip, itemName));
+                }
+                case "FILE" -> // DataFileLocation
+                    // format: "FILE:<path>"
+                    Optional.of(((DataFileLocation) loc).getFile().toURI());
+                default -> // SpecDataLocation
+                    // format "<type>://<location>"
+                    // wrap into URN to ensure URI encoding is correct (no spaces!)
+                    Optional.empty();
             };
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException(
@@ -854,49 +854,49 @@ public final class MiscTools {
             schemeSpecPart = m.group(2);
         }
         switch (scheme) {
-        case "URL" -> {
-            // schemeSpecPart actually contains a URL again
-            return new URL(schemeSpecPart);
-        }
-        case "ARCHIVE" -> {
-            // format: "ARCHIVE:<filename>?<itemname>"
-            // extract item name and zip file
-            int qmindex = schemeSpecPart.lastIndexOf('?');
-            String zipName = schemeSpecPart.substring(0, qmindex);
-            String itemName = schemeSpecPart.substring(qmindex + 1);
-            try {
-                ZipFile zip = new ZipFile(zipName);
-                // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName).toURL();
-            } catch (IOException e) {
-                MalformedURLException me =
-                    new MalformedURLException(input + " does not contain a valid URL");
-                me.initCause(e);
-                throw me;
+            case "URL" -> {
+                // schemeSpecPart actually contains a URL again
+                return new URL(schemeSpecPart);
             }
-        }
-        case "FILE" -> {
-            // format: "FILE:<path>"
-            Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
-            return path.toUri().toURL();
-        }
-        case "" -> {
-            // only file/path without protocol
-            Path p = Paths.get(input).toAbsolutePath().normalize();
-            return p.toUri().toURL();
-        }
-        default -> {
-            // may still be Windows path starting with <drive_letter>:
-            if (scheme.length() == 1) {
-                // TODO: Theoretically, a protocol with only a single letter is allowed.
-                // This (very rare) case currently is not handled correctly.
-                Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
-                return windowsPath.toUri().toURL();
+            case "ARCHIVE" -> {
+                // format: "ARCHIVE:<filename>?<itemname>"
+                // extract item name and zip file
+                int qmindex = schemeSpecPart.lastIndexOf('?');
+                String zipName = schemeSpecPart.substring(0, qmindex);
+                String itemName = schemeSpecPart.substring(qmindex + 1);
+                try {
+                    ZipFile zip = new ZipFile(zipName);
+                    // use special method to ensure that path separators are correct
+                    return getZipEntryURI(zip, itemName).toURL();
+                } catch (IOException e) {
+                    MalformedURLException me =
+                        new MalformedURLException(input + " does not contain a valid URL");
+                    me.initCause(e);
+                    throw me;
+                }
             }
-            // otherwise call URL constructor
-            // if this also fails, there is an unknown protocol -> MalformedURLException
-            return new URL(input);
-        }
+            case "FILE" -> {
+                // format: "FILE:<path>"
+                Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
+                return path.toUri().toURL();
+            }
+            case "" -> {
+                // only file/path without protocol
+                Path p = Paths.get(input).toAbsolutePath().normalize();
+                return p.toUri().toURL();
+            }
+            default -> {
+                // may still be Windows path starting with <drive_letter>:
+                if (scheme.length() == 1) {
+                    // TODO: Theoretically, a protocol with only a single letter is allowed.
+                    // This (very rare) case currently is not handled correctly.
+                    Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
+                    return windowsPath.toUri().toURL();
+                }
+                // otherwise call URL constructor
+                // if this also fails, there is an unknown protocol -> MalformedURLException
+                return new URL(input);
+            }
         }
     }
 }

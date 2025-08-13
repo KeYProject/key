@@ -56,9 +56,9 @@ public class SExprs {
      */
     public static SExpr and(List<SExpr> clauses) {
         return switch (clauses.size()) {
-        case 0 -> TRUE;
-        case 1 -> clauses.get(0);
-        default -> new SExpr("and", Type.BOOL, clauses);
+            case 0 -> TRUE;
+            case 1 -> clauses.get(0);
+            default -> new SExpr("and", Type.BOOL, clauses);
         };
     }
 

@@ -225,9 +225,9 @@ public class MasterHandlerTest {
 
         try {
             String lookFor = switch (expectation) {
-            case VALID -> "unsat";
-            case FAIL -> "(sat|timeout)";
-            case IRRELEVANT -> null;
+                case VALID -> "unsat";
+                case FAIL -> "(sat|timeout)";
+                case IRRELEVANT -> null;
             };
 
             if (lookFor != null) {

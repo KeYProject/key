@@ -68,30 +68,31 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             return new NullLiteral();
         } else if (type instanceof PrimitiveType) {
             return switch (type.getName()) {
-            case "boolean" -> new BooleanLiteral(false);
-            case "byte", "short", "int", "\\bigint" -> new IntLiteral(0);
-            case "long" -> new LongLiteral(0);
-            case "\\real" -> new RealLiteral();
-            case "char" -> new CharLiteral((char) 0);
-            case "float" -> new FloatLiteral(0.0F);
-            case "double" -> new DoubleLiteral(0.0D);
-            case "\\locset" -> EmptySetLiteral.INSTANCE;
-            case "\\seq" -> EmptySeqLiteral.INSTANCE;
-            case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
-            case "\\TYPE" -> new DLEmbeddedExpression("any::ssort", Collections.emptyList());
-            case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
-            case "\\map" -> EmptyMapLiteral.INSTANCE;
-            default -> {
-                if (type.getName().startsWith("\\dl_")) {
-                    // The default value of a type is resolved later, then we know the Sort of the
-                    // type
-                    yield new DLEmbeddedExpression(
-                        "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
-                        Collections.emptyList());
+                case "boolean" -> new BooleanLiteral(false);
+                case "byte", "short", "int", "\\bigint" -> new IntLiteral(0);
+                case "long" -> new LongLiteral(0);
+                case "\\real" -> new RealLiteral();
+                case "char" -> new CharLiteral((char) 0);
+                case "float" -> new FloatLiteral(0.0F);
+                case "double" -> new DoubleLiteral(0.0D);
+                case "\\locset" -> EmptySetLiteral.INSTANCE;
+                case "\\seq" -> EmptySeqLiteral.INSTANCE;
+                case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
+                case "\\TYPE" -> new DLEmbeddedExpression("any::ssort", Collections.emptyList());
+                case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
+                case "\\map" -> EmptyMapLiteral.INSTANCE;
+                default -> {
+                    if (type.getName().startsWith("\\dl_")) {
+                        // The default value of a type is resolved later, then we know the Sort of
+                        // the
+                        // type
+                        yield new DLEmbeddedExpression(
+                            "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
+                            Collections.emptyList());
+                    }
+                    Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
+                    yield null;
                 }
-                Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
-                yield null;
-            }
             };
         }
         return null;

@@ -191,10 +191,10 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     private String getSolverSupportText() {
         return switch (checkForSupport()) {
-        case NOT_SUPPORTED ->
-            "This version of Isabelle is not supported and is thus unlikely to work.";
-        case SUPPORTED -> "This version of Isabelle is supported.";
-        case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
+            case NOT_SUPPORTED ->
+                "This version of Isabelle is not supported and is thus unlikely to work.";
+            case SUPPORTED -> "This version of Isabelle is supported.";
+            case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
         };
     }
 

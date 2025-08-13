@@ -214,34 +214,34 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START -> {
-                    currentPos = POS_LEAVES;
-                    if (selectedNode != null) {
-                        nodeIt = selectedNode.leavesIterator();
-                    } else {
-                        nodeIt = null;
-                    }
-                }
-                case POS_LEAVES -> {
-                    if (nodeIt == null || !nodeIt.hasNext()) {
-                        currentPos = POS_GOAL_LIST;
-                        if (!proof.openGoals().isEmpty()) {
-                            goalIt = proof.openGoals().iterator();
+                    case POS_START -> {
+                        currentPos = POS_LEAVES;
+                        if (selectedNode != null) {
+                            nodeIt = selectedNode.leavesIterator();
                         } else {
-                            goalIt = null;
+                            nodeIt = null;
                         }
-                    } else {
-                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
-                }
-                case POS_GOAL_LIST -> {
-                    if (goalIt == null || !goalIt.hasNext()) {
-                        // no more items
-                        return;
-                    } else {
-                        nextOne = goalIt.next();
+                    case POS_LEAVES -> {
+                        if (nodeIt == null || !nodeIt.hasNext()) {
+                            currentPos = POS_GOAL_LIST;
+                            if (!proof.openGoals().isEmpty()) {
+                                goalIt = proof.openGoals().iterator();
+                            } else {
+                                goalIt = null;
+                            }
+                        } else {
+                            nextOne = proof.getOpenGoal(nodeIt.next());
+                        }
                     }
-                }
+                    case POS_GOAL_LIST -> {
+                        if (goalIt == null || !goalIt.hasNext()) {
+                            // no more items
+                            return;
+                        } else {
+                            nextOne = goalIt.next();
+                        }
+                    }
                 }
             }
         }
