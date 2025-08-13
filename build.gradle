@@ -521,7 +521,7 @@ tasks.register('sarifCopy', Copy) {
 
     def counter = 0
     rename { String filename ->
-        return (counter++) + "_.quality.sarif"
+        return (counter++) + "_.sarif"
     }
     into layout.buildDirectory.dir("sarif-results")
 }
