@@ -35,7 +35,7 @@ public class FOLStrategyFactory implements StrategyFactory {
 
     @Override
     public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties) {
-        return new FOLStrategy(proof, strategyProperties);
+        return new JFOLStrategy(proof, strategyProperties);
     }
 
     private static OneOfStrategyPropertyDefinition getQuantifierTreatment() {

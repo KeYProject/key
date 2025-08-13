@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -48,9 +47,8 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     private final Feature approvalF;
     private final Feature instantiationF;
 
-    private final ArithTermFeatures tf;
-    private final FormulaTermFeatures ff;
-    private final ValueTermFeature vf;
+    protected final ArithTermFeatures tf;
+    protected final FormulaTermFeatures ff;
 
     public FOLStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
@@ -59,8 +57,6 @@ public class FOLStrategy extends AbstractFeatureStrategy {
 
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
-        var heapLDT = getServices().getTypeConverter().getHeapLDT();
-        vf = new ValueTermFeature(op(heapLDT.getNull()));
 
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
@@ -72,7 +68,6 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "closure", -15000);
@@ -144,7 +139,7 @@ public class FOLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
 
         if (quantifierInstantiatedEnabled()) {
-            setupFormulaNormalisation(d, numbers);
+            setupFormulaNormalisation(d);
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
             bindRuleSet(d, "moveQuantToLeft", inftyConst());
@@ -247,7 +242,7 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private void setupFormulaNormalisation(RuleSetDispatchFeature d, IntegerLDT numbers) {
+    protected void setupFormulaNormalisation(RuleSetDispatchFeature d) {
         bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.getInstance(),
             longConst(-500),
             ScaleFeature.createScaled(FindDepthFeature.getInstance(), 10.0)));
@@ -299,28 +294,9 @@ public class FOLStrategy extends AbstractFeatureStrategy {
 
         // category "conjunctive normal form"
 
-        bindRuleSet(d, "cnf_orComm",
-            SumFeature.createSum(applyTF("commRight", ff.clause),
-                applyTFNonStrict("commResidue", ff.clauseSet),
-                or(applyTF("commLeft", ff.andF),
-                    add(applyTF("commLeft", ff.literal),
-                        literalsSmallerThan("commRight", "commLeft", numbers))),
-                longConst(-100)));
-
         bindRuleSet(d, "cnf_orAssoc",
             SumFeature.createSum(applyTF("assoc0", ff.clause),
                 applyTF("assoc1", ff.clause), applyTF("assoc2", ff.literal), longConst(-80)));
-
-        bindRuleSet(d, "cnf_andComm",
-            SumFeature.createSum(applyTF("commLeft", ff.clause),
-                applyTF("commRight", ff.clauseSet), applyTFNonStrict("commResidue", ff.clauseSet),
-                // at least one of the subformulas has to be a literal;
-                // otherwise, sorting is not likely to have any big effect
-                ifZero(
-                    add(applyTF("commLeft", not(ff.literal)),
-                        applyTF("commRight", rec(ff.andF, not(ff.literal)))),
-                    longConst(100), longConst(-60)),
-                clausesSmallerThan("commRight", "commLeft", numbers)));
 
         bindRuleSet(d, "cnf_andAssoc",
             SumFeature.createSum(applyTF("assoc0", ff.clauseSet),
@@ -359,10 +335,6 @@ public class FOLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "pullOutQuantifierEx", add(pullOutQuantifierAllowed,
             ifZero(FocusInAntecFeature.getInstance(), longConst(-40), longConst(-20))));
-    }
-
-    private Feature clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
-        return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -456,7 +428,7 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private void setupSplitting(RuleSetDispatchFeature d) {
+    protected void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer();
         final Feature noCutsAllowed =
             sum(subFor, AllowedCutPositionsGenerator.INSTANCE, not(applyTF(subFor, ff.cutAllowed)));
@@ -495,13 +467,6 @@ public class FOLStrategy extends AbstractFeatureStrategy {
                                     // do not cut over formulas containing
                                     // auxiliary variables
                                     rec(any(), not(selectSkolemConstantTermFeature())))),
-                                // prefer cuts over "something = null"
-                                ifZero(applyTF(FocusProjection.INSTANCE,
-                                    opSub(tf.eq, any(), vf.nullTerm)),
-                                    longConst(-5), longConst(0)),
-                                // punish cuts over formulas containing anon heap functions
-                                ifZero(applyTF(cutFormula, rec(any(), not(anonHeapTermFeature()))),
-                                    longConst(0), longConst(1000)),
                                 countOccurrencesInSeq, // standard costs
                                 longConst(100)),
                             SumFeature // check for cuts below quantifiers
