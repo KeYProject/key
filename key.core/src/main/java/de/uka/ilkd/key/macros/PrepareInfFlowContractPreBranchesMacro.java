@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -148,6 +149,10 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
         public boolean isStopAtFirstNonCloseableGoal() {
             return false;
         }
-    }
 
+        @Override
+        protected RuleSetDispatchFeature getCostDispatcher() {
+            return new RuleSetDispatchFeature();
+        }
+    }
 }
