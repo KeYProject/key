@@ -83,14 +83,14 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs,
             List<AbstractFeatureStrategy> value) {
         switch (rs.name().toString()) {
-        case "order_terms" -> {
-            var intStrat = value.getFirst();
-            var javaDLStrat = value.get(1);
-            bindRuleSet(d, "order_terms",
-                ifZero(applyTF("commEqLeft", tf.intF),
-                    intStrat.getCostDispatcher().remove(rs),
-                    javaDLStrat.getCostDispatcher().remove(rs)));
-        }
+            case "order_terms" -> {
+                var intStrat = value.getFirst();
+                var javaDLStrat = value.get(1);
+                bindRuleSet(d, "order_terms",
+                    ifZero(applyTF("commEqLeft", tf.intF),
+                        intStrat.getCostDispatcher().remove(rs),
+                        javaDLStrat.getCostDispatcher().remove(rs)));
+            }
         }
     }
 

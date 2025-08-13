@@ -61,13 +61,14 @@ public class SymExStrategy extends AbstractFeatureStrategy {
         final String methProp =
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
         switch (methProp) {
-        case StrategyProperties.METHOD_CONTRACT -> methodSpecF = methodSpecFeature(longConst(-20));
-        case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
-            methodSpecFeature(inftyConst());
-        default -> {
-            methodSpecF = null;
-            assert false;
-        }
+            case StrategyProperties.METHOD_CONTRACT ->
+                methodSpecF = methodSpecFeature(longConst(-20));
+            case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
+                methodSpecFeature(inftyConst());
+            default -> {
+                methodSpecF = null;
+                assert false;
+            }
         }
 
         Feature loopInvF;
@@ -159,29 +160,32 @@ public class SymExStrategy extends AbstractFeatureStrategy {
         final String methProp =
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
         switch (methProp) {
-        case StrategyProperties.METHOD_CONTRACT ->
-            /*
-             * If method treatment by contracts is chosen, this does not mean that method expansion
-             * is disabled. The original cost was 200 and is now increased to 2000 in order to
-             * repress method expansion stronger when method treatment by contracts is chosen.
-             */
-            bindRuleSet(d, "method_expand", longConst(2000));
-        case StrategyProperties.METHOD_EXPAND -> bindRuleSet(d, "method_expand", longConst(100));
-        case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
-        default -> throw new RuntimeException("Unexpected strategy property " + methProp);
+            case StrategyProperties.METHOD_CONTRACT ->
+                /*
+                 * If method treatment by contracts is chosen, this does not mean that method
+                 * expansion
+                 * is disabled. The original cost was 200 and is now increased to 2000 in order to
+                 * repress method expansion stronger when method treatment by contracts is chosen.
+                 */
+                bindRuleSet(d, "method_expand", longConst(2000));
+            case StrategyProperties.METHOD_EXPAND ->
+                bindRuleSet(d, "method_expand", longConst(100));
+            case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
+            default -> throw new RuntimeException("Unexpected strategy property " + methProp);
         }
 
         final String mpsProp = strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
         switch (mpsProp) {
-        case StrategyProperties.MPS_MERGE ->
-            /*
-             * For this case, we use a special feature, since deleting merge points should only be
-             * done after a merge rule application.
-             */
-            bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
-        case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
-        case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
-        default -> throw new RuntimeException("Unexpected strategy property " + mpsProp);
+            case StrategyProperties.MPS_MERGE ->
+                /*
+                 * For this case, we use a special feature, since deleting merge points should only
+                 * be
+                 * done after a merge rule application.
+                 */
+                bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+            case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
+            case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
+            default -> throw new RuntimeException("Unexpected strategy property " + mpsProp);
         }
 
         bindRuleSet(d, "modal_tautology", longConst(-10000));
