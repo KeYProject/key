@@ -2351,7 +2351,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        if (ctx.method_body() == null) {
+        if (ctx.method_body == null) {
             return new SLExpression(tb.tt());
         }
 
@@ -2368,14 +2368,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         ParserRuleContext equal = JmlFacade.parseExpr(ctx.IDENT() + paramsString);
         Object a = accept(equal);
 
-        SLExpression body = accept(ctx.method_body().expression());
+        SLExpression body = accept(ctx.method_body);
         SLParameters params = visitParameters(ctx.param_list());
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
 
         var forbiddenHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
         boolean applyContainsHeap = TermUtil.contains(apply.getTerm(), forbiddenHeapVar);
         boolean bodyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
-
 
         if (!applyContainsHeap && bodyContainsHeap) {
             // NOT (no heap in applies --> no heap in body)
@@ -2385,6 +2384,60 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return termFactory.eq(apply, body);
     }
 
+    @Override
+    public SLExpression visitMbody_return(JmlParser.Mbody_returnContext ctx) {
+        return accept(ctx.expression());
+    }
+
+    @Override
+    public SLExpression visitMbody_block(JmlParser.Mbody_blockContext ctx) {
+        resolverManager.pushLocalVariablesNamespace();
+        List<Pair<LogicVariable, JTerm>> substList = new ArrayList<>();
+        for (JmlParser.Mbody_varContext varCtx : ctx.mbody_var()) {
+            String name = varCtx.IDENT().getText();
+            SLExpression expr = accept(varCtx.expression());
+            JTerm term = expr.getTerm();
+            LogicVariable logVar;
+            Optional<LogicVariable> existingVar = substList.stream()
+                    .map(p -> p.first)
+                    .filter(p -> p.name().toString().equals(name))
+                    .findAny();
+            if (varCtx.VAR() != null) {
+                existingVar.ifPresent(p -> {
+                    raiseError("Variable " + name + " already declared in this block.", ctx);
+                });
+                logVar = new LogicVariable(new Name(name), term.sort());
+                resolverManager.putIntoTopLocalVariablesNamespace(ImmutableList.of(logVar),
+                    javaInfo.getKeYJavaType(term.sort()));
+            } else {
+                logVar = existingVar.orElseThrow(() -> {
+                    raiseError("Assigned variable " + name + " unknown in this block.", varCtx);
+                    return new Error("Unreachable");
+                });
+                if (!term.sort().extendsTrans(logVar.sort())) {
+                    raiseError("Assignment to variable " + name + " with incompatible type.",
+                        varCtx);
+                }
+            }
+            substList.add(new Pair<>(logVar, term));
+        }
+
+        SLExpression stmExpr = accept(ctx.mbody_statement());
+        JTerm term = stmExpr.getTerm();
+        for (Pair<LogicVariable, JTerm> lv : substList.reversed()) {
+            term = tb.subst(lv.first, lv.second, term);
+        }
+        resolverManager.popLocalVariablesNamespace();
+        return new SLExpression(term);
+    }
+
+    @Override
+    public SLExpression visitMbody_if(JmlParser.Mbody_ifContext ctx) {
+        SLExpression cond = accept(ctx.getChild(ParserRuleContext.class, 0));
+        SLExpression then = accept(ctx.getChild(ParserRuleContext.class, 1));
+        SLExpression elze = accept(ctx.getChild(ParserRuleContext.class, 2));
+        return new SLExpression(tb.ife(cond.getTerm(), then.getTerm(), elze.getTerm()));
+    }
 
     @Override
     public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
