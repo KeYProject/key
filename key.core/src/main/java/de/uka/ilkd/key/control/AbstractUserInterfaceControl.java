@@ -257,7 +257,8 @@ public abstract class AbstractUserInterfaceControl
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+            ProofAggregate proofList, ReplayResult result, Configuration settings)
+            throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof
