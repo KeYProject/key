@@ -59,6 +59,9 @@ jobs:
       - name: Copy Sarif
         run: ./gradlew --parallel --continue sarifCopy
 
+      - run: "ls build/sarif-results/*"
+
+
       - name: "Job summary"
         run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
 
