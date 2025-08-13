@@ -27,6 +27,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.FocusInAntecFeature;
+import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
@@ -150,6 +151,38 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "order_terms",
             add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
                 monSmallerThan("commEqLeft", "commEqRight", numbers), longConst(-5000)));
+
+        final TermBuffer equation = new TermBuffer();
+        final TermBuffer left = new TermBuffer();
+        final TermBuffer right = new TermBuffer();
+        bindRuleSet(d, "apply_equations",
+            SumFeature.createSum(
+                add(applyTF(FocusProjection.create(0), tf.monomial),
+                    ScaleFeature.createScaled(FindRightishFeature.create(numbers), 5.0)),
+                ifZero(MatchedAssumesFeature.INSTANCE,
+                    add(CheckApplyEqFeature.INSTANCE, let(equation, AssumptionProjection.create(0),
+                        add(not(applyTF(equation, ff.update)),
+                            // there might be updates in
+                            // front of the assumption
+                            // formula; in this case we wait
+                            // until the updates have
+                            // been applied
+                            let(left, sub(equation, 0),
+                                let(right, sub(equation, 1),
+                                    add(applyTF(left, tf.nonNegOrNonCoeffMonomial),
+                                        applyTF(right, tf.polynomial),
+                                        MonomialsSmallerThanFeature.create(right, left,
+                                            numbers)))))))),
+                longConst(-4000)));
+
+        final TermBuffer l = new TermBuffer();
+        final TermBuffer r = new TermBuffer();
+        bindRuleSet(d, "apply_equations_andOr",
+            add(let(l, instOf("applyEqLeft"),
+                let(r, instOf("applyEqRight"),
+                    add(applyTF(l, tf.nonNegOrNonCoeffMonomial), applyTF(r, tf.polynomial),
+                        MonomialsSmallerThanFeature.create(r, l, numbers)))),
+                longConst(-150)));
 
         // For taclets that need instantiation, but where the instantiation is
         // deterministic and does not have to be repeated at a later point, we

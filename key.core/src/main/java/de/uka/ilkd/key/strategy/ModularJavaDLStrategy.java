@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -90,6 +91,26 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
                     ifZero(applyTF("commEqLeft", tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
                         javaDLStrat.getCostDispatcher().remove(rs)));
+            }
+            case "apply_equations" -> {
+                var intStrat = value.getFirst();
+                var javaDLStrat = value.get(1);
+                bindRuleSet(d, "apply_equations",
+                    ifZero(applyTF(FocusProjection.create(0), tf.intF),
+                        intStrat.getCostDispatcher().remove(rs),
+                        javaDLStrat.getCostDispatcher().remove(rs)));
+            }
+            case "apply_equations_andOr" -> {
+                var intStrat = value.getFirst();
+                var javaDLStrat = value.get(1);
+                if (quantifierInstantiatedEnabled()) {
+                    bindRuleSet(d, "apply_equations_andOr",
+                        ifZero(applyTF(FocusProjection.create(0), tf.intF),
+                            intStrat.getCostDispatcher().remove(rs),
+                            javaDLStrat.getCostDispatcher().remove(rs)));
+                } else {
+                    bindRuleSet(d, "apply_equations_andOr", inftyConst());
+                }
             }
         }
     }
@@ -185,5 +206,10 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             return reduceTillMax(app, NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
                 RuleAppCost::add, s -> mapper.compute(s, app, pos, (Goal) goal, mState));
         }
+    }
+
+    private boolean quantifierInstantiatedEnabled() {
+        return !StrategyProperties.QUANTIFIERS_NONE
+                .equals(strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
     }
 }
