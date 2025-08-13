@@ -29,7 +29,7 @@ sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-s
 
 // Generate code from JavaCC grammars.
 compileJavacc {
-    outputDirectory = javaCCOutputDirMain.asFile
+    outputDirectory = javaCCOutputDirMain
     inputDirectory = file("src/main/javacc")
     doLast {
         // Some manual overwriting of Token files needed

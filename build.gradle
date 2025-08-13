@@ -1,5 +1,3 @@
-import groovy.transform.Memoized
-
 plugins {
     //Support for IntelliJ IDEA
     //https://docs.gradle.org/current/userguide/idea_plugin.html
@@ -65,7 +63,7 @@ subprojects {
     version = rootProject.version
 
     //conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
-    def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
+    def jacocoEnabled = (System.properties.getProperty("jacocoEnabled") ?: "false") == "true"
 
     java {
         sourceCompatibility = 21
@@ -112,6 +110,13 @@ subprojects {
         testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.1'
+
+        //checkstyle extensions
+        checkstyle("org.key-project.devel:checkstyle-key-extensions:1.17-SNAPSHOT")
+        checkstyle("com.puppycrawl.tools:checkstyle:10.26.1")
+
+        //def checkstyle = configurations.getByName("checkstyle")
+        //println(checkstyle.resolve())
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -228,60 +233,27 @@ subprojects {
         classpath = sourceSets.test.runtimeClasspath
     }
 
-    // findbugs { findbugsTest.enabled = false; ignoreFailures = true }
-    pmd {
-        pmdTest.enabled = false
-        ignoreFailures = true
-        toolVersion = "7.10.0"
-        consoleOutput = false
-        rulesMinimumPriority = 5
-        ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
-    }
-
-    tasks.register('pmdMainChanged', Pmd) {
-        // Specify all files that should be checked
-        def changedFiles = getChangedFiles()
-        source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
-        classpath = checkstyleMain.classpath
-        reports {
-            html {
-                required = true
-                outputLocation = file("build/reports/pmd/main_diff.html")
-            }
-            xml {
-                required = true
-                outputLocation = file("build/reports/pmd/main_diff.xml")
-            }
-        }
-    }
-
-
     checkstyle {
         toolVersion = "10.26.0"
         ignoreFailures = true
         configFile = file("$rootDir/gradle/key_checks.xml")
-        showViolations = false // disable console output
+        showViolations = true // disable console output
+        configProperties.put("home.dir", rootDir.absoluteFile)
+        configProperties.put("GitDiff.debug", "true")
     }
 
-
-    tasks.register('checkstyleMainChanged', Checkstyle) {
-        // Specify all files that should be checked
-        def changedFiles = getChangedFiles()
-        source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
-        classpath = checkstyleMain.classpath
-
-        //println(source.getFiles())
-
-        // Define the output folder of the generated reports
+    tasks.withType(Checkstyle).configureEach {
         reports {
-            html {
-                required = true
-                outputLocation = file("build/reports/checkstyle/main_diff.html")
-            }
-            xml {
-                required = true
-                outputLocation = file("build/reports/checkstyle/main_diff.xml")
-            }
+            xml.required = true
+            html.required = true
+            //html.stylesheet = resources.text.fromFile('gradle/checkstyle-custom.xsl')
+            sarif.required = true
+        }
+
+        doLast {
+            checkstyleMarkdownReport(
+                    layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile,
+                    layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile)
         }
     }
 
@@ -496,41 +468,11 @@ tasks.register('start'){
 }
 
 checkstyle {
-    toolVersion = "10.21.1"
+    toolVersion = "10.21.1" // will be ignored
     ignoreFailures = true
     configFile file("$rootDir/gradle/key_checks.xml")
-    showViolations = true
+    showViolations = false
 }
-
-tasks.register('checkstyleMainChanged', Checkstyle){
-    classpath = checkstyleClasspath
-
-    def changedFiles = getChangedFiles()
-    changedFiles.removeAll { f -> !f.endsWith(".java") }
-    source changedFiles
-    println(source.getFiles())
-
-    minHeapSize = "200m"
-    maxHeapSize = "1g"
-
-    // Define the output folder of the generated reports
-    reports {
-        sarif.required = true
-        sarif.outputLocation = file("build/reports/checkstyle/main_diff.sarif.json")
-        html.required = true
-        html.outputLocation = file("build/reports/checkstyle/main_diff.html")
-        xml.required = true
-        xml.outputLocation = file("build/reports/checkstyle/main_diff.xml")
-    }
-
-    doLast {
-        checkstyleMarkdownReport(
-                file("build/reports/checkstyle/main_diff.xml"),
-                file("build/reports/checkstyle/main_diff.md"))
-    }
-}
-
-
 
 // Generation of a JavaDoc across sub projects.
 tasks.register('alldoc', Javadoc){
@@ -571,24 +513,6 @@ tasks.register('alldocJar', Zip){
     destinationDirectory = layout.buildDirectory.dir("distribution").getOrNull()
 }
 
-@Memoized
-def getChangedFiles() {
-    // Get the target and source branch
-    //def anchor = "git merge-base HEAD origin/main".execute().getText()
-    //println("Base revision: $anchor")
-
-    def baseRef = /*System.getenv("GITHUB_BASE_REF") ?:*/ "origin/main"
-
-    // Get list of all changed files including status
-    def allFiles = "git diff --name-only --diff-filter=dr $baseRef".execute().getText().split("\n")
-    println("Found ${allFiles.length} changed files")
-
-    // Remove the status prefix
-    def files = new TreeSet<String>(allFiles.toList())
-    // Return the list of touched files
-    files
-}
-
 def checkstyleMarkdownReport(File xmlFile, File targetFile) {
     if(!xmlFile.exists()) return
     def root = new groovy.xml.XmlSlurper().parseText(xmlFile.text)
@@ -599,7 +523,7 @@ def checkstyleMarkdownReport(File xmlFile, File targetFile) {
     def host = System.getenv("GITHUB_SERVER_URL") ?: "https://github.com"
     def repo = System.getenv("GITHUB_REPOSITORY") ?: "keyproject/key"
     def baseUrl = "$host/$repo/blob/$sha"
-    try{
+    try {
         out.write("# Checkstyle Report\n\n")
 
         for(xmlFileNode in root.file) {
@@ -612,7 +536,7 @@ def checkstyleMarkdownReport(File xmlFile, File targetFile) {
             }
         }
     }
-    finally{
+    finally {
         out.close()
-}
     }
+}

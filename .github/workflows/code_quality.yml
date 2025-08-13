@@ -36,7 +36,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew --parallel --continue spotlessCheck
 
-  checkstyle_changed_files:
+  checkstyle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,8 +50,11 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
+      - run: git merge-base HEAD origin/main
+      - run: git diff -U0 $(git merge-base HEAD origin/main)
+
       - name: Build with Gradle
-        run: ./gradlew --parallel --continue checkstyleMainChanged
+        run: ./gradlew --parallel --continue checkstyleMain
 
       - name: "Touch files to avoid errors"
         run: |
@@ -60,17 +63,17 @@ jobs:
           echo '{ "$schema": "https://json.schemastore.org/sarif-2.1.0.json", "version": "2.1.0", "runs": []}' > build/reports/checkstyle/main_diff.sarif.json
 
       - name: "Job summary"
-        run: "cat build/reports/checkstyle/main_diff.md >> $GITHUB_STEP_SUMMARY"
+        run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
 
       - name: Upload checkstyle report
         uses: actions/upload-artifact@v4
         if: (success() || failure())
         with:
           name: checkstyle-report
-          path: build/reports/checkstyle/main_diff.html
+          path: "**/build/reports/checkstyle/main.html"
 
       - name: "Publish in Github code scanning"
         uses: github/codeql-action/upload-sarif@v3
         if: (success() || failure())
         with:
-          sarif_file: build/reports/checkstyle/main_diff.sarif.json
+          sarif_file: build/reports/checkstyle/main.sarif.json
