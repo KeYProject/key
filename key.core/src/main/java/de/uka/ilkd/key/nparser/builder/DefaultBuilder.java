@@ -18,10 +18,7 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
-import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.*;
@@ -37,6 +34,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
@@ -445,5 +443,35 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
         return ctx.getText();
+    }
+
+    @Override
+    public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
+            KeYParser.Formal_sort_param_declsContext ctx) {
+        return mapOf(ctx.formal_sort_param_decl());
+    }
+
+    @Override
+    public @Nullable GenericParameter visitFormal_sort_param_decl(
+            KeYParser.Formal_sort_param_declContext ctx) {
+
+        GenericParameter.Variance variance;
+        if (ctx.PLUS() != null) {
+            variance = GenericParameter.Variance.COVARIANT;
+        } else if (ctx.MINUS() != null) {
+            variance = GenericParameter.Variance.CONTRAVARIANT;
+        } else {
+            variance = GenericParameter.Variance.INVARIANT;
+        }
+
+        var name = ctx.simple_ident().getText();
+        Sort paramSort = sorts().lookup(name);
+        if (paramSort == null) {
+            semanticError(ctx, "Parameter sort %s not found", name);
+        }
+        if (!(paramSort instanceof GenericSort)) {
+            semanticError(ctx, "Parameter sort %s is not a generic sort", name);
+        }
+        return new GenericParameter((GenericSort) paramSort, variance);
     }
 }

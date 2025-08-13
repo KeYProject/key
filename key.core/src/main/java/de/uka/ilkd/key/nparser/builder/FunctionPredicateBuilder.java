@@ -7,8 +7,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -101,6 +103,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     @Override
     public Object visitPred_decl(KeYParser.Pred_declContext ctx) {
         String pred_name = accept(ctx.funcpred_name());
+        List<GenericParameter> params = ctx.formal_sort_param_decls() == null ? null
+                : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
         List<Boolean> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
         if (whereToBind != null && whereToBind.size() != argSorts.size()) {
@@ -123,9 +127,30 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (p == null) {
             assert argSorts != null;
-            p = new JFunction(new Name(pred_name), JavaDLTheory.FORMULA,
-                argSorts.toArray(new Sort[0]),
-                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
+            Name name = new Name(pred_name);
+            Boolean[] whereToBind1 =
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]);
+            if (params == null) {
+                if (nss.parametricFunctions().lookup(name) != null) {
+                    semanticError(ctx,
+                        "Cannot declare predicate %s: Parametric predicate already exists", name);
+                }
+                p = new JFunction(name, JavaDLTheory.FORMULA,
+                    argSorts.toArray(new Sort[0]),
+                    whereToBind1, false);
+            } else {
+                if (functions().lookup(name) != null) {
+                    semanticError(ctx,
+                        "Cannot declare parametric predicate %s: Predicate already exists", name);
+                }
+                var d = new ParametricFunctionDecl(name, ImmutableList.fromList(params),
+                    new ImmutableArray<>(argSorts),
+                    JavaDLTheory.FORMULA,
+                    whereToBind == null ? null : new ImmutableArray<>(whereToBind1), false, true,
+                    false);
+                nss.parametricFunctions().addSafely(d);
+                return null;
+            }
         }
 
         if (lookup(p.name()) == null) {
@@ -142,6 +167,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         boolean unique = ctx.UNIQUE() != null;
         Sort retSort = accept(ctx.sortId());
         String funcName = accept(ctx.funcpred_name());
+        List<GenericParameter> params = ctx.formal_sort_param_decls() == null ? null
+                : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
         List<Boolean[]> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
         assert argSorts != null;
@@ -164,8 +191,28 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
 
         if (f == null) {
-            f = new JFunction(new Name(funcName), retSort, argSorts.toArray(new Sort[0]),
-                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
+            Name name = new Name(funcName);
+            Boolean[] whereToBind1 =
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]);
+            if (params == null) {
+                if (nss.parametricFunctions().lookup(name) != null) {
+                    semanticError(ctx,
+                        "Cannot declare function %s: Parametric function already exists", name);
+                }
+                f = new JFunction(name, retSort, argSorts.toArray(new Sort[0]),
+                    whereToBind1, unique);
+            } else {
+                if (functions().lookup(name) != null) {
+                    semanticError(ctx,
+                        "Cannot declare parametric function %s: Function already exists", name);
+                }
+                var d = new ParametricFunctionDecl(name, ImmutableList.fromList(params),
+                    new ImmutableArray<>(argSorts),
+                    retSort, whereToBind == null ? null : new ImmutableArray<>(whereToBind1),
+                    unique, true, false);
+                nss.parametricFunctions().add(d);
+                return null;
+            }
         }
 
         if (lookup(f.name()) == null) {
