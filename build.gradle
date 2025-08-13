@@ -524,16 +524,18 @@ def checkstyleMarkdownReport(File xmlFile, File targetFile) {
     def repo = System.getenv("GITHUB_REPOSITORY") ?: "keyproject/key"
     def baseUrl = "$host/$repo/blob/$sha"
     try {
-        out.write("# Checkstyle Report\n\n")
+        //out.write("### Checkstyle Report\n\n")
+        out.write("\n\n")
 
         for(xmlFileNode in root.file) {
             def f = file(xmlFileNode.@name.toString())
             def path = projectDir.relativePath(f)
-            out.write("## $path\n\n")
+            out.write("#### $path\n\n")
             def url="$baseUrl/$path"
             for(error in xmlFileNode.error) {
                 out.write("\n* ${error.@severity} [${error.@message} @${error.@line}:${error.@column}]($url#L${error.@line})")
             }
+            out.write("\n\n")
         }
     }
     finally {
