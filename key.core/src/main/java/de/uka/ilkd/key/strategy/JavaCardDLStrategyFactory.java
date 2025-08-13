@@ -113,24 +113,6 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_EXPAND_LOCAL_QUERIES_OFF =
         "<html>" + "Expansion of local queries is turned off. <br>"
             + "This setting is independent of the query treatment setting." + "</html>";
-    public static final String TOOL_TIP_QUANTIFIER_NONE =
-        "<html>" + "Do not instantiate quantified formulas automatically" + "</html>";
-    public static final String TOOL_TIP_QUANTIFIER_NO_SPLITS = "<html>"
-        + "Instantiate quantified formulas automatically<br>"
-        + "with terms that occur in a sequent, but only if<br>"
-        + "this does not cause proof splitting. Further, quantified<br>"
-        + "formulas that contain queries are not instantiated<br>" + "automatically." + "</html>";
-    public static final String TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS =
-        "<html>" + "Instantiate quantified formulas automatically<br>"
-            + "with terms that occur in a sequent, but if the<br>"
-            + "sequent contains programs then only perform<br>"
-            + "instantiations that do not cause proof splitting.<br>"
-            + "Further, quantified formulas that contain queries<br>"
-            + "are not instantiated automatically." + "</html>";
-    public static final String TOOL_TIP_QUANTIFIER_FREE =
-        "<html>" + "Instantiate quantified formulas automatically<br>"
-            + "with terms that occur in a sequent, also if this<br>"
-            + "might cause proof splitting." + "</html>";
     public static final String TOOL_TIP_AUTO_INDUCTION_ON =
         "<html>" + "Create an inductive proof for formulas of the form:<br>"
             + "      ==>  \\forall int i; 0&lt;=i->phi <br>"
@@ -208,20 +190,6 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 TOOL_TIP_QUERY_OFF));
     }
 
-    private static OneOfStrategyPropertyDefinition getQuantifierTreatment() {
-        return new OneOfStrategyPropertyDefinition(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-            "Quantifier treatment", 2,
-            new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NONE, "None",
-                TOOL_TIP_QUANTIFIER_NONE, 2, 4),
-            new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_NON_SPLITTING,
-                "No Splits", TOOL_TIP_QUANTIFIER_NO_SPLITS, 6, 2),
-            new StrategyPropertyValueDefinition(
-                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS, "No Splits with Progs",
-                TOOL_TIP_QUANTIFIER_NO_SPLITS_WITH_PROGS, 2, 4),
-            new StrategyPropertyValueDefinition(StrategyProperties.QUANTIFIERS_INSTANTIATE, "Free",
-                TOOL_TIP_QUANTIFIER_FREE, 6, 2));
-    }
-
     private static OneOfStrategyPropertyDefinition getClassAxiom() {
         return new OneOfStrategyPropertyDefinition(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
             "Class axiom rule",
@@ -261,12 +229,10 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         final OneOfStrategyPropertyDefinition proofSplitting = getProofSplitting();
         final OneOfStrategyPropertyDefinition dependencyContracts = getDependencyContracts();
         final OneOfStrategyPropertyDefinition queryTreatment = getQueryTreatment();
-        final OneOfStrategyPropertyDefinition quantifierTreatment = getQuantifierTreatment();
         final OneOfStrategyPropertyDefinition classAxiom = getClassAxiom();
         final OneOfStrategyPropertyDefinition autoInduction = getAutoInduction();
         // Model
         return new StrategySettingsDefinition("Java DL Options", ossUsage, proofSplitting,
-            dependencyContracts, queryTreatment, quantifierTreatment,
-            classAxiom, autoInduction);
+            dependencyContracts, queryTreatment, classAxiom, autoInduction);
     }
 }

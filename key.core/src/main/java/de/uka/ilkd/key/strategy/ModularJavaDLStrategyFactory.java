@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class ModularJavaDLStrategyFactory implements StrategyFactory {
-    private final List<StrategyFactory> componentFactories = Arrays.asList(
+    private final List<StrategyFactory> componentFactories = Arrays.asList(new FOLStrategyFactory(),
         new IntegerStrategyFactory(), new SymExStrategyFactory(), new StringStrategyFactory(),
         new JavaCardDLStrategyFactory());
 

@@ -6,27 +6,13 @@ package de.uka.ilkd.key.strategy;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.*;
-import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
@@ -40,9 +26,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
-import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeature;
-import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
@@ -69,7 +52,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private final ArithTermFeatures tf;
     private final FormulaTermFeatures ff;
-    private final ValueTermFeature vf;
 
 
     protected JavaCardDLStrategy(Proof proof, StrategyProperties strategyProperties) {
@@ -80,7 +62,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
-        this.vf = new ValueTermFeature(op(heapLDT.getNull()));
 
         costComputationDispatcher = setupCostComputationF();
         approvalDispatcher = setupApprovalDispatcher();
@@ -105,7 +86,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 || approvalDispatcher.get(rs) != null;
     }
 
-    protected Feature setupGlobalF(Feature dispatcher) {
+    protected Feature setupGlobalF(@NonNull Feature dispatcher) {
         final String queryProp =
             strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
@@ -162,78 +143,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
 
     private RuleSetDispatchFeature setupCostComputationF() {
-        final LocSetLDT locSetLDT = getServices().getTypeConverter().getLocSetLDT();
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
-
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
-        bindRuleSet(d, "closure", -15000);
-        bindRuleSet(d, "alpha", -7000);
-        bindRuleSet(d, "delta", -6000);
-        bindRuleSet(d, "simplify_boolean", -200);
-
-        final Feature findDepthFeature =
-            FindDepthFeature.getInstance();
-
-        bindRuleSet(d, "concrete",
-            add(longConst(-11000),
-                ScaleFeature.createScaled(findDepthFeature, 10.0)));
-        bindRuleSet(d, "simplify", -4500);
-        bindRuleSet(d, "simplify_enlarging", -2000);
-        bindRuleSet(d, "simplify_ENLARGING", -1900);
-        bindRuleSet(d, "simplify_int", inftyConst());
-
         bindRuleSet(d, "javaIntegerSemantics",
             ifZero(sequentContainsNoPrograms(), longConst(-5000), ifZero(
                 leq(CountBranchFeature.INSTANCE, longConst(1)), longConst(-5000), inftyConst())));
 
-        // always give infinite cost to obsolete rules
-        bindRuleSet(d, "obsolete", inftyConst());
-
         setupSelectSimplification(d);
-
-        bindRuleSet(d, "no_self_application",
-            ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
-
-        bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
-            not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE))));
-
-        bindRuleSet(d, "update_elim",
-            add(longConst(-8000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
-        bindRuleSet(d, "update_apply_on_update",
-            add(longConst(-7000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
-        bindRuleSet(d, "update_join", -4600);
-        bindRuleSet(d, "update_apply", -4500);
-
-        setupSplitting(d);
 
         bindRuleSet(d, "test_gen", inftyConst());
         bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
         bindRuleSet(d, "test_gen_quan", inftyConst());
         bindRuleSet(d, "test_gen_quan_num", inftyConst());
-
-        bindRuleSet(d, "gamma", add(not(isInstantiated("t")),
-            ifZero(allowQuantifierSplitting(), longConst(0), longConst(50))));
-        bindRuleSet(d, "gamma_destructive", inftyConst());
-
-        bindRuleSet(d, "triggered", add(not(isTriggerVariableInstantiated()), longConst(500)));
-
-        bindRuleSet(d, "comprehension_split",
-            add(applyTF(FocusFormulaProjection.INSTANCE, ff.notContainsExecutable),
-                ifZero(allowQuantifierSplitting(), longConst(2500), longConst(5000))));
-
-        setupReplaceKnown(d);
-
-        setupApplyEq(d);
-
-        bindRuleSet(d, "insert_eq_nonrigid",
-            applyTF(FocusProjection.create(0), IsNonRigidTermFeature.INSTANCE));
-
-        bindRuleSet(d, "order_terms",
-            add(termSmallerThan("commEqLeft", "commEqRight"), longConst(-5000)));
 
         bindRuleSet(d, "simplify_literals",
             // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
@@ -242,9 +166,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "nonDuplicateAppCheckEq", EqNonDuplicateAppFeature.INSTANCE);
 
-        bindRuleSet(d, "simplify_instanceof_static",
-            add(EqNonDuplicateAppFeature.INSTANCE, longConst(-500)));
-
+        // TODO: rename rule set?
         bindRuleSet(d, "comprehensions",
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-50)));
 
@@ -253,13 +175,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "comprehensions_low_costs",
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-5000)));
-
-        bindRuleSet(d, "evaluate_instanceof", longConst(-500));
-
-        bindRuleSet(d, "instanceof_to_exists", TopLevelFindFeature.ANTEC);
-
-        bindRuleSet(d, "try_apply_subst",
-            add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
 
         // features influenced by the strategy options
         /*
@@ -286,12 +201,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
          * bindRuleSet ( d, "block_expand", useBlockExpand ? longConst ( 0 ) : inftyConst () );
          */
 
-        // delete cast
-        bindRuleSet(d, "cast_deletion",
-            ifZero(implicitCastNecessary(instOf("castedTerm")), longConst(-5000), inftyConst()));
-
-        bindRuleSet(d, "type_hierarchy_def", -6500);
-
         // partial inv axiom
         bindRuleSet(d, "partialInvAxiom",
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(10000)));
@@ -304,25 +213,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "limitObserver",
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-200)));
 
-        bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
-
         setupUserTaclets(d);
 
         setupSystemInvariantSimp(d);
-
-        if (quantifierInstantiatedEnabled()) {
-            setupFormulaNormalisation(d, numbers, locSetLDT);
-        } else {
-            bindRuleSet(d, "negationNormalForm", inftyConst());
-            bindRuleSet(d, "moveQuantToLeft", inftyConst());
-            bindRuleSet(d, "conjNormalForm", inftyConst());
-            bindRuleSet(d, "apply_equations_andOr", inftyConst());
-            bindRuleSet(d, "elimQuantifier", inftyConst());
-            bindRuleSet(d, "distrQuantifier", inftyConst());
-            bindRuleSet(d, "swapQuantifiers", inftyConst());
-            bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
-            bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
-        }
 
         // chrisg: The following rule, if active, must be applied delta rules.
         if (autoInductionEnabled()) {
@@ -401,20 +294,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             add(isSelectSkolemConstantTerm("auxiliarySK"), longConst(-500)));
     }
 
-    private void setupReplaceKnown(RuleSetDispatchFeature d) {
-        final Feature commonF =
-            add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE),
-                longConst(-5000),
-                add(DiffFindAndReplacewithFeature.INSTANCE,
-                    ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0)));
-
-        bindRuleSet(d, "replace_known_left", commonF);
-
-        bindRuleSet(d, "replace_known_right",
-            add(commonF, ifZero(directlyBelowSymbolAtIndex(Junctor.IMP, 1), longConst(100),
-                ifZero(directlyBelowSymbolAtIndex(Equality.EQV, -1), longConst(100)))));
-    }
-
     private void setupUserTaclets(RuleSetDispatchFeature d) {
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             final String userTacletsProbs =
@@ -442,35 +321,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     //
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
-
-    private boolean instQuantifiersWithQueries() {
-        return StrategyProperties.QUANTIFIERS_INSTANTIATE
-                .equals(strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
-    }
-
-    private boolean quantifiersMightSplit() {
-        return StrategyProperties.QUANTIFIERS_INSTANTIATE
-                .equals(strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))
-                || StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS.equals(
-                    strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
-    }
-
-    private Feature allowQuantifierSplitting() {
-        if (StrategyProperties.QUANTIFIERS_INSTANTIATE.equals(
-            strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
-            return longConst(0);
-        }
-        if (StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS.equals(
-            strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
-            return sequentContainsNoPrograms();
-        }
-        return inftyConst();
-    }
-
-    private boolean quantifierInstantiatedEnabled() {
-        return !StrategyProperties.QUANTIFIERS_NONE
-                .equals(strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
-    }
 
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
@@ -500,338 +350,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
          * ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
          */
     }
-
-    private Feature allowSplitting(ProjectionToTerm<Goal> focus) {
-        if (normalSplitting()) {
-            return longConst(0);
-        }
-        if (StrategyProperties.SPLITTING_DELAYED
-                .equals(strategyProperties.getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY))) {
-            return or(applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS),
-                sequentContainsNoPrograms());
-        }
-        // else: SPLITTING_OFF
-        return applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS);
-    }
-
-    private boolean normalSplitting() {
-        return StrategyProperties.SPLITTING_NORMAL
-                .equals(strategyProperties.getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY));
-    }
-
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-    //
-    // Application of beta- and cut-rules to handle disjunctions
-    //
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-
-    private void setupSplitting(RuleSetDispatchFeature d) {
-        final TermBuffer subFor = new TermBuffer();
-        final Feature noCutsAllowed =
-            sum(subFor, AllowedCutPositionsGenerator.INSTANCE, not(applyTF(subFor, ff.cutAllowed)));
-        bindRuleSet(d, "beta",
-            SumFeature.createSum(noCutsAllowed,
-                ifZero(PurePosDPathFeature.INSTANCE, longConst(-200)),
-                ScaleFeature.createScaled(CountPosDPathFeature.INSTANCE, -3.0),
-                ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0), longConst(20)));
-        TermBuffer superF = new TermBuffer();
-        final ProjectionToTerm<Goal> splitCondition = sub(FocusProjection.INSTANCE, 0);
-        bindRuleSet(d, "split_cond", add(// do not split over formulas containing auxiliary
-            // variables
-            applyTF(FocusProjection.INSTANCE,
-                rec(any(), not(selectSkolemConstantTermFeature()))),
-            // prefer splits when condition has quantifiers (less
-            // likely to be simplified away)
-            applyTF(splitCondition,
-                rec(ff.quantifiedFor, ifZero(ff.quantifiedFor, longTermConst(-10)))),
-            FindDepthFeature.getInstance(), // prefer top level splits
-            ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
-            sum(superF, SuperTermGenerator.upwards(any(), getServices()),
-                applyTF(superF, not(ff.elemUpdate))),
-            ifZero(applyTF(FocusProjection.INSTANCE, ContainsExecutableCodeTermFeature.PROGRAMS),
-                longConst(-100), longConst(25))));
-        ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
-        Feature countOccurrencesInSeq =
-            ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
-        bindRuleSet(d, "cut_direct",
-            SumFeature
-                    .createSum(
-                        not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
-                        AllowedCutPositionFeature.INSTANCE,
-                        ifZero(notBelowQuantifier(),
-                            add(
-                                applyTF(cutFormula, add(ff.cutAllowed,
-                                    // do not cut over formulas containing
-                                    // auxiliary variables
-                                    rec(any(), not(selectSkolemConstantTermFeature())))),
-                                // prefer cuts over "something = null"
-                                ifZero(applyTF(FocusProjection.INSTANCE,
-                                    opSub(tf.eq, any(), vf.nullTerm)),
-                                    longConst(-5), longConst(0)),
-                                // punish cuts over formulas containing anon heap functions
-                                ifZero(applyTF(cutFormula, rec(any(), not(anonHeapTermFeature()))),
-                                    longConst(0), longConst(1000)),
-                                countOccurrencesInSeq, // standard costs
-                                longConst(100)),
-                            SumFeature // check for cuts below quantifiers
-                                    .createSum(applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
-                                        applyTF(FocusFormulaProjection.INSTANCE,
-                                            ff.quantifiedClauseSet),
-                                        ifZero(allowQuantifierSplitting(), longConst(0),
-                                            longConst(100))))));
-    }
-
-    private void setupSplittingApproval(RuleSetDispatchFeature d) {
-        bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
-
-        bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.INSTANCE));
-
-        final TermBuffer subFor = new TermBuffer();
-        final Feature compareCutAllowed = ifZero(applyTF(subFor, ff.cutAllowed),
-            leq(applyTF("cutFormula", ff.cutPriority), applyTF(subFor, ff.cutPriority)));
-
-        final Feature noBetterCut =
-            sum(subFor, AllowedCutPositionsGenerator.INSTANCE, compareCutAllowed);
-
-        bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.INSTANCE),
-            ifZero(notBelowQuantifier(), noBetterCut)));
-    }
-
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-    //
-    // Application of equations
-    //
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-
-    private void setupApplyEq(RuleSetDispatchFeature d) {
-        final TermBuffer equation = new TermBuffer();
-        final TermBuffer left = new TermBuffer();
-        final TermBuffer right = new TermBuffer();
-
-        // applying equations less deep/less leftish in terms/formulas is
-        // preferred
-        // this is important for reducing polynomials (start with the biggest
-        // summands)
-        bindRuleSet(d, "apply_equations",
-            SumFeature.createSum(
-                ifZero(MatchedAssumesFeature.INSTANCE,
-                    add(CheckApplyEqFeature.INSTANCE, let(equation, AssumptionProjection.create(0),
-                        add(not(applyTF(equation, ff.update)),
-                            // there might be updates in
-                            // front of the assumption
-                            // formula; in this case we wait
-                            // until the updates have
-                            // been applied
-                            let(left, sub(equation, 0),
-                                let(right, sub(equation, 1),
-                                    TermSmallerThanFeature.create(right, left))))))),
-                longConst(-4000)));
-    }
-
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-    //
-    // Normalisation of formulas; this is mostly a pre-processing step for
-    // handling quantified formulas
-    //
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-
-    private void setupFormulaNormalisation(RuleSetDispatchFeature d, IntegerLDT numbers,
-            LocSetLDT locSetLDT) {
-
-        bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.getInstance(),
-            longConst(-500),
-            ScaleFeature.createScaled(FindDepthFeature.<Goal>getInstance(), 10.0)));
-
-        bindRuleSet(d, "moveQuantToLeft",
-            add(quantifiersMightSplit() ? longConst(0)
-                    : applyTF(FocusFormulaProjection.INSTANCE, ff.quantifiedPureLitConjDisj),
-                longConst(-550)));
-
-        bindRuleSet(d, "conjNormalForm",
-            ifZero(
-                add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
-                    NotInScopeOfModalityFeature.INSTANCE),
-                add(longConst(-150),
-                    ScaleFeature.createScaled(FindDepthFeature.<Goal>getInstance(), 20)),
-                inftyConst()));
-
-        bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
-
-        bindRuleSet(d, "cnf_setComm",
-            add(SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
-                NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
-
-        bindRuleSet(d, "elimQuantifier", -1000);
-        bindRuleSet(d, "elimQuantifierWithCast", 50);
-
-        final TermBuffer left = new TermBuffer();
-        final TermBuffer right = new TermBuffer();
-        bindRuleSet(d, "apply_equations_andOr",
-            add(let(left, instOf("applyEqLeft"),
-                let(right, instOf("applyEqRight"),
-                    TermSmallerThanFeature.create(right, left))),
-                longConst(-150)));
-
-        bindRuleSet(d, "distrQuantifier",
-            add(or(
-                applyTF(FocusProjection.INSTANCE,
-                    add(ff.quantifiedClauseSet, not(opSub(Quantifier.ALL, ff.orF)),
-                        EliminableQuantifierTF.INSTANCE)),
-                SumFeature.createSum(onlyInScopeOfQuantifiers(),
-                    SplittableQuantifiedFormulaFeature.INSTANCE,
-                    ifZero(FocusInAntecFeature.getInstance(),
-                        applyTF(FocusProjection.INSTANCE, sub(ff.andF)),
-                        applyTF(FocusProjection.INSTANCE, sub(ff.orF))))),
-                longConst(-300)));
-
-        bindRuleSet(d, "swapQuantifiers",
-            add(applyTF(FocusProjection.INSTANCE, add(ff.quantifiedClauseSet,
-                EliminableQuantifierTF.INSTANCE, sub(not(EliminableQuantifierTF.INSTANCE)))),
-                longConst(-300)));
-
-        // category "conjunctive normal form"
-
-        bindRuleSet(d, "cnf_orComm",
-            SumFeature.createSum(applyTF("commRight", ff.clause),
-                applyTFNonStrict("commResidue", ff.clauseSet),
-                or(applyTF("commLeft", ff.andF),
-                    add(applyTF("commLeft", ff.literal),
-                        literalsSmallerThan("commRight", "commLeft", numbers))),
-                longConst(-100)));
-
-        bindRuleSet(d, "cnf_orAssoc",
-            SumFeature.createSum(applyTF("assoc0", ff.clause),
-                applyTF("assoc1", ff.clause), applyTF("assoc2", ff.literal), longConst(-80)));
-
-        bindRuleSet(d, "cnf_andComm",
-            SumFeature.createSum(applyTF("commLeft", ff.clause),
-                applyTF("commRight", ff.clauseSet), applyTFNonStrict("commResidue", ff.clauseSet),
-                // at least one of the subformulas has to be a literal;
-                // otherwise, sorting is not likely to have any big effect
-                ifZero(
-                    add(applyTF("commLeft", not(ff.literal)),
-                        applyTF("commRight", rec(ff.andF, not(ff.literal)))),
-                    longConst(100), longConst(-60)),
-                clausesSmallerThan("commRight", "commLeft", numbers)));
-
-        bindRuleSet(d, "cnf_andAssoc",
-            SumFeature.createSum(applyTF("assoc0", ff.clauseSet),
-                applyTF("assoc1", ff.clauseSet), applyTF("assoc2", ff.clause), longConst(-10)));
-
-        bindRuleSet(d, "cnf_dist",
-            SumFeature.createSum(applyTF("distRight0", ff.clauseSet),
-                applyTF("distRight1", ff.clauseSet), ifZero(applyTF("distLeft", ff.clause),
-                    longConst(-15), applyTF("distLeft", ff.clauseSet)),
-                longConst(-35)));
-
-        final TermBuffer superFor = new TermBuffer();
-        final Feature onlyBelowQuanAndOr =
-            sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                applyTF(superFor, or(ff.quantifiedFor, ff.andF, ff.orF)));
-
-        final Feature belowUnskolemisableQuantifier =
-            ifZero(FocusInAntecFeature.getInstance(),
-                not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                    not(applyTF(superFor, op(Quantifier.ALL))))),
-                not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                    not(applyTF(superFor, op(Quantifier.EX))))));
-
-        bindRuleSet(d, "cnf_expandIfThenElse", add(
-            isBelow(OperatorClassTF.create(Quantifier.class)),
-            onlyBelowQuanAndOr, belowUnskolemisableQuantifier));
-
-        final Feature pullOutQuantifierAllowed =
-            add(isBelow(OperatorClassTF.create(Quantifier.class)), onlyBelowQuanAndOr, applyTF(
-                FocusProjection.create(0), sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
-
-        bindRuleSet(d, "pullOutQuantifierUnifying", -20);
-
-        bindRuleSet(d, "pullOutQuantifierAll", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.getInstance(), longConst(-20), longConst(-40))));
-
-        bindRuleSet(d, "pullOutQuantifierEx", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.getInstance(), longConst(-40), longConst(-20))));
-    }
-
-    private Feature clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
-        return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
-    }
-
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-    //
-    // Heuristic instantiation of quantified formulas
-    //
-    // //////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
-
-    private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
-        if (quantifierInstantiatedEnabled()) {
-            final TermBuffer varInst = new TermBuffer();
-            final Feature branchPrediction = InstantiationCostScalerFeature
-                    .create(InstantiationCost.create(varInst), allowQuantifierSplitting());
-
-            bindRuleSet(d, "gamma",
-                SumFeature.createSum(FocusInAntecFeature.getInstance(),
-                    applyTF(FocusProjection.create(0),
-                        add(ff.quantifiedClauseSet,
-                            instQuantifiersWithQueries() ? longTermConst(0)
-                                    : ff.notContainsExecutable)),
-                    forEach(varInst, HeuristicInstantiation.INSTANCE,
-                        add(instantiate("t", varInst), branchPrediction, longConst(10)))));
-            final TermBuffer splitInst = new TermBuffer();
-
-            bindRuleSet(d, "triggered",
-                SumFeature.createSum(forEach(splitInst, TriggeredInstantiations.create(true),
-                    add(instantiateTriggeredVariable(splitInst), longConst(500))),
-                    longConst(1500)));
-
-        } else {
-            bindRuleSet(d, "gamma", inftyConst());
-            bindRuleSet(d, "triggered", inftyConst());
-        }
-    }
-
-    private void setupQuantifierInstantiationApproval(RuleSetDispatchFeature d) {
-        if (quantifierInstantiatedEnabled()) {
-            final TermBuffer varInst = new TermBuffer();
-
-            bindRuleSet(d, "gamma", add(isInstantiated("t"),
-                not(sum(varInst, HeuristicInstantiation.INSTANCE, not(eq(instOf("t"), varInst)))),
-                InstantiationCostScalerFeature.create(InstantiationCost.create(instOf("t")),
-                    longConst(0))));
-
-            final TermBuffer splitInst = new TermBuffer();
-            bindRuleSet(d, "triggered",
-                add(isTriggerVariableInstantiated(),
-                    not(sum(splitInst, TriggeredInstantiations.create(false),
-                        not(eq(instOfTriggerVariable(), splitInst))))));
-        } else {
-            bindRuleSet(d, "gamma", inftyConst());
-            bindRuleSet(d, "triggered", inftyConst());
-        }
-    }
-
-
-    protected final Feature onlyInScopeOfQuantifiers() {
-        final TermBuffer buf = new TermBuffer();
-        return sum(buf, SuperTermGenerator.upwards(any(), getServices()),
-            applyTF(buf, ff.quantifiedFor));
-    }
-
-    protected Feature notBelowQuantifier() {
-        final TermBuffer superFor = new TermBuffer();
-        return or(TopLevelFindFeature.ANTEC_OR_SUCC,
-            sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                not(applyTF(superFor, OperatorClassTF.create(Quantifier.class)))));
-    }
-
 
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
@@ -864,8 +382,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
 
         setupClassAxiomApproval(d);
-        setupQuantifierInstantiationApproval(d);
-        setupSplittingApproval(d);
 
         bindRuleSet(d, "apply_select_eq",
             add(isInstantiated("s"), isInstantiated("t1"),
@@ -877,12 +393,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     rec(any(),
                         add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
                 not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
-
-        // Without EqNonDuplicateAppFeature.INSTANCE
-        // rule 'applyEq' might be applied on the same term
-        // without changing the sequent for a really long time. This is tested by
-        // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
-        bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
 
         return d;
     }
@@ -937,7 +447,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         enableInstantiate();
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        setupQuantifierInstantiation(d);
         setClassAxiomInstantiation(d);
 
         disableInstantiate();
@@ -980,10 +489,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pio,
-            Goal goal,
-            MutableState mState) {
+    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(@NonNull RuleApp app,
+            @NonNull PosInOccurrence pio,
+            @NonNull GOAL goal,
+            @NonNull MutableState mState) {
         var time = System.nanoTime();
         try {
             return costComputationF.computeCost(app, pio, goal, mState);

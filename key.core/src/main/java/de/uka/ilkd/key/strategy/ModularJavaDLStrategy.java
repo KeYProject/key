@@ -54,7 +54,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     @Override
     protected RuleSetDispatchFeature getCostDispatcher() {
-        return null;
+        return conflictCostDispatcher;
     }
 
     private record StratAndDispatcher(AbstractFeatureStrategy strategy,
@@ -85,33 +85,34 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             List<AbstractFeatureStrategy> value) {
         switch (rs.name().toString()) {
             case "order_terms" -> {
-                var intStrat = value.getFirst();
-                var javaDLStrat = value.get(1);
+                var folStrat = value.getFirst();
+                var intStrat = value.get(1);
                 bindRuleSet(d, "order_terms",
                     ifZero(applyTF("commEqLeft", tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
-                        javaDLStrat.getCostDispatcher().remove(rs)));
+                        folStrat.getCostDispatcher().remove(rs)));
             }
             case "apply_equations" -> {
-                var intStrat = value.getFirst();
-                var javaDLStrat = value.get(1);
+                var folStrat = value.getFirst();
+                var intStrat = value.get(1);
                 bindRuleSet(d, "apply_equations",
                     ifZero(applyTF(FocusProjection.create(0), tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
-                        javaDLStrat.getCostDispatcher().remove(rs)));
+                        folStrat.getCostDispatcher().remove(rs)));
             }
             case "apply_equations_andOr" -> {
-                var intStrat = value.getFirst();
-                var javaDLStrat = value.get(1);
+                var folStrat = value.getFirst();
+                var intStrat = value.get(1);
                 if (quantifierInstantiatedEnabled()) {
                     bindRuleSet(d, "apply_equations_andOr",
                         ifZero(applyTF(FocusProjection.create(0), tf.intF),
                             intStrat.getCostDispatcher().remove(rs),
-                            javaDLStrat.getCostDispatcher().remove(rs)));
+                            folStrat.getCostDispatcher().remove(rs)));
                 } else {
                     bindRuleSet(d, "apply_equations_andOr", inftyConst());
                 }
             }
+            default -> throw new IllegalArgumentException("No resolution defined for " + rs);
         }
     }
 

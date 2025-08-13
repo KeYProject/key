@@ -141,6 +141,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
 
+        bindRuleSet(d, "simplify_int", inftyConst());
 
         setupArithPrimaryCategories(d);
         setupPolySimp(d, numbers);
