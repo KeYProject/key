@@ -513,6 +513,19 @@ tasks.register('alldocJar', Zip){
     destinationDirectory = layout.buildDirectory.dir("distribution").getOrNull()
 }
 
+
+tasks.register('sarifCopy', Copy) {
+    def source = fileTree(dir: '.').matching { include "*/build/reports/checkstyle/main.sarif" }.asCollection()
+    from source
+
+
+    def counter = 0
+    rename { String filename ->
+        return (counter++) + "_.quality.sarif"
+    }
+    into layout.buildDirectory.dir("sarif-results")
+}
+
 def checkstyleMarkdownReport(File xmlFile, File targetFile) {
     if(!xmlFile.exists()) return
     def root = new groovy.xml.XmlSlurper().parseText(xmlFile.text)

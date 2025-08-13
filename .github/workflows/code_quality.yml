@@ -54,7 +54,7 @@ jobs:
       - run: git diff -U0 $(git merge-base HEAD origin/main)
 
       - name: Build with Gradle
-        run: ./gradlew --parallel --continue checkstyleMain
+        run: ./gradlew --parallel --continue checkstyleMain sarifCopy
 
       - name: "Job summary"
         run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
@@ -66,11 +66,8 @@ jobs:
           name: checkstyle-report
           path: "**/build/reports/checkstyle/main.html"
 
-      - name: "Gather Sarif files"
-        run: "mkdir -p results && cp -v **/build/reports/checkstyle/main.sarif results"
-
       - name: "Publish in Github code scanning"
         uses: github/codeql-action/upload-sarif@v3
         if: (success() || failure())
         with:
-          sarif_file: "results"
+          sarif_file: "build/sarif-results"
