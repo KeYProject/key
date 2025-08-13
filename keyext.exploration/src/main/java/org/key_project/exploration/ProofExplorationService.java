@@ -168,7 +168,7 @@ public class ProofExplorationService {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
             tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS,
-                null),
+                services),
             pio, services);
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
