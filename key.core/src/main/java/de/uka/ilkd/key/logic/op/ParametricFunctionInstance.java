@@ -119,7 +119,8 @@ public class ParametricFunctionInstance extends JFunction {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ParametricFunctionInstance that = (ParametricFunctionInstance) o;
         return Objects.equals(args, that.args) && Objects.equals(base, that.base);
     }
