@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.op.QualifierWrapper;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -56,7 +57,13 @@ public class MatchGenericSortInstruction implements MatchInstruction {
     @Override
     public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
-        return matchSorts(((QualifierWrapper<Sort>) actualElement).getQualifier(), mc, services);
+        if (actualElement instanceof GenericArgument(Sort sort)) {
+            return matchSorts(sort, mc, services);
+        }
+        if (actualElement instanceof QualifierWrapper<?> w && w.getQualifier() instanceof Sort sort) {
+            return matchSorts(sort, mc, services);
+        }
+        return null;
     }
 
 }
