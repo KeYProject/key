@@ -60,7 +60,8 @@ public class MatchGenericSortInstruction implements MatchInstruction {
         if (actualElement instanceof GenericArgument(Sort sort)) {
             return matchSorts(sort, mc, services);
         }
-        if (actualElement instanceof QualifierWrapper<?> w && w.getQualifier() instanceof Sort sort) {
+        if (actualElement instanceof QualifierWrapper<?> w
+                && w.getQualifier() instanceof Sort sort) {
             return matchSorts(sort, mc, services);
         }
         return null;
