@@ -116,4 +116,16 @@ public class ParametricFunctionInstance extends JFunction {
     public @NonNull SyntaxElement getChild(int n) {
         return Objects.requireNonNull(args.get(n));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ParametricFunctionInstance that = (ParametricFunctionInstance) o;
+        return Objects.equals(args, that.args) && Objects.equals(base, that.base);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(args, base);
+    }
 }
