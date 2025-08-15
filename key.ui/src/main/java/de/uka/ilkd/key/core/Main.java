@@ -594,7 +594,7 @@ public final class Main {
         try {
 
             opt = new LemmataAutoModeOptions(options, KeYConstants.INTERNAL_VERSION,
-                PathConfig.getKeyConfigDir());
+                PathConfig.getKeyConfigDir().toString());
             LemmataHandler handler = new LemmataHandler(opt, AbstractProfile.getDefaultProfile());
             handler.start();
 
