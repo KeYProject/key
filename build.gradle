@@ -125,7 +125,7 @@ subprojects {
         options.addBooleanOption('html5', true)
     }
 
-    tasks.withType(Test) {//Configure all tests
+    tasks.withType(Test).configureEach {//Configure all tests
 
         def examplesDir = rootProject.layout.projectDirectory.dir("key.ui/examples").getAsFile()
         def runAllProofsReportDir = layout.buildDirectory.dir("report/runallproves/").get().getAsFile()
@@ -141,11 +141,18 @@ subprojects {
 
         forkEvery = 0 //default
         maxParallelForks = 1 // weigl: test on master
-    }
 
-    tasks.withType(Test) {
         useJUnitPlatform {
             includeEngines 'junit-jupiter'
+        }
+
+        // these seems to be missing starting with Gradle 9
+        testClassesDirs = sourceSets.test.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath
+
+        // Fail on empty test suites
+        afterSuite { suite, result ->
+            assert result.testCount > 0, "There are no executed test. This is unexpected and should be investigated!"
         }
     }
 
