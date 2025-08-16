@@ -14,6 +14,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.varexp.ArgumentType;
@@ -649,8 +650,10 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         Sort s = visitSortId(ctx.term().getText(), ctx.term());
         if (s != null) {
-            if (s instanceof GenericSort) {
-                return TypeResolver.createGenericSortResolver((GenericSort) s);
+            if (s instanceof GenericSort gs) {
+                return TypeResolver.createGenericSortResolver(gs);
+            } else if (s instanceof ParametricSortInstance psi) {
+                return TypeResolver.createParametricSortResolver(psi);
             } else {
                 return TypeResolver.createNonGenericSortResolver(s);
             }
