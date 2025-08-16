@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * Sets the behavior if an already closed proof is encountered: Either throw an exception (default
@@ -16,34 +16,31 @@ import de.uka.ilkd.key.scripts.meta.Option;
  *
  * @author Dominic Steinhoefel
  */
-public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedCommand.Parameters> {
+public class SetFailOnClosedCommand extends AbstractCommand {
     public SetFailOnClosedCommand() {
         super(Parameters.class);
     }
 
     @Override
     public String getName() {
-        return "@failonclosed";
+        return "failonclosed";
     }
 
-    @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
+
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+        state().setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "on".
          */
-        @Option("#2")
-        public String command;
+        @Argument
+        public @MonotonicNonNull String command;
     }
 
 }

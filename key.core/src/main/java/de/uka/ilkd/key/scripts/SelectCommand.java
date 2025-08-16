@@ -5,7 +5,6 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -21,21 +20,20 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
+public class SelectCommand extends AbstractCommand {
     public SelectCommand() {
         super(Parameters.class);
     }
 
-    @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), params);
+
         Goal g;
         if (args.number != null && args.formula == null && args.branch == null) {
             ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
@@ -151,17 +149,17 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     public static class Parameters {
         /** A formula defining the goal to select */
-        @Option(value = "formula", required = false)
-        public JTerm formula;
+        @Option(value = "formula")
+        public @Nullable JTerm formula;
         /**
          * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
          * the last goal, -2 the second-to-last, etc.
          */
-        @Option(value = "number", required = false)
-        public Integer number;
+        @Option(value = "number")
+        public @Nullable Integer number;
         /** The name of the branch to select */
-        @Option(value = "branch", required = false)
-        public String branch;
+        @Option(value = "branch")
+        public @Nullable String branch;
     }
 
 }

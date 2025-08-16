@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * A simple "echo" command for giving feedback to human observers during lengthy executions.
  */
-public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
+public class SetEchoCommand extends AbstractCommand {
     public SetEchoCommand() {
         super(Parameters.class);
     }
@@ -22,23 +22,18 @@ public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(ScriptCommandAst args)
             throws ScriptException, InterruptedException {
-        state.setEchoOn("on".equalsIgnoreCase(args.command));
+        Parameters parameters = state().getValueInjector().inject(new Parameters(), args);
+        state().setEchoOn("on".equalsIgnoreCase(parameters.command));
     }
 
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "off".
          */
-        @Option("#2")
-        public String command;
+        @Argument
+        public @MonotonicNonNull String command;
     }
 
 }

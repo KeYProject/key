@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.io.StringReader;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -27,13 +27,13 @@ public class ScriptLineParserTest {
                  with="line breaks in\s
                  values";\s
                 select formula="a;b";\s
-                hyphened-command;
+                hyphenedCommand;
                 """;
 
-        ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg), null);
-        ScriptLineParser.ParsedCommand command;
-        while ((command = mlp.parseCommand()) != null) {
-            LOGGER.info(String.valueOf(command.args()));
+        var script = ParsingFacade.parseScript(arg);
+        var ast = script.asAst();
+        for (var scriptCommandAst : ast) {
+            System.out.println(scriptCommandAst);
         }
     }
 }

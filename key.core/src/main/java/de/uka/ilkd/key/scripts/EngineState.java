@@ -302,7 +302,7 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public Consumer<ProofScriptEngine.Message> getObserver() {
+    public @Nullable Consumer<ProofScriptEngine.Message> getObserver() {
         return observer;
     }
 
