@@ -1,15 +1,16 @@
 plugins {
-    id 'application'
-    id 'com.gradleup.shadow' version "9.0.1"
+    id("java-convention")
+    application
+    id("com.gradleup.shadow")
 }
 
 description = "Management of larger verification with KeY."
 
 dependencies {
-    implementation project(':key.core')
-    implementation project(':key.ui')
+    implementation(project(":key.core"))
+    implementation(project(":key.ui"))
 
-    implementation group: 'org.antlr', name: 'ST4', version: '4.3.4'
+    implementation(libs.stringtemplate)
 }
 
 application {
@@ -18,7 +19,7 @@ application {
     applicationName = "pm"
 }
 
-run {
+tasks.run {
     // for debugging, something like this can be used:
     //args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency', 'pmexample2')
     //args('merge', 'bundle1', 'bundle2.zip', 'output.zproof')
@@ -28,7 +29,7 @@ run {
     // jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
 }
 
-shadowJar {
+tasks.shadowJar {
     archiveClassifier = "exe"
     archiveBaseName = "keyext.proofmanagement"
 }
