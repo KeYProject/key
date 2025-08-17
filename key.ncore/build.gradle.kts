@@ -9,4 +9,4 @@ dependencies {
     api(project(":key.util"))
 }
 
-val packages = "org\\.key_project\\.logic"
+//extra = "org\\.key_project\\.logic"
