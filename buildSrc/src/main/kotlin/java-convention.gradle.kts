@@ -44,13 +44,17 @@ dependencies {
     implementation(libs.findLibrary("slf4j").get())
     api(libs.findLibrary("jspecify").get())
 
-    compileOnly(libs.findLibrary("eisopCheckerQual").get())
-    compileOnly(libs.findLibrary("eisopUtil").get())
-    checkerFramework(libs.findLibrary("eisopCheckerQual").get())
-    checkerFramework(libs.findLibrary("eisopUtil").get())
+    val checkerQual = libs.findLibrary("eisopCheckerQual").get()
+    val eisopUtil = libs.findLibrary("eisopUtil").get()
+
+    compileOnly(checkerQual)
+    compileOnly(eisopUtil)
+    checkerFramework(checkerQual)
+    checkerFramework(eisopUtil)
+    checkerFramework(libs.findLibrary("eisopChecker").get())
 
     // Testing
-    testCompileOnly(libs.findLibrary("eisopCheckerQual").get())
+    testCompileOnly(checkerQual)
 
     testImplementation(platform(libs.findLibrary("junit-bom").get()))
     testImplementation(libs.findBundle("testing").get())
@@ -66,7 +70,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }
 
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc> {
     isFailOnError = false
     val o = options as CoreJavadocOptions
     o.addBooleanOption("Xdoclint:none", true)
@@ -76,8 +80,8 @@ tasks.withType<Javadoc>() {
 }
 
 tasks.withType<Test>().configureEach {
-    val examplesDir = rootProject.layout.projectDirectory.dir("key.ui/examples").getAsFile()
-    val runAllProofsReportDir = layout.buildDirectory.dir("report/runallproves/").get().getAsFile()
+    val examplesDir = rootProject.layout.projectDirectory.dir("key.ui/examples").asFile
+    val runAllProofsReportDir = layout.buildDirectory.dir("report/runallproves/").get().asFile
 
     systemProperty("test-resources", "src/test/resources")
     systemProperty("testcases", "src/test/resources/testcase")
@@ -347,17 +351,22 @@ signing {
 }
 
 
-val CHECKER_FRAMEWORK_PACKAGES_REGEX: String? by project
 extra["CHECKER_FRAMEWORK_PACKAGES_REGEX"] = "^org\\.key_project"
 
 checkerFramework {
     if(System.getProperty("ENABLE_NULLNESS").toBoolean()) {
         checkers = listOf("org.checkerframework.checker.nullness.NullnessChecker")
+        val stubsEntries = listOf(
+            "$rootDir/key.util/src/main/checkerframework",
+            "permit-nullness-assertion-exception.astub",
+            "checker.jar/junit-assertions.astub"
+        )
+        val stubs = stubsEntries.joinToString(File.pathSeparator)
+
         extraJavacArgs = listOf(
-            CHECKER_FRAMEWORK_PACKAGES_REGEX?.let { "-AonlyDefs=$it" }
-                ?: "",
+            extra["CHECKER_FRAMEWORK_PACKAGES_REGEX"]?.let { "-AonlyDefs=$it" } ?: "",
             "-Xmaxerrs", "10000",
-            "-Astubs=$projectDir/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
+            "-Astubs=$stubs",
             "-AstubNoWarnIfNotFound",
             "-Werror",
             "-Aversion",
