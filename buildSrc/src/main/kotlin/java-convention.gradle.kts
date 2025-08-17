@@ -347,11 +347,15 @@ signing {
 }
 
 
+val CHECKER_FRAMEWORK_PACKAGES_REGEX: String? by project
+extra["CHECKER_FRAMEWORK_PACKAGES_REGEX"] = "^org\\.key_project"
+
 checkerFramework {
     if(System.getProperty("ENABLE_NULLNESS").toBoolean()) {
         checkers = listOf("org.checkerframework.checker.nullness.NullnessChecker")
         extraJavacArgs = listOf(
-            "-AonlyDefs=^org\\.key_project\\.util",
+            CHECKER_FRAMEWORK_PACKAGES_REGEX?.let { "-AonlyDefs=$it" }
+                ?: "",
             "-Xmaxerrs", "10000",
             "-Astubs=$projectDir/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
             "-AstubNoWarnIfNotFound",
