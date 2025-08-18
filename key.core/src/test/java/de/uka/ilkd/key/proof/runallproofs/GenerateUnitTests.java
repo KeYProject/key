@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,16 +38,19 @@ public class GenerateUnitTests {
     private static Path outputFolder;
 
     public static void main(String[] args) throws IOException {
-        var collections = new ProofCollection[] { ProofCollections.automaticJavaDL(),
-            ProofCollections.automaticInfFlow() };
+        var collections = List.of(ProofCollections.automaticJavaDL());
         if (args.length != 1) {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
         }
-
         outputFolder = Paths.get(args[0]);
+        run(outputFolder, collections);
+    }
+
+    public static void run(Path outputFolder, List<ProofCollection> collections) throws IOException {
         LOGGER.info("Output folder {}", outputFolder);
 
+        GenerateUnitTests.outputFolder = outputFolder.toAbsolutePath();
         Files.createDirectories(outputFolder);
 
         for (var col : collections) {
@@ -60,11 +60,6 @@ public class GenerateUnitTests {
         }
     }
 
-    // "import de.uka.ilkd.key.util.NamedRunner;\n" +
-    // "import de.uka.ilkd.key.util.TestName;\n" +
-    // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
-    // +
-    // "@RunWith(NamedRunner.class)\n" +
     private static final String TEMPLATE_CONTENT =
         """
                 /* This file is part of KeY - https://key-project.org
