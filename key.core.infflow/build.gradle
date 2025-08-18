@@ -1,3 +1,13 @@
 dependencies {
     api(project(":key.core"))
+    testImplementation(project(":key.core").sourceSets.test.output)
+}
+
+
+tasks.register('testRunAllInfProofs', Test) {
+    description = 'Prove/reload all keyfiles tagged for regression testing'
+    group = "verification"
+    filter {
+        includeTestsMatching "RunAllProofsInfFlow"
+    }
 }
