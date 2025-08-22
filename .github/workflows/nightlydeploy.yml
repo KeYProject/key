@@ -1,4 +1,4 @@
-name: Nightly Deployer of Weekly Builds
+name: Weekly Builds of KeY
 
 on:
   workflow_dispatch:
@@ -9,9 +9,12 @@ permissions:
   contents: write
   id-token: write
 
+env:
+  JAVA_VERSION: 21
+
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       # weigl: Should produce fancier release notes, but needs some configuration
@@ -27,13 +30,51 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: 21
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Build with Gradle
         run: ./gradlew --parallel assemble
+
+  doc:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Documentation with Gradle
+        run: ./gradlew alldoc
+
+      - name: Package
+        run: tar cvf key-javadoc.tar.xz build/docs/javadoc
+
+  deploy:
+    needs: [build, doc]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload Javadoc
+        uses: actions/upload-artifact@v4
+        with:
+          name: javadoc
+          path: "javadoc.tar.xz"
+
+      - name: Upload ShadowJar
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadowjars
+          path: "*/build/libs/*-exe.jar"
 
       - name: Delete previous nightly release
         continue-on-error: true
@@ -50,3 +91,25 @@ jobs:
           gh release create --generate-notes --title "Nightly Release" \
              --prerelease --notes-start-tag KEY-2.12.3 \
              nightly key.ui/build/libs/key-*-exe.jar
+
+  deploy-maven:
+    needs: [ build, doc ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Upload to SNAPSHOT repository
+        run: ./gradlew publishToCentral
+        env:
+          BUILD_NUMBER: "SNAPSHOT"
+          ossrhUsername: ${{ secrets.MAVEN_CENTRAL_USER }}
+          ossrhPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}

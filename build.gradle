@@ -111,7 +111,6 @@ subprojects {
     }
 
     tasks.withType(Test).configureEach {//Configure all tests
-
         def examplesDir = rootProject.layout.projectDirectory.dir("key.ui/examples").getAsFile()
         def runAllProofsReportDir = layout.buildDirectory.dir("report/runallproves/").get().getAsFile()
         systemProperty "test-resources", "src/test/resources"
@@ -325,8 +324,28 @@ subprojects {
             }
             repositories {
                 maven {
-                    name = "keylocal"
+                    name = "LOCAL"
                     url= uri("$rootDir/local")
+                }
+
+                maven { // deployment to git.key-project.org/key-public/key
+                    name = "KEYLAB"
+                    url = uri("https://git.key-project.org/api/v4/projects/35/packages/maven")
+                    credentials(HttpHeaderCredentials) {
+                        // Gitlab supports three kinds of token.
+                        if (System.getenv("TOKEN") != null) {
+                            // Support for user token
+                            name = 'Private-Token'
+                            value = envOrPropertyValue("TOKEN")
+                        } else {
+                            // Support for Gitlab CI
+                            name = 'Job-Token'
+                            value = envOrPropertyValue("CI_JOB_TOKEN")
+                        }
+                    }
+                    authentication {
+                        header(HttpHeaderAuthentication)
+                    }
                 }
             }
         }
@@ -364,34 +383,8 @@ nexusPublishing {
              * You can test signing with `gradle sign`, and publish with `gradle publish`.
              * https://central.sonatype.org/publish/publish-guide/
              */
-            username = project.properties.getOrDefault("ossrhUsername", "")
-            password = project.properties.getOrDefault("ossrhPassword", "")
-        }
-    }
-}
-
-            maven { // deployment to git.key-project.org
-                name = "GitlabPackages"
-                url "https://git.key-project.org/api/v4/projects/35/packages/maven"
-                credentials(HttpHeaderCredentials) {
-                    if (System.getenv("TOKEN") != null) {
-                        name = 'Private-Token'
-                        value = System.getenv("TOKEN")
-                    } else {
-                        name = 'Job-Token'
-                        value = System.getenv("CI_JOB_TOKEN")
-                    }
-                }
-                authentication {
-                    header(HttpHeaderAuthentication)
-                }
-            }
-            }
-        }
-
-        signing {
-            useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
-            sign publishing.publications.mavenJava
+            username = envOrPropertyValue("ossrhUsername")
+            password = envOrPropertyValue("ossrhPassword")
         }
     }
 }
@@ -446,4 +439,13 @@ def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
 if (jacocoEnabled.toBoolean()) {
     project.logger.lifecycle("Jacoco enabled. Test performance will be slower.")
     apply from: rootProject.file("scripts/jacocokey.gradle")
+}
+
+
+def envOrPropertyValue(String key) {
+    if(key in System.getenv()) {
+        return System.getenv(key)
+    }else{
+        return project.properties.getOrDefault(key, "$key-not-found")
+    }
 }

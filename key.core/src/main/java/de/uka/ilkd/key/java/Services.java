@@ -453,8 +453,8 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * sets the factory for origin term labels
      *
-     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
-     *        should not be created
+     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin
+     *        labels should not be created
      */
     public void setOriginFactory(OriginTermLabelFactory originFactory) {
         this.originFactory = originFactory;
