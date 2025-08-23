@@ -1,8 +1,0 @@
-params=-in -smt2
-timeout=-1
-name=Z3_CE
-info=Z3 solver by Microsoft, used for counterexample generation.
-command=z3
-version=--version
-translatorClass=de.uka.ilkd.key.smt.SmtLib2Translator
-socketClass=de.uka.ilkd.key.smt.communication.Z3CESocket
