@@ -29,9 +29,6 @@ import org.key_project.util.collection.Pair;
  * @author Arne Keller
  */
 public class ShowNodeInfoAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -1878750240016534264L;
-
     /**
      * Dependency tracker, used to get the information to display in the dialog.
      */

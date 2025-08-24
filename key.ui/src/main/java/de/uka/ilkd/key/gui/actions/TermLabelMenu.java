@@ -45,7 +45,7 @@ public class TermLabelMenu extends JMenu {
      * Observes changes on {@link #visibleTermLabels}.
      */
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
-        this::handleVisibleLabelsChanged;
+            this::handleVisibleLabelsChanged;
 
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -64,18 +64,20 @@ public class TermLabelMenu extends JMenu {
              */
             @Override
             public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                Set<Name> labelNames =
-                    getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
-                for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
-                    TermLabelCheckBox checkBox = entry.getValue();
-                    /*
-                     * Font style indicates whether a label occurs in the currently displayed
-                     * sequent.
-                     */
-                    if (labelNames.contains(entry.getKey())) {
-                        checkBox.setBoldFont();
-                    } else {
-                        checkBox.setItalicFont();
+                final var selectedSequent = mainWindow.getMediator().getSelectionModel().getSelectedSequent();
+                if (selectedSequent != null) {
+                    Set<Name> labelNames = getOccuringTermLabels(selectedSequent);
+                    for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
+                        TermLabelCheckBox checkBox = entry.getValue();
+                        /*
+                         * Font style indicates whether a label occurs in the currently displayed
+                         * sequent.
+                         */
+                        if (labelNames.contains(entry.getKey())) {
+                            checkBox.setBoldFont();
+                        } else {
+                            checkBox.setItalicFont();
+                        }
                     }
                 }
             }
@@ -177,7 +179,7 @@ public class TermLabelMenu extends JMenu {
         public static final String LABEL = "Display Term Labels in Formulas";
 
         public static final String TOOL_TIP =
-            "Use this checkbox to toggle visibility for all term labels.";
+                "Use this checkbox to toggle visibility for all term labels.";
 
         /**
          *
@@ -247,7 +249,7 @@ public class TermLabelMenu extends JMenu {
         private void setItalicFont() {
             setFont(getFont().deriveFont(Font.ITALIC));
             setEnabledToolTipText(
-                "Term label " + labelName + " does not occur in the current sequent.");
+                    "Term label " + labelName + " does not occur in the current sequent.");
         }
 
         private void setBoldFont() {
@@ -271,7 +273,7 @@ public class TermLabelMenu extends JMenu {
                 setToolTipText(enabledToolTipText);
             } else {
                 setToolTipText("You turned off visibility for all term labels. "
-                    + "This checkbox is disabled.");
+                        + "This checkbox is disabled.");
             }
         }
 

@@ -3,20 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Predicate;
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
@@ -36,8 +27,16 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
-
 import org.key_project.prover.engine.TaskStartedInfo;
+
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Predicate;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
@@ -601,11 +600,11 @@ public class ProofTreePopupFactory {
         }
     }
 
-    public static abstract class ProofTreeAction extends KeyAction {
-        private static final long serialVersionUID = 2686349019163064481L;
+    public static abstract class ProofTreeAction extends MainWindowAction {
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {
+            super(context.window, true);
             this.context = context;
         }
     }

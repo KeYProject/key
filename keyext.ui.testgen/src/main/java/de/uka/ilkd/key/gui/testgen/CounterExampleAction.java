@@ -8,10 +8,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
-import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
@@ -32,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CounterExampleAction extends MainWindowAction implements PropertyChangeListener {
-    private static final long serialVersionUID = -1931682474791981751L;
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterExampleAction.class);
 
     private static final String NAME = "Search for Counterexample";
@@ -45,10 +42,13 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         setName(NAME);
         setTooltip(TOOLTIP);
         Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
-        putValue(SMALL_ICON, icon);
+        setSmallIcon(icon);
         setMenuPath("Proof");
         init();
         lookupAcceleratorKey();
+
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     /**
@@ -63,42 +63,23 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
                 .addPropertyChangeListener(this);
         checkZ3CE();
 
-        final KeYSelectionListener selListener = new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                final Proof proof = getMediator().getSelectedProof();
-                if (proof == null) {
-                    // no proof loaded
-                    setEnabled(false);
-                } else {
-                    final Node selNode = getMediator().getSelectedNode();
-                    // Can be applied only to root nodes
-                    setEnabled(haveZ3CE && selNode.childrenCount() == 0 && !selNode.isClosed());
-                }
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                selectedNodeChanged(null);
+        final PropertyChangeListener propertyChangeListener = e -> {
+            final Proof proof = getMediator().getSelectedProof();
+            if (proof == null) {
+                // no proof loaded
+                setEnabled(false);
+            } else {
+                final Node selNode = getMediator().getSelectedNode();
+                // Can be applied only to root nodes
+                setEnabled(haveZ3CE && selNode.childrenCount() == 0 && !selNode.isClosed());
             }
         };
-        getMediator().addKeYSelectionListener(selListener);
-        // This method delegates the request only to the UserInterfaceControl which implements the
-        // functionality.
-        // No functionality is allowed in this method body!
-        getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-                getMediator().removeKeYSelectionListener(selListener);
-                setEnabled(false);
-            }
+        getMediator().getSelectionModel().addPropertyChangeListener(
+            KeYSelectionModel.PROPERTY_SELECTED_NODE,
+            propertyChangeListener);
 
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                getMediator().addKeYSelectionListener(selListener);
-            }
-        });
-        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     @Override
