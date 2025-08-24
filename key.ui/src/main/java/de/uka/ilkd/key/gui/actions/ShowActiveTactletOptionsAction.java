@@ -14,14 +14,13 @@ import de.uka.ilkd.key.gui.MainWindow;
  * Now defers to the "Show Active Settings" action to show the taclet options.
  */
 public class ShowActiveTactletOptionsAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -7012564698194718532L;
     private final ShowActiveSettingsAction action;
 
     public ShowActiveTactletOptionsAction(MainWindow mainWindow, ShowActiveSettingsAction action) {
         super(mainWindow);
         setName("Show Active Taclet Options");
         this.action = action;
+        enabledOnAnActiveProof();
     }
 
     @Override

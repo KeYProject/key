@@ -17,9 +17,6 @@ import org.key_project.slicing.graph.GraphNode;
  * @author Arne Keller
  */
 public class ShowGraphAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -9022480738622934631L;
-
     /**
      * Dependency tracker to use when generating the graph excerpt.
      */
@@ -42,6 +39,7 @@ public class ShowGraphAction extends MainWindowAction {
         setName("Show dependency graph around this formula");
         this.tracker = tracker;
         this.node = node;
+        enabledOnAnActiveProof();
     }
 
     @Override

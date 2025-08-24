@@ -53,7 +53,7 @@ public abstract class MainWindowAction extends KeyAction {
     /// Useful as a predicate for [#setEnabledWhen].
     /// ```java
     /// setEnabledWhen(this::isProofSelected);
-    ///```
+    /// ```
     protected final boolean isProofSelected() {
         return getMediator().getSelectionModel().getSelectedProof() != null;
     }
@@ -62,7 +62,7 @@ public abstract class MainWindowAction extends KeyAction {
     /// Useful as a predicate for [#setEnabledWhen].
     /// ```java
     /// setEnabledWhen(not(this::isMainWindowAutoMode));
-    ///```
+    /// ```
     protected final boolean isMainWindowAutoMode() {
         return mainWindow.isInAutoMode();
     }
@@ -86,10 +86,11 @@ public abstract class MainWindowAction extends KeyAction {
     }
 
     /// This methods places a {@link #java.beans.PropertyChangeListener}, s.t.,
-    /// the enabledness is updated when the auto-mode/macro is executed or finished in side the [#mainWindow].
+    /// the enabledness is updated when the auto-mode/macro is executed or finished in side the
+    /// [#mainWindow].
     protected final void updateEnablednessOnAutoModeChange() {
         mainWindow.addPropertyChangeListener(MainWindow.PROPERTY_IN_AUTO_MODE,
-                p -> updateEnabledness());
+            p -> updateEnabledness());
     }
 
     @Override
@@ -108,19 +109,5 @@ public abstract class MainWindowAction extends KeyAction {
 
     protected KeYMediator getMediator() {
         return mainWindow.getMediator();
-    }
-}
-
-        @Override
-        public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-            var enable = e.getSource().getSelectedProof() != null;
-            actions.forEach(a -> a.setEnabled(enable));
-        }
-
-        @Override
-        public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            var enable = e.getSource().getSelectedProof() != null;
-            actions.forEach(a -> a.setEnabled(enable));
-        }
     }
 }

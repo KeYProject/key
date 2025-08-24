@@ -23,9 +23,6 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  * @author Alicia Appelhagen (move from MainWindow to own class)
  */
 public class SMTInvokeAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -8176122007799747342L;
-
     protected final transient KeYMediator mediator;
 
     /**
@@ -47,6 +44,9 @@ public class SMTInvokeAction extends MainWindowAction {
         if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
             putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
         }
+
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     public SolverTypeCollection getSolverUnion() {

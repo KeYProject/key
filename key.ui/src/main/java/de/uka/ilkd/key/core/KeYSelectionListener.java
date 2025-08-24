@@ -9,7 +9,12 @@ import de.uka.ilkd.key.proof.Proof;
 
 /**
  * The KeYSelectionListener is notified if the proof or the node the user works with has changed.
+ *
+ * @deprecated weigl: Please use switch to the {@link java.beans.PropertyChangeListener} interface
+ *             of
+ *             {@link KeYSelectionModel}.
  */
+@Deprecated
 public interface KeYSelectionListener {
 
     /**

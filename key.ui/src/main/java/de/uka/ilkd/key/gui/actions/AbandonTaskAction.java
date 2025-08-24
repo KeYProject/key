@@ -10,12 +10,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
 public final class AbandonTaskAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 915588190956945751L;
-
     private final Proof proof;
 
     public AbandonTaskAction(MainWindow mainWindow, Proof proof) {
@@ -25,6 +19,7 @@ public final class AbandonTaskAction extends MainWindowAction {
         setTooltip("Drop current proof.");
 
         enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
 
         this.proof = proof;
     }

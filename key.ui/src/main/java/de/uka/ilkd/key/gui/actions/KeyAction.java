@@ -9,8 +9,6 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
-import java.util.function.Supplier;
-
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
 /// Common class for all "actions" (menu entries / toolbar buttons) the user can trigger.
@@ -197,9 +195,10 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     /// A stupid interface which is like [#java.util.function.Predicate] but without an argument.
-    /// The JDK alternative [#java.util.function.BooleanSupplier] does not provide combinatorial functions.
+    /// The JDK alternative [#java.util.function.BooleanSupplier] does not provide combinatorial
+    /// functions.
     /// @author weigl
-    interface Pred {
+    public interface Pred {
         boolean test();
 
         default Pred not() {

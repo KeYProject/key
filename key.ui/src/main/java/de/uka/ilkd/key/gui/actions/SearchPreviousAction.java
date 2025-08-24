@@ -15,8 +15,6 @@ import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
  * KeyStrokemanager
  */
 public class SearchPreviousAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -9002009635814787502L;
     private final SequentViewSearchBar searchBar;
 
     public SearchPreviousAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {

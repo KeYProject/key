@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -12,76 +14,123 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *
+ */
+@NullMarked
 public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
 
     // the KeYMediator is informed before all
     private final KeYMediator primary;
 
-    /** the proof to listen to */
-    private Proof proof;
-    /** if true the selectedGoal field below can be trusted */
-    private boolean goalIsValid;
-    /** is the selected node a goal */
-    private Goal selectedGoal;
-    /** the current displayed node */
-    private Node selectedNode;
+    protected final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    /**
+     * the proof to listen to
+     */
+    private @Nullable Proof proof;
+    public static String PROPERTY_SELECTED_PROOF = "proof";
+
+    /**
+     * is the selected node a goal
+     */
+    private @Nullable Goal selectedGoal;
+    public static String PROPERTY_SELECTED_GOAL = "selectedGoal";
+
+
+    /**
+     * the current displayed node
+     */
+    private @Nullable Node selectedNode;
+    public static String PROPERTY_SELECTED_NODE = "selectedNode";
+
+
     /**
      * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
      * we are displaying an OSS node.
      */
-    private Sequent selectedSequent;
+    private @Nullable Sequent selectedSequent;
+    public static String PROPERTY_SELECTED_SEQUENT = "selectedSequent";
+
+
     /**
      * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
      * unless we are displaying an OSS node.
      */
-    private RuleApp selectedRuleApp;
-    /** the listeners to this model */
+    private @Nullable RuleApp selectedRuleApp;
+    public static String PROPERTY_SELECTED_RULE_APP = "selectedRuleApp";
+
+
+    /**
+     * the listeners to this model
+     */
     private final List<KeYSelectionListener> listenerList;
 
-    /** cached selected node event */
+    /**
+     * cached selected node event
+     */
 
     public KeYSelectionModel(KeYMediator primary) {
         this.primary = primary;
         listenerList = Collections.synchronizedList(new ArrayList<>(5));
-        goalIsValid = false;
+    }
+
+    /// @see PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /// @see PropertyChangeSupport#removePropertyChangeListener(PropertyChangeListener)
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /// @see PropertyChangeSupport#getPropertyChangeListeners()
+    public PropertyChangeListener[] getPropertyChangeListeners() {
+        return propertyChangeSupport.getPropertyChangeListeners();
+    }
+
+    /// @see PropertyChangeSupport#addPropertyChangeListener(String, PropertyChangeListener)
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /// @see PropertyChangeSupport#removePropertyChangeListener(String, PropertyChangeListener)
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
     /**
      * Sets the selected proof.
      *
      * @param p the proof to select.
-     *
      * @see KeYMediator#getSelectionModel()#setProof(Proof)
      */
     public synchronized void setSelectedProof(Proof p) {
         final Proof previousProof = proof;
-        goalIsValid = false;
         proof = p;
         primary.setProof(p, previousProof);
         if (proof != null) {
             if (proof.openGoals().isEmpty()) {
-                selectedNode = proof.root().leavesIterator().next();
-                selectedSequent = selectedNode.sequent();
-                selectedRuleApp = selectedNode.getAppliedRuleApp();
+                setSelectedNode(proof.root().leavesIterator().next());
             } else {
                 final Goal g = proof.openGoals().iterator().next();
-                goalIsValid = true;
-                selectedNode = g.node();
-                selectedSequent = selectedNode.sequent();
-                selectedRuleApp = selectedNode.getAppliedRuleApp();
-                selectedGoal = g;
+                setSelectedGoal(g);
             }
         } else {
-            selectedNode = null;
-            selectedSequent = null;
-            selectedRuleApp = null;
-            selectedGoal = null;
+            setSelectedNode(null);
+            setSelectedSequent(null);
+            setSelectedRuleApp(null);
+            setSelectedGoal(null);
         }
 
+        propertyChangeSupport.firePropertyChange(PROPERTY_SELECTED_PROOF, previousProof, proof);
         fireSelectedProofChanged(previousProof);
     }
 
@@ -99,17 +148,19 @@ public class KeYSelectionModel {
      *
      * @param n the selected node
      */
-    public synchronized void setSelectedNode(Node n) {
+    public synchronized void setSelectedNode(@Nullable Node n) {
         final Node previousSelectedNode = selectedNode;
         // switch proof if needed
         if (n.proof() != getSelectedProof()) {
             setSelectedProof(n.proof());
         }
-        goalIsValid = false;
         selectedNode = n;
-        selectedSequent = selectedNode.sequent();
-        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        setSelectedGoal(null);
+        setSelectedRuleApp(selectedNode.getAppliedRuleApp());
+        setSelectedSequent(selectedNode.sequent());
         fireSelectedNodeChanged(previousSelectedNode);
+        propertyChangeSupport.firePropertyChange(PROPERTY_SELECTED_NODE, previousSelectedNode,
+            selectedGoal);
     }
 
     /**
@@ -117,20 +168,13 @@ public class KeYSelectionModel {
      *
      * @param node selected node
      * @param sequent selected sequent
+     * @param ruleApp a rule app
      */
-    public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
-            RuleApp ruleApp) {
-        final Node previousNode = selectedNode;
-        // switch proof if needed
-        if (node.proof() != getSelectedProof()) {
-            setSelectedProof(node.proof());
-        }
-        goalIsValid = true;
-        selectedGoal = null;
-        selectedNode = node;
-        selectedSequent = sequent;
-        selectedRuleApp = ruleApp;
-        fireSelectedNodeChanged(previousNode);
+    public synchronized void setSelectedSequentAndRuleApp(
+            @Nullable Node node, @Nullable Sequent sequent, @Nullable RuleApp ruleApp) {
+        setSelectedNode(node);
+        setSelectedSequent(sequent);
+        setSelectedRuleApp(ruleApp);
     }
 
     /**
@@ -138,14 +182,27 @@ public class KeYSelectionModel {
      *
      * @param g the Goal that contains the selected node
      */
-    public synchronized void setSelectedGoal(Goal g) {
+    public synchronized void setSelectedGoal(@Nullable Goal g) {
         final Node previousNode = selectedNode;
-        goalIsValid = true;
         selectedGoal = g;
-        selectedNode = g.node();
-        selectedSequent = selectedNode.sequent();
-        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        setSelectedNode(g == null ? null : g.node());
+        setSelectedSequent(g == null ? null : g.node().sequent());
+        setSelectedRuleApp(g == null ? null : g.node().getAppliedRuleApp());
         fireSelectedNodeChanged(previousNode);
+        propertyChangeSupport.firePropertyChange(PROPERTY_SELECTED_GOAL, previousNode,
+            selectedGoal);
+    }
+
+    private void setSelectedRuleApp(@Nullable RuleApp ruleApp) {
+        var old = selectedRuleApp;
+        selectedRuleApp = ruleApp;
+        propertyChangeSupport.firePropertyChange(PROPERTY_SELECTED_RULE_APP, old, ruleApp);
+    }
+
+    private void setSelectedSequent(@Nullable Sequent sequent) {
+        var old = selectedSequent;
+        selectedSequent = sequent;
+        propertyChangeSupport.firePropertyChange(PROPERTY_SELECTED_SEQUENT, old, sequent);
     }
 
     /**
@@ -153,15 +210,15 @@ public class KeYSelectionModel {
      *
      * @return the node that is selected by the user
      */
-    public Node getSelectedNode() {
+    public @Nullable Node getSelectedNode() {
         return selectedNode;
     }
 
-    public Sequent getSelectedSequent() {
+    public @Nullable Sequent getSelectedSequent() {
         return selectedSequent;
     }
 
-    public RuleApp getSelectedRuleApp() {
+    public @Nullable RuleApp getSelectedRuleApp() {
         return selectedRuleApp;
     }
 
@@ -170,13 +227,12 @@ public class KeYSelectionModel {
      *
      * @return the goal the selected node belongs to, null if it is an inner node
      */
-    public Goal getSelectedGoal() {
+    public @Nullable Goal getSelectedGoal() {
         if (proof == null) {
             throw new IllegalStateException("No proof loaded.");
         }
-        if (!goalIsValid) {
-            selectedGoal = proof.getOpenGoal(selectedNode);
-            goalIsValid = true;
+        if (!isGoal()) {
+            setSelectedGoal(proof.getOpenGoal(getSelectedNode()));
         }
         return selectedGoal;
     }
@@ -187,9 +243,6 @@ public class KeYSelectionModel {
      * @return true iff the selected node is a goal
      */
     public boolean isGoal() {
-        if (!goalIsValid) {
-            return (getSelectedGoal() != null);
-        }
         return selectedGoal != null;
     }
 
@@ -202,9 +255,9 @@ public class KeYSelectionModel {
         private static final int POS_GOAL_LIST = 2;
 
         private int currentPos = POS_START;
-        private Goal nextOne;
-        private Iterator<Goal> goalIt;
-        private Iterator<Node> nodeIt;
+        private @Nullable Goal nextOne;
+        private @Nullable Iterator<Goal> goalIt;
+        private @Nullable Iterator<Node> nodeIt;
 
         public DefaultSelectionIterator() {
             findNext();
@@ -285,54 +338,6 @@ public class KeYSelectionModel {
         } else {
             setSelectedNode(proof.root().leavesIterator().next());
         }
-    }
-
-    /**
-     * selects the first open goal below the given node <tt>old</tt> if no open goal is available
-     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof, the
-     * proof root is selected.
-     *
-     * @param old the Node to start looking for open goals
-     */
-    // XXX this method is never used
-    public void nearestOpenGoalSelection(Node old) {
-        Node n = old;
-        while (n != null && n.isClosed()) {
-            n = n.parent();
-        }
-        if (n == null) {
-            if (proof.find(old)) {
-                setSelectedNode(old);
-            } else {
-                setSelectedNode(proof.root());
-            }
-        } else {
-            final Goal g = getFirstOpenGoalBelow(n);
-            if (g == null || g.node() == null) {
-                setSelectedNode(proof.root());
-            } else {
-                setSelectedGoal(g);
-            }
-        }
-    }
-
-    /**
-     * retrieves the first open goal below the given node, i.e. the goal containing the first leaf
-     * of the subtree starting at <code>n</code> which is not already closed
-     *
-     * @param n the Node where to start from
-     * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
-     *         is not already closed. <code>null</code> is returned if no such goal exists.
-     */
-    private Goal getFirstOpenGoalBelow(Node n) {
-        final Iterator<Node> it = n.leavesIterator();
-        while (it.hasNext()) {
-            final Node node = it.next();
-            if (!node.isClosed()) {
-                return proof.getOpenGoal(node);
-            }
-        }
-        return null;
     }
 
     public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
