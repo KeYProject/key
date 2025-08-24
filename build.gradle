@@ -501,7 +501,9 @@ tasks.register('alldoc', Javadoc){
     def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
-    classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
+    classpath = files(projects
+            .collect { it.sourceSets.main.compileClasspath }
+    )
     destinationDir = layout.buildDirectory.dir("docs/javadoc").getOrNull().getAsFile()
 
     if (JavaVersion.current().isJava9Compatible()) {
