@@ -53,9 +53,18 @@ public abstract class PythonGenerator implements Supplier<String> {
     }
 
     protected String asPython(Metamodel.Type t) {
-        if (t instanceof Metamodel.ListType lt) {
-            return "typing.List[" + asPython(lt.type()) + "]";
-        }
+        return switch (t) {
+            case Metamodel.ListType lt -> "typing.List[" + asPython(lt.type()) + "]";
+            case Metamodel.EitherType lt ->
+                "typing.Union[" + asPython(lt.a()) + ", " + asPython(lt.b()) + "]";
+            case Metamodel.BuiltinType bt -> switch (bt) {
+                case INT, LONG -> "int";
+                case STRING -> "str";
+                case BOOL -> "bool";
+                case DOUBLE -> "float";
+            };
+            default -> t.name();
+        };
 
         if (t instanceof Metamodel.EitherType lt) {
             return "typing.Union[" + asPython(lt.a()) + ", " + asPython(lt.b()) + "]";
