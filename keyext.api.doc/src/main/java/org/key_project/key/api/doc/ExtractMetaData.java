@@ -188,6 +188,12 @@ public class ExtractMetaData implements Callable<Integer> {
             return getOrFindType(type.getTypeParameters()[0].getClass());
         }
 
+        if (type == List.class) {
+            // TODO try to get the type below.
+            var subType = getOrFindType(type.getTypeParameters()[0].getClass());
+            return new Metamodel.ListType(subType, "");
+        }
+
         if (type == Class.class || type == Constructor.class || type == Proof.class) {
             throw new IllegalStateException("Forbidden class reached!");
         }
