@@ -98,7 +98,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     private final KeYSelectionListener mediatorListener = new KeYSelectionListener() {
 
         public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            refresh(e.getSource().getSelectedProof());
+            refresh(e.source().getSelectedProof());
         }
     };
     private JButton btnGo;

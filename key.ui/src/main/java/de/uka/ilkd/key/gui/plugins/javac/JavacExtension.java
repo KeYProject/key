@@ -225,7 +225,7 @@ public class JavacExtension
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        loadProof(e.getSource().getSelectedProof());
+        loadProof(e.source().getSelectedProof());
     }
 }
 

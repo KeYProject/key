@@ -5,14 +5,10 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Shows the proof management dialog
@@ -30,28 +26,7 @@ public final class ProofManagementAction extends MainWindowAction {
         setTooltip("Browse contracts and possible proof targets");
         setIcon(IconFactory.proofMgt(16));
 
-        setEnabled(enabled());
-
-        getMediator().addKeYSelectionListener(new KeYSelectionListener() {
-            /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-            }
-
-            /**
-             * the selected proof has changed. Enable or disable action depending on whether a proof
-             * is
-             * available or not
-             */
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                setEnabled(enabled());
-            }
-        });
-    }
-
-    private boolean enabled() {
-        return getMediator().getSelectedProof() != null
-                && getMediator().getSelectedProof().getServices().getJavaModel() != null
-                && !getMediator().getSelectedProof().getServices().getJavaModel().isEmpty();
+        enabledOnAnActiveProof();
     }
 
     public void actionPerformed(ActionEvent e) {

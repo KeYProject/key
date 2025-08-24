@@ -7,12 +7,15 @@ import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -24,8 +27,8 @@ import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
  * This class provides the user interface to the macro extensions.
  *
  * <p>
- * It provides a menu with all macros which are applicable in a given context. The check of of
- * applicability is done using {@link ProofMacro#canApplyTo}.
+ * It provides a menu with all macros which are applicable in a given context.
+ * The check of applicability is done using {@link ProofMacro#canApplyTo}.
  *
  * <p>
  * The menu items bear the name returned by {@link ProofMacro#getName()} and the tooltip is set to
@@ -39,19 +42,14 @@ import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
  * register a macro, add its class name to the file
  * <tt>resources/META-INF/services/de.uka.ilkd.key.macros.ProofMacro</tt>.
  *
+ * @author mattias ulbrich
  * @see ProofMacro
  * @see ServiceLoader
- *
- * @author mattias ulbrich
  */
 public class ProofMacroMenu extends JMenu {
-
-
-    private static final long serialVersionUID = -5946657022043894399L;
-
     /**
      * The loader used to access the providers for macros.
-     *
+     * <p>
      * This is used as iteration source in other parts of KeY's ui.
      */
     public static final Iterable<ProofMacro> REGISTERED_MACROS =
@@ -73,13 +71,11 @@ public class ProofMacroMenu extends JMenu {
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
-    public ProofMacroMenu(KeYMediator mediator,
-            PosInOccurrence posInOcc) {
+    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy Macros");
 
         // Macros are grouped according to their category.
         Map<String, List<JMenuItem>> submenus = new LinkedHashMap<>();
-
         int count = 0;
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
@@ -127,25 +123,23 @@ public class ProofMacroMenu extends JMenu {
                 }
             });
         }
-
-        mediator.enableWhenProofLoaded(this);
         this.numberOfMacros = count;
+
+        setEnabled(mediator.getSelectedProof() != null);
+        mediator.addKeYSelectionListener(new KeYSelectionListener() {
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                setEnabled(e.currentSelection() != null);
+            }
+        });
     }
 
-    private static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
+    private static JMenuItem createMenuItem(final ProofMacro macro,
+            final KeYMediator mediator,
             final PosInOccurrence posInOcc) {
-
-        JMenuItem menuItem = new JMenuItem(macro.getName());
-        menuItem.setToolTipText(macro.getDescription());
-        final KeyStroke macroKey = KeyStrokeManager.get(macro);
-
-        if (macroKey != null && posInOcc == null) { // currently only for global macro applications
-            menuItem.setAccelerator(macroKey);
-        }
-
-        menuItem.addActionListener(
-            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
-        return menuItem;
+        var action =
+            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof());
+        return new JMenuItem(action);
     }
 
     /**

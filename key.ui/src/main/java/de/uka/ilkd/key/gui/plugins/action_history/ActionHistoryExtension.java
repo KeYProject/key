@@ -138,7 +138,7 @@ public class ActionHistoryExtension implements UserActionListener,
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        Proof p = e.getSource().getSelectedProof();
+        Proof p = e.source().getSelectedProof();
         currentProof = p;
         if (p == null || registeredProofs.contains(p)) {
             return;

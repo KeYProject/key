@@ -64,18 +64,21 @@ public class TermLabelMenu extends JMenu {
              */
             @Override
             public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                Set<Name> labelNames =
-                    getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
-                for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
-                    TermLabelCheckBox checkBox = entry.getValue();
-                    /*
-                     * Font style indicates whether a label occurs in the currently displayed
-                     * sequent.
-                     */
-                    if (labelNames.contains(entry.getKey())) {
-                        checkBox.setBoldFont();
-                    } else {
-                        checkBox.setItalicFont();
+                final var selectedSequent =
+                    mainWindow.getMediator().getSelectionModel().getSelectedSequent();
+                if (selectedSequent != null) {
+                    Set<Name> labelNames = getOccuringTermLabels(selectedSequent);
+                    for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
+                        TermLabelCheckBox checkBox = entry.getValue();
+                        /*
+                         * Font style indicates whether a label occurs in the currently displayed
+                         * sequent.
+                         */
+                        if (labelNames.contains(entry.getKey())) {
+                            checkBox.setBoldFont();
+                        } else {
+                            checkBox.setItalicFont();
+                        }
                     }
                 }
             }

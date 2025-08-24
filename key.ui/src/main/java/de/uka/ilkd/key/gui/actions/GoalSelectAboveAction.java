@@ -26,6 +26,8 @@ public final class GoalSelectAboveAction extends MainWindowAction {
         setIcon(IconFactory.selectGoalAbove(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip(
             "Changes selected goal in the proof-tree to the next item above the current one");
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     @Override

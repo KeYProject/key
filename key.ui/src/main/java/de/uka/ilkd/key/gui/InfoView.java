@@ -214,7 +214,7 @@ public class InfoView extends JSplitPane implements TabPanel {
          */
         @Override
         public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            final KeYSelectionModel selectionModel = e.getSource();
+            final KeYSelectionModel selectionModel = e.source();
             Runnable action = () -> {
                 if (isVisible()) {
                     if (selectionModel.getSelectedProof() == null) {

@@ -22,6 +22,8 @@ public class IsabelleTranslateAllAction extends MainWindowAction {
     public IsabelleTranslateAllAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Translate all goals to Isabelle");
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     @Override

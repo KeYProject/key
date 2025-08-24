@@ -10,17 +10,13 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class ToggleConfirmExitAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3453843972242689758L;
-
     public ToggleConfirmExitAction(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Ask for extra confirmation when trying to exit the prover");
         setName("Confirm Exit");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().confirmExit());
+
+        enabledWhenNotInAutoMode();
     }
 
     @Override

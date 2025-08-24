@@ -13,18 +13,13 @@ import de.uka.ilkd.key.proof.Proof;
  * Saves the current selected proof.
  */
 public final class SaveFileAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5479654127272775831L;
-
     public SaveFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Save...");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof.");
         enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     public void actionPerformed(ActionEvent e) {

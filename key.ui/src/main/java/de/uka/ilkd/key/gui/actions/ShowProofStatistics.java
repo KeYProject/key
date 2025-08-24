@@ -41,8 +41,6 @@ public class ShowProofStatistics extends MainWindowAction {
     private static final String CSV_SEPERATOR = ";";
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
-    private static final long serialVersionUID = -8814798230037775905L;
-
     /**
      * Regex pattern to check for tooltips in statistics entries.
      */
@@ -58,8 +56,9 @@ public class ShowProofStatistics extends MainWindowAction {
         super(mainWindow);
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
-        enabledOnAnActiveProof();
 
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
         this.proof = proof;
     }
 

@@ -360,7 +360,7 @@ public class KeYSelectionModel {
     public synchronized void fireSelectedNodeChanged(Node previousNode) {
         synchronized (listenerList) {
             final KeYSelectionEvent<Node> selectionEvent =
-                new KeYSelectionEvent<>(this, previousNode);
+                new KeYSelectionEvent<>(this, previousNode, selectedNode);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedNodeChanged(selectionEvent);
             }
@@ -371,7 +371,7 @@ public class KeYSelectionModel {
         synchronized (listenerList) {
             LOGGER.debug("Selected Proof changed, firing...");
             final KeYSelectionEvent<Proof> selectionEvent =
-                new KeYSelectionEvent<>(this, previousProof);
+                new KeYSelectionEvent<>(this, previousProof, proof);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }

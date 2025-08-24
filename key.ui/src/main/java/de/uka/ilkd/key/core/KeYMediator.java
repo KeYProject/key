@@ -720,7 +720,7 @@ public class KeYMediator {
         addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                a.setEnabled(e.getSource().getSelectedProof() != null);
+                a.setEnabled(e.source().getSelectedProof() != null);
             }
         });
     }
@@ -736,7 +736,7 @@ public class KeYMediator {
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                a.setEnabled(e.getSource().getSelectedProof() != null);
+                a.setEnabled(e.source().getSelectedProof() != null);
             }
         });
     }

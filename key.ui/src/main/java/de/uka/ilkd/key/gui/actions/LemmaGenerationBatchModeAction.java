@@ -35,13 +35,13 @@ public class LemmaGenerationBatchModeAction extends MainWindowAction {
                 runProver --help
                 in the batch mode.""";
 
-    private static final long serialVersionUID = 1L;
-
     public LemmaGenerationBatchModeAction(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Show information about proving taclets by using the batch mode.");
         putValue(NAME, "Taclets Using the Batch Mode...");
         putValue(SHORT_DESCRIPTION, "A short description for using the batch mode.");
+
+        enabledWhenNotInAutoMode();
     }
 
     @Override

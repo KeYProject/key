@@ -20,11 +20,9 @@ import org.key_project.exploration.ExplorationModeModel;
  * Common functionalities for proof exploration actions.
  */
 public abstract class ExplorationAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -1662459714803539089L;
-
     protected ExplorationAction(MainWindow mw) {
         super(mw);
+        enabledOnAnActiveProof();
         enabledWhenNotInAutoMode();
     }
 

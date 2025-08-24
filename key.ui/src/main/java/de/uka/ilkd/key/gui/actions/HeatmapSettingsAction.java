@@ -5,13 +5,9 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Action for invoking the heatmap options dialog.
@@ -19,8 +15,6 @@ import de.uka.ilkd.key.proof.Proof;
  * @author jschiffl
  */
 public class HeatmapSettingsAction extends MainWindowAction {
-    private static final long serialVersionUID = -6165100588113899099L;
-
     private HeatmapOptionsDialog dialog;
 
     /**
@@ -34,20 +28,7 @@ public class HeatmapSettingsAction extends MainWindowAction {
         setMenuPath("View.Heatmap");
         setEnabled(getMediator().getSelectedProof() != null);
         setIcon(IconFactory.selectDecProcArrow(MainWindow.TOOLBAR_ICON_SIZE));
-
-        final KeYSelectionListener selListener = new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                final Proof proof = getMediator().getSelectedProof();
-                setEnabled(proof != null);
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                selectedNodeChanged(null);
-            }
-        };
-        getMediator().addKeYSelectionListener(selListener);
+        enabledOnAnActiveProof();
     }
 
     @Override

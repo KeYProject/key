@@ -5,13 +5,9 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle
@@ -34,27 +30,10 @@ public final class SaveBundleAction extends MainWindowAction {
         setIcon(IconFactory.saveBundle(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof as a bundle containing all files to successfully reload "
             + "the proof (disabled when option \"Allow proof bundle saving\" is set).");
-
-        // react to setting changes
-        GeneralSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        settings.addPropertyChangeListener(e -> updateStatus());
-
-        // react to changes of proof selection
-        mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                updateStatus();
-            }
-        });
-
-        updateStatus();
+        enabledWhenNotInAutoMode();
+        enabledOnAnActiveProof();
     }
 
-    private void updateStatus() {
-        // enable only if there is a proof
-        setEnabled(mainWindow.getMediator().getSelectedProof() != null);
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions.useractions;
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -29,6 +32,12 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
         super(mediator, proof);
         this.macro = macro;
         this.pio = pio;
+
+        setTooltip(macro.getDescription());
+        final KeyStroke macroKey = KeyStrokeManager.get(macro);
+        if (macroKey != null && pio == null) { // currently only for global macro applications
+            setAcceleratorKey(macroKey);
+        }
     }
 
     @Override

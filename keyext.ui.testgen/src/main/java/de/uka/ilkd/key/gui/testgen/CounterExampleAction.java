@@ -3,21 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.*;
-
-import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.InterruptListener;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
@@ -27,12 +21,15 @@ import de.uka.ilkd.key.testgen.smt.counterexample.AbstractCounterExampleGenerato
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 
 import org.key_project.prover.sequent.Sequent;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 public class CounterExampleAction extends MainWindowAction implements PropertyChangeListener {
-    private static final long serialVersionUID = -1931682474791981751L;
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterExampleAction.class);
 
     private static final String NAME = "Search for Counterexample";
@@ -45,10 +42,13 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         setName(NAME);
         setTooltip(TOOLTIP);
         Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
-        putValue(SMALL_ICON, icon);
+        setSmallIcon(icon);
         setMenuPath("Proof");
         init();
         lookupAcceleratorKey();
+
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     /**
@@ -63,42 +63,15 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
                 .addPropertyChangeListener(this);
         checkZ3CE();
 
-        final KeYSelectionListener selListener = new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                final Proof proof = getMediator().getSelectedProof();
-                if (proof == null) {
-                    // no proof loaded
-                    setEnabled(false);
-                } else {
-                    final Node selNode = getMediator().getSelectedNode();
-                    // Can be applied only to root nodes
-                    setEnabled(haveZ3CE && selNode.childrenCount() == 0 && !selNode.isClosed());
-                }
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                selectedNodeChanged(null);
-            }
+        final Pred hasZ3CE = () -> {
+            final Node selNode = getMediator().getSelectedNode();
+            // Can be applied only to root nodes
+            return haveZ3CE && selNode != null && selNode.childrenCount() == 0 && !selNode.isClosed();
         };
-        getMediator().addKeYSelectionListener(selListener);
-        // This method delegates the request only to the UserInterfaceControl which implements the
-        // functionality.
-        // No functionality is allowed in this method body!
-        getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-                getMediator().removeKeYSelectionListener(selListener);
-                setEnabled(false);
-            }
 
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                getMediator().addKeYSelectionListener(selListener);
-            }
-        });
-        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
+        addConjunctivelyEnabledWhen(hasZ3CE);
     }
 
     @Override
@@ -147,7 +120,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             extends AbstractSideProofCounterExampleGenerator {
         @Override
         protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
-                Proof proof) {
+                                                              Proof proof) {
             return new SolverListener(settings, proof);
         }
     }
@@ -174,7 +147,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         @Override
         protected Void doInBackground() throws Exception {
             final NoMainWindowCounterExampleGenerator generator =
-                new NoMainWindowCounterExampleGenerator();
+                    new NoMainWindowCounterExampleGenerator();
             generator.searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
             return null;
         }

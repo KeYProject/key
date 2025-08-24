@@ -5,14 +5,8 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 /**
@@ -25,12 +19,6 @@ import de.uka.ilkd.key.settings.GeneralSettings;
  * @author Pfeifer (enabled pruning in closed branches)
  */
 public final class PruneProofAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 9133317783386913373L;
-
     /**
      * Creates a new PruneProofAction.
      *
@@ -39,72 +27,21 @@ public final class PruneProofAction extends MainWindowAction {
      */
     public PruneProofAction(MainWindow mainWindow) {
         super(mainWindow);
-        init();
-        putValue(NAME, "Prune Proof");
-        putValue(SMALL_ICON, IconFactory.pruneLogo(MainWindow.TOOLBAR_ICON_SIZE));
-        putValue(SHORT_DESCRIPTION, "Prune the tree below the selected node.");
-    }
+        setName("Prune Proof");
+        setSmallIcon(IconFactory.pruneLogo(MainWindow.TOOLBAR_ICON_SIZE));
+        setTooltip("Prune the tree below the selected node.");
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
 
-    /**
-     * Registers the action at some listeners to update its status in a correct fashion. This method
-     * has to be invoked after the Main class has been initialized with the KeYMediator.
-     */
-    public void init() {
-        final KeYSelectionListener selListener = new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                final Proof proof = getMediator().getSelectedProof();
-                handleProof(proof);
-            }
-
-            private void handleProof(Proof proof) {
-                boolean enabled = false;
-                if (proof != null) {
-                    final Node selNode = getMediator().getSelectedNode();
-
-                    if (selNode != null) {
-                        /*
-                         * disable pruning for leaves and disable it for closed subtrees if the
-                         * command line option "--no-pruning-closed" is set (saves memory)
-                         */
-                        if (!selNode.leaf() && (!proof.getSubtreeGoals(selNode).isEmpty()
-                                || (!GeneralSettings.noPruningClosed
-                                        && !proof.getClosedSubtreeGoals(selNode).isEmpty()))) {
-
-                            enabled = true;
-                        }
-                    }
-                }
-                setEnabled(enabled);
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                final Proof proof = getMediator().getSelectedProof();
-                handleProof(proof);
-            }
+        Pred pruningAllowed = () -> {
+            var selNode = getMediator().getSelectedNode();
+            if (selNode == null)
+                return false;
+            final var empty = selNode.proof().getClosedSubtreeGoals(selNode).isEmpty();
+            return !selNode.leaf() && (!selNode.proof().getSubtreeGoals(selNode).isEmpty()
+                    || (!GeneralSettings.noPruningClosed && !empty));
         };
-
-        getMediator().addKeYSelectionListener(selListener);
-
-        /*
-         * This method delegates the request only to the UserInterfaceControl which implements the
-         * functionality. No functionality is allowed in this method body!
-         */
-        getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-                getMediator().removeKeYSelectionListener(selListener);
-                setEnabled(false);
-            }
-
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                getMediator().addKeYSelectionListener(selListener);
-                selListener.selectedNodeChanged(null);
-            }
-        });
-        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
+        setEnabledWhen(getEnabledWhen().and(pruningAllowed));
     }
 
     @Override

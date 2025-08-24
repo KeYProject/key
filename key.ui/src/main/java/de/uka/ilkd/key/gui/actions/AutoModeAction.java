@@ -21,16 +21,12 @@ import de.uka.ilkd.key.proof.*;
 import org.key_project.util.collection.ImmutableList;
 
 public final class AutoModeAction extends MainWindowAction {
-
-    private static final KeyStroke START_KEY =
+    public static final KeyStroke START_KEY =
         KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
-    private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7702898691162947994L;
-    final Icon startLogo = IconFactory.autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
-    final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
+    public static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    public static final Icon startLogo =
+        IconFactory.autoModeStartLogo(MainWindow.TOOLBAR_ICON_SIZE);
+    public static final Icon stopLogo = IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE);
 
     private Proof associatedProof;
 
@@ -91,7 +87,7 @@ public final class AutoModeAction extends MainWindowAction {
                     associatedProof.removeProofTreeListener(ptl);
                 }
 
-                associatedProof = e.getSource().getSelectedProof();
+                associatedProof = e.source().getSelectedProof();
                 enable();
 
                 if (associatedProof != null) {

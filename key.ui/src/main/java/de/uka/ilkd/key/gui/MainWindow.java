@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -1650,7 +1651,7 @@ public final class MainWindow extends JFrame {
             if (proof != null && !proof.isDisposed()) {
                 proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
-            proof = e.getSource().getSelectedProof();
+            proof = e.source().getSelectedProof();
             if (proof != null) {
                 proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
@@ -1697,7 +1698,7 @@ public final class MainWindow extends JFrame {
 
         @Override
         public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            handleProof(e.getSource().getSelectedProof());
+            handleProof(e.source().getSelectedProof());
         }
 
         private void handleProof(Proof p) {
@@ -1710,7 +1711,7 @@ public final class MainWindow extends JFrame {
 
         @Override
         public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-            handleProof(e.getSource().getSelectedProof());
+            handleProof(e.source().getSelectedProof());
         }
 
     }
