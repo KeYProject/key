@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -21,7 +23,7 @@ public class ValueInjector {
      *
      * @see #getInstance()
      */
-    private static ValueInjector instance;
+    private static @MonotonicNonNull ValueInjector instance;
 
     /**
      * A mapping between desired types and suitable @{@link Converter}.
@@ -46,7 +48,7 @@ public class ValueInjector {
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
-     * {@link #inject(ProofScriptCommand, Object, Map)}
+     * {@link #inject(Object, ScriptCommandAst)}
      *
      * @param command a proof script command
      * @param obj a parameter class with annotation
@@ -58,10 +60,10 @@ public class ValueInjector {
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException an converter could not translate the given value in arguments
      */
-    public static <T> T injection(ProofScriptCommand<T> command, T obj,
-            Map<String, Object> arguments) throws ArgumentRequiredException,
+    public static <T> T injection(ProofScriptCommand command, @NonNull T obj,
+            ScriptCommandAst arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
-        return getInstance().inject(command, obj, arguments);
+        return getInstance().inject(obj, arguments);
     }
 
     /**
@@ -109,7 +111,6 @@ public class ValueInjector {
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
      * @param <T> type safety
-     * @param command a proof script command
      * @param obj a non-null instance of a parameter class (with annotation)
      * @param arguments a non-null string map
      * @return the same object as {@code obj}
@@ -120,42 +121,20 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, Object> arguments)
+    public <T> T inject(T obj, ScriptCommandAst arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument<T>> meta =
-            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
-        List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
+        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass());
 
-        List<String> usedKeys = new ArrayList<>();
-
-        for (ProofScriptArgument<T> arg : meta) {
-            if (arg.hasVariableArguments()) {
-                varArgs.add(arg);
-            } else {
-                injectIntoField(arg, arguments, obj);
-                usedKeys.add(arg.getName());
-            }
-        }
-
-        for (ProofScriptArgument<T> vararg : varArgs) {
-            final Map<String, Object> map = getStringMap(obj, vararg);
-            final int prefixLength = vararg.getName().length();
-            for (Map.Entry<String, Object> e : arguments.entrySet()) {
-                var k = e.getKey();
-                var v = e.getValue();
-                if (!usedKeys.contains(k) && k.startsWith(vararg.getName())) {
-                    map.put(k.substring(prefixLength), convert(vararg, v));
-                    usedKeys.add(k);
-                }
-            }
+        for (ProofScriptArgument arg : meta) {
+            injectIntoField(arg, arguments, obj);
         }
 
         return obj;
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getStringMap(Object obj, ProofScriptArgument<?> vararg)
+    private Map<String, Object> getStringMap(Object obj, ProofScriptArgument vararg)
             throws InjectionReflectionException {
         try {
             Map<String, Object> map = (Map<String, Object>) vararg.getField().get(obj);
@@ -166,61 +145,128 @@ public class ValueInjector {
             return map;
         } catch (IllegalAccessException e) {
             throw new InjectionReflectionException(
-                "Error on using reflection on class " + obj.getClass(), e, vararg);
+                "Error on using reflection on class " + obj.getClass(), e);
         }
     }
 
-    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, Object> args, Object obj)
+    private void injectIntoField(ProofScriptArgument meta, ScriptCommandAst args, Object obj)
             throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
             NoSpecifiedConverterException {
-        final var val = args.get(meta.getName());
-        if (val == null) {
-            if (meta.isRequired()) {
-                throw new ArgumentRequiredException(String.format(
-                    "Argument %s:%s is required, but %s was given. " + "For comamnd class: '%s'",
-                    meta.getName(), meta.getField().getType(), null, meta.getCommand().getClass()),
-                    meta);
-            }
-        } else {
-            Object value = convert(meta, val);
-            try {
-                // if (meta.getType() != value.getClass())
-                // throw new ConversionException("The typed returned '" + val.getClass()
-                // + "' from the converter mismatched with the
-                // type of the field " + meta.getType(), meta);
-                // FIXME: I had to add this, otherwise I would receive an illegal access exception.
-                meta.getField().setAccessible(true);
-                meta.getField().set(obj, value);
-            } catch (IllegalAccessException e) {
-                throw new InjectionReflectionException("Could not inject values via reflection", e,
-                    meta);
+        Object val = null;
+        if (meta.isPositional()) {
+            final var idx = meta.getArgumentPosition();
+            if (idx < args.positionalArgs().size()) {
+                val = args.positionalArgs().get(idx);
             }
         }
+
+        if (meta.isPositionalVarArgs()) {
+            val = args.positionalArgs();
+        }
+
+        if (meta.isOptionalVarArgs()) {
+            OptionalVarargs ov = Objects.requireNonNull(meta.getOptionalVarArgs());
+            var targetType = ov.as();
+            Map<String, Object> result = new TreeMap<>();
+            for (var entry : args.namedArgs().entrySet()) {
+                if (entry.getKey().startsWith(ov.prefix())) {
+                    result.put(entry.getKey(),
+                        convert(entry.getValue(), targetType));
+                }
+            }
+            val = result;
+        }
+
+        if (meta.isOption()) {
+            val = args.namedArgs().get(meta.getName());
+        }
+
+        if (meta.isFlag()) {
+            val = args.namedArgs().get(meta.getName());
+            System.out.println("X" + val + "  " + args.namedArgs() + "  " + meta.getName());
+            if (val == null) {
+                // can also be given w/o colon or equal sign, e.g., "command hide;"
+                var stringStream = args.positionalArgs().stream()
+                        .map(it -> {
+                            try {
+                                return convert(it, String.class);
+                            } catch (NoSpecifiedConverterException | ConversionException e) {
+                                return "";
+                            }
+                        });
+                // val == true iff the name of the flag appear as a positional argument.
+                val = stringStream.anyMatch(it -> Objects.equals(it, meta.getName()));
+                System.out.println(val);
+            }
+        }
+
+        try {
+            meta.getField().setAccessible(true);
+            if (val == null) {
+                if (meta.isRequired() && meta.getField().get(obj) == null) {
+                    throw new ArgumentRequiredException(String.format(
+                        "Argument %s (of type %s) is required, but %s was given. For command class: '%s'",
+                        meta.getName(), meta.getField().getType(), null,
+                        meta.getField().getDeclaringClass()));
+                }
+            } else {
+                Object value = convert(meta, val);
+                meta.getField().set(obj, value);
+            }
+        } catch (IllegalAccessException e) {
+            throw new InjectionReflectionException("Could not inject values via reflection", e);
+        }
+
+    }
+
+    private Object convert(ProofScriptArgument meta, Object val)
+            throws NoSpecifiedConverterException, ConversionException {
+        if (meta.isPositionalVarArgs()) {
+            var source = (List<?>) val;
+            var seq = new ArrayList<>();
+            var targetType = meta.getPositionalVarargs().as();
+            for (var o : source) {
+                seq.add(convert(o, targetType));
+            }
+            return seq;
+        }
+
+        if (meta.isOptionalVarArgs()) {
+            var source = (Map<String, ?>) val;
+            var seq = new TreeMap<String, Object>();
+            var targetType = meta.getOptionalVarArgs().as();
+            for (var o : source.entrySet()) {
+                seq.put(o.getKey(), convert(o.getValue(), targetType));
+            }
+            return seq;
+        }
+
+        var targetType = meta.getField().getType();
+        return convert(targetType, val);
     }
 
     @SuppressWarnings("unchecked")
-    private Object convert(ProofScriptArgument<?> meta, Object val)
+    public <T> T convert(Class<T> targetType, Object val)
             throws NoSpecifiedConverterException, ConversionException {
-        var converter = (Converter<Object, Object>) getConverter(meta.getType(), val.getClass());
+        var converter = (Converter<Object, Object>) getConverter(targetType, val.getClass());
         if (converter == null) {
             throw new NoSpecifiedConverterException(
-                "No converter registered for class: " + meta.getField().getType() + " from "
-                    + val.getClass(),
-                meta);
+                "No converter registered for class: " + targetType + " from " + val.getClass());
         }
         try {
-            return converter.convert(val);
+            return (T) converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(
-                String.format("Could not convert value %s (%s) to type %s",
-                    val, val.getClass(), meta.getField().getType().getName()),
-                e, meta);
+                String.format("Could not convert value '%s' from type '%s' to type '%s'",
+                    val, val.getClass(), targetType),
+                e);
         }
     }
 
     public <T> T convert(Object val, Class<T> type)
             throws NoSpecifiedConverterException, ConversionException {
-        Converter<T, Object> converter = (Converter<T, Object>) getConverter(type, val.getClass());
+        @SuppressWarnings("unchecked")
+        var converter = (Converter<T, Object>) getConverter(type, val.getClass());
 
         if (converter == null) {
             throw new NoSpecifiedConverterException(
@@ -232,7 +278,7 @@ public class ValueInjector {
             throw new ConversionException(
                 String.format("Could not convert value %s (%s) to type %s", val, val.getClass(),
                     type),
-                e, null);
+                e);
         }
     }
 
@@ -261,7 +307,10 @@ public class ValueInjector {
      * @return null or a suitable converter (registered) converter for the requested class.
      */
     @SuppressWarnings("unchecked")
-    public <R, T> Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
+    public <R, T> @Nullable Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
+        if (ret == arg) {
+            return (T it) -> (R) it;
+        }
         return (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
     }
 

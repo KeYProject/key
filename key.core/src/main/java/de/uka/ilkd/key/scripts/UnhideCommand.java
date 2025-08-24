@@ -4,13 +4,12 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -18,6 +17,8 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * Proof script command to insert a formula hidden earlier in the proof.
@@ -32,7 +33,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Mattias Ulbrich
  */
-public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
+public class UnhideCommand extends AbstractCommand {
 
     public static final String INSERT_HIDDEN_PATTERN = "insert_hidden_taclet_[0-9]+";
 
@@ -48,14 +49,9 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
-        Goal goal = state.getFirstOpenAutomaticGoal();
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+        Goal goal = state().getFirstOpenAutomaticGoal();
 
         Set<Term> antes = new HashSet<>();
         args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
@@ -88,8 +84,8 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public Sequent sequent;
+        @Argument
+        public @MonotonicNonNull Sequent sequent;
     }
 
 }

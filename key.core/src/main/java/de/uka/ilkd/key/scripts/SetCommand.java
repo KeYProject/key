@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+
+import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -10,31 +12,25 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
-
+public class SetCommand extends AbstractCommand {
     public SetCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(new Parameters(), arguments);
 
-    @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
-        if (args.key == null ^ args.value == null) {
-            throw new IllegalArgumentException(
-                "When using key or value in a set command, you have to use both.");
-        }
+        args.settings.remove("oss");
+        args.settings.remove("steps");
 
         final Proof proof = state.getProof();
 
@@ -47,14 +43,22 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
                         : StrategyProperties.OSS_OFF);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
-        } else if (args.proofSteps != null) {
-            state.setMaxAutomaticSteps(args.proofSteps);
-        } else if (args.key != null) {
-            newProps.setProperty(args.key, args.value);
-            updateStrategySettings(newProps);
-        } else {
-            throw new IllegalArgumentException("You have to set oss, steps, or key and value.");
         }
+        if (args.proofSteps != null) {
+            state.setMaxAutomaticSteps(args.proofSteps);
+        }
+
+        for (var entry : args.settings.entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
+
+            if (!newProps.containsKey(key)) {
+                throw new ScriptException("Unknown setting key: " + key);
+            }
+            newProps.setProperty(key, value);
+        }
+
+        updateStrategySettings(state, newProps);
     }
 
     /*
@@ -64,9 +68,9 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
      * quite complicated implementation, which is inspired by StrategySelectionView.
      */
 
-    private void updateStrategySettings(StrategyProperties p) {
+    public static void updateStrategySettings(EngineState state, StrategyProperties p) {
         final Proof proof = state.getProof();
-        final Strategy<@NonNull Goal> strategy = getStrategy(p);
+        final Strategy<Goal> strategy = getStrategy(state, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
@@ -77,8 +81,9 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
         proof.setActiveStrategy(strategy);
     }
 
-    private Strategy<@NonNull Goal> getStrategy(StrategyProperties properties) {
+    private static Strategy getStrategy(EngineState state, StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
+        final Proof proof = state.getProof();
 
         //
         for (StrategyFactory s : profile.supportedStrategies()) {
@@ -99,20 +104,20 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
     }
 
     public static class Parameters {
-        /** One Step Simplification parameter */
-        @Option(value = "oss", required = false)
-        public Boolean oneStepSimplification;
+        /**
+         * One Step Simplification parameter
+         */
+        @Option(value = "oss")
+        public @Nullable Boolean oneStepSimplification;
 
-        /** Maximum number of proof steps parameter */
-        @Option(value = "steps", required = false)
-        public Integer proofSteps;
+        /**
+         * Maximum number of proof steps parameter
+         */
+        @Option(value = "steps")
+        public @Nullable Integer proofSteps;
 
-        /** Normal key-value setting -- key */
-        @Option(value = "key", required = false)
-        public String key;
-
-        /** Normal key-value setting -- value */
-        @Option(value = "value", required = false)
-        public String value;
+        /***/
+        @OptionalVarargs
+        public Map<String, String> settings = HashMap.newHashMap(0);
     }
 }

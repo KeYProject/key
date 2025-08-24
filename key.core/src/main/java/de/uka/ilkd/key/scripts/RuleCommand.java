@@ -5,7 +5,6 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.*;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -14,8 +13,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.scripts.meta.Varargs;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -28,6 +28,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -44,7 +47,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * <li>inst_= instantiation</li>
  * </ol>
  */
-public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
+public class RuleCommand extends AbstractCommand {
 
     public RuleCommand() {
         super(Parameters.class);
@@ -73,16 +76,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(ScriptCommandAst params)
             throws ScriptException, InterruptedException {
-        RuleApp theApp = makeRuleApp(args, state);
-        Goal g = state.getFirstOpenAutomaticGoal();
+        var args = state().getValueInjector().inject(new Parameters(), params);
+
+        RuleApp theApp = makeRuleApp(args, state());
+        Goal g = state().getFirstOpenAutomaticGoal();
 
         if (theApp instanceof TacletApp tacletApp) {
 
@@ -117,7 +116,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
 
-        if (!maybeBuiltInRule.isPresent() && !maybeTaclet.isPresent()) {
+        if (maybeBuiltInRule.isEmpty() && maybeTaclet.isEmpty()) {
             /*
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by hide_left etc.
              */
@@ -408,21 +407,26 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option(value = "#2")
-        public String rulename;
-        @Option(value = "on", required = false)
-        public JTerm on;
-        @Option(value = "formula", required = false)
-        public JTerm formula;
-        @Option(value = "occ", required = false)
-        public int occ = -1;
+        @Argument
+        public @MonotonicNonNull String rulename;
+
+        @Option(value = "on")
+        public @Nullable JTerm on;
+
+        @Option(value = "formula")
+        public @Nullable JTerm formula;
+
+        @Option(value = "occ")
+        public @Nullable int occ = -1;
+
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
-        @Option(value = "matches", required = false)
-        public String matches = null;
-        @Varargs(as = JTerm.class, prefix = "inst_")
+        @Option(value = "matches")
+        public @Nullable String matches = null;
+
+        @OptionalVarargs(as = JTerm.class, prefix = "inst_")
         public Map<String, JTerm> instantiations = new HashMap<>();
     }
 
