@@ -5,15 +5,11 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.prover.rules.RuleApp;
@@ -23,19 +19,13 @@ import org.key_project.util.collection.ImmutableList;
  * This action is one part of the previous UndoLastStepAction: It undoes the last rule application
  * on the currently selected branch. It now also works on closed branches if the flag
  * "--no-pruning-closed" is not set (to save memory).
- *
+ * <p>
  * The action is enabled if: 1. the proof is not empty (just the root node exists) and 2. either
  * pruning of closed branches is enabled or the selected node is open
  *
  * @author Pfeifer (enabled goalBack in closed branches)
  */
 public final class GoalBackAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4574670781882014062L;
-
     /**
      * indicates if long names (including the name of the rule to undo) are displayed
      */
@@ -53,57 +43,27 @@ public final class GoalBackAction extends MainWindowAction {
         this.longName = longName;
         putValue(SMALL_ICON, IconFactory.goalBackLogo(MainWindow.TOOLBAR_ICON_SIZE));
         putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
-        initListeners();
         updateName();
+
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
+        enabledWhenPruningIsAllowed();
     }
+
 
     /**
      * Registers the action at some listeners to update its status in a correct fashion. This method
      * has to be invoked after the Main class has been initialized with the KeYMediator.
      */
-    public void initListeners() {
-        final KeYSelectionListener selListener = new KeYSelectionListener() {
-
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                final Proof proof = getMediator().getSelectedProof();
-                if (proof == null) {
-                    // no proof loaded
-                    setEnabled(false);
-                } else {
-                    final Node selNode = getMediator().getSelectedNode();
-                    // enable/disable the action (see JavaDoc of class)
-                    setEnabled(selNode != null && !proof.root().leaf()
-                            && !(GeneralSettings.noPruningClosed && selNode.isClosed()));
-                }
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                selectedNodeChanged(null);
-            }
+    private void enabledWhenPruningIsAllowed() {
+        Pred pruningAllowed = () -> {
+            final var selectedNode = getMediator().getSelectedNode();
+            final var selectedProof = getMediator().getSelectedProof();
+            return selectedProof != null && selectedNode != null &&
+                    !(GeneralSettings.noPruningClosed && selectedNode.isClosed())
+                    && !selectedProof.root().leaf();
         };
-
-        getMediator().addKeYSelectionListener(selListener);
-
-        /*
-         * This method delegates the request only to the UserInterfaceControl which implements the
-         * functionality. No functionality is allowed in this method body!
-         */
-        getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-                getMediator().removeKeYSelectionListener(selListener);
-                setEnabled(false);
-            }
-
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                getMediator().addKeYSelectionListener(selListener);
-                selListener.selectedNodeChanged(null);
-            }
-        });
-        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
+        this.setEnabledWhen(this.getEnabledWhen().and(pruningAllowed));
     }
 
     /**

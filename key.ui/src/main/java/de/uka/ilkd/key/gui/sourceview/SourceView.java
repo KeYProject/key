@@ -216,7 +216,7 @@ public final class SourceView extends JComponent {
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 clear();
-                ensureProofJavaSourceCollectionExists(e.getSource().getSelectedProof());
+                ensureProofJavaSourceCollectionExists(e.source().getSelectedProof());
                 updateGUI();
             }
         });

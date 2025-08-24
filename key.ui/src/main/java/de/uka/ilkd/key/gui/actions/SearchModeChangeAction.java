@@ -10,13 +10,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
 
-/*
+/**
  * Menu option for showing the next search result of sequent search Keyboard shortcut: F3. This
  * shortcut is set in the KeyStrokemanager
  */
 public class SearchModeChangeAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -9002019635814787502L;
     private final SequentViewSearchBar searchBar;
     private final SequentViewSearchBar.SearchMode mode;
 

@@ -16,8 +16,6 @@ import de.uka.ilkd.key.gui.MainWindow;
  *
  */
 public class QuickLoadAction extends MainWindowAction {
-    private static final long serialVersionUID = -7149996409297248408L;
-
     /**
      * Create a new action.
      *

@@ -403,10 +403,10 @@ public class TaskTree extends JPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            if (e.getSource().getSelectedProof() == null) {
+            if (e.source().getSelectedProof() == null) {
                 return;
             }
-            TaskTreeNode ttn = model.getTaskForProof(e.getSource().getSelectedProof());
+            TaskTreeNode ttn = model.getTaskForProof(e.source().getSelectedProof());
             delegateView.setSelectionPath(new TreePath(ttn.getPath()));
             validate();
         }

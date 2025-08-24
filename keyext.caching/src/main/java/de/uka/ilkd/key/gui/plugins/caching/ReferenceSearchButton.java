@@ -72,7 +72,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
 
     @Override
     public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-        Proof p = e.getSource().getSelectedProof();
+        Proof p = e.source().getSelectedProof();
         updateState(p);
     }
 
