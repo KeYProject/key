@@ -21,7 +21,7 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
 /// [#enabledWhen]. This predicate is ask whether the action is enabled in the current state inside
 /// the method [#updateEnabledness()]. This machinary requires, that the enabledness of an action
 /// is defined as follows in a sub-class:
-/// 1. You need to set this variable using [#setEnabledWhen(Supplier<Boolean>)].
+/// 1. You need to set this variable using [#setEnabledWhen(Pred)].
 /// 2. You also need to add the method [#updateEnabledness()] in the listener,
 /// e.g., {@link java.beans.PropertyChangeListener}, s.t. the action is notified on a state change.
 ///
@@ -87,6 +87,13 @@ public abstract class KeyAction extends AbstractAction {
     /// @see [#setEnabledWhen(Pred)]
     public Pred getEnabledWhen() {
         return enabledWhen;
+    }
+
+    /// Appends conjunctively a predicate to the enabledness predicated of this action
+    /// @see #setEnabledWhen(Pred)
+    /// @see #getEnabledWhen()
+    public void addConjunctivelyEnabledWhen(Pred enabledWhen) {
+        setEnabledWhen(getEnabledWhen().and(enabledWhen));
     }
 
     /**

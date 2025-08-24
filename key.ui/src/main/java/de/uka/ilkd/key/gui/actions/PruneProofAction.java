@@ -35,6 +35,7 @@ public final class PruneProofAction extends MainWindowAction {
 
         Pred pruningAllowed = () -> {
             var selNode = getMediator().getSelectedNode();
+            if(selNode == null) return false;
             final var empty = selNode.proof().getClosedSubtreeGoals(selNode).isEmpty();
             return !selNode.leaf() && (!selNode.proof().getSubtreeGoals(selNode).isEmpty()
                     || (!GeneralSettings.noPruningClosed && !empty));

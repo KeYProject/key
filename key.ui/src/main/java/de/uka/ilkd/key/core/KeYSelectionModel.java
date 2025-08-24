@@ -150,14 +150,18 @@ public class KeYSelectionModel {
      */
     public synchronized void setSelectedNode(@Nullable Node n) {
         final Node previousSelectedNode = selectedNode;
-        // switch proof if needed
-        if (n.proof() != getSelectedProof()) {
-            setSelectedProof(n.proof());
-        }
+        if(n == selectedNode) return;
+
         selectedNode = n;
-        setSelectedGoal(null);
-        setSelectedRuleApp(selectedNode.getAppliedRuleApp());
-        setSelectedSequent(selectedNode.sequent());
+        if (selectedNode != null) {
+            // switch proof if needed
+            if (n.proof() != getSelectedProof()) {
+                setSelectedProof(n.proof());
+            }
+            setSelectedRuleApp(selectedNode.getAppliedRuleApp());
+            setSelectedSequent(selectedNode.sequent());
+            setSelectedGoal(null);
+        }
         fireSelectedNodeChanged(previousSelectedNode);
         propertyChangeSupport.firePropertyChange(PROPERTY_SELECTED_NODE, previousSelectedNode,
             selectedGoal);
@@ -363,9 +367,11 @@ public class KeYSelectionModel {
     }
 
     public synchronized void fireSelectedNodeChanged(Node previousNode) {
+        if(previousNode == getSelectedNode())
+            return;
+
         synchronized (listenerList) {
-            final KeYSelectionEvent<Node> selectionEvent =
-                new KeYSelectionEvent<>(this, previousNode);
+            final KeYSelectionEvent<Node> selectionEvent = new KeYSelectionEvent<>(this, previousNode);
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedNodeChanged(selectionEvent);
             }
@@ -373,6 +379,9 @@ public class KeYSelectionModel {
     }
 
     public synchronized void fireSelectedProofChanged(Proof previousProof) {
+        if(previousProof == getSelectedProof())
+            return;
+
         synchronized (listenerList) {
             LOGGER.debug("Selected Proof changed, firing...");
             final KeYSelectionEvent<Proof> selectionEvent =
