@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Properties;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.Configuration;
 
@@ -74,6 +76,20 @@ public interface IPersistablePO extends ProofOblInput {
      * @throws IOException Occurred Exception.
      */
     Configuration createLoaderConfig() throws IOException;
+
+    /// Called to manifest the proof manifest the proof obligation configuration
+    /// into the given {@link PrintWriter}
+    /// If the method returns `true`, a `\proofObligation` statement was successfully written
+    /// to the `ps`. Therefore, no `\problem` statement is printed.
+    ///
+    /// @return true if a `\proofObligation` was written successfully.
+    default boolean printProofObligation(PrintWriter ps, Proof proof) throws IOException {
+        var loadingConfig = createLoaderConfig();
+        ps.println("\\proofObligation ");
+        loadingConfig.save(ps, "");
+        ps.println("\n");
+        return true;
+    }
 
     /**
      * The class stored in a {@link Properties} instance via key must provide the static method with

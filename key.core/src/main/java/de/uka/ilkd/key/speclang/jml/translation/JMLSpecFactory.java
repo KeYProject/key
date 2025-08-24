@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
