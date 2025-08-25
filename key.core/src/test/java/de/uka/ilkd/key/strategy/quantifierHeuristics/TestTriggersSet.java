@@ -195,13 +195,15 @@ public class TestTriggersSet {
         proof.add(g);
 
         proof.setNamespaces(new NamespaceSet(variables, functions, sorts, new Namespace<>(),
+            new Namespace<>(), new Namespace<>(),
             new Namespace<>(), new Namespace<>()));
 
     }
 
     private JTerm parseTerm(String termstr) {
-        return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
-            new Namespace<>(), new Namespace<>(), new Namespace<>()));
+        return TacletForTests.parseTerm(termstr,
+            new NamespaceSet(variables, functions, sorts, new Namespace<>(), new Namespace<>(),
+                new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
 
     @Test
