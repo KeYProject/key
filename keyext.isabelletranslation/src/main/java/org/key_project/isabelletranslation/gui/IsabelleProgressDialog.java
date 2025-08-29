@@ -224,18 +224,18 @@ public class IsabelleProgressDialog extends JDialog {
     public void setModus(Modus m) {
         modus = m;
         switch (modus) {
-        case SOLVERS_DONE -> {
-            stopButton.setText("Discard");
-            if (applyButton != null) {
-                applyButton.setEnabled(true);
+            case SOLVERS_DONE -> {
+                stopButton.setText("Discard");
+                if (applyButton != null) {
+                    applyButton.setEnabled(true);
+                }
             }
-        }
-        case SOLVERS_RUNNING -> {
-            stopButton.setText("Stop");
-            if (applyButton != null) {
-                applyButton.setEnabled(false);
+            case SOLVERS_RUNNING -> {
+                stopButton.setText("Stop");
+                if (applyButton != null) {
+                    applyButton.setEnabled(false);
+                }
             }
-        }
         }
     }
 }

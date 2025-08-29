@@ -10,13 +10,14 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
+import org.key_project.logic.op.Operator;
 
 
 /**
@@ -45,7 +46,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * The invariant from which the initially clause is derived.
      */
-    private final Term originalInv;
+    private final JTerm originalInv;
     /**
      * The original self variable of the receiver object.
      */
@@ -72,7 +73,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, LocationVariable selfVar,
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
             LabeledParserRuleContext originalSpec) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -94,7 +95,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(LocationVariable selfVar, TermServices services) {
+    private Map<Operator, Operator> getReplaceMap(LocationVariable selfVar,
+            TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
@@ -111,7 +113,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // -------------------------------------------------------------------------
 
     @Override
-    public InitiallyClause map(UnaryOperator<Term> op, Services services) {
+    public InitiallyClause map(UnaryOperator<JTerm> op, Services services) {
         return new InitiallyClauseImpl(name, displayName, kjt, visibility, op.apply(originalInv),
             originalSelfVar, originalSpec);
     }
@@ -133,10 +135,10 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
     @Override
-    public Term getClause(LocationVariable selfVar, TermServices services) {
+    public JTerm getClause(LocationVariable selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        Term res = or.replace(originalInv);
+        JTerm res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;
     }

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.slf4j.Logger;
@@ -144,10 +145,9 @@ public class JavacExtension
                 return;
             }
 
-            File bootClassPath =
-                jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
-            List<File> classpath = jm.getClassPathEntries();
-            File javaPath = new File(jm.getModelDir());
+            Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
+            List<Path> classpath = jm.getClassPath();
+            Path javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
             lblStatus.setText("Javac runs");
@@ -219,12 +219,12 @@ public class JavacExtension
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         /* ignored */
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         loadProof(e.getSource().getSelectedProof());
     }
 }

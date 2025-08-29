@@ -12,8 +12,8 @@ import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
@@ -23,6 +23,8 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in proof scripts. It is
@@ -146,7 +148,7 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }
@@ -180,7 +182,7 @@ public class AutoMacro extends StrategyProofMacro {
         /** Signals that we already reached the breakpoint(s) */
         private boolean breakpointReached = false;
 
-        public AutoMacroFilterStrategy(Strategy delegate,
+        public AutoMacroFilterStrategy(Strategy<@NonNull Goal> delegate,
                 Optional<String> breakpoint, boolean allowSplits,
                 List<String> whitelist, boolean symbexOnly,
                 boolean onlyHumanReadable) {
@@ -224,7 +226,7 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (isJavaPIO(pio)) {
-                var term = (Term) pio.subTerm();final SourceElement activeStmt = //
+                var term = (JTerm) pio.subTerm();final SourceElement activeStmt = //
                         JavaTools.getActiveStatement(term.javaBlock());
                 final String currStmtString = activeStmt.toString();
 
@@ -240,7 +242,7 @@ public class AutoMacro extends StrategyProofMacro {
         }
 
         private boolean isJavaPIO(PosInOccurrence pio) {
-            if(pio==null) return false;var term = (Term) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+            if(pio==null) return false;var term = (JTerm) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
         @Override

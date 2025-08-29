@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -457,7 +457,7 @@ public final class ProofTreePopupFactory {
                     return false;
                 }
 
-                Term formula =
+                JTerm formula =
                     InspectorForDecisionPredicates.translate(proof.getServices(), result);
 
                 DelayedCutProcessor processor = new DelayedCutProcessor(proof, invokedNode,

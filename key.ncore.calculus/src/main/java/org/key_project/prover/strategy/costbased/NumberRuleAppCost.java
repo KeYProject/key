@@ -6,13 +6,12 @@ package org.key_project.prover.strategy.costbased;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost(0);
-    /**
-     * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
-     */
+    /// Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
         new LRUCache<>(255);
 
@@ -49,9 +48,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return new LongRuleAppCost(p_cost);
     }
 
-    /**
-     * returns the cost
-     */
+    /// returns the cost
     public abstract long getValue();
 
     @Override
@@ -82,7 +79,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
 
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }
@@ -99,9 +96,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         } else if (cost2 instanceof TopRuleAppCost) {
             return TopRuleAppCost.INSTANCE;
         } else {
-            assert false : "Can't add costs of class " + cost2.getClass();
-            // Should not be reached
-            return null;
+            throw new AssertionError("Can't add costs of class " + cost2.getClass());
         }
     }
 
@@ -120,11 +115,10 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return String.valueOf(getValue());
     }
 
-    /**
-     * Implementation of the <code>RuleAppCost</code> interface that uses a <code>long</code> value
-     * for the representation of costs, ordered by the usual ordering of natural numbers. Objects of
-     * this class are immutable
-     */
+    /// Implementation of the <code>RuleAppCost</code> interface that uses a <code>long</code> value
+    /// for the representation of costs, ordered by the usual ordering of natural numbers. Objects
+    /// of
+    /// this class are immutable
     private final static class LongRuleAppCost extends NumberRuleAppCost {
 
         private final long cost;

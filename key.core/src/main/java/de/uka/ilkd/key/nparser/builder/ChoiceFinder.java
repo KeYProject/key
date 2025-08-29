@@ -5,10 +5,10 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 

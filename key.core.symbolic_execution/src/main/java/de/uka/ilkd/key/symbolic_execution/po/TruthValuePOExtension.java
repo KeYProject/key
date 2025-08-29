@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -36,9 +36,9 @@ public class TruthValuePOExtension implements POExtension {
      * {@inheritDoc}
      */
     @Override
-    public Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+    public JTerm modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
             Services services, ProgramVariable selfTerm,
-            Term postTerm) {
+            JTerm postTerm) {
         if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
             return labelPostTerm(services, postTerm);
         } else {
@@ -47,22 +47,22 @@ public class TruthValuePOExtension implements POExtension {
     }
 
     /**
-     * Labels all predicates in the given {@link Term} and its children with a
+     * Labels all predicates in the given {@link JTerm} and its children with a
      * {@link FormulaTermLabel}.
      *
      * @param services The {@link Services} to use.
-     * @param term The {@link Term} to label.
-     * @return The labeled {@link Term}.
+     * @param term The {@link JTerm} to label.
+     * @return The labeled {@link JTerm}.
      */
-    protected Term labelPostTerm(Services services, Term term) {
+    protected JTerm labelPostTerm(Services services, JTerm term) {
         if (term != null) {
             final TermFactory tf = services.getTermFactory();
             // Label children of operator
             if (TruthValueTracingUtil.isLogicOperator(term)) {
-                Term[] newSubs = new Term[term.arity()];
+                JTerm[] newSubs = new JTerm[term.arity()];
                 boolean subsChanged = false;
                 for (int i = 0; i < newSubs.length; i++) {
-                    Term oldTerm = term.sub(i);
+                    JTerm oldTerm = term.sub(i);
                     newSubs[i] = labelPostTerm(services, oldTerm);
                     if (oldTerm != newSubs[i]) {
                         subsChanged = true;

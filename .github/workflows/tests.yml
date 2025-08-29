@@ -9,7 +9,7 @@ on:
       - "main"
       - "KeY-*"
   merge_group:
-  
+
 permissions:
   contents: write
   issues: write
@@ -22,8 +22,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        java: [21]
+        os: [ ubuntu-latest, windows-latest ]
+        java: [ 21 ]
+        modules: [
+          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core, key.core.rifl,
+          key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
+          key.util, key.core.example, keyext.caching,
+          keyext.proofmanagement, key.removegenerics ]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
@@ -53,18 +58,18 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Test with Gradle
-        run: ./gradlew --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
+        run: ./gradlew --continue -DjacocoEnabled=true :${{ matrix.modules }}:test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: test-results-${{ matrix.os }}
+          name: test-results-${{ matrix.os }}-${{ matrix.modules }}
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
             !**/jacocoTestReport.xml
-          
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
 
@@ -75,9 +80,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [testProveRules, testRunAllFunProofs, testRunAllInfProofs]
-        os: [ubuntu-latest]
-        java: [21]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs ]
+        os: [ ubuntu-latest ]
+        java: [ 21 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

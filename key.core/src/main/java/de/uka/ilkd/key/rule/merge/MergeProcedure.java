@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.merge;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
@@ -64,9 +64,9 @@ public abstract class MergeProcedure {
      * @param services The services object.
      * @return The merge result.
      */
-    public abstract ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services);
+    public abstract ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services);
 
     /**
      * Similar to {@link AbstractBuiltInRuleApp#complete()}. Method was introduced for predicate
@@ -113,9 +113,9 @@ public abstract class MergeProcedure {
      *
      * @author Dominic Scheurer
      */
-    public record ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
+    public record ValuesMergeResult(ImmutableSet<JTerm> newConstraints, JTerm mergeVal,
             LinkedHashSet<Name> newNames,
-            LinkedHashSet<Term> sideConditions) {
+            LinkedHashSet<JTerm> sideConditions) {
     }
 
 }

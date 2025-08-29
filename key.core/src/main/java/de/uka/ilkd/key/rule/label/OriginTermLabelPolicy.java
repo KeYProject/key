@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -25,9 +25,9 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
 
     @Override
     public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm,
-            Term newTerm, TermLabel label) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm,
+            JTerm newTerm, TermLabel label) {
         if (services.getProof() == null) {
             return label;
         }

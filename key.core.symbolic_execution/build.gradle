@@ -1,4 +1,4 @@
-description "API for using KeY as a symbolic execution engine for Java programs"
+description = "API for using KeY as a symbolic execution engine for Java programs"
 
 dependencies {
     implementation project(":key.core")

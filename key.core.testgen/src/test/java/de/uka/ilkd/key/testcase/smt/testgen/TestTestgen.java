@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testcase.smt.testgen;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -23,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class TestTestgen extends TestCommons {
-    public static final File testFile =
-        new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/tg");
+    public static final Path testFile =
+        HelperClassForTestgenTests.TESTCASE_DIRECTORY.resolve("smt").resolve("tg");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTestgen.class);
     private static boolean isInstalled = false;
@@ -70,8 +71,8 @@ public class TestTestgen extends TestCommons {
 
     @Test
     public void testMiddle() throws Exception {
-        File file = new File(testFile, "middle.key");
-        assertTrue(file.exists(), "File " + file + " does not exists!");
+        var file = testFile.resolve("middle.key");
+        assertTrue(Files.exists(file), "File " + file + " does not exists!");
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(file, null, null, null);
         try {

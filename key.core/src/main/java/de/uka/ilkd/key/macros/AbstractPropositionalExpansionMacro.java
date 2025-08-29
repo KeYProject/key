@@ -61,7 +61,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
             allowOSS());
@@ -90,10 +90,11 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
-        private final Strategy delegate;
+        private final Strategy<@NonNull Goal> delegate;
         private final boolean allowOSS;
 
-        public PropExpansionStrategy(Strategy delegate, Set<String> admittedRuleNames,
+        public PropExpansionStrategy(Strategy<@NonNull Goal> delegate,
+                Set<String> admittedRuleNames,
                 boolean allowOSS) {
             this.delegate = delegate;
             this.admittedRuleNames = admittedRuleNames;

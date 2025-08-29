@@ -363,53 +363,53 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
             // MU refactored this using enums which makes it a little less ugly
             // and more flexible.
             switch (markType) {
-            case MARK_START_SUB -> {
-                if (parameter == -1) {
-                    // no parameter means subterms in normal order
-                    posTbl.setStart(count() - pos);
-                } else {
-                    // parameter means a particular subterm has been chosen
-                    posTbl.setStart(parameter, count() - pos);
+                case MARK_START_SUB -> {
+                    if (parameter == -1) {
+                        // no parameter means subterms in normal order
+                        posTbl.setStart(count() - pos);
+                    } else {
+                        // parameter means a particular subterm has been chosen
+                        posTbl.setStart(parameter, count() - pos);
+                    }
+                    stack.push(new StackEntry(posTbl, pos));
+                    pos = count();
                 }
-                stack.push(new StackEntry(posTbl, pos));
-                pos = count();
-            }
-            case MARK_END_SUB -> {
-                StackEntry se = stack.peek();
-                stack.pop();
-                pos = se.pos();
-                se.posTbl().setEnd(count() - pos, posTbl);
-                posTbl = se.posTbl();
-            }
-            case MARK_MOD_POS_TBL -> need_modPosTable = true;
-            case MARK_START_TERM -> {
-                // This is sent by startTerm
-                if (need_modPosTable) {
-                    posTbl = new ModalityPositionTable(parameter);
-                } else {
-                    posTbl = new PositionTable(parameter);
+                case MARK_END_SUB -> {
+                    StackEntry se = stack.peek();
+                    stack.pop();
+                    pos = se.pos();
+                    se.posTbl().setEnd(count() - pos, posTbl);
+                    posTbl = se.posTbl();
                 }
-                need_modPosTable = false;
-            }
-            case MARK_START_FIRST_STMT -> firstStmtStart = count() - pos;
-            case MARK_END_FIRST_STMT -> {
-                if (posTbl instanceof ModalityPositionTable) {
-                    Range firstStmtRange = new Range(firstStmtStart, count() - pos);
-                    ((ModalityPositionTable) posTbl).setFirstStatementRange(firstStmtRange);
+                case MARK_MOD_POS_TBL -> need_modPosTable = true;
+                case MARK_START_TERM -> {
+                    // This is sent by startTerm
+                    if (need_modPosTable) {
+                        posTbl = new ModalityPositionTable(parameter);
+                    } else {
+                        posTbl = new PositionTable(parameter);
+                    }
+                    need_modPosTable = false;
                 }
-            }
-            case MARK_START_UPDATE -> updateStarts.push(count());
-            case MARK_END_UPDATE -> {
-                int updateStart = updateStarts.pop();
-                initPosTbl.addUpdateRange(new Range(updateStart, count()));
-            }
-            case MARK_START_KEYWORD -> keywordStarts.push(count());
-            case MARK_END_KEYWORD -> initPosTbl
-                    .addKeywordRange(new Range(keywordStarts.pop(), count()));
-            case MARK_START_JAVA_BLOCK -> javaBlockStarts.push(count());
-            case MARK_END_JAVA_BLOCK -> initPosTbl
-                    .addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
-            default -> LOGGER.error("Unexpected mark: {}", markType);
+                case MARK_START_FIRST_STMT -> firstStmtStart = count() - pos;
+                case MARK_END_FIRST_STMT -> {
+                    if (posTbl instanceof ModalityPositionTable) {
+                        Range firstStmtRange = new Range(firstStmtStart, count() - pos);
+                        ((ModalityPositionTable) posTbl).setFirstStatementRange(firstStmtRange);
+                    }
+                }
+                case MARK_START_UPDATE -> updateStarts.push(count());
+                case MARK_END_UPDATE -> {
+                    int updateStart = updateStarts.pop();
+                    initPosTbl.addUpdateRange(new Range(updateStart, count()));
+                }
+                case MARK_START_KEYWORD -> keywordStarts.push(count());
+                case MARK_END_KEYWORD -> initPosTbl
+                        .addKeywordRange(new Range(keywordStarts.pop(), count()));
+                case MARK_START_JAVA_BLOCK -> javaBlockStarts.push(count());
+                case MARK_END_JAVA_BLOCK -> initPosTbl
+                        .addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
+                default -> LOGGER.error("Unexpected mark: {}", markType);
             }
         }
     }

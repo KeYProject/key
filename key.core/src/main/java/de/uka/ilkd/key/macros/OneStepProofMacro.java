@@ -45,7 +45,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new OneStepStrategy(proof.getActiveStrategy());
     }
@@ -57,13 +57,13 @@ public class OneStepProofMacro extends StrategyProofMacro {
      *
      */
 
-    private static class OneStepStrategy implements Strategy<Goal> {
+    private static class OneStepStrategy implements Strategy<@NonNull Goal> {
 
         private static final Name NAME = new Name(OneStepStrategy.class.getSimpleName());
         private int counter;
-        public final Strategy<Goal> delegate;
+        public final Strategy<@NonNull Goal> delegate;
 
-        public OneStepStrategy(Strategy<Goal> delegate) {
+        public OneStepStrategy(Strategy<@NonNull Goal> delegate) {
             this.delegate = delegate;
             this.counter = 0;
         }

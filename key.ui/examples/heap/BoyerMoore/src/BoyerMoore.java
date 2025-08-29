@@ -23,8 +23,15 @@ class BoyerMoore {
       @  measured_by k;
       @  accessible a[*];
       @ model int count(int[] a, \bigint k, \bigint v) {
-      @   return k == 0 ? 0 :
-      @     ((a[k-1] == v ? 1 : 0) + count(a, k-1, v));
+      @   if (k == 0)
+      @     return 0;
+      @   else {
+      @     var last = a[k-1];
+      @     if (a[k-1] == v)
+      @       return 1 + count(a, k-1, v);
+      @     else
+      @       return count(a, k-1, v);
+      @   }
       @ }
       @*/
 

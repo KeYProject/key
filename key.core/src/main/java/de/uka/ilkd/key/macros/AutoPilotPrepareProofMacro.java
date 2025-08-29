@@ -74,7 +74,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static class AutoPilotStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
-        private final Strategy delegate;
+        private final Strategy<@NonNull Goal> delegate;
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
@@ -151,7 +151,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }

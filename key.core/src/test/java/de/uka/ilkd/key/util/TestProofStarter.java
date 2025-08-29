@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -61,8 +61,8 @@ public class TestProofStarter {
         boolean originalOneStepSimplification =
             HelperClassForTests.isOneStepSimplificationEnabled(null);
         try {
-            File file =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "proofStarter/CC/project.key");
+            Path file =
+                HelperClassForTests.TESTCASE_DIRECTORY.resolve("proofStarter/CC/project.key");
             env = KeYEnvironment.load(file, null, null, null);
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -70,21 +70,21 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm) {
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm) {
         if (goal != null) {
             final String branchLabel = goal.node().getNodeInfo().getBranchLabel();
             return switch (rule) {
-            case UseOperationContractRule ignored when (branchLabel.startsWith("Pre") ||
-                    branchLabel.startsWith("Null reference")) ->
-                RefactoringScope.SEQUENT;
-            case WhileInvariantRule ignored when branchLabel
-                    .startsWith("Invariant Initially Valid") ->
-                RefactoringScope.SEQUENT;
-            case AbstractAuxiliaryContractRule ignored when branchLabel
-                    .startsWith("Precondition") ->
-                RefactoringScope.SEQUENT;
-            case null, default -> RefactoringScope.NONE;
+                case UseOperationContractRule ignored when (branchLabel.startsWith("Pre") ||
+                        branchLabel.startsWith("Null reference")) ->
+                    RefactoringScope.SEQUENT;
+                case WhileInvariantRule ignored when branchLabel
+                        .startsWith("Invariant Initially Valid") ->
+                    RefactoringScope.SEQUENT;
+                case AbstractAuxiliaryContractRule ignored when branchLabel
+                        .startsWith("Precondition") ->
+                    RefactoringScope.SEQUENT;
+                case null, default -> RefactoringScope.NONE;
             };
         } else {
             return RefactoringScope.NONE;
@@ -96,8 +96,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
         labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

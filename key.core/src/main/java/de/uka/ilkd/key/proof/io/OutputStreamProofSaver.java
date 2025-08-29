@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -46,6 +46,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -180,7 +181,7 @@ public class OutputStreamProofSaver {
                 strategySettings.setActiveStrategyProperties(strategyProperties);
                 for (final SequentFormula s : proof.root().sequent()
                         .succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm((Term) s.formula());
+                    ((InfFlowProof) proof).addLabeledTotalTerm((JTerm) s.formula());
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -207,7 +208,7 @@ public class OutputStreamProofSaver {
                             && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
                 var loadingConfig = ppo.createLoaderConfig();
                 ps.println("\\proofObligation ");
-                loadingConfig.save(ps, "Proof-Obligation settings");
+                loadingConfig.save(ps, "");
                 ps.println("\n");
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
@@ -238,10 +239,10 @@ public class OutputStreamProofSaver {
         }
     }
 
-    protected String getBasePath() throws IOException {
+    protected Path getBasePath() throws IOException {
         File javaSourceLocation = getJavaSourceLocation(proof);
         if (javaSourceLocation != null) {
-            return javaSourceLocation.getCanonicalPath();
+            return javaSourceLocation.toPath().toAbsolutePath();
         } else {
             return null;
         }
@@ -250,6 +251,13 @@ public class OutputStreamProofSaver {
     /**
      * Searches in the header for absolute paths to Java files and tries to replace them by paths
      * relative to the proof file to be saved.
+     *
+     * TODO weigl: if someone finds time, this function is a string manipulation mess.
+     * You should rather parse the header using the {@link de.uka.ilkd.key.nparser.ParsingFacade}
+     * and
+     * use the {@link de.uka.ilkd.key.nparser.builder.ProblemFinder} to extract the field.
+     *
+     * Better would be to get rid of the header, and using an AST.
      */
     private String makePathsRelative(String header) {
         final String[] search =
@@ -257,11 +265,7 @@ public class OutputStreamProofSaver {
         final String basePath;
         String tmp = header;
         try {
-            basePath = getBasePath();
-            if (basePath == null) {
-                // if \javaSource has not been set, do not modify paths.
-                return header;
-            }
+            basePath = getBasePath().toString();
 
             // locate filenames in header
             for (final String s : search) {
@@ -279,7 +283,7 @@ public class OutputStreamProofSaver {
 
                 // there may be more than one path
                 while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
-                    if (relPathString.length() > 0) {
+                    if (!relPathString.isEmpty()) {
                         relPathString.append(", ");
                     }
 
@@ -741,7 +745,7 @@ public class OutputStreamProofSaver {
 
             final Object value = pair.value().getInstantiation();
 
-            if (!(value instanceof Term || value instanceof ProgramElement
+            if (!(value instanceof JTerm || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
                     + "FIXME: Unhandled instantiation type: " + value.getClass());
@@ -779,7 +783,7 @@ public class OutputStreamProofSaver {
             } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm((Term) sequentFormula.formula(), node.proof().getServices());
+                    printTerm((JTerm) sequentFormula.formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
@@ -826,11 +830,11 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(Term t, Services serv) {
+    public static String printTerm(JTerm t, Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(Term t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(JTerm t, Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
@@ -844,8 +848,8 @@ public class OutputStreamProofSaver {
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
-        } else if (val instanceof Term) {
-            return printTerm((Term) val, services, shortAttrNotation);
+        } else if (val instanceof JTerm) {
+            return printTerm((JTerm) val, services, shortAttrNotation);
         } else if (val instanceof Sequent) {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {

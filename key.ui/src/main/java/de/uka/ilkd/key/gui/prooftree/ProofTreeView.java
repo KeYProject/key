@@ -31,7 +31,7 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
@@ -45,6 +45,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,26 +55,35 @@ import org.slf4j.LoggerFactory;
  */
 public class ProofTreeView extends JPanel implements TabPanel {
     public static final ColorSettings.ColorProperty GRAY_COLOR =
-        ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
+        ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY, Color.LIGHT_GRAY);
+
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
     /**
      * Color used for closed goals.
      */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
-        ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
+        ColorSettings.define("[proofTree]darkGreen", "used for closed goals",
+            new Color(0, 128, 51),
+            new Color(100, 255, 102));
+
     /**
      * Color used for open goals.
      */
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
-        ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+        ColorSettings.define("[proofTree]darkRed", "used for open goals",
+            new Color(191, 0, 0),
+            new Color(191, 120, 120));
     /**
      * Color used for linked goals.
      */
     public static final ColorSettings.ColorProperty PINK_COLOR =
-        ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
+        ColorSettings.define("[proofTree]pink", "",
+            new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
-        ColorSettings.define("[proofTree]orange", "", new Color(255, 140, 0));
+        ColorSettings.define("[proofTree]orange", "",
+            new Color(255, 140, 0),
+            new Color(255, 180, 40));
 
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
@@ -82,8 +92,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         KeyStrokeManager.MULTI_KEY_MASK);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
-
-    private static final long serialVersionUID = 3732875161168302809L;
 
     /**
      * Whether to expand oss nodes when using expand all
@@ -176,10 +184,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
         delegateView = new JTree(new DefaultMutableTreeNode("No proof loaded")) {
-            private static final long serialVersionUID = 6555955929759162324L;
-
             @Override
-            public String getToolTipText(MouseEvent mouseEvent) {
+            public @Nullable String getToolTipText(MouseEvent mouseEvent) {
                 /*
                  * For performance reasons, we want to make sure that the tooltips are only rendered
                  * when they are really needed. Therefore, they are now lazily generated and can
@@ -389,7 +395,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * layout the component
      */
     protected void layoutKeYComponent() {
-        delegateView.setBackground(Color.white);
         delegateView.setCellRenderer(renderer);
         delegateView.putClientProperty("JTree.lineStyle", "Angled");
         delegateView.setVisible(true);
@@ -897,7 +902,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * focused node has changed
          */
         @Override
-        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
+        public synchronized void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             if (!ignoreNodeSelectionChange) {
                 ThreadUtilities.invokeOnEventQueue(
                     () -> makeSelectedNodeVisible(mediator.getSelectedNode()));
@@ -908,7 +913,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+        public synchronized void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             LOGGER.debug("ProofTreeView: initialize with new proof");
             ThreadUtilities.invokeOnEventQueue(() -> {
                 lastGoalNode = null;
@@ -1088,7 +1093,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
-            stylers.add(0, guiAbstractTreeNodeStyler);
+            stylers.addFirst(guiAbstractTreeNodeStyler);
         }
 
         private void render(Style style, GUIAbstractTreeNode node) {
@@ -1193,13 +1198,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         private void renderNonLeaf(Style style, GUIAbstractTreeNode treeNode) {
             Node node = treeNode.getNode();
-            style.foreground = Color.black;
 
             style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
                 String on = LogicPrinter.quickPrintTerm(
-                    (Term) pio.subTerm(), node.proof().getServices());
+                    (JTerm) pio.subTerm(), node.proof().getServices());
                 style.tooltip.addAppliedOn(cutIfTooLong(on));
             }
 
@@ -1266,7 +1270,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 if (node.getNodeInfo().getActiveStatement() != null) {
                     style.background = LIGHT_BLUE_COLOR.get();
                 } else {
-                    style.background = Color.white;
+                    // style.background = Color.white;
                 }
             }
         }
@@ -1278,7 +1282,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.text = app.rule().name().toString();
             Services services = node.getNode().proof().getServices();
             String on =
-                LogicPrinter.quickPrintTerm((Term) app.posInOccurrence().subTerm(), services);
+                LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
             style.tooltip.addRule(style.text);
             style.tooltip.addAppliedOn(cutIfTooLong(on));
         }
@@ -1304,7 +1308,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 setBorder(BorderFactory.createLineBorder(style.border));
             } else {
                 // set default
-                setBorder(BorderFactory.createLineBorder(Color.WHITE));
+                setBorder(BorderFactory.createLineBorder(UIManager.getColor("Panel.background")));
             }
 
             setFont(getFont().deriveFont(Font.PLAIN));
@@ -1325,15 +1329,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         public Style initStyleForNode(GUIAbstractTreeNode node) {
             Style style = new Style();
-            style.foreground = getForeground();
-            style.background = getBackground();
+            style.foreground = UIManager.getColor("Label.foreground");
+            style.background = UIManager.getColor("Label.background");
             // Normalize whitespace
             style.text = node.toString().replaceAll("\\s+", " ");
             style.border = null;
             style.tooltip = new Style.Tooltip();
             style.icon = null;
 
-            stylers.forEach(it -> it.style(style, node));
+            for (Styler<GUIAbstractTreeNode> it : stylers) {
+                it.style(style, node);
+            }
             return style;
         }
     }

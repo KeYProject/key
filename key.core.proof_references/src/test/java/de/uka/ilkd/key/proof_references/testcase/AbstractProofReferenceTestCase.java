@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -11,7 +12,6 @@ import java.util.function.Predicate;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
@@ -28,12 +28,15 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.Choice;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.Nullable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Martin Hentschel
  */
 public abstract class AbstractProofReferenceTestCase {
-    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
+    public static final @Nullable Path TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
 
     static {
         assertNotNull(TESTCASE_DIRECTORY, "Could not find test case directory");
@@ -61,7 +64,7 @@ public abstract class AbstractProofReferenceTestCase {
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
-    protected void doReferenceFunctionTest(File baseDir, String javaPathInBaseDir,
+    protected void doReferenceFunctionTest(@Nullable Path baseDir, String javaPathInBaseDir,
             String containerTypeName, String targetName, boolean useContracts,
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
@@ -83,7 +86,7 @@ public abstract class AbstractProofReferenceTestCase {
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
-    protected void doReferenceFunctionTest(File baseDir, String javaPathInBaseDir,
+    protected void doReferenceFunctionTest(@Nullable Path baseDir, String javaPathInBaseDir,
             String containerTypeName, String targetName, boolean useContracts,
             IProofReferencesAnalyst analyst, Predicate<IProofReference<?>> currentReferenceFilter,
             ExpectedProofReferences... expectedReferences) throws Exception {
@@ -105,7 +108,7 @@ public abstract class AbstractProofReferenceTestCase {
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
-    protected void doReferenceMethodTest(File baseDir, String javaPathInBaseDir,
+    protected void doReferenceMethodTest(@Nullable Path baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
@@ -126,7 +129,7 @@ public abstract class AbstractProofReferenceTestCase {
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
-    protected void doReferenceMethodTest(File baseDir, String javaPathInBaseDir,
+    protected void doReferenceMethodTest(@Nullable Path baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
             IProofReferencesAnalyst analyst, Predicate<IProofReference<?>> currentReferenceFilter,
             ExpectedProofReferences... expectedReferences) throws Exception {
@@ -138,8 +141,8 @@ public abstract class AbstractProofReferenceTestCase {
 
     /**
      * Creates the {@link IProofTester} used by
-     * {@link #doProofFunctionTest(File, String, String, String, boolean, IProofTester)} and
-     * {@link #doProofMethodTest(File, String, String, String, boolean, IProofTester)}.
+     * {@link #doProofFunctionTest(Path, String, String, String, boolean, IProofTester)} and
+     * {@link #doProofMethodTest(Path, String, String, String, boolean, IProofTester)}.
      *
      * @param analyst The {@link IProofReferencesAnalyst} to use.
      * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
@@ -296,7 +299,7 @@ public abstract class AbstractProofReferenceTestCase {
      * @param tester The {@link IProofTester} which executes the test steps.
      * @throws Exception Occurred Exception.
      */
-    protected void doProofFunctionTest(File baseDir, String javaPathInBaseDir,
+    protected void doProofFunctionTest(@Nullable Path baseDir, String javaPathInBaseDir,
             String containerTypeName, final String targetName, boolean useContracts,
             IProofTester tester) throws Exception {
         assertNotNull(tester);
@@ -309,8 +312,8 @@ public abstract class AbstractProofReferenceTestCase {
             // representations
             ProofIndependentSettings.setUsePrettyPrinting(false);
             // Make sure that required files exists
-            File javaFile = new File(baseDir, javaPathInBaseDir);
-            assertTrue(javaFile.exists());
+            Path javaFile = baseDir.resolve(javaPathInBaseDir);
+            assertTrue(Files.exists(javaFile));
             // Make sure that the correct taclet options are defined.
             originalTacletOptions = HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile,
                 containerTypeName, targetName);
@@ -369,7 +372,7 @@ public abstract class AbstractProofReferenceTestCase {
      * @param tester The {@link IProofTester} which executes the test steps.
      * @throws Exception Occurred Exception.
      */
-    protected void doProofMethodTest(File baseDir, String javaPathInBaseDir,
+    protected void doProofMethodTest(@Nullable Path baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
             IProofTester tester) throws Exception {
         assertNotNull(tester);
@@ -382,8 +385,8 @@ public abstract class AbstractProofReferenceTestCase {
             // representations
             ProofIndependentSettings.setUsePrettyPrinting(false);
             // Make sure that required files exists
-            File javaFile = new File(baseDir, javaPathInBaseDir);
-            assertTrue(javaFile.exists());
+            Path javaFile = baseDir.resolve(javaPathInBaseDir);
+            assertTrue(Files.exists(javaFile));
             // Make sure that the correct taclet options are defined.
             originalTacletOptions =
                 HelperClassForTests.setDefaultTacletOptions(baseDir, javaPathInBaseDir);

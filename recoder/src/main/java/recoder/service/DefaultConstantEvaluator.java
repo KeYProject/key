@@ -680,7 +680,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Stack holding all variable references that have already been followed. This is used to detect
      * cycles
      */
-    private final Stack visitedVariableReferences = new Stack();
+    private final Stack<Expression> visitedVariableReferences = new Stack<>();
 
     /**
      * Create a new constant evaluator.
@@ -724,15 +724,15 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static PrimitiveType translateType(int t, NameInfo ni) {
         return switch (t) {
-        case INT_TYPE -> ni.getIntType();
-        case BOOLEAN_TYPE -> ni.getBooleanType();
-        case LONG_TYPE -> ni.getLongType();
-        case FLOAT_TYPE -> ni.getFloatType();
-        case DOUBLE_TYPE -> ni.getDoubleType();
-        case BYTE_TYPE -> ni.getByteType();
-        case CHAR_TYPE -> ni.getCharType();
-        case SHORT_TYPE -> ni.getShortType();
-        default -> null;
+            case INT_TYPE -> ni.getIntType();
+            case BOOLEAN_TYPE -> ni.getBooleanType();
+            case LONG_TYPE -> ni.getLongType();
+            case FLOAT_TYPE -> ni.getFloatType();
+            case DOUBLE_TYPE -> ni.getDoubleType();
+            case BYTE_TYPE -> ni.getByteType();
+            case CHAR_TYPE -> ni.getCharType();
+            case SHORT_TYPE -> ni.getShortType();
+            default -> null;
         };
     }
 
@@ -741,9 +741,9 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      */
     static void promoteNumericTypeToInt(ConstantEvaluator.EvaluationResult res) {
         switch (res.getTypeCode()) {
-        case BYTE_TYPE -> res.setInt(res.getByte());
-        case CHAR_TYPE -> res.setInt(res.getChar());
-        case SHORT_TYPE -> res.setInt(res.getShort());
+            case BYTE_TYPE -> res.setInt(res.getByte());
+            case CHAR_TYPE -> res.setInt(res.getChar());
+            case SHORT_TYPE -> res.setInt(res.getShort());
         }
     }
 
@@ -756,42 +756,42 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     static void matchTypes(ConstantEvaluator.EvaluationResult lhs,
             ConstantEvaluator.EvaluationResult rhs) {
         switch (lhs.getTypeCode()) {
-        case INT_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case LONG_TYPE -> lhs.setLong(lhs.getInt());
-            case FLOAT_TYPE -> lhs.setFloat(lhs.getInt());
-            case DOUBLE_TYPE -> lhs.setDouble(lhs.getInt());
+            case INT_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case LONG_TYPE -> lhs.setLong(lhs.getInt());
+                    case FLOAT_TYPE -> lhs.setFloat(lhs.getInt());
+                    case DOUBLE_TYPE -> lhs.setDouble(lhs.getInt());
+                }
             }
-        }
-        case LONG_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE -> rhs.setLong(rhs.getInt());
-            case FLOAT_TYPE -> lhs.setFloat(lhs.getLong());
-            case DOUBLE_TYPE -> lhs.setDouble(lhs.getLong());
+            case LONG_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE -> rhs.setLong(rhs.getInt());
+                    case FLOAT_TYPE -> lhs.setFloat(lhs.getLong());
+                    case DOUBLE_TYPE -> lhs.setDouble(lhs.getLong());
+                }
             }
-        }
-        case FLOAT_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE -> rhs.setFloat(rhs.getInt());
-            case LONG_TYPE -> rhs.setFloat(rhs.getLong());
-            case DOUBLE_TYPE -> lhs.setDouble(lhs.getFloat());
+            case FLOAT_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE -> rhs.setFloat(rhs.getInt());
+                    case LONG_TYPE -> rhs.setFloat(rhs.getLong());
+                    case DOUBLE_TYPE -> lhs.setDouble(lhs.getFloat());
+                }
             }
-        }
-        case DOUBLE_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE -> rhs.setDouble(rhs.getInt());
-            case LONG_TYPE -> rhs.setDouble(rhs.getLong());
-            case FLOAT_TYPE -> rhs.setDouble(rhs.getFloat());
+            case DOUBLE_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE -> rhs.setDouble(rhs.getInt());
+                    case LONG_TYPE -> rhs.setDouble(rhs.getLong());
+                    case FLOAT_TYPE -> rhs.setDouble(rhs.getFloat());
+                }
             }
-        }
-        case STRING_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE -> rhs.setString(String.valueOf(rhs.getInt()));
-            case LONG_TYPE -> rhs.setString(String.valueOf(rhs.getLong()));
-            case FLOAT_TYPE -> rhs.setString(String.valueOf(rhs.getFloat()));
-            case DOUBLE_TYPE -> rhs.setString(String.valueOf(rhs.getDouble()));
+            case STRING_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE -> rhs.setString(String.valueOf(rhs.getInt()));
+                    case LONG_TYPE -> rhs.setString(String.valueOf(rhs.getLong()));
+                    case FLOAT_TYPE -> rhs.setString(String.valueOf(rhs.getFloat()));
+                    case DOUBLE_TYPE -> rhs.setString(String.valueOf(rhs.getDouble()));
+                }
             }
-        }
         }
         // if the rules above did not produce equal types,
         // something is wrong, e.g. boolean + non-boolean,
@@ -811,70 +811,70 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             ConstantEvaluator.EvaluationResult rhs) {
         int value;
         switch (lhs.getTypeCode()) {
-        case INT_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case BYTE_TYPE -> {
-                value = lhs.getInt();
-                if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
-                    lhs.setByte((byte) value);
-                } else {
-                    rhs.setInt(rhs.getByte());
+            case INT_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case BYTE_TYPE -> {
+                        value = lhs.getInt();
+                        if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
+                            lhs.setByte((byte) value);
+                        } else {
+                            rhs.setInt(rhs.getByte());
+                        }
+                        return;
+                    }
+                    case CHAR_TYPE -> {
+                        value = lhs.getInt();
+                        if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
+                            lhs.setChar((char) value);
+                        } else {
+                            rhs.setInt(rhs.getChar());
+                        }
+                        return;
+                    }
+                    case SHORT_TYPE -> {
+                        value = lhs.getInt();
+                        if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
+                            lhs.setShort((short) value);
+                        } else {
+                            rhs.setInt(rhs.getShort());
+                        }
+                        return;
+                    }
                 }
-                return;
             }
-            case CHAR_TYPE -> {
-                value = lhs.getInt();
-                if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
-                    lhs.setChar((char) value);
-                } else {
-                    rhs.setInt(rhs.getChar());
+            case BYTE_TYPE -> {
+                if (rhs.getTypeCode() == INT_TYPE) {
+                    value = rhs.getInt();
+                    if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
+                        rhs.setByte((byte) value);
+                    } else {
+                        lhs.setInt(lhs.getByte());
+                    }
+                    return;
                 }
-                return;
             }
             case SHORT_TYPE -> {
-                value = lhs.getInt();
-                if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
-                    lhs.setShort((short) value);
-                } else {
-                    rhs.setInt(rhs.getShort());
+                if (rhs.getTypeCode() == INT_TYPE) {
+                    value = rhs.getInt();
+                    if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
+                        rhs.setShort((short) value);
+                    } else {
+                        lhs.setInt(lhs.getShort());
+                    }
+                    return;
                 }
-                return;
             }
-            }
-        }
-        case BYTE_TYPE -> {
-            if (rhs.getTypeCode() == INT_TYPE) {
-                value = rhs.getInt();
-                if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
-                    rhs.setByte((byte) value);
-                } else {
-                    lhs.setInt(lhs.getByte());
+            case CHAR_TYPE -> {
+                if (rhs.getTypeCode() == INT_TYPE) {
+                    value = rhs.getInt();
+                    if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
+                        rhs.setChar((char) value);
+                    } else {
+                        lhs.setInt(lhs.getChar());
+                    }
+                    return;
                 }
-                return;
             }
-        }
-        case SHORT_TYPE -> {
-            if (rhs.getTypeCode() == INT_TYPE) {
-                value = rhs.getInt();
-                if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
-                    rhs.setShort((short) value);
-                } else {
-                    lhs.setInt(lhs.getShort());
-                }
-                return;
-            }
-        }
-        case CHAR_TYPE -> {
-            if (rhs.getTypeCode() == INT_TYPE) {
-                value = rhs.getInt();
-                if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
-                    rhs.setChar((char) value);
-                } else {
-                    lhs.setInt(lhs.getChar());
-                }
-                return;
-            }
-        }
         }
         matchTypes(lhs, rhs);
     }
@@ -887,41 +887,41 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     static void matchConditionalTypes(ConstantEvaluator.EvaluationResult lhs,
             ConstantEvaluator.EvaluationResult rhs) {
         switch (lhs.getTypeCode()) {
-        case BYTE_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case SHORT_TYPE -> { // byte x short -> short x short
-                lhs.setShort(lhs.getByte());
-                return;
+            case BYTE_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case SHORT_TYPE -> { // byte x short -> short x short
+                        lhs.setShort(lhs.getByte());
+                        return;
+                    }
+                    case CHAR_TYPE -> { // byte x char -> int x int
+                        promoteNumericTypeToInt(lhs);
+                        promoteNumericTypeToInt(rhs);
+                        return;
+                    }
+                }
             }
-            case CHAR_TYPE -> { // byte x char -> int x int
-                promoteNumericTypeToInt(lhs);
-                promoteNumericTypeToInt(rhs);
-                return;
+            case CHAR_TYPE -> {
+                switch (rhs.getTypeCode()) { // char x byte, char x short -> int x int
+                    case BYTE_TYPE, SHORT_TYPE -> {
+                        promoteNumericTypeToInt(lhs);
+                        promoteNumericTypeToInt(rhs);
+                        return;
+                    }
+                }
             }
+            case SHORT_TYPE -> {
+                switch (rhs.getTypeCode()) {
+                    case BYTE_TYPE -> { // short x byte -> short x short
+                        rhs.setShort(rhs.getByte());
+                        return;
+                    }
+                    case CHAR_TYPE -> { // short x char -> int x int
+                        promoteNumericTypeToInt(lhs);
+                        promoteNumericTypeToInt(rhs);
+                        return;
+                    }
+                }
             }
-        }
-        case CHAR_TYPE -> {
-            switch (rhs.getTypeCode()) { // char x byte, char x short -> int x int
-            case BYTE_TYPE, SHORT_TYPE -> {
-                promoteNumericTypeToInt(lhs);
-                promoteNumericTypeToInt(rhs);
-                return;
-            }
-            }
-        }
-        case SHORT_TYPE -> {
-            switch (rhs.getTypeCode()) {
-            case BYTE_TYPE -> { // short x byte -> short x short
-                rhs.setShort(rhs.getByte());
-                return;
-            }
-            case CHAR_TYPE -> { // short x char -> int x int
-                promoteNumericTypeToInt(lhs);
-                promoteNumericTypeToInt(rhs);
-                return;
-            }
-            }
-        }
         }
         matchAssignmentTypes(lhs, rhs);
     }
@@ -936,33 +936,33 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             } else {
                 i += 1;
                 switch (text.charAt(i)) {
-                case 'b' -> buf.append('\b');
-                case 't' -> buf.append('\t');
-                case 'n' -> buf.append('\n');
-                case 'f' -> buf.append('\f');
-                case 'r' -> buf.append('\r');
-                case '\"' -> buf.append('\"');
-                case '\'' -> buf.append('\'');
-                case '\\' -> buf.append('\\');
-                case 'u' -> {
-                    // skip an arbitrary number of u's
-                    i += 1;
-                    while (text.charAt(i) == 'u') {
+                    case 'b' -> buf.append('\b');
+                    case 't' -> buf.append('\t');
+                    case 'n' -> buf.append('\n');
+                    case 'f' -> buf.append('\f');
+                    case 'r' -> buf.append('\r');
+                    case '\"' -> buf.append('\"');
+                    case '\'' -> buf.append('\'');
+                    case '\\' -> buf.append('\\');
+                    case 'u' -> {
+                        // skip an arbitrary number of u's
                         i += 1;
+                        while (text.charAt(i) == 'u') {
+                            i += 1;
+                        }
+                        // the following must be a 4-digit hex value
+                        buf.append((char) Integer.parseInt(text.substring(i, i + 4), 16));
+                        i += 4;
                     }
-                    // the following must be a 4-digit hex value
-                    buf.append((char) Integer.parseInt(text.substring(i, i + 4), 16));
-                    i += 4;
-                }
-                case '0', '1', '2', '3', '4', '5', '6', '7' -> {
-                    int j = i + 1;
-                    while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') {
-                        j += 1;
+                    case '0', '1', '2', '3', '4', '5', '6', '7' -> {
+                        int j = i + 1;
+                        while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') {
+                            j += 1;
+                        }
+                        buf.append((char) Integer.parseInt(text.substring(i, j), 8));
+                        i = j;
                     }
-                    buf.append((char) Integer.parseInt(text.substring(i, j), 8));
-                    i = j;
-                }
-                default -> throw new ModelException("Bad character representation: " + text);
+                    default -> throw new ModelException("Bad character representation: " + text);
                 }
             }
         }
@@ -978,76 +978,76 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             throw new ModelException("Cast not allowed");
         }
         switch (oldType) {
-        case BYTE_TYPE -> {
-            switch (newType) {
-            case SHORT_TYPE -> res.setShort(res.getByte());
-            case CHAR_TYPE -> res.setChar((char) res.getByte());
-            case INT_TYPE -> res.setInt(res.getByte());
-            case LONG_TYPE -> res.setLong(res.getByte());
-            case FLOAT_TYPE -> res.setFloat(res.getByte());
-            case DOUBLE_TYPE -> res.setDouble(res.getByte());
+            case BYTE_TYPE -> {
+                switch (newType) {
+                    case SHORT_TYPE -> res.setShort(res.getByte());
+                    case CHAR_TYPE -> res.setChar((char) res.getByte());
+                    case INT_TYPE -> res.setInt(res.getByte());
+                    case LONG_TYPE -> res.setLong(res.getByte());
+                    case FLOAT_TYPE -> res.setFloat(res.getByte());
+                    case DOUBLE_TYPE -> res.setDouble(res.getByte());
+                }
             }
-        }
-        case SHORT_TYPE -> {
-            switch (newType) {
-            case BYTE_TYPE -> res.setByte((byte) res.getShort());
-            case CHAR_TYPE -> res.setChar((char) res.getShort());
-            case INT_TYPE -> res.setInt(res.getShort());
-            case LONG_TYPE -> res.setLong(res.getShort());
-            case FLOAT_TYPE -> res.setFloat(res.getShort());
-            case DOUBLE_TYPE -> res.setDouble(res.getShort());
+            case SHORT_TYPE -> {
+                switch (newType) {
+                    case BYTE_TYPE -> res.setByte((byte) res.getShort());
+                    case CHAR_TYPE -> res.setChar((char) res.getShort());
+                    case INT_TYPE -> res.setInt(res.getShort());
+                    case LONG_TYPE -> res.setLong(res.getShort());
+                    case FLOAT_TYPE -> res.setFloat(res.getShort());
+                    case DOUBLE_TYPE -> res.setDouble(res.getShort());
+                }
             }
-        }
-        case CHAR_TYPE -> {
-            switch (newType) {
-            case BYTE_TYPE -> res.setByte((byte) res.getChar());
-            case SHORT_TYPE -> res.setShort((short) res.getChar());
-            case INT_TYPE -> res.setInt(res.getChar());
-            case LONG_TYPE -> res.setLong(res.getChar());
-            case FLOAT_TYPE -> res.setFloat(res.getChar());
-            case DOUBLE_TYPE -> res.setDouble(res.getChar());
+            case CHAR_TYPE -> {
+                switch (newType) {
+                    case BYTE_TYPE -> res.setByte((byte) res.getChar());
+                    case SHORT_TYPE -> res.setShort((short) res.getChar());
+                    case INT_TYPE -> res.setInt(res.getChar());
+                    case LONG_TYPE -> res.setLong(res.getChar());
+                    case FLOAT_TYPE -> res.setFloat(res.getChar());
+                    case DOUBLE_TYPE -> res.setDouble(res.getChar());
+                }
             }
-        }
-        case INT_TYPE -> {
-            switch (newType) {
-            case BYTE_TYPE -> res.setByte((byte) res.getInt());
-            case SHORT_TYPE -> res.setShort((short) res.getInt());
-            case CHAR_TYPE -> res.setChar((char) res.getInt());
-            case LONG_TYPE -> res.setLong(res.getInt());
-            case FLOAT_TYPE -> res.setFloat((float) res.getInt());
-            case DOUBLE_TYPE -> res.setDouble(res.getInt());
+            case INT_TYPE -> {
+                switch (newType) {
+                    case BYTE_TYPE -> res.setByte((byte) res.getInt());
+                    case SHORT_TYPE -> res.setShort((short) res.getInt());
+                    case CHAR_TYPE -> res.setChar((char) res.getInt());
+                    case LONG_TYPE -> res.setLong(res.getInt());
+                    case FLOAT_TYPE -> res.setFloat((float) res.getInt());
+                    case DOUBLE_TYPE -> res.setDouble(res.getInt());
+                }
             }
-        }
-        case LONG_TYPE -> {
-            switch (newType) {
-            case BYTE_TYPE -> res.setByte((byte) res.getLong());
-            case SHORT_TYPE -> res.setShort((short) res.getLong());
-            case CHAR_TYPE -> res.setChar((char) res.getLong());
-            case INT_TYPE -> res.setInt((int) res.getLong());
-            case FLOAT_TYPE -> res.setFloat((float) res.getLong());
-            case DOUBLE_TYPE -> res.setDouble((double) res.getLong());
+            case LONG_TYPE -> {
+                switch (newType) {
+                    case BYTE_TYPE -> res.setByte((byte) res.getLong());
+                    case SHORT_TYPE -> res.setShort((short) res.getLong());
+                    case CHAR_TYPE -> res.setChar((char) res.getLong());
+                    case INT_TYPE -> res.setInt((int) res.getLong());
+                    case FLOAT_TYPE -> res.setFloat((float) res.getLong());
+                    case DOUBLE_TYPE -> res.setDouble((double) res.getLong());
+                }
             }
-        }
-        case FLOAT_TYPE -> {
-            switch (newType) {
-            case BYTE_TYPE -> res.setByte((byte) res.getFloat());
-            case SHORT_TYPE -> res.setShort((short) res.getFloat());
-            case CHAR_TYPE -> res.setChar((char) res.getFloat());
-            case INT_TYPE -> res.setInt((int) res.getFloat());
-            case LONG_TYPE -> res.setLong((long) res.getFloat());
-            case DOUBLE_TYPE -> res.setDouble(res.getFloat());
+            case FLOAT_TYPE -> {
+                switch (newType) {
+                    case BYTE_TYPE -> res.setByte((byte) res.getFloat());
+                    case SHORT_TYPE -> res.setShort((short) res.getFloat());
+                    case CHAR_TYPE -> res.setChar((char) res.getFloat());
+                    case INT_TYPE -> res.setInt((int) res.getFloat());
+                    case LONG_TYPE -> res.setLong((long) res.getFloat());
+                    case DOUBLE_TYPE -> res.setDouble(res.getFloat());
+                }
             }
-        }
-        case DOUBLE_TYPE -> {
-            switch (newType) {
-            case BYTE_TYPE -> res.setByte((byte) res.getDouble());
-            case SHORT_TYPE -> res.setShort((short) res.getDouble());
-            case CHAR_TYPE -> res.setChar((char) res.getDouble());
-            case INT_TYPE -> res.setInt((int) res.getDouble());
-            case LONG_TYPE -> res.setLong((long) res.getDouble());
-            case FLOAT_TYPE -> res.setFloat((float) res.getDouble());
+            case DOUBLE_TYPE -> {
+                switch (newType) {
+                    case BYTE_TYPE -> res.setByte((byte) res.getDouble());
+                    case SHORT_TYPE -> res.setShort((short) res.getDouble());
+                    case CHAR_TYPE -> res.setChar((char) res.getDouble());
+                    case INT_TYPE -> res.setInt((int) res.getDouble());
+                    case LONG_TYPE -> res.setLong((long) res.getDouble());
+                    case FLOAT_TYPE -> res.setFloat((float) res.getDouble());
+                }
             }
-        }
         }
     }
 
@@ -1180,168 +1180,171 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             BinaryBooleanOperation bbo = null;
 
             switch (op.getArity()) {
-            case 1 -> { // unary operations
+                case 1 -> { // unary operations
 
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
+                    if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
+                        return false;
+                    }
+                    if (op instanceof Positive) {
+                        uno = POSITIVE;
+                    } else if (op instanceof Negative) {
+                        uno = NEGATIVE;
+                    } else if (op instanceof BinaryNot) {
+                        uno = BINARY_NOT;
+                    } else if (op instanceof LogicalNot) {
+                        ubo = LOGICAL_NOT;
+                    }
                 }
-                if (op instanceof Positive) {
-                    uno = POSITIVE;
-                } else if (op instanceof Negative) {
-                    uno = NEGATIVE;
-                } else if (op instanceof BinaryNot) {
-                    uno = BINARY_NOT;
-                } else if (op instanceof LogicalNot) {
-                    ubo = LOGICAL_NOT;
-                }
-            }
-            case 2 -> { // binary operations
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                // widen type
-                lhs = res;
-                promoteNumericTypeToInt(lhs);
-                /*
-                 * The allocation could be optimized away if the contents of the res/lhs object
-                 * would be stored locally and res would be reused for the rhs call. However,
-                 * performance is not critical here.
-                 */
-                rhs = new EvaluationResult();
-                // evaluate right-hand side; finish if not constant
-                if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) {
-                    return false;
-                }
-                // widen numerical types shorter than int
-                promoteNumericTypeToInt(rhs);
+                case 2 -> { // binary operations
+                    if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
+                        return false;
+                    }
+                    // widen type
+                    lhs = res;
+                    promoteNumericTypeToInt(lhs);
+                    /*
+                     * The allocation could be optimized away if the contents of the res/lhs object
+                     * would be stored locally and res would be reused for the rhs call. However,
+                     * performance is not critical here.
+                     */
+                    rhs = new EvaluationResult();
+                    // evaluate right-hand side; finish if not constant
+                    if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) {
+                        return false;
+                    }
+                    // widen numerical types shorter than int
+                    promoteNumericTypeToInt(rhs);
 
-                // widen the remaining types to match both argument types
-                matchTypes(lhs, rhs);
-                if (op instanceof ComparativeOperator) {
-                    if (op instanceof Equals) {
-                        bbo = EQUALS;
-                    } else if (op instanceof NotEquals) {
-                        bbo = NOT_EQUALS;
-                    } else if (op instanceof GreaterThan) {
-                        bbo = GREATER_THAN;
-                    } else if (op instanceof LessThan) {
-                        bbo = LESS_THAN;
-                    } else if (op instanceof GreaterOrEquals) {
-                        bbo = GREATER_OR_EQUALS;
-                    } else if (op instanceof LessOrEquals) {
-                        bbo = LESS_OR_EQUALS;
+                    // widen the remaining types to match both argument types
+                    matchTypes(lhs, rhs);
+                    if (op instanceof ComparativeOperator) {
+                        if (op instanceof Equals) {
+                            bbo = EQUALS;
+                        } else if (op instanceof NotEquals) {
+                            bbo = NOT_EQUALS;
+                        } else if (op instanceof GreaterThan) {
+                            bbo = GREATER_THAN;
+                        } else if (op instanceof LessThan) {
+                            bbo = LESS_THAN;
+                        } else if (op instanceof GreaterOrEquals) {
+                            bbo = GREATER_OR_EQUALS;
+                        } else if (op instanceof LessOrEquals) {
+                            bbo = LESS_OR_EQUALS;
+                        } else if (op instanceof LogicalAnd) {
+                            bbo = LOGICAL_AND;
+                        } else if (op instanceof LogicalOr) {
+                            bbo = LOGICAL_OR;
+                        }
+                    } else if (op instanceof Plus) {
+                        bno = PLUS;
+                    } else if (op instanceof Minus) {
+                        bno = MINUS;
+                    } else if (op instanceof Times) {
+                        bno = TIMES;
+                    } else if (op instanceof Divide) {
+                        bno = DIVIDE;
+                    } else if (op instanceof Modulo) {
+                        bno = MODULO;
+                    } else if (op instanceof ShiftLeft) {
+                        bno = SHIFT_LEFT;
+                    } else if (op instanceof ShiftRight) {
+                        bno = SHIFT_RIGHT;
+                    } else if (op instanceof UnsignedShiftRight) {
+                        bno = UNSIGNED_SHIFT_RIGHT;
+                    } else if (op instanceof BinaryAnd) {
+                        bno = BINARY_AND;
+                    } else if (op instanceof BinaryOr) {
+                        bno = BINARY_OR;
+                    } else if (op instanceof BinaryXOr) {
+                        bno = BINARY_XOR;
                     } else if (op instanceof LogicalAnd) {
                         bbo = LOGICAL_AND;
                     } else if (op instanceof LogicalOr) {
                         bbo = LOGICAL_OR;
                     }
-                } else if (op instanceof Plus) {
-                    bno = PLUS;
-                } else if (op instanceof Minus) {
-                    bno = MINUS;
-                } else if (op instanceof Times) {
-                    bno = TIMES;
-                } else if (op instanceof Divide) {
-                    bno = DIVIDE;
-                } else if (op instanceof Modulo) {
-                    bno = MODULO;
-                } else if (op instanceof ShiftLeft) {
-                    bno = SHIFT_LEFT;
-                } else if (op instanceof ShiftRight) {
-                    bno = SHIFT_RIGHT;
-                } else if (op instanceof UnsignedShiftRight) {
-                    bno = UNSIGNED_SHIFT_RIGHT;
-                } else if (op instanceof BinaryAnd) {
-                    bno = BINARY_AND;
-                } else if (op instanceof BinaryOr) {
-                    bno = BINARY_OR;
-                } else if (op instanceof BinaryXOr) {
-                    bno = BINARY_XOR;
-                } else if (op instanceof LogicalAnd) {
-                    bbo = LOGICAL_AND;
-                } else if (op instanceof LogicalOr) {
-                    bbo = LOGICAL_OR;
                 }
-            }
-            case 3 -> {
-                // this must be the conditional (?:)
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                if (res.getTypeCode() != BOOLEAN_TYPE) {
-                    throw new ModelException("No boolean expression in ?:");
-                }
-                boolean cond = res.getBoolean();
-                // evaluate both sides; finish if not constant
+                case 3 -> {
+                    // this must be the conditional (?:)
+                    if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
+                        return false;
+                    }
+                    if (res.getTypeCode() != BOOLEAN_TYPE) {
+                        throw new ModelException("No boolean expression in ?:");
+                    }
+                    boolean cond = res.getBoolean();
+                    // evaluate both sides; finish if not constant
 
-                lhs = res; // overwrite old values
-                if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) {
-                    return false;
+                    lhs = res; // overwrite old values
+                    if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) {
+                        return false;
+                    }
+                    rhs = new EvaluationResult();
+                    if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) {
+                        return false;
+                    }
+                    matchConditionalTypes(lhs, rhs);
+                    switch (lhs.getTypeCode()) { // matches type of rhs
+                        case BOOLEAN_TYPE ->
+                            res.setBoolean(cond ? lhs.getBoolean() : rhs.getBoolean());
+                        case BYTE_TYPE -> res.setByte(cond ? lhs.getByte() : rhs.getByte());
+                        case SHORT_TYPE -> res.setShort(cond ? lhs.getShort() : rhs.getShort());
+                        case CHAR_TYPE -> res.setChar(cond ? lhs.getChar() : rhs.getChar());
+                        case INT_TYPE -> res.setInt(cond ? lhs.getInt() : rhs.getInt());
+                        case LONG_TYPE -> res.setLong(cond ? lhs.getLong() : rhs.getLong());
+                        case FLOAT_TYPE -> res.setFloat(cond ? lhs.getFloat() : rhs.getFloat());
+                        case DOUBLE_TYPE -> res.setDouble(cond ? lhs.getDouble() : rhs.getDouble());
+                        case STRING_TYPE -> res.setString(cond ? lhs.getString() : rhs.getString());
+                    }
+                    return true;
                 }
-                rhs = new EvaluationResult();
-                if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) {
-                    return false;
-                }
-                matchConditionalTypes(lhs, rhs);
-                switch (lhs.getTypeCode()) { // matches type of rhs
-                case BOOLEAN_TYPE -> res.setBoolean(cond ? lhs.getBoolean() : rhs.getBoolean());
-                case BYTE_TYPE -> res.setByte(cond ? lhs.getByte() : rhs.getByte());
-                case SHORT_TYPE -> res.setShort(cond ? lhs.getShort() : rhs.getShort());
-                case CHAR_TYPE -> res.setChar(cond ? lhs.getChar() : rhs.getChar());
-                case INT_TYPE -> res.setInt(cond ? lhs.getInt() : rhs.getInt());
-                case LONG_TYPE -> res.setLong(cond ? lhs.getLong() : rhs.getLong());
-                case FLOAT_TYPE -> res.setFloat(cond ? lhs.getFloat() : rhs.getFloat());
-                case DOUBLE_TYPE -> res.setDouble(cond ? lhs.getDouble() : rhs.getDouble());
-                case STRING_TYPE -> res.setString(cond ? lhs.getString() : rhs.getString());
-                }
-                return true;
-            }
             }
 
             if (bno != null) {
                 switch (lhs.getTypeCode()) {
-                case BOOLEAN_TYPE -> lhs.setBoolean(bno.eval(lhs.getBoolean(), rhs.getBoolean()));
-                case INT_TYPE -> lhs.setInt(bno.eval(lhs.getInt(), rhs.getInt()));
-                case LONG_TYPE -> lhs.setLong(bno.eval(lhs.getLong(), rhs.getLong()));
-                case FLOAT_TYPE -> lhs.setFloat(bno.eval(lhs.getFloat(), rhs.getFloat()));
-                case DOUBLE_TYPE -> lhs.setDouble(bno.eval(lhs.getDouble(), rhs.getDouble()));
-                case STRING_TYPE -> lhs.setString(bno.eval(lhs.getString(), rhs.getString()));
+                    case BOOLEAN_TYPE ->
+                        lhs.setBoolean(bno.eval(lhs.getBoolean(), rhs.getBoolean()));
+                    case INT_TYPE -> lhs.setInt(bno.eval(lhs.getInt(), rhs.getInt()));
+                    case LONG_TYPE -> lhs.setLong(bno.eval(lhs.getLong(), rhs.getLong()));
+                    case FLOAT_TYPE -> lhs.setFloat(bno.eval(lhs.getFloat(), rhs.getFloat()));
+                    case DOUBLE_TYPE -> lhs.setDouble(bno.eval(lhs.getDouble(), rhs.getDouble()));
+                    case STRING_TYPE -> lhs.setString(bno.eval(lhs.getString(), rhs.getString()));
                 }
                 return true;
             }
 
             if (bbo != null) {
                 switch (lhs.getTypeCode()) {
-                case BOOLEAN_TYPE -> lhs.setBoolean(bbo.eval(lhs.getBoolean(), rhs.getBoolean()));
-                case INT_TYPE -> lhs.setBoolean(bbo.eval(lhs.getInt(), rhs.getInt()));
-                case LONG_TYPE -> lhs.setBoolean(bbo.eval(lhs.getLong(), rhs.getLong()));
-                case FLOAT_TYPE -> lhs.setBoolean(bbo.eval(lhs.getFloat(), rhs.getFloat()));
-                case DOUBLE_TYPE -> lhs.setBoolean(bbo.eval(lhs.getDouble(), rhs.getDouble()));
-                case STRING_TYPE -> lhs.setBoolean(bbo.eval(lhs.getString(), rhs.getString()));
+                    case BOOLEAN_TYPE ->
+                        lhs.setBoolean(bbo.eval(lhs.getBoolean(), rhs.getBoolean()));
+                    case INT_TYPE -> lhs.setBoolean(bbo.eval(lhs.getInt(), rhs.getInt()));
+                    case LONG_TYPE -> lhs.setBoolean(bbo.eval(lhs.getLong(), rhs.getLong()));
+                    case FLOAT_TYPE -> lhs.setBoolean(bbo.eval(lhs.getFloat(), rhs.getFloat()));
+                    case DOUBLE_TYPE -> lhs.setBoolean(bbo.eval(lhs.getDouble(), rhs.getDouble()));
+                    case STRING_TYPE -> lhs.setBoolean(bbo.eval(lhs.getString(), rhs.getString()));
                 }
                 return true;
             }
 
             if (uno != null) {
                 switch (res.getTypeCode()) {
-                case BOOLEAN_TYPE -> res.setBoolean(uno.eval(res.getBoolean()));
-                case INT_TYPE -> res.setInt(uno.eval(res.getInt()));
-                case LONG_TYPE -> res.setLong(uno.eval(res.getLong()));
-                case FLOAT_TYPE -> res.setFloat(uno.eval(res.getFloat()));
-                case DOUBLE_TYPE -> res.setDouble(uno.eval(res.getDouble()));
-                case STRING_TYPE -> res.setString(uno.eval(res.getString()));
+                    case BOOLEAN_TYPE -> res.setBoolean(uno.eval(res.getBoolean()));
+                    case INT_TYPE -> res.setInt(uno.eval(res.getInt()));
+                    case LONG_TYPE -> res.setLong(uno.eval(res.getLong()));
+                    case FLOAT_TYPE -> res.setFloat(uno.eval(res.getFloat()));
+                    case DOUBLE_TYPE -> res.setDouble(uno.eval(res.getDouble()));
+                    case STRING_TYPE -> res.setString(uno.eval(res.getString()));
                 }
                 return true;
             }
 
             if (ubo != null) {
                 switch (res.getTypeCode()) {
-                case BOOLEAN_TYPE -> res.setBoolean(ubo.eval(res.getBoolean()));
-                case INT_TYPE -> res.setBoolean(ubo.eval(res.getInt()));
-                case LONG_TYPE -> res.setBoolean(ubo.eval(res.getLong()));
-                case FLOAT_TYPE -> res.setBoolean(ubo.eval(res.getFloat()));
-                case DOUBLE_TYPE -> res.setBoolean(ubo.eval(res.getDouble()));
-                case STRING_TYPE -> res.setBoolean(ubo.eval(res.getString()));
+                    case BOOLEAN_TYPE -> res.setBoolean(ubo.eval(res.getBoolean()));
+                    case INT_TYPE -> res.setBoolean(ubo.eval(res.getInt()));
+                    case LONG_TYPE -> res.setBoolean(ubo.eval(res.getLong()));
+                    case FLOAT_TYPE -> res.setBoolean(ubo.eval(res.getFloat()));
+                    case DOUBLE_TYPE -> res.setBoolean(ubo.eval(res.getDouble()));
+                    case STRING_TYPE -> res.setBoolean(ubo.eval(res.getString()));
                 }
                 return true;
             }
@@ -1412,29 +1415,29 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                         return false;
                     }
                     switch (vtype) {
-                    case BOOLEAN_TYPE -> res.setBoolean(Integer.parseInt(val) != 0);
-                    case BYTE_TYPE -> res.setByte((byte) Integer.parseInt(val));
-                    case SHORT_TYPE -> res.setShort((short) Integer.parseInt(val));
-                    case CHAR_TYPE -> res.setChar((char) Integer.parseInt(val));
-                    case INT_TYPE -> res.setInt(Integer.parseInt(val));
-                    case LONG_TYPE -> res.setLong(Long.parseLong(val));
-                    case FLOAT_TYPE -> {
-                        if (val.equals("NaN")) {
-                            // may occur in byte code?!
-                            res.setFloat(Float.NaN);
-                        } else {
-                            res.setFloat(Float.valueOf(val));
+                        case BOOLEAN_TYPE -> res.setBoolean(Integer.parseInt(val) != 0);
+                        case BYTE_TYPE -> res.setByte((byte) Integer.parseInt(val));
+                        case SHORT_TYPE -> res.setShort((short) Integer.parseInt(val));
+                        case CHAR_TYPE -> res.setChar((char) Integer.parseInt(val));
+                        case INT_TYPE -> res.setInt(Integer.parseInt(val));
+                        case LONG_TYPE -> res.setLong(Long.parseLong(val));
+                        case FLOAT_TYPE -> {
+                            if (val.equals("NaN")) {
+                                // may occur in byte code?!
+                                res.setFloat(Float.NaN);
+                            } else {
+                                res.setFloat(Float.valueOf(val));
+                            }
                         }
-                    }
-                    case DOUBLE_TYPE -> {
-                        if (val.equals("NaN")) {
-                            // may occur in byte code?!
-                            res.setDouble(Double.NaN);
-                        } else {
-                            res.setDouble(Double.valueOf(val));
+                        case DOUBLE_TYPE -> {
+                            if (val.equals("NaN")) {
+                                // may occur in byte code?!
+                                res.setDouble(Double.NaN);
+                            } else {
+                                res.setDouble(Double.valueOf(val));
+                            }
                         }
-                    }
-                    case STRING_TYPE -> res.setString(val);
+                        case STRING_TYPE -> res.setString(val);
                     }
                     return true;
                 }

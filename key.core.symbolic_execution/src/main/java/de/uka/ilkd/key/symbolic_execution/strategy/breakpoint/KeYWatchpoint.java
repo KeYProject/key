@@ -10,8 +10,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,6 +27,8 @@ import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -83,14 +86,13 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
         if (suspendOnTrue) {
             return super.conditionMet(ruleApp, node);
         } else {
-            ApplyStrategyInfo info = null;
+            ApplyStrategyInfo<@NonNull Proof, Goal> info = null;
             try {
                 final TermBuilder tb = getProof().getServices().getTermBuilder();
-                Term negatedCondition = tb.not(getCondition());
+                JTerm negatedCondition = tb.not(getCondition());
                 // initialize values
                 PosInOccurrence pio = ruleApp.posInOccurrence();
-                var t = pio.subTerm();
-                Term term = TermBuilder.goBelowUpdates(t);
+                JTerm term = TermBuilder.goBelowUpdates((JTerm) pio.subTerm());
                 IExecutionContext ec =
                     JavaTools.getInnermostExecutionContext(term.javaBlock(),
                         getProof().getServices());
@@ -100,9 +102,9 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
                 }
                 // replace renamings etc.
                 OpReplacer replacer = new OpReplacer(getVariableNamingMap(), tb.tf());
-                Term termForSideProof = replacer.replace(negatedCondition);
+                JTerm termForSideProof = replacer.replace(negatedCondition);
                 // start side proof
-                Term toProof = tb.equals(tb.tt(), termForSideProof);
+                JTerm toProof = tb.equals(tb.tt(), termForSideProof);
                 // New OneStepSimplifier is required because it has an internal state and the
                 // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil

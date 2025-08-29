@@ -9,10 +9,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
-/**
- * A feature that computes the sum of two given features (faster than the more general class
- * <code>SumFeature</code>)
- */
+/// A feature that computes the sum of two given features (faster than the more general class
+/// <code>SumFeature</code>)
 public class BinarySumTermFeature implements TermFeature {
 
     public RuleAppCost compute(Term term, MutableState mState, LogicServices services) {

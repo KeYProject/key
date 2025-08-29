@@ -20,7 +20,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -91,7 +91,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                         (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     for (Object file : files) {
                         File f = (File) file;
-                        MainWindow.getInstance().loadProblem(f);
+                        MainWindow.getInstance().loadProblem(f.toPath());
                     }
                     event.dropComplete(true);
                 } catch (ClassCastException ex) {
@@ -434,7 +434,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             if (app.isInstantiationRequired(missingSV)) {
                 try {
                     app = (PosTacletApp) app.addCheckedInstantiation(missingSV,
-                        (Term) missingSVPIO.subTerm(), services, true);
+                        (JTerm) missingSVPIO.subTerm(), services, true);
                 } catch (IllegalInstantiationException ie) {
                     app = null;
                 }

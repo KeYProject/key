@@ -55,6 +55,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
@@ -509,7 +510,7 @@ public class IntermediateProofReplayer {
             // MU 2019: #1487. We have to use the right namespaces to not
             // ignore branch-local functions
             NamespaceSet nss = currGoal.getLocalNamespaces();
-            Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
+            JTerm term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
             ifFormulaList =
                 ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
@@ -956,7 +957,7 @@ public class IntermediateProofReplayer {
      * @return The parsed term.
      * @throws ParserException In case of an error.
      */
-    public static Term parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
+    public static JTerm parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
@@ -975,7 +976,7 @@ public class IntermediateProofReplayer {
      * @param proof Proof object (for namespaces and Services object).
      * @return The parsed term.
      */
-    public static Term parseTerm(String value, Proof proof) {
+    public static JTerm parseTerm(String value, Proof proof) {
         NamespaceSet nss = proof.getNamespaces();
         return parseTerm(value, proof, nss.variables(), nss.programVariables(), nss.functions());
     }
@@ -993,7 +994,7 @@ public class IntermediateProofReplayer {
     public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
         LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(sv, services));
-        Term instance = services.getTermFactory().createTerm(lv);
+        JTerm instance = services.getTermFactory().createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services, true);
     }
 
@@ -1025,7 +1026,7 @@ public class IntermediateProofReplayer {
             result = app.createSkolemConstant(value, skolemSv, true, services);
         } else if (sv instanceof ModalOperatorSV msv) {
             result = app.addInstantiation(
-                app.instantiations().add(msv, Modality.JavaModalityKind.getKind(value), services),
+                app.instantiations().add(msv, JModality.JavaModalityKind.getKind(value), services),
                 services);
         } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
@@ -1033,7 +1034,7 @@ public class IntermediateProofReplayer {
                 targetGoal.getLocalNamespaces().programVariables();
             Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
-            Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
+            JTerm instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);
         }
         return result;

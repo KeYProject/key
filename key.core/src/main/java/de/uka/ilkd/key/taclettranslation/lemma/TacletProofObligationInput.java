@@ -5,6 +5,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -157,7 +159,8 @@ public class TacletProofObligationInput implements IPersistablePO {
                 new ProblemInitializer(environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                new File(baseDir, tacletFile), fileCollection(axiomFiles), environmentConfig);
+                Paths.get(baseDir, tacletFile),
+                fileCollection(axiomFiles), environmentConfig);
         }
 
         ProofEnvironment proofEnv = createProofEnvironment();
@@ -178,10 +181,10 @@ public class TacletProofObligationInput implements IPersistablePO {
     }
 
 
-    private Collection<File> fileCollection(String[] strings) {
-        ArrayList<File> result = new ArrayList<>();
+    private Collection<Path> fileCollection(String[] strings) {
+        ArrayList<Path> result = new ArrayList<>();
         for (String string : strings) {
-            result.add(new File(baseDir, string));
+            result.add(Paths.get(baseDir, string));
         }
         return result;
     }
@@ -217,13 +220,13 @@ public class TacletProofObligationInput implements IPersistablePO {
         this.axiomFiles = axioms.toArray(new String[0]);
     }
 
-    public void setLoadInfo(File tacletFile, File definitionFile, Collection<File> axiomFiles) {
+    public void setLoadInfo(Path tacletFile, File definitionFile, Collection<Path> axiomFiles) {
         this.tacletFile = tacletFile.toString();
         this.definitionFile = definitionFile.toString();
         this.axiomFiles = new String[axiomFiles.size()];
 
         int i = 0;
-        for (File file : axiomFiles) {
+        for (Path file : axiomFiles) {
             this.axiomFiles[i] = file.toString();
             i++;
         }

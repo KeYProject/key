@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,17 +61,17 @@ public class TrivialFileRepo implements FileRepo {
     }
 
     @Override
-    public void setBootClassPath(File path) throws IllegalStateException {
+    public void setBootClassPath(Path path) throws IllegalStateException {
         // nothing to do here
     }
 
     @Override
-    public void setClassPath(List<File> classPath) throws IllegalStateException {
+    public void setClassPath(List<Path> classPath) throws IllegalStateException {
         // nothing to do here
     }
 
     @Override
-    public void setJavaPath(String javaPath) throws IllegalStateException {
+    public void setJavaPath(Path javaPath) throws IllegalStateException {
         // nothing to do here
     }
 

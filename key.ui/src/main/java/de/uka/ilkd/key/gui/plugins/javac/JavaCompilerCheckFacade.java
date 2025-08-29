@@ -60,7 +60,7 @@ public class JavaCompilerCheckFacade {
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+            Path bootClassPath, List<Path> classPath, Path javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -88,16 +88,18 @@ public class JavaCompilerCheckFacade {
         List<String> options = new ArrayList<>();
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
-            options.add(bootClassPath.getAbsolutePath());
+            options.add(bootClassPath.toAbsolutePath().toString());
         }
         if (classPath != null && !classPath.isEmpty()) {
             options.add("-classpath");
             options.add(
-                classPath.stream().map(File::getAbsolutePath).collect(Collectors.joining(":")));
+                classPath.stream().map(Path::toAbsolutePath)
+                        .map(Objects::toString)
+                        .collect(Collectors.joining(":")));
         }
         ArrayList<Path> files = new ArrayList<>();
-        if (javaPath.isDirectory()) {
-            try (var s = Files.walk(javaPath.toPath())) {
+        if (Files.isDirectory(javaPath)) {
+            try (var s = Files.walk(javaPath)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
@@ -105,7 +107,7 @@ public class JavaCompilerCheckFacade {
                 LOGGER.info("", e);
             }
         } else {
-            files.add(javaPath.toPath());
+            files.add(javaPath);
         }
 
         Iterable<? extends JavaFileObject> compilationUnits =
@@ -126,8 +128,10 @@ public class JavaCompilerCheckFacade {
                     it.getMessage(Locale.ENGLISH),
                     new Location(
                         fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
-                        Position.newOneBased((int) it.getLineNumber(),
-                            (int) it.getColumnNumber())),
+                        it.getPosition() != Diagnostic.NOPOS
+                                ? Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())
+                                : Position.UNDEFINED),
                     it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });

@@ -4,13 +4,8 @@
 package org.key_project.prover.rules;
 
 
-/**
- *
- * @author jomi
- *
- *         This Exception signals the abort of a rule Application
- *
- */
+/// @author jomi
+/// This Exception signals the abort of a rule Application
 public class RuleAbortException extends RuntimeException {
     public RuleAbortException() {
         super("A rule application has been aborted");

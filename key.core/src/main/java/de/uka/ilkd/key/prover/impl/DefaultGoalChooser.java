@@ -118,7 +118,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#getNextGoal()
      */
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         Goal result;
 
         if (allGoalsSatisfiable) {
@@ -149,8 +149,8 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#removeGoal(de.uka.ilkd.key.proof.Goal)
      */
-    public void removeGoal(Goal p_goal) {
-        selectedList = selectedList.removeAll(p_goal);
+    public void removeGoal(Goal goal) {
+        selectedList = selectedList.removeAll(goal);
         nextGoals = ImmutableSLList.nil();
 
         if (selectedList.isEmpty()) {

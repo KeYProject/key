@@ -112,11 +112,11 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         int sbl = asb.length();
         for (int i = 0; i < sbl; i++) {
             switch (asb.charAt(i)) {
-            case '<' -> nsb.append("&lt;");
-            case '>' -> nsb.append("&gt;");
-            case '&' -> nsb.append("&amp;");
-            case '\n' -> nsb.append("<br>");
-            default -> nsb.append(asb.charAt(i));
+                case '<' -> nsb.append("&lt;");
+                case '>' -> nsb.append("&gt;");
+                case '&' -> nsb.append("&amp;");
+                case '\n' -> nsb.append("<br>");
+                default -> nsb.append(asb.charAt(i));
             }
         }
         return nsb;

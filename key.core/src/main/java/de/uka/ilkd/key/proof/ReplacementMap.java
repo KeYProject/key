@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -123,8 +123,8 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
 
         @SuppressWarnings("unchecked")
         private <R> R wrap(R obj) {
-            if (obj instanceof Term) {
-                return (R) TermLabelManager.removeIrrelevantLabels((Term) obj, tf);
+            if (obj instanceof JTerm) {
+                return (R) TermLabelManager.removeIrrelevantLabels((JTerm) obj, tf);
             } else {
                 return obj;
             }

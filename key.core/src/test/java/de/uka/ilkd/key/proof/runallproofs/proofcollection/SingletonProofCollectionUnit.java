@@ -15,8 +15,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SingletonProofCollectionUnit extends ProofCollectionUnit {
-
-    private static final long serialVersionUID = 1L;
     private final TestFile file;
     private final ProofCollectionSettings settings;
 
@@ -32,7 +30,7 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
     @Override
     String getName() throws IOException {
-        return file.getKeYFile().getName();
+        return file.getKeYFile().getFileName().toString();
     }
 
 }

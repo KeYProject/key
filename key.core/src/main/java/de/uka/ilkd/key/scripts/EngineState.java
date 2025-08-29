@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
@@ -80,12 +80,12 @@ public class EngineState {
 
     private ValueInjector createDefaultValueInjector() {
         var v = ValueInjector.createDefault();
-        v.addConverter(Term.class, String.class, (str) -> this.toTerm(str, null));
+        v.addConverter(JTerm.class, String.class, (str) -> this.toTerm(str, null));
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
 
         addContextTranslator(v, String.class);
-        addContextTranslator(v, Term.class);
+        addContextTranslator(v, JTerm.class);
         addContextTranslator(v, Integer.class);
         addContextTranslator(v, Byte.class);
         addContextTranslator(v, Long.class);
@@ -97,7 +97,7 @@ public class EngineState {
         addContextTranslator(v, Long.TYPE);
         addContextTranslator(v, Boolean.TYPE);
         addContextTranslator(v, Character.TYPE);
-        addContextTranslator(v, Term.class);
+        addContextTranslator(v, JTerm.class);
         addContextTranslator(v, Sequent.class);
         addContextTranslator(v, Semisequent.class);
         return v;
@@ -229,30 +229,30 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0 -> {
-                result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
-                    // We found our goal
-                    break loop;
+                case 0 -> {
+                    result = getGoal(proof.openGoals(), node);
+                    if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
+                        // We found our goal
+                        break loop;
+                    }
+                    node = choices.pollLast();
                 }
-                node = choices.pollLast();
-            }
-            case 1 -> node = node.child(0);
-            default -> {
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
+                case 1 -> node = node.child(0);
+                default -> {
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
+                    assert next != null;
+                    node = next;
                 }
-                assert next != null;
-                node = next;
-            }
             }
         }
 
@@ -260,7 +260,7 @@ public class EngineState {
     }
 
 
-    public Term toTerm(String string, @Nullable Sort sort)
+    public JTerm toTerm(String string, @Nullable Sort sort)
             throws ParserException, ScriptException {
         final var io = getKeyIO();
         var term = io.parseExpression(string);

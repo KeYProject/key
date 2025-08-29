@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
@@ -673,19 +674,19 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
             SMTTerm typeReq;
             switch (single) {
-            case "int", "char", "byte" -> typeReq =
-                SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
-            case "java.lang.Object" -> typeReq =
-                SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-            case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
-            default -> {
-                typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-                Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
-                addTypePredicate(singleSort);
-                SMTFunction tps = getTypePredicate(singleSort.name().toString());
-                SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
-                typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
-            }
+                case "int", "char", "byte" -> typeReq =
+                    SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+                case "java.lang.Object" -> typeReq =
+                    SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
+                default -> {
+                    typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                    Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+                    addTypePredicate(singleSort);
+                    SMTFunction tps = getTypePredicate(singleSort.name().toString());
+                    SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
+                    typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
+                }
             }
             assertion4 = assertion4.and(premise.implies(typeReq));
         }
@@ -1126,7 +1127,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a quantified variable.
      */
-    private SMTTermVariable translateVariable(org.key_project.logic.op.QuantifiableVariable q)
+    private SMTTermVariable translateVariable(QuantifiableVariable q)
             throws IllegalFormulaException {
         SMTSort s = translateSort(q.sort());
         return new SMTTermVariable(q.name().toString(), s);

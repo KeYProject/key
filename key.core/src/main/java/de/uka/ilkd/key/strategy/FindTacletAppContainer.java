@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.prover.indexing.FormulaTag;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -49,12 +50,10 @@ public class FindTacletAppContainer extends TacletAppContainer {
             long age) {
         super(app, cost, age);
         applicationPosition = pio;
-        positionTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
 
-        if (positionTag == null) {
-            // faster than <code>assertFalse</code>
-            Debug.fail("Formula " + pio + " does not exist");
-        }
+        final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
+        assert posTag != null : "No formula tag found for " + pio;
+        positionTag = posTag;
     }
 
 
@@ -75,7 +74,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         altered since the creation of this object or if a preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
-        ImmutableList<FormulaChangeInfo> infoList =
+        ImmutableList<@NonNull FormulaChangeInfo> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
@@ -123,7 +122,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
             }
 
             if (changeIndex == -1) {
-                final Term beforeChangeTerm = (Term) changePIO.getSubTerm();
+                final JTerm beforeChangeTerm = (JTerm) changePIO.getSubTerm();
                 final Operator beforeChangeOp = beforeChangeTerm.op();
 
                 // special case: a taclet application is not affected by changes
@@ -134,7 +133,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 if (beforeChangeOp instanceof Modality beforeChangeMod) {
                     final PosInOccurrence afterChangePos =
                         changePos.replaceSequentFormula(newFormula);
-                    final Term afterChangeTerm = (Term) afterChangePos.subTerm();
+                    final JTerm afterChangeTerm = (JTerm) afterChangePos.subTerm();
                     if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
                         return beforeChangeMod.kind() == afterChangeMod.kind()
                                 && beforeChangeTerm.sub(0)
