@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.*;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
 import org.key_project.prover.sequent.Sequent;
@@ -13,6 +14,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
 
 import static org.key_project.util.java.StringUtil.trim;
 
@@ -34,6 +37,12 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
 
     ExprEvaluator(EngineState engineState) {
         this.state = engineState;
+    }
+
+    @Override
+    public Object visitProofScriptCodeBlock(ProofScriptCodeBlockContext ctx) {
+        URI uri = KeyAst.ProofScript.getUri(ctx.start);
+        return KeyAst.ProofScript.asAst(uri, ctx);
     }
 
     @Override

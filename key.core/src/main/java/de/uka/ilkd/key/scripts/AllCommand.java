@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.List;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
-public class AllCommand implements ProofScriptCommand {
-    private String documentation;
+import java.util.List;
 
+public class AllCommand implements ProofScriptCommand {
     @Override
     public List<ProofScriptArgument> getArguments() {
         return List.of();
@@ -19,22 +17,21 @@ public class AllCommand implements ProofScriptCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-            EngineState stateMap) throws ScriptException, InterruptedException {
-        var block = args.commands();
-
-        if (block == null) {
-            throw new ScriptException("Missing command to apply onAll to");
+                        EngineState stateMap) throws ScriptException, InterruptedException {
+        if (args.positionalArgs().size() != 1) {
+            throw new ScriptException("Invalid number of positional arguments to 'onAll'. Pos. arguments: "
+                    + args.positionalArgs().size());
         }
+
+        var block = stateMap.getValueInjector().convert(
+                args.positionalArgs().getFirst(),
+                ScriptBlock.class);
 
         var proof = stateMap.getProof();
-        // Node selectedNode = state.getSelectedNode();
         for (Goal g : proof.openGoals()) {
-            // if (isBelow(g, selectedNode)) {
             stateMap.setGoal(g);
             stateMap.getEngine().execute(uiControl, block);
-            // }
         }
-        // state.setGoal(selectedNode);
     }
 
 

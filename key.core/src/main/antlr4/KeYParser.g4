@@ -5,6 +5,7 @@ parser grammar KeYParser;
 }
 
 @members {
+private boolean lastPosArgWasCodeBlock=false;
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
@@ -859,16 +860,18 @@ proofScriptEntry
     | LBRACE proofScript RBRACE
     )
 ;
+
 proofScriptEOF: proofScript EOF;
 proofScript: proofScriptCommand+;
-proofScriptCommand: cmd=IDENT proofScriptParameters?
-	( LBRACE sub=proofScript RBRACE SEMI?
-	| SEMI);
+proofScriptCommand: cmd=IDENT proofScriptParameters? SEMI;
+//	( {lastPosArgWasCodeBlock}? SEMI?
+//	| SEMI);
 
 proofScriptParameters: proofScriptParameter+;
 proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
 proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
 proofScriptExpression:
+//  {lastPosArgWasCodeBlock=false;}
     boolean_literal
   | char_literal
   | integer
@@ -878,8 +881,10 @@ proofScriptExpression:
   | simple_ident
   | abbreviation
   | literals
+  | proofScriptCodeBlock
   ;
 
+proofScriptCodeBlock: LBRACE proofScript RBRACE;
 
 // PROOF
 proof: PROOF EOF;

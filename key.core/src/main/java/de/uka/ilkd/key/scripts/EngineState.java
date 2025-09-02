@@ -100,6 +100,7 @@ public class EngineState {
         addContextTranslator(v, JTerm.class);
         addContextTranslator(v, Sequent.class);
         addContextTranslator(v, Semisequent.class);
+        addContextTranslator(v, ScriptBlock.class);
         return v;
     }
 
