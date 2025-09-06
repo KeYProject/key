@@ -46,8 +46,8 @@ public final class ParsingFacade {
     }
 
     /**
-     * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
-     * <b>The use of this method is discourage and should be avoided in all high level
+     * Use this function to retrieve the {@link ParserRuleContext} inside an {@link KeyAst} object.
+     * <b>The use of this method is discouraged and should be avoided in all high level
      * scenarios.</b>
      *
      * @param ast a key ast object
