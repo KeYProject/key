@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+import java.net.URI;
+
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.*;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
@@ -14,8 +16,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
 
 import static org.key_project.util.java.StringUtil.trim;
 

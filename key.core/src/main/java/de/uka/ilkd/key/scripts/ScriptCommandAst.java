@@ -21,17 +21,24 @@ import static java.util.stream.Collectors.joining;
 ///
 /// It is an abstraction to the commands of following structure:
 /// ```
-/// <commandName> key_1:value_1 ... key_m:value_m positionalArgs_1 ... positionalArgs_n {
-/// commands_0; ...; commands_k;
-///}
-///```
+/// integer-split
+/// "<0" : { auto; }
+/// "=0" : { instantiate; }
+/// ">0" : { tryclose; }
+/// ;
+/// ```
+/// or
+/// ```
+/// <commandName> key_1:value_1 ... key_m:value_m positionalArgs_1 ... positionalArgs_n;
+/// ```
+/// where `value_X` and `positionalArgs_X` can also be scripts.
 ///
-/// @param commandName    the name of the command, e.g., "macro" for `macro auto;`
-/// @param namedArgs      a map of the given named arguments and values.
-///                       If a named argument is not given, the entry should be missing in the map. Null-values are not
-///                       allowed.
+/// @param commandName the name of the command, e.g., "macro" for `macro auto;`
+/// @param namedArgs a map of the given named arguments and values.
+/// If a named argument is not given, the entry should be missing in the map. Null-values are not
+/// allowed.
 /// @param positionalArgs the list of given positional arguments
-/// @param location       the location of this command for error reporting. **excluded from equality**
+/// @param location the location of this command for error reporting. **excluded from equality**
 /// @author Alexander Weigl
 /// @version 1 (14.03.25)
 @NullMarked
@@ -42,7 +49,7 @@ public record ScriptCommandAst(
         @Nullable Location location) {
 
     public ScriptCommandAst(String commandName, Map<String, Object> namedArgs,
-                            List<Object> positionalArgs) {
+            List<Object> positionalArgs) {
         this(commandName, namedArgs, positionalArgs, null);
     }
 
@@ -53,13 +60,13 @@ public record ScriptCommandAst(
     /// @see de.uka.ilkd.key.nparser.ParsingFacade#parseScript(CharStream)
     public String asCommandLine() {
         return commandName + ' ' +
-                namedArgs.entrySet().stream()
-                        .map(it -> it.getKey() + ": " + asReadableString(it.getValue()))
-                        .collect(joining(" "))
-                + ' '
-                + positionalArgs.stream().map(ScriptCommandAst::asReadableString)
-                        .collect(joining(" "))
-                + ";";
+            namedArgs.entrySet().stream()
+                    .map(it -> it.getKey() + ": " + asReadableString(it.getValue()))
+                    .collect(joining(" "))
+            + ' '
+            + positionalArgs.stream().map(ScriptCommandAst::asReadableString)
+                    .collect(joining(" "))
+            + ";";
     }
 
     public static String asReadableString(Object value) {
@@ -83,8 +90,12 @@ public record ScriptCommandAst(
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-        if(obj == null || getClass() != obj.getClass()) { return false; }
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         ScriptCommandAst other = (ScriptCommandAst) obj;
         return Objects.equals(commandName, other.commandName)
                 && Objects.equals(positionalArgs, other.positionalArgs)

@@ -283,15 +283,18 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return cmds.stream().map(it -> asAst(file, it)).toList();
         }
 
-        public static @NonNull ScriptBlock asAst(URI file, KeYParser.ProofScriptCodeBlockContext ctx) {
+        public static @NonNull ScriptBlock asAst(URI file,
+                KeYParser.ProofScriptCodeBlockContext ctx) {
             var loc = new Location(file, Position.fromToken(ctx.start));
             return new ScriptBlock(
-                    ctx.proofScript().proofScriptCommand().stream()
-                    .map(it -> asAst(file, it))
-                    .toList(), loc);
+                ctx.proofScript().proofScriptCommand().stream()
+                        .map(it -> asAst(file, it))
+                        .toList(),
+                loc);
         }
 
-        private static @NonNull ScriptCommandAst asAst(URI file, KeYParser.ProofScriptCommandContext it) {
+        private static @NonNull ScriptCommandAst asAst(URI file,
+                KeYParser.ProofScriptCommandContext it) {
             var loc = new Location(file, Position.fromToken(it.start));
             var nargs = new HashMap<String, Object>();
             var pargs = new ArrayList<>();
@@ -300,7 +303,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 for (var param : it.proofScriptParameters().proofScriptParameter()) {
                     var expr = param.expr;
                     Object value = expr;
-                    if(expr.proofScriptCodeBlock() != null) {
+                    if (expr.proofScriptCodeBlock() != null) {
                         value = asAst(file, expr.proofScriptCodeBlock());
                     }
 

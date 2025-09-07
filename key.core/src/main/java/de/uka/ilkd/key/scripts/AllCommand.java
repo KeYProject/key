@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+import java.util.List;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
-
-import java.util.List;
 
 public class AllCommand implements ProofScriptCommand {
     @Override
@@ -17,15 +17,16 @@ public class AllCommand implements ProofScriptCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-                        EngineState stateMap) throws ScriptException, InterruptedException {
+            EngineState stateMap) throws ScriptException, InterruptedException {
         if (args.positionalArgs().size() != 1) {
-            throw new ScriptException("Invalid number of positional arguments to 'onAll'. Pos. arguments: "
+            throw new ScriptException(
+                "Invalid number of positional arguments to 'onAll'. Pos. arguments: "
                     + args.positionalArgs().size());
         }
 
         var block = stateMap.getValueInjector().convert(
-                args.positionalArgs().getFirst(),
-                ScriptBlock.class);
+            args.positionalArgs().getFirst(),
+            ScriptBlock.class);
 
         var proof = stateMap.getProof();
         for (Goal g : proof.openGoals()) {

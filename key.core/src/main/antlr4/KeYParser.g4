@@ -5,7 +5,6 @@ parser grammar KeYParser;
 }
 
 @members {
-private boolean lastPosArgWasCodeBlock=false;
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
@@ -864,8 +863,6 @@ proofScriptEntry
 proofScriptEOF: proofScript EOF;
 proofScript: proofScriptCommand+;
 proofScriptCommand: cmd=IDENT proofScriptParameters? SEMI;
-//	( {lastPosArgWasCodeBlock}? SEMI?
-//	| SEMI);
 
 proofScriptParameters: proofScriptParameter+;
 proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
