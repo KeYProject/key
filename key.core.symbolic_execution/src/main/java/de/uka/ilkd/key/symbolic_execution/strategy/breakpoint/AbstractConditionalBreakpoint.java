@@ -38,6 +38,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
  *
@@ -353,7 +355,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @return true if the condition evaluates to true
      */
     protected boolean conditionMet(RuleApp ruleApp, Node node) {
-        ApplyStrategyInfo info = null;
+        ApplyStrategyInfo<@NonNull Proof, Goal> info = null;
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();

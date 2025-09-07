@@ -852,7 +852,7 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public @NonNull RuleExecutor getExecutor()
+        public @NonNull RuleExecutor<Goal> getExecutor()
                 throws RuleAbortException {
             throw new RuleAbortException("no implementation");
         }

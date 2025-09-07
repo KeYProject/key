@@ -34,6 +34,9 @@ dependencies {
     testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
 }
 
+// The target directory for JavaCC (parser generation)
+def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
+def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")
 
@@ -62,7 +65,7 @@ compileJavacc {
     }
 }
 
-task generateSMTListings {
+tasks.register('generateSMTListings') {
     def pack = "de/uka/ilkd/key/smt/newsmt2"
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
@@ -253,11 +256,14 @@ tasks.register('debugJmlLexer', JavaExec) {
 
 tasks.register('ptest', Test) { group = "verification" }
 
+def rapDir = layout.buildDirectory.dir("generated-src/rap/").getOrNull()
+
 tasks.register('generateRAPUnitTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests")
-    args("$buildDir/generated-src/rap/")
+    args(rapDir)
 }
-sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
+
+sourceSets.test.java.srcDirs(rapDir)
 
 sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc)

@@ -152,8 +152,14 @@ name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 //old_clause: OLD modifiers type IDENT INITIALISER ;
 
 field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
-method_declaration: typespec IDENT param_list (method_body|SEMI_TOPLEVEL);
-method_body: LBRACE RETURN expression SEMI_TOPLEVEL RBRACE;
+method_declaration: typespec IDENT param_list (method_body=mbody_block | SEMI_TOPLEVEL);
+mbody_block: LBRACE mbody_var* mbody_statement RBRACE;
+mbody_statement:
+    RETURN expression SEMI_TOPLEVEL #mbody_return
+  | IF LPAREN expression RPAREN (mbody_statement | mbody_block) ELSE (mbody_statement | mbody_block) #mbody_if
+  ;
+mbody_var: VAR? IDENT EQUAL_SINGLE expression SEMI_TOPLEVEL;
+
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
 history_constraint: CONSTRAINT expression;

@@ -81,13 +81,13 @@ public final class Watchdog {
                     continue;
                 }
                 switch (thread.getState()) {
-                case NEW, RUNNABLE -> anyProgress = true;
-                case WAITING, BLOCKED, TIMED_WAITING, TERMINATED -> {
-                    if (thread.getName().equals("AWT-EventQueue-0")
-                            && EventQueue.getCurrentEvent() == null) {
-                        anyProgress = true; // nothing to do
+                    case NEW, RUNNABLE -> anyProgress = true;
+                    case WAITING, BLOCKED, TIMED_WAITING, TERMINATED -> {
+                        if (thread.getName().equals("AWT-EventQueue-0")
+                                && EventQueue.getCurrentEvent() == null) {
+                            anyProgress = true; // nothing to do
+                        }
                     }
-                }
                 }
             }
 

@@ -1,0 +1,4 @@
+contains:
+  - (assert (not (u2b (ite (< 2 1) (b2u (< 3 1)) (b2u (< 4 1))))))
+expected: IRRELEVANT
+keySrc: "\\problem { \\if(2<1)\\then(3<1)\\else(4<1) }"

@@ -479,12 +479,7 @@ public class EqualityModuloProofIrrelevancy {
             EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
             return false;
         }
-        if (!equalsModProofIrrelevancy(_this.instantiations, that.instantiations)) {
-            return false;
-        }
-        final MatchConditions matchConditions = _this.matchConditions();
-        if (!equalsModProofIrrelevancy(matchConditions,
-            that.matchConditions())) {
+        if (!equalsModProofIrrelevancy(_this.instantiations(), that.instantiations())) {
             return false;
         }
         final var missingVars = _this.uninstantiatedVars();
@@ -504,12 +499,10 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(TacletApp app) {
-        MatchConditions matchConditions = app.matchConditions();
         return Objects.hash(
             EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.assumesFormulaInstantiations(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
             app.instantiations(),
-            hashCodeModProofIrrelevancy(matchConditions),
             app.uninstantiatedVars(),
             app.isUpdateContextFixed(),
             app.rule());
@@ -573,7 +566,7 @@ public class EqualityModuloProofIrrelevancy {
                 }
             } else if (inst instanceof ProgramElement instAsProgramElement) {
                 if (!equalsModProofIrrelevancy(instAsProgramElement,
-                    (ProgramElement) that.getInstantiation(e.key()))) {
+                    that.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(that.getInstantiation(e.key()))) {

@@ -53,8 +53,12 @@ public final class PruneProofAction extends MainWindowAction {
     public void init() {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
+                handleProof(proof);
+            }
+
+            private void handleProof(Proof proof) {
                 boolean enabled = false;
                 if (proof != null) {
                     final Node selNode = getMediator().getSelectedNode();
@@ -64,9 +68,9 @@ public final class PruneProofAction extends MainWindowAction {
                          * disable pruning for leaves and disable it for closed subtrees if the
                          * command line option "--no-pruning-closed" is set (saves memory)
                          */
-                        if (!selNode.leaf() && (proof.getSubtreeGoals(selNode).size() > 0
+                        if (!selNode.leaf() && (!proof.getSubtreeGoals(selNode).isEmpty()
                                 || (!GeneralSettings.noPruningClosed
-                                        && proof.getClosedSubtreeGoals(selNode).size() > 0))) {
+                                        && !proof.getClosedSubtreeGoals(selNode).isEmpty()))) {
 
                             enabled = true;
                         }
@@ -76,8 +80,9 @@ public final class PruneProofAction extends MainWindowAction {
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                final Proof proof = getMediator().getSelectedProof();
+                handleProof(proof);
             }
         };
 
@@ -100,7 +105,7 @@ public final class PruneProofAction extends MainWindowAction {
                 selListener.selectedNodeChanged(null);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
     }
 
     @Override

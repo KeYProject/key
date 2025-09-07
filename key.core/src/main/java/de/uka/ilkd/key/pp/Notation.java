@@ -528,33 +528,33 @@ public abstract class Notation {
             String specificSort = "";
             if (v instanceof JOperatorSV) {
                 switch (v) {
-                case ProgramSV psv -> {
-                    svType = "\\program";
-                    specificSort = psv.sort().declarationString();
-                }
-                case TermSV tsv -> {
-                    svType = "\\term";
-                    specificSort = tsv.sort().name().toString();
-                }
-                case FormulaSV fsv -> {
-                    svType = "\\formula";
-                    specificSort = fsv.sort().name().toString();
-                }
-                case VariableSV varSV -> {
-                    svType = "\\variables";
-                    specificSort = varSV.sort().name().toString();
-                }
-                case UpdateSV ignored -> svType = "\\update";
-                case SkolemTermSV skolemTermSV -> {
-                    if (skolemTermSV.sort() == JavaDLTheory.FORMULA) {
-                        svType = "\\skolemFormula";
-                    } else {
-                        svType = "\\skolemTerm";
-                        specificSort = skolemTermSV.sort().name().toString();
+                    case ProgramSV psv -> {
+                        svType = "\\program";
+                        specificSort = psv.sort().declarationString();
                     }
-                }
-                case TermLabelSV ignored -> svType = "\\termlabel";
-                default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                    case TermSV tsv -> {
+                        svType = "\\term";
+                        specificSort = tsv.sort().name().toString();
+                    }
+                    case FormulaSV fsv -> {
+                        svType = "\\formula";
+                        specificSort = fsv.sort().name().toString();
+                    }
+                    case VariableSV varSV -> {
+                        svType = "\\variables";
+                        specificSort = varSV.sort().name().toString();
+                    }
+                    case UpdateSV ignored -> svType = "\\update";
+                    case SkolemTermSV skolemTermSV -> {
+                        if (skolemTermSV.sort() == JavaDLTheory.FORMULA) {
+                            svType = "\\skolemFormula";
+                        } else {
+                            svType = "\\skolemTerm";
+                            specificSort = skolemTermSV.sort().name().toString();
+                        }
+                    }
+                    case TermLabelSV ignored -> svType = "\\termlabel";
+                    default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
                 }
                 sp.layouter().print("\\schemaVar ").print(svType + " ").print(specificSort)
                         .print(" ").print(v.name().toString());

@@ -30,6 +30,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -122,7 +123,7 @@ public class ProofStarter {
 
     private @Nullable AutoSaver autoSaver;
 
-    private @Nullable Strategy strategy;
+    private @Nullable Strategy<@NonNull Goal> strategy;
 
     /**
      * creates an instance of the ProofStarter
@@ -196,7 +197,7 @@ public class ProofStarter {
         this.maxSteps = maxSteps;
     }
 
-    public void setStrategy(Strategy strategy) {
+    public void setStrategy(Strategy<@NonNull Goal> strategy) {
         this.strategy = strategy;
     }
 

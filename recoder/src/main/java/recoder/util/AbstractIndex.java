@@ -175,7 +175,7 @@ public abstract class AbstractIndex implements HashCode {
         count = 0;
     }
 
-    public final Enumeration elements() {
+    public final Enumeration<Object> elements() {
         return new Enumerator(table);
     }
 
@@ -186,7 +186,7 @@ public abstract class AbstractIndex implements HashCode {
         if (x.size() != size()) {
             return false;
         }
-        Enumeration enum2 = x.elements();
+        Enumeration<Object> enum2 = x.elements();
         while (enum2.hasMoreElements()) {
             Object z = enum2.nextElement();
             if (get(z) != x.get(z)) {
@@ -213,7 +213,7 @@ public abstract class AbstractIndex implements HashCode {
     public String toString() {
         int max = size() - 1;
         StringBuilder buf = new StringBuilder();
-        Enumeration e = elements();
+        Enumeration<Object> e = elements();
         buf.append("{");
         for (int i = 0; i <= max; i++) {
             String s = e.nextElement().toString();
@@ -228,7 +228,7 @@ public abstract class AbstractIndex implements HashCode {
         return buf.toString();
     }
 
-    static class Enumerator implements Enumeration {
+    static class Enumerator implements Enumeration<Object> {
         int index;
 
         final Object[] table;

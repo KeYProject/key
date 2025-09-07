@@ -44,7 +44,7 @@ public final class SaveBundleAction extends MainWindowAction {
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 updateStatus();
             }
         });

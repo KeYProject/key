@@ -17,6 +17,8 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.Sequent;
@@ -61,7 +63,7 @@ public class TermLabelMenu extends JMenu {
              * Change font style for TermLabelCheckBox instances when the selected node changes.
              */
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 Set<Name> labelNames =
                     getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
@@ -112,7 +114,7 @@ public class TermLabelMenu extends JMenu {
              * This function only has effect if the Profile gets changed.
              */
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 rebuildMenu();
             }
         });

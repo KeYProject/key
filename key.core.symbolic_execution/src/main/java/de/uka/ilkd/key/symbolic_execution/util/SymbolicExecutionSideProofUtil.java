@@ -51,6 +51,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Provides utility methods for side proofs.
  *
@@ -571,7 +573,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The proof result represented as {@link ApplyStrategyInfo} instance.
      * @throws ProofInputException Occurred Exception
      */
-    public static ApplyStrategyInfo startSideProof(Proof proof,
+    public static ApplyStrategyInfo<@NonNull Proof, Goal> startSideProof(Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve)
             throws ProofInputException {
         return startSideProof(proof, sideProofEnvironment, sequentToProve,
@@ -588,7 +590,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The proof result represented as {@link ApplyStrategyInfo} instance.
      * @throws ProofInputException Occurred Exception
      */
-    public static ApplyStrategyInfo startSideProof(Proof proof,
+    public static ApplyStrategyInfo<@NonNull Proof, Goal> startSideProof(Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, String methodTreatment,
             String loopTreatment, String queryTreatment, String splittingOption)
             throws ProofInputException {

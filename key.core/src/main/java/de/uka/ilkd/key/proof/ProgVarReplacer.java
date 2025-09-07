@@ -124,7 +124,7 @@ public final class ProgVarReplacer {
                 if (newPe != pe) {
                     result = result.replace(sv, newPe, services);
                 }
-            } else if (ie instanceof ListInstantiation list) {
+            } else if (ie instanceof ListInstantiation<?> list) {
                 if (list.getType() != ProgramElement.class) {
                     throw new RuntimeException("Unexpected list instantiation: " + ie);
                 }

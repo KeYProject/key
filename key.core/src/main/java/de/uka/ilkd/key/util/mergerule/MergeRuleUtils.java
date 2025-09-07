@@ -1491,7 +1491,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds.
      * @return The proof result.
      */
-    private static ProofSearchInformation tryToProve(JTerm toProve, Services services,
+    private static ProofSearchInformation<@NonNull Proof, Goal> tryToProve(JTerm toProve,
+            Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
@@ -1510,7 +1511,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds. Set to -1 for no timeout.
      * @return The proof result.
      */
-    private static ProofSearchInformation tryToProve(Sequent toProve, Services services,
+    private static ProofSearchInformation<@NonNull Proof, Goal> tryToProve(Sequent toProve,
+            Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         final ProofEnvironment sideProofEnv =
@@ -1562,7 +1564,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(JTerm toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ProofSearchInformation proofResult =
+            final ProofSearchInformation<@NonNull Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1584,7 +1586,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ProofSearchInformation<Proof, Goal> proofResult =
+            final ProofSearchInformation<@NonNull Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {

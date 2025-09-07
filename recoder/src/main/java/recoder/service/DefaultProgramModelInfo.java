@@ -272,8 +272,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     private Type makeParameterizedType(TypeArgument ta) {
         Type bt = switch (ta.getWildcardMode()) {
-        case Super, Any -> getNameInfo().getJavaLangObject();
-        case None, Extends -> getBaseType(ta);
+            case Super, Any -> getNameInfo().getJavaLangObject();
+            case None, Extends -> getBaseType(ta);
         };
         if (ta.getTypeArguments() == null || ta.getTypeArguments().isEmpty()) {
             return bt;

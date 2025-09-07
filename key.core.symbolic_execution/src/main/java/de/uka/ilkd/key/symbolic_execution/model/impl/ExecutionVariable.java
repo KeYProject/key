@@ -33,6 +33,8 @@ import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The default implementation of {@link IExecutionVariable}.
  *
@@ -162,10 +164,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services,
                     getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
             }
-            ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
-                sideProofEnv, sequentToProve.getSequentToProve(), StrategyProperties.METHOD_NONE,
-                StrategyProperties.LOOP_NONE, StrategyProperties.QUERY_OFF,
-                StrategyProperties.SPLITTING_DELAYED);
+            ApplyStrategyInfo<@NonNull Proof, Goal> info =
+                SymbolicExecutionSideProofUtil.startSideProof(getProof(),
+                    sideProofEnv, sequentToProve.getSequentToProve(),
+                    StrategyProperties.METHOD_NONE,
+                    StrategyProperties.LOOP_NONE, StrategyProperties.QUERY_OFF,
+                    StrategyProperties.SPLITTING_DELAYED);
             try {
                 return instantiateValuesFromSideProof(initConfig, services, tb, info,
                     sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition);
