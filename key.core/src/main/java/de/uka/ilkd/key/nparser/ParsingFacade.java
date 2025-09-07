@@ -50,7 +50,7 @@ public final class ParsingFacade {
      * <b>The use of this method is discouraged and should be avoided in all high level
      * scenarios.</b>
      *
-     * @param ast a key ast object
+     * @param ast a {@link KeyAst} object
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */

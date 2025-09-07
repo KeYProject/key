@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.joining;
 ///
 /// It is an abstraction to the commands of following structure:
 /// ```
-/// <commandName> key_1=value_1 ... key_m=value_m positionalArgs_1 ... positionalArgs_n {
+/// <commandName> key_1:value_1 ... key_m:value_m positionalArgs_1 ... positionalArgs_n {
 /// commands_0; ...; commands_k;
 /// }
 /// ```
@@ -49,13 +49,19 @@ public record ScriptCommandAst(
         this(commandName, namedArgs, positionalArgs, Collections.emptyList(), null);
     }
 
+    /// Renders this command a parsable string representation. The order of the arguments is as
+    /// follows:
+    /// key-value arguments, positional arguments and the additional script block.
+    ///
+    /// @see de.uka.ilkd.key.nparser.ParsingFacade#parseScript(CharStream)
     public String asCommandLine() {
         return commandName + ' ' +
                 namedArgs.entrySet().stream()
-                        .map(it -> it.getKey() + ": " + humanString(it.getValue()))
+                        .map(it -> it.getKey() + ": " + asReadableString(it.getValue()))
                         .collect(joining(" "))
                 + ' '
-                + positionalArgs.stream().map(ScriptCommandAst::humanString).collect(joining(" "))
+                + positionalArgs.stream().map(ScriptCommandAst::asReadableString)
+                        .collect(joining(" "))
                 + (commands != null
                         ? " {"
                             + commands.stream().map(ScriptCommandAst::asCommandLine)
@@ -64,7 +70,7 @@ public record ScriptCommandAst(
                         : ";");
     }
 
-    public static String humanString(Object value) {
+    public static String asReadableString(Object value) {
         if (value instanceof ParserRuleContext ctx) {
             return ctx.getText();
         }
