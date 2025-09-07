@@ -43,7 +43,7 @@ public class ReduxTest {
     private final JavaSymbolSolver javaSymbolSolver = new JavaSymbolSolver(typeSolver);
 
     private final JavaParser parser =
-            new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
+        new JavaParser(new ParserConfiguration().setSymbolResolver(javaSymbolSolver));
 
     private final KeYJPMapping mapping;
     private final JP2KeYConverter converter;
@@ -58,7 +58,7 @@ public class ReduxTest {
         services.activateJava(null);
         mapping = services.getJavaService().getMapping();;
         converter = new JP2KeYConverter(services, mapping,
-                new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));;
+            new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));;
     }
 
     @Test

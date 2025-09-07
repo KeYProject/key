@@ -95,82 +95,82 @@ public class ConstantExpressionEvaluator {
             Object left = n.getLeft().accept(this, arg);
             Object right = n.getRight().accept(this, arg);
             switch (n.getOperator()) {
-            case OR:
-                if (left instanceof Boolean && right instanceof Boolean)
-                    return ((Boolean) left) || (Boolean) right;
-                throw new RuntimeException();
+                case OR:
+                    if (left instanceof Boolean && right instanceof Boolean)
+                        return ((Boolean) left) || (Boolean) right;
+                    throw new RuntimeException();
 
-            case AND:
-                if (left instanceof Boolean && right instanceof Boolean)
-                    return ((Boolean) left) && (Boolean) right;
-                throw new RuntimeException();
+                case AND:
+                    if (left instanceof Boolean && right instanceof Boolean)
+                        return ((Boolean) left) && (Boolean) right;
+                    throw new RuntimeException();
 
-            case BINARY_OR:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) | (Integer) right;
-                throw new RuntimeException();
+                case BINARY_OR:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) | (Integer) right;
+                    throw new RuntimeException();
 
-            case BINARY_AND:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) & (Integer) right;
-                throw new RuntimeException();
+                case BINARY_AND:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) & (Integer) right;
+                    throw new RuntimeException();
 
-            case XOR:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) ^ (Integer) right;
-                throw new RuntimeException();
-            case EQUALS:
-                return left.equals(right);
-            case NOT_EQUALS:
-                return !left.equals(right);
-            case LESS:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) < (Integer) right;
-                throw new RuntimeException();
-            case GREATER:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) > (Integer) right;
-                throw new RuntimeException();
-            case LESS_EQUALS:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) <= (Integer) right;
-                throw new RuntimeException();
-            case GREATER_EQUALS:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) >= (Integer) right;
-                throw new RuntimeException();
-            case LEFT_SHIFT:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) << (Integer) right;
-                throw new RuntimeException();
-            case SIGNED_RIGHT_SHIFT:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) >> (Integer) right;
-                throw new RuntimeException();
-            case UNSIGNED_RIGHT_SHIFT:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) >>> (Integer) right;
-                throw new RuntimeException();
-            case PLUS:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) + (Integer) right;
-                throw new RuntimeException();
-            case MINUS:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) - (Integer) right;
-                throw new RuntimeException();
-            case MULTIPLY:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) * (Integer) right;
-                throw new RuntimeException();
-            case DIVIDE:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) / (Integer) right;
-                throw new RuntimeException();
-            case REMAINDER:
-                if (left instanceof Integer && right instanceof Integer)
-                    return ((Integer) left) % (Integer) right;
-                throw new RuntimeException();
+                case XOR:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) ^ (Integer) right;
+                    throw new RuntimeException();
+                case EQUALS:
+                    return left.equals(right);
+                case NOT_EQUALS:
+                    return !left.equals(right);
+                case LESS:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) < (Integer) right;
+                    throw new RuntimeException();
+                case GREATER:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) > (Integer) right;
+                    throw new RuntimeException();
+                case LESS_EQUALS:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) <= (Integer) right;
+                    throw new RuntimeException();
+                case GREATER_EQUALS:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) >= (Integer) right;
+                    throw new RuntimeException();
+                case LEFT_SHIFT:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) << (Integer) right;
+                    throw new RuntimeException();
+                case SIGNED_RIGHT_SHIFT:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) >> (Integer) right;
+                    throw new RuntimeException();
+                case UNSIGNED_RIGHT_SHIFT:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) >>> (Integer) right;
+                    throw new RuntimeException();
+                case PLUS:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) + (Integer) right;
+                    throw new RuntimeException();
+                case MINUS:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) - (Integer) right;
+                    throw new RuntimeException();
+                case MULTIPLY:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) * (Integer) right;
+                    throw new RuntimeException();
+                case DIVIDE:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) / (Integer) right;
+                    throw new RuntimeException();
+                case REMAINDER:
+                    if (left instanceof Integer && right instanceof Integer)
+                        return ((Integer) left) % (Integer) right;
+                    throw new RuntimeException();
             }
             throw new RuntimeException();
         }
@@ -304,65 +304,65 @@ public class ConstantExpressionEvaluator {
         public Object visit(UnaryExpr n, Void arg) {
             Object value = n.getExpression().accept(this, arg);
             switch (n.getOperator()) {
-            case PLUS:
-                return value;
-            case MINUS:
-                if (value instanceof Integer)
-                    return -(Integer) value;
-                if (value instanceof Long)
-                    return -(Long) value;
-                if (value instanceof Byte)
-                    return -(Byte) value;
-                if (value instanceof Short)
-                    return -(Short) value;
-                if (value instanceof Double)
-                    return -(Double) value;
-                if (value instanceof Float)
-                    return -(Float) value;
-                throw new RuntimeException();
-            case PREFIX_INCREMENT:
-            case POSTFIX_INCREMENT:
-                if (value instanceof Integer)
-                    return 1 + (Integer) value;
-                if (value instanceof Long)
-                    return 1 + (Long) value;
-                if (value instanceof Byte)
-                    return 1 + (Byte) value;
-                if (value instanceof Short)
-                    return 1 + (Short) value;
-                if (value instanceof Double)
-                    return 1 + (Double) value;
-                if (value instanceof Float)
-                    return 1 + (Float) value;
-                throw new RuntimeException();
-            case PREFIX_DECREMENT:
-            case POSTFIX_DECREMENT:
-                if (value instanceof Integer)
-                    return ((Integer) value) - 1;
-                if (value instanceof Long)
-                    return ((Long) value) - 1;
-                if (value instanceof Byte)
-                    return ((Byte) value) - 1;
-                if (value instanceof Short)
-                    return ((Short) value) - 1;
-                if (value instanceof Double)
-                    return ((Double) value) - 1;
-                if (value instanceof Float)
-                    return ((Float) value) - 1;
-                throw new RuntimeException();
-            case LOGICAL_COMPLEMENT:
-                if (value instanceof Boolean)
-                    return !(Boolean) value;
-                throw new RuntimeException();
-            case BITWISE_COMPLEMENT:
-                if (value instanceof Integer)
-                    return ~((Integer) value);
-                if (value instanceof Long)
-                    return ~((Long) value);
-                if (value instanceof Byte)
-                    return ~((Byte) value);
-                if (value instanceof Short)
-                    return ~((Short) value);
+                case PLUS:
+                    return value;
+                case MINUS:
+                    if (value instanceof Integer)
+                        return -(Integer) value;
+                    if (value instanceof Long)
+                        return -(Long) value;
+                    if (value instanceof Byte)
+                        return -(Byte) value;
+                    if (value instanceof Short)
+                        return -(Short) value;
+                    if (value instanceof Double)
+                        return -(Double) value;
+                    if (value instanceof Float)
+                        return -(Float) value;
+                    throw new RuntimeException();
+                case PREFIX_INCREMENT:
+                case POSTFIX_INCREMENT:
+                    if (value instanceof Integer)
+                        return 1 + (Integer) value;
+                    if (value instanceof Long)
+                        return 1 + (Long) value;
+                    if (value instanceof Byte)
+                        return 1 + (Byte) value;
+                    if (value instanceof Short)
+                        return 1 + (Short) value;
+                    if (value instanceof Double)
+                        return 1 + (Double) value;
+                    if (value instanceof Float)
+                        return 1 + (Float) value;
+                    throw new RuntimeException();
+                case PREFIX_DECREMENT:
+                case POSTFIX_DECREMENT:
+                    if (value instanceof Integer)
+                        return ((Integer) value) - 1;
+                    if (value instanceof Long)
+                        return ((Long) value) - 1;
+                    if (value instanceof Byte)
+                        return ((Byte) value) - 1;
+                    if (value instanceof Short)
+                        return ((Short) value) - 1;
+                    if (value instanceof Double)
+                        return ((Double) value) - 1;
+                    if (value instanceof Float)
+                        return ((Float) value) - 1;
+                    throw new RuntimeException();
+                case LOGICAL_COMPLEMENT:
+                    if (value instanceof Boolean)
+                        return !(Boolean) value;
+                    throw new RuntimeException();
+                case BITWISE_COMPLEMENT:
+                    if (value instanceof Integer)
+                        return ~((Integer) value);
+                    if (value instanceof Long)
+                        return ~((Long) value);
+                    if (value instanceof Byte)
+                        return ~((Byte) value);
+                    if (value instanceof Short)
+                        return ~((Short) value);
             }
             throw new RuntimeException("unsupported expression");
         }

@@ -155,17 +155,17 @@ public final class PrimitiveType implements Type {
     public ProgramElementName getArrayElementName() {
         if (arrayElementName == null) {
             switch (this.getName()) {
-            case "byte" -> arrayElementName = new ProgramElementName("[B");
-            case "char" -> arrayElementName = new ProgramElementName("[C");
-            case "double" -> arrayElementName = new ProgramElementName("[D");
-            case "float" -> arrayElementName = new ProgramElementName("[F");
-            case "int" -> arrayElementName = new ProgramElementName("[I");
-            case "long" -> arrayElementName = new ProgramElementName("[J");
-            case "short" -> arrayElementName = new ProgramElementName("[S");
-            case "boolean" -> arrayElementName = new ProgramElementName("[Z");
-            case "\\locset" -> arrayElementName = new ProgramElementName("[X");
-            case "\\bigint" -> arrayElementName = new ProgramElementName("[Y");
-            case "\\real" -> arrayElementName = new ProgramElementName("[R");
+                case "byte" -> arrayElementName = new ProgramElementName("[B");
+                case "char" -> arrayElementName = new ProgramElementName("[C");
+                case "double" -> arrayElementName = new ProgramElementName("[D");
+                case "float" -> arrayElementName = new ProgramElementName("[F");
+                case "int" -> arrayElementName = new ProgramElementName("[I");
+                case "long" -> arrayElementName = new ProgramElementName("[J");
+                case "short" -> arrayElementName = new ProgramElementName("[S");
+                case "boolean" -> arrayElementName = new ProgramElementName("[Z");
+                case "\\locset" -> arrayElementName = new ProgramElementName("[X");
+                case "\\bigint" -> arrayElementName = new ProgramElementName("[Y");
+                case "\\real" -> arrayElementName = new ProgramElementName("[R");
             }
         }
         assert arrayElementName != null;

@@ -94,10 +94,10 @@ public record JP2KeYConverter(Services services, KeYJPMapping mapping,
     }
 
     public Object process(Node block) {
-        try{
-            // Install the symbolSolver  if the node has none.
+        try {
+            // Install the symbolSolver if the node has none.
             block.getSymbolResolver();
-        }catch (IllegalStateException ignore) {
+        } catch (IllegalStateException ignore) {
             var symbolSolver = services.getJavaService().getProgramFactory().getSymbolSolver();
             var compUnit = block.findCompilationUnit();
             compUnit.ifPresent(it -> it.setData(Node.SYMBOL_RESOLVER_KEY, symbolSolver));
@@ -228,18 +228,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return switch (n.getOperator()) {
-        case ASSIGN -> new CopyAssignment(pi, c, target, expr);
-        case PLUS -> new PlusAssignment(pi, c, target, expr);
-        case MINUS -> new MinusAssignment(pi, c, target, expr);
-        case MULTIPLY -> new TimesAssignment(pi, c, target, expr);
-        case DIVIDE -> new DivideAssignment(pi, c, target, expr);
-        case BINARY_AND -> new BinaryAndAssignment(pi, c, target, expr);
-        case BINARY_OR -> new BinaryOrAssignment(pi, c, target, expr);
-        case XOR -> new BinaryXOrAssignment(pi, c, target, expr);
-        case REMAINDER -> new ModuloAssignment(pi, c, target, expr);
-        case LEFT_SHIFT -> new ShiftLeftAssignment(pi, c, target, expr);
-        case SIGNED_RIGHT_SHIFT -> new ShiftRightAssignment(pi, c, target, expr);
-        case UNSIGNED_RIGHT_SHIFT -> new UnsignedShiftRightAssignment(pi, c, target, expr);
+            case ASSIGN -> new CopyAssignment(pi, c, target, expr);
+            case PLUS -> new PlusAssignment(pi, c, target, expr);
+            case MINUS -> new MinusAssignment(pi, c, target, expr);
+            case MULTIPLY -> new TimesAssignment(pi, c, target, expr);
+            case DIVIDE -> new DivideAssignment(pi, c, target, expr);
+            case BINARY_AND -> new BinaryAndAssignment(pi, c, target, expr);
+            case BINARY_OR -> new BinaryOrAssignment(pi, c, target, expr);
+            case XOR -> new BinaryXOrAssignment(pi, c, target, expr);
+            case REMAINDER -> new ModuloAssignment(pi, c, target, expr);
+            case LEFT_SHIFT -> new ShiftLeftAssignment(pi, c, target, expr);
+            case SIGNED_RIGHT_SHIFT -> new ShiftRightAssignment(pi, c, target, expr);
+            case UNSIGNED_RIGHT_SHIFT -> new UnsignedShiftRightAssignment(pi, c, target, expr);
         };
     }
 
@@ -250,25 +250,25 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         return switch (n.getOperator()) {
-        case OR -> new LogicalOr(pi, c, lhs, rhs);
-        case AND -> new LogicalAnd(pi, c, lhs, rhs);
-        case BINARY_OR -> new BinaryOr(pi, c, lhs, rhs);
-        case BINARY_AND -> new BinaryAnd(pi, c, lhs, rhs);
-        case XOR -> new BinaryXOr(pi, c, lhs, rhs);
-        case EQUALS -> new Equals(pi, c, lhs, rhs);
-        case NOT_EQUALS -> new NotEquals(pi, c, lhs, rhs);
-        case LESS -> new LessThan(pi, c, lhs, rhs);
-        case GREATER -> new GreaterThan(pi, c, lhs, rhs);
-        case LESS_EQUALS -> new LessOrEquals(pi, c, lhs, rhs);
-        case GREATER_EQUALS -> new GreaterOrEquals(pi, c, lhs, rhs);
-        case LEFT_SHIFT -> new ShiftLeft(pi, c, lhs, rhs);
-        case SIGNED_RIGHT_SHIFT -> new ShiftRight(pi, c, lhs, rhs);
-        case UNSIGNED_RIGHT_SHIFT -> new UnsignedShiftRight(pi, c, lhs, rhs);
-        case PLUS -> new Plus(pi, c, lhs, rhs);
-        case MINUS -> new Minus(pi, c, lhs, rhs);
-        case MULTIPLY -> new Times(pi, c, lhs, rhs);
-        case DIVIDE -> new Divide(pi, c, lhs, rhs);
-        case REMAINDER -> new Modulo(pi, c, lhs, rhs);
+            case OR -> new LogicalOr(pi, c, lhs, rhs);
+            case AND -> new LogicalAnd(pi, c, lhs, rhs);
+            case BINARY_OR -> new BinaryOr(pi, c, lhs, rhs);
+            case BINARY_AND -> new BinaryAnd(pi, c, lhs, rhs);
+            case XOR -> new BinaryXOr(pi, c, lhs, rhs);
+            case EQUALS -> new Equals(pi, c, lhs, rhs);
+            case NOT_EQUALS -> new NotEquals(pi, c, lhs, rhs);
+            case LESS -> new LessThan(pi, c, lhs, rhs);
+            case GREATER -> new GreaterThan(pi, c, lhs, rhs);
+            case LESS_EQUALS -> new LessOrEquals(pi, c, lhs, rhs);
+            case GREATER_EQUALS -> new GreaterOrEquals(pi, c, lhs, rhs);
+            case LEFT_SHIFT -> new ShiftLeft(pi, c, lhs, rhs);
+            case SIGNED_RIGHT_SHIFT -> new ShiftRight(pi, c, lhs, rhs);
+            case UNSIGNED_RIGHT_SHIFT -> new UnsignedShiftRight(pi, c, lhs, rhs);
+            case PLUS -> new Plus(pi, c, lhs, rhs);
+            case MINUS -> new Minus(pi, c, lhs, rhs);
+            case MULTIPLY -> new Times(pi, c, lhs, rhs);
+            case DIVIDE -> new Divide(pi, c, lhs, rhs);
+            case REMAINDER -> new Modulo(pi, c, lhs, rhs);
         };
     }
 
@@ -499,10 +499,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // store container type as member when visiting type declaration.
             final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
             var method =
-                    new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
-                            heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+                new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
+                    heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
             return addToMapping(n, method);
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             e.printStackTrace();
             throw e;
         }
@@ -1172,14 +1172,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         Expression child = accept(n.getExpression());
         return switch (n.getOperator()) {
-        case PLUS -> new Positive(pi, c, child);
-        case MINUS -> throw new IllegalStateException();
-        case PREFIX_INCREMENT -> new PreIncrement(pi, c, child);
-        case PREFIX_DECREMENT -> new PreDecrement(pi, c, child);
-        case LOGICAL_COMPLEMENT -> new LogicalNot(pi, c, child);
-        case BITWISE_COMPLEMENT -> new BinaryNot(pi, c, child);
-        case POSTFIX_INCREMENT -> new PostIncrement(pi, c, child);
-        case POSTFIX_DECREMENT -> new PostDecrement(pi, c, child);
+            case PLUS -> new Positive(pi, c, child);
+            case MINUS -> throw new IllegalStateException();
+            case PREFIX_INCREMENT -> new PreIncrement(pi, c, child);
+            case PREFIX_DECREMENT -> new PreDecrement(pi, c, child);
+            case LOGICAL_COMPLEMENT -> new LogicalNot(pi, c, child);
+            case BITWISE_COMPLEMENT -> new BinaryNot(pi, c, child);
+            case POSTFIX_INCREMENT -> new PostIncrement(pi, c, child);
+            case POSTFIX_DECREMENT -> new PostDecrement(pi, c, child);
         };
     }
 
@@ -1394,25 +1394,25 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         var k = n.getKeyword();
         return switch (k) {
-        case PUBLIC -> new Public(pi, c);
-        case PROTECTED -> new Protected(pi, c);
-        case PRIVATE -> new Private(pi, c);
-        case ABSTRACT -> new Abstract(pi, c);
-        case STATIC -> new Static(pi, c);
-        case FINAL -> new Final(pi, c);
-        case TRANSIENT -> new Transient(pi, c);
-        case VOLATILE -> new Volatile(pi, c);
-        case SYNCHRONIZED -> new Synchronized(pi, c);
-        case NATIVE -> new Native(pi, c);
-        case STRICTFP -> new StrictFp(pi, c);
-        case GHOST -> new Ghost(pi, c);
-        case MODEL -> new Model(pi, c);
-        case TWO_STATE -> new TwoState(pi, c);
-        case NO_STATE -> new NoState(pi, c);
-        default -> {
-            reportUnsupportedElement(n);
-            yield null;
-        }
+            case PUBLIC -> new Public(pi, c);
+            case PROTECTED -> new Protected(pi, c);
+            case PRIVATE -> new Private(pi, c);
+            case ABSTRACT -> new Abstract(pi, c);
+            case STATIC -> new Static(pi, c);
+            case FINAL -> new Final(pi, c);
+            case TRANSIENT -> new Transient(pi, c);
+            case VOLATILE -> new Volatile(pi, c);
+            case SYNCHRONIZED -> new Synchronized(pi, c);
+            case NATIVE -> new Native(pi, c);
+            case STRICTFP -> new StrictFp(pi, c);
+            case GHOST -> new Ghost(pi, c);
+            case MODEL -> new Model(pi, c);
+            case TWO_STATE -> new TwoState(pi, c);
+            case NO_STATE -> new NoState(pi, c);
+            default -> {
+                reportUnsupportedElement(n);
+                yield null;
+            }
         };
     }
 
@@ -1554,30 +1554,31 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<Expression> args = map(arguments);
 
         return switch (name) {
-        case "\\all_objects" -> new AllObjects(pi, c, args.get(0));
-        case "\\all_fields" -> new AllFields(pi, c, args.get(0));
-        case "\\intersect" -> new Intersect(pi, c, args.get(0), args.get(1));
-        case "\\set_union" -> new SetUnion(pi, c, args.get(0), args.get(1));
-        case "\\singleton" -> new Singleton(pi, c, args.get(0));
-        case "\\set_minus" -> new SetMinus(pi, c, args.get(0), args.get(1));
-        case "\\seq_sub" -> new SeqSub(pi, c, args.get(0), args.get(1), args.get(2));
-        case "\\seq_reverse" -> new SeqReverse(pi, c, args.get(0));
-        case "\\seq_singleton" -> new SeqSingleton(pi, c, args.get(0));
-        case "\\seq_length" -> new SeqLength(pi, c, args.get(0));
-        case "\\indexOf" -> new SeqIndexOf(pi, c, args.get(0), args.get(1));
-        case "\\seq_concat" -> new SeqConcat(pi, c, args.get(0), args.get(1));
-        case "\\seq_get" -> new SeqGet(pi, c, args.get(0), args.get(1));
-        default -> {
-            Function named =
-                services.getNamespaces().functions().lookup(new org.key_project.logic.Name(name));
-            if (named == null) {
+            case "\\all_objects" -> new AllObjects(pi, c, args.get(0));
+            case "\\all_fields" -> new AllFields(pi, c, args.get(0));
+            case "\\intersect" -> new Intersect(pi, c, args.get(0), args.get(1));
+            case "\\set_union" -> new SetUnion(pi, c, args.get(0), args.get(1));
+            case "\\singleton" -> new Singleton(pi, c, args.get(0));
+            case "\\set_minus" -> new SetMinus(pi, c, args.get(0), args.get(1));
+            case "\\seq_sub" -> new SeqSub(pi, c, args.get(0), args.get(1), args.get(2));
+            case "\\seq_reverse" -> new SeqReverse(pi, c, args.get(0));
+            case "\\seq_singleton" -> new SeqSingleton(pi, c, args.get(0));
+            case "\\seq_length" -> new SeqLength(pi, c, args.get(0));
+            case "\\indexOf" -> new SeqIndexOf(pi, c, args.get(0), args.get(1));
+            case "\\seq_concat" -> new SeqConcat(pi, c, args.get(0), args.get(1));
+            case "\\seq_get" -> new SeqGet(pi, c, args.get(0), args.get(1));
+            default -> {
+                Function named =
+                    services.getNamespaces().functions()
+                            .lookup(new org.key_project.logic.Name(name));
+                if (named == null) {
 
-                yield reportError(n, format(
-                    "In an embedded DL expression, %s is not a known DL function name.", name));
+                    yield reportError(n, format(
+                        "In an embedded DL expression, %s is not a known DL function name.", name));
+                }
+                yield new DLEmbeddedExpression(pi, c, (JFunction) named, new ImmutableArray<>());
+
             }
-            yield new DLEmbeddedExpression(pi, c, (JFunction) named, new ImmutableArray<>());
-
-        }
         };
     }
 
@@ -1722,10 +1723,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         String mcName = n.getText();
         Expression child = accept(n.getChild());
         return switch (mcName) {
-        case "#create-object" -> new CreateObject(child);
-        case "#isstatic" -> new IsStatic(child);
-        case "#length-reference" -> new ArrayLength(child);
-        default -> reportError(n, "Program meta construct " + mcName + " unknown.");
+            case "#create-object" -> new CreateObject(child);
+            case "#isstatic" -> new IsStatic(child);
+            case "#length-reference" -> new ArrayLength(child);
+            default -> reportError(n, "Program meta construct " + mcName + " unknown.");
         };
     }
 
@@ -1735,57 +1736,61 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         String mcName = n.getKind();
         final ImmutableArray<SchemaVariable> labels = map(n.getSchemas());
         return switch (mcName) {
-        case "#switch-to-if" -> new SwitchToIf(accept(n.getChild()));
-        case "#unwind-loop" -> new UnwindLoop(labels.get(0), labels.get(1), accept(n.getChild()));
-        case "#unpack" -> new Unpack(accept(n.getChild()));
-        case "#forInitUnfoldTransformer" ->
-            new ForInitUnfoldTransformer((ProgramSV) accept(n.getChild()));
-        case "#for-to-while" -> new ForToWhile(labels.get(0), labels.get(1), accept(n.getChild()));
-        case "#enhancedfor-elim" -> {
-            EnhancedFor efor = acceptn(n.getChild());
-            if (efor == null) {
+            case "#switch-to-if" -> new SwitchToIf(accept(n.getChild()));
+            case "#unwind-loop" ->
+                new UnwindLoop(labels.get(0), labels.get(1), accept(n.getChild()));
+            case "#unpack" -> new Unpack(accept(n.getChild()));
+            case "#forInitUnfoldTransformer" ->
+                new ForInitUnfoldTransformer((ProgramSV) accept(n.getChild()));
+            case "#for-to-while" ->
+                new ForToWhile(labels.get(0), labels.get(1), accept(n.getChild()));
+            case "#enhancedfor-elim" -> {
+                EnhancedFor efor = acceptn(n.getChild());
+                if (efor == null) {
 
-                yield reportError(n,
-                    "#enhancedfor-elim requires an enhanced for loop as argument");
-            }
+                    yield reportError(n,
+                        "#enhancedfor-elim requires an enhanced for loop as argument");
+                }
 
-            ProgramSV execSV = null;
-            for (SchemaVariable programSV : labels) {
-                if (((OperatorSV) programSV).sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = (ProgramSV) programSV;
-                    break;
+                ProgramSV execSV = null;
+                for (SchemaVariable programSV : labels) {
+                    if (((OperatorSV) programSV).sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                        execSV = (ProgramSV) programSV;
+                        break;
+                    }
                 }
+                yield new EnhancedForElimination(execSV, efor);
             }
-            yield new EnhancedForElimination(execSV, efor);
-        }
-        case "#do-break" -> new DoBreak(accept(n.getChild()));
-        case "#expand-method-body" -> new ExpandMethodBody((SchemaVariable) accept(n.getChild()));
-        case "#method-call" -> {
-            ProgramSV execSV = null;
-            ProgramSV returnSV = null;
-            for (int i = 0; i < labels.size(); i++) {
-                final var sv = (OperatorSV) labels.get(i);
-                if (sv.sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = (ProgramSV) sv;
+            case "#do-break" -> new DoBreak(accept(n.getChild()));
+            case "#expand-method-body" ->
+                new ExpandMethodBody((SchemaVariable) accept(n.getChild()));
+            case "#method-call" -> {
+                ProgramSV execSV = null;
+                ProgramSV returnSV = null;
+                for (int i = 0; i < labels.size(); i++) {
+                    final var sv = (OperatorSV) labels.get(i);
+                    if (sv.sort() == ProgramSVSort.VARIABLE) {
+                        returnSV = (ProgramSV) sv;
+                    }
+                    if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                        execSV = (ProgramSV) sv;
+                    }
                 }
-                if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = (ProgramSV) sv;
-                }
+                yield new MethodCall(execSV, returnSV, accept(n.getChild()));
             }
-            yield new MethodCall(execSV, returnSV, accept(n.getChild()));
-        }
-        case "#evaluate-arguments" -> new EvaluateArgs(accept(n.getChild()));
-        case "#constructor-call" -> new ConstructorCall(labels.get(0), accept(n.getChild()));
-        case "#special-constructor-call" -> new SpecialConstructorCall(accept(n.getChild()));
-        case "#post-work" -> new PostWork((SchemaVariable) accept(n.getChild()));
-        case "#static-initialisation" -> new StaticInitialisation(accept(n.getChild()));
-        case "#resolve-multiple-var-decl" ->
-            new MultipleVarDecl((SchemaVariable) n.getChild().accept(this, arg));
-        case "#array-post-declaration" ->
-            new ArrayPostDecl((SchemaVariable) n.getChild().accept(this, arg));
-        case "#init-array-creation" -> new InitArrayCreation(labels.get(0), accept(n.getChild()));
-        case "#reattachLoopInvariant" -> new ReattachLoopInvariant(accept(n.getChild()));
-        default -> reportError(n, "Program meta construct " + n.getKind() + " unknown.");
+            case "#evaluate-arguments" -> new EvaluateArgs(accept(n.getChild()));
+            case "#constructor-call" -> new ConstructorCall(labels.get(0), accept(n.getChild()));
+            case "#special-constructor-call" -> new SpecialConstructorCall(accept(n.getChild()));
+            case "#post-work" -> new PostWork((SchemaVariable) accept(n.getChild()));
+            case "#static-initialisation" -> new StaticInitialisation(accept(n.getChild()));
+            case "#resolve-multiple-var-decl" ->
+                new MultipleVarDecl((SchemaVariable) n.getChild().accept(this, arg));
+            case "#array-post-declaration" ->
+                new ArrayPostDecl((SchemaVariable) n.getChild().accept(this, arg));
+            case "#init-array-creation" ->
+                new InitArrayCreation(labels.get(0), accept(n.getChild()));
+            case "#reattachLoopInvariant" -> new ReattachLoopInvariant(accept(n.getChild()));
+            default -> reportError(n, "Program meta construct " + n.getKind() + " unknown.");
         };
     }
 

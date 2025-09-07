@@ -100,19 +100,19 @@ public class TransformationPipelineServices {
         } else if (type instanceof PrimitiveType) {
             PrimitiveType ptype = (PrimitiveType) type;
             switch (ptype.getType()) {
-            case BOOLEAN:
-                return new BooleanLiteralExpr(false);
-            case BYTE:
-            case SHORT:
-            case INT:
-                return new IntegerLiteralExpr("0");
-            case LONG:
-                return new LongLiteralExpr("0");
+                case BOOLEAN:
+                    return new BooleanLiteralExpr(false);
+                case BYTE:
+                case SHORT:
+                case INT:
+                    return new IntegerLiteralExpr("0");
+                case LONG:
+                    return new LongLiteralExpr("0");
 
-            case CHAR:
-                return new CharLiteralExpr((char) 0);
-            case FLOAT:
-            case DOUBLE:
+                case CHAR:
+                    return new CharLiteralExpr((char) 0);
+                case FLOAT:
+                case DOUBLE:
             }
         }
         LOGGER.error("makeImplicitMembersExplicit: unknown primitive type: {}", type);
@@ -293,10 +293,11 @@ public class TransformationPipelineServices {
 
             final var name = p.name();
             return switch (name.toLowerCase()) {
-            case "int", "byte", "short" -> new IntegerLiteralExpr("0");
-            case "char" -> new CharLiteralExpr("0");
-            case "float", "double" -> new DoubleLiteralExpr("0.0");
-            default -> throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
+                case "int", "byte", "short" -> new IntegerLiteralExpr("0");
+                case "char" -> new CharLiteralExpr("0");
+                case "float", "double" -> new DoubleLiteralExpr("0.0");
+                default ->
+                    throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
             };
         }
 

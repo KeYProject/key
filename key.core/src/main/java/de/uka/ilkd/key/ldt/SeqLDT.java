@@ -143,15 +143,15 @@ public final class SeqLDT extends LDT {
     @Override
     public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
         return switch (op) {
-        case SeqSingleton ignored -> seqSingleton;
-        case SeqConcat ignored -> seqConcat;
-        case SeqSub ignored -> seqSub;
-        case SeqReverse ignored -> seqReverse;
-        case SeqPut ignored -> seqUpd;
-        case SeqIndexOf ignored -> seqIndexOf;
-        case SeqGet ignored -> seqGet;
-        case SeqLength ignored -> seqLen;
-        default -> throw new AssertionError();
+            case SeqSingleton ignored -> seqSingleton;
+            case SeqConcat ignored -> seqConcat;
+            case SeqSub ignored -> seqSub;
+            case SeqReverse ignored -> seqReverse;
+            case SeqPut ignored -> seqUpd;
+            case SeqIndexOf ignored -> seqIndexOf;
+            case SeqGet ignored -> seqGet;
+            case SeqLength ignored -> seqLen;
+            default -> throw new AssertionError();
         };
     }
 

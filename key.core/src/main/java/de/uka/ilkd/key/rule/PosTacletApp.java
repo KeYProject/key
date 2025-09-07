@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.LogicServices;

@@ -134,17 +134,17 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
             Services services,
             ExecutionContext ec) {
         return switch (op) {
-        case GreaterThan ignored -> getGreaterThan();
-        case LessThan ignored -> getLessThan();
-        case GreaterOrEquals ignored -> getGreaterOrEquals();
-        case LessOrEquals ignored -> getLessOrEquals();
-        case Negative ignored -> getJavaUnaryMinus();
-        case Plus ignored -> getJavaAdd();
-        case Minus ignored -> getJavaSub();
-        case Times ignored -> getJavaMul();
-        case Divide ignored -> getJavaDiv();
-        case Modulo ignored -> getJavaMod();
-        default -> null;
+            case GreaterThan ignored -> getGreaterThan();
+            case LessThan ignored -> getLessThan();
+            case GreaterOrEquals ignored -> getGreaterOrEquals();
+            case LessOrEquals ignored -> getLessOrEquals();
+            case Negative ignored -> getJavaUnaryMinus();
+            case Plus ignored -> getJavaAdd();
+            case Minus ignored -> getJavaSub();
+            case Times ignored -> getJavaMul();
+            case Divide ignored -> getJavaDiv();
+            case Modulo ignored -> getJavaMod();
+            default -> null;
         };
     }
 
