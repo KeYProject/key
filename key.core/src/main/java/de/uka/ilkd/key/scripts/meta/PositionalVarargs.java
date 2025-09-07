@@ -9,23 +9,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation marks key-value arguments in proof scripts parameter classes.
- * In contrast to a [Flag], an option receives an arbitrary value.
- *
  * @author Alexander Weigl
- * @version 1
- * @see Flag
- * @see Argument
+ * @version 1 (02.05.17)
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Option {
-    /**
-     * Name of the command line argument.
-     * If left blank, the name of the field is used.
-     *
-     * @return a non-null string
-     * @see ProofScriptArgument
-     */
-    String value() default "";
+public @interface PositionalVarargs {
+    Class<?> as() default String.class;
+
+    int startIndex() default 0;
 }

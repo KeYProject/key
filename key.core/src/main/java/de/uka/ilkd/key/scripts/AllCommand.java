@@ -4,30 +4,23 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
-public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
+public class AllCommand implements ProofScriptCommand {
     private String documentation;
 
     @Override
-    public List<ProofScriptArgument<Map<String, Object>>> getArguments() {
+    public List<ProofScriptArgument> getArguments() {
         return List.of();
     }
 
     @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap) throws ScriptException, InterruptedException {
-        var block = (KeYParser.ProofScriptContext) args.get(ProofScriptEngine.KEY_SUB_SCRIPT);
+        var block = args.commands();
 
         if (block == null) {
             throw new ScriptException("Missing command to apply onAll to");
@@ -38,7 +31,7 @@ public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
         for (Goal g : proof.openGoals()) {
             // if (isBelow(g, selectedNode)) {
             stateMap.setGoal(g);
-            stateMap.getEngine().execute(uiControl, block.proofScriptCommand());
+            stateMap.getEngine().execute(uiControl, block);
             // }
         }
         // state.setGoal(selectedNode);

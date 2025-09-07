@@ -8,14 +8,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @author Alexander Weigl
- * @version 1 (02.05.17)
- */
-@Target(ElementType.FIELD)
+/// This annotation is used for documenting proof script commands or arguments.
+///
+/// @author Mattias Ulbrich
+/// @version 1
+@Target({ ElementType.TYPE, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Varargs {
-    Class<?> as() default String.class;
-
-    String prefix() default "";
+public @interface Documentation {
+    /// @return a non-null string
+    String value();
 }
