@@ -29,7 +29,7 @@ public class ValueInjectorTest {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
         ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
-            null, null);
+            null);
         args.put("b", true);
         args.put("i", 42);
 
@@ -51,7 +51,7 @@ public class ValueInjectorTest {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
         ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
-            null, null);
+            null);
         args.put("b", "true");
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class,

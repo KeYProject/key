@@ -17,6 +17,7 @@ import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.scripts.ScriptBlock;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -253,7 +254,11 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         public URI getUri() {
-            final var sourceName = ctx.start.getTokenSource().getSourceName();
+            return getUri(ctx.start);
+        }
+
+        public static URI getUri(Token token) {
+            final var sourceName = token.getTokenSource().getSourceName();
             try {
                 if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
                         || sourceName.startsWith("jar:"))
@@ -273,31 +278,45 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return asAst(fileUri, ctx.proofScriptCommand());
         }
 
-        private List<ScriptCommandAst> asAst(URI file,
+        private static List<ScriptCommandAst> asAst(URI file,
                 List<KeYParser.ProofScriptCommandContext> cmds) {
             return cmds.stream().map(it -> asAst(file, it)).toList();
         }
 
-        private @NonNull ScriptCommandAst asAst(URI file, KeYParser.ProofScriptCommandContext it) {
-            var loc = new Location(file, Position.fromToken(it.start));
-            var sub = it.sub != null
-                    ? asAst(file, it.sub.proofScriptCommand())
-                    : null;
+        public static @NonNull ScriptBlock asAst(URI file,
+                KeYParser.ProofScriptCodeBlockContext ctx) {
+            var loc = new Location(file, Position.fromToken(ctx.start));
+            final var proofScriptCommandContexts = ctx.proofScript().proofScriptCommand();
+            final List<ScriptCommandAst> list =
+                proofScriptCommandContexts.stream()
+                        .map(it -> asAst(file, it))
+                        .toList();
+            return new ScriptBlock(list, loc);
+        }
 
+        private static @NonNull ScriptCommandAst asAst(URI file,
+                KeYParser.ProofScriptCommandContext it) {
+            var loc = new Location(file, Position.fromToken(it.start));
             var nargs = new HashMap<String, Object>();
             var pargs = new ArrayList<>();
 
             if (it.proofScriptParameters() != null) {
                 for (var param : it.proofScriptParameters().proofScriptParameter()) {
+                    var expr = param.expr;
+                    Object value = expr;
+                    if (expr.proofScriptCodeBlock() != null) {
+                        value = asAst(file, expr.proofScriptCodeBlock());
+                    }
+
                     if (param.pname != null) {
-                        nargs.put(param.pname.getText(), param.expr);
+                        nargs.put(param.pname.getText(), value);
                     } else {
-                        pargs.add(param.expr);
+                        pargs.add(value);
                     }
                 }
             }
 
-            return new ScriptCommandAst(it.cmd.getText(), nargs, pargs, sub, loc);
+            return new ScriptCommandAst(it.cmd.getText(), nargs, pargs, loc);
         }
     }
 }
