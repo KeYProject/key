@@ -40,6 +40,7 @@ lexer grammar KeYLexer;
    }
 
     private Token tokenBackStorage = null;
+    // see: https://keyproject.github.io/key-docs/devel/NewKeyParser/#why-does-the-lexer-required-some-pieces-of-java-code
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
@@ -219,6 +220,7 @@ AXIOMS : '\\axioms';
 PROBLEM : '\\problem';
 CHOOSECONTRACT : '\\chooseContract';
 PROOFOBLIGATION : '\\proofObligation';
+// for PROOF see: https://keyproject.github.io/key-docs/devel/NewKeyParser/#why-does-the-lexer-required-some-pieces-of-java-code
 PROOF : '\\proof';
 PROOFSCRIPT : '\\proofScript';
 CONTRACTS : '\\contracts';

@@ -223,6 +223,20 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    public static class JMLProofScript extends KeyAst<JmlParser.AssertionProofContext> {
+        public JMLProofScript(JmlParser.@NonNull AssertionProofContext ctx) {
+            super(ctx);
+        }
+
+        public static JMLProofScript fromContext(JmlParser.AssertionProofContext ctx) {
+            if(ctx == null) {
+                return null;
+            } else {
+                return new JMLProofScript(ctx);
+            }
+        }
+    }
+
 
     public static class Term extends KeyAst<KeYParser.TermContext> {
         Term(KeYParser.TermContext ctx) {

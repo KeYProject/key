@@ -5,7 +5,10 @@ package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
+import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+import org.jspecify.annotations.Nullable;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
@@ -22,6 +25,7 @@ public class JmlAssert extends JavaStatement {
      * The kind of this statement either ASSERT or ASSUME
      */
     private final TextualJMLAssertStatement.Kind kind;
+    private final KeyAst.@Nullable JMLProofScript assertionProof;
 
 
     /**
@@ -35,8 +39,13 @@ public class JmlAssert extends JavaStatement {
      * @param condition the condition for this statement
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition) {
+        this(kind, condition, null);
+    }
+
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition, KeyAst.@Nullable JMLProofScript assertionProof) {
         this.kind = kind;
         this.condition = condition;
+        this.assertionProof = assertionProof;
     }
 
     /**
@@ -48,6 +57,7 @@ public class JmlAssert extends JavaStatement {
         super(proto);
         this.kind = proto.kind;
         this.condition = proto.condition;
+        this.assertionProof = proto.assertionProof;
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -56,6 +66,10 @@ public class JmlAssert extends JavaStatement {
 
     public KeyAst.Expression getCondition() {
         return condition;
+    }
+
+    public KeyAst.@Nullable JMLProofScript getAssertionProof() {
+        return assertionProof;
     }
 
     @Override
