@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.scripts;
 
+import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -100,10 +102,10 @@ public class BranchesCommand extends AbstractCommand {
 
     public static class Parameters {
         /** A formula defining the goal to select */
-        @Option(value = "#2")
+        @Argument
         public String mode;
         @Option(value = "branch")
-        public String branch;
+        public @Nullable String branch;
         @Option(value = "child")
         public int child;
     }

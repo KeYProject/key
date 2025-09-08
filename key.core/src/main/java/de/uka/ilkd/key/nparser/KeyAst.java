@@ -246,7 +246,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             ImmutableList<ParserRuleContext> result = ImmutableList.of();
             for (JmlParser.ProofArgContext arg : cmd.proofArg()) {
                 JmlParser.ExpressionContext exp = arg.expression();
-                if (exp != null && exp.start.getType() != JmlParser.STRING_LITERAL) {
+                if (exp != null) {
                     result = result.prepend(exp);
                 }
             }
@@ -271,7 +271,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public @NonNull ImmutableList<ParserRuleContext> collectTerms() {
             ImmutableList<ParserRuleContext> result = ImmutableList.of();
             for (JmlParser.ProofCmdContext cmd : ctx.proofCmd()) {
-                result.prepend(collectTerms(cmd));
+                result = result.prepend(collectTerms(cmd));
             }
             return result.reverse();
         }

@@ -16,6 +16,6 @@ public @interface Argument {
     /// Position of this argument in the positional argument list.
     ///
     /// @return a non-null string
-    /// @see ScriptCommandAst#positionalArgs()
+    /// @see de.uka.ilkd.key.scripts.ScriptCommandAst#positionalArgs()
     int value() default 0;
 }
