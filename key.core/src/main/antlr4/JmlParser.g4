@@ -203,11 +203,23 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT expression | UNREACHABLE) (SEMI_TOPLEVEL | assertionProof);
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
+// --- proof scripts in JML
+assertionProof:  BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
+proofCmd:
+    cmd=IDENT ( (argLabel=IDENT COLON)? proofArg )*
+    ( SEMI | BY proofCmd | LBRACE (( proofCmd )+ | proofCmdCase) RBRACE )
+  ;
+proofCmdCase:
+    CASE ( STRING_LITERAL )? COLON ( proofCmd )*
+  | DEFAULT COLON ( proofCmd )*
+  ;
+proofArg: expression;
+// ---
 
 mergeparamsspec:
     MERGE_PARAMS

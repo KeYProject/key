@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.io.IOException;
 import java.net.URI;
 
 import de.uka.ilkd.key.java.Position;
@@ -113,5 +114,12 @@ public final class JmlFacade {
         JmlParser.ClauseContext ctx = p.clauseEOF().clause();
         p.getErrorReporter().throwException();
         return ctx;
+    }
+
+    public static void main(String[] args) throws IOException {
+        String input = new String(System.in.readAllBytes());
+        var parser = createParser(createLexer(input));
+        var tree = parser.methodlevel_comment();
+        System.out.println(tree.toStringTree(parser));
     }
 }

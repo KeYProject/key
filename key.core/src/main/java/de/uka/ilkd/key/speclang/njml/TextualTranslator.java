@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -549,8 +550,10 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
-            TextualJMLAssertStatement.Kind.ASSERT, new KeyAst.Expression(ctx.expression()));
+        TextualJMLAssertStatement b =
+            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
+                                          new KeyAst.Expression(ctx.expression()),
+                                          KeyAst.JMLProofScript.fromContext(ctx.assertionProof()));
         finishConstruct(b);
         return null;
     }

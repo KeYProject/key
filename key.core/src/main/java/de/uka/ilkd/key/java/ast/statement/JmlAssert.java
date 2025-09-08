@@ -8,10 +8,13 @@ import java.util.Objects;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
+
+import java.util.Objects;
+
+import de.uka.ilkd.key.nparser.KeyAst;
 
 /**
  * A JML assert statement.
@@ -32,21 +35,25 @@ public class JmlAssert extends JavaStatement {
     /**
      * the condition in parse tree form
      */
-    private KeyAst.Expression condition;
+    private final KeyAst.Expression condition;
 
     /**
-     * @param kind
-     *        assert or assume
-     * @param condition
-     *        the condition of this statement
-     * @param positionInfo
-     *        the position information for this statement
+     * the assertion proof in parse tree form
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+    private final KeyAst.@Nullable JMLProofScript assertionProof;
+
+    /**
+     * @param kind assert or assume
+     * @param condition the condition of this statement
+     * @param assertionProof the optional proof for an assert statement (not for assume)
+     * @param positionInfo the position information for this statement
+     */
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition, KeyAst.@Nullable JMLProofScript assertionProof,
             PositionInfo positionInfo) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
+        this.assertionProof = assertionProof;
     }
 
     /**
@@ -57,10 +64,12 @@ public class JmlAssert extends JavaStatement {
         super(children);
         this.kind = Objects.requireNonNull(children.get(TextualJMLAssertStatement.Kind.class));
         this.condition = Objects.requireNonNull(children.get(KeyAst.Expression.class));
+        // script may be null
+        this.assertionProof = children.get(KeyAst.JMLProofScript.class);
     }
 
     public JmlAssert(JmlAssert other) {
-        this(other.kind, other.condition, other.getPositionInfo());
+        this(other.kind, other.condition, other.assertionProof, other.getPositionInfo());
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -150,6 +159,10 @@ public class JmlAssert extends JavaStatement {
     @Override
     protected int computeHashCode() {
         return System.identityHashCode(this);
+    }
+
+    public KeyAst.@Nullable JMLProofScript getAssertionProof() {
+        return assertionProof;
     }
 
     @Override
