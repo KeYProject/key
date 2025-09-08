@@ -206,7 +206,7 @@ public class ValueInjector {
                 if (meta.isRequired() && meta.getField().get(obj) == null) {
                     throw new ArgumentRequiredException(String.format(
                         "Argument %s (of type %s) is required, but %s was given. For command class: '%s'",
-                        meta.getName(), meta.getField().getType(), null,
+                        meta.getName(), meta.getField().getType().getSimpleName(), null,
                         meta.getField().getDeclaringClass()));
                 }
             } else {
@@ -301,10 +301,11 @@ public class ValueInjector {
     /**
      * Finds a converter for the given class.
      *
-     * @param <T> an arbitrary type
-     * @param ret a non-null class
-     * @param arg
-     * @return null or a suitable converter (registered) converter for the requested class.
+     * @param <R> the result type
+     * @param <T> the source type
+     * @param ret the result type class
+     * @param arg the source type class
+     * @return a suitable converter (registered) converter for the requested class. null if no such converter is known.
      */
     @SuppressWarnings("unchecked")
     public <R, T> @Nullable Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Stack;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -17,8 +19,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class SetCommand extends AbstractCommand {
     public SetCommand() {
@@ -29,12 +30,17 @@ public class SetCommand extends AbstractCommand {
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var args = state.getValueInjector().inject(new Parameters(), arguments);
 
+        if(args.settings.isEmpty()) {
+            throw new IllegalArgumentException("You have to set oss, steps, stack, or key(s) and value(s).");
+        }
+
         args.settings.remove("oss");
         args.settings.remove("steps");
+        args.settings.remove("stack");
 
         final Proof proof = state.getProof();
 
-        final StrategyProperties newProps =
+        StrategyProperties newProps =
             proof.getSettings().getStrategySettings().getActiveStrategyProperties();
 
         if (args.oneStepSimplification != null) {
@@ -44,6 +50,27 @@ public class SetCommand extends AbstractCommand {
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
         }
+
+        if (args.stackAction != null) {
+            Stack<StrategyProperties> stack = (Stack<StrategyProperties>) state.getUserData("settingsStack");
+            if (stack == null) {
+                stack = new Stack<>();
+                state.putUserData("settingsStack", stack);
+            }
+            switch(args.stackAction) {
+                case "push":
+                    stack.push(newProps.clone());
+                    break;
+                case "pop":
+                    // TODO sensible error if empty
+                    var resetProps = stack.pop();
+                    updateStrategySettings(state, resetProps);
+                    break;
+                default:
+                    throw new IllegalArgumentException("stack must be either push or pop.");
+            }
+        }
+
         if (args.proofSteps != null) {
             state.setMaxAutomaticSteps(args.proofSteps);
         }
@@ -116,8 +143,11 @@ public class SetCommand extends AbstractCommand {
         @Option(value = "steps")
         public @Nullable Integer proofSteps;
 
-        /***/
+        /** key-value pairs to set */
         @OptionalVarargs
         public Map<String, String> settings = HashMap.newHashMap(0);
+
+        @Option(value = "stack")
+        public @Nullable String stackAction;
     }
 }

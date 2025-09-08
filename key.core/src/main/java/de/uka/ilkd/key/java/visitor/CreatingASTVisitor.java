@@ -1513,6 +1513,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 changeList.add(x.getKind());
                 changeList.add(x.getCondition());
+                changeList.add(x.getAssertionProof());
                 return new JmlAssert(changeList);
             }
         };

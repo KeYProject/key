@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
@@ -60,6 +61,8 @@ public class EngineState {
 
     private @Nullable Goal goal;
     private @Nullable Node lastSetGoalNode;
+
+    private final HashMap<String, Object> userData = new HashMap<>();
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
@@ -361,5 +364,13 @@ public class EngineState {
 
     public ExprEvaluator getEvaluator() {
         return exprEvaluator;
+    }
+
+    public void putUserData(String key, Object val) {
+        userData.put(key, val);
+    }
+
+    public Object getUserData(String key) {
+        return userData.get(key);
     }
 }
