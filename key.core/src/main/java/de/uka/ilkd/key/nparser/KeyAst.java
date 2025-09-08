@@ -286,11 +286,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         public static @NonNull ScriptBlock asAst(URI file,
                 KeYParser.ProofScriptCodeBlockContext ctx) {
             var loc = new Location(file, Position.fromToken(ctx.start));
-            return new ScriptBlock(
-                ctx.proofScript().proofScriptCommand().stream()
+            final var proofScriptCommandContexts = ctx.proofScript().proofScriptCommand();
+            final List<ScriptCommandAst> list =
+                proofScriptCommandContexts.stream()
                         .map(it -> asAst(file, it))
-                        .toList(),
-                loc);
+                        .toList();
+            return new ScriptBlock(list, loc);
         }
 
         private static @NonNull ScriptCommandAst asAst(URI file,

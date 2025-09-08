@@ -861,14 +861,13 @@ proofScriptEntry
 ;
 
 proofScriptEOF: proofScript EOF;
-proofScript: proofScriptCommand+;
-proofScriptCommand: cmd=IDENT proofScriptParameters? SEMI;
+proofScript: proofScriptCommand*;
+proofScriptCommand: cmd=IDENT proofScriptParameters SEMI;
 
-proofScriptParameters: proofScriptParameter+;
+proofScriptParameters: proofScriptParameter*;
 proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
 proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
 proofScriptExpression:
-//  {lastPosArgWasCodeBlock=false;}
     boolean_literal
   | char_literal
   | integer
