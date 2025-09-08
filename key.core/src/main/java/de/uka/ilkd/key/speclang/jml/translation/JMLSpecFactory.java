@@ -1513,10 +1513,10 @@ public class JMLSpecFactory {
                 .exceptionVariable(pv.excVar)
                 .atPres(pv.atPres)
                 .atBefore(pv.atBefores);
-        JTerm expr = io.translateTerm(jmlAssert.getCondition());
+        ImmutableList<JTerm> terms = jmlAssert.collectTerms().map(io::translateTerm);
         services.getSpecificationRepository().addStatementSpec(
             jmlAssert,
-            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(expr)));
+            new SpecificationRepository.JmlStatementSpec(pv, terms));
     }
 
     public @Nullable String checkSetStatementAssignee(JTerm assignee) {

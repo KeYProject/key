@@ -23,6 +23,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStream;
@@ -47,7 +48,7 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
 
-    final @NonNull T ctx;
+    public final @NonNull T ctx;
 
     protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
@@ -234,6 +235,45 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             } else {
                 return new JMLProofScript(ctx);
             }
+        }
+
+        /**
+         * Collect all JML expressions in a script (and potentially sub-blocks)
+         * @param cmd the command to collect from
+         * @return a list in reverse(!) order of all expressions in cmd
+         */
+        private static ImmutableList<ParserRuleContext> collectTerms(JmlParser.ProofCmdContext cmd) {
+            ImmutableList<ParserRuleContext> result = ImmutableList.of();
+            for (JmlParser.ProofArgContext arg : cmd.proofArg()) {
+                JmlParser.ExpressionContext exp = arg.expression();
+                if (exp != null && exp.start.getType() != JmlParser.STRING_LITERAL) {
+                    result = result.prepend(exp);
+                }
+            }
+            for (JmlParser.ProofCmdContext childCmd : cmd.proofCmd()) {
+                result = result.prepend(collectTerms(childCmd));
+            }
+            if (cmd.proofCmdCase() != null) {
+                for (JmlParser.ProofCmdCaseContext pcase : cmd.proofCmdCase()) {
+                    for (JmlParser.ProofCmdContext childCmd : pcase.proofCmd()) {
+                        result = result.prepend(collectTerms(childCmd));
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
+         * returns a list of all term parse trees in this proof script.
+         *
+         * Todo: Consider caching the result if this is called very often.
+         */
+        public @NonNull ImmutableList<ParserRuleContext> collectTerms() {
+            ImmutableList<ParserRuleContext> result = ImmutableList.of();
+            for (JmlParser.ProofCmdContext cmd : ctx.proofCmd()) {
+                result.prepend(collectTerms(cmd));
+            }
+            return result.reverse();
         }
     }
 

@@ -1520,14 +1520,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    // XXX Is this still needed (merge artifact)
-    @Override
-    public void performActionOnJmlAssertCondition(final Term cond) {
-        // should only be called by walk(), which puts an ExtList on the stack
-        assert stack.peek() != null;
-        stack.peek().add(cond);
-    }
-
     /**
      * returns the position of pe2 in the virtual child array of pe1
      *

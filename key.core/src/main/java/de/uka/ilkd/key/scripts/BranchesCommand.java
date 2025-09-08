@@ -1,38 +1,27 @@
-package de.uka.ilkd.key.macros.scripts;
+package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
-import java.util.function.Function;
 
-public class BranchesCommand extends AbstractCommand<BranchesCommand.Parameters> {
+public class BranchesCommand extends AbstractCommand {
     public BranchesCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new BranchesCommand.Parameters(), arguments);
 
-    @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
         Stack<Integer> stack = (Stack<Integer>) state.getUserData("_branchStack");
         if (stack == null) {
             stack = new Stack<>();
@@ -111,11 +100,11 @@ public class BranchesCommand extends AbstractCommand<BranchesCommand.Parameters>
 
     public static class Parameters {
         /** A formula defining the goal to select */
-        @Option(value = "#2", required = true)
+        @Option(value = "#2")
         public String mode;
-        @Option(value = "branch", required = false)
+        @Option(value = "branch")
         public String branch;
-        @Option(value = "child", required = false)
+        @Option(value = "child")
         public int child;
     }
 

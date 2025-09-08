@@ -211,10 +211,10 @@ assert_statement: (ASSERT expression | UNREACHABLE) (SEMI_TOPLEVEL | assertionPr
 assertionProof: BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
 proofCmd:
     cmd=IDENT ( proofArg )*
-    ( SEMI | BY proofCmd | LBRACE (( proofCmd )+ | proofCmdCase) RBRACE )
+    ( SEMI | BY proofCmd | LBRACE (proofCmd+ | proofCmdCase+) RBRACE )
   ;
 proofCmdCase:
-    CASE ( STRING_LITERAL )? COLON ( proofCmd )*
+    CASE ( label=STRING_LITERAL )? COLON ( proofCmd )*
   | DEFAULT COLON ( proofCmd )*
   ;
 proofArg: (argLabel=IDENT COLON)? expression;

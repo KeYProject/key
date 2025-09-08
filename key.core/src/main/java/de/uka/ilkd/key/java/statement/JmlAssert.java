@@ -6,13 +6,21 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import de.uka.ilkd.key.nparser.KeyAst;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Immutables;
 
 /**
  * A JML assert statement.
@@ -175,5 +183,20 @@ public class JmlAssert extends JavaStatement {
     @Override
     public void visit(Visitor v) {
         v.performActionOnJmlAssert(this);
+    }
+
+    /**
+     * This method collects all terms contained in this assertion. This is at least the condition.
+     * If there is a proof script, all terms in the proof script are collected as well.
+     *
+     * @return a freshly created list of at least one term
+     */
+    public @NonNull ImmutableList<ParserRuleContext> collectTerms() {
+        ImmutableList<ParserRuleContext> result = ImmutableList.of();
+        if(assertionProof != null) {
+            result = result.prepend(assertionProof.collectTerms());
+        }
+        result = result.prepend(condition.ctx);
+        return result;
     }
 }
