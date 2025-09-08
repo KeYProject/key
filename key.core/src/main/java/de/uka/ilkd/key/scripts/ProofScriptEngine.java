@@ -154,6 +154,7 @@ public class ProofScriptEngine {
                 }
                 command.execute(uiControl, ast, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
+                LOGGER.info("done with command {}", cmd);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (ProofAlreadyClosedException e) {

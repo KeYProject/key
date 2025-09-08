@@ -206,7 +206,7 @@ public class ValueInjector {
                 if (meta.isRequired() && meta.getField().get(obj) == null) {
                     throw new ArgumentRequiredException(String.format(
                         "Argument %s (of type %s) is required, but %s was given. For command class: '%s'",
-                        meta.getName(), meta.getField().getType(), null,
+                        meta.getName(), meta.getField().getType().getSimpleName(), null,
                         meta.getField().getDeclaringClass()));
                 }
             } else {
