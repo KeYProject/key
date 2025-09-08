@@ -20,7 +20,8 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         this(kind, clause, null);
     }
 
-    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause, KeyAst.@Nullable JMLProofScript assertionProof) {
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause,
+            KeyAst.@Nullable JMLProofScript assertionProof) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;

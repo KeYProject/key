@@ -1955,6 +1955,12 @@ public class PrettyPrinter implements Visitor {
                 layouter.print(text);
             }
         }
+
+        if (jmlAssert.getAssertionProof() != null) {
+            // For now: Just say that there is a script. It can be seen in the source pane anyways.
+            layouter.print(" \\by ...");
+        }
+
         layouter.end();
     }
 

@@ -206,17 +206,18 @@ assert_statement: (ASSERT expression | UNREACHABLE) (SEMI_TOPLEVEL | assertionPr
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
+
 // --- proof scripts in JML
-assertionProof:  BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
+assertionProof: BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
 proofCmd:
-    cmd=IDENT ( (argLabel=IDENT COLON)? proofArg )*
+    cmd=IDENT ( proofArg )*
     ( SEMI | BY proofCmd | LBRACE (( proofCmd )+ | proofCmdCase) RBRACE )
   ;
 proofCmdCase:
     CASE ( STRING_LITERAL )? COLON ( proofCmd )*
   | DEFAULT COLON ( proofCmd )*
   ;
-proofArg: expression;
+proofArg: (argLabel=IDENT COLON)? expression;
 // ---
 
 mergeparamsspec:
