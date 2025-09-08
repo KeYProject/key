@@ -8,18 +8,18 @@ import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 /**
- * Halts the script if some condition is not met.
+ * Halts the script if the expected number of open and enabled goals is not met.
  * <p>
  * See exported documentation at {@link Parameters} at the end of this file.
  *
  * @author lanzinger
  */
-public class AssertCommand extends AbstractCommand {
+public class FailUnlessCommand extends AbstractCommand {
 
     /**
      * Instantiates a new assert command.
      */
-    public AssertCommand() {
+    public FailUnlessCommand() {
         super(Parameters.class);
     }
 
@@ -49,10 +49,7 @@ public class AssertCommand extends AbstractCommand {
             The assert command checks if the number of open and enabled goals is equal to the given number.
             If not, the script is halted with an error message.
 
-            Deprecated: This command is deprecated and should not be used in new scripts.
-            The name of this command is likely to change since "assert" will
-            be used for a more general purpose. You may find that this is called
-            "failUnless".
+            Note: This command was called "assert" originally.
             """)
     public static class Parameters {
         /**
