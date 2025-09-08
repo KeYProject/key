@@ -148,7 +148,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 positional.add(value);
             }
         }
-        result.add(new ScriptCommandAst(ctx.cmd.getText(), named, positional, null, Location.fromToken(ctx.start)));
+        result.add(new ScriptCommandAst(ctx.cmd.getText(), named, positional, Location.fromToken(ctx.start)));
 
         // handle proofCmd if present
         if(!ctx.proofCmd().isEmpty()) {
