@@ -866,7 +866,7 @@ proofScriptCommand: cmd=IDENT proofScriptParameters SEMI;
 
 proofScriptParameters: proofScriptParameter*;
 proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
-proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
+proofScriptParameterName: AT? IDENT | string_value; // someone thought, that the let-command parameters should have a leading "@"
 proofScriptExpression:
     boolean_literal
   | char_literal
