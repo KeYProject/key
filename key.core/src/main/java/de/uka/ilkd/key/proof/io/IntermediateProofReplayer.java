@@ -962,6 +962,8 @@ public class IntermediateProofReplayer {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
                 varNS, functNS, proof.getNamespaces().sorts(),
+                proof.getNamespaces().parametricSorts(),
+                proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException(
