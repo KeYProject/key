@@ -35,4 +35,12 @@ public record ScriptBlock(
             + commands.stream().map(ScriptCommandAst::asCommandLine).collect(joining("\n"))
             + "\n}";
     }
+
+    public boolean isEmpty() {
+        return commands.isEmpty();
+    }
+
+    public boolean isNotEmpty() {
+        return !isEmpty();
+    }
 }
