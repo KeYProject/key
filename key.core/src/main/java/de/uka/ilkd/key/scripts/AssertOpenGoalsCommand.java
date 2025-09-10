@@ -14,12 +14,12 @@ import de.uka.ilkd.key.scripts.meta.Option;
  *
  * @author lanzinger
  */
-public class FailUnlessCommand extends AbstractCommand {
+public class AssertOpenGoalsCommand extends AbstractCommand {
 
     /**
      * Instantiates a new assert command.
      */
-    public FailUnlessCommand() {
+    public AssertOpenGoalsCommand() {
         super(Parameters.class);
     }
 
@@ -39,7 +39,7 @@ public class FailUnlessCommand extends AbstractCommand {
 
     @Override
     public String getName() {
-        return "assert";
+        return "assertOpenGoals";
     }
 
     /**
