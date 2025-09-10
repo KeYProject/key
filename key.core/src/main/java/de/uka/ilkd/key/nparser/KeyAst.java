@@ -185,6 +185,17 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             }
             return "";
         }
+
+        /// Returns the raw settings within a [de.uka.ilkd.key.proof.io.KeYFile].
+        public Configuration findSettings() {
+            final var cfg = new ConfigurationBuilder();
+            if (ctx.preferences() == null || ctx.preferences().cvalue() == null) {
+                return new Configuration();
+            }
+
+            var c = ctx.preferences().cvalue();
+            return (Configuration) c.accept(cfg);
+        }
     }
 
     public static class ConfigurationFile extends KeyAst<KeYParser.CfileContext> {

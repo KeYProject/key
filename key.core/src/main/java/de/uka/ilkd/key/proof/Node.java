@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleApp;
