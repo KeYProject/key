@@ -268,7 +268,7 @@ public class Configuration {
 
     /**
      * Returns a list of strings for the given name.
-     *
+     * <p>
      * In contrast to the other methods, this method does not throw an exception if the entry does
      * not
      * exist in the configuration. Instead, it returns an empty list.
@@ -464,14 +464,19 @@ public class Configuration {
     }
 
     // TODO Add documentation for this.
+
     /**
      * POJO for metadata of configuration entries.
      */
     public static class ConfigurationMeta {
-        /** Position of declaration within a file */
+        /**
+         * Position of declaration within a file
+         */
         private Position position;
 
-        /** documentation given in the file */
+        /**
+         * documentation given in the file
+         */
         private String documentation;
 
         public Position getPosition() {
@@ -578,6 +583,19 @@ public class Configuration {
 
         private ConfigurationWriter print(String s) {
             out.print(s);
+            return this;
+        }
+
+        private ConfigurationWriter printSeq(int[] values) {
+            out.format("[");
+            for (var i = 0; i < values.length; i++) {
+                int o = values[i];
+                printValue(o);
+                if (i + 1 < values.length) {
+                    print(", ");
+                }
+            }
+            out.format("]");
             return this;
         }
 
