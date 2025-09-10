@@ -86,7 +86,8 @@ public interface SMTSolver {
     /**
      * Use this method in order to interrupt a running solver process.
      *
-     * @param reasonOfInterruption The reason of interruption. Can only be set to
+     * @param reasonOfInterruption
+     *        The reason of interruption. Can only be set to
      *        <code>ReasonOfInterruption.Timeout</code> or <code>ReasonOfInterruption.User</code>
      *        other wise a <code>IllegalArgumentException</code> is thrown.
      */

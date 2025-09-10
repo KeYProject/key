@@ -58,7 +58,8 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     }
 
     /**
-     * @param predicates the abstraction predicates for this domain element to set.
+     * @param predicates
+     *        the abstraction predicates for this domain element to set.
      */
     public void setPredicates(ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
@@ -131,9 +132,12 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     /**
      * Combines the given predicate terms (classically using AND or OR).
      *
-     * @param preds Term with all previous predicates.
-     * @param newPred The new predicate to combine preds with.
-     * @param services The services object.
+     * @param preds
+     *        Term with all previous predicates.
+     * @param newPred
+     *        The new predicate to combine preds with.
+     * @param services
+     *        The services object.
      * @return The combination of preds with newPred.
      */
     protected abstract JTerm combinePredicates(JTerm preds, JTerm newPred, Services services);

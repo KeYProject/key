@@ -32,7 +32,8 @@ class ProofPruner {
     /**
      * prunes the proof at the given node
      *
-     * @param cuttingPoint the node where to prune
+     * @param cuttingPoint
+     *        the node where to prune
      * @return the subtrees whose common root was the given {@code cuttingPoint}
      */
     public ImmutableList<Node> prune(final Node cuttingPoint) {

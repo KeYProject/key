@@ -205,7 +205,7 @@
                      (rule "hideAuxiliaryEq" (formula "1"))
                      (rule "commute_and" (formula "16"))
                      (rule "ifthenelse_split" (formula "1") (term "0"))
-                     (branch " !o_0 = null & !( o_0.<created> = TRUE | o_0.<created>@anon_heap_canWithdraw<<anonHeapFunction>> = TRUE) TRUE"
+                     (branch " !o_0 = null & !( o_0.$created = TRUE | o_0.$created@anon_heap_canWithdraw<<anonHeapFunction>> = TRUE) TRUE"
                         (rule "andLeft" (formula "1"))
                         (rule "notLeft" (formula "1"))
                         (rule "notLeft" (formula "1"))
@@ -217,7 +217,7 @@
                         (builtin "One Step Simplification" (formula "19") (ifInst ""  (formula "16")))
                         (rule "closeTrue" (formula "19"))
                      )
-                     (branch " !o_0 = null & !( o_0.<created> = TRUE | o_0.<created>@anon_heap_canWithdraw<<anonHeapFunction>> = TRUE) FALSE"
+                     (branch " !o_0 = null & !( o_0.$created = TRUE | o_0.$created@anon_heap_canWithdraw<<anonHeapFunction>> = TRUE) FALSE"
                         (rule "close" (formula "19") (ifseqformula "1"))
                      )
                   )

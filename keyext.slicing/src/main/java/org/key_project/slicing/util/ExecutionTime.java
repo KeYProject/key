@@ -36,7 +36,8 @@ public final class ExecutionTime {
      * Begin the given activity. Saves the current time as starting time.
      * The same activity may not be started more than once.
      *
-     * @param activity activity name
+     * @param activity
+     *        activity name
      */
     public void start(String activity) {
         if (startTimes.containsKey(activity)) {
@@ -49,7 +50,8 @@ public final class ExecutionTime {
      * Stop the given activity. Saves the current time as end time.
      * The same activity may not be stopped more than once.
      *
-     * @param activity activity name
+     * @param activity
+     *        activity name
      */
     public void stop(String activity) {
         if (!startTimes.containsKey(activity)) {

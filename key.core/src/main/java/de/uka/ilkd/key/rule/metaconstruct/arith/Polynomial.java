@@ -226,7 +226,8 @@ public class Polynomial {
     /**
      * Creates a term from this polynomial expression.
      *
-     * @param services the services object
+     * @param services
+     *        the services object
      * @return the resulting term
      */
     public Term toTerm(Services services) {

@@ -16,7 +16,8 @@ import org.jspecify.annotations.Nullable;
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
  * (means e.g. O(n) for adding an element, searching for an element and so on).
  *
- * @param <T> type of object to store
+ * @param <T>
+ *        type of object to store
  */
 public class DefaultImmutableSet<T extends @Nullable Object> implements ImmutableSet<T> {
 
@@ -46,7 +47,8 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     /**
      * creates new set with one element
      *
-     * @param element of type <T> the new Set contains
+     * @param element
+     *        of type <T> the new Set contains
      */
     private DefaultImmutableSet(T element) {
         elementList = (ImmutableSLList.<T>nil()).prepend(element);
@@ -56,7 +58,8 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
      * creates new set containg all elements from the elementList PRECONDITION: elementList has no
      * duplicates
      *
-     * @param elementList IList<T> contains all elements of the new Set
+     * @param elementList
+     *        IList<T> contains all elements of the new Set
      */
     private DefaultImmutableSet(ImmutableList<T> elementList) {
         this.elementList = elementList;
@@ -88,7 +91,8 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     /**
      * adds an element
      *
-     * @param element of type <T> that has to be added to this set
+     * @param element
+     *        of type <T> that has to be added to this set
      */
     @Override
     public ImmutableSet<T> add(T element) {
@@ -102,8 +106,10 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     /**
      * adds an element, barfs if the element is already present
      *
-     * @param element of type <T> that has to be added to this set
-     * @throws NotUniqueException if the element is already present
+     * @param element
+     *        of type <T> that has to be added to this set
+     * @throws NotUniqueException
+     *         if the element is already present
      */
     @Override
     public ImmutableSet<T> addUnique(T element) throws NotUniqueException {
@@ -205,7 +211,8 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     /**
      * return true if predicate is fullfilled for at least one element
      *
-     * @param predicate the predicate
+     * @param predicate
+     *        the predicate
      * @return true if predicate is fullfilled for at least one element
      */
     @Override
@@ -287,7 +294,8 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     /**
      * Create an immutable set from an immutable list.
      *
-     * @param list a non-null immutable list
+     * @param list
+     *        a non-null immutable list
      * @return a fresh immutable set with the same iteration order.
      */
     public static <T extends @Nullable Object> ImmutableSet<T> fromImmutableList(
@@ -313,8 +321,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
         private static final long serialVersionUID = -8055357307337694419L;
         static final NILSet<?> NIL = new NILSet<>();
 
-        private NILSet() {
-        }
+        private NILSet() {}
 
         /**
          * the NIL list is a singleton. Deserialization builds a new NIL object that has to be

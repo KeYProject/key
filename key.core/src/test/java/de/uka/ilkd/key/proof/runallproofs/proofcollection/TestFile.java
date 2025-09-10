@@ -215,7 +215,7 @@ public class TestFile implements Serializable {
                 // Write statistics.
                 StatisticsFile statisticsFile = settings.getStatisticsFile();
                 if (statisticsFile != null) {
-                    statisticsFile.appendStatistics(loadedProof, keyFile.toFile());
+                    statisticsFile.appendStatistics(loadedProof, keyFile);
                 }
 
                 /*

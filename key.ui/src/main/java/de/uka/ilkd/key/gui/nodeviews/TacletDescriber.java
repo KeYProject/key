@@ -126,8 +126,10 @@ class TacletDescriber {
      * This information is also relevant for other tools like the Symbolic Execution Debugger.
      * </p>
      *
-     * @param mediator The {@link KeYMediator} to use.
-     * @param app The {@link RuleApp} to use.
+     * @param mediator
+     *        The {@link KeYMediator} to use.
+     * @param app
+     *        The {@link RuleApp} to use.
      * @return The text to show.
      */
     public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {

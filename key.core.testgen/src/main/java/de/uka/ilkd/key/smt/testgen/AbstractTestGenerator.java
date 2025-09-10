@@ -63,8 +63,10 @@ public abstract class AbstractTestGenerator {
     /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} to use.
-     * @param originalProof The {@link Proof} to generate test cases for.
+     * @param ui
+     *        The {@link UserInterfaceControl} to use.
+     * @param originalProof
+     *        The {@link Proof} to generate test cases for.
      */
     protected AbstractTestGenerator(UserInterfaceControl ui, Proof originalProof) {
         this.ui = ui;
@@ -212,8 +214,10 @@ public abstract class AbstractTestGenerator {
      * Creates a proof for each open node if the selected proof is open and a proof for each node on
      * which the emptyModality rules was applied if the selected proof is closed.
      *
-     * @param removeDuplicatePathConditions - if true no identical proofs will be created
-     * @param removePostCondition - if true, remove post condition
+     * @param removeDuplicatePathConditions
+     *        - if true no identical proofs will be created
+     * @param removePostCondition
+     *        - if true, remove post condition
      * @return a list of proofs
      */
     private List<Proof> createProofsForTesting(boolean removeDuplicatePathConditions,
@@ -252,8 +256,10 @@ public abstract class AbstractTestGenerator {
     /**
      * Adds all nodes on which the emptyModality rule was applied to the list.
      *
-     * @param root the root node
-     * @param nodes the nodes to be added
+     * @param root
+     *        the root node
+     * @param nodes
+     *        the nodes to be added
      */
     private void getNodesWithEmptyModalities(Node root, List<Node> nodes) {
         if (root.getAppliedRuleApp() != null) {
@@ -271,11 +277,15 @@ public abstract class AbstractTestGenerator {
      * Creates a proof with the specified node as its root. If an identical proof is found in
      * otherProofs than null will be returned instead.
      *
-     * @param node the new root node
-     * @param otherProofs a list of proofs as described above
-     * @param removePostCondition if true, then remove post condition
+     * @param node
+     *        the new root node
+     * @param otherProofs
+     *        a list of proofs as described above
+     * @param removePostCondition
+     *        if true, then remove post condition
      * @return the new proof with the specified root node
-     * @throws ProofInputException exception for proof input
+     * @throws ProofInputException
+     *         exception for proof input
      */
     private Proof createProofForTestingNoDuplicate(Node node, List<Proof> otherProofs,
             boolean removePostCondition) throws ProofInputException {
@@ -379,8 +389,7 @@ public abstract class AbstractTestGenerator {
      * This method is used in the Eclipse world to show a dialog with the log.
      */
     protected void informAboutNoTestResults(SolverLauncher launcher,
-            Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {
-    }
+            Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {}
 
     public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(
             Collection<SMTSolver> problemSolvers, TestGenerationLog log) {

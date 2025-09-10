@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
@@ -37,7 +39,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
             KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
-        super(createName(baseName, container), sort,
+        super(createName(baseName, Objects.requireNonNull(container)), sort,
             getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;
         assert container != null;

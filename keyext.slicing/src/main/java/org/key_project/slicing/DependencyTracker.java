@@ -78,7 +78,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Construct a new tracker for a proof.
      * This tracker is added as a RuleAppListener and ProofTreeListener to the proof.
      *
-     * @param proof the proof to track
+     * @param proof
+     *        the proof to track
      */
     public DependencyTracker(Proof proof) {
         this.proof = proof;
@@ -99,8 +100,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Compute the sequent formulas used by the provided rule application:
      * instantiations for \find, \assume, etc.
      *
-     * @param ruleApp a rule application
-     * @param node node corresponding to the rule application
+     * @param ruleApp
+     *        a rule application
+     * @param node
+     *        node corresponding to the rule application
      * @return all formulas used by the rule application
      */
     private static Set<PosInOccurrence> inputsOfRuleApp(
@@ -118,8 +121,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * another previous proof step. Always includes the sequent formulas used to instantiate
      * the \find and \assumes pattern.
      *
-     * @param n node
-     * @param removed formulas removed by this node
+     * @param n
+     *        node
+     * @param removed
+     *        formulas removed by this node
      * @return pairs of graph nodes and whether the graph node was removed
      */
     private List<Pair<GraphNode, Boolean>> inputsOfNode(Node n,
@@ -179,7 +184,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Get all formulas removed by the provided rule application, i.e. all formulas not present
      * in the replacement nodes.
      *
-     * @param ruleAppInfo some rule application
+     * @param ruleAppInfo
+     *        some rule application
      * @return formulas removed by that rule application
      */
     private Set<PosInOccurrence> formulasRemovedBy(
@@ -219,7 +225,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Get the formulas added by this rule application. Each returned pair is one formula
      * and the ID of the branch it is added to (-1 if the node doesn't branch).
      *
-     * @param ruleAppInfo rule application info
+     * @param ruleAppInfo
+     *        rule application info
      * @return formulas added
      */
     private List<Pair<PosInOccurrence, Integer>> outputsOfNode(
@@ -349,7 +356,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Either this method or {@link #ruleApplied(ProofEvent)} needs to be called to track
      * a node in the dependency graph.
      *
-     * @param n the node
+     * @param n
+     *        the node
      */
     public void trackNode(Node n) {
         if (n.proof() != proof) {
@@ -440,8 +448,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Export the dependency graph created by this tracker in DOT format.
      * See {@link DotExporter}.
      *
-     * @param abbreviateFormulas whether to shorten formula labels
-     * @param abbreviateChains whether to reduce long chains to one link
+     * @param abbreviateFormulas
+     *        whether to shorten formula labels
+     * @param abbreviateChains
+     *        whether to reduce long chains to one link
      * @return DOT string
      */
     public String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
@@ -452,9 +462,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * Export part of the dependency graph around a specific graph node.
      *
-     * @param abbreviateFormulas whether to shorten formula labels
-     * @param omitBranch whether to omit branch labels
-     * @param node graph node to center export around
+     * @param abbreviateFormulas
+     *        whether to shorten formula labels
+     * @param omitBranch
+     *        whether to omit branch labels
+     * @param node
+     *        graph node to center export around
      * @return DOT string
      */
     public String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, GraphNode node) {
@@ -466,8 +479,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * Analyze the tracked proof using one or both analysis algorithms.
      * Returns null if the proof is not closed.
      *
-     * @param doDependencyAnalysis whether to apply the dependency analysis algorithm
-     * @param doDeduplicateRuleApps whether to de-duplicate rule applications
+     * @param doDependencyAnalysis
+     *        whether to apply the dependency analysis algorithm
+     * @param doDeduplicateRuleApps
+     *        whether to de-duplicate rule applications
      * @return analysis results (null if proof is not closed)
      */
     public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
@@ -486,8 +501,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * Get the proof step that added a sequent formula to the proof.
      *
-     * @param currentNode the proof node that contains <code>pio</code>
-     * @param pio a sequent formula
+     * @param currentNode
+     *        the proof node that contains <code>pio</code>
+     * @param pio
+     *        a sequent formula
      * @return the node that added this formula, or null
      */
     public Node getNodeThatProduced(Node currentNode,

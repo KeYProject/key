@@ -51,7 +51,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * creates a viewer for a sequent
      *
-     * @param mainWindow the MainWindow allowing access to the current system status
+     * @param mainWindow
+     *        the MainWindow allowing access to the current system status
      */
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
@@ -98,8 +99,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if the user wants to abort the proving session
              */
             @Override
-            public void shutDown(EventObject e) {
-            }
+            public void shutDown(EventObject e) {}
         };
 
         addMouseListener(listener);
@@ -239,8 +239,10 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * selected rule to apply
      *
-     * @param taclet the selected Taclet
-     * @param pos the PosInSequent describes the position where to apply the rule
+     * @param taclet
+     *        the selected Taclet
+     * @param pos
+     *        the PosInSequent describes the position where to apply the rule
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
         KeYMediator r = getMediator();

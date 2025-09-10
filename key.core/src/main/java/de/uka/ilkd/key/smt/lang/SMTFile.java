@@ -90,7 +90,8 @@ public class SMTFile {
     }
 
     /**
-     * @param defaultLogic the defaultLogic to set
+     * @param defaultLogic
+     *        the defaultLogic to set
      */
     public void setDefaultLogic(String defaultLogic) {
         this.defaultLogic = defaultLogic;
@@ -104,7 +105,8 @@ public class SMTFile {
     }
 
     /**
-     * @param scope the scope to set
+     * @param scope
+     *        the scope to set
      */
     public void setScope(String scope) {
         this.scope = scope;

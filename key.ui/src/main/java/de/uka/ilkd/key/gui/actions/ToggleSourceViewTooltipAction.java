@@ -34,7 +34,8 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     /**
      * Create a new action.
      *
-     * @param mainWindow the main window.
+     * @param mainWindow
+     *        the main window.
      */
     public ToggleSourceViewTooltipAction(MainWindow mainWindow) {
         super(mainWindow);

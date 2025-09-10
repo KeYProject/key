@@ -7,13 +7,16 @@ import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.Branch;
+import de.uka.ilkd.key.java.ast.statement.BranchStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -105,12 +108,18 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param name The name to use.
-     * @param pm The {@link IProgramMethod} to execute code parts from.
-     * @param precondition An optional precondition to use.
-     * @param startPosition The start position.
-     * @param endPosition The end position.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param name
+     *        The name to use.
+     * @param pm
+     *        The {@link IProgramMethod} to execute code parts from.
+     * @param precondition
+     *        An optional precondition to use.
+     * @param startPosition
+     *        The start position.
+     * @param endPosition
+     *        The end position.
      */
     public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
             String precondition, Position startPosition, Position endPosition) {
@@ -124,15 +133,23 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param name The name to use.
-     * @param pm The {@link IProgramMethod} to execute code parts from.
-     * @param precondition An optional precondition to use.
-     * @param startPosition The start position.
-     * @param endPosition The end position.
-     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param name
+     *        The name to use.
+     * @param pm
+     *        The {@link IProgramMethod} to execute code parts from.
+     * @param precondition
+     *        An optional precondition to use.
+     * @param startPosition
+     *        The start position.
+     * @param endPosition
+     *        The end position.
+     * @param addUninterpretedPredicate
+     *        {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel
+     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
@@ -180,8 +197,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * Collects recursive the {@link Statement}s which are in the given source range defined by
      * {@link #startPosition} and {@link #endPosition}.
      *
-     * @param toFill The result {@link List} to fill.
-     * @param container The {@link StatementContainer} to seach in.
+     * @param toFill
+     *        The result {@link List} to fill.
+     * @param container
+     *        The {@link StatementContainer} to seach in.
      */
     protected void collectStatementsToExecute(List<Statement> toFill,
             StatementContainer container) {
@@ -208,7 +227,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Checks if the last statement is a {@link Return} statement.
      *
-     * @param statements The statements to check.
+     * @param statements
+     *        The statements to check.
      * @return {@code true} last statement is {@link Return}, {@code false} statements are empty or
      *         last statement is something else.
      */
@@ -260,7 +280,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Converts the given {@link Collection} into an {@link ImmutableList}.
      *
-     * @param c The {@link Collection} to convert.
+     * @param c
+     *        The {@link Collection} to convert.
      * @return The created {@link ImmutableList}.
      */
     protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
@@ -334,9 +355,11 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Extracts the start position from the given {@link Properties}.
      *
-     * @param properties The proof obligation settings to read from.
+     * @param properties
+     *        The proof obligation settings to read from.
      * @return The defined start {@link Position}.
-     * @throws IOException Occurred Exception if it was not possible to read the start position.
+     * @throws IOException
+     *         Occurred Exception if it was not possible to read the start position.
      */
     protected static Position getStartPosition(Configuration properties) throws IOException {
         String line = properties.getString(START_LINE);
@@ -372,9 +395,11 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Extracts the end position from the given {@link Properties}.
      *
-     * @param properties The proof obligation settings to read from.
+     * @param properties
+     *        The proof obligation settings to read from.
      * @return The defined end {@link Position}.
-     * @throws IOException Occurred Exception if it was not possible to read the end position.
+     * @throws IOException
+     *         Occurred Exception if it was not possible to read the end position.
      */
     protected static Position getEndPosition(Configuration properties) throws IOException {
         String line = properties.getString(END_LINE);

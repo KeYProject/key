@@ -4,13 +4,12 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.ldt.FinalHeapResolution;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
@@ -32,7 +31,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
     private ProgramVariable lookupVisibleAttribute(String name, KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration
-                : "type " + containingType + " is primitive, lookup for " + name;
+                : "type %s is primitive, lookup for %s".formatted(containingType, name);
         final TypeDeclaration td = (TypeDeclaration) containingType.getJavaType();
         // lookup locally
         for (MemberDeclaration md : td.getMembers()) {
@@ -100,11 +99,11 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             while (attribute == null) {
                 attribute = lookupVisibleAttribute(name, containingType);
                 if (attribute == null) {
-                    attribute = lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX + name,
+                    attribute = lookupVisibleAttribute(PipelineConstants.FINAL_VAR_PREFIX + name,
                         containingType);
                 }
                 final LocationVariable et = (LocationVariable) javaInfo
-                        .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                        .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
@@ -135,20 +134,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     JTerm attributeTerm;
                     if (attribute.isStatic()) {
-                        if (attribute.isFinal() &&
-                                FinalHeapResolution.recallIsFinalEnabled()) {
-                            attributeTerm =
-                                services.getTermBuilder().staticFinalDot(attribute.sort(),
-                                    fieldSymbol);
-                        } else {
-                            attributeTerm =
-                                services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
-                        }
-                    } else if (attribute.isFinal() &&
-                            FinalHeapResolution.recallIsFinalEnabled()) {
-                        attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
-                            recTerm,
-                            fieldSymbol);
+                        attributeTerm =
+                            services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
                     } else {
                         attributeTerm =
                             services.getTermBuilder().dot(attribute.sort(), recTerm, fieldSymbol);

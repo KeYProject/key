@@ -36,12 +36,16 @@ public class TermLabelsProperty implements Property<Term> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, ignoring <b>all</b>
      * term labels.
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
-     * @param v should not be used for this equality check
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
+     * @param v
+     *        should not be used for this equality check
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}
      *         ignoring <b>all</b> term labels
-     * @param <V> is not needed for this equality check
+     * @param <V>
+     *        is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
@@ -72,7 +76,8 @@ public class TermLabelsProperty implements Property<Term> {
     /**
      * Computes the hash code of {@code term} while ignoring <b>all</b> term labels.
      *
-     * @param term the term to compute the hash code for
+     * @param term
+     *        the term to compute the hash code for
      * @return the hash code
      */
     @Override

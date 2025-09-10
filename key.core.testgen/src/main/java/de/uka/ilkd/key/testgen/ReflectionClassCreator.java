@@ -164,7 +164,8 @@ public class ReflectionClassCreator {
     /**
      * Writes a hashmap and a utility method for associating ghost/model fiels with objects.
      *
-     * @param ghostMapActive becomes are runtime flag that determins if the hashmap should be
+     * @param ghostMapActive
+     *        becomes are runtime flag that determins if the hashmap should be
      *        enabled or not.
      */
     private StringBuilder ghostMapDecls(boolean ghostMapActive) {

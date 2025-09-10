@@ -151,8 +151,10 @@ public class ArrayUtilTest {
     /**
      * Makes sure that the given array contains all values.
      *
-     * @param array The array.
-     * @param expectedValues The expected values.
+     * @param array
+     *        The array.
+     * @param expectedValues
+     *        The expected values.
      */
     @SuppressWarnings("unchecked")
     protected <T> void assertArrayEquals(T[] array, T... expectedValues) {

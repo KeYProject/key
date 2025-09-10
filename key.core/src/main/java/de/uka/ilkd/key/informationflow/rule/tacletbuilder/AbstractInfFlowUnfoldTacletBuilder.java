@@ -204,7 +204,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             if (origTerm != null && svTerm != null) {
                 assert svTerm.sort().equals(origTerm.sort())
                         || svTerm.sort().extendsSorts().contains(origTerm.sort())
-                        : "mismatch of sorts: orignal term " + origTerm + ", sort "
+                        : "mismatch of sorts: orignal term "
+                            + origTerm + ", sort "
                             + origTerm.sort() + "; replacement term" + svTerm + ", sort "
                             + svTerm.sort();
                 map.put(origTerm, svTerm);

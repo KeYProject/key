@@ -184,8 +184,7 @@ public final class IconFactory {
 
     private static final HashMap<String, Icon> cache = new HashMap<>();
 
-    private IconFactory() {
-    }
+    private IconFactory() {}
 
     public static Image getImage(String s) {
         ImageIcon ii = createImageIcon(s);
@@ -195,7 +194,8 @@ public final class IconFactory {
     /**
      * Creates an icon from an image contained in a resource.
      *
-     * @param filename String the name of the file to search (only relative pathname to the path of
+     * @param filename
+     *        String the name of the file to search (only relative pathname to the path of
      *        this class)
      * @return the newly created image
      */
@@ -461,7 +461,8 @@ public final class IconFactory {
     }
 
     /**
-     * @param size desired icon size
+     * @param size
+     *        desired icon size
      * @return the icon to use for useless proof steps
      */
     public static Icon uselessAppLogo(int size) {
