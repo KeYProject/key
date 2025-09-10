@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.settings.Configuration;
 
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
@@ -257,7 +258,8 @@ public abstract class AbstractUserInterfaceControl
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+            ProofAggregate proofList, ReplayResult result, Configuration settings)
+            throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof
