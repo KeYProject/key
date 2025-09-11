@@ -1,0 +1,54 @@
+[versions]
+jspecify = "1.0.0"
+eisop = "3.42.0-eisop5"
+kotlin = "2.2.0"
+junit = "5.13.4"
+retrotranslator = "1.2.9"
+
+[libraries]
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+slf4j = { module = "org.slf4j:slf4j-api", version = "2.0.16" }
+
+eisopCheckerQual = { module = "io.github.eisop:checker-qual", version.ref = "eisop" }
+eisopUtil = { module = "io.github.eisop:checker-util", version.ref = "eisop" }
+eisopChecker = { module = "io.github.eisop:checker", version.ref = "eisop" }
+
+assertj = { module = "org.assertj:assertj-core", version = "3.27.3" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
+
+
+yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version = "2.18.2" }
+yamljsr = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version = "2.18.2" }
+
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-platform = { module = "org.junit.platform:junit-platform-launcher" }
+
+javacc = { module = "net.java.dev.javacc:javacc", version = "4.0" }
+antlr = { module = "org.antlr:antlr4", version = "4.13.2" }
+antlrRuntime = { module = "org.antlr:antlr4-runtime", version = "4.13.2" }
+miglayout = { module = "com.miglayout:miglayout-swing", version = "11.4.2" }
+
+dockingFramesCommon = { module = "org.key-project:docking-frames-common", version = "1.1.3p1" }
+dockingFramesCore = { module = "org.key-project:docking-frames-core", version = "1.1.3p1" }
+
+stringtemplate = { module = "org.antlr:ST4", version = "4.3.4" }
+
+## recoder stuff
+asm = { module = "org.ow2.asm:asm", version = "9.8" }
+beanshell = { module = "org.apache-extras.beanshell:bsh", version = "2.0b6" }
+retrotranslator-runtime = { module = "net.sf.retrotranslator:retrotranslator-runtime", version.ref = "retrotranslator" }
+retrotranslator-transformer = { module = "net.sf.retrotranslator:retrotranslator-transformer", version.ref = "retrotranslator" }
+
+[bundles]
+testing = ["junit-api", "junit-params", "assertj", "logback", "yaml", "yamljsr"]
+
+recoder = ["asm", "beanshell", "retrotranslator-runtime", "retrotranslator-transformer"]
+
+
+[plugins]
+shadowjar = { id = "com.gradleup.shadow", version = "9.0.1" }
