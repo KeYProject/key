@@ -102,7 +102,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
         // read key file itself (except contracts)
-        warnings = warnings.union(super.readExtendedSignature());
+        // should have been read earlier (TODO: find a clean solution)
+        //warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
