@@ -9,6 +9,8 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
 /**
@@ -57,6 +59,14 @@ public abstract class KeyAction extends AbstractAction {
      * The stored values are {@link KeyStroke}.
      */
     public static final String LOCAL_ACCELERATOR = "LOCAL_ACCELERATOR";
+
+    /// {@inheritDoc}
+    @Override
+    public void putValue(
+            @UnderInitialization(KeyAction.class) KeyAction this,
+            String key, Object newValue) {
+        super.putValue(key, newValue);
+    }
 
     public String getName() {
         return (String) getValue(NAME);
