@@ -917,7 +917,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             LOGGER.debug("ProofTreeView: initialize with new proof");
             ThreadUtilities.invokeOnEventQueue(() -> {
                 lastGoalNode = null;
-                setProof(e.getSource().getSelectedProof());
+                setProof(e.source().getSelectedProof());
                 delegateView.validate();
             });
         }

@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions.useractions;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * User action that modifies the proof in some way.
@@ -27,18 +28,18 @@ public abstract class ProofModifyingUserAction extends UserAction {
     /**
      * The node selected before the user action is performed.
      */
-    private final Node originalSelection;
+    private final @Nullable Node originalSelection;
 
     /**
      * Save the current state of the proof.
      *
-     * @param mediator the mediator
+     * @param mediator      the mediator
      * @param originalState the proof
      */
     protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState) {
         super(mediator, originalState);
         this.originalOpenGoals =
-            originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
+                originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
         this.originalSelection = mediator.getSelectedNode();
     }
 
@@ -46,15 +47,15 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * Save the current state of the proof.
      * Mark the just modified node as an open goal.
      *
-     * @param mediator the mediator
-     * @param originalState the proof
+     * @param mediator         the mediator
+     * @param originalState    the proof
      * @param justModifiedNode just modified node
      */
     protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState,
-            Node justModifiedNode) {
+                                       Node justModifiedNode) {
         super(mediator, originalState);
         List<Node> openGoals =
-            originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
+                originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
         Node openGoalToReplace = null;
         for (Node openGoal : openGoals) {
             if (openGoal.parent() == justModifiedNode) {
@@ -80,6 +81,7 @@ public abstract class ProofModifyingUserAction extends UserAction {
 
     @Override
     public boolean canUndo() {
-        return originalOpenGoals.stream().allMatch(proof::find) && proof.find(originalSelection);
+        return originalOpenGoals.stream().allMatch(proof::find) &&
+                (originalSelection != null && proof.find(originalSelection));
     }
 }

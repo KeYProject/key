@@ -23,7 +23,6 @@ import org.key_project.util.java.SwingUtil;
  *
  */
 public class KeYProjectHomepageAction extends MainWindowAction {
-    private static final long serialVersionUID = 8657661861116034536L;
     private final static String url = "https://www.key-project.org/";
 
     public KeYProjectHomepageAction(MainWindow mainWindow) {

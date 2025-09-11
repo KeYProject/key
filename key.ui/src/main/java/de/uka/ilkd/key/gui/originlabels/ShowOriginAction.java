@@ -21,9 +21,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * @author lanzinger
  */
 public class ShowOriginAction extends MainWindowAction {
-
-    private static final long serialVersionUID = 4557953425770258852L;
-
     private final PosInSequent pos;
 
     /**

@@ -9,12 +9,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ViewSelector;
 
 public class ToolTipOptionsAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -360744615149278733L;
-
     public ToolTipOptionsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("ToolTip Options");

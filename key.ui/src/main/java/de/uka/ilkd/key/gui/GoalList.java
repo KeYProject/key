@@ -568,7 +568,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          */
         public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
             LOGGER.debug("GoalList: initialize with new proof");
-            selectingListModel.setProof(e.getSource().getSelectedProof());
+            selectingListModel.setProof(e.source().getSelectedProof());
             validate();
         }
     }

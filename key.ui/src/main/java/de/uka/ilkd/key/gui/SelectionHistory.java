@@ -151,12 +151,12 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     @Override
     public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         if (selectedNodes.isEmpty()) {
-            selectedNodes.add(new WeakReference<>(e.getSource().getSelectedNode()));
+            selectedNodes.add(new WeakReference<>(e.source().getSelectedNode()));
             fireChangeEvent();
             return;
         }
         Node last = selectedNodes.peekLast().get();
-        Node now = e.getSource().getSelectedNode();
+        Node now = e.source().getSelectedNode();
         if (last != now) {
             selectedNodes.add(new WeakReference<>(now));
             fireChangeEvent();
@@ -165,7 +165,7 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        Proof p = e.getSource().getSelectedProof();
+        Proof p = e.source().getSelectedProof();
         if (p == null || monitoredProofs.contains(p)) {
             return;
         }
