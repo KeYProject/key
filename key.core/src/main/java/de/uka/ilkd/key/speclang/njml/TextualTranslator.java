@@ -552,8 +552,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
-                                          new KeyAst.Expression(ctx.expression()),
-                                          KeyAst.JMLProofScript.fromContext(ctx.assertionProof()));
+                new KeyAst.Expression(ctx.expression()),
+                KeyAst.JMLProofScript.fromContext(ctx.assertionProof()));
         finishConstruct(b);
         return null;
     }

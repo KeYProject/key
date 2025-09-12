@@ -6,10 +6,12 @@ package de.uka.ilkd.key.scripts;
 /**
  * An assertion which essentially performs a cut.
  *
- * The only difference is that this implementation tampers with the labels of the resulting goals to allow them to be
+ * The only difference is that this implementation tampers with the labels of the resulting goals to
+ * allow them to be
  * better recognized in the script engine.
  *
- * (Unlike in other systems, in KeY the assertion does not remove the original goal formula since that is not well-defined in sequent calculus.)
+ * (Unlike in other systems, in KeY the assertion does not remove the original goal formula since
+ * that is not well-defined in sequent calculus.)
  */
 public class AssertCommand extends CutCommand {
 
@@ -23,7 +25,7 @@ public class AssertCommand extends CutCommand {
         var args = state().getValueInjector().inject(new Parameters(), arguments);
         var node = state().getFirstOpenAutomaticGoal().node();
         execute(state(), args);
-        node.proof().getGoal(node.child(0)).setBranchLabel("use");
-        node.proof().getGoal(node.child(1)).setBranchLabel("show");
+        node.proof().getGoal(node.child(0)).setBranchLabel("Validity");
+        node.proof().getGoal(node.child(1)).setBranchLabel("Usage");
     }
 }
