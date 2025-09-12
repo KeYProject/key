@@ -5,9 +5,7 @@ package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
-import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
 import org.jspecify.annotations.Nullable;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -42,7 +40,8 @@ public class JmlAssert extends JavaStatement {
         this(kind, condition, null);
     }
 
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition, KeyAst.@Nullable JMLProofScript assertionProof) {
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+            KeyAst.@Nullable JMLProofScript assertionProof) {
         this.kind = kind;
         this.condition = condition;
         this.assertionProof = assertionProof;

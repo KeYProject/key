@@ -133,7 +133,8 @@ public final class JmlAssertRule implements BuiltInRule {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final JTerm self = MiscTools.getSelfTerm(frame, services);
 
-        final SpecificationRepository.JmlStatementSpec spec = services.getSpecificationRepository().getStatementSpec(jmlAssert);
+        final SpecificationRepository.JmlStatementSpec spec =
+            services.getSpecificationRepository().getStatementSpec(jmlAssert);
 
         if (spec == null) {
             throw new RuleAbortException(

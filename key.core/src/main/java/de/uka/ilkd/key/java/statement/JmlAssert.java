@@ -3,24 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.ExtList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import de.uka.ilkd.key.nparser.KeyAst;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Immutables;
 
 /**
  * A JML assert statement.
@@ -54,7 +50,8 @@ public class JmlAssert extends JavaStatement {
      * @param assertionProof the optional proof for an assert statement (not for assume)
      * @param positionInfo the position information for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition, KeyAst.@Nullable JMLProofScript assertionProof,
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+            KeyAst.@Nullable JMLProofScript assertionProof,
             PositionInfo positionInfo) {
         super(positionInfo);
         this.kind = kind;
@@ -193,7 +190,7 @@ public class JmlAssert extends JavaStatement {
      */
     public @NonNull ImmutableList<ParserRuleContext> collectTerms() {
         ImmutableList<ParserRuleContext> result = ImmutableList.of();
-        if(assertionProof != null) {
+        if (assertionProof != null) {
             result = result.prepend(assertionProof.collectTerms());
         }
         result = result.prepend(condition.ctx);

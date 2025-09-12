@@ -33,7 +33,8 @@ public final class IntegerUtil {
     }
 
     /**
-     * Creates a list of integers from {@code 0} (inclusive) to the size of the given collection (exclusive).
+     * Creates a list of integers from {@code 0} (inclusive) to the size of the given collection
+     * (exclusive).
      */
     public static List<Integer> indexRangeOf(Collection<?> coll) {
         return rangeUntil(coll.size());
@@ -47,7 +48,8 @@ public final class IntegerUtil {
     }
 
     /**
-     * Creates a list of integers from {@code from} (inclusive) to {@code untilExclusive} (exclusive).
+     * Creates a list of integers from {@code from} (inclusive) to {@code untilExclusive}
+     * (exclusive).
      */
     private static List<Integer> range(int from, int untilExclusive) {
         return java.util.stream.IntStream.range(from, untilExclusive).boxed().toList();

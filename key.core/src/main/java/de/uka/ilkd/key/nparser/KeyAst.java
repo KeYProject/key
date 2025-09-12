@@ -230,7 +230,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         public static JMLProofScript fromContext(JmlParser.AssertionProofContext ctx) {
-            if(ctx == null) {
+            if (ctx == null) {
                 return null;
             } else {
                 return new JMLProofScript(ctx);
@@ -239,10 +239,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         /**
          * Collect all JML expressions in a script (and potentially sub-blocks)
+         *
          * @param cmd the command to collect from
          * @return a list in reverse(!) order of all expressions in cmd
          */
-        private static ImmutableList<ParserRuleContext> collectTerms(JmlParser.ProofCmdContext cmd) {
+        private static ImmutableList<ParserRuleContext> collectTerms(
+                JmlParser.ProofCmdContext cmd) {
             ImmutableList<ParserRuleContext> result = ImmutableList.of();
             for (JmlParser.ProofArgContext arg : cmd.proofArg()) {
                 JmlParser.ExpressionContext exp = arg.expression();

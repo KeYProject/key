@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.nparser.KeyAst;
+
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.antlr.v4.runtime.RuleContext;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A JML assert/assume statement.

@@ -1,11 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
-
-import de.uka.ilkd.key.scripts.meta.Argument;
-import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -14,6 +10,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Option;
+
+import org.jspecify.annotations.Nullable;
 
 public class BranchesCommand extends AbstractCommand {
     public BranchesCommand() {
@@ -31,28 +35,32 @@ public class BranchesCommand extends AbstractCommand {
         }
 
         switch (args.mode) {
-        case "push":
-            Node node = state.getFirstOpenAutomaticGoal().node();
-            // this is the first goal. The parent is the decision point
-            node = node.parent();
-            stack.push(node.serialNr());
-            break;
-        case "pop":
-            stack.pop();
-            break;
-        case "select":
-            Node root = findNodeByNumber(proof, stack.peek());
-            Goal goal;
-            if (args.branch == null) {
-                goal = findGoalByNode(state.getProof(), root.child(args.child));
-            } else {
-                goal = findGoalByName(root, args.branch);
-            }
-            state.setGoal(goal);
-            break;
-        default:
-            throw new ScriptException();
+            case "push":
+                ensureSingleGoal();
+                Node node = state.getFirstOpenAutomaticGoal().node();
+                // this is the first goal. The parent is the decision point
+                stack.push(node.serialNr());
+                break;
+            case "pop":
+                stack.pop();
+                break;
+            case "select":
+                Node root = findNodeByNumber(proof, stack.peek());
+                Goal goal;
+                if (args.branch == null) {
+                    goal = findGoalByNode(state.getProof(), root.child(args.child));
+                } else {
+                    goal = findGoalByName(root, args.branch);
+                }
+                state.setGoal(goal);
+                break;
+            default:
+                throw new ScriptException();
         }
+    }
+
+    private void ensureSingleGoal() {
+        state.
     }
 
     private Goal findGoalByName(Node root, String branch) throws ScriptException {
@@ -107,7 +115,7 @@ public class BranchesCommand extends AbstractCommand {
         @Option(value = "branch")
         public @Nullable String branch;
         @Option(value = "child")
-        public int child;
+        public @Nullable Integer child;
     }
 
 }

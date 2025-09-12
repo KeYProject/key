@@ -964,7 +964,8 @@ public class Recoder2KeYConverter {
      * @return the converted statement
      */
     public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
-        return new JmlAssert(ja.getKind(), ja.getCondition(), ja.getAssertionProof(), positionInfo(ja));
+        return new JmlAssert(ja.getKind(), ja.getCondition(), ja.getAssertionProof(),
+            positionInfo(ja));
     }
 
     // ------------------- declaration ---------------------

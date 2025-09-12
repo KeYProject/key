@@ -9,10 +9,11 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 
+import org.key_project.util.java.IntegerUtil;
+
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.java.IntegerUtil;
 
 /**
  * @author Alexander Weigl
@@ -137,24 +138,24 @@ public class ValueInjector {
         Optional<String> unhandled = arguments.namedArgs().keySet().stream()
                 .filter(it -> !handledOptions.contains(it))
                 .findAny();
-        if(unhandled.isPresent()) {
+        if (unhandled.isPresent()) {
             throw new UnknownArgumentException(String.format(
-                    "Unknown argument %s (with value %s) was provided. For command class: '%s'",
-                    unhandled.get(),
-                    arguments.namedArgs().get(unhandled.get()),
-                    obj.getClass().getName()));
+                "Unknown argument %s (with value %s) was provided. For command class: '%s'",
+                unhandled.get(),
+                arguments.namedArgs().get(unhandled.get()),
+                obj.getClass().getName()));
         }
 
         Optional<Integer> unhandledPos = IntegerUtil.indexRangeOf(arguments.positionalArgs())
                 .stream()
                 .filter(it -> !handledOptions.contains(it))
                 .findAny();
-        if(unhandledPos.isPresent()) {
+        if (unhandledPos.isPresent()) {
             long count = handledOptions.stream().filter(it -> it instanceof Integer).count();
             throw new UnknownArgumentException(String.format(
-                    "Unexpected positional argument at index %d was provided. " +
-                            "Expected (at most) %d positional arguments. For command class: '%s'",
-                    unhandledPos.get(), count, obj.getClass().getName()));
+                "Unexpected positional argument at index %d was provided. " +
+                    "Expected (at most) %d positional arguments. For command class: '%s'",
+                unhandledPos.get(), count, obj.getClass().getName()));
         }
 
         return obj;
@@ -336,7 +337,8 @@ public class ValueInjector {
      * @param <T> the source type
      * @param ret the result type class
      * @param arg the source type class
-     * @return a suitable converter (registered) converter for the requested class. null if no such converter is known.
+     * @return a suitable converter (registered) converter for the requested class. null if no such
+     *         converter is known.
      */
     @SuppressWarnings("unchecked")
     public <R, T> @Nullable Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {

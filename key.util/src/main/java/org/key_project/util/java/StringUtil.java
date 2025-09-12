@@ -562,10 +562,10 @@ public final class StringUtil {
      *         present.
      */
     public static String stripQuotes(String text) {
-        if(text.length() >= 2 && text.startsWith("\"") && text.endsWith("\"")) {
+        if (text.length() >= 2 && text.startsWith("\"") && text.endsWith("\"")) {
             return text.substring(1, text.length() - 1);
         }
-        if(text.length() >= 2 && text.startsWith("'") && text.endsWith("'")) {
+        if (text.length() >= 2 && text.startsWith("'") && text.endsWith("'")) {
             return text.substring(1, text.length() - 1);
         }
         return text;
