@@ -745,56 +745,60 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * Resolve the function symbol which is embedded here to its logical counterpart.
+     * Resolve the function symbol with the given name. Also supports sort-dependent functions
+     * (where the name contains "::").
+     * @param name
+     * @param e
+     * @return
      */
-    public DLEmbeddedExpression convert(EscapeExpression e) {
-        final var PREFIX = "\\dl_DEFAULT_VALUE_";
-        final var DEFVALUE = "@defaultValue(";
-        ExtList children = collectChildren(e);
-        String name = e.getFunctionName();
+    private Function resolveFunction(String name, EscapeExpression e) {
 
-        if (name.startsWith(PREFIX)) { // handle default value resolution
-            String sortName = name.substring(PREFIX.length()).trim();
+        final Function named = namespaceSet.functions().lookup(new Name(name));
+
+        if (named != null) {
+            // found a non-sort-depending function
+            return named;
+        }
+
+        // check for sort-depending function
+        if (name.contains("::")) {
+            String sortName = name.substring(0, name.indexOf("::"));
+            String fName = name.substring(name.indexOf("::") + 2);
             Sort sort = namespaceSet.sorts().lookup(sortName);
+            if (!fName.equals("defaultValue")) {
+                // only defaultValue is supported here (for other names we should get an earlier
+                // parser error)
+                throw new ConvertException(format(
+                    "Requested to find the default value of a sort-dependent function '%s', "
+                        + "but the function name '%s' is not 'defaultValue'. Line/Col:%s",
+                    name, fName, e.getStartPosition()));
+            }
+
             if (sort == null) {
                 throw new ConvertException(format(
                     "Requested to find the default value of an unknown sort '%s'. " + "Line/Col:%s",
                     sortName, e.getStartPosition()));
             }
-
-            var doc = sort.getDocumentation();
-
-            if (doc == null) {
-                throw new ConvertException(
-                    format("Requested to find the default value for the sort '%s', "
-                        + "which does not have a documentary comment. The sort is defined at %s. "
-                        + "Line/Col: %s", sortName, sort.getOrigin(), e.getStartPosition()));
-            }
-
-            int pos = doc.indexOf(DEFVALUE);
-            if (pos >= 0) {
-                int start = doc.indexOf('(', pos) + 1;
-                int closing = doc.indexOf(')', pos);
-
-                if (closing < 0) {
-                    throw new ConvertException(format(
-                        "Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
-                        sortName, sort.getOrigin()));
-                }
-
-                // set this as the function name, as the user had written \dl_XXX
-                name = doc.substring(start, closing);
+            SortDependingFunction firstInstance = SortDependingFunction.getFirstInstance(
+                new Name(fName), services);
+            if (firstInstance != null) {
+                return firstInstance.getInstanceFor(sort, services);
             } else {
-                throw new ConvertException(format(
-                    "Could not infer the default value for the given sort '%s'. "
-                        + "The sort found was as '%s' and the sort's documentation is '%s'. "
-                        + "Did you forget @defaultValue(XXX) in the documentation?Line/Col: %s",
-                    sortName, sort, doc, e.getStartPosition()));
+                return null;
             }
+        } else {
+            return null;
         }
+    }
 
+    /**
+     * Resolve the function symbol which is embedded here to its logical counterpart.
+     */
+    public DLEmbeddedExpression convert(EscapeExpression e) {
+        ExtList children = collectChildren(e);
+        String name = e.getFunctionName();
 
-        final Function named = namespaceSet.functions().lookup(new Name(name));
+        final Function named = resolveFunction(name, e);
 
         if (named == null) {
             // TODO provide position information?!
