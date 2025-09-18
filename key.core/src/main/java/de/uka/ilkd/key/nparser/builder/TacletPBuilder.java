@@ -263,7 +263,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             for (int i = 0; i < constructor.sortId().size(); i++) {
                 var argName = constructor.argName.get(i).getText();
 
-                var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i);
+                var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i, dtSort);
                 registerTaclet(ctx, tbDeconstructor);
 
                 var tbDeconsEq = createDeconstructorEQTaclet(constructor, argName, i, dtSort);
@@ -275,12 +275,12 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<? extends Taclet> createDeconstructorTaclet(
-            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex) {
+            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex, Sort dtSort) {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder
-                .setName(new Name(String.format("%s_Dec_%s", argName, constructor.name.getText())));
+                .setName(new Name(String.format("DT_%s#Dec_%s#%s", dtSort.name(), argName, constructor.name.getText())));
         tacletBuilder.setDisplayName(
-            String.format("%s_Deconstruct_%s", argName, constructor.name.getText()));
+            String.format("DT %s Deconstructor %s (for %s)", dtSort.name(), argName, constructor.name.getText()));
 
         var schemaVariables = new JOperatorSV[constructor.argName.size()];
         var args = new JTerm[constructor.argName.size()];
@@ -305,6 +305,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             new RewriteTacletGoalTemplate(tb.var(schemaVariables[argIndex])));
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
+        tacletBuilder.addRuleSet(ruleSets().lookup(new Name("simplify")));
 
         return tacletBuilder;
     }
@@ -314,9 +315,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             Sort dtSort) {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(
-            new Name(String.format("%s_DecEQ_%s", argName, constructor.name.getText())));
+            new Name(String.format("DT_%s#Dec_%s#%s#EQ", dtSort.name(), argName, constructor.name.getText())));
         tacletBuilder.setDisplayName(
-            String.format("%s_DeconstructEQ_%s", argName, constructor.name.getText()));
+            String.format("DT %s Deconstructor %s (for %s)", dtSort.name(), argName, constructor.name.getText()));
 
         var schemaVariables = new JOperatorSV[constructor.argName.size()];
         var args = new JTerm[constructor.argName.size()];
@@ -342,10 +343,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.setFind(tb.func(function, tb.var(x)));
         tacletBuilder.setIfSequent(JavaDLSequentKit.createAnteSequent(
             ImmutableSLList
-                    .singleton(new SequentFormula(tb.equals(tb.var(x), tb.func(consFn, args))))));
+                    .singleton(new SequentFormula(tb.equals(tb.func(consFn, args), tb.var(x))))));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
+        tacletBuilder.addRuleSet(ruleSets().lookup(new Name("simplify")));
 
         return tacletBuilder;
     }
@@ -354,7 +356,6 @@ public class TacletPBuilder extends ExpressionBuilder {
     private TacletBuilder<? extends Taclet> createInductionTaclet(
             KeYParser.Datatype_declContext ctx) {
         var tacletBuilder = new NoFindTacletBuilder();
-        tacletBuilder.setName(new Name(String.format("%s_Ind", ctx.name.getText())));
         final var sort = sorts().lookup(ctx.name.getText());
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
@@ -376,7 +377,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         cases.add(useCase);
 
         cases.forEach(tacletBuilder::addTacletGoalTemplate);
-        tacletBuilder.setDisplayName("Induction_for_" + sort.name());
+        tacletBuilder.setName(new Name(String.format("DT_%s_Induction", sort.name())));
+        tacletBuilder.setDisplayName(String.format("DT %s Induction", sort.name()));
         return tacletBuilder;
     }
 
@@ -395,7 +397,6 @@ public class TacletPBuilder extends ExpressionBuilder {
     private TacletBuilder<NoFindTaclet> createAxiomTaclet(
             KeYParser.Datatype_declContext ctx) {
         var tacletBuilder = new NoFindTacletBuilder();
-        tacletBuilder.setName(new Name(String.format("%s_Axiom", ctx.name.getText())));
         final var sort = sorts().lookup(ctx.name.getText());
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
@@ -417,7 +418,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             ImmutableSLList.nil());
         tacletBuilder.addTacletGoalTemplate(goal);
 
-        tacletBuilder.setDisplayName("Axiom_for_" + sort.name());
+        tacletBuilder.setName(new Name(String.format("DT_%s_Axiom", sort.name())));
+        tacletBuilder.setDisplayName(String.format("DT %s Axiom", sort.name()));
         return tacletBuilder;
     }
 
@@ -452,7 +454,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (ind.isEmpty()) {
-            return tb.all(qvs, tb.func(fn, args));
+            return tb.all(qvs, tb.subst(qvX, tb.func(fn, args), phi));
         } else {
             var base = tb.and(ind);
             return tb.all(qvs, tb.imp(base, tb.subst(qvX, tb.func(fn, args), phi)));
@@ -482,8 +484,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         final var sort = sorts().lookup(ctx.name.getText());
 
-        b.setName(new Name(sort.name() + "_ctor_split"));
-        b.setDisplayName("case distinction of " + sort.name());
+        b.setName(new Name("DT_" + sort.name() + "_ctor_split"));
+        b.setDisplayName(String.format("DT %s case distinction ", sort.name()));
 
         var phi = declareSchemaVariable(ctx, "var", sort,
             false, false, false,

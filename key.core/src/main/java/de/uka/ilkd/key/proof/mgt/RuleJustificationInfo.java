@@ -29,7 +29,7 @@ public class RuleJustificationInfo {
             for (RuleKey key : rule2Justification.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {
                     throw new IllegalArgumentException(
-                        "A rule named " + r.name() + "has already been registered.");
+                        "A rule named " + r.name() + " has already been registered.");
                 }
             }
         } else {
