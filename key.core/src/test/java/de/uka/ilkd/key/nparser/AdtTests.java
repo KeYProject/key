@@ -20,17 +20,17 @@ import org.junit.jupiter.api.Test;
  */
 public class AdtTests {
     private static final String EXPECTED_PRED_DEC_SUCC = """
-            pred_Dec_succ {
+            DT_Nat#Dec_pred#succ {
             \\find(pred(succ(pred_sv)))
             \\sameUpdateLevel\\replacewith(pred_sv)\s
-
+            \\heuristics(simplify)
             Choices: true}""";
     private static final String EXPECTED_PRED_DECEQ_SUCC = """
-            pred_DecEQ_succ {
-            \\assumes ([equals(pred_x,succ(pred_sv))]==>[])\s
+            DT_Nat#Dec_pred#succ#EQ {
+            \\assumes ([equals(succ(pred_sv),pred_x)]==>[])\s
             \\find(pred(pred_x))
             \\sameUpdateLevel\\replacewith(pred_sv)\s
-
+            \\heuristics(simplify)
             Choices: true}""";
 
     @Test
@@ -44,8 +44,8 @@ public class AdtTests {
                 System.out.println(taclet.name());
         }
 
-        var predDecsucc = get("pred_Dec_succ", taclets);
-        var predDecEqSucc = get("pred_DecEQ_succ", taclets);
+        var predDecsucc = get("DT_Nat#Dec_pred#succ", taclets);
+        var predDecEqSucc = get("DT_Nat#Dec_pred#succ#EQ", taclets);
 
         Assertions.assertEquals(EXPECTED_PRED_DEC_SUCC, predDecsucc.toString());
         Assertions.assertEquals(EXPECTED_PRED_DECEQ_SUCC, predDecEqSucc.toString());
