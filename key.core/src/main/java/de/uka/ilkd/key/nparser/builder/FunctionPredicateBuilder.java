@@ -68,17 +68,18 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 args[i] = argSort;
                 var argName = argNames.get(i).getText();
                 SortedOperator alreadyDefinedFn = dtNamespace.lookup(argName);
-                if(alreadyDefinedFn == null) {
+                if (alreadyDefinedFn == null) {
                     alreadyDefinedFn = namespaces().functions().lookup(argName);
                 }
-                if(alreadyDefinedFn == null) {
+                if (alreadyDefinedFn == null) {
                     alreadyDefinedFn = namespaces().programVariables().lookup(argName);
                 }
                 if (alreadyDefinedFn != null
                         && (!alreadyDefinedFn.sort().equals(argSort)
                                 || !alreadyDefinedFn.argSorts().equals(ImmutableList.of(sort)))) {
-                    semanticError( argNames.get(i), "Name already in namespace: %s" +
-                            ". Identifiers in datatype definitions must be unique (also wrt. global functions).", argName);
+                    semanticError(argNames.get(i), "Name already in namespace: %s" +
+                        ". Identifiers in datatype definitions must be unique (also wrt. global functions).",
+                        argName);
                 }
                 Function fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
                     false, false);

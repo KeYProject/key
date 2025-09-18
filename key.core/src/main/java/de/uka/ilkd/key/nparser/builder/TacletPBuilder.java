@@ -275,12 +275,15 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<? extends Taclet> createDeconstructorTaclet(
-            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex, Sort dtSort) {
+            KeYParser.Datatype_constructorContext constructor, String argName, int argIndex,
+            Sort dtSort) {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder
-                .setName(new Name(String.format("DT_%s#Dec_%s#%s", dtSort.name(), argName, constructor.name.getText())));
+                .setName(new Name(String.format("DT_%s#Dec_%s#%s", dtSort.name(), argName,
+                    constructor.name.getText())));
         tacletBuilder.setDisplayName(
-            String.format("DT %s Deconstructor %s (for %s)", dtSort.name(), argName, constructor.name.getText()));
+            String.format("DT %s Deconstructor %s (for %s)", dtSort.name(), argName,
+                constructor.name.getText()));
 
         var schemaVariables = new JOperatorSV[constructor.argName.size()];
         var args = new JTerm[constructor.argName.size()];
@@ -315,9 +318,11 @@ public class TacletPBuilder extends ExpressionBuilder {
             Sort dtSort) {
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(
-            new Name(String.format("DT_%s#Dec_%s#%s#EQ", dtSort.name(), argName, constructor.name.getText())));
+            new Name(String.format("DT_%s#Dec_%s#%s#EQ", dtSort.name(), argName,
+                constructor.name.getText())));
         tacletBuilder.setDisplayName(
-            String.format("DT %s Deconstructor %s (for %s)", dtSort.name(), argName, constructor.name.getText()));
+            String.format("DT %s Deconstructor %s (for %s)", dtSort.name(), argName,
+                constructor.name.getText()));
 
         var schemaVariables = new JOperatorSV[constructor.argName.size()];
         var args = new JTerm[constructor.argName.size()];
