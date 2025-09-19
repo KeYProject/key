@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 
@@ -20,17 +22,17 @@ import org.junit.jupiter.api.Test;
  */
 public class AdtTests {
     private static final String EXPECTED_PRED_DEC_SUCC = """
-            pred_Dec_succ {
+            DT_Nat#Dec_pred#succ {
             \\find(pred(succ(pred_sv)))
             \\sameUpdateLevel\\replacewith(pred_sv)\s
-
+            \\heuristics(simplify)
             Choices: true}""";
     private static final String EXPECTED_PRED_DECEQ_SUCC = """
-            pred_DecEQ_succ {
-            \\assumes ([equals(pred_x,succ(pred_sv))]==>[])\s
+            DT_Nat#Dec_pred#succ#EQ {
+            \\assumes ([equals(succ(pred_sv),pred_x)]==>[])\s
             \\find(pred(pred_x))
             \\sameUpdateLevel\\replacewith(pred_sv)\s
-
+            \\heuristics(simplify)
             Choices: true}""";
 
     @Test
@@ -44,13 +46,34 @@ public class AdtTests {
                 System.out.println(taclet.name());
         }
 
-        var predDecsucc = get("pred_Dec_succ", taclets);
-        var predDecEqSucc = get("pred_DecEQ_succ", taclets);
+        var predDecsucc = get("DT_Nat#Dec_pred#succ", taclets);
+        var predDecEqSucc = get("DT_Nat#Dec_pred#succ#EQ", taclets);
 
         Assertions.assertEquals(EXPECTED_PRED_DEC_SUCC, predDecsucc.toString());
         Assertions.assertEquals(EXPECTED_PRED_DECEQ_SUCC, predDecEqSucc.toString());
 
     }
+
+    /*
+     * Test for a non-recursive constructor. The generated taclet must not contain an induction
+     * hypothesis.
+     * See #3661
+     */
+    @Test
+    public void nonRecursiveConstructorTest() throws ProblemLoaderException, IOException {
+        var path = Paths.get("../key.ui/examples/standard_key/adt/dt_nonrec.key");
+        var env = KeYEnvironment.load(path);
+        var taclets = env.getInitConfig().activatedTaclets();
+        String expected = Files.lines(path)
+                .filter(l -> l.startsWith("//!"))
+                .map(l -> l.substring(4))
+                .collect(java.util.stream.Collectors.joining("\n"));
+
+        var consTaclet = get("DT_NonRec#Dec_nonrecarg#b", taclets);
+        // There are spaces before linebreaks. Better remove them for the comparison.
+        Assertions.assertEquals(expected, consTaclet.toString().replaceAll(" +\n", "\n"));
+    }
+
 
     private Taclet get(String name, Collection<Taclet> taclets) {
         var n = new Name(name);
