@@ -77,6 +77,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 if (alreadyDefinedFn != null
                         && (!alreadyDefinedFn.sort().equals(argSort)
                                 || !alreadyDefinedFn.argSorts().equals(ImmutableList.of(sort)))) {
+                    // The condition checks whether there is already a function with the same name
+                    // but different signature. This is necessarily true if there is a globally defined function
+                    // of the same name and may or may not be true if there is another constructor argument of the
+                    // same name.
                     semanticError(argNames.get(i), "Name already in namespace: %s" +
                         ". Identifiers in datatype definitions must be unique (also wrt. global functions).",
                         argName);
