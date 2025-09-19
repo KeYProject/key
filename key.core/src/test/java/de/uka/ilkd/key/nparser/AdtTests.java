@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 
@@ -51,6 +53,27 @@ public class AdtTests {
         Assertions.assertEquals(EXPECTED_PRED_DECEQ_SUCC, predDecEqSucc.toString());
 
     }
+
+    /*
+     * Test for a non-recursive constructor. The generated taclet must not contain an induction
+     * hypothesis.
+     * See #3661
+     */
+    @Test
+    public void nonRecursiveConstructorTest() throws ProblemLoaderException, IOException {
+        var path = Paths.get("../key.ui/examples/standard_key/adt/dt_nonrec.key");
+        var env = KeYEnvironment.load(path);
+        var taclets = env.getInitConfig().activatedTaclets();
+        String expected = Files.lines(path)
+                .filter(l -> l.startsWith("//!"))
+                .map(l -> l.substring(4))
+                .collect(java.util.stream.Collectors.joining("\n"));
+
+        var consTaclet = get("DT_NonRec#Dec_nonrecarg#b", taclets);
+        // There are spaces before linebreaks. Better remove them for the comparison.
+        Assertions.assertEquals(expected, consTaclet.toString().replaceAll(" +\n", "\n"));
+    }
+
 
     private Taclet get(String name, Collection<Taclet> taclets) {
         var n = new Name(name);
