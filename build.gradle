@@ -73,7 +73,8 @@ subprojects {
     repositories {
         mavenCentral()
         maven {
-            url = 'https://git.key-project.org/api/v4/projects/35/packages/maven'
+            url = "https://git.key-project.org/api/v4/projects/35/packages/maven"
+            allowInsecureProtocol=true
         }
     }
 
@@ -252,8 +253,10 @@ subprojects {
 
         doLast {
             CheckstyleMarkdownReport.report(
-                    layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile,
-                    layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile)
+                    layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile.toPath(),
+                    layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile.toPath(),
+                    projectDir.toPath()
+            )
         }
     }
 
