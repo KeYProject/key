@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -23,31 +26,66 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProofInfo {
+public record ProofInfo(Proof proof, Services services) {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
 
-    private final Proof proof;
-
-    private final Services services;
-
     public ProofInfo(Proof proof) {
-        this.proof = proof;
-        this.services = proof.getServices();
+        this(proof, proof.getServices());
     }
 
+
+    @Nullable
     public IProgramMethod getMUT() {
         SpecificationRepository spec = services.getSpecificationRepository();
         IObserverFunction f = spec.getTargetOfProof(proof);
-        if (f instanceof IProgramMethod) {
-            return (IProgramMethod) f;
+        if (f instanceof IProgramMethod pm) {
+            return pm;
         } else {
             return null;
         }
     }
 
+    @Nullable
+    public String getMUTCall() {
+        var m = getMUT();
+        if (m == null)
+            return null;
+
+        var name = m.getFullName();
+        if (name == null)
+            return null;
+
+        StringBuilder params = new StringBuilder();
+        for (ParameterDeclaration p : m.getParameters()) {
+            for (VariableSpecification v : p.getVariables()) {
+                IProgramVariable pvar = v.getProgramVariable();
+                params.append(",").append(pvar.name());
+            }
+        }
+        if (!params.isEmpty()) {
+            params = new StringBuilder(params.substring(1));
+        }
+
+        String caller;
+        if (m.isStatic()) {
+            caller = getTypeOfClassUnderTest().getName();
+        } else {
+            caller = "self";
+        }
+
+        if (m.getReturnType().equals(KeYJavaType.VOID_TYPE)) {
+            return caller + "." + name + "(" + params + ");";
+        } else {
+            String returnType = m.getReturnType().getFullName();
+            return returnType + " result = " + caller + "." + name + "(" + params + ");";
+        }
+    }
+
+    @Nullable
     public KeYJavaType getTypeOfClassUnderTest() {
         if (getMUT() == null) {
             return null;
@@ -55,13 +93,15 @@ public class ProofInfo {
         return getMUT().getContainerType();
     }
 
+    @Nullable
     public KeYJavaType getReturnType() {
-        return getMUT().getType();
+        var mut = getMUT();
+        return mut != null ? mut.getType() : null;
     }
 
     public Contract getContract() {
         ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
-        return po.getContract();
+        return Objects.requireNonNull(po).getContract();
     }
 
     public JTerm getPostCondition() {
@@ -80,9 +120,8 @@ public class ProofInfo {
         Contract c = getContract();
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
-            JTerm post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
+            return t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
                 orig.params, orig.atPres, services);
-            return post;
         }
         // no pre <==> false
         return services.getTermBuilder().ff();

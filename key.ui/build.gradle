@@ -1,6 +1,7 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
+
 plugins {
     id 'application'
 
@@ -23,6 +24,8 @@ dependencies {
     implementation project(":key.removegenerics")
 
     api 'com.miglayout:miglayout-swing:11.4.2'
+
+    implementation("info.picocli:picocli:4.7.6")
 
     //logging implementation used by the slf4j
     implementation 'ch.qos.logback:logback-classic:1.5.18'
