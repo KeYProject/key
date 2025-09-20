@@ -1,5 +1,3 @@
-
-
 plugins {
     //Support for IntelliJ IDEA
     //https://docs.gradle.org/current/userguide/idea_plugin.html
@@ -253,7 +251,7 @@ subprojects {
         }
 
         doLast {
-            checkstyleMarkdownReport(
+            CheckstyleMarkdownReport.report(
                     layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile,
                     layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile)
         }
@@ -523,32 +521,15 @@ tasks.register('sarifCopy', SarifJoiner) {
     outputFile.set(layout.buildDirectory.file("sarif-results/checkstyle.sarif"))
 }
 
-def checkstyleMarkdownReport(File xmlFile, File targetFile) {
-    if(!xmlFile.exists()) return
-    def root = new groovy.xml.XmlSlurper().parseText(xmlFile.text)
-    def out = new PrintWriter(targetFile)
+tasks.register("junitAsAnnotations") {
+    def source = files(fileTree(dir: '.').matching {
+        include "*/build/test-results/test/TEST-*xml" }
+    )
+    inputs.files(source)
 
-
-    def sha= System.getenv("GITHUB_SHA") ?: "main"
-    def host = System.getenv("GITHUB_SERVER_URL") ?: "https://github.com"
-    def repo = System.getenv("GITHUB_REPOSITORY") ?: "keyproject/key"
-    def baseUrl = "$host/$repo/blob/$sha"
-    try {
-        //out.write("### Checkstyle Report\n\n")
-        out.write("\n\n")
-
-        for(xmlFileNode in root.file) {
-            def f = file(xmlFileNode.@name.toString())
-            def path = projectDir.relativePath(f)
-            out.write("#### $path\n\n")
-            def url="$baseUrl/$path"
-            for(error in xmlFileNode.error) {
-                out.write("\n* ${error.@severity} [${error.@message} @${error.@line}:${error.@column}]($url#L${error.@line})")
-            }
-            out.write("\n\n")
+    doLast {
+        source.asList().forEach {
+            JUnitGithubAnnotations.readAndPrint(it.toPath())
         }
-    }
-    finally {
-        out.close()
     }
 }
