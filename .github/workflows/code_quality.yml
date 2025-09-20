@@ -56,11 +56,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew --parallel --continue checkstyleMain
 
-      - name: Copy Sarif
+      - name: Merge sarif files into single file.
         run: ./gradlew --parallel --continue sarifCopy
 
       - run: "ls build/sarif-results/*"
-
 
       - name: "Job summary"
         run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
