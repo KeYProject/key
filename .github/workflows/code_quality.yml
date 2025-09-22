@@ -57,12 +57,14 @@ jobs:
         run: ./gradlew --parallel --continue checkstyleMain
 
       - name: Merge sarif files into single file.
-        run: ./gradlew --parallel --continue sarifCopy
-
-      - run: "ls build/sarif-results/*"
+        run: |
+          ./gradlew --parallel --continue sarifCopy
+          ls build/sarif-results/*
+        if: (success() || failure())
 
       - name: "Job summary"
         run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
+        if: (success() || failure())
 
       - name: Upload checkstyle report
         uses: actions/upload-artifact@v4
