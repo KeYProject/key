@@ -1662,11 +1662,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression e2 = accept(ctx.expression(1));
         SLExpression e3 = accept(ctx.expression(2));
         // short for "e1[0..e2-1]+e3+e1[e2+1..e1.length-1]"
-        final JTerm minusOne = tb.zTerm("-1");
         assert e2 != null;
         assert e1 != null;
-        JTerm updated = tb.seqUpd(e1.getTerm(), e2.getTerm(), e3.getTerm());
-        return new SLExpression(updated);
+        return termFactory.seqUpd(e1.getTerm(), e2.getTerm(), e3.getTerm());
     }
 
     @Override
