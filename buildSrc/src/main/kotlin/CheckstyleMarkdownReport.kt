@@ -27,10 +27,10 @@ object CheckstyleMarkdownReport {
             for (i in 0 until files.length) {
                 val fileNode = files.item(i) as Element
                 val filePath = Paths.get(fileNode.getAttribute("name"))
-                val relativePath = projectDir.relativize(filePath).toString()
-                val url = "$baseUrl/$relativePath"
+                //val relativePath = projectDir.relativize(filePath).toString()
+                val url = "$baseUrl/$filePath".replace("\\", "/")
 
-                out.write("#### $relativePath\n\n")
+                out.write("#### $filePath\n\n")
 
                 val errors = fileNode.getElementsByTagName("error")
                 for (j in 0 until errors.length) {
@@ -39,7 +39,7 @@ object CheckstyleMarkdownReport {
                     val message = error.getAttribute("message")
                     val line = error.getAttribute("line")
                     val column = error.getAttribute("column")
-                    out.write("\n* $severity [$message @$line:$column]")
+                    out.write("\n* $severity `$message` [@$line:$column]($url#L$line)")
                 }
 
                 out.write("\n\n")
