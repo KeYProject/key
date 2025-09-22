@@ -252,11 +252,9 @@ subprojects {
         }
 
         doLast {
-            CheckstyleMarkdownReport.report(
-                    layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile.toPath(),
-                    layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile.toPath(),
-                    projectDir.toPath()
-            )
+            def inputXml = layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile.toPath()
+            def outputMd = layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile.toPath()
+            CheckstyleMarkdownReport.report(inputXml, outputMd, projectDir.toPath())
         }
     }
 
