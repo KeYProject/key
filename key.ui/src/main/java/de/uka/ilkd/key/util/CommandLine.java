@@ -10,6 +10,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.core.Main;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A small framework to handle command lines.
  *
@@ -77,7 +79,7 @@ public final class CommandLine {
         private String description;
         private String image;
         private String value;
-        private String parameter;
+        private @Nullable String parameter;
 
         @Override
         protected void print(PrintStream stream, int descriptionCol) {
@@ -257,7 +259,7 @@ public final class CommandLine {
      *        this option (e.g. {@code <file>, time, path}, ...
      * @param description the description of the option
      */
-    public void addOption(String image, String parameter, String description) {
+    public void addOption(String image, @Nullable String parameter, String description) {
 
         if (!image.startsWith(MINUS)) {
             throw new IllegalArgumentException(

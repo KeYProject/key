@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.proofmanagement.check.CheckerData.ProofEntry;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyGraphBuilder;
 import org.key_project.proofmanagement.io.LogLevel;
@@ -100,8 +101,8 @@ public final class KeYFacade {
         }
     }
 
-    private static CheckerData.ProofEntry ensureProofEntryExists(Path proofPath, CheckerData data) {
-        CheckerData.ProofEntry line = findProofLine(proofPath, data);
+    private static ProofEntry ensureProofEntryExists(Path proofPath, CheckerData data) {
+        ProofEntry line = findProofLine(proofPath, data);
         if (line == null) {
             line = data.new ProofEntry();
             data.getProofEntries().add(line);

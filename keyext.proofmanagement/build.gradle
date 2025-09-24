@@ -9,7 +9,7 @@ dependencies {
     implementation project(':key.core')
     implementation project(':key.ui')
 
-    implementation group: 'org.antlr', name: 'ST4', version: '4.3.4'
+    implementation("org.freemarker:freemarker:2.3.34")
 }
 
 application {
@@ -17,6 +17,26 @@ application {
     // for start script generated with createStartScripts
     applicationName = "pm"
 }
+
+
+def testIntegrationReport = tasks.register('testIntegrationReport', JavaExec) {
+    group = "verification"
+    mainClass.set(application.mainClass)
+    classpath = sourceSets.main.runtimeClasspath
+
+    args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency',
+            'proofBundle/simpleBundleGeneration')
+}
+
+def testIntegrationReport2 = tasks.register('testIntegrationReport2', JavaExec) {
+    group = "verification"
+    mainClass.set(application.mainClass)
+    classpath = sourceSets.main.runtimeClasspath
+
+    args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency',
+            'src/test/pmexample2')
+}
+test.dependsOn(testIntegrationReport, testIntegrationReport2)
 
 run {
     // for debugging, something like this can be used:
@@ -31,4 +51,22 @@ run {
 shadowJar {
     archiveClassifier = "exe"
     archiveBaseName = "keyext.proofmanagement"
+}
+
+
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.proofmanagement",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$projectDir/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
+                "-AstubNoWarnIfNotFound",
+                //"-Werror",
+                "-Aversion",
+        ]
+    }
 }
