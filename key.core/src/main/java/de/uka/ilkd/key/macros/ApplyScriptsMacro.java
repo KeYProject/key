@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,11 +18,14 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
+import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
@@ -29,6 +33,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -52,35 +57,35 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {
-        return "null";
+        return "Apply scripts macro";
     }
 
     @Override
     public String getCategory() {
-        return "null";
+        return null;
     }
 
     @Override
     public String getDescription() {
-        return "null";
+        return "Apply scripts";
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<@NonNull Goal> goals,
             PosInOccurrence posInOcc) {
         return fallBackMacro.canApplyTo(proof, goals, posInOcc)
-                || goals.exists(g -> getScript(g) != null);
+                || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
 
-    private static JmlAssert getScript(Goal goal) {
-        RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
+    private static JmlAssert getJmlAssert(Node node) {
+        RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof JmlAssertBuiltInRuleApp) {
             JTerm target = (JTerm) ruleApp.posInOccurrence().subTerm();
             if (target.op() instanceof UpdateApplication) {
                 target = UpdateApplication.getTarget(target);
             }
             final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
-            if (activeStatement instanceof JmlAssert jmlAssert) {
+            if (activeStatement instanceof JmlAssert jmlAssert && jmlAssert.getAssertionProof() != null) {
                 return jmlAssert;
             }
         }
@@ -99,17 +104,21 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
+        ArrayList<Goal> laterGoals = new ArrayList<>(goals.size());
         for (Goal goal : goals) {
             if (Thread.interrupted()) {
                 throw new InterruptedException();
             }
-            JmlAssert jmlAssert = getScript(goal);
-            if (jmlAssert == null || jmlAssert.getAssertionProof() == null) {
-                // no script found, use fallback macro
-                fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
+
+            JmlAssert jmlAssert = getJmlAssert(goal.node());
+            if (jmlAssert == null) {
+                laterGoals.add(goal);
                 continue;
             }
+
+            listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running attached script from goal " + goal.node().serialNr(), 0));
+
             KeyAst.JMLProofScript proofScript = jmlAssert.getAssertionProof();
             Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, proof.getServices());
             JTerm update = getUpdate(goal);
@@ -121,6 +130,13 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             LOGGER.debug("---- End Script");
 
             pse.execute((AbstractUserInterfaceControl) uic, proof);
+        }
+        listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running fallback macro on the remaining goals", 0));
+        for (Goal goal : laterGoals) {
+            if (Thread.interrupted()) {
+                throw new InterruptedException();
+            }
+            fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
         }
         return new ProofMacroFinishedInfo(this, proof);
     }

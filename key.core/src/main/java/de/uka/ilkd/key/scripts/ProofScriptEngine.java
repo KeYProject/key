@@ -145,7 +145,7 @@ public class ProofScriptEngine {
             try {
                 ProofScriptCommand command = COMMANDS.get(name);
                 if (command == null) {
-                    throw new ScriptException("Unknown command " + name + " at " + ast.location());
+                    throw new ScriptException("Unknown command " + name, ast.location());
                 }
 
                 if (stateMap.isEchoOn()) {
