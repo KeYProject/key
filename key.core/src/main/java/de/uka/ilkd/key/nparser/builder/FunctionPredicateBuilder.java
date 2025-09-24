@@ -7,13 +7,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.Name;
@@ -23,6 +22,8 @@ import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -58,8 +59,25 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
-        var sort = sorts().lookup(ctx.name.getText());
-        var dtNamespace = new Namespace<Function>();
+        Sort sort;
+        var dtFnNamespace = new Namespace<@NonNull Function>();
+        var dtPfnNamespace = new Namespace<@NonNull ParametricFunctionDecl>();
+        ImmutableList<GenericParameter> genericParams;
+        if (sorts().lookup(ctx.name.getText()) == null) {
+            // Is polymorphic
+            var psd = namespaces().parametricSorts().lookup(ctx.name.getText());
+            assert psd != null;
+            genericParams = psd.getParameters();
+            ImmutableList<GenericArgument> args = ImmutableList.of();
+            for (int i = psd.getParameters().size() - 1; i >= 0; i--) {
+                var param = psd.getParameters().get(i);
+                args = args.prepend(new GenericArgument(param.sort()));
+            }
+            sort = ParametricSortInstance.get(psd, args);
+        } else {
+            sort = sorts().lookup(ctx.name.getText());
+            genericParams = null;
+        }
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());
@@ -69,12 +87,19 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 Sort argSort = accept(constructorContext.sortId(i));
                 args[i] = argSort;
                 var argName = argNames.get(i).getText();
-                SortedOperator alreadyDefinedFn = dtNamespace.lookup(argName);
+                SortedOperator alreadyDefinedFn = dtFnNamespace.lookup(argName);
                 if (alreadyDefinedFn == null) {
                     alreadyDefinedFn = namespaces().functions().lookup(argName);
                 }
                 if (alreadyDefinedFn == null) {
                     alreadyDefinedFn = namespaces().programVariables().lookup(argName);
+                }
+                if (alreadyDefinedFn == null) {
+                    var alreadyDefinedPfn = dtPfnNamespace.lookup(argName);
+                    if (alreadyDefinedPfn != null) {
+                        alreadyDefinedFn = ParametricFunctionInstance.get(alreadyDefinedPfn,
+                            ImmutableList.of(new GenericArgument(sort)));
+                    }
                 }
                 if (alreadyDefinedFn != null
                         && (!alreadyDefinedFn.sort().equals(argSort)
@@ -89,14 +114,31 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                         ". Identifiers in datatype definitions must be unique (also wrt. global functions).",
                         argName);
                 }
-                Function fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
-                    false, false);
-                dtNamespace.add(fn);
+                if (genericParams == null) {
+                    Function fn =
+                        new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
+                            false, false);
+                    dtFnNamespace.add(fn);
+                } else {
+                    var fn = new ParametricFunctionDecl(new Name(argName), genericParams,
+                        new ImmutableArray<>(sort), argSort, null, false, true, false);
+                    dtPfnNamespace.add(fn);
+                }
             }
-            Function function = new JFunction(name, sort, args, null, true, false);
-            namespaces().functions().addSafely(function);
+            if (genericParams == null) {
+                var fn = new JFunction(name, sort, args, null, true, false);
+                functions().addSafely(fn);
+            } else {
+                var fn = new ParametricFunctionDecl(name, genericParams, new ImmutableArray<>(args),
+                    sort, null, true, true, false);
+                namespaces().parametricFunctions().add(fn);
+            }
         }
-        namespaces().functions().addSafely(dtNamespace.allElements());
+        if (genericParams != null) {
+            namespaces().parametricFunctions().addSafely(dtPfnNamespace.allElements());
+        } else {
+            namespaces().functions().addSafely(dtFnNamespace.allElements());
+        }
         return null;
     }
 
