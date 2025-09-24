@@ -83,7 +83,8 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * Undo the provided user action after undoing every action performed after that one.
      *
-     * @param userAction the action
+     * @param userAction
+     *        the action
      */
     private void undoUptoAction(UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());

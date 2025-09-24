@@ -19,7 +19,8 @@ public class TermReplacementMap extends ReplacementMap<JTerm> {
     /**
      * constructs a replacement map with the given term factory
      *
-     * @param tf a term factory
+     * @param tf
+     *        a term factory
      */
     public TermReplacementMap(TermFactory tf) {
         super(tf);
@@ -28,8 +29,10 @@ public class TermReplacementMap extends ReplacementMap<JTerm> {
     /**
      * adds a replacement of heap with newHeap
      *
-     * @param newHeap the heap that should be used
-     * @param services services
+     * @param newHeap
+     *        the heap that should be used
+     * @param services
+     *        services
      */
     public void replaceHeap(final JTerm newHeap, final Services services) {
         if (newHeap == null) {

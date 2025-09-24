@@ -10,8 +10,7 @@ public class SMTTranslationException extends Exception {
      */
     private static final long serialVersionUID = -2230789489767950432L;
 
-    public SMTTranslationException() {
-    }
+    public SMTTranslationException() {}
 
     public SMTTranslationException(String message) {
         super(message);

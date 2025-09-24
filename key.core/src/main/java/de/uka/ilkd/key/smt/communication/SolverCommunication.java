@@ -46,8 +46,10 @@ public class SolverCommunication {
     /**
      * Represents a single message sent from or to the solver.
      *
-     * @param content the text of the message
-     * @param type the type of the message (INPUT/OUTPUT/ERROR)
+     * @param content
+     *        the text of the message
+     * @param type
+     *        the type of the message (INPUT/OUTPUT/ERROR)
      */
     public record Message(String content, MessageType type) {
     }
@@ -67,7 +69,8 @@ public class SolverCommunication {
      * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
      * containing all the sent messages of the given type.
      *
-     * @param type the type to filter the messages for
+     * @param type
+     *        the type to filter the messages for
      * @return a new Iterable containing all messages of the given type
      */
     public Iterable<Message> getMessages(MessageType type) {
@@ -94,8 +97,10 @@ public class SolverCommunication {
     /**
      * Adds a message to the communication log.
      *
-     * @param message the text of the message to add
-     * @param type the type of the message to add
+     * @param message
+     *        the text of the message to add
+     * @param type
+     *        the type of the message to add
      */
     void addMessage(String message, MessageType type) {
         messages.add(new Message(message, type));

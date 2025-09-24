@@ -28,9 +28,12 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     /**
      * Creates a new SquigglyUnderlinePainter.
      *
-     * @param highlightColor the color of the line
-     * @param squiggleSize the size (width) of a single arc of the painter
-     * @param lineWidth the line width of the squiggle (1 works best)
+     * @param highlightColor
+     *        the color of the line
+     * @param squiggleSize
+     *        the size (width) of a single arc of the painter
+     * @param lineWidth
+     *        the line width of the squiggle (1 works best)
      */
     public SquigglyUnderlinePainter(Color highlightColor, int squiggleSize, float lineWidth) {
         this.highlightColor = highlightColor;

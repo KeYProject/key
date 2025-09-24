@@ -104,7 +104,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * For the given JTree. Assumes only the root is expanded, if at all (for example, a freshly
      * created JTree, or one for which the model has just been set)
      *
-     * @param t the JTree of the ProofTreeView
+     * @param t
+     *        the JTree of the ProofTreeView
      */
     public ProofTreeExpansionState(@NonNull JTree t) {
         tree = t;
@@ -126,8 +127,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * Creates a new ProofExpansionState for the given JTree, where the given paths are expanded
      * initially.
      *
-     * @param tree the JTree this ProofExpansionState refers to
-     * @param state the collection of paths to expand initially
+     * @param tree
+     *        the JTree this ProofExpansionState refers to
+     * @param state
+     *        the collection of paths to expand initially
      */
     public ProofTreeExpansionState(@NonNull JTree tree, @NonNull Collection<TreePath> state) {
         this(tree);
@@ -239,7 +242,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * and the tree has an invisible root, since otherwise the tree will appear empty, and there is
      * no easy way for the user to change that.
      *
-     * @param tree the JTree to collapse
+     * @param tree
+     *        the JTree to collapse
      */
     public static void collapseAll(JTree tree) {
         TreeModel data = tree.getModel();
@@ -269,8 +273,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * Collapses all nodes that are below the given path. Requires that the given path is not a
      * leaf. That implies that the tree's model is not null and does have a root.
      *
-     * @param tree the JTree to collapse
-     * @param path the path which will be collapsed afterwards (including all children recursively)
+     * @param tree
+     *        the JTree to collapse
+     * @param path
+     *        the path which will be collapsed afterwards (including all children recursively)
      */
     public static void collapseAllBelow(JTree tree, TreePath path) {
         Object node = path.getLastPathComponent();
@@ -297,8 +303,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      *
      * Expands the given JTree completely except for the filtered out nodes.
      *
-     * @param tree the JTree to expand
-     * @param filter only the nodes that pass this filter will be expanded
+     * @param tree
+     *        the JTree to expand
+     * @param filter
+     *        only the nodes that pass this filter will be expanded
      */
     public static void expandAll(JTree tree, Predicate<TreePath> filter) {
         TreeModel data = tree.getModel();
@@ -321,9 +329,12 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * given filter. Requires that path is not a leaf. That implies the tree has a model, and that
      * has a root.
      *
-     * @param tree the JTree to expand
-     * @param path the root path under which everything should be expanded afterwards
-     * @param filter only the nodes that pass this filter will be expanded
+     * @param tree
+     *        the JTree to expand
+     * @param path
+     *        the root path under which everything should be expanded afterwards
+     * @param filter
+     *        only the nodes that pass this filter will be expanded
      */
     public static void expandAllBelow(JTree tree, TreePath path, Predicate<TreePath> filter) {
         // we temporarily remove all expansion listeners (except that which updates the expanded
@@ -406,7 +417,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * calling getState() on it. To return the proper result, this method must temporarily expand
      * paths. If any TreeWillExpandListeners veto that, the result is undefined.
      *
-     * @param tree the JTree the expanded paths are read from
+     * @param tree
+     *        the JTree the expanded paths are read from
      * @return the TreePaths that are currently expanded in the given tree, even if any of their
      *         parents are collapsed
      */
@@ -474,8 +486,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * Try to expand exactly the given paths given in paths (assumes them to be valid in the current
      * TreeModel). Will give undefined results if any TreeWillExpandListeners veto.
      *
-     * @param tree the JTree where exactly the paths should be expanded
-     * @param paths the paths to expand. All other paths will be collapsed. Note that collapsed
+     * @param tree
+     *        the JTree where exactly the paths should be expanded
+     * @param paths
+     *        the paths to expand. All other paths will be collapsed. Note that collapsed
      *        parent paths may hide their children, even if those are expanded.
      */
     public static void setPaths(@NonNull JTree tree, @NonNull Collection<TreePath> paths) {
@@ -554,12 +568,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         }
 
         @Override
-        public void treeNodesChanged(TreeModelEvent e) {
-        }
+        public void treeNodesChanged(TreeModelEvent e) {}
 
         @Override
-        public void treeNodesInserted(TreeModelEvent e) {
-        }
+        public void treeNodesInserted(TreeModelEvent e) {}
 
         @Override
         public void treeNodesRemoved(TreeModelEvent e) {

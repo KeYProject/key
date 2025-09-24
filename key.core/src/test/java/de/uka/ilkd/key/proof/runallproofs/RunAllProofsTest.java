@@ -62,9 +62,11 @@ public final class RunAllProofsTest {
      * first constructor parameter is used to determine name of individual test cases, see
      * {@link RunAllProofsTestUnit#toString()} for further information.
      *
-     * @param proofCollection The file name of the index file which parsed to produce test cases
+     * @param proofCollection
+     *        The file name of the index file which parsed to produce test cases
      * @return The parameters. Each row will be one test case.
-     * @throws IOException If an exceptions occurs while reading and parsing the index file
+     * @throws IOException
+     *         If an exceptions occurs while reading and parsing the index file
      */
     public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
         /*

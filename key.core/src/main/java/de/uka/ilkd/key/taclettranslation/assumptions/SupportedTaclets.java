@@ -139,7 +139,8 @@ public final class SupportedTaclets {
     /**
      * Checks whether a taclet specified by its name can be used for external provers.
      *
-     * @param tacletname the name of the taclet
+     * @param tacletname
+     *        the name of the taclet
      * @return <code>true</code> if the taclet can be used for external provers.
      */
     public boolean contains(String tacletname, boolean mustBeSelected) {
@@ -238,8 +239,10 @@ public final class SupportedTaclets {
     /**
      * Adds a taclet to the list of supported taclets.
      *
-     * @param node the TreeNode the taclet belongs to.
-     * @param taclet the name of the taclet.
+     * @param node
+     *        the TreeNode the taclet belongs to.
+     * @param taclet
+     *        the name of the taclet.
      */
     private void addTaclet(TreeItem node, String taclet) {
         addTaclet(node, taclet, 0);
@@ -263,8 +266,10 @@ public final class SupportedTaclets {
      * Adds an inner node to the tree. Inner nodes do not represents taclets but the category
      * taclets belonging to.
      *
-     * @param root the parent of the node.
-     * @param text the description of the node.
+     * @param root
+     *        the parent of the node.
+     * @param text
+     *        the description of the node.
      * @return returns the created node.
      */
     private TreeItem newNode(TreeItem root, String text, Category cat) {

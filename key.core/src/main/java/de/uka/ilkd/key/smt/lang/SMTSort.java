@@ -132,7 +132,8 @@ public class SMTSort {
     }
 
     /**
-     * @param l the bound to set
+     * @param l
+     *        the bound to set
      */
     public void setBound(long l) {
         this.bound = l;
@@ -147,7 +148,8 @@ public class SMTSort {
     }
 
     /**
-     * @param intSize the bitSize to set
+     * @param intSize
+     *        the bitSize to set
      */
     public void setBitSize(long intSize) {
         this.bitSize = intSize;
@@ -162,7 +164,8 @@ public class SMTSort {
     }
 
     /**
-     * @param boundConst the boundConst to set
+     * @param boundConst
+     *        the boundConst to set
      */
     public void setBoundConst(SMTFunction boundConst) {
         this.boundConst = boundConst;
@@ -176,7 +179,8 @@ public class SMTSort {
     }
 
     /**
-     * @param allocatedAtoms the allocatedAtoms to set
+     * @param allocatedAtoms
+     *        the allocatedAtoms to set
      */
     public void setAllocatedAtoms(SMTFunction allocatedAtoms) {
         this.allocatedAtoms = allocatedAtoms;

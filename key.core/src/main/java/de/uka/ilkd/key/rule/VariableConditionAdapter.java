@@ -21,10 +21,13 @@ public abstract class VariableConditionAdapter implements VariableCondition {
     /**
      * checks if the condition for a correct instantiation is fulfilled
      *
-     * @param var the template Variable to be instantiated
-     * @param instMap the MatchCondition with the current matching state and in particular the
+     * @param var
+     *        the template Variable to be instantiated
+     * @param instMap
+     *        the MatchCondition with the current matching state and in particular the
      *        SVInstantiations that are already known to be needed
-     * @param services the program information object
+     * @param services
+     *        the program information object
      * @return true iff condition is fulfilled
      */
     public abstract boolean check(SchemaVariable var, SyntaxElement instCandidate,

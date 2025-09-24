@@ -77,8 +77,10 @@ class GenericTranslator {
      * same name with the prefix [sort]__
      *
      * @param term
-     * @param generic the generic sort that should be instantiated.
-     * @param instantiation the instantiation sort.
+     * @param generic
+     *        the generic sort that should be instantiated.
+     * @param instantiation
+     *        the instantiation sort.
      * @return returns the new term with instantiated variables. If <code>term</code> can not be
      *         instantiated the method returns <code>null</code>, e.g. this can occur, when
      *         <code>term</code> is of type {@link SortDependingFunction} and
@@ -209,9 +211,12 @@ class GenericTranslator {
      * Instantiates generic variables of the term. It instantiates the variables using all
      * possibilities.
      *
-     * @param term the term to be instantiated.
-     * @param genericSorts the generic sorts that should be replaced.
-     * @param instSorts the instantiations
+     * @param term
+     *        the term to be instantiated.
+     * @param genericSorts
+     *        the generic sorts that should be replaced.
+     * @param instSorts
+     *        the instantiations
      * @return returns a new term, where all generic variables are instantiated. If there is no
      *         generic variable the original term is returned.
      * @throws IllegalTacletException

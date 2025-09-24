@@ -33,9 +33,12 @@ public class SimpleTacletSelectionMenu extends JMenu {
     /**
      * creates an instance of this menu displaying the applications stored in <tt>apps</tt>
      *
-     * @param apps the {@link ImmutableList<PosTacletApp>} to be displayed
-     * @param info the NotationInfo used to pretty print the taclets in tooltips
-     * @param listener the ActionListener which is registered at each menu item
+     * @param apps
+     *        the {@link ImmutableList<PosTacletApp>} to be displayed
+     * @param info
+     *        the NotationInfo used to pretty print the taclets in tooltips
+     * @param listener
+     *        the ActionListener which is registered at each menu item
      */
     public SimpleTacletSelectionMenu(ImmutableList<PosTacletApp> apps, NotationInfo info,
             ActionListener listener, Services services) {
@@ -47,9 +50,12 @@ public class SimpleTacletSelectionMenu extends JMenu {
     /**
      * adds the given applications to the menu
      *
-     * @param apps the IList to be displayed
-     * @param info the NotationInfo used to pretty print the taclets in tooltips
-     * @param listener the ActionListener which is registered at each menu item
+     * @param apps
+     *        the IList to be displayed
+     * @param info
+     *        the NotationInfo used to pretty print the taclets in tooltips
+     * @param listener
+     *        the ActionListener which is registered at each menu item
      */
     private void addMenuEntries(ImmutableList<PosTacletApp> apps, NotationInfo info,
             ActionListener listener, Services services) {

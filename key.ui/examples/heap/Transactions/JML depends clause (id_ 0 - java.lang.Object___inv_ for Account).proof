@@ -282,14 +282,14 @@
          (rule "castDel" (formula "6") (term "0,0,0"))
          (rule "ifthenelse_split" (formula "12") (term "2,0,1,0,0,1,0,0"))
          (branch "   !(self.transactions, footprint) in self.transactions.footprint
-| !self.transactions.<created> = TRUE TRUE"
+| !self.transactions.$created = TRUE TRUE"
             (rule "replace_known_left" (formula "13") (term "0,1,0,1") (ifseqformula "1"))
             (builtin "One Step Simplification" (formula "13"))
             (rule "ifthenelse_split" (formula "13") (term "0,1,0"))
             (branch "   !(self.transactions, total) in self.transactions.footprint
-| !self.transactions.<created> = TRUE TRUE"
+| !self.transactions.$created = TRUE TRUE"
                (rule "cut_direct" (formula "2") (term "0,1"))
-               (branch " CUT: self.transactions.<created> = TRUE TRUE"
+               (branch " CUT: self.transactions.$created = TRUE TRUE"
                   (builtin "One Step Simplification" (formula "3"))
                   (rule "notLeft" (formula "3"))
                   (rule "replace_known_left" (formula "1") (term "0,1") (ifseqformula "2"))
@@ -591,7 +591,7 @@
                      (rule "closeTrue" (formula "14"))
                   )
                )
-               (branch " CUT: self.transactions.<created> = TRUE FALSE"
+               (branch " CUT: self.transactions.$created = TRUE FALSE"
                   (builtin "One Step Simplification" (formula "2"))
                   (rule "true_left" (formula "2"))
                   (rule "referencedObjectIsCreatedRight" (formula "11") (ifseqformula "12"))
@@ -599,7 +599,7 @@
                )
             )
             (branch "   !(self.transactions, total) in self.transactions.footprint
-| !self.transactions.<created> = TRUE FALSE"
+| !self.transactions.$created = TRUE FALSE"
                (builtin "One Step Simplification" (formula "14"))
                (rule "orRight" (formula "13"))
                (rule "notRight" (formula "14"))
@@ -776,7 +776,7 @@
             )
          )
          (branch "   !(self.transactions, footprint) in self.transactions.footprint
-| !self.transactions.<created> = TRUE FALSE"
+| !self.transactions.$created = TRUE FALSE"
             (rule "orRight" (formula "12"))
             (rule "notRight" (formula "13"))
             (rule "notRight" (formula "13"))

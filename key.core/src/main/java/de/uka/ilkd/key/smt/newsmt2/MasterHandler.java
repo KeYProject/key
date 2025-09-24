@@ -4,16 +4,8 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -76,12 +68,17 @@ public class MasterHandler {
     /**
      * Create a new handler with the default set of smt handlers.
      *
-     * @param services non-null services
-     * @param settings settings from the proof for the property settings.
-     * @param handlerNames fully qualified class names of the handlers to use. If empty, all
+     * @param services
+     *        non-null services
+     * @param settings
+     *        settings from the proof for the property settings.
+     * @param handlerNames
+     *        fully qualified class names of the handlers to use. If empty, all
      *        available handlers are used.
-     * @param handlerOptions arbitrary String options for the handlers to process
-     * @throws IOException if the handlers cannot be loaded
+     * @param handlerOptions
+     *        arbitrary String options for the handlers to process
+     * @throws IOException
+     *         if the handlers cannot be loaded
      */
     public MasterHandler(Services services, SMTSettings settings, String[] handlerNames,
             String[] handlerOptions) throws IOException {
@@ -135,7 +132,8 @@ public class MasterHandler {
      * <p>
      * A default translation is triggered if no handler can be found.
      *
-     * @param problem the non-null term to translate
+     * @param problem
+     *        the non-null term to translate
      * @return the S-Expression representing the translation
      */
     public SExpr translate(Term problem) {
@@ -180,8 +178,10 @@ public class MasterHandler {
      * <p>
      * A default translation is triggered if no handler can be found.
      *
-     * @param problem the non-null term to translate
-     * @param type the type of the resulting s-expression
+     * @param problem
+     *        the non-null term to translate
+     * @param type
+     *        the type of the resulting s-expression
      * @return the S-Expression representing the translation
      */
     public SExpr translate(Term problem, Type type) {
@@ -203,7 +203,8 @@ public class MasterHandler {
     /**
      * If no handler can handle a term, it is taken care of here.
      *
-     * @param problem the problematic term
+     * @param problem
+     *        the problematic term
      * @return a generic translation as unknown value
      */
     private SExpr handleAsUnknownValue(Term problem) {
@@ -250,8 +251,10 @@ public class MasterHandler {
      *
      * is returned where t1, ..., tn are the smt-translations of the subterms of term.
      *
-     * @param functionName the name of the function
-     * @param term the term to be translated
+     * @param functionName
+     *        the name of the function
+     * @param term
+     *        the term to be translated
      * @return an expression with the name functionName and subterms as children
      */
     SExpr handleAsFunctionCall(String functionName, Term term) {
@@ -269,9 +272,12 @@ public class MasterHandler {
      *
      * is returned where t1, ..., tn are the smt-translations of the sub-terms of term.
      *
-     * @param functionName the name of the function
-     * @param type the type of the resulting s-expression
-     * @param term the term to be translated
+     * @param functionName
+     *        the name of the function
+     * @param type
+     *        the type of the resulting s-expression
+     * @param term
+     *        the term to be translated
      * @return an expression with the name functionName and the term's sub-terms as children
      */
     SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
@@ -285,7 +291,8 @@ public class MasterHandler {
     /**
      * Decides whether a symbol is already known to the master handler.
      *
-     * @param pr the SMT symbol name to test
+     * @param pr
+     *        the SMT symbol name to test
      * @return true iff the name is already known
      */
     boolean isKnownSymbol(String pr) {
@@ -304,10 +311,13 @@ public class MasterHandler {
     /**
      * Translate a list of terms into a list of SExprs.
      *
-     * @param terms non-null list of terms.
-     * @param type the non-null smt type to coerce to
+     * @param terms
+     *        non-null list of terms.
+     * @param type
+     *        the non-null smt type to coerce to
      * @return a list of translations
-     * @throws SMTTranslationException if the type conversion is impossible
+     * @throws SMTTranslationException
+     *         if the type conversion is impossible
      */
     public List<SExpr> translate(Iterable<? extends Term> terms, Type type)
             throws SMTTranslationException {
@@ -317,7 +327,8 @@ public class MasterHandler {
     /**
      * Translate a list of terms into a list of SExprs without coercion.
      *
-     * @param terms non-null list of terms.
+     * @param terms
+     *        non-null list of terms.
      * @return a list of translations
      */
     public List<SExpr> translate(Iterable<? extends Term> terms) {

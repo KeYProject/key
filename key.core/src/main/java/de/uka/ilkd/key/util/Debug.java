@@ -28,7 +28,8 @@ public final class Debug {
     /**
      * an assertion failure is thrown if isOK is evaluated to false
      *
-     * @param isOK boolean the assertion that is checked
+     * @param isOK
+     *        boolean the assertion that is checked
      */
     public static void assertTrue(boolean isOK) {
         if (ENABLE_ASSERTION) {
@@ -46,8 +47,10 @@ public final class Debug {
      * an assertion failure is thrown if isOK is evaluated to false the text in message is handed
      * over to this exception
      *
-     * @param isOK boolean the assertion that is checked
-     * @param message String describes the failed assertion
+     * @param isOK
+     *        boolean the assertion that is checked
+     * @param message
+     *        String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message) {
         if (ENABLE_ASSERTION) {
@@ -61,8 +64,10 @@ public final class Debug {
      * an assertion failure is thrown if isOK is evaluated to false the text in message is handed
      * over to this exception
      *
-     * @param isOK boolean the assertion that is checked
-     * @param message String describes the failed assertion
+     * @param isOK
+     *        boolean the assertion that is checked
+     * @param message
+     *        String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message, Object parameter) {
         if (ENABLE_ASSERTION) {
@@ -76,8 +81,10 @@ public final class Debug {
      * an assertion failure is thrown if an iterable object is either null or contains the null
      * element.
      *
-     * @param iterable The iterable object to check
-     * @param message String describes the failed assertion
+     * @param iterable
+     *        The iterable object to check
+     * @param message
+     *        String describes the failed assertion
      */
     public static void assertDeepNonNull(Iterable<?> iterable, String message) {
         if (ENABLE_ASSERTION) {

@@ -73,7 +73,8 @@ public final class Main {
     /**
      * Main entry point. Parses CLI flags/options and performs the appropriate actions.
      *
-     * @param args command-line arguments
+     * @param args
+     *        command-line arguments
      */
     public static void main(String[] args) {
         try {

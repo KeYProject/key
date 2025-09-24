@@ -31,8 +31,10 @@ public class RuleStatisticsDialog extends JDialog {
     /**
      * Construct and show a new dialog based on the provided analysis results.
      *
-     * @param window main window
-     * @param results the results to show
+     * @param window
+     *        main window
+     * @param results
+     *        the results to show
      */
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");
@@ -47,7 +49,8 @@ public class RuleStatisticsDialog extends JDialog {
     /**
      * Initialize the UI of this dialog.
      *
-     * @param window main window
+     * @param window
+     *        main window
      */
     private void createUI(Window window) {
         setLayout(new BorderLayout());
@@ -96,7 +99,8 @@ public class RuleStatisticsDialog extends JDialog {
     /**
      * Construct the buttons panel. Should be added to the main panel after construction.
      *
-     * @param statisticsPane text pane showing the statistics
+     * @param statisticsPane
+     *        text pane showing the statistics
      * @return the buttons panel
      */
     private JPanel constructButtonPanel(JEditorPane statisticsPane) {
@@ -158,7 +162,8 @@ public class RuleStatisticsDialog extends JDialog {
     /**
      * Generate the HTML table to display in this dialog.
      *
-     * @param rules statistics on rule apps (see {@link RuleStatistics})
+     * @param rules
+     *        statistics on rule apps (see {@link RuleStatistics})
      * @return HTML
      */
     private String genTable(List<RuleStatisticEntry> rules) {

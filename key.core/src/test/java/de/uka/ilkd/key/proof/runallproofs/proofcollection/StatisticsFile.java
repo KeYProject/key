@@ -164,9 +164,11 @@ public class StatisticsFile implements Serializable {
     /**
      * Method used for writing a new line into the table of statistics entries.
      *
-     * @param entries List representing a line in the table. Each list entry corresponds to one
+     * @param entries
+     *        List representing a line in the table. Each list entry corresponds to one
      *        table cell.
-     * @throws IOException In case statistics file is not accessible for some reason.
+     * @throws IOException
+     *         In case statistics file is not accessible for some reason.
      */
     private void writeLine(List<String> entries) throws IOException {
         final FileWriter statisticsFileWriter =
@@ -187,17 +189,20 @@ public class StatisticsFile implements Serializable {
     /**
      * Append statistics for one proof to statistics file.
      *
-     * @param proof {@link Proof}, whose statistics will be added.
-     * @param keyFile KeY file, from which the original proof obligation has been created, must be
+     * @param proof
+     *        {@link Proof}, whose statistics will be added.
+     * @param keyFile
+     *        KeY file, from which the original proof obligation has been created, must be
      *        mentioned explicitly.
-     * @throws IOException Thrown in case statistics file is not accessible.
+     * @throws IOException
+     *         Thrown in case statistics file is not accessible.
      */
-    public void appendStatistics(Proof proof, File keyFile) throws IOException {
+    public void appendStatistics(Proof proof, Path keyFile) throws IOException {
         Statistics statistics = proof.getStatistics();
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
         for (Column<?> column : columns) {
-            entries.add(column.addEntry(statistics, keyFile, proofClosed).toString());
+            entries.add(column.addEntry(statistics, keyFile.toFile(), proofClosed).toString());
         }
         writeLine(entries);
     }

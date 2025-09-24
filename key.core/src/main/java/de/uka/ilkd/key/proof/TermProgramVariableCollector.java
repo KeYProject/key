@@ -27,7 +27,8 @@ public class TermProgramVariableCollector implements DefaultVisitor {
     /**
      * is called by the execPostOrder-method of a term
      *
-     * @param visited the Term to checked if it is a program variable and if true the variable is
+     * @param visited
+     *        the Term to checked if it is a program variable and if true the variable is
      *        added
      *        to the list of found variables
      */

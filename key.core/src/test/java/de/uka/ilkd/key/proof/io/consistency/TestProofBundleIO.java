@@ -69,7 +69,8 @@ public class TestProofBundleIO {
      * Afterwards checks that the generated bundle is loadable again. The *.key file includes
      * bootclasspath and multiple classpath statements with *.java, *.class, and *.zip files.
      *
-     * @throws Exception on errors (should not happen)
+     * @throws Exception
+     *         on errors (should not happen)
      */
     @Test
     public void testComplexBundleGeneration() throws Exception {
@@ -93,7 +94,8 @@ public class TestProofBundleIO {
      * Afterwards checks that the generated bundle is loadable again and that it does not contain
      * unnecessary files (no classpath, no bootclasspath). The *.key file only includes javaSource.
      *
-     * @throws Exception on errors (should not happen)
+     * @throws Exception
+     *         on errors (should not happen)
      */
     @Test
     public void testSimpleBundleGeneration() throws Exception {
@@ -124,7 +126,8 @@ public class TestProofBundleIO {
     /**
      * Tests that the SimpleFileRepo is able to save a proof as bundle (without consistency).
      *
-     * @throws IOException on I/O errors
+     * @throws IOException
+     *         on I/O errors
      */
     @Test
     public void testSimpleFileRepo() throws IOException {
@@ -160,9 +163,11 @@ public class TestProofBundleIO {
     /**
      * Loads a proof from a bundle.
      *
-     * @param p the path of the bundle
+     * @param p
+     *        the path of the bundle
      * @return the loaded proof (currently, only a single proof is supported)
-     * @throws ProblemLoaderException if loading fails
+     * @throws ProblemLoaderException
+     *         if loading fails
      */
     private Proof loadBundle(Path p) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p);
@@ -189,9 +194,12 @@ public class TestProofBundleIO {
      * </ul>
      * The saved bundle is deleted afterwards.
      *
-     * @param dirName the name of the directory with test resources (expects a file test.key here)
-     * @param expectedSize the minimal size (in bytes) the generated bundle should have
-     * @throws Exception on errors (should not happen)
+     * @param dirName
+     *        the name of the directory with test resources (expects a file test.key here)
+     * @param expectedSize
+     *        the minimal size (in bytes) the generated bundle should have
+     * @throws Exception
+     *         on errors (should not happen)
      */
     private Path testBundleGeneration(String dirName, long expectedSize) throws Exception {
         // we test DiskFileRepo here!

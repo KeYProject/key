@@ -33,9 +33,12 @@ public abstract class AbstractDomainLattice
      * element. The returned abstract element should be as precise as possible, that is there should
      * not be a smaller abstract element that also describes the concrete element.
      *
-     * @param state The state in which the abstraction should hold.
-     * @param term Element to abstract from.
-     * @param services The services object.
+     * @param state
+     *        The state in which the abstraction should hold.
+     * @param term
+     *        Element to abstract from.
+     * @param services
+     *        The services object.
      * @return A suitable abstract domain element.
      */
     public AbstractDomainElement abstractFrom(SymbolicExecutionState state, JTerm term,
@@ -55,10 +58,14 @@ public abstract class AbstractDomainLattice
     /**
      * Returns a side condition which has to hold if elem is a correct abstraction for term.
      *
-     * @param state The state in which the abstraction should hold.
-     * @param term Element to abstract from.
-     * @param elem Abstract domain element to check.
-     * @param services The services object.
+     * @param state
+     *        The state in which the abstraction should hold.
+     * @param term
+     *        Element to abstract from.
+     * @param elem
+     *        Abstract domain element to check.
+     * @param services
+     *        The services object.
      * @return Side condition to prove in order to show that elem abstracts from term.
      */
     public static JTerm getSideConditionForAxiom(SymbolicExecutionState state, JTerm term,
@@ -76,8 +83,10 @@ public abstract class AbstractDomainLattice
      * A lattice join operation; finds an abstract element that is the least upper bound of the set
      * consisting of the elements a and b.
      *
-     * @param a First element to find the least upper bound for.
-     * @param b Second element to find the least upper bound for.
+     * @param a
+     *        First element to find the least upper bound for.
+     * @param b
+     *        Second element to find the least upper bound for.
      * @return The least upper bound of the set consisting of the elements a and b.
      */
     public abstract AbstractDomainElement join(AbstractDomainElement a, AbstractDomainElement b);
@@ -113,10 +122,13 @@ public abstract class AbstractDomainLattice
      * {@code fromString(e.toParseableString(),
      * services).equals(e)}.
      *
-     * @param s String to parse.
-     * @param services The services object.
+     * @param s
+     *        String to parse.
+     * @param services
+     *        The services object.
      * @return The corresponding {@link AbstractDomainElement}.
-     * @throws RuntimeException if s cannot be parsed.
+     * @throws RuntimeException
+     *         if s cannot be parsed.
      */
     public AbstractDomainElement fromString(String s, Services services) {
         for (AbstractDomainElement elem : this) {

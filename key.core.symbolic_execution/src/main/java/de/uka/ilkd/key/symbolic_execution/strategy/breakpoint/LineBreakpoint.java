@@ -6,10 +6,10 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -44,18 +44,29 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * Creates a new {@link LineBreakpoint}.
      *
-     * @param classPath the path of the class the associated Breakpoint lies within
-     * @param lineNumber the line where the associated Breakpoint is located in the class
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located
+     * @param classPath
+     *        the path of the class the associated Breakpoint lies within
+     * @param lineNumber
+     *        the line where the associated Breakpoint is located in the class
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param pm
+     *        the {@link IProgramMethod} representing the Method which the Breakpoint is located
      *        at
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param condition the condition as given by the user
-     * @param enabled flag if the Breakpoint is enabled
-     * @param conditionEnabled flag if the condition is enabled
-     * @param methodStart the line the containing method of this breakpoint starts at
-     * @param methodEnd the line the containing method of this breakpoint ends at
-     * @throws SLTranslationException if the condition could not be parsed to a valid Term
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param condition
+     *        the condition as given by the user
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param conditionEnabled
+     *        flag if the condition is enabled
+     * @param methodStart
+     *        the line the containing method of this breakpoint starts at
+     * @param methodEnd
+     *        the line the containing method of this breakpoint ends at
+     * @throws SLTranslationException
+     *         if the condition could not be parsed to a valid Term
      */
     public LineBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm,
             Proof proof, String condition, boolean enabled, boolean conditionEnabled,
@@ -75,7 +86,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      * For a given {@link StatementContainer} this method computes the {@link StatementBlock} that
      * contains all lines before the line the Breakpoint is at, including the line itself.
      *
-     * @param statementContainer the {@link StatementContainer} to build the block from
+     * @param statementContainer
+     *        the {@link StatementContainer} to build the block from
      * @return the {@link StatementBlock} representing the container without the line below the
      *         Breakpoint
      */
@@ -106,8 +118,10 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * Checks if the execution should stop in the given line for the given class.
      *
-     * @param line The current line of code, that the auto mode is evaluating
-     * @param path The path of the Class, that contains the currently evaluated code
+     * @param line
+     *        The current line of code, that the auto mode is evaluating
+     * @param path
+     *        The path of the Class, that contains the currently evaluated code
      * @return true if a {@link LineBreakpoint} is in the given line and the condition evaluates
      *         to true and the Hitcount is exceeded, false otherwise
      */
@@ -193,7 +207,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     /**
-     * @param classPath the classPath to set
+     * @param classPath
+     *        the classPath to set
      */
     public void setClassPath(String classPath) {
         this.classPath = classPath;

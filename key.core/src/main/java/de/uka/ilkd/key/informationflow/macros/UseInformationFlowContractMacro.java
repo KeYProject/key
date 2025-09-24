@@ -99,9 +99,12 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * Checks whether the application of the passed rule is ok in the given context.
      * <p/>
      *
-     * @param ruleApp rule to be applied
-     * @param pio context
-     * @param goal context
+     * @param ruleApp
+     *        rule to be applied
+     * @param pio
+     *        context
+     * @param goal
+     *        context
      * @return true if rule may be applied
      */
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
@@ -253,8 +256,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-        }
+                RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
