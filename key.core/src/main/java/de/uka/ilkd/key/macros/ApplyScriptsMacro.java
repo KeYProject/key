@@ -162,9 +162,13 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     private static List<ScriptCommandAst>  renderProof(KeyAst.JMLProofScript script,
                                                       Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
         List<ScriptCommandAst> result = new ArrayList<>();
+        // Push current settings onto the settings stack
+        result.add(new ScriptCommandAst("set", Map.of("stack", "push"), List.of()));
         for (ProofCmdContext proofCmdContext : script.ctx.proofCmd()) {
             result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
         }
+        // Pop settings stack to restore old settings
+        result.add(new ScriptCommandAst("set", Map.of("stack", "pop"), List.of()));
         return result;
     }
 
