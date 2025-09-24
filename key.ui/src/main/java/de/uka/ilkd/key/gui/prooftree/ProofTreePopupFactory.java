@@ -16,7 +16,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
@@ -604,11 +604,11 @@ public final class ProofTreePopupFactory {
         }
     }
 
-    public static abstract class ProofTreeAction extends KeyAction {
-        private static final long serialVersionUID = 2686349019163064481L;
+    public static abstract class ProofTreeAction extends MainWindowAction {
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {
+            super(context.window, true);
             this.context = context;
         }
     }

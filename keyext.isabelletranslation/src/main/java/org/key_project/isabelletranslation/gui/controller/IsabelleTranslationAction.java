@@ -33,6 +33,8 @@ public class IsabelleTranslationAction extends MainWindowAction {
     public IsabelleTranslationAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Translate to Isabelle");
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     @Override

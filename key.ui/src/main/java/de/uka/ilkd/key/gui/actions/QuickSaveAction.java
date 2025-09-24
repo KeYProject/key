@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class QuickSaveAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickSaveAction.class);
-    private static final long serialVersionUID = -7084304175671744403L;
 
     /** The OS's tmp directory. */
     private static final File TMP_DIR = IOUtil.getTempDirectory();
@@ -41,7 +40,8 @@ public final class QuickSaveAction extends MainWindowAction {
         super(mainWindow);
         setName("Quicksave");
         setTooltip("Save current proof to a temporal location.");
-        mainWindow.getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     /**
