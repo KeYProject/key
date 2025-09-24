@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -35,8 +37,12 @@ import org.key_project.util.java.StringUtil;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
 
     private final ProofMacro fallBackMacro;
 
@@ -81,6 +87,15 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return null;
     }
 
+    private static @Nullable JTerm getUpdate(Goal goal) {
+        RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
+        Term appliedOn = ruleApp.posInOccurrence().subTerm();
+        if(appliedOn.op() instanceof UpdateApplication) {
+            return UpdateApplication.getUpdate((JTerm) appliedOn);
+        }
+        return null;
+    }
+
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
@@ -97,21 +112,19 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             }
             KeyAst.JMLProofScript proofScript = jmlAssert.getAssertionProof();
             Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, proof.getServices());
+            JTerm update = getUpdate(goal);
             List<ScriptCommandAst> renderedProof =
-                renderProof(proofScript, termMap, proof.getServices());
+                renderProof(proofScript, termMap, update, proof.getServices());
             ProofScriptEngine pse = new ProofScriptEngine(renderedProof, goal);
-            addConverters(pse, proof.getServices());
-            System.out.println("---- Script");
-            System.out.println(renderedProof);
+            LOGGER.debug("---- Script");
+            LOGGER.debug(renderedProof.stream().map(ScriptCommandAst::asCommandLine).collect(Collectors.joining("\n")));
+            LOGGER.debug("---- End Script");
+
             pse.execute((AbstractUserInterfaceControl) uic, proof);
         }
         return new ProofMacroFinishedInfo(this, proof);
     }
 
-    private void addConverters(ProofScriptEngine pse, Services services) {
-        // pse.
-
-    }
 
     private Map<ParserRuleContext, JTerm> getTermMap(JmlAssert jmlAssert, Services services) {
         SpecificationRepository.@Nullable JmlStatementSpec jmlspec =
@@ -131,17 +144,17 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return result;
     }
 
-    private static List<ScriptCommandAst> renderProof(KeyAst.JMLProofScript script,
-            Map<ParserRuleContext, JTerm> termMap, Services services) {
+    private static List<ScriptCommandAst>  renderProof(KeyAst.JMLProofScript script,
+                                                      Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
         List<ScriptCommandAst> result = new ArrayList<>();
         for (ProofCmdContext proofCmdContext : script.ctx.proofCmd()) {
-            result.addAll(renderProofCmd(proofCmdContext, termMap, services));
+            result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
         }
         return result;
     }
 
     private static List<ScriptCommandAst> renderProofCmd(ProofCmdContext ctx,
-            Map<ParserRuleContext, JTerm> termMap, Services services) {
+                                                         Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
         List<ScriptCommandAst> result = new ArrayList<>();
 
         // Push the current branch context
@@ -157,6 +170,10 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 value = StringUtil.stripQuotes(exp.getText());
             } else {
                 value = termMap.get(exp);
+                if(update != null) {
+                    // Wrap in update application if an update is present
+                    value = services.getTermBuilder().apply(update, (JTerm)value);
+                }
             }
             if (argContext.argLabel != null) {
                 named.put(argContext.argLabel.getText(), value);
@@ -169,9 +186,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
         // handle proofCmd if present
         if (!ctx.proofCmd().isEmpty()) {
-            result.add(new ScriptCommandAst("branches", Map.of("child", 0), List.of("select")));
+            result.add(new ScriptCommandAst("branches", Map.of(), List.of("single")));
             for (ProofCmdContext proofCmdContext : ctx.proofCmd()) {
-                result.addAll(renderProofCmd(proofCmdContext, termMap, services));
+                result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
             }
         }
 
@@ -181,7 +198,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             result.add(new ScriptCommandAst("branches", Map.of("branch", label),
                 List.of("select")));
             for (ProofCmdContext proofCmdContext : pcase.proofCmd()) {
-                result.addAll(renderProofCmd(proofCmdContext, termMap, services));
+                result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
             }
         }
 

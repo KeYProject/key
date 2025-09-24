@@ -25,7 +25,7 @@ public class AssertCommand extends CutCommand {
         var args = state().getValueInjector().inject(new Parameters(), arguments);
         var node = state().getFirstOpenAutomaticGoal().node();
         execute(state(), args);
-        node.proof().getGoal(node.child(0)).setBranchLabel("Validity");
-        node.proof().getGoal(node.child(1)).setBranchLabel("Usage");
+        // node.proof().getGoal(node.child(0)).setBranchLabel("Validity");
+        // node.proof().getGoal(node.child(1)).setBranchLabel("Usage");
     }
 }

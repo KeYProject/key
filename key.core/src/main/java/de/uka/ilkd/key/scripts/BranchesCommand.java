@@ -11,17 +11,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.InjectionException;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import de.uka.ilkd.key.scripts.meta.ValueInjector;
 import org.jspecify.annotations.Nullable;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.util.collection.ImmutableList;
 
 public class BranchesCommand extends AbstractCommand {
+
     public BranchesCommand() {
         super(Parameters.class);
+    }
+
+    @Override
+    public String getName() {
+        return "branches";
     }
 
     @Override
@@ -32,6 +44,10 @@ public class BranchesCommand extends AbstractCommand {
         if (stack == null) {
             stack = new Stack<>();
             state.putUserData("_branchStack", stack);
+        }
+
+        if(args.mode == null) {
+            throw new ScriptException("For 'branches', a mode must be specified");
         }
 
         switch (args.mode) {
@@ -53,14 +69,38 @@ public class BranchesCommand extends AbstractCommand {
                     goal = findGoalByName(root, args.branch);
                 }
                 state.setGoal(goal);
+            case "single":
+                root = findNodeByNumber(proof, stack.peek());
+                TacletApp ta = (TacletApp) root.getAppliedRuleApp();
+                ImmutableList<TacletGoalTemplate> templates = ta.taclet().goalTemplates();
+
+                int no = 0;
+                int found = -1;
+                for (TacletGoalTemplate template : templates) {
+                    if(!"main".equals(template.tag())) {
+                        if(found != -1) {
+                            throw new ScriptException("More than one non-main goal found");
+                        }
+                        found = no;
+                    }
+                    no++;
+                }
+                if (found == -1) {
+                    throw new ScriptException("No single non-main goal found");
+                }
+
+                // For some reason, the child index is reversed between the node and the templates
+                found = templates.size() - 1 - found;
+                goal = findGoalByNode(proof, root.child(found));
+                state.setGoal(goal);
                 break;
             default:
-                throw new ScriptException();
+                throw new ScriptException("Unknown mode " + args.mode + " for the 'branches' command" );
         }
     }
 
     private void ensureSingleGoal() {
-        state.
+        //state.
     }
 
     private Goal findGoalByName(Node root, String branch) throws ScriptException {
@@ -101,11 +141,6 @@ public class BranchesCommand extends AbstractCommand {
             }
         }
         throw new ScriptException();
-    }
-
-    @Override
-    public String getName() {
-        return "branches";
     }
 
     public static class Parameters {

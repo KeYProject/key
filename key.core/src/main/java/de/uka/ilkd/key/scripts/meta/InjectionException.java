@@ -30,4 +30,13 @@ public class InjectionException extends ScriptException {
     public InjectionException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    /**
+     * An injection exception with a cause to be displayed.
+     *
+     * @param cause the cause of the exception.
+     */
+    public InjectionException(Throwable cause) {
+        super(cause);
+    }
 }

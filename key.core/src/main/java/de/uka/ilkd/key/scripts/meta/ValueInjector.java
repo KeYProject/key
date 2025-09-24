@@ -49,7 +49,7 @@ public class ValueInjector {
     }
 
     interface VerifyableParameters {
-        void verifyParameters() throws IllegalArgumentException;
+        void verifyParameters() throws IllegalArgumentException, InjectionException;
     }
 
     /**
@@ -156,6 +156,14 @@ public class ValueInjector {
                 "Unexpected positional argument at index %d was provided. " +
                     "Expected (at most) %d positional arguments. For command class: '%s'",
                 unhandledPos.get(), count, obj.getClass().getName()));
+        }
+
+        if(obj instanceof VerifyableParameters vp) {
+            try {
+                vp.verifyParameters();
+            } catch(IllegalArgumentException e) {
+                throw new InjectionException(e);
+            }
         }
 
         return obj;
