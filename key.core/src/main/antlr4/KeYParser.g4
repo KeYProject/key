@@ -781,7 +781,7 @@ option_expr
 
 goalspec
 :
-  (name=string_value COLON)?
+  (name=string_value (LBRACKET tag=simple_ident RBRACKET)? COLON)?
   ( rwObj=replacewith
     addSeq=add?
     addRList=addrules?
@@ -886,13 +886,12 @@ proofScriptEntry
     | LBRACE proofScript RBRACE
     )
 ;
-proofScriptEOF: proofScript EOF;
-proofScript: proofScriptCommand+;
-proofScriptCommand: cmd=IDENT proofScriptParameters?
-	( LBRACE sub=proofScript RBRACE SEMI?
-	| SEMI);
 
-proofScriptParameters: proofScriptParameter+;
+proofScriptEOF: proofScript EOF;
+proofScript: proofScriptCommand*;
+proofScriptCommand: cmd=IDENT proofScriptParameters SEMI;
+
+proofScriptParameters: proofScriptParameter*;
 proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
 proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
 proofScriptExpression:
@@ -905,8 +904,10 @@ proofScriptExpression:
   | simple_ident
   | abbreviation
   | literals
+  | proofScriptCodeBlock
   ;
 
+proofScriptCodeBlock: LBRACE proofScript RBRACE;
 
 // PROOF
 proof: PROOF EOF;

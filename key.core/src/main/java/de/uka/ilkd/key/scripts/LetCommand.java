@@ -16,37 +16,38 @@ import org.jspecify.annotations.NullMarked;
 
 /// The *let* command lets you introduce entries to the abbreviation table.
 /// ```
-/// let @abbrev1=term1 ... @abbrev2=term2 force=true;
+/// let @abbrev1=term1 ... @abbrev2=term2;
+/// ```
+/// of
+/// ```
+/// letf @abbrev1=term1 ... @abbrev2=term2;
 /// ```
 /// **Arguments:**
 /// - varargs any key-value where *value* is a term and key is prefixed with `@`
-/// - `force` : `boolean` if set the bindings are overridden otherwise conflicts results into an
-/// exception.
+///
+/// **Aliases**
+/// - `letf` if used, the let bindings are overridden otherwise conflicts results into an exception.
 ///
 /// **Changes:**
+/// * Apr,2025 (weigl): remove {@code force} in favor of {@code letf}.
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 @NullMarked
-public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
-
+public class LetCommand implements ProofScriptCommand {
     @Override
-    public List<ProofScriptArgument<Map<String, Object>>> getArguments() {
+    public List<ProofScriptArgument> getArguments() {
         return List.of();
     }
 
-    @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap) throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
 
-        boolean force = args.containsKey("force");
+        boolean force = "letf".equals(args.commandName());
 
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
             if (key.startsWith("#") || key.equals("force")) {
                 continue;
@@ -82,5 +83,10 @@ public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
     @Override
     public String getDocumentation() {
         return "";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of(getName(), "letf");
     }
 }

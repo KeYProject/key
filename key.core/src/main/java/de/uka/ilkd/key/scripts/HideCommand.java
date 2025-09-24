@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -20,6 +19,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
@@ -36,7 +37,7 @@ import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROP
  *
  * @author Mattias Ulbrich
  */
-public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
+public class HideCommand extends AbstractCommand {
 
     private static final Name HIDE_LEFT = new Name("hide_left");
     private static final Name HIDE_RIGHT = new Name("hide_right");
@@ -45,19 +46,15 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         super(Parameters.class);
     }
 
-    @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        Goal goal = state().getFirstOpenAutomaticGoal();
 
         Taclet hideLeft =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
+            state().getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
         for (SequentFormula s : args.sequent.antecedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
@@ -70,7 +67,8 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         }
 
         Taclet hideRight =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
+            state().getProof().getEnv().getInitConfigForEnvironment()
+                    .lookupActiveTaclet(HIDE_RIGHT);
         for (SequentFormula s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
@@ -102,7 +100,8 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option("#2")
+        @Argument
+        @MonotonicNonNull
         public Sequent sequent;
     }
 

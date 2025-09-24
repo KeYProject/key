@@ -90,5 +90,4 @@ public class TacletGoalTemplate
 
         return result.union(bvv.getBoundVariables());
     }
-
 }

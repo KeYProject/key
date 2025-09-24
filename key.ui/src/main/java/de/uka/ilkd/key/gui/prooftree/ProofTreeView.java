@@ -54,8 +54,6 @@ import org.slf4j.LoggerFactory;
  * Usually shown as a tab in the lower left panel.
  */
 public class ProofTreeView extends JPanel implements TabPanel {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
-
     public static final ColorSettings.ColorProperty GRAY_COLOR =
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY, Color.LIGHT_GRAY);
 
@@ -65,12 +63,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Color used for closed goals.
      */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
-        ColorSettings.define("[proofTree]darkGreen", "",
+        ColorSettings.define("[proofTree]darkGreen", "used for closed goals",
             new Color(0, 128, 51),
             new Color(100, 255, 102));
 
+    /**
+     * Color used for open goals.
+     */
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
-        ColorSettings.define("[proofTree]darkRed", "",
+        ColorSettings.define("[proofTree]darkRed", "used for open goals",
             new Color(191, 0, 0),
             new Color(191, 120, 120));
     /**
@@ -90,10 +91,16 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public static final KeyStroke SEARCH_KEY_STROKE = KeyStroke.getKeyStroke(KeyEvent.VK_F,
         KeyStrokeManager.MULTI_KEY_MASK);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
+
     /**
      * Whether to expand oss nodes when using expand all
      */
     private boolean expandOSSNodes = false;
+    /**
+     * Whether the main branch (normal execution) should be inlined into the parent branch.
+     */
+    private boolean linearizedMode = false;
 
     /**
      * The JTree that is used for actual display and interaction
@@ -169,17 +176,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private int iconHeight = 12;
 
     /**
-     * creates a new proof tree
+     * Creates a new proof tree container.
+     *
+     * @param m the mediator
      */
     public ProofTreeView(KeYMediator m) {
-        this();
-        setMediator(m);
-    }
-
-    /**
-     * creates a new proof tree
-     */
-    public ProofTreeView() {
         proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
         delegateView = new JTree(new DefaultMutableTreeNode("No proof loaded")) {
@@ -324,6 +325,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
+
+        setMediator(m);
     }
 
     public boolean isExpandOSSNodes() {
@@ -332,6 +335,24 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     public void setExpandOSSNodes(boolean expandOSSNodes) {
         this.expandOSSNodes = expandOSSNodes;
+    }
+
+    public boolean isLinearizedMode() {
+        return linearizedMode;
+    }
+
+    /**
+     * Set whether linearized mode is active. This will automatically refresh the tree.
+     *
+     * @param linearizedMode whether linearized mode will be active
+     */
+    public void setLinearizedMode(boolean linearizedMode) {
+        boolean isChange = linearizedMode != this.linearizedMode;
+        this.linearizedMode = linearizedMode;
+        delegateModel.setLinearizedMode(linearizedMode);
+        if (isChange) {
+            delegateModel.updateTree(null);
+        }
     }
 
     protected void dispose() throws Throwable {
@@ -1207,11 +1228,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             boolean isBranch = false;
-            final Node child = treeNode.findChild(node);
-            if (!(treeNode instanceof GUIOneStepChildTreeNode) && child != null
-                    && child.getNodeInfo().getBranchLabel() != null) {
+            List<Node> child = treeNode.findChild(node);
+            if (!(treeNode instanceof GUIOneStepChildTreeNode) && child.size() == 1
+                    && child.get(0).getNodeInfo().getBranchLabel() != null) {
                 isBranch = true;
-                style.text = style.text + ": " + child.getNodeInfo().getBranchLabel();
+                style.text = style.text + ": " + child.get(0).getNodeInfo().getBranchLabel();
             }
             if (isBranch && node.childrenCount() > 1) {
                 defaultIcon = getOpenIcon();

@@ -7,12 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
+public class ScriptCommand extends AbstractCommand {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ProofScriptCommand.class);
 
@@ -21,13 +22,14 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option("#2")
-        public String filename;
+        @Argument
+        public @MonotonicNonNull String filename;
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
-        Path root = state.getBaseFileName();
+    public void execute(ScriptCommandAst ast) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), ast);
+        Path root = state().getBaseFileName();
         if (!Files.isDirectory(root)) {
             root = root.getParent();
         }
@@ -37,7 +39,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
 
         try {
             ProofScriptEngine pse = new ProofScriptEngine(file);
-            pse.setCommandMonitor(state.getObserver());
+            pse.setCommandMonitor(state().getObserver());
             pse.execute(uiControl, proof);
         } catch (NoSuchFileException e) {
             // The message is very cryptic otherwise.
