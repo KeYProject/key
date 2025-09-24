@@ -10,6 +10,7 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
 import org.jspecify.annotations.NullMarked;
@@ -32,12 +33,20 @@ import org.jspecify.annotations.NullMarked;
 /// * Apr,2025 (weigl): remove {@code force} in favor of {@code letf}.
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 @NullMarked
+@Documentation("""
+    The let command lets you introduce entries to the abbreviation table.
+       let @abbrev1=term1 ... @abbrev2=term2;
+    or
+       letf @abbrev1=term1 ... @abbrev2=term2;
+    One or more key-value pairs are supported where key starts is @ followed by an identifier and
+    value is a term.
+    If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
 public class LetCommand implements ProofScriptCommand {
+
     @Override
     public List<ProofScriptArgument> getArguments() {
         return List.of();
     }
-
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,

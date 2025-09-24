@@ -14,6 +14,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
+import java.util.List;
+
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
  * id "#2"
@@ -28,6 +30,12 @@ public class CutCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "cut";
+    }
+
+    // From within JML scripts, "assert" is more common than "cut"
+    @Override
+    public List<String> getAliases() {
+        return List.of(getName(), "assert");
     }
 
     @Override
