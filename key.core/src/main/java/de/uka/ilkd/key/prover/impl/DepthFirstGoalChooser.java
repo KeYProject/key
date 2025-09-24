@@ -74,6 +74,9 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
 
         nextGoals = ImmutableSLList.nil();
 
+        // Only consider automatic goals
+        newGoals = newGoals.filter(Goal::isAutomatic);
+
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
             final @NonNull Goal goal = selectedList.head();

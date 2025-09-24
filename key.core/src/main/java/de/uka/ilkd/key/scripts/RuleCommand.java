@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
@@ -56,23 +57,6 @@ public class RuleCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "rule";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return """
-                Command that applies a calculus rule.
-                All parameters are passed as strings and converted by the command.
-
-                The parameters are:
-                <ol>
-                    <li>#2 = <String>rule name</String></li>
-                    <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
-                    <li>formula= toplevel formula in which term appears in</li>
-                    <li>occ = occurrence number</li>
-                    <li>inst_= instantiation</li>
-                </ol>
-                """;
     }
 
     @Override
@@ -241,7 +225,7 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("No matching applications.");
         }
 
-        if (p.occ < 0) {
+        if (p.occ == null || p.occ < 0) {
             if (matchingApps.size() > 1) {
                 throw new ScriptException("More than one applicable occurrence");
             }
@@ -405,18 +389,23 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
+    @Documentation("Command that applies a calculus rule.")
     public static class Parameters {
         @Argument
+        @Documentation("Name of the rule to be applied.")
         public @MonotonicNonNull String rulename;
 
         @Option(value = "on")
+        @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule).")
         public @Nullable JTerm on;
 
         @Option(value = "formula")
+        @Documentation("Top-level formula in which the term appears.")
         public @Nullable JTerm formula;
 
         @Option(value = "occ")
-        public @Nullable int occ = -1;
+        @Documentation("Occurrence number if more than one occurrence matches.")
+        public @Nullable Integer occ = -1;
 
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
@@ -426,6 +415,7 @@ public class RuleCommand extends AbstractCommand {
         public @Nullable String matches = null;
 
         @OptionalVarargs(as = JTerm.class, prefix = "inst_")
+        @Documentation("Instantiations for schema variables used in the rule.")
         public Map<String, JTerm> instantiations = new HashMap<>();
     }
 
