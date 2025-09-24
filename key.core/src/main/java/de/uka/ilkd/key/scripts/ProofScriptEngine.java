@@ -180,6 +180,9 @@ public class ProofScriptEngine {
                 proof.getSubtreeGoals(stateMap.getProof().root())
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
 
+                LOGGER.debug("Commands: {}", commands.stream()
+                        .map(ScriptCommandAst::asCommandLine)
+                        .collect(Collectors.joining("\n")));
 
                 throw new ScriptException(
                     String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
