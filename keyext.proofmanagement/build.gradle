@@ -10,6 +10,7 @@ dependencies {
     implementation project(':key.ui')
 
     implementation group: 'org.antlr', name: 'ST4', version: '4.3.4'
+    implementation("info.picocli:picocli:4.7.6")
 }
 
 application {
