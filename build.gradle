@@ -254,10 +254,11 @@ subprojects {
             sarif.required = true
         }
 
-        doLast {
+        finalizedBy  {
             def inputXml = layout.buildDirectory.dir("reports/checkstyle/main.xml").get().asFile.toPath()
             def outputMd = layout.buildDirectory.dir("reports/checkstyle/main.md").get().asFile.toPath()
             CheckstyleMarkdownReport.report(inputXml, outputMd, projectDir.toPath())
+            logger.lifecycle("Create checkstyle markdown report: $outputMd")
         }
     }
 
