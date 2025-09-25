@@ -10,6 +10,18 @@ import org.jetbrains.kotlin.com.google.gson.GsonBuilder
 import org.jetbrains.kotlin.com.google.gson.JsonElement
 import java.io.File
 
+/**
+ * Utility class for combining multiple SARIF (Static Analysis Results Interchange Format) files.
+ *
+ * This class provides a method to merge SARIF reports, which are commonly used for aggregating
+ * static analysis results from different tools or runs into a single report.
+ * 
+ * The implementation has no deep understanding of the SARIF format and simply merges the `results` field.
+ * Not applicable for multiple `run` or `tool` entries.
+ *
+ * @see <a href="https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html">SARIF Specification</a>
+ */
+/** */
 private val JsonElement.getResultsOfFirstRun
     get() = asJsonObject.get("runs").asJsonArray.get(0).asJsonObject.get("results").asJsonArray
 

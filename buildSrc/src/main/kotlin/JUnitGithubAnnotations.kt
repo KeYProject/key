@@ -7,6 +7,13 @@ import kotlin.io.path.extension
 import kotlin.io.path.name
 import kotlin.io.path.walk
 
+
+/**
+ * Provides utility functions to parse JUnit XML test reports and print annotations understood by GitHub Actions
+ * workflow for failed test cases. This helps surface test failures directly
+ * in the GitHub Actions UI by generating error annotations with relevant file and test information.
+ */
+@kotlin.io.path.ExperimentalPathApi
 object JUnitGithubAnnotations {
     private val xqryTestcase by lazy {
         val xPath = XPathFactory.newInstance().newXPath()
@@ -40,10 +47,10 @@ object JUnitGithubAnnotations {
             val attributes = node.attributes
             val caseName = attributes.getNamedItem("name").textContent
             val classname = attributes.getNamedItem("classname").textContent
-            val filename = "$base/${classname.replace(".", "/")}"
+            val filename = "$base/${classname.replace(".", "/")}.java"
             val message = failure?.take(80) ?: ""
             // ::error file={name},line={line},endLine={endLine}, ={title}::{message}
-            print("::error title=Testcase-missed,file=$filename::Error in test case '$caseName' and $message")
+            print("::error title=Testcase-missed,file=$filename::Test error in '$caseName' with '$message'")
         }
     }
 
