@@ -1,0 +1,11 @@
+plugins {
+    id("java-convention")
+}
+
+description = "Extension for key.ui to access the Test Case Generation graphically"
+
+dependencies {
+    implementation (project(":key.ui"))
+    implementation (project(":key.core"))
+    implementation (project(":key.core.testgen"))
+}
