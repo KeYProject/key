@@ -223,6 +223,10 @@ public abstract class AbstractProofControl implements ProofControl {
                         firstApp = tmpApp;
                     }
                 } catch (GenericSortException ge) {
+                    // If we just "try" to instantiate, it is fine to fail at this point.
+                    // In many cases, we add instantiations later (e.g., through a dialog) that
+                    // clear up any missing
+                    // generic sort instantiations.
                 }
             }
             if (ifSeqInteraction || !firstApp.complete()) {
