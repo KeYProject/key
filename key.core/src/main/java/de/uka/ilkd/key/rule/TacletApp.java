@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -77,6 +78,8 @@ public abstract class TacletApp implements RuleApp {
      * instantiated yet. This means SchemaVariables in addrule-sections have to be ignored
      */
     private volatile ImmutableSet<SchemaVariable> missingVars = null;
+
+    private volatile ImmutableSet<GenericSort> missingSorts = null;
 
     /**
      * the update context given by the current instantiations must not be changed
@@ -399,6 +402,23 @@ public abstract class TacletApp implements RuleApp {
         return missingVars;
     }
 
+    /**
+     * calculate needed GenericSorts that have not been instantiated yet. This means to ignore
+     * GenericSorts that appear only in addrule-sections of Taclets
+     *
+     * @return ImmutableSet<GenericSort> that need to be instantiated but are not
+     */
+    protected ImmutableSet<GenericSort> calculateNonInstantiatedGenericSorts() {
+        if (missingSorts == null) {
+            var coll =
+                new UninstantiatedGenericSortCollector(instantiations());
+            coll.visitWithoutAddrule(taclet());
+            missingSorts = Immutables.createSetFrom(coll.getSortList());
+        }
+
+        return missingSorts;
+    }
+
 
     /**
      * creates a new Tacletapp where the SchemaVariable sv is instantiated with the given term.
@@ -445,6 +465,15 @@ public abstract class TacletApp implements RuleApp {
      */
     public @NonNull ImmutableSet<SchemaVariable> uninstantiatedVars() {
         return calculateNonInstantiatedSV();
+    }
+
+    /// returns the generic sorts that have not yet been instantiated and need to be instantiated to
+    /// apply the Taclet. (These are not all sorts like the one that appear only in the
+    /// addrule sections)
+    ///
+    /// @return ImmutableSet<GenericSort> with GenericSorts that have not been instantiated yet
+    public @NonNull ImmutableSet<GenericSort> uninstantiatedGenericSorts() {
+        return calculateNonInstantiatedGenericSorts();
     }
 
 
@@ -712,6 +741,7 @@ public abstract class TacletApp implements RuleApp {
     public final boolean complete() {
         return (posInOccurrence() != null || taclet instanceof NoFindTaclet)
                 && uninstantiatedVars().isEmpty()
+                && uninstantiatedGenericSorts().isEmpty()
                 && assumesInstantionsComplete();
     }
 
