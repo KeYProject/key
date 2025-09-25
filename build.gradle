@@ -244,6 +244,9 @@ subprojects {
     }
 
     tasks.withType(Checkstyle).configureEach {
+        ignoreFailures = false
+        maxWarnings = 0
+
         reports {
             xml.required = true
             html.required = true
