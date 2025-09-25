@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.GenericSortException;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 
@@ -215,12 +216,14 @@ public abstract class AbstractProofControl implements ProofControl {
                     ifSeqInteraction = false;
                     firstApp = ifSeqCandidates.head();
                 }
-                TacletApp tmpApp =
-                    firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
-                if (tmpApp != null) {
-                    firstApp = tmpApp;
+                try {
+                    TacletApp tmpApp =
+                        firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
+                    if (tmpApp != null) {
+                        firstApp = tmpApp;
+                    }
+                } catch (GenericSortException ge) {
                 }
-
             }
             if (ifSeqInteraction || !firstApp.complete()) {
                 LinkedList<TacletApp> l = new LinkedList<>();

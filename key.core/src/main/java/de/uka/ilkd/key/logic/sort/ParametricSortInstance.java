@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
@@ -15,8 +16,6 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -35,7 +34,7 @@ public final class ParametricSortInstance extends AbstractSort {
     private final ImmutableSet<Sort> extendsSorts;
 
     public static ParametricSortInstance get(ParametricSortDecl base,
-            ImmutableList<GenericArgument> args) {
+            ImmutableList<GenericArgument> args, Services services) {
         assert args.size() == base.getParameters().size();
         ParametricSortInstance sort =
             new ParametricSortInstance(base, args);
@@ -44,6 +43,8 @@ public final class ParametricSortInstance extends AbstractSort {
             return cached;
         } else {
             CACHE.put(sort, sort);
+            if (!sort.containsGenericSort())
+                services.getNamespaces().sorts().addSafely(sort);
             return sort;
         }
     }
@@ -65,7 +66,7 @@ public final class ParametricSortInstance extends AbstractSort {
     }
 
     private static ImmutableSet<Sort> computeExt(ParametricSortDecl base,
-            ImmutableList<GenericArgument> args) {
+            ImmutableList<GenericArgument> args, Services services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
 
         // 1. extensions by base sort
@@ -73,7 +74,8 @@ public final class ParametricSortInstance extends AbstractSort {
         if (!baseExt.isEmpty()) {
             for (Sort s : baseExt) {
                 result =
-                    result.add(ParametricFunctionInstance.instantiate(s, getInstMap(base, args)));
+                    result.add(ParametricFunctionInstance.instantiate(s, getInstMap(base, args),
+                        services));
             }
         }
 
@@ -151,20 +153,21 @@ public final class ParametricSortInstance extends AbstractSort {
     }
 
     public static Sort instantiate(GenericSort genericSort, Sort instantiation,
-            Sort toInstantiate) {
+            Sort toInstantiate, Services services) {
         if (genericSort == toInstantiate) {
             return instantiation;
         } else if (toInstantiate instanceof ParametricSortInstance psort) {
-            return psort.instantiate(genericSort, instantiation);
+            return psort.instantiate(genericSort, instantiation, services);
         } else {
             return toInstantiate;
         }
     }
 
-    public Sort instantiate(GenericSort template, Sort instantiation) {
+    public Sort instantiate(GenericSort template, Sort instantiation, Services services) {
         ImmutableList<GenericArgument> newParameters =
-            args.map(s -> new GenericArgument(instantiate(template, instantiation, s.sort())));
-        return get(base, newParameters);
+            args.map(
+                s -> new GenericArgument(instantiate(template, instantiation, s.sort(), services)));
+        return get(base, newParameters, services);
     }
 
     public boolean isComplete(SVInstantiations instMap) {
@@ -181,8 +184,7 @@ public final class ParametricSortInstance extends AbstractSort {
         return true;
     }
 
-    public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-            SVInstantiations instMap) {
+    public Sort resolveSort(SVInstantiations instMap, Services services) {
         ImmutableList<GenericArgument> newArgs = ImmutableSLList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             GenericArgument arg = args.get(i);
@@ -190,7 +192,7 @@ public final class ParametricSortInstance extends AbstractSort {
             if (sort instanceof ParametricSortInstance psi) {
                 newArgs =
                     newArgs.prepend(
-                        new GenericArgument(psi.resolveSort(sv, instCandidate, instMap)));
+                        new GenericArgument(psi.resolveSort(instMap, services)));
             } else if (sort instanceof GenericSort gs) {
                 newArgs = newArgs.prepend(
                     new GenericArgument(
@@ -199,6 +201,18 @@ public final class ParametricSortInstance extends AbstractSort {
                 newArgs = newArgs.prepend(arg);
             }
         }
-        return get(base, newArgs);
+        return get(base, newArgs, services);
+    }
+
+    public boolean containsGenericSort() {
+        for (GenericArgument arg : args) {
+            if (arg.sort() instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
+                return true;
+            }
+            if (arg.sort() instanceof GenericSort) {
+                return true;
+            }
+        }
+        return false;
     }
 }

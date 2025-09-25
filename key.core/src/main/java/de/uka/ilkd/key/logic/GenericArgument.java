@@ -32,7 +32,7 @@ public record GenericArgument(Sort sort) implements TerminalSyntaxElement {
                 args = args.prepend(psi.getArgs().get(i).instantiate(svInst, services));
             }
 
-            return new GenericArgument(ParametricSortInstance.get(psi.getBase(), args));
+            return new GenericArgument(ParametricSortInstance.get(psi.getBase(), args, services));
         } else {
             return this;
         }

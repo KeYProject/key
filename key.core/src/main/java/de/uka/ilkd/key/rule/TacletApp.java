@@ -658,12 +658,11 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * @param services the Services class allowing access to the type model
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is instantiated with
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(JOperatorSV p_sv, TermServices services) {
+    public Sort getRealSort(JOperatorSV p_sv, Services services) {
         return instantiations().getGenericSortInstantiations().getRealSort(p_sv, services);
     }
 

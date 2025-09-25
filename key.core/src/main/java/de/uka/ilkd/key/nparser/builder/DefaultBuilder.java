@@ -193,7 +193,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 return null;
             }
             var args = getGenericArgs(genericArgsCtxt, d.getParameters());
-            return ParametricFunctionInstance.get(d, args);
+            return ParametricFunctionInstance.get(d, args, services);
         }
         semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
         return null;
@@ -342,7 +342,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
             ImmutableList<GenericArgument> params =
                 getGenericArgs(ctx.formal_sort_args(), sortDecl.getParameters());
-            return ParametricSortInstance.get(sortDecl, params);
+            return ParametricSortInstance.get(sortDecl, params, services);
         }
         // Special handling for byte, char, short, long:
         // these are *not* sorts, but they are nevertheless valid

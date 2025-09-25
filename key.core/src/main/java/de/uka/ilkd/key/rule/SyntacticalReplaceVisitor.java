@@ -314,7 +314,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
                     final JTerm instantiationForBoundSchemaVariable =
-                        (JTerm) svInst.getInstantiation(boundSchemaVariable);
+                        svInst.getInstantiation(boundSchemaVariable);
                     // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
@@ -422,7 +422,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             args = args.prepend(pfi.getArgs().get(i).instantiate(svInst, services));
         }
 
-        return ParametricFunctionInstance.get(pfi.getBase(), args);
+        return ParametricFunctionInstance.get(pfi.getBase(), args, services);
     }
 
     private JTerm resolveSubst(JTerm t) {

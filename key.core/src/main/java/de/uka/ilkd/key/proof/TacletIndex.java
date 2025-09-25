@@ -98,6 +98,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
                 case SortDependingFunction sortDependingFunction ->
                     // indexed independently of sort
                     indexObj = sortDependingFunction.getKind();
+                case ParametricFunctionInstance pfi -> indexObj = pfi.getBase();
                 case ElementaryUpdate ignored ->
                     indexObj = ElementaryUpdate.class;
                 case JModality ignored ->
@@ -341,6 +342,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
         final ImmutableList<NoPosTacletApp> inMap = switch (op) {
             case SortDependingFunction sortDependingFunction ->
                 map.get(sortDependingFunction.getKind());
+            case ParametricFunctionInstance pfi -> map.get(pfi.getBase());
             case ElementaryUpdate ignored -> map.get(ElementaryUpdate.class);
             case JModality ignored -> map.get(JModality.class);
             default -> map.get(op);

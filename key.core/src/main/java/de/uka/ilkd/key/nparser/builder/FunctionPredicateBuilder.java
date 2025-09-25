@@ -73,7 +73,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 var param = psd.getParameters().get(i);
                 args = args.prepend(new GenericArgument(param.sort()));
             }
-            sort = ParametricSortInstance.get(psd, args);
+            sort = ParametricSortInstance.get(psd, args, services);
         } else {
             sort = sorts().lookup(ctx.name.getText());
             genericParams = null;
@@ -98,7 +98,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     var alreadyDefinedPfn = dtPfnNamespace.lookup(argName);
                     if (alreadyDefinedPfn != null) {
                         alreadyDefinedFn = ParametricFunctionInstance.get(alreadyDefinedPfn,
-                            ImmutableList.of(new GenericArgument(sort)));
+                            ImmutableList.of(new GenericArgument(sort)), services);
                     }
                 }
                 if (alreadyDefinedFn != null
@@ -163,7 +163,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                    new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false);
+                    new Name(baseName), JavaDLTheory.FORMULA, argSorts.toArray(new Sort[0]), false,
+                    services);
             }
         }
 
@@ -228,7 +229,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                    new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
+                    new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique, services);
             }
         }
 
