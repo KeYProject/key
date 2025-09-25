@@ -38,11 +38,12 @@ public final class SortDependingFunction extends JFunction {
     // constructors
     // -------------------------------------------------------------------------
 
-    private SortDependingFunction(SortDependingFunctionTemplate template, Sort sortDependingOn) {
+    private SortDependingFunction(SortDependingFunctionTemplate template, Sort sortDependingOn,
+            Services services) {
         super(instantiateName(template.kind, sortDependingOn),
             ParametricSortInstance.instantiate(template.sortDependingOn, sortDependingOn,
-                template.sort),
-            instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
+                template.sort, services),
+            instantiateArgSorts(template, sortDependingOn, services), null, template.unique, false);
         this.template = template;
         this.sortDependingOn = sortDependingOn;
     }
@@ -64,11 +65,11 @@ public final class SortDependingFunction extends JFunction {
 
 
     private static ImmutableArray<Sort> instantiateArgSorts(SortDependingFunctionTemplate template,
-            Sort sortDependingOn) {
+            Sort sortDependingOn, Services services) {
         Sort[] result = new Sort[template.argSorts.size()];
         for (int i = 0; i < result.length; i++) {
             result[i] = ParametricSortInstance.instantiate(template.sortDependingOn,
-                sortDependingOn, template.argSorts.get(i));
+                sortDependingOn, template.argSorts.get(i), services);
         }
         return new ImmutableArray<>(result);
     }
@@ -84,10 +85,10 @@ public final class SortDependingFunction extends JFunction {
     }
 
     public static SortDependingFunction createFirstInstance(GenericSort sortDependingOn, Name kind,
-            Sort sort, Sort[] argSorts, boolean unique) {
+            Sort sort, Sort[] argSorts, boolean unique, Services services) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
             kind, sort, new ImmutableArray<>(argSorts), unique);
-        return new SortDependingFunction(template, JavaDLTheory.ANY);
+        return new SortDependingFunction(template, JavaDLTheory.ANY, services);
     }
 
 
@@ -128,7 +129,7 @@ public final class SortDependingFunction extends JFunction {
 
             if (result != null && sort instanceof GenericSort
                     && result.getSortDependingOn() != sort) {
-                result = new SortDependingFunction(template, sort);
+                result = new SortDependingFunction(template, sort, (Services) services);
                 synchronized (functions) {
                     functions.add(result);
                     if (instantiateName(getKind(), sort).toString().contains("String")
@@ -138,7 +139,7 @@ public final class SortDependingFunction extends JFunction {
                     }
                 }
             } else if (result == null) {
-                result = new SortDependingFunction(template, sort);
+                result = new SortDependingFunction(template, sort, (Services) services);
                 // The namespaces may be wrapped for local symbols
                 // Sort depending on functions are to be added to the "root" namespace, however.
                 // Therefore, let's rewind to the root (MU, 2017-03)
