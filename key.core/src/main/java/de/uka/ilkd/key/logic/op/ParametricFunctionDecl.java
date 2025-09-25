@@ -15,6 +15,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/// The abstract declaration of a parametric function, e.g., `append<[E]>(List<[E]>, List<[E]>)`.
+///
+/// To get an instantiated instance, use [ParametricFunctionInstance#get(ParametricFunctionDecl,
+/// ImmutableList, Services)].
 public final class ParametricFunctionDecl implements Named, Sorted {
     private final Name name;
     private final ImmutableList<GenericParameter> parameters;

@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
+/// An argument for a [ParametricSortInstance] or [ParametricFunctionInstance].
 public record GenericArgument(Sort sort) implements TerminalSyntaxElement {
     @Override
     public @NonNull String toString() {
