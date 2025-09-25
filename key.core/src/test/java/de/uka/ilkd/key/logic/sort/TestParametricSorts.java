@@ -71,7 +71,7 @@ class TestParametricSorts {
     public void testParametricSortIdentical() {
         ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
         var sdf = SortDependingFunction.createFirstInstance(g1, new Name("someConst"), g1,
-            new Sort[0], false);
+            new Sort[0], false, services);
         nss.functions().add(sdf);
 
         var term = io.parseExpression("List<[int]>::someConst = List<[int]>::someConst");
@@ -85,14 +85,16 @@ class TestParametricSorts {
         Sort intSort = nss.sorts().lookup("int");
 
         var someConst = SortDependingFunction.createFirstInstance(g1, new Name("someConst"), g1,
-            new Sort[0], false);
+            new Sort[0], false, services);
         nss.functions().add(someConst);
 
         var listOfInt =
-            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(intSort)));
-        var listOfG1 = ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)));
+            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(intSort)),
+                services);
+        var listOfG1 =
+            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)), services);
         var sdf = SortDependingFunction.createFirstInstance(g1, new Name("head"), g1,
-            new Sort[] { listOfG1 }, false);
+            new Sort[] { listOfG1 }, false, services);
         nss.functions().add(sdf);
 
         SortDependingFunction sdfInst = sdf.getInstanceFor(intSort, services);
@@ -117,8 +119,10 @@ class TestParametricSorts {
         nss.parametricFunctions().add(someConst);
 
         var listOfInt =
-            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(intSort)));
-        var listOfG1 = ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)));
+            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(intSort)),
+                services);
+        var listOfG1 =
+            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)), services);
 
         var head = new ParametricFunctionDecl(new Name("head"),
             ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.COVARIANT)),
@@ -126,7 +130,8 @@ class TestParametricSorts {
         nss.parametricFunctions().add(head);
 
         var headInst =
-            ParametricFunctionInstance.get(head, ImmutableList.of(new GenericArgument(intSort)));
+            ParametricFunctionInstance.get(head, ImmutableList.of(new GenericArgument(intSort)),
+                services);
         assertEquals(intSort, headInst.sort());
         assertEquals(listOfInt, headInst.argSort(0));
 
