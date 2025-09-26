@@ -60,7 +60,7 @@
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
             "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
-            "OSS_OPTIONS_KEY" : "OSS_OFF",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
             "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
             "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
@@ -82,6 +82,7 @@
 
 \sorts {
     \generic E;
+    \generic F;
     S;
 }
 
@@ -123,6 +124,11 @@
 	// definition of revert
 	revert_base {\find (rev<[E]>(Nil<[E]>)) \replacewith(Nil<[E]>) };
 	revert_step {\find (rev<[E]>(Cons<[E]>(e,list))) \replacewith (app<[E]>(rev<[E]>(list),Cons<[E]>(e,Nil<[E]>)))};
+
+    // This tests that rules are not applicable if uninstantiated generic sorts remain.
+	my_weird_sort {
+	    \add(==> Nil<[F]> = Nil<[F]>)
+	};
 }
 \problem {
 \forall List<[S]> l; app<[S]>(l, Nil<[S]>) = l
@@ -134,26 +140,23 @@
 (autoModeTime "0")
 
 (branch "dummy ID"
-(rule "DT_List<[E]>_Induction" (newnames "heapAtPre,savedHeapAtPre,arg0AtPre,arg1AtPre,heapAtPre,savedHeapAtPre,arg0AtPre,arg1AtPre,heapAtPre,savedHeapAtPre,arg0AtPre,heapAtPre,savedHeapAtPre,vAtPre") (inst "phi=(app<[S]>(x, Nil<[S]>) = x)<<origin(\"User_Interaction @ node 0 (DT List<[E]> Induction)\",\"[]\")>>") (inst "x=x") (inst "tail=tail") (inst "head=head") (userinteraction))
+(rule "DT_List<[E]>_Induction" (newnames "heapAtPre,savedHeapAtPre,arg0AtPre,arg1AtPre,heapAtPre,savedHeapAtPre,arg0AtPre,arg1AtPre,heapAtPre,savedHeapAtPre,arg0AtPre,heapAtPre,savedHeapAtPre,vAtPre") (inst "phi=(app<[S]>(l, Nil<[S]>) = l)<<origin(\"User_Interaction @ node 0 (DT List<[E]> Induction)\",\"[]\")>>") (inst "x=l:List<[S]>") (inst "tail=tail:List<[S]>") (inst "head=head:S") (userinteraction))
 (branch "Nil"
    (rule "concat_base" (formula "1") (term "0") (userinteraction))
-   (rule "equalUnique" (formula "1") (userinteraction))
+    (builtin "One Step Simplification" (formula "1") (userinteraction))
    (rule "closeTrue" (formula "1") (userinteraction))
 )
 (branch "Cons(Ehead,List<[E]>tail)"
-   (rule "allRight" (formula "1") (inst "sk=tail_0") (userinteraction))
-   (rule "allRight" (formula "1") (inst "sk=head_0") (userinteraction))
+   (rule "allRight" (formula "1") (inst "sk=tail_0:List<[S]>") (userinteraction))
+   (rule "allRight" (formula "1") (inst "sk=head_0:S") (userinteraction))
    (rule "impRight" (formula "1") (userinteraction))
    (rule "concat_step" (formula "2") (term "0") (userinteraction))
    (rule "applyEqRigid" (formula "2") (term "1,0") (ifseqformula "1") (userinteraction))
-   (rule "equalUnique" (formula "2") (userinteraction))
-   (rule "eqClose" (formula "2") (term "0") (userinteraction))
-   (rule "concrete_and_1" (formula "2") (userinteraction))
-   (rule "eqClose" (formula "2") (userinteraction))
+    (builtin "One Step Simplification" (formula "2") (userinteraction))
    (rule "closeTrue" (formula "2") (userinteraction))
 )
 (branch "Use case of List"
-   (rule "close" (formula "2") (ifseqformula "1") (userinteraction))
+   (rule "closeAntec" (formula "1") (ifseqformula "2") (userinteraction))
 )
 )
 }
