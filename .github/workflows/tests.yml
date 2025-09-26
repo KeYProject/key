@@ -72,6 +72,12 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
+        if: (success() || failure())
+
+      - name: JUnit into Github Annotations
+        run: ./gradlew junitAsAnnotations
+        if: (success() || failure())
+
 
   integration-tests:
     env:
@@ -110,3 +116,9 @@ jobs:
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/
+
+      - name: JUnit into Github Annotations
+        run: ./gradlew junitAsAnnotations
+        if: (success() || failure())
+
+
