@@ -51,11 +51,11 @@ public class SetCommand extends AbstractCommand {
                         : StrategyProperties.OSS_OFF);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
-        } 
+        }
 
         if (args.proofSteps != null) {
             state.setMaxAutomaticSteps(args.proofSteps);
-        } 
+        }
 
         if (args.stackAction != null) {
             Stack<StrategyProperties> stack =
@@ -76,10 +76,11 @@ public class SetCommand extends AbstractCommand {
                 default:
                     throw new IllegalArgumentException("stack must be either push or pop.");
             }
-        } else if(args.userKey != null) {
+        } else if (args.userKey != null) {
             String[] kv = args.userKey.split(":", 2);
-            if(kv.length != 2) {
-                throw new IllegalArgumentException("userData must be of the form key:value. Use userData:\"myKey:myValue\".");
+            if (kv.length != 2) {
+                throw new IllegalArgumentException(
+                    "userData must be of the form key:value. Use userData:\"myKey:myValue\".");
             }
             state.putUserData("user." + kv[0], kv[1]);
         } else {

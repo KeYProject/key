@@ -365,7 +365,8 @@ public class RuleCommand extends AbstractCommand {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Services services, Parameters p, ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Services services, Parameters p,
+            ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {

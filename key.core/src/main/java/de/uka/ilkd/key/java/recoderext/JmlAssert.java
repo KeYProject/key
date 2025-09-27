@@ -40,7 +40,8 @@ public class JmlAssert extends JavaStatement {
      */
     private final @Nullable String optLabel;
 
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition, String optLabel) {
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+            String optLabel) {
         this(kind, condition, null, optLabel);
     }
 

@@ -370,7 +370,7 @@ public interface ImmutableList<T extends @Nullable Object>
      *         ({@code index < 0 || index >= size()})
      */
     default T get(int index) {
-        if(index < 0 || index >= size()) {
+        if (index < 0 || index >= size()) {
             throw new IndexOutOfBoundsException();
         } else {
             return take(index).head();

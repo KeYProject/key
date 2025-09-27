@@ -11,19 +11,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
-import de.uka.ilkd.key.scripts.meta.InjectionException;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import de.uka.ilkd.key.scripts.meta.ValueInjector;
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 public class BranchesCommand extends AbstractCommand {
 
@@ -46,7 +44,7 @@ public class BranchesCommand extends AbstractCommand {
             state.putUserData("_branchStack", stack);
         }
 
-        if(args.mode == null) {
+        if (args.mode == null) {
             throw new ScriptException("For 'branches', a mode must be specified");
         }
 
@@ -77,8 +75,8 @@ public class BranchesCommand extends AbstractCommand {
                 int no = 0;
                 int found = -1;
                 for (TacletGoalTemplate template : templates) {
-                    if(!"main".equals(template.tag())) {
-                        if(found != -1) {
+                    if (!"main".equals(template.tag())) {
+                        if (found != -1) {
                             throw new ScriptException("More than one non-main goal found");
                         }
                         found = no;
@@ -95,12 +93,13 @@ public class BranchesCommand extends AbstractCommand {
                 state.setGoal(goal);
                 break;
             default:
-                throw new ScriptException("Unknown mode " + args.mode + " for the 'branches' command" );
+                throw new ScriptException(
+                    "Unknown mode " + args.mode + " for the 'branches' command");
         }
     }
 
     private void ensureSingleGoal() {
-        //state.
+        // state.
     }
 
     private Goal findGoalByName(Node root, String branch) throws ScriptException {

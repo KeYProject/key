@@ -79,7 +79,8 @@ public class JmlAssert extends JavaStatement {
     }
 
     public JmlAssert(JmlAssert other) {
-        this(other.kind, other.optLabel, other.condition, other.assertionProof, other.getPositionInfo());
+        this(other.kind, other.optLabel, other.condition, other.assertionProof,
+            other.getPositionInfo());
     }
 
     public TextualJMLAssertStatement.Kind getKind() {

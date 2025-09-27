@@ -34,13 +34,13 @@ import org.jspecify.annotations.NullMarked;
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 @NullMarked
 @Documentation("""
-    The let command lets you introduce entries to the abbreviation table.
-       let @abbrev1=term1 ... @abbrev2=term2;
-    or
-       letf @abbrev1=term1 ... @abbrev2=term2;
-    One or more key-value pairs are supported where key starts is @ followed by an identifier and
-    value is a term.
-    If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
+        The let command lets you introduce entries to the abbreviation table.
+           let @abbrev1=term1 ... @abbrev2=term2;
+        or
+           letf @abbrev1=term1 ... @abbrev2=term2;
+        One or more key-value pairs are supported where key starts is @ followed by an identifier and
+        value is a term.
+        If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
 public class LetCommand implements ProofScriptCommand {
 
     @Override

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.parser;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,7 +71,7 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
 
     public static Location fromPositionInfo(PositionInfo info) {
         Optional<URI> uri = info.getURI();
-        if(uri.isEmpty()) {
+        if (uri.isEmpty()) {
             return UNDEFINED;
         } else {
             Position pos = info.getStartPosition();

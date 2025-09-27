@@ -702,7 +702,8 @@ public final class IOUtil {
 
     public static URL makeMemoryURL(String data) {
         try {
-            return new URL("memory", "", 0, String.format("/%x", System.identityHashCode(data)), new MemoryDataHandler(data));
+            return new URL("memory", "", 0, String.format("/%x", System.identityHashCode(data)),
+                new MemoryDataHandler(data));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -710,13 +711,15 @@ public final class IOUtil {
 
     private static final class MemoryDataHandler extends URLStreamHandler {
         private final String data;
+
         public MemoryDataHandler(String data) {
             this.data = data;
         }
+
         @Override
         protected URLConnection openConnection(URL u) throws IOException {
             // perhaps check the hash code too?
-            if(!u.getProtocol().equals("memory")) {
+            if (!u.getProtocol().equals("memory")) {
                 throw new IOException("Unsupported protocol");
             }
             return new URLConnection(u) {

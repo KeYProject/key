@@ -96,7 +96,8 @@ public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceEl
      * These are not syntactical equal, therefore false is returned.
      */
     @Override
-    default <V> boolean equalsModProperty(Object o, Property<? super SourceElement> property, V... v) {
+    default <V> boolean equalsModProperty(Object o, Property<? super SourceElement> property,
+            V... v) {
         if (!(o instanceof SourceElement)) {
             return false;
         }

@@ -158,10 +158,10 @@ public class ValueInjector {
                 unhandledPos.get(), count, obj.getClass().getName()));
         }
 
-        if(obj instanceof VerifyableParameters vp) {
+        if (obj instanceof VerifyableParameters vp) {
             try {
                 vp.verifyParameters();
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 throw new InjectionException(e);
             }
         }
