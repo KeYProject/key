@@ -28,7 +28,6 @@ import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -190,8 +189,10 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
         if (label != null) {
             NoFindTacletBuilder bld = new NoFindTacletBuilder();
-            Sequent ante = JavaDLSequentKit.createAnteSequent(ImmutableList.of(new SequentFormula(tb.apply(update, condition))));
-            bld.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(ante, ImmutableList.of(), JavaDLSequentKit.getInstance().getEmptySequent()));
+            Sequent ante = JavaDLSequentKit.createAnteSequent(
+                ImmutableList.of(new SequentFormula(tb.apply(update, condition))));
+            bld.addTacletGoalTemplate(new AntecSuccTacletGoalTemplate(ante, ImmutableList.of(),
+                JavaDLSequentKit.getInstance().getEmptySequent()));
             bld.setName(new Name("recall_" + label));
             goal.addTaclet(bld.getNoFindTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, false);
         }

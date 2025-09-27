@@ -64,12 +64,12 @@ public class ValueInjectorTest {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
         ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
-                null);
+            null);
         args.put("i", "42");
         args.put("b", "true");
         args.put("unknownParameter", "unknownValue");
         assertThrows(UnknownArgumentException.class,
-                () -> ValueInjector.injection(new PPCommand(), pp, ast));
+            () -> ValueInjector.injection(new PPCommand(), pp, ast));
     }
 
     // copied from old jmlScript branch ... possibly needs adaptation
@@ -78,7 +78,7 @@ public class ValueInjectorTest {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
         ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
-                null);
+            null);
         args.put("#literal", "here goes the entire string...");
         args.put("i", "42");
         args.put("b", "true");

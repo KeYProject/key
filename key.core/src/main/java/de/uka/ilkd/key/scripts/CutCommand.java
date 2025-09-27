@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+import java.util.List;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -13,8 +15,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-
-import java.util.List;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the

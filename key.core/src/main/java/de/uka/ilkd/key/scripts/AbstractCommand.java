@@ -48,7 +48,8 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     }
 
     /**
-     * The POJO class of the parameter object, or null if this command does not take any parameters via
+     * The POJO class of the parameter object, or null if this command does not take any parameters
+     * via
      * a POJO.
      */
     private final @Nullable Class<?> parameterClazz;
