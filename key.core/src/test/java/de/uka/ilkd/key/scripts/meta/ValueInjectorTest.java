@@ -58,6 +58,38 @@ public class ValueInjectorTest {
             () -> ValueInjector.injection(new PPCommand(), pp, ast));
     }
 
+    // copied from old jmlScript branch ... possibly needs adaptation
+    @Test
+    public void testUnknownArguments() {
+        PP pp = new PP();
+        Map<String, Object> args = new HashMap<>();
+        ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
+                null);
+        args.put("i", "42");
+        args.put("b", "true");
+        args.put("unknownParameter", "unknownValue");
+        assertThrows(UnknownArgumentException.class,
+                () -> ValueInjector.injection(new PPCommand(), pp, ast));
+    }
+
+    // copied from old jmlScript branch ... possibly needs adaptation
+    @Test
+    public void testVarargsOld() throws Exception {
+        PP pp = new PP();
+        Map<String, Object> args = new HashMap<>();
+        ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
+                null);
+        args.put("#literal", "here goes the entire string...");
+        args.put("i", "42");
+        args.put("b", "true");
+        args.put("var_21", "21");
+        args.put("var_other", "otherString");
+        ValueInjector.injection(new PPCommand(), pp, ast);
+        assertEquals("21", pp.varargs.get("21"));
+        assertEquals("otherString", pp.varargs.get("other"));
+        assertEquals(2, pp.varargs.size());
+    }
+
     @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
         List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class);
@@ -90,8 +122,7 @@ public class ValueInjectorTest {
     }
 
     @Test
-    public void testFlag() throws ConversionException, ArgumentRequiredException,
-            InjectionReflectionException, NoSpecifiedConverterException {
+    public void testFlag() throws Exception {
         class Options {
             @Flag
             boolean a;
@@ -110,8 +141,7 @@ public class ValueInjectorTest {
 
 
     @Test
-    public void testVarargs() throws ConversionException, ArgumentRequiredException,
-            InjectionReflectionException, NoSpecifiedConverterException {
+    public void testVarargs() throws InjectionException {
         class Varargs {
             @OptionalVarargs(prefix = "a", as = Boolean.class)
             Map<String, Boolean> a;
@@ -149,6 +179,9 @@ public class ValueInjectorTest {
         @Option("q")
         @MonotonicNonNull
         String required;
+
+        @OptionalVarargs(prefix = "var_")
+        Map<String, String> varargs;
     }
 
     @NullMarked

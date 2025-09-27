@@ -145,7 +145,7 @@ public class ProofScriptEngine {
             try {
                 ProofScriptCommand command = COMMANDS.get(name);
                 if (command == null) {
-                    throw new ScriptException("Unknown command " + name + " at " + ast.location());
+                    throw new ScriptException("Unknown command " + name, ast.location());
                 }
 
                 if (stateMap.isEchoOn()) {
@@ -154,6 +154,7 @@ public class ProofScriptEngine {
                 }
                 command.execute(uiControl, ast, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
+                LOGGER.info("done with command {}", cmd);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (ProofAlreadyClosedException e) {
@@ -179,6 +180,9 @@ public class ProofScriptEngine {
                 proof.getSubtreeGoals(stateMap.getProof().root())
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
 
+                LOGGER.debug("Commands: {}", commands.stream()
+                        .map(ScriptCommandAst::asCommandLine)
+                        .collect(Collectors.joining("\n")));
 
                 throw new ScriptException(
                     String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",

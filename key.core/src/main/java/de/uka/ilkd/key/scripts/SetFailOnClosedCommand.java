@@ -15,7 +15,10 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * complexity in a try-and-error manner, etc.).
  *
  * @author Dominic Steinhoefel
+ *
+ * @deprecated This should be merged in the {@link SetCommand} with a parameter like "failonclosed".
  */
+@Deprecated
 public class SetFailOnClosedCommand extends AbstractCommand {
     public SetFailOnClosedCommand() {
         super(Parameters.class);

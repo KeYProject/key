@@ -175,6 +175,8 @@ mode expr;
 /* Java keywords */
 BOOLEAN: 'boolean';
 BYTE: 'byte';
+CASE: 'case';
+DEFAULT: 'default';
 FALSE: 'false';
 INSTANCEOF: 'instanceof';
 INT: 'int';

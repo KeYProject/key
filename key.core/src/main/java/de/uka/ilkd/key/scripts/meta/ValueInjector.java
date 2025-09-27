@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 
+import org.key_project.util.java.IntegerUtil;
+
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -46,6 +48,10 @@ public class ValueInjector {
             Class<S> source, Class<T> target) {
     }
 
+    interface VerifyableParameters {
+        void verifyParameters() throws IllegalArgumentException, InjectionException;
+    }
+
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
      * {@link #inject(Object, ScriptCommandAst)}
@@ -61,8 +67,7 @@ public class ValueInjector {
      * @throws ConversionException an converter could not translate the given value in arguments
      */
     public static <T> T injection(ProofScriptCommand command, @NonNull T obj,
-            ScriptCommandAst arguments) throws ArgumentRequiredException,
-            InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
+            ScriptCommandAst arguments) throws InjectionException {
         return getInstance().inject(obj, arguments);
     }
 
@@ -122,12 +127,43 @@ public class ValueInjector {
      * @see Flag
      */
     public <T> T inject(T obj, ScriptCommandAst arguments)
-            throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
-            ArgumentRequiredException {
+            throws InjectionException {
         List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass());
 
+        Set<Object> handledOptions = new HashSet<>();
         for (ProofScriptArgument arg : meta) {
-            injectIntoField(arg, arguments, obj);
+            handledOptions.addAll(injectIntoField(arg, arguments, obj));
+        }
+
+        Optional<String> unhandled = arguments.namedArgs().keySet().stream()
+                .filter(it -> !handledOptions.contains(it))
+                .findAny();
+        if (unhandled.isPresent()) {
+            throw new UnknownArgumentException(String.format(
+                "Unknown argument %s (with value %s) was provided. For command class: '%s'",
+                unhandled.get(),
+                arguments.namedArgs().get(unhandled.get()),
+                obj.getClass().getName()));
+        }
+
+        Optional<Integer> unhandledPos = IntegerUtil.indexRangeOf(arguments.positionalArgs())
+                .stream()
+                .filter(it -> !handledOptions.contains(it))
+                .findAny();
+        if (unhandledPos.isPresent()) {
+            long count = handledOptions.stream().filter(it -> it instanceof Integer).count();
+            throw new UnknownArgumentException(String.format(
+                "Unexpected positional argument at index %d was provided. " +
+                    "Expected (at most) %d positional arguments. For command class: '%s'",
+                unhandledPos.get(), count, obj.getClass().getName()));
+        }
+
+        if(obj instanceof VerifyableParameters vp) {
+            try {
+                vp.verifyParameters();
+            } catch(IllegalArgumentException e) {
+                throw new InjectionException(e);
+            }
         }
 
         return obj;
@@ -149,19 +185,22 @@ public class ValueInjector {
         }
     }
 
-    private void injectIntoField(ProofScriptArgument meta, ScriptCommandAst args, Object obj)
+    private List<?> injectIntoField(ProofScriptArgument meta, ScriptCommandAst args, Object obj)
             throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
             NoSpecifiedConverterException {
         Object val = null;
+        List<?> handled = List.of();
         if (meta.isPositional()) {
             final var idx = meta.getArgumentPosition();
             if (idx < args.positionalArgs().size()) {
                 val = args.positionalArgs().get(idx);
+                handled = List.of(idx);
             }
         }
 
         if (meta.isPositionalVarArgs()) {
             val = args.positionalArgs();
+            handled = IntegerUtil.indexRangeOf(args.positionalArgs());
         }
 
         if (meta.isOptionalVarArgs()) {
@@ -175,15 +214,16 @@ public class ValueInjector {
                 }
             }
             val = result;
+            handled = new ArrayList<>(result.keySet());
         }
 
         if (meta.isOption()) {
             val = args.namedArgs().get(meta.getName());
+            handled = List.of(meta.getName());
         }
 
         if (meta.isFlag()) {
             val = args.namedArgs().get(meta.getName());
-            System.out.println("X" + val + "  " + args.namedArgs() + "  " + meta.getName());
             if (val == null) {
                 // can also be given w/o colon or equal sign, e.g., "command hide;"
                 var stringStream = args.positionalArgs().stream()
@@ -196,8 +236,8 @@ public class ValueInjector {
                         });
                 // val == true iff the name of the flag appear as a positional argument.
                 val = stringStream.anyMatch(it -> Objects.equals(it, meta.getName()));
-                System.out.println(val);
             }
+            handled = List.of(meta.getName());
         }
 
         try {
@@ -206,7 +246,7 @@ public class ValueInjector {
                 if (meta.isRequired() && meta.getField().get(obj) == null) {
                     throw new ArgumentRequiredException(String.format(
                         "Argument %s (of type %s) is required, but %s was given. For command class: '%s'",
-                        meta.getName(), meta.getField().getType(), null,
+                        meta.getName(), meta.getField().getType().getSimpleName(), null,
                         meta.getField().getDeclaringClass()));
                 }
             } else {
@@ -216,7 +256,7 @@ public class ValueInjector {
         } catch (IllegalAccessException e) {
             throw new InjectionReflectionException("Could not inject values via reflection", e);
         }
-
+        return handled;
     }
 
     private Object convert(ProofScriptArgument meta, Object val)
@@ -301,14 +341,16 @@ public class ValueInjector {
     /**
      * Finds a converter for the given class.
      *
-     * @param <T> an arbitrary type
-     * @param ret a non-null class
-     * @param arg
-     * @return null or a suitable converter (registered) converter for the requested class.
+     * @param <R> the result type
+     * @param <T> the source type
+     * @param ret the result type class
+     * @param arg the source type class
+     * @return a suitable converter (registered) converter for the requested class. null if no such
+     *         converter is known.
      */
     @SuppressWarnings("unchecked")
     public <R, T> @Nullable Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
-        if (ret == arg) {
+        if (ret.isAssignableFrom(arg)) {
             return (T it) -> (R) it;
         }
         return (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
