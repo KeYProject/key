@@ -44,7 +44,7 @@ public class ProofScriptEngine {
      */
     private final EngineState stateMap;
 
-    public ProofScriptEngine(Proof proof) throws IOException {
+    public ProofScriptEngine(Proof proof) {
         super();
         this.stateMap = new EngineState(proof, this);
     }
