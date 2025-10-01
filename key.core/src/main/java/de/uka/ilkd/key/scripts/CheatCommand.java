@@ -25,8 +25,8 @@ public class CheatCommand extends NoArgumentCommand {
     static {
         TacletApplPart applPart =
             new TacletApplPart(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ApplicationRestriction.NONE, ImmutableList.of(), ImmutableList.of(),
-                ImmutableList.of(), ImmutableList.of());
+                new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE), ImmutableList.of(),
+                    ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
         CHEAT_TACLET =
             new NoFindTaclet(new Name("CHEAT"), applPart, ImmutableList.of(), ImmutableList.of(),
                 new TacletAttributes("cheat", null), DefaultImmutableMap.nilMap(), ChoiceExpr.TRUE,

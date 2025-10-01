@@ -232,8 +232,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class JMLProofScript extends KeyAst<JmlParser.AssertionProofContext> {
 
         private static class ObtainedVarsVisitor extends JmlParserBaseVisitor<Void> {
-            /// To make debugging easier, obtained variables have a special (hopefully but not necessarily unique) prefix.
-            public static final String OBTAIN_PREFIX = "_obtained_";
             private ImmutableList<LocationVariable> collectedVars = ImmutableList.of();
             private final JmlIO io;
 
@@ -245,7 +243,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             public Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
                 if(ctx.obtain != null) {
                     KeYJavaType type = io.translateType(ctx.typespec());
-                    ProgramElementName name = new ProgramElementName(OBTAIN_PREFIX + ctx.var.getText());
+                    ProgramElementName name = new ProgramElementName(ctx.var.getText());
                     collectedVars = collectedVars.prepend(new LocationVariable(name, type, true));
                 }
                 return null;
