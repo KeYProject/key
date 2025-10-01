@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -75,14 +76,15 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
         this.mediator = mediator;
         this.script = script;
         this.initiallySelectedGoal = initiallySelectedGoal;
-        engine = new ProofScriptEngine(script, initiallySelectedGoal);
+        engine = new ProofScriptEngine(initiallySelectedGoal.proof());
+        engine.setInitiallySelectedGoal(initiallySelectedGoal);
     }
 
     @Override
     protected @Nullable Object doInBackground() throws Exception {
         try {
             engine.setCommandMonitor(observer);
-            engine.execute(mediator.getUI(), mediator.getSelectedProof());
+            engine.execute(mediator.getUI(), script);
         } catch (InterruptedException ex) {
             LOGGER.debug("Proof macro has been interrupted:", ex);
         }

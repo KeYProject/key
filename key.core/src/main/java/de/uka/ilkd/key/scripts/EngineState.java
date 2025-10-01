@@ -146,7 +146,7 @@ public class EngineState {
         return null;
     }
 
-    public void setGoal(Goal g) {
+    public void setGoal(@Nullable Goal g) {
         goal = g;
         lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
     }

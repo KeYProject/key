@@ -38,9 +38,9 @@ public class ScriptCommand extends AbstractCommand {
         LOGGER.info("Included script {}", file);
 
         try {
-            ProofScriptEngine pse = new ProofScriptEngine(file);
+            ProofScriptEngine pse = new ProofScriptEngine(proof);
             pse.setCommandMonitor(state().getObserver());
-            pse.execute(uiControl, proof);
+            pse.execute(uiControl, file);
         } catch (NoSuchFileException e) {
             // The message is very cryptic otherwise.
             throw new ScriptException("Script file '" + file + "' not found", e);
