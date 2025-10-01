@@ -79,7 +79,7 @@ public class ProgramVariableCollection {
      *
      * @param selfVar {@code self}
      * @param paramVars the list of method parameters if the textual specification case is a method
-     *        contract.
+     *        contract. May also contain the local variables visible at a statement.
      * @param resultVar {@code result}
      * @param excVar {@code exception}
      * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.

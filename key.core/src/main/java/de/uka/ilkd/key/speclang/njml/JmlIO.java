@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -197,6 +198,22 @@ public class JmlIO {
         } else {
             return (JTerm) interpret;
         }
+    }
+
+    /**
+     * Interpret the given parse tree as an KeYJavaType in the current context.
+     * May return null if the KJT cannot be resolved.
+     */
+    public @Nullable KeYJavaType translateType(JmlParser.TypespecContext ctx) {
+        Object interpreted = interpret(ctx);
+        return switch (interpreted) {
+            case SLExpression slExpression -> slExpression.getType();
+            case Sort sort -> services.getJavaInfo().getKeYJavaType(sort);
+            case KeYJavaType kjt -> kjt;
+            case Type type -> services.getJavaInfo().getKeYJavaType(type);
+            default -> throw new IllegalArgumentException("Cannot translate to KeYJavaType: " +
+                    interpreted + " of class " + interpreted.getClass());
+        };
     }
 
     /**
@@ -410,4 +427,5 @@ public class JmlIO {
     public void clearWarnings() {
         warnings = ImmutableSLList.nil();
     }
+
 }

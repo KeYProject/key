@@ -13,18 +13,23 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
+import de.uka.ilkd.key.scripts.ScriptException;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
@@ -76,6 +81,27 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
 
+    record ObtainAwareTerm(JTerm term) {
+        JTerm resolve(Map<LocationVariable, LocationVariable> obtainMap, Services services) {
+            ProgVarReplacer pvr = new ProgVarReplacer(obtainMap, services);
+            JTerm result = pvr.replace(term);
+            assertNoObtainVarsLeft(result, obtainMap);
+            return result;
+        }
+
+        private void assertNoObtainVarsLeft(JTerm term, Map<LocationVariable, LocationVariable> obtainMap) {
+            var v = new DefaultVisitor() {
+                @Override
+                public void visit(Term visited) {
+                    if(obtainMap.containsKey(term.op())) {
+                        throw new RuntimeException("Use of obtain variable before it being obtained: " + term.op());
+                    }
+                }
+            };
+            term.execPreOrder(v);
+        }
+    }
+
     private static JmlAssert getJmlAssert(Node node) {
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof JmlAssertBuiltInRuleApp) {
@@ -122,10 +148,15 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
             KeyAst.JMLProofScript proofScript = jmlAssert.getAssertionProof();
             Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, proof.getServices());
+            // We heavily rely on that variables have been computed before, otherwise this will raise an NPE.
+            Map<LocationVariable, LocationVariable> obtainMap = makeObtainVarMap(jmlAssert.collectVariablesInProof(null));
             JTerm update = getUpdate(goal);
             List<ScriptCommandAst> renderedProof =
                 renderProof(proofScript, termMap, update, proof.getServices());
             ProofScriptEngine pse = new ProofScriptEngine(renderedProof, goal);
+            pse.getStateMap().putUserData("jml.obtainVarMap", obtainMap);
+            pse.getStateMap().getValueInjector().addConverter(JTerm.class, ObtainAwareTerm.class,
+                    oat -> oat.resolve(obtainMap, goal.proof().getServices()));
             LOGGER.debug("---- Script");
             LOGGER.debug(renderedProof.stream().map(ScriptCommandAst::asCommandLine)
                     .collect(Collectors.joining("\n")));
@@ -157,18 +188,25 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 "No specification found for JML assert statement at " + jmlAssert);
         }
         ImmutableList<JTerm> terms = jmlspec.terms().tail();
-        ImmutableList<ParserRuleContext> jmlExprs = jmlAssert.collectTerms().tail();
+        ImmutableList<JmlParser.ExpressionContext> jmlExprs = jmlAssert.collectTerms().tail();
         Map<ParserRuleContext, JTerm> result = new IdentityHashMap<>();
         assert terms.size() == jmlExprs.size();
         for (int i = 0; i < terms.size(); i++) {
-            // TODO build a map from jmlExprs.get(i) to terms.get(i)
             result.put(jmlExprs.get(i), terms.get(i));
         }
         return result;
     }
 
+    private Map<LocationVariable, LocationVariable> makeObtainVarMap(ImmutableList<LocationVariable> locationVariables) {
+        HashMap<LocationVariable, LocationVariable> result = new HashMap<>();
+        for (LocationVariable lv : locationVariables) {
+            result.put(lv, null);
+        }
+        return result;
+    }
+
     private static List<ScriptCommandAst> renderProof(KeyAst.JMLProofScript script,
-            Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
+            Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) throws ScriptException {
         List<ScriptCommandAst> result = new ArrayList<>();
         // Do not fail on open proofs
         // TODO Migrate into SetCommand
@@ -184,13 +222,79 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     private static List<ScriptCommandAst> renderProofCmd(ProofCmdContext ctx,
-            Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
+            Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) throws ScriptException {
         List<ScriptCommandAst> result = new ArrayList<>();
 
         // Push the current branch context
         result.add(new ScriptCommandAst("branches", Map.of(), List.of("push")));
 
         // Compose the command itself
+        if(ctx.obtain != null) {
+            ScriptCommandAst command = renderObtainCommand(ctx, termMap, update, services);
+            result.add(command);
+        } else {
+            ScriptCommandAst command = renderRegularCommand(ctx, termMap, update, services);
+            result.add(command);
+        }
+
+        // handle followup proofCmd if present
+        JmlParser.ProofCmdSuffixContext suffix = ctx.proofCmdSuffix();
+        if(suffix != null) {
+            if (!suffix.proofCmd().isEmpty()) {
+                result.add(new ScriptCommandAst("branches", Map.of(), List.of("single")));
+                for (ProofCmdContext proofCmdContext : suffix.proofCmd()) {
+                    result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
+                }
+            }
+
+            // handle proofCmdCases if present
+            for (ProofCmdCaseContext pcase : suffix.proofCmdCase()) {
+                String label = StringUtil.stripQuotes(pcase.label.getText());
+                result.add(new ScriptCommandAst("branches", Map.of("branch", label),
+                        List.of("select")));
+                for (ProofCmdContext proofCmdContext : pcase.proofCmd()) {
+                    result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
+                }
+            }
+        }
+
+        // Pop the branch stack
+        result.add(new ScriptCommandAst("branches", Map.of(), List.of("pop")));
+
+        return result;
+    }
+
+    private static ScriptCommandAst renderObtainCommand(ProofCmdContext ctx, Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) throws ScriptException {
+        Map<String, Object> named = new HashMap<>();
+
+        String argName = switch(ctx.obtKind.getType()) {
+            case JmlLexer.SUCH_THAT -> "such_that";
+            case JmlLexer.EQUAL_SINGLE -> "equals";
+            case JmlLexer.FROM_GOAL -> "from_goal";
+            default -> throw new ScriptException("Unknown obtain kind: " + ctx.obtKind.getText());
+        };
+
+        if(ctx.expression() == null) {
+            named.put(argName, true);
+        } else {
+            JmlParser.ExpressionContext exp = ctx.expression();
+            Object value;
+            if (isStringLiteral(exp)) {
+                value = StringUtil.stripQuotes(exp.getText());
+            } else {
+                value = termMap.get(exp);
+                if (update != null) {
+                    // Wrap in update application if an update is present
+                    value = services.getTermBuilder().apply(update, (JTerm) value);
+                }
+            }
+            named.put(argName, value);
+        }
+
+        return new ScriptCommandAst("__obtain", named, List.of(), Location.fromToken(ctx.start));
+    }
+
+    private static @NonNull ScriptCommandAst renderRegularCommand(ProofCmdContext ctx, Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
         Map<String, Object> named = new HashMap<>();
         List<Object> positional = new ArrayList<>();
         for (ProofArgContext argContext : ctx.proofArg()) {
@@ -211,31 +315,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 positional.add(value);
             }
         }
-        result.add(new ScriptCommandAst(ctx.cmd.getText(), named, positional,
-            Location.fromToken(ctx.start)));
-
-        // handle proofCmd if present
-        if (!ctx.proofCmd().isEmpty()) {
-            result.add(new ScriptCommandAst("branches", Map.of(), List.of("single")));
-            for (ProofCmdContext proofCmdContext : ctx.proofCmd()) {
-                result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
-            }
-        }
-
-        // handle proofCmdCase if present
-        for (ProofCmdCaseContext pcase : ctx.proofCmdCase()) {
-            String label = StringUtil.stripQuotes(pcase.label.getText());
-            result.add(new ScriptCommandAst("branches", Map.of("branch", label),
-                List.of("select")));
-            for (ProofCmdContext proofCmdContext : pcase.proofCmd()) {
-                result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
-            }
-        }
-
-        // Pop the branch stack
-        result.add(new ScriptCommandAst("branches", Map.of(), List.of("pop")));
-
-        return result;
+        return new ScriptCommandAst(ctx.cmd.getText(), named, positional,
+                Location.fromToken(ctx.start));
     }
 
     private static boolean isStringLiteral(JmlParser.ExpressionContext ctx) {
