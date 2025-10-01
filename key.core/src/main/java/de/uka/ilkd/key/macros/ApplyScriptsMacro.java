@@ -153,7 +153,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             JTerm update = getUpdate(goal);
             List<ScriptCommandAst> renderedProof =
                 renderProof(proofScript, termMap, update, proof.getServices());
-            ProofScriptEngine pse = new ProofScriptEngine(renderedProof, goal);
+            ProofScriptEngine pse = new ProofScriptEngine(proof);
+            pse.setInitiallySelectedGoal(goal);
             pse.getStateMap().putUserData("jml.obtainVarMap", obtainMap);
             pse.getStateMap().getValueInjector().addConverter(JTerm.class, ObtainAwareTerm.class,
                     oat -> oat.resolve(obtainMap, goal.proof().getServices()));
@@ -162,7 +163,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                     .collect(Collectors.joining("\n")));
             LOGGER.debug("---- End Script");
 
-            pse.execute((AbstractUserInterfaceControl) uic, proof);
+            pse.execute((AbstractUserInterfaceControl) uic, renderedProof);
         }
         listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
             "Running fallback macro on the remaining goals", 0));

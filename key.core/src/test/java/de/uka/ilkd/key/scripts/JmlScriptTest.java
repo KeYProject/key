@@ -46,8 +46,8 @@ public class JmlScriptTest {
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(projectFile);
             KeyAst.ProofScript script = env.getProofScript();
             if (script != null) {
-                ProofScriptEngine pse = new ProofScriptEngine(script);
-                pse.execute(env.getUi(), env.getLoadedProof());
+                ProofScriptEngine pse = new ProofScriptEngine(env.getLoadedProof());
+                pse.execute(env.getUi(), script);
             }
             // TODO read comments from java file to allow for more than only closed proofs ...
             Assertions.assertTrue(env.getLoadedProof().closed(), "Proof did not close.");

@@ -135,8 +135,8 @@ public class TestLocalSymbols {
         Proof proof = env.getLoadedProof();
         var script = env.getProofScript();
 
-        ProofScriptEngine pse = new ProofScriptEngine(script);
-        pse.execute(null, proof);
+        ProofScriptEngine pse = new ProofScriptEngine(proof);
+        pse.execute(null, script);
 
         ImmutableList<Goal> openGoals = proof.openGoals();
         assert openGoals.size() == 1;

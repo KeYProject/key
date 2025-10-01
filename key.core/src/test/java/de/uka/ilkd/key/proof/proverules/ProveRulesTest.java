@@ -69,8 +69,8 @@ public class ProveRulesTest {
 
         KeyAst.ProofScript script = env.getProofScript();
         if (script != null) {
-            ProofScriptEngine pse = new ProofScriptEngine(script);
-            pse.execute(env.getUi(), proof);
+            ProofScriptEngine pse = new ProofScriptEngine(proof);
+            pse.execute(env.getUi(), script);
         }
 
         assertTrue(proof.closed(), "Taclet proof of taclet " + tacletName + " did not close.");

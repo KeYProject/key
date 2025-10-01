@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -77,12 +78,12 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        var script = ParsingFacade.parseScript(data.script());
-        ProofScriptEngine pse = new ProofScriptEngine(script);
+        KeyAst.ProofScript script = ParsingFacade.parseScript(data.script());
+        ProofScriptEngine pse = new ProofScriptEngine(proof);
 
         boolean hasException = data.exception() != null;
         try {
-            pse.execute(env.getUi(), proof);
+            pse.execute(env.getUi(), script);
         } catch (ScriptException ex) {
             assertTrue(data.exception != null && !data.exception.isEmpty(),
                 "An exception was not expected, but got " + ex.getMessage());
