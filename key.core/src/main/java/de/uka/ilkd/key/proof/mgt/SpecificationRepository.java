@@ -1879,10 +1879,11 @@ public final class SpecificationRepository {
      * list of terms, in
      * an immutable fasion. Updates require to create instances.
      * <p>
-     * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable
+     * <b>Note:</b> There is an immutability hole in {@link ProgramVariableCollection} due to mutable
      * {@link Map}
      * <p>
-     * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
+     * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert
+     * (Potientially also containing the formulas within the optional proof).
      * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value
      * terms.
      * You may want to use the index constant for accessing them:
@@ -1909,7 +1910,7 @@ public final class SpecificationRepository {
         }
 
         /**
-         * Retrieve a term with a update to the given {@code self} term.
+         * Retrieve a term with an update to the given {@code self} term.
          *
          * @param services the corresponding services instance
          * @param self a term which describes the {@code self} object aka. this on the current

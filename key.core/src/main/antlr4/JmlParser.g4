@@ -9,6 +9,9 @@ options { tokenVocab=JmlLexer; }
 @members {
   private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+  private boolean isNextToken(String tokenText) {
+    return _input.LA(1) != Token.EOF && tokenText.equals(_input.LT(1).getText());
+  }
 }
 
 classlevel_comments: classlevel_comment* EOF;
@@ -210,9 +213,19 @@ assert_statement: (ASSERT (label=IDENT COLON)? expression | UNREACHABLE) (assert
 // --- proof scripts in JML
 assertionProof: BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
 proofCmd:
-    cmd=IDENT ( proofArg )*
-    ( SEMI | BY ( proofCmd | LBRACE (proofCmd+ | proofCmdCase+) RBRACE ))
+    // TODO allow more than one var in obtain
+  { isNextToken("obtain") }? obtain=IDENT typespec var=IDENT
+       ( obtKind=EQUAL_SINGLE expression SEMI
+       | obtKind=SUCH_THAT expression proofCmdSuffix
+       | obtKind=FROM_GOAL SEMI
+       )
+  | cmd=IDENT ( proofArg )* proofCmdSuffix
   ;
+
+proofCmdSuffix:
+  SEMI | BY ( proofCmd | LBRACE (proofCmd+ | proofCmdCase+) RBRACE )
+  ;
+
 proofCmdCase:
     CASE ( label=STRING_LITERAL )? COLON ( proofCmd )*
   | DEFAULT COLON ( proofCmd )*

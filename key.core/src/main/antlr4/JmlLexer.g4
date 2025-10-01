@@ -246,6 +246,7 @@ FP_SUBNORMAL: '\\fp_subnormal';   //KeY extension, not official JML
 FP_ZERO: '\\fp_zero';   //KeY extension, not official JML
 FREE: '\\free';  //KeY extension, not official JML
 FRESH: '\\fresh';
+FROM_GOAL: '\\from_goal';  //KeY extension, not official JML
 INDEX: '\\index';
 INDEXOF: '\\seq_indexOf';  //KeY extension, not official JML
 INTERSECT: '\\intersect';  //KeY extension, not official JML

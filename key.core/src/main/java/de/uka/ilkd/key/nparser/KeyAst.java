@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -21,8 +24,10 @@ import de.uka.ilkd.key.scripts.ScriptBlock;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import de.uka.ilkd.key.speclang.njml.JmlParserBaseVisitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
@@ -225,6 +230,40 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     }
 
     public static class JMLProofScript extends KeyAst<JmlParser.AssertionProofContext> {
+
+        private static class ObtainedVarsVisitor extends JmlParserBaseVisitor<Void> {
+            /// To make debugging easier, obtained variables have a special (hopefully but not necessarily unique) prefix.
+            public static final String OBTAIN_PREFIX = "_obtained_";
+            private ImmutableList<LocationVariable> collectedVars = ImmutableList.of();
+            private final JmlIO io;
+
+            private ObtainedVarsVisitor(JmlIO io) {
+                this.io = io;
+            }
+
+            @Override
+            public Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
+                if(ctx.obtain != null) {
+                    KeYJavaType type = io.translateType(ctx.typespec());
+                    ProgramElementName name = new ProgramElementName(OBTAIN_PREFIX + ctx.var.getText());
+                    collectedVars = collectedVars.prepend(new LocationVariable(name, type, true));
+                }
+                return null;
+            }
+        }
+
+        private static class TermCollectionVisitor extends JmlParserBaseVisitor<Void> {
+            private ImmutableList<JmlParser.ExpressionContext> collectedTerms = ImmutableList.of();
+
+            @Override
+            public Void visitExpression(JmlParser.ExpressionContext ctx) {
+                collectedTerms = collectedTerms.prepend(ctx);
+                return null;
+            }
+        }
+
+        private ImmutableList<LocationVariable> obtainedProgramVars;
+
         public JMLProofScript(JmlParser.@NonNull AssertionProofContext ctx) {
             super(ctx);
         }
@@ -237,32 +276,13 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             }
         }
 
-        /**
-         * Collect all JML expressions in a script (and potentially sub-blocks)
-         *
-         * @param cmd the command to collect from
-         * @return a list in reverse(!) order of all expressions in cmd
-         */
-        private static ImmutableList<ParserRuleContext> collectTerms(
-                JmlParser.ProofCmdContext cmd) {
-            ImmutableList<ParserRuleContext> result = ImmutableList.of();
-            for (JmlParser.ProofArgContext arg : cmd.proofArg()) {
-                JmlParser.ExpressionContext exp = arg.expression();
-                if (exp != null) {
-                    result = result.prepend(exp);
-                }
+        public ImmutableList<LocationVariable> getObtainedProgramVars(JmlIO io) {
+            if(obtainedProgramVars == null) {
+                var visitor = new ObtainedVarsVisitor(io);
+                ctx.accept(visitor);
+                obtainedProgramVars = visitor.collectedVars;
             }
-            for (JmlParser.ProofCmdContext childCmd : cmd.proofCmd()) {
-                result = result.prepend(collectTerms(childCmd));
-            }
-            if (cmd.proofCmdCase() != null) {
-                for (JmlParser.ProofCmdCaseContext pcase : cmd.proofCmdCase()) {
-                    for (JmlParser.ProofCmdContext childCmd : pcase.proofCmd()) {
-                        result = result.prepend(collectTerms(childCmd));
-                    }
-                }
-            }
-            return result;
+            return obtainedProgramVars;
         }
 
         /**
@@ -270,12 +290,10 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          *
          * Todo: Consider caching the result if this is called very often.
          */
-        public @NonNull ImmutableList<ParserRuleContext> collectTerms() {
-            ImmutableList<ParserRuleContext> result = ImmutableList.of();
-            for (JmlParser.ProofCmdContext cmd : ctx.proofCmd()) {
-                result = result.prepend(collectTerms(cmd));
-            }
-            return result.reverse();
+        public @NonNull ImmutableList<JmlParser.ExpressionContext> collectTerms() {
+            TermCollectionVisitor visitor = new TermCollectionVisitor();
+            ctx.accept(visitor);
+            return visitor.collectedTerms.reverse();
         }
     }
 

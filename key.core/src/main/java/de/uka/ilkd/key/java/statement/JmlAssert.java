@@ -8,13 +8,15 @@ import java.util.Objects;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 
+import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -197,13 +199,20 @@ public class JmlAssert extends JavaStatement {
      *
      * @return a freshly created list of at least one term
      */
-    public @NonNull ImmutableList<ParserRuleContext> collectTerms() {
-        ImmutableList<ParserRuleContext> result = ImmutableList.of();
+    public @NonNull ImmutableList<JmlParser.ExpressionContext> collectTerms() {
+        ImmutableList<JmlParser.ExpressionContext> result = ImmutableList.of();
         if (assertionProof != null) {
             result = result.prepend(assertionProof.collectTerms());
         }
         result = result.prepend(condition.ctx);
         return result;
+    }
+
+    public ImmutableList<LocationVariable> collectVariablesInProof(JmlIO io) {
+        if (assertionProof != null) {
+            return assertionProof.getObtainedProgramVars(io);
+        }
+        return ImmutableList.of();
     }
 
     public String getOptLabel() {
