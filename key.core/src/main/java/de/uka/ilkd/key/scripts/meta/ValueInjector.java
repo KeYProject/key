@@ -48,7 +48,7 @@ public class ValueInjector {
             Class<S> source, Class<T> target) {
     }
 
-    interface VerifyableParameters {
+    public interface VerifyableParameters {
         void verifyParameters() throws IllegalArgumentException, InjectionException;
     }
 

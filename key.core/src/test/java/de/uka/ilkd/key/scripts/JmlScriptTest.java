@@ -33,6 +33,9 @@ public class JmlScriptTest {
     private static final Path KEY_FILE;
     private static final Logger LOGGER = LoggerFactory.getLogger(JmlScriptTest.class);
 
+    // Set this to a specific case to only run that case for debugging
+    private static final String ONLY_CASE = null;
+
     static {
         URL url = JmlScriptTest.class.getResource("jml/project.key");
         try {
@@ -90,9 +93,13 @@ public class JmlScriptTest {
 
     public static Stream<Arguments> filesProvider() throws URISyntaxException, IOException {
         URL jmlUrl = JmlScriptTest.class.getResource("jml");
-        return Files.list(Paths.get(jmlUrl.toURI()))
-                .filter(p -> p.toString().endsWith(".java"))
-                .map(p -> Arguments.of(p, p.getFileName().toString()));
+        if (ONLY_CASE != null) {
+            return Stream.of(Arguments.of(Paths.get(jmlUrl.toURI()).resolve(ONLY_CASE), "single specified case"));
+        } else {
+            return Files.list(Paths.get(jmlUrl.toURI()))
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .map(p -> Arguments.of(p, p.getFileName().toString()));
+        }
     }
 
     static class Parameters {
