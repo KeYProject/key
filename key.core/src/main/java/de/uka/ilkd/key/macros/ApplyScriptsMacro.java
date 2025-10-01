@@ -15,14 +15,12 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
@@ -36,6 +34,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.rules.RuleApp;
@@ -82,14 +81,14 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     record ObtainAwareTerm(JTerm term) {
-        JTerm resolve(Map<LocationVariable, LocationVariable> obtainMap, Services services) {
-            ProgVarReplacer pvr = new ProgVarReplacer(obtainMap, services);
+        JTerm resolve(Map<LocationVariable, JFunction> obtainMap, Services services) {
+            OpReplacer pvr = new OpReplacer(obtainMap, services.getTermFactory());
             JTerm result = pvr.replace(term);
             assertNoObtainVarsLeft(result, obtainMap);
             return result;
         }
 
-        private void assertNoObtainVarsLeft(JTerm term, Map<LocationVariable, LocationVariable> obtainMap) {
+        private void assertNoObtainVarsLeft(JTerm term, Map<LocationVariable, JFunction> obtainMap) {
             var v = new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
@@ -149,7 +148,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             KeyAst.JMLProofScript proofScript = jmlAssert.getAssertionProof();
             Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, proof.getServices());
             // We heavily rely on that variables have been computed before, otherwise this will raise an NPE.
-            Map<LocationVariable, LocationVariable> obtainMap = makeObtainVarMap(jmlAssert.collectVariablesInProof(null));
+            Map<LocationVariable, JFunction> obtainMap = makeObtainVarMap(jmlAssert.collectVariablesInProof(null));
             JTerm update = getUpdate(goal);
             List<ScriptCommandAst> renderedProof =
                 renderProof(proofScript, termMap, update, proof.getServices());
@@ -198,8 +197,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return result;
     }
 
-    private Map<LocationVariable, LocationVariable> makeObtainVarMap(ImmutableList<LocationVariable> locationVariables) {
-        HashMap<LocationVariable, LocationVariable> result = new HashMap<>();
+    private Map<LocationVariable, JFunction> makeObtainVarMap(ImmutableList<LocationVariable> locationVariables) {
+        HashMap<LocationVariable, JFunction> result = new HashMap<>();
         for (LocationVariable lv : locationVariables) {
             result.put(lv, null);
         }
@@ -272,6 +271,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             default -> throw new ScriptException("Unknown obtain kind: " + ctx.obtKind.getText());
         };
 
+        named.put("var", ctx.var.getText());
+
         if(ctx.expression() == null) {
             named.put(argName, true);
         } else {
@@ -307,10 +308,11 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                     value = services.getTermBuilder().apply(update, (JTerm) value);
                 }
             }
+            ObtainAwareTerm wrapped = new ObtainAwareTerm((JTerm) value);
             if (argContext.argLabel != null) {
-                named.put(argContext.argLabel.getText(), value);
+                named.put(argContext.argLabel.getText(), wrapped);
             } else {
-                positional.add(value);
+                positional.add(wrapped);
             }
         }
         return new ScriptCommandAst(ctx.cmd.getText(), named, positional,
