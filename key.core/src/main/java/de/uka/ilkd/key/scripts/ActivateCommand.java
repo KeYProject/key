@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 /**
  * Command for re-activating the first open (not necessarily enabled) {@link Goal} after a "leave"
@@ -13,15 +14,16 @@ import de.uka.ilkd.key.proof.Goal;
  *
  * @author Dominic Steinhoefel
  */
+@Documentation(category = "Control", value = """
+        Reactivates the first open (not necessarily enabled) goal.
+        This can be useful after a 'leave' command to continue
+        working on a complicated proof where 'tryclose' should not
+        apply on certain branches temporarily, but where one still
+        wants to finish the proof.""")
 public class ActivateCommand extends NoArgumentCommand {
     @Override
     public String getName() {
         return "activate";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return "";
     }
 
     @Override

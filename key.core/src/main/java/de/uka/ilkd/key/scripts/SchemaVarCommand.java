@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.Argument;
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
@@ -18,6 +19,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 /**
  *
  */
+@Deprecated
 public class SchemaVarCommand extends AbstractCommand {
 
     public SchemaVarCommand() {
@@ -65,6 +67,9 @@ public class SchemaVarCommand extends AbstractCommand {
         return "schemaVar";
     }
 
+    @Documentation(category = "Internal", value = """
+            Defines a schema variable that can be used in subsequent commands.
+            """)
     public static class Parameters {
         @Argument(0)
         public @MonotonicNonNull String type;

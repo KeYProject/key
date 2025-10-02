@@ -64,7 +64,11 @@ public class DocumentationGenerator {
         String version = KeYResourceManager.getManager().getVersion();
         String sha1 = KeYResourceManager.getManager().getSHA1();
 
-        System.out.printf("""
+        // This gets too technical. But this is for the key-docs repository. ...
+        System.out.printf("""                
+                <style>
+                  nav.md-nav--secondary li.md-nav__item li.md-nav__item li.md-nav__item { display: none; }
+                </style>
                 # Proof Script Commands
                 
                 This document lists all proof script commands available in the KeY system.
@@ -87,6 +91,7 @@ public class DocumentationGenerator {
     }
 
     private static void listCategory(String category, List<ProofScriptCommand> proofScriptCommands) {
+        proofScriptCommands.sort(Comparator.comparing(ProofScriptCommand::getName));
         Set<ProofScriptCommand> alreadyListed = new HashSet<>();
         System.out.println("\n## Category *" + category + "*\n");
         for (ProofScriptCommand command : proofScriptCommands) {

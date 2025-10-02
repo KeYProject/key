@@ -5,7 +5,12 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
+@Documentation(category = "Control", value = """
+        Exits the currently running script context unconditionally.
+        (In the future, there may try-catch blocks to react to this).
+        """)
 public class ExitCommand extends NoArgumentCommand {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
@@ -17,10 +22,5 @@ public class ExitCommand extends NoArgumentCommand {
     @Override
     public String getName() {
         return "exit";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return "Kills the script execution.";
     }
 }

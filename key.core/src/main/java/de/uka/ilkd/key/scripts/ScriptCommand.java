@@ -9,10 +9,15 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.scripts.meta.Argument;
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Includes and runs another script file.
+ * See Parameters for more documentation.
+ */
 public class ScriptCommand extends AbstractCommand {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ProofScriptCommand.class);
@@ -21,7 +26,9 @@ public class ScriptCommand extends AbstractCommand {
         super(Parameters.class);
     }
 
+    @Documentation(category = "Control", value = "Includes and runs another script file.")
     public static class Parameters {
+        @Documentation("The filename of the script to include. May be relative to the current script.")
         @Argument
         public @MonotonicNonNull String filename;
     }

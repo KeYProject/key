@@ -143,7 +143,7 @@ public final class ArgumentsLifter {
             if (meta.isOptionalVarArgs()) {
                 sb.append("* `%s...`: *(options prefixed by `%s`, type %s)*:<br>%s".formatted(
                     meta.getName(), meta.getOptionalVarArgs().prefix(),
-                    meta.getField().getType().getSimpleName(),
+                    meta.getOptionalVarArgs().as().getSimpleName(),
                     meta.getDocumentation()));
             }
 
