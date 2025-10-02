@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.PosInTerm;
@@ -57,10 +58,20 @@ public class OneStepSimplifierCommand extends AbstractCommand {
         }
     }
 
+    @Documentation(category = "Fundamental", value = """
+        The oss command applies the *one step simplifier* on the current proof goal.
+        This simplifier applies a set of built-in simplification rules to the formulas in the sequent.
+        It can be configured to apply the one step simplifier only on the antecedent or succedent.
+        By default, it is applied on both sides of the sequent.
+        """)
     public static class Parameters {
+        @Documentation("Application of the one step simplifier can be forbidden on the antecedent side by setting " +
+                "this option to false. Default is true.")
         @Option(value = "antecedent")
         public @Nullable Boolean antecedent = Boolean.TRUE;
 
+        @Documentation("Application of the one step simplifier can be forbidden on the succedent side by setting " +
+                "this option to false. Default is true.")
         @Option(value = "succedent")
         public @Nullable Boolean succedent = Boolean.TRUE;
     }

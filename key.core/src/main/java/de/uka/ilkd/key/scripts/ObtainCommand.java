@@ -155,10 +155,16 @@ public class ObtainCommand extends AbstractCommand {
         throw new NoSuchElementException("No schema variable with name " + name);
     }
 
-    @Documentation("TODO.")
+    @Documentation(category = "JML", value = """
+            Command that introduces a fresh variable with a given name and sort.
+            Exactly one of `such_that`, `equals`, or `from_goal` must be given.
+            
+            The command should not be called directly, but is used internally by
+            the JML script support within KeY.
+            """)
     public static class Parameters implements ValueInjector.VerifyableParameters {
         @Option(value = "var")
-        @Documentation("Name of the instantiated variable.")
+        @Documentation("Name of the variable to be instantiated.")
         public @MonotonicNonNull String var;
 
         @Option(value = "such_that")

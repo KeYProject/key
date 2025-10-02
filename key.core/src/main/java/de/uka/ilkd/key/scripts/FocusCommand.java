@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.scripts.meta.Argument;
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -48,8 +49,24 @@ public class FocusCommand extends AbstractCommand {
         super(Parameters.class);
     }
 
+    @Documentation(category = "Fundamental", value = """
+            The command "focus" allows you to select formulas from the current sequent
+            to focus verification on. This means that all other formulas are discarded
+            (i.e. hidden using `hide_right`, `hide_left`).
+            
+            Benefits are: The automation is guided into focussing on a relevant set of
+            formulas.
+            
+            The selected set of sequent formulas can be regarded as an equivalent to a
+            believed "unsat core" of the sequent.
+            
+            #### Examples:
+            - `focus x > 2 ==> x > 1` only keeps the mentioned to formulas in the current goal
+              removing all other formulas that could distract the automation.
+            """)
     static class Parameters {
         @Argument
+        @Documentation("The sequent containing the formulas to keep. It may contain placeholder symbols.")
         public @MonotonicNonNull Sequent toKeep;
     }
 

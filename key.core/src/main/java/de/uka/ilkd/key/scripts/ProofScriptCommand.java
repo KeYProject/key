@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
 import org.jspecify.annotations.NullMarked;
@@ -38,15 +39,19 @@ public interface ProofScriptCommand {
             EngineState stateMap)
             throws ScriptException, InterruptedException;
 
-    /// Returns the name of this proof command. The name should be constant and not be clash with
-    /// the
-    /// name of other commands. The name is essential for finding this command within an hashmap.
+    /// Returns the name of this proof command. The name must be a constant and not be clash with
+    /// the name of other commands. The name is used to identify the command in a script. The name
+    /// must be amongst the aliases returned by [#getAliases()].
     ///
     /// @return a non-null, non-empty string
     /// @see ProofScriptEngine
+    /// @see #getAliases()
     String getName();
 
-    /// Announce a list of potential aliases of this command.
+    /// Announce a list of aliases of this command.
+    ///
+    /// Aliases of different commands should be disjoint, otherwise the first command found
+    /// will be executed.
     ///
     /// The command can react differently for each alias. The call name is given to
     /// [#execute(AbstractUserInterfaceControl,ScriptCommandAst,EngineState)]
@@ -55,6 +60,7 @@ public interface ProofScriptCommand {
     ///
     /// @return an unmodifiable list of alias names under which command can be called, including
     /// [#getName()]
+    /// @see #getName()
     default List<String> getAliases() {
         return List.of(getName());
     }
@@ -62,5 +68,12 @@ public interface ProofScriptCommand {
     /// A documentation for the commands.
     ///
     /// @return a non-null string
-    String getDocumentation();
+    default String getDocumentation() {
+        return ArgumentsLifter.extractDocumentation(getName(), getClass(), null);
+    }
+
+    /// A category name for this command. This is used to group commands in the UI or documentation.
+    default String getCategory() {
+        return ArgumentsLifter.extractCategory(getClass(), null);
+    }
 }

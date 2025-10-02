@@ -49,7 +49,7 @@ public class ProofScriptEngine {
         this.stateMap = new EngineState(proof, this);
     }
 
-    private static Map<String, ProofScriptCommand> loadCommands() {
+    static Map<String, ProofScriptCommand> loadCommands() {
         Map<String, ProofScriptCommand> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 

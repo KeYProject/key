@@ -392,34 +392,46 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
-    @Documentation("This command can be used to apply a calculus rule to the currently active open goal.")
+    @Documentation(category = "Fundamental", value = """
+        This command can be used to apply a calculus rule to the currently active open goal.
+        
+        #### Examples:
+        - `rule cut inst_cutFormula: (a > 0)` applies the cut rule on the formula `a > 0` like the cut command.          
+        - `rule and_right on=(__ & __)` applies the rule `and_right` to the second occurrence
+            of a conjunction in the succedent.
+        - `rule my_rule on=(f(x)) formula="f\\(.*search.*\\)"` applies the rule `my_rule` to the term 
+            `f(x)` in a formula matching the regular expression.
+        """)
     public static class Parameters {
         @Argument
         @Documentation("Name of the rule to be applied.")
         public @MonotonicNonNull String rulename;
 
         @Option(value = "on")
-        @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule).")
+        @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule). " +
+                "This may contain placeholders.")
         public @Nullable JTerm on;
 
         @Option(value = "formula")
-        @Documentation("Top-level formula in which the term appears.")
+        @Documentation("Top-level formula in which the term appears. This may contain placeholders.")
         public @Nullable JTerm formula;
 
         @Option(value = "occ")
-        @Documentation("Occurrence number if more than one occurrence matches.")
+        @Documentation("Occurrence number if more than one occurrence matches. The first occurrence is 1. " +
+                "If ommitted, there must be exactly one occurrence.")
         public @Nullable Integer occ = -1;
 
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
-        @Documentation("Instead of giving the toplevl formula completely, a regular expression can be specified to match the toplevel formula.")
+        @Documentation("Instead of giving the toplevl formula completely, a regular expression can be " +
+                "specified to match the toplevel formula.")
         @Option(value = "matches")
         public @Nullable String matches = null;
 
         @OptionalVarargs(as = JTerm.class, prefix = "inst_")
-        @Documentation("Instantiations for schema variables used in the rule.")
+        @Documentation("Instantiations for term schema variables used in the rule.")
         public Map<String, JTerm> instantiations = new HashMap<>();
     }
 

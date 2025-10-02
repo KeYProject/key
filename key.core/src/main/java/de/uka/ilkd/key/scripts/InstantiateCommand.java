@@ -222,34 +222,36 @@ public class InstantiateCommand extends AbstractCommand {
         return "instantiate";
     }
 
-    @Override
-    public String getDocumentation() {
-        return """
-                instantiate var=a occ=2 with="a_8" hide
-                  <p>
-                  instantiate formula="\\forall int a; phi(a)" with="a_8\"
-                """;
-    }
-
-    @Documentation("Instantiate a universally quantified formula (or an existentially quantified formula in succedent) by a term."
-        + "One of 'var' or 'formula' must be specified. If 'var' is given, the formula is determined by looking for a particular occurrence of a quantifier over that variable name.\n"
-        + "'with' must be specified.")
+    @Documentation(category = "Fundamental", value = """
+        Instantiate a universally quantified formula (in the antecedent;
+        or an existentially quantified formula in succedent) by a term.
+        One of `var` or `formula` must be specified. If `var` is given, the formula is determined by looking for
+        a particular occurrence of a quantifier over that variable name.
+        If `formula` is given, that quantified formula is used directly.
+        `with` must be specified.
+        
+        #### Examples:
+        
+        * `instantiate var:a occ:2 with:a_8 hide`
+        * `instantiate formula:"\\forall int a; phi(a)" with="a_8"`
+        """)
     public static class Parameters {
-        @Documentation("The toplevel quantified formula to instantiate. Either this or 'var' must be given.")
+        @Documentation("The toplevel quantified formula to instantiate. Placeholder matching symbols can be used.")
         @Option(value = "formula")
         @Nullable
         public JTerm formula;
 
-        @Documentation("The name of the bound variable to instantiate. Either this or 'formula' must be given.")
+        @Documentation("The name of the bound variable to instantiate.")
         @Option(value = "var")
         @Nullable
         public String var;
 
-        @Documentation("The occurrence number of the quantifier over 'var' in the sequent. Default is 1 (the first).")
+        @Documentation("The occurrence number of the quantifier over 'var' in the sequent starting at 1. Default is 1.")
         @Option(value = "occ")
         public @Nullable int occ = 1;
 
-        @Documentation("If given, the rule used for instantiation is the one that hides the instantiated formula.")
+        @Documentation("If given, the rule used for instantiation is the one that hides the instantiated formula to "
+                    + "prevent it from being used for further automatic proof steps.")
         @Flag("hide")
         public boolean hide;
 
