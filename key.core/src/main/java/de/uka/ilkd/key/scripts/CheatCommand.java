@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -19,6 +20,11 @@ import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+@Documentation(category = "Internal", value = """
+        Use this to close a goal unconditionally. This is unsound and should only
+        be used for testing and proof debugging purposes. It is similar to 'sorry'
+        in Isabelle or 'admit' in Rocq.
+        """)
 public class CheatCommand extends NoArgumentCommand {
     private static final Taclet CHEAT_TACLET;
 
@@ -36,13 +42,6 @@ public class CheatCommand extends NoArgumentCommand {
     @Override
     public String getName() {
         return "cheat";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return "Use this to close a goal unconditionally. This is unsound and should only " +
-            "be used for testing and proof debugging purposes. It is similar to 'sorry' " +
-            "in Isabelle or 'admit' in Rocq.";
     }
 
     @Override

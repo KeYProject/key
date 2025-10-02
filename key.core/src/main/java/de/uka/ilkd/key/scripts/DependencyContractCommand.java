@@ -11,8 +11,10 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -23,6 +25,10 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+/**
+ * The DependencyContractCommand applies a dependency contract to a selected formula in the current
+ * goal. See documentation of {@link Parameters} for more information.
+ */
 public class DependencyContractCommand extends AbstractCommand {
 
     public DependencyContractCommand() {
@@ -104,10 +110,21 @@ public class DependencyContractCommand extends AbstractCommand {
         goal.apply(ruleApp);
     }
 
+    @Documentation(category = "Fundamental", value = """
+            The dependency command applies a dependency contract to a specified term in the current goal.
+            Dependency contracts allow you to do modular reasoning. If for a heap-dependent function symbol,
+            no changes occur inside the dependency set of this function, the result remains the same.
+            This can be applied to model methods, model fields or invariants.
+            """)
     public static class Parameters {
-        @Option(value = "on")
-        public JTerm on;
 
+        @Documentation("The term to which the dependency contract should be applied. " +
+                "This term must occur in the current goal. " +
+                "And it must be the invocation of a heap-dependent observer function symbol.")
+        @Option(value = "on")
+        public @MonotonicNonNull JTerm on;
+
+        @Documentation("The heap term to be compared against. If not given, the default heap is used.")
         @Option(value = "heap")
         public @Nullable JTerm heap;
     }
