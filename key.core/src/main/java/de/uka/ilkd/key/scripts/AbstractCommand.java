@@ -104,4 +104,8 @@ public abstract class AbstractCommand implements ProofScriptCommand {
         return Objects.requireNonNullElse(documentation, "");
     }
 
+    @Override
+    public String getCategory() {
+        return ArgumentsLifter.extractCategory(getClass(), parameterClazz);
+    }
 }

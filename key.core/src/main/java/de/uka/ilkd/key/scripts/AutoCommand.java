@@ -161,9 +161,10 @@ public class AutoCommand extends AbstractCommand {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
-    @Documentation("""
-            The AutoCommand is a command that invokes the automatic strategy "Auto" of KeY.
-            It can be used to automatically prove a goal or a set of goals.
+    @Documentation(category = "Fundamental", value ="""
+            The AutoCommand invokes the automatic strategy "Auto" of KeY (which is also launched by
+            when clicking the "Auto" button in the GUI).
+            It can be used to try to automatically prove the current goal.
             Use with care, as this command may leave the proof in a incomprehensible state
             with many open goals.
 
@@ -172,46 +173,48 @@ public class AutoCommand extends AbstractCommand {
     public static class Parameters {
         // @ TODO Deprecated with the higher order proof commands?
         @Flag(value = "all")
-        @Documentation("Apply the strategy on all open goals. There is a better syntax for that now.")
+        @Documentation("*Deprecated*. Apply the strategy on all open goals. There is a better syntax for that now.")
         public boolean onAllOpenGoals = false;
 
         @Option(value = "steps")
-        @Documentation("The maximum number of steps to be performed.")
-        public int maxSteps = -1;
+        @Documentation("The maximum number of proof steps to be performed.")
+        public @Nullable int maxSteps = -1;
 
         /**
          * Run on formula matching the given regex
          */
         @Option(value = "matches")
-        @Documentation("Run on formula matching the given regex.")
+        @Documentation("Run on the formula matching the given regex.")
         public @Nullable String matches = null;
 
         /**
          * Run on formula matching the given regex
          */
         @Option(value = "breakpoint")
-        @Documentation("Run on formula matching the given regex.")
+        @Documentation("When doing symbolic execution by auto, this option can be used to set a Java statement at which " +
+                "symbolic execution has to stop.")
         public @Nullable String breakpoint = null;
 
         @Flag(value = "modelsearch")
-        @Documentation("Enable model search. Better for some types of arithmetic problems. Sometimes a lot worse")
-        public @Nullable Boolean modelSearch;
+        @Documentation("Enable model search. Better for some (types of) arithmetic problems. Sometimes a lot worse.")
+        public boolean modelSearch;
 
         @Flag(value = "expandQueries")
-        @Documentation("Expand queries by modalities.")
-        public @Nullable Boolean expandQueries;
+        @Documentation("Automatically expand occurrences of query symbols using additional modalities on the sequent.")
+        public boolean expandQueries;
 
         @Flag(value = "classAxioms")
         @Documentation("""
-                Enable class axioms. This expands model methods and fields and invariants quite eagerly. \
-                May lead to divergence.""")
-        public @Nullable Boolean classAxioms;
+                Enable automatic and eager expansion of symbols. This expands class invariants, model methods and
+                fields and invariants quite eagerly. May be an enabler (if a few definitions need to expanded),
+                may be a showstopper (if expansion increases the complexity on the sequent too much).""")
+        public boolean classAxioms;
 
         @Flag(value = "dependencies")
         @Documentation("""
                 Enable dependency reasoning. In modular reasoning, the value of symbols may stay the same, \
                 without that its definition is known. May be an enabler, may be a showstopper.""")
-        public @Nullable Boolean dependencies;
+        public boolean dependencies;
     }
 
     private static final class OriginalValue {
