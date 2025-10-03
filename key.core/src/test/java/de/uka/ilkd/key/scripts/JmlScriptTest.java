@@ -7,6 +7,8 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.KeYConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +38,7 @@ public class JmlScriptTest {
 
     // Set this to a specific case to only run that case for debugging
     private static final String ONLY_CASE = null;
+    private static final boolean SAVE_PROOF = true;
 
     static {
         URL url = JmlScriptTest.class.getResource("jml/project.key");
@@ -57,10 +61,23 @@ public class JmlScriptTest {
             Path projectFile = tmpDir.resolve("project.key");
             Files.copy(KEY_FILE, projectFile);
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(projectFile);
+            if(params.settings != null && !params.settings.isEmpty()) {
+                for (Map.Entry<String, String> entry : params.settings.entrySet()) {
+                    env.getLoadedProof().getSettings().getStrategySettings().getActiveStrategyProperties()
+                            .setProperty(entry.getKey(), entry.getValue());
+                }
+            }
             KeyAst.ProofScript script = env.getProofScript();
             if (script != null) {
                 ProofScriptEngine pse = new ProofScriptEngine(env.getLoadedProof());
                 pse.execute(env.getUi(), script);
+            }
+
+            if(SAVE_PROOF) {
+                String filename = tmpDir.resolve("saved.proof").toString();
+                ProofSaver saver = new ProofSaver(env.getLoadedProof(), filename, KeYConstants.INTERNAL_VERSION);
+                saver.save();
+                LOGGER.info("Saved proof to {}", filename);
             }
 
             if(params.shouldClose) {
@@ -70,7 +87,7 @@ public class JmlScriptTest {
             }
         } finally {
             // Uncomment the following line to delete the temporary directory after the test
-            if(params.deleteTmpDir) {
+            if(params.deleteTmpDir && !SAVE_PROOF) {
                 LOGGER.info("Deleting temporary directory: {}", tmpDir);
                 Files.walk(tmpDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
             } else {
@@ -81,7 +98,7 @@ public class JmlScriptTest {
     }
 
     private static Parameters readParams(Path path) throws IOException {
-        String input = Files.lines(path).filter(l -> l.startsWith("//!")).map(l -> l.substring(3).trim())
+        String input = Files.lines(path).filter(l -> l.startsWith("//!")).map(l -> l.substring(3))
                         .collect(Collectors.joining("\n")).trim();
         if(input.isEmpty()) {
             return new Parameters();
@@ -107,6 +124,7 @@ public class JmlScriptTest {
         public String method;
         public String exception;
         public boolean deleteTmpDir = true;
+        public Map<String, String> settings;
     }
 
 

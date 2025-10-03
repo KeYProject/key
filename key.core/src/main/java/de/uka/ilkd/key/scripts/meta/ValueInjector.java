@@ -140,10 +140,10 @@ public class ValueInjector {
                 .findAny();
         if (unhandled.isPresent()) {
             throw new UnknownArgumentException(String.format(
-                "Unknown argument %s (with value %s) was provided. For command class: '%s'",
+                "Unknown option %s (with value %s) was provided. For command: '%s'",
                 unhandled.get(),
                 arguments.namedArgs().get(unhandled.get()),
-                obj.getClass().getName()));
+                arguments.commandName()));
         }
 
         Optional<Integer> unhandledPos = IntegerUtil.indexRangeOf(arguments.positionalArgs())
@@ -151,11 +151,9 @@ public class ValueInjector {
                 .filter(it -> !handledOptions.contains(it))
                 .findAny();
         if (unhandledPos.isPresent()) {
-            long count = handledOptions.stream().filter(it -> it instanceof Integer).count();
             throw new UnknownArgumentException(String.format(
-                "Unexpected positional argument at index %d was provided. " +
-                    "Expected (at most) %d positional arguments. For command class: '%s'",
-                unhandledPos.get(), count, obj.getClass().getName()));
+                "Unexpected positional argument or flag provided: %s",
+                arguments.positionalArgs().get(unhandledPos.get())));
         }
 
         if (obj instanceof VerifyableParameters vp) {
