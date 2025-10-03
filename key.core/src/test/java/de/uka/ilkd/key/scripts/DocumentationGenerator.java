@@ -1,31 +1,14 @@
 package de.uka.ilkd.key.scripts;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DocumentationGenerator {
+
+    private static String branch;
+    private static String sha1;
 
     public static void main(String[] args) throws FileNotFoundException {
 
@@ -36,15 +19,15 @@ public class DocumentationGenerator {
 
         printHeader();
 
-        Collection<ProofScriptCommand> commands = ProofScriptEngine.loadCommands().values();
-        Map<String, List<ProofScriptCommand>> commandsByCategory = new TreeMap<>();
+        Set<Map.Entry<String, ProofScriptCommand>> commands = ProofScriptEngine.loadCommands().entrySet();
+        Map<String, List<Map.Entry<String, ProofScriptCommand>>> commandsByCategory = new TreeMap<>();
 
-        for (ProofScriptCommand command : commands) {
-            String category = command.getCategory();
+        for (Map.Entry<String, ProofScriptCommand> entry : commands) {
+            String category = entry.getValue().getCategory();
             if (category == null) {
                 category = "Uncategorized";
             }
-            commandsByCategory.computeIfAbsent(category, k -> new ArrayList<>()).add(command);
+            commandsByCategory.computeIfAbsent(category, k -> new ArrayList<>()).add(entry);
         }
 
         List<String> categories = new ArrayList<>(commandsByCategory.keySet());
@@ -60,9 +43,9 @@ public class DocumentationGenerator {
     }
 
     private static void printHeader() {
-        String branch = KeYResourceManager.getManager().getBranch();
+        branch = KeYResourceManager.getManager().getBranch();
         String version = KeYResourceManager.getManager().getVersion();
-        String sha1 = KeYResourceManager.getManager().getSHA1();
+        sha1 = KeYResourceManager.getManager().getSHA1();
 
         // This gets too technical. But this is for the key-docs repository. ...
         System.out.printf("""                
@@ -90,19 +73,25 @@ public class DocumentationGenerator {
                 """, new Date(), branch, version, sha1);
     }
 
-    private static void listCategory(String category, List<ProofScriptCommand> proofScriptCommands) {
-        proofScriptCommands.sort(Comparator.comparing(ProofScriptCommand::getName));
-        Set<ProofScriptCommand> alreadyListed = new HashSet<>();
+    private static void listCategory(String category, List<Map.Entry<String, ProofScriptCommand>> proofScriptCommands) {
+        proofScriptCommands.sort(Map.Entry.comparingByKey());
         System.out.println("\n## Category *" + category + "*\n");
-        for (ProofScriptCommand command : proofScriptCommands) {
-            if(alreadyListed.contains(command))
-                continue;
-            alreadyListed.add(command);
+        for (Map.Entry<String, ProofScriptCommand> entry : proofScriptCommands) {
             System.out.println("<hr>\n");
-            System.out.println("### <span style=\"color: var(--md-primary-fg-color);\"> Command `" + command.getName() + "`</span>\n");
-            System.out.println(command.getDocumentation() + "\n");
-            if(command.getAliases().size() > 1) {
-                System.out.println("#### Aliases:\n" + String.join(", ", command.getAliases()) + "\n");
+            if(entry.getKey().equals(entry.getValue().getName())) {
+                ProofScriptCommand command = entry.getValue();
+                String link = "main".equals(branch) ? "main" : sha1;
+                System.out.printf("### <span style=\"float:right;\">[Source](https://github.com/KeYProject/key/blob/%s/key.core/src/main/java/%s.java)</span>",
+                        link,
+                        command.getClass().getName().replace('.', '/') );
+                System.out.println("<span style=\"color: var(--md-primary-fg-color);\"> Command `" + command.getName() + "`</span>\n\n");
+                System.out.println(command.getDocumentation() + "\n");
+                if (command.getAliases().size() > 1) {
+                    System.out.println("#### Aliases:\n" + String.join(", ", command.getAliases()) + "\n");
+                }
+            } else {
+                System.out.println("### <span style=\"color: var(--md-primary-fg-color);\"> Command `" + entry.getKey() + "`</span>\n");
+                System.out.println("Alias for command [\u2192 `" + entry.getValue().getName() + "`](#command-" + entry.getValue().getName() + ")\n");
             }
         }
     }
