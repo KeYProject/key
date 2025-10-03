@@ -173,6 +173,7 @@ public final class SpecificationRepository {
                 ImmutableSLList.nil(), unlimitedTerm));
         tacletBuilder.setName(
             MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
+        //tacletBuilder.addRuleSet(new RuleSet(new Name("unlimitObserver")));
         return tacletBuilder.getTaclet();
     }
 

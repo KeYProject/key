@@ -107,7 +107,7 @@ public class ExpandDefCommand extends AbstractCommand {
 
     public static class Parameters {
         @Option(value = "on")
-        public @Nullable Term on;
+        public @Nullable JTerm on;
         @Option(value = "occ")
         public @Nullable Integer occ;
         @Option(value = "formula")

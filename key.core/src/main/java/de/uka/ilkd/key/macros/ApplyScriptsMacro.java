@@ -170,6 +170,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             pse.getStateMap().putUserData("jml.obtainVarMap", obtainMap);
             pse.getStateMap().getValueInjector().addConverter(JTerm.class, ObtainAwareTerm.class,
                     oat -> oat.resolve(obtainMap, goal.proof().getServices()));
+            pse.getStateMap().getValueInjector().addConverter(boolean.class, ObtainAwareTerm.class,
+                    oat -> Boolean.parseBoolean(oat.term.toString()));
             LOGGER.debug("---- Script");
             LOGGER.debug(renderedProof.stream().map(ScriptCommandAst::asCommandLine)
                     .collect(Collectors.joining("\n")));
@@ -335,11 +337,13 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                     value = services.getTermBuilder().apply(update, (JTerm) value);
                 }
             }
-            ObtainAwareTerm wrapped = new ObtainAwareTerm((JTerm) value);
+            if (value instanceof JTerm term) {
+                value = new ObtainAwareTerm(term);
+            }
             if (argContext.argLabel != null) {
-                named.put(argContext.argLabel.getText(), wrapped);
+                named.put(argContext.argLabel.getText(), value);
             } else {
-                positional.add(wrapped);
+                positional.add(value);
             }
         }
         return new ScriptCommandAst(ctx.cmd.getText(), named, positional,
