@@ -13,8 +13,10 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -33,8 +35,9 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Term;
-import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.rules.RuleApp;
@@ -126,6 +129,16 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return null;
     }
 
+    private static JavaBlock getJavaBlock(Goal goal) {
+        RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
+        JTerm appliedOn = (JTerm) ruleApp.posInOccurrence().subTerm();
+        if (appliedOn.op() instanceof UpdateApplication) {
+            appliedOn = UpdateApplication.getTarget(appliedOn);
+        }
+        assert appliedOn.op() instanceof Modality;
+        return appliedOn.javaBlock();
+    }
+
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
@@ -146,7 +159,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 "Running attached script from goal " + goal.node().serialNr(), 0));
 
             KeyAst.JMLProofScript proofScript = jmlAssert.getAssertionProof();
-            Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, proof.getServices());
+            Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, getJavaBlock(goal), proof.getServices());
             // We heavily rely on that variables have been computed before, otherwise this will raise an NPE.
             Map<LocationVariable, JFunction> obtainMap = makeObtainVarMap(jmlAssert.collectVariablesInProof(null));
             JTerm update = getUpdate(goal);
@@ -180,14 +193,17 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
 
-    private Map<ParserRuleContext, JTerm> getTermMap(JmlAssert jmlAssert, Services services) {
+    private Map<ParserRuleContext, JTerm> getTermMap(JmlAssert jmlAssert, JavaBlock javaBlock, Services services) {
         SpecificationRepository.@Nullable JmlStatementSpec jmlspec =
             services.getSpecificationRepository().getStatementSpec(jmlAssert);
         if (jmlspec == null) {
             throw new IllegalStateException(
                 "No specification found for JML assert statement at " + jmlAssert);
         }
-        ImmutableList<JTerm> terms = jmlspec.terms().tail();
+        ImmutableList<JTerm> terms = ImmutableList.of();
+        for (int i = jmlspec.terms().size() - 1; i >= 1; i--) {
+            terms = terms.prepend(correctSelfVar(i, javaBlock, jmlspec, services));
+        }
         ImmutableList<JmlParser.ExpressionContext> jmlExprs = jmlAssert.collectTerms().tail();
         Map<ParserRuleContext, JTerm> result = new IdentityHashMap<>();
         assert terms.size() == jmlExprs.size();
@@ -195,6 +211,17 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             result.put(jmlExprs.get(i), terms.get(i));
         }
         return result;
+    }
+
+    /**
+     * For some reason, the self variable in the spec is not the same as the self variable and needs to
+     * be corrected.
+     */
+    private JTerm correctSelfVar(int index, JavaBlock javaBlock, SpecificationRepository.JmlStatementSpec spec, Services services) {
+        final MethodFrame frame = JavaTools.getInnermostMethodFrame(javaBlock, services);
+        final JTerm self = MiscTools.getSelfTerm(frame, services);
+        return spec.getTerm(services, self, index);
+
     }
 
     private Map<LocationVariable, JFunction> makeObtainVarMap(ImmutableList<LocationVariable> locationVariables) {

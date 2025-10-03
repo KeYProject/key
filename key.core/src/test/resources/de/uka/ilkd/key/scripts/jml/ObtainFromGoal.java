@@ -2,7 +2,7 @@
 
 class Test {
 
-    //@ static model int f(int arg);
+    //@ model int f(int arg);
 
     //@ ensures true;
     void test() {
