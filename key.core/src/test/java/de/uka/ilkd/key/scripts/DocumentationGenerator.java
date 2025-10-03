@@ -81,10 +81,10 @@ public class DocumentationGenerator {
             if(entry.getKey().equals(entry.getValue().getName())) {
                 ProofScriptCommand command = entry.getValue();
                 String link = "main".equals(branch) ? "main" : sha1;
-                System.out.printf("### <span style=\"float:right;\">[Source](https://github.com/KeYProject/key/blob/%s/key.core/src/main/java/%s.java)</span>",
+                System.out.println("### <span style=\"color: var(--md-primary-fg-color);\"> Command `" + command.getName() + "`</span>\n\n");
+                System.out.printf("<span style=\"float:right;\">[Source](https://github.com/KeYProject/key/blob/%s/key.core/src/main/java/%s.java)</span>\n\n",
                         link,
                         command.getClass().getName().replace('.', '/') );
-                System.out.println("<span style=\"color: var(--md-primary-fg-color);\"> Command `" + command.getName() + "`</span>\n\n");
                 System.out.println(command.getDocumentation() + "\n");
                 if (command.getAliases().size() > 1) {
                     System.out.println("#### Aliases:\n" + String.join(", ", command.getAliases()) + "\n");

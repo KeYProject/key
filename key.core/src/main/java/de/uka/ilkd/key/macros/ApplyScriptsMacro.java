@@ -17,9 +17,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.*;
@@ -120,13 +118,32 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return null;
     }
 
-    private static @Nullable JTerm getUpdate(Goal goal) {
+    private static @Nullable OpReplacer getUpdateReplacer(Goal goal) {
         RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
         Term appliedOn = ruleApp.posInOccurrence().subTerm();
         if (appliedOn.op() instanceof UpdateApplication) {
-            return UpdateApplication.getUpdate((JTerm) appliedOn);
+            var update = UpdateApplication.getUpdate((JTerm) appliedOn);
+            Map<JTerm, JTerm> updates = new HashMap<>();
+            Services services = goal.proof().getServices();
+            collectUpdates(update, updates, services);
+            return new OpReplacer(updates, services.getTermFactory());
         }
         return null;
+    }
+
+    private static void collectUpdates(JTerm update, Map<JTerm, JTerm> updates, Services services) {
+        switch(update.op()) {
+            case ElementaryUpdate eu ->
+                    updates.put(services.getTermBuilder().var((ProgramVariable) eu.lhs()), update.sub(0));
+
+            case UpdateJunctor uj-> {
+                collectUpdates(update.sub(0), updates, services);
+                collectUpdates(update.sub(1), updates, services);
+            }
+
+            default ->
+                    throw new IllegalStateException("Unexpected update operation: " + update.op().getClass());
+        }
     }
 
     private static JavaBlock getJavaBlock(Goal goal) {
@@ -162,9 +179,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             Map<ParserRuleContext, JTerm> termMap = getTermMap(jmlAssert, getJavaBlock(goal), proof.getServices());
             // We heavily rely on that variables have been computed before, otherwise this will raise an NPE.
             Map<LocationVariable, JFunction> obtainMap = makeObtainVarMap(jmlAssert.collectVariablesInProof(null));
-            JTerm update = getUpdate(goal);
+            @Nullable OpReplacer updateReplacer = getUpdateReplacer(goal);
             List<ScriptCommandAst> renderedProof =
-                renderProof(proofScript, termMap, update, proof.getServices());
+                renderProof(proofScript, termMap, updateReplacer, proof.getServices());
             ProofScriptEngine pse = new ProofScriptEngine(proof);
             pse.setInitiallySelectedGoal(goal);
             pse.getStateMap().putUserData("jml.obtainVarMap", obtainMap);
@@ -235,7 +252,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     private static List<ScriptCommandAst> renderProof(KeyAst.JMLProofScript script,
-            Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) throws ScriptException {
+                                                      Map<ParserRuleContext, JTerm> termMap, @Nullable OpReplacer update, Services services) throws ScriptException {
         List<ScriptCommandAst> result = new ArrayList<>();
         // Push current settings onto the settings stack
         result.add(new ScriptCommandAst("set", Map.of("stack", "push"), List.of()));
@@ -248,8 +265,12 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     private static List<ScriptCommandAst> renderProofCmd(ProofCmdContext ctx,
-            Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) throws ScriptException {
+                                                         Map<ParserRuleContext, JTerm> termMap,
+                                                         @Nullable OpReplacer update, Services services) throws ScriptException {
         List<ScriptCommandAst> result = new ArrayList<>();
+
+        // Prepare by resolving the update
+        result.add(new ScriptCommandAst("oss", Map.of("recentOnly", true), List.of()));
 
         // Push the current branch context
         result.add(new ScriptCommandAst("branches", Map.of(), List.of("push")));
@@ -290,7 +311,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return result;
     }
 
-    private static ScriptCommandAst renderObtainCommand(ProofCmdContext ctx, Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) throws ScriptException {
+    private static ScriptCommandAst renderObtainCommand(ProofCmdContext ctx, Map<ParserRuleContext, JTerm> termMap,
+                                                        @Nullable OpReplacer update, Services services) throws ScriptException {
         Map<String, Object> named = new HashMap<>();
 
         String argName = switch(ctx.obtKind.getType()) {
@@ -313,7 +335,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 value = termMap.get(exp);
                 if (update != null) {
                     // Wrap in update application if an update is present
-                    value = services.getTermBuilder().apply(update, (JTerm) value);
+                    value = update.replace((JTerm) value);
                 }
             }
             named.put(argName, value);
@@ -322,7 +344,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return new ScriptCommandAst("__obtain", named, List.of(), Location.fromToken(ctx.start));
     }
 
-    private static @NonNull ScriptCommandAst renderRegularCommand(ProofCmdContext ctx, Map<ParserRuleContext, JTerm> termMap, JTerm update, Services services) {
+    private static @NonNull ScriptCommandAst renderRegularCommand(ProofCmdContext ctx, Map<ParserRuleContext, JTerm> termMap, @Nullable OpReplacer update, Services services) {
         Map<String, Object> named = new HashMap<>();
         List<Object> positional = new ArrayList<>();
         for (ProofArgContext argContext : ctx.proofArg()) {
@@ -334,7 +356,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 value = termMap.get(exp);
                 if (update != null) {
                     // Wrap in update application if an update is present
-                    value = services.getTermBuilder().apply(update, (JTerm) value);
+                    value = update.replace((JTerm) value);
                 }
             }
             if (value instanceof JTerm term) {
@@ -349,6 +371,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return new ScriptCommandAst(ctx.cmd.getText(), named, positional,
                 Location.fromToken(ctx.start));
     }
+
 
     private static boolean isStringLiteral(JmlParser.ExpressionContext ctx) {
         return ctx.start == ctx.stop && ctx.start.getType() == JmlParser.STRING_LITERAL;
