@@ -4,6 +4,6 @@ dependencies {
     implementation project(":key.core")
     implementation("com.squareup:javapoet:1.13.0")
 
-    implementation "info.picocli:picocli:4.7.5"
+    implementation "info.picocli:picocli:4.7.7"
 }
 
