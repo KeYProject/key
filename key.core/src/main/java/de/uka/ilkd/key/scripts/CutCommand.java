@@ -51,8 +51,9 @@ public class CutCommand extends AbstractCommand {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, args.formula,
-            state.getProof().getServices(), true);
+        var formula = state.getProof().getServices().getTermBuilder().convertToFormula(args.formula);
+
+        app = app.addCheckedInstantiation(sv, formula, state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
