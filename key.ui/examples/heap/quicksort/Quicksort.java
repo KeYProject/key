@@ -73,9 +73,6 @@ class Quicksort {
               @   assert \dl_seqPerm(seq2, seq0) \by auto;
               @   auto;
               @ } */
-            //@ assert (\forall int i; from<=i && i<to; array[i] <= array[i+1]) \by { auto; }
-            //@ assert from > 0 ==> (\forall int x; from<=x && x<=to; array[x] > array[from-1]) \by { auto; }
-            //@ assert to < array.length-1 ==> (\forall int x; from<=x && x<=to; array[x] <= array[to+1]) \by { auto; }
         }
     }
 
@@ -112,12 +109,37 @@ class Quicksort {
                 int t = array[i];
                 array[i] = array[j];
                 array[j] = t;
+                /*@ assert \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array))) \by {
+                  @  oss;
+                  @  rule "seqPermFromSwap";
+                  @  rule "andRight" \by {
+                  @    case "Case 1": // the first of the two conjuncts is easy
+                  @      auto;
+                  @    case "Case 2": // the 2nd requires instantiations:
+                  @      instantiate hide:true var:"iv" with:i;
+                  @      instantiate hide:true var:"jv" with:j;
+                  @      auto;
+                  @  }
+                  @ };  */
                 i++;
             }
         }
 
         array[to] = array[i];
         array[i] = pivot;
+
+         /*@ assert \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array))) \by {
+           @  oss;
+           @  rule "seqPermFromSwap";
+           @  rule "andRight" \by {
+           @    case "Case 1": // the first of the two conjuncts is easy
+           @      auto;
+           @    case "Case 2": // the 2nd requires instantiations:
+           @      instantiate hide:true var:"iv" with:i;
+           @      instantiate hide:true var:"jv" with:to;
+           @      auto;
+           @  }
+           @ };  */
 
         return i;
 

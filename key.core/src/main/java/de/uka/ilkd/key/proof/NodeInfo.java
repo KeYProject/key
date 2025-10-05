@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.prover.rules.RuleApp;
@@ -49,7 +50,7 @@ public class NodeInfo {
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;
 
-    private String branchLabel = null;
+    private @Nullable String branchLabel = null;
 
     /** flag true if the first and active statement have been determined */
     private boolean determinedFstAndActiveStatement = false;
@@ -265,7 +266,7 @@ public class NodeInfo {
      *
      * @return branch label
      */
-    public String getBranchLabel() {
+    public @Nullable String getBranchLabel() {
         return branchLabel;
     }
 
