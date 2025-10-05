@@ -67,6 +67,7 @@ public class BranchesCommand extends AbstractCommand {
                     goal = findGoalByName(root, args.branch);
                 }
                 state.setGoal(goal);
+                break;
             case "single":
                 root = findNodeByNumber(proof, stack.peek());
                 TacletApp ta = (TacletApp) root.getAppliedRuleApp();
@@ -105,13 +106,18 @@ public class BranchesCommand extends AbstractCommand {
     private Goal findGoalByName(Node root, String branch) throws ScriptException {
         Iterator<Node> it = root.childrenIterator();
         List<String> knownBranchLabels = new ArrayList<>();
+        int number = 1;
         while (it.hasNext()) {
             Node node = it.next();
             String label = node.getNodeInfo().getBranchLabel();
+            if (label == null) {
+                label = "Case " + number;
+            }
             knownBranchLabels.add(label);
             if (branch.equals(label)) {
                 return findGoalByNode(root.proof(), node);
             }
+            number ++;
         }
         throw new ScriptException(
             "Unknown branch " + branch + ". Known branches are " + knownBranchLabels);
