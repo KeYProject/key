@@ -28,7 +28,10 @@
  * The  example has  been  added  to show  the  power of  proof
  * scripts.
  *
- * @author Mattias Ulbrich, 2015
+ * Translated to the use of JML proof scripts in 2025. Currently,
+ * this still increases the size of proof.
+ *
+ * @author Mattias Ulbrich, 2015, 2025
  */
 
 class Quicksort {
@@ -58,9 +61,21 @@ class Quicksort {
       @*/
     private void sort(int[] array, int from, int to) {
         if(from < to) {
+            //@ ghost \seq seq0 = \dl_array2seq(array);
             int splitPoint = split(array, from, to);
+            //@ ghost \seq seq1 = \dl_array2seq(array);
             sort(array, from, splitPoint-1);
+            //@ ghost \seq seq2 = \dl_array2seq(array);
             sort(array, splitPoint+1, to);
+            //@ ghost \seq seq3 = \dl_array2seq(array);
+            /*@ assert \dl_seqPerm(seq3, seq0) \by {
+              @   assert \dl_seqPerm(seq1, seq0) \by auto;
+              @   assert \dl_seqPerm(seq2, seq0) \by auto;
+              @   auto;
+              @ } */
+            //@ assert (\forall int i; from<=i && i<to; array[i] <= array[i+1]) \by { auto; }
+            //@ assert from > 0 ==> (\forall int x; from<=x && x<=to; array[x] > array[from-1]) \by { auto; }
+            //@ assert to < array.length-1 ==> (\forall int x; from<=x && x<=to; array[x] <= array[to+1]) \by { auto; }
         }
     }
 
