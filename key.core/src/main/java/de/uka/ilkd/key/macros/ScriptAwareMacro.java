@@ -34,7 +34,7 @@ package de.uka.ilkd.key.macros;
  */
 public class ScriptAwareMacro extends SequentialProofMacro {
 
-    private final ProofMacro autoMacro = new FinishSymbolicExecutionMacro();
+    private final ProofMacro autoMacro = new SymbolicExecutionOnlyMacro(); // FinishSymbolicExecutionMacro();
     private final ApplyScriptsMacro applyMacro = new ApplyScriptsMacro(new TryCloseMacro());
 
     @Override

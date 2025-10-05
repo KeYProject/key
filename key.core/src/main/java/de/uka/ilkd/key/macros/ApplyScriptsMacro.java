@@ -256,6 +256,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         List<ScriptCommandAst> result = new ArrayList<>();
         // Push current settings onto the settings stack
         result.add(new ScriptCommandAst("set", Map.of("stack", "push"), List.of()));
+        // Prepare by resolving the update
+        result.add(new ScriptCommandAst("oss", Map.of("recentOnly", true), List.of()));
         for (ProofCmdContext proofCmdContext : script.ctx.proofCmd()) {
             result.addAll(renderProofCmd(proofCmdContext, termMap, update, services));
         }
@@ -268,9 +270,6 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                                                          Map<ParserRuleContext, JTerm> termMap,
                                                          @Nullable OpReplacer update, Services services) throws ScriptException {
         List<ScriptCommandAst> result = new ArrayList<>();
-
-        // Prepare by resolving the update
-        result.add(new ScriptCommandAst("oss", Map.of("recentOnly", true), List.of()));
 
         // Push the current branch context
         result.add(new ScriptCommandAst("branches", Map.of(), List.of("push")));
