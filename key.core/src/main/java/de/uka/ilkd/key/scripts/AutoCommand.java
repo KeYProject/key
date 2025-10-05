@@ -95,7 +95,10 @@ public class AutoCommand extends AbstractCommand {
 
         final Strategy originalStrategy = state.getProof().getActiveStrategy();
         if (arguments.additionalRules != null) {
-            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules));
+            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
+        }
+        if (arguments.onlyRules != null) {
+            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.onlyRules, true));
         }
 
         // Give some feedback
@@ -177,7 +180,7 @@ public class AutoCommand extends AbstractCommand {
 
             Use the command with "close" to make sure the command succeeds for fails without
             changes.""")
-    public static class Parameters {
+    public static class Parameters implements ValueInjector.VerifyableParameters {
         // @ TODO Deprecated with the higher order proof commands?
         @Flag(value = "all")
         @Documentation("*Deprecated*. Apply the strategy on all open goals. There is a better syntax for that now.")
@@ -228,8 +231,26 @@ public class AutoCommand extends AbstractCommand {
                Additional rules to be used by the auto strategy. The rules have to be given as a
                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
                (high, low, medium or a natural number) using an equals sign.
+               Cannot be combined with the 'only' parameter.
                """)
         public @Nullable String additionalRules;
+
+        @Option(value = "only")
+        @Documentation("""
+               Limit the rules to be used by the auto strategy. The rules have to be given as a
+               comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+               (high, low, medium or a natural number) using an equals sign.
+               All rules application which do not match the given names will be disabled.
+               Cannot be combined with the 'add' parameter.
+               """)
+        public @Nullable String onlyRules;
+
+        @Override
+        public void verifyParameters() throws IllegalArgumentException, InjectionException {
+            if(onlyRules != null && additionalRules != null) {
+                throw new InjectionException("Parameters 'add' and 'only' are mutually exclusive.");
+            }
+        }
     }
 
     private static final class OriginalValue {

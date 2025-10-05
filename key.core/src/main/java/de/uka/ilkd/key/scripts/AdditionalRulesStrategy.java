@@ -29,10 +29,12 @@ class AdditionalRulesStrategy extends FilterStrategy {
     private static final int DEFAULT_PRIORITY = 1000;
 
     private final List<Pair<String, Integer>> additionalRules;
+    private final boolean exclusive;
 
-    public AdditionalRulesStrategy(Strategy delegate, String additionalRules) {
+    public AdditionalRulesStrategy(Strategy delegate, String additionalRules, boolean exclusive) {
         super(delegate);
         this.additionalRules = parseAddRules(additionalRules);
+        this.exclusive = exclusive;
     }
 
     private List<Pair<String, Integer>> parseAddRules(String additionalRules) {
@@ -77,7 +79,11 @@ class AdditionalRulesStrategy extends FilterStrategy {
         if (localCost != null) {
             return true;
         }
-        return super.isApprovedApp(app, pio, goal);
+        if (exclusive) {
+            return false;
+        } else {
+            return super.isApprovedApp(app, pio, goal);
+        }
     }
 
     private @Nullable RuleAppCost computeLocalCost(Rule rule) {
