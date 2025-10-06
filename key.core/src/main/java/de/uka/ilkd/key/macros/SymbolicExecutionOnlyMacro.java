@@ -18,6 +18,8 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.util.Streams;
 import org.key_project.util.java.StringUtil;
@@ -25,6 +27,8 @@ import org.key_project.util.java.StringUtil;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * This macro is very restritive in which rules are allowed to be applied for symbolic
@@ -125,6 +129,7 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
     private static class FilterSymbexStrategy extends FilterStrategy {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
+        private final Map<Sequent, Boolean> modalityCache = new WeakHashMap<>();
 
         public FilterSymbexStrategy(Strategy<@NonNull Goal> delegate) {
             super(delegate);
@@ -137,7 +142,30 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+            if(!hasModality(goal)) {
+                return false;
+            }
             return isAdmittedRule(app) && super.isApprovedApp(app, pio, goal);
+        }
+
+        private boolean hasModality(Goal goal) {
+            return modalityCache.computeIfAbsent(goal.node().sequent(), this::hasModality);
+        }
+
+        private boolean hasModality(Sequent seq) {
+            for (SequentFormula formula : seq.asList()) {
+                if (hasModality(formula.formula())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean hasModality(Term term) {
+            if(term.op() instanceof Modality) {
+                return true;
+            }
+            return term.subs().stream().anyMatch(this::hasModality);
         }
 
         @Override

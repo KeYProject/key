@@ -56,7 +56,8 @@ public class TestProofScriptCommand {
                 try {
                     TestInstance instance =
                         objectMapper.readValue(path.toFile(), TestInstance.class);
-                    args.add(Arguments.of(instance));
+                    var name = instance.name == null ? path.getFileName().toString() : instance.name;
+                    args.add(Arguments.of(instance, name));
                 } catch (Exception e) {
                     System.out.println(path);
                     e.printStackTrace();
@@ -67,10 +68,9 @@ public class TestProofScriptCommand {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("data")
-    void testProofScript(TestInstance data) throws Exception {
-        var name = data.name();
+    void testProofScript(TestInstance data, String name) throws Exception {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.writeString(tmpKey, data.key());
 
