@@ -1,21 +1,61 @@
-package de.uka.ilkd.key.macros.scripts;
+package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
+import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Name;
+import org.key_project.logic.Property;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
-/** This is more a temporary hack for scripts ... */
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A property that can be used for comparisons for terms.
+ * All term labels are ignored in this equality check. Additionally, holes (represented by the
+ * SortDependingFunction with name "_" and the Predicate with name "__") are treated as wildcards that
+ * match any subterm.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link TermComparisonWithHoles#INSTANCE}.
+ *
+ * @author Mattias Ulbrich
+ */
 public class TermComparisonWithHoles {
 
     private static final Name HOLE_NAME = new Name("_");
     private static final Name HOLE_PREDICATE_NAME = new Name("__");
 
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
+    private final JTerm referenceTerm;
 
-    public static boolean compareModHoles(Term t1, Term t2) {
+    TermComparisonWithHoles(JTerm referenceTerm) {
+        this.referenceTerm = referenceTerm;
+    }
+
+    public static boolean compare(JTerm referenceTerm, JTerm concreteTerm) {
+        TermComparisonWithHoles comparator = new TermComparisonWithHoles(referenceTerm);
+        return comparator.compareTo(concreteTerm);
+    }
+
+    public final boolean compareTo(JTerm t) {
+        if (referenceTerm == t) {
+            return true;
+        }
+        return unifyHelp(referenceTerm, t,
+                ImmutableSLList.<QuantifiableVariable>nil(),
+                ImmutableSLList.<QuantifiableVariable>nil(),
+                null);
+    }
+
+    public static boolean compareModHoles(JTerm t1, JTerm t2) {
         if (t1 == t2) {
             return true;
         }
@@ -29,14 +69,14 @@ public class TermComparisonWithHoles {
     /**
      * Compares two terms modulo bound renaming
      *
-     * @param t0           the first term
+     * @param t0           the first term -- potentially containing holes
      * @param t1           the second term
      * @param ownBoundVars variables bound above the current position
      * @param cmpBoundVars variables bound above the current position
      * @return <code>true</code> is returned iff the terms are equal modulo
      * bound renaming
      */
-    private static boolean unifyHelp(Term t0, Term t1,
+    private static boolean unifyHelp(JTerm t0, JTerm t1,
                                      ImmutableList<QuantifiableVariable> ownBoundVars,
                                      ImmutableList<QuantifiableVariable> cmpBoundVars,
                                      NameAbstractionTable nat) {
@@ -46,8 +86,7 @@ public class TermComparisonWithHoles {
         }
 
         Operator op = t0.op();
-        if(op instanceof SortDependingFunction) {
-            var sdop = (SortDependingFunction) op;
+        if(op instanceof SortDependingFunction sdop) {
             if(sdop.getKind().equals(HOLE_NAME)) {
                 return true;
             }
@@ -73,15 +112,15 @@ public class TermComparisonWithHoles {
             return false;
         }
 
-        nat = handleJava(t0, t1, nat);
-        if (nat == FAILED) {
-            return false;
-        }
+//        nat = handleJava(t0, t1, nat);
+//        if (nat == FAILED) {
+//            return false;
+//        }
 
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
 
-    private static boolean handleQuantifiableVariable(Term t0, Term t1,
+    private static boolean handleQuantifiableVariable(JTerm t0, JTerm t1,
                                                       ImmutableList<QuantifiableVariable> ownBoundVars,
                                                       ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable) && compareBoundVariables(
@@ -92,30 +131,30 @@ public class TermComparisonWithHoles {
         return true;
     }
 
-    private static NameAbstractionTable handleJava(Term t0, Term t1,
-                                                   NameAbstractionTable nat) {
-
-        if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
-            nat = checkNat(nat);
-            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
-                return FAILED;
-            }
-        }
-
-        if (!(t0.op() instanceof SchemaVariable)
-                && t0.op() instanceof ProgramVariable) {
-            if (!(t1.op() instanceof ProgramVariable)) {
-                return FAILED;
-            }
-            nat = checkNat(nat);
-            if (!((ProgramVariable) t0.op()).equalsModRenaming(
-                    (ProgramVariable) t1.op(), nat)) {
-                return FAILED;
-            }
-        }
-
-        return nat;
-    }
+//    private static NameAbstractionTable handleJava(JTerm t0, JTerm t1,
+//                                                   NameAbstractionTable nat) {
+//
+//        if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
+//            nat = checkNat(nat);
+//            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
+//                return FAILED;
+//            }
+//        }
+//
+//        if (!(t0.op() instanceof SchemaVariable)
+//                && t0.op() instanceof ProgramVariable) {
+//            if (!(t1.op() instanceof ProgramVariable)) {
+//                return FAILED;
+//            }
+//            nat = checkNat(nat);
+//            if (!((ProgramVariable) t0.op()).equalsModRenaming(
+//                    (ProgramVariable) t1.op(), nat)) {
+//                return FAILED;
+//            }
+//        }
+//
+//        return nat;
+//    }
 
     /**
      * compare two quantifiable variables if they are equal modulo renaming
@@ -165,7 +204,7 @@ public class TermComparisonWithHoles {
         return nat;
     }
 
-    private static boolean descendRecursively(Term t0, Term t1,
+    private static boolean descendRecursively(JTerm t0, JTerm t1,
                                               ImmutableList<QuantifiableVariable> ownBoundVars,
                                               ImmutableList<QuantifiableVariable> cmpBoundVars,
                                               NameAbstractionTable nat) {
@@ -197,5 +236,30 @@ public class TermComparisonWithHoles {
         }
 
         return true;
+    }
+
+    public List<Pair<Boolean, SequentFormula>> findMatchesInSequent(Sequent sequent) {
+        List<Pair<Boolean, SequentFormula>> matches = new ArrayList<>();
+        for (SequentFormula sf : sequent.antecedent()) {
+            if (compareTo((JTerm) sf.formula())) {
+                matches.add(new Pair<>(true, sf));
+            }
+        }
+        for (SequentFormula sf : sequent.succedent()) {
+            if (compareTo((JTerm) sf.formula())) {
+                matches.add(new Pair<>(false, sf));
+            }
+        }
+        return matches;
+    }
+
+
+    public @Nullable Pair<Boolean, SequentFormula> findUniqueMatchInSequent(Sequent sequent) {
+        List<Pair<Boolean, SequentFormula>> matches = findMatchesInSequent(sequent);
+        if (matches.size() != 1) {
+            return null;
+        } else {
+            return matches.getFirst();
+        }
     }
 }
