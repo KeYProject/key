@@ -28,6 +28,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.util.Debug;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,15 +39,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
+
+    private static final String ONLY_CASE = "witness2.yml";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProofScriptCommand.class);
+
     public record TestInstance(
             String name,
-            String key, String script, @Nullable String exception,
-            String[] goals, Integer selectedGoal) {
+            String key,
+            String script,
+            @Nullable String exception,
+            String[] goals,
+            Integer selectedGoal) {
     }
 
     public static List<Arguments> data() throws IOException, URISyntaxException {
         var folder = Paths.get("src/test/resources/de/uka/ilkd/key/scripts/cases")
                 .toAbsolutePath();
+
+        if(ONLY_CASE != null) {
+             folder = folder.resolve(ONLY_CASE);
+        }
+
         try (var walker = Files.walk(folder)) {
             List<Path> files =
                 walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
@@ -56,7 +71,9 @@ public class TestProofScriptCommand {
                 try {
                     TestInstance instance =
                         objectMapper.readValue(path.toFile(), TestInstance.class);
-                    var name = instance.name == null ? path.getFileName().toString() : instance.name;
+                    var name = instance.name == null ?
+                            path.getFileName().toString().substring(0, path.getFileName().toString().length() - 4) :
+                            instance.name;
                     args.add(Arguments.of(instance, name));
                 } catch (Exception e) {
                     System.out.println(path);
@@ -72,6 +89,7 @@ public class TestProofScriptCommand {
     @MethodSource("data")
     void testProofScript(TestInstance data, String name) throws Exception {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
+        LOGGER.info("Testing {} using file", name, tmpKey);
         Files.writeString(tmpKey, data.key());
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);

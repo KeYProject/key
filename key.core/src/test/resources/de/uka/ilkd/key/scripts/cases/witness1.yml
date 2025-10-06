@@ -1,0 +1,6 @@
+key: |  
+  \problem { ==> \forall int x; x=x, \forall int x; (x > 0 | x < 2) }
+script: |
+  witness (\forall int x; (__ | __)) as="y";
+goals:
+  - ==> \forall int x; x = x, y >  0 | y < 2

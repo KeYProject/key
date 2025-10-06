@@ -4,20 +4,22 @@
 
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
+import de.uka.ilkd.key.scripts.meta.Option;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.Name;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.Pair;
 
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -57,19 +59,12 @@ public class WitnessCommand extends AbstractCommand {
         Goal goal = state.getFirstOpenAutomaticGoal();
         Services services = state.getProof().getServices();
 
-        TermComparisonWithHoles tc = new TermComparisonWithHoles(services);
-        Pair<Boolean, SequentFormula> match = goal.node().sequent().antecedent().asList().stream()
-                .filter(f -> tc.compareModHoles(params.formula, f.formula()))
-                .map(f -> new Pair<>(true, f))
-                .findFirst().orElse(
-                        goal.node().sequent().succedent().asList().stream()
-                                .filter(f -> tc.compareModHoles(params.formula, f.formula()))
-                                .map(f -> new Pair<>(false, f))
-                                .findFirst().orElse(null)
-                );
+        TermComparisonWithHoles comp = new TermComparisonWithHoles(params.formula);
 
+        // First component: true for antecedent, false for succedent
+        Pair<Boolean, SequentFormula> match = comp.findUniqueMatchInSequent(goal.node().sequent());
         if (match == null) {
-            throw new ScriptException("Cannot match the formula argument");
+            throw new ScriptException("Cannot unique match the formula argument");
         }
 
         Operator op = match.second.formula().op();
@@ -80,6 +75,15 @@ public class WitnessCommand extends AbstractCommand {
 
         if(!GOOD_NAME.matcher(params.as).matches()) {
             throw new ScriptException("Invalid name: " + params.as);
+        }
+
+        NamespaceSet nss = services.getNamespaces();
+        Name asName = new Name(params.as);
+        if(nss.functions().lookup(asName) != null) {
+            throw new ScriptException("Name already used as function or predicate: " + params.as);
+        }
+        if(nss.programVariables().lookup(asName) != null) {
+            throw new ScriptException("Name already used as program variable: " + params.as);
         }
 
         Name tacletName = match.first ? ANTEC_TACLET : SUCC_TACLET;
@@ -93,7 +97,7 @@ public class WitnessCommand extends AbstractCommand {
                 services.getTermBuilder().tf().createTerm(match.second.formula().boundVars().get(0)),
                 true, services);
         app = app.addInstantiation(getSV(schemaVars, "b"), match.second.formula().sub(0), true, services);
-        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"), true, services);
+        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"), match.second.formula().boundVars().get(0).sort(), true, services);
 
         Goal g = state.getFirstOpenAutomaticGoal();
         g.apply(app);
@@ -108,11 +112,27 @@ public class WitnessCommand extends AbstractCommand {
         throw new NoSuchElementException("No schema variable with name " + name);
     }
 
+    @Documentation(category = "Fundamental", value = """
+            Provides a witness symbol for an existential or universal quantifier.
+            The given formula must be present on the sequent. Placeholders are allowed.
+            The command fails if the formula cannot be uniquely matched on the sequent.
+            The witness symbol `as` must be a valid identifier and not already used as function, predicate, or
+            program variable name. The new function symbol is created as a Skolem constant.
+            
+            #### Example:
+            
+            If the sequent contains the formula `\\exists int x; x > 0` in the antecedent then the command
+            `witness "\\exists int x; x > 0" as="x_12"` will introduce the witness symbol `x_12` for which "x_12 > 0`
+            holds and is added to the antecedent.
+            """)
     public static class Parameters {
+        @Documentation("The name of the witness symbol to be created.")
         @Option(value = "as")
-        public String as;
-        @Option(value = "#2")
-        public Term formula;
+        public @MonotonicNonNull String as;
+
+        @Documentation("The formula containing the quantifier for which a witness should be provided. Placeholders are allowed.")
+        @Argument
+        public @MonotonicNonNull JTerm formula;
     }
 
 }
