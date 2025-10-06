@@ -1760,7 +1760,6 @@ public class Recoder2KeYConverter {
         ImmutableArray<AnnotationUseSpecification> immutableAnnots = null;
         if (annots != null) {
             var annotArr = new AnnotationUseSpecification[annots.size()];
-            assert annots.size() >= 1;
             for (int i = annots.size() - 1; i >= 0; i--) {
                 annotArr[i] = convert(annots.get(i));
             }
