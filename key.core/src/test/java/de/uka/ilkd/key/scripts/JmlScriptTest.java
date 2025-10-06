@@ -38,7 +38,8 @@ public class JmlScriptTest {
 
     // Set this to a specific case to only run that case for debugging
     private static final String ONLY_CASE = null;
-    private static final boolean SAVE_PROOF = true;
+    // Set this to true to save the proof after running the script
+    private static final boolean SAVE_PROOF = false;
 
     static {
         URL url = JmlScriptTest.class.getResource("jml/project.key");
@@ -111,7 +112,7 @@ public class JmlScriptTest {
     public static Stream<Arguments> filesProvider() throws URISyntaxException, IOException {
         URL jmlUrl = JmlScriptTest.class.getResource("jml");
         if (ONLY_CASE != null) {
-            return Stream.of(Arguments.of(Paths.get(jmlUrl.toURI()).resolve(ONLY_CASE), "single specified case"));
+            return Stream.of(Arguments.of(Paths.get(jmlUrl.toURI()).resolve(ONLY_CASE), "single specified case: " + ONLY_CASE));
         } else {
             return Files.list(Paths.get(jmlUrl.toURI()))
                     .filter(p -> p.toString().endsWith(".java"))
