@@ -104,7 +104,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     }
 
     public static String checkForIllegalConditions(Taclet taclet) {
-        LOGGER.info("{} {}", taclet, taclet.getVariableConditions());
         if (!taclet.getVariableConditions().isEmpty()) {
             return "The given taclet " + taclet.name()
                 + " contains variable conditions that are not supported.";
