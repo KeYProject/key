@@ -5,7 +5,7 @@
     "Choice" : { 
         "JavaCard" : "JavaCard:off",
         "Strings" : "Strings:on",
-        "assertions" : "assertions:on",
+        "assertions" : "assertions:safe",
         "bigint" : "bigint:on",
         "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
@@ -15,7 +15,7 @@
         "javaLoopTreatment" : "javaLoopTreatment:efficient",
         "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
         "methodExpansion" : "methodExpansion:modularOnly",
-        "modelFields" : "modelFields:showSatisfiability",
+        "modelFields" : "modelFields:treatAsAxiom",
         "moreSeqRules" : "moreSeqRules:off",
         "permissions" : "permissions:off",
         "programRules" : "programRules:Java",
@@ -48,22 +48,22 @@
      },
     "Strategy" : { 
         "ActiveStrategy" : "JavaCardDLStrategy",
-        "MaximumNumberOfAutomaticApplications" : 7000,
+        "MaximumNumberOfAutomaticApplications" : 10000,
         "Timeout" : -1,
         "options" : { 
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
-            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
             "DEP_OPTIONS_KEY" : "DEP_ON",
             "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
-            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
-            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
             "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
-            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
-            "QUERY_NEW_OPTIONS_KEY" : "QUERY_ON",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_RESTRICTED",
             "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
             "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
             "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
@@ -80,35 +80,19 @@
 // Proof-Obligation settings
 { 
     "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
-    "definitionFile" : "unknown",
-    "name" : "dominatesSetSubset",
-    "tacletFile" : "/home/boby/Dev/key/Examples/universe_lemmas.key"
+    "name" : "variousReferencedObjectIsCreated"
  }
 
 \proof {
-(keyLog "0" (keyUser "boby" ) (keyVersion "fb96158cd902ea794b07f245944d17da701055e2"))
+(keyLog "0" (keyUser "boby" ) (keyVersion "19f98e9b750147137d3ed98179e16502b6f60abf"))
 
-(autoModeTime "7")
+(autoModeTime "69")
 
 (branch "dummy ID"
-(rule "dominatesSetDef" (formula "1") (term "0,0,1") (newnames "f_o,f_s2,f_s1") (inst "o=o") (inst "f=f") (userinteraction))
-(rule "dominatesSetDef" (formula "1") (term "0,0") (inst "o=o") (inst "f=f") (userinteraction))
-(rule "impRight" (formula "1"))
-(rule "orRight" (formula "2"))
-(rule "notRight" (formula "2"))
+(rule "impRight" (formula "1") (newnames "f_h,f_o,f_f"))
+(rule "impRight" (formula "2"))
 (rule "notLeft" (formula "2"))
-(rule "notRight" (formula "3"))
-(rule "allRight" (formula "3") (inst "sk=o_0"))
-(rule "allRight" (formula "3") (inst "sk=f_0"))
-(rule "impRight" (formula "3"))
-(rule "elementOfSubsetImpliesElementOfSuperset" (formula "1") (ifseqformula "2"))
-(rule "nnf_imp2or" (formula "4") (term "0,0"))
-(rule "commute_or" (formula "4") (term "0,0"))
-(rule "allLeft" (formula "4") (inst "t=o_0"))
-(rule "replace_known_right" (formula "4") (term "0,0") (ifseqformula "6"))
- (builtin "One Step Simplification" (formula "4"))
-(rule "allLeft" (formula "4") (inst "t=f_0"))
-(rule "notLeft" (formula "4"))
-(rule "close" (formula "6") (ifseqformula "1"))
+(rule "referencedObjectIsCreatedRight" (formula "2") (ifseqformula "3"))
+(rule "close" (formula "2") (ifseqformula "1"))
 )
 }

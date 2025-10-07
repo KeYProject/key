@@ -5,7 +5,7 @@
     "Choice" : { 
         "JavaCard" : "JavaCard:off",
         "Strings" : "Strings:on",
-        "assertions" : "assertions:on",
+        "assertions" : "assertions:safe",
         "bigint" : "bigint:on",
         "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
@@ -15,7 +15,7 @@
         "javaLoopTreatment" : "javaLoopTreatment:efficient",
         "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
         "methodExpansion" : "methodExpansion:modularOnly",
-        "modelFields" : "modelFields:showSatisfiability",
+        "modelFields" : "modelFields:treatAsAxiom",
         "moreSeqRules" : "moreSeqRules:off",
         "permissions" : "permissions:off",
         "programRules" : "programRules:Java",
@@ -48,22 +48,22 @@
      },
     "Strategy" : { 
         "ActiveStrategy" : "JavaCardDLStrategy",
-        "MaximumNumberOfAutomaticApplications" : 9000,
+        "MaximumNumberOfAutomaticApplications" : 10000,
         "Timeout" : -1,
         "options" : { 
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
-            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
             "DEP_OPTIONS_KEY" : "DEP_ON",
             "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
-            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
-            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
             "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
-            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
-            "QUERY_NEW_OPTIONS_KEY" : "QUERY_ON",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_RESTRICTED",
             "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
             "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
             "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
@@ -84,39 +84,45 @@
  }
 
 \proof {
-(keyLog "0" (keyUser "boby" ) (keyVersion "fb96158cd902ea794b07f245944d17da701055e2"))
+(keyLog "0" (keyUser "boby" ) (keyVersion "19f98e9b750147137d3ed98179e16502b6f60abf"))
 
-(autoModeTime "530")
+(autoModeTime "232")
 
 (branch "dummy ID"
+(rule "createdRepfpDef" (formula "1") (term "1,0,0,0,0,0") (inst "y=y") (userinteraction))
+(rule "createdRepfpDef" (formula "1") (term "1,0,0,0,0") (inst "y=y") (userinteraction))
+(rule "equalityToElementOf" (formula "1") (term "0,0,0") (inst "ov=ov") (inst "fv=fv") (userinteraction))
+ (builtin "One Step Simplification" (formula "1"))
 (rule "impRight" (formula "1"))
+(rule "notLeft" (formula "1"))
 (rule "notRight" (formula "2"))
-(rule "notLeft" (formula "2"))
 (rule "andLeft" (formula "1"))
-(rule "disjointToElementOf" (formula "3") (term "0") (inst "ov=ov") (inst "fv=fv") (userinteraction))
-(rule "elementOfSetMinus" (formula "3") (term "0,0,0,0,0") (userinteraction))
-(rule "createdRepfpDef" (formula "3") (term "2,0,1,0,0,0,0,0") (inst "y=y") (userinteraction))
-(rule "createdRepfpDef" (formula "3") (term "2,0,1,0,0,0") (inst "y=y") (userinteraction))
-(rule "elementOfIntersect" (formula "3") (term "0,1,0,0,0") (userinteraction))
-(rule "elementOfInfiniteUnion" (formula "3") (term "0,0,1,0,0,0") (userinteraction))
-(rule "elementOfIntersect" (formula "3") (term "0,1,0,0,0,0,0") (userinteraction))
-(rule "elementOfInfiniteUnion" (formula "3") (term "0,0,1,0,0,0,0,0") (userinteraction))
- (builtin "One Step Simplification" (formula "3") (userinteraction))
-(rule "repfpElement" (formula "3") (term "1,0,0,0,0") (userinteraction))
-(rule "repfpElement" (formula "3") (term "1,0,1,0,0,0") (userinteraction))
- (builtin "One Step Simplification" (formula "3") (userinteraction))
-(rule "equiv_right" (formula "3") (userinteraction))
+(rule "eqSymm" (formula "3") (term "0,1"))
+(rule "elementOfIntersect" (formula "3") (term "0,0,0,0"))
+(rule "elementOfSetMinus" (formula "3") (term "0,0,0,0,0"))
+ (builtin "One Step Simplification" (formula "3"))
+(rule "elementOfIntersect" (formula "3") (term "0,0,0,0,0,0"))
+(rule "repfpElement" (formula "3") (term "1,0,0,0,0,0,0"))
+(rule "elementOfInfiniteUnion" (formula "3") (term "0,0,0,0,0,0,0"))
+ (builtin "One Step Simplification" (formula "3"))
+(rule "elementOfIntersect" (formula "3") (term "1,0,0,0,0"))
+(rule "repfpElement" (formula "3") (term "1,1,0,0,0,0"))
+(rule "elementOfInfiniteUnion" (formula "3") (term "0,1,0,0,0,0"))
+ (builtin "One Step Simplification" (formula "3"))
+(rule "pullOutSelect" (formula "1") (term "0") (inst "selectSK=java_lang_Object_created__0"))
+(rule "applyEqRigid" (formula "1") (term "1") (ifseqformula "2"))
+(rule "pullOutSelect" (formula "3") (term "0") (inst "selectSK=java_lang_Object_created__1"))
+(rule "applyEq" (formula "3") (term "1") (ifseqformula "4"))
+(rule "hideAuxiliaryEqConcrete" (formula "2"))
+(rule "hideAuxiliaryEqConcrete" (formula "3"))
+(rule "nnf_notAnd" (formula "3") (term "0,0"))
+ (builtin "One Step Simplification" (formula "3"))
+(rule "nnf_notAnd" (formula "3") (term "1,0,0"))
+(rule "nnf_notOr" (formula "3") (term "1,1,0,0"))
+(rule "commute_or" (formula "3") (term "1"))
+(rule "equiv_right" (formula "3"))
 (branch "Case '->'"
    (rule "orRight" (formula "4"))
-   (rule "eqSymm" (formula "4"))
-   (rule "pullOutSelect" (formula "3") (term "0") (inst "selectSK=java_lang_Object_created__0"))
-   (rule "applyEq" (formula "3") (term "1") (ifseqformula "4"))
-   (rule "pullOutSelect" (formula "2") (term "0") (inst "selectSK=java_lang_Object_created__1"))
-   (rule "applyEq" (formula "2") (term "1") (ifseqformula "3"))
-   (rule "hideAuxiliaryEqConcrete" (formula "5"))
-   (rule "hideAuxiliaryEqConcrete" (formula "3"))
-   (rule "nnf_notAnd" (formula "1") (term "1,0"))
-   (rule "nnf_notOr" (formula "1") (term "1,1,0"))
    (rule "cnf_rightDist" (formula "1") (term "1,0"))
    (rule "commute_or" (formula "1") (term "0,1,0"))
    (rule "cnf_rightDist" (formula "1") (term "0"))
@@ -135,56 +141,41 @@
     (builtin "One Step Simplification" (formula "2"))
    (rule "true_left" (formula "2"))
    (rule "shift_paren_or" (formula "2") (term "0"))
-    (builtin "One Step Simplification" (formula "2") (ifInst ""  (formula "6")) (ifInst ""  (formula "5")) (ifInst ""  (formula "4")))
+    (builtin "One Step Simplification" (formula "2") (ifInst ""  (formula "5")) (ifInst ""  (formula "6")) (ifInst ""  (formula "4")))
    (rule "closeFalse" (formula "2"))
 )
 (branch "Case '<-'"
    (rule "allRight" (formula "4") (inst "sk=ov_0"))
    (rule "orRight" (formula "4"))
+   (rule "orRight" (formula "5"))
    (rule "notRight" (formula "5"))
-   (rule "andLeft" (formula "1"))
-   (rule "eqSymm" (formula "3") (term "0"))
-   (rule "replace_known_left" (formula "6") (term "0") (ifseqformula "1"))
-    (builtin "One Step Simplification" (formula "6"))
-   (rule "orRight" (formula "6"))
-   (rule "pullOutSelect" (formula "4") (term "0") (inst "selectSK=java_lang_Object_created__0"))
-   (rule "applyEqRigid" (formula "4") (term "1") (ifseqformula "5"))
-   (rule "pullOutSelect" (formula "6") (term "0") (inst "selectSK=java_lang_Object_created__1"))
-   (rule "applyEqRigid" (formula "6") (term "1") (ifseqformula "7"))
+   (rule "replace_known_left" (formula "5") (term "0") (ifseqformula "1"))
+    (builtin "One Step Simplification" (formula "5"))
+   (rule "orRight" (formula "5"))
    (rule "pullOutSelect" (formula "1") (term "0") (inst "selectSK=java_lang_Object_created__2"))
-   (rule "applyEqRigid" (formula "1") (term "1") (ifseqformula "2"))
-   (rule "hideAuxiliaryEqConcrete" (formula "6"))
-   (rule "hideAuxiliaryEqConcrete" (formula "7"))
+   (rule "applyEq" (formula "1") (term "1") (ifseqformula "2"))
    (rule "hideAuxiliaryEqConcrete" (formula "2"))
-   (rule "commute_or" (formula "3"))
    (rule "cut_direct" (formula "2") (term "1"))
-   (branch "CUT: ov_0 = f_y TRUE"
+   (branch "CUT: f_y = f_x TRUE"
        (builtin "One Step Simplification" (formula "3"))
       (rule "true_left" (formula "3"))
-      (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "2"))
-      (rule "applyEq" (formula "5") (term "1") (ifseqformula "1"))
-      (rule "replace_known_right" (formula "2") (term "0") (ifseqformula "5"))
-       (builtin "One Step Simplification" (formula "2"))
-      (rule "applyEqRigid" (formula "6") (term "0") (ifseqformula "1"))
-      (rule "close" (formula "6") (ifseqformula "2"))
+      (rule "applyEqRigid" (formula "7") (term "1,0,1") (ifseqformula "2"))
+      (rule "replace_known_right" (formula "7") (term "0,1") (ifseqformula "6"))
+       (builtin "One Step Simplification" (formula "7"))
+      (rule "notRight" (formula "7"))
+      (rule "applyEq" (formula "5") (term "1,0") (ifseqformula "3"))
+      (rule "applyEqRigid" (formula "1") (term "0") (ifseqformula "3"))
+      (rule "close" (formula "5") (ifseqformula "1"))
    )
-   (branch "CUT: ov_0 = f_y FALSE"
+   (branch "CUT: f_y = f_x FALSE"
        (builtin "One Step Simplification" (formula "2"))
-      (rule "dominatesNotEqualLeft" (formula "6") (ifseqformula "2"))
+      (rule "dominatesNegTransitive" (formula "8") (term "0,0") (ifseqformula "2") (ifseqformula "6"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "notRight" (formula "8"))
+      (rule "dominatesNotEqualLeft" (formula "6") (ifseqformula "3"))
       (rule "false_right" (formula "6"))
-      (rule "cut_direct" (formula "3") (term "1"))
-      (branch "CUT: f_y = f_x TRUE"
-          (builtin "One Step Simplification" (formula "4"))
-         (rule "true_left" (formula "4"))
-         (rule "applyEqRigid" (formula "5") (term "1,0") (ifseqformula "3"))
-         (rule "applyEq" (formula "2") (term "0") (ifseqformula "3"))
-         (rule "close" (formula "5") (ifseqformula "2"))
-      )
-      (branch "CUT: f_y = f_x FALSE"
-          (builtin "One Step Simplification" (formula "3"))
-         (rule "dominatesNegTransitive" (formula "2") (ifseqformula "3") (ifseqformula "7"))
-         (rule "closeFalse" (formula "2"))
-      )
+      (rule "dominatesNegNotEqual" (formula "1") (ifseqformula "3") (ifseqformula "6"))
+      (rule "closeFalse" (formula "1"))
    )
 )
 )

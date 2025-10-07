@@ -80,9 +80,7 @@
 // Proof-Obligation settings
 { 
     "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
-    "definitionFile" : "unknown",
     "name" : "dominatesSameDepth",
-    "tacletFile" : "/home/boby/Dev/key/Examples/universe_lemmas.key"
  }
 
 \proof {

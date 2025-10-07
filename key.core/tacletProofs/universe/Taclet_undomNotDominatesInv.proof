@@ -5,7 +5,7 @@
     "Choice" : { 
         "JavaCard" : "JavaCard:off",
         "Strings" : "Strings:on",
-        "assertions" : "assertions:on",
+        "assertions" : "assertions:safe",
         "bigint" : "bigint:on",
         "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
@@ -15,7 +15,7 @@
         "javaLoopTreatment" : "javaLoopTreatment:efficient",
         "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
         "methodExpansion" : "methodExpansion:modularOnly",
-        "modelFields" : "modelFields:showSatisfiability",
+        "modelFields" : "modelFields:treatAsAxiom",
         "moreSeqRules" : "moreSeqRules:off",
         "permissions" : "permissions:off",
         "programRules" : "programRules:Java",
@@ -48,22 +48,22 @@
      },
     "Strategy" : { 
         "ActiveStrategy" : "JavaCardDLStrategy",
-        "MaximumNumberOfAutomaticApplications" : 7000,
+        "MaximumNumberOfAutomaticApplications" : 10000,
         "Timeout" : -1,
         "options" : { 
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
-            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
             "DEP_OPTIONS_KEY" : "DEP_ON",
             "INF_FLOW_CHECK_PROPERTY" : "INF_FLOW_CHECK_FALSE",
-            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
-            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
             "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
-            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
-            "QUERY_NEW_OPTIONS_KEY" : "QUERY_ON",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_RESTRICTED",
             "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
             "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
             "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
@@ -80,36 +80,23 @@
 // Proof-Obligation settings
 { 
     "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
-    "name" : "selectOfDominatedAnon"
+    "name" : "undomNotDominatesInv"
  }
 
 \proof {
-(keyLog "0" (keyUser "boby" ) (keyVersion "fb96158cd902ea794b07f245944d17da701055e2"))
+(keyLog "0" (keyUser "boby" ) (keyVersion "19f98e9b750147137d3ed98179e16502b6f60abf"))
 
-(autoModeTime "0")
+(autoModeTime "65")
 
 (branch "dummy ID"
- (builtin "One Step Simplification" (formula "1") (newnames "f_h,f_s,f_h2,f_o,f_f") (userinteraction))
-(rule "ifthenelse_split" (formula "1") (term "0,1") (userinteraction))
-(branch " dominatesSet(f_o, f_s) ∧ ¬(¬f_o = null ∧ ¬f_o.<created>@f_h = TRUE) TRUE"
-   (rule "selectOfAnon" (formula "2") (term "0") (userinteraction))
-   (rule "andLeft" (formula "1") (userinteraction))
-   (rule "notLeft" (formula "2") (userinteraction))
-    (builtin "One Step Simplification" (formula "3") (ifInst ""  (formula "2")) (userinteraction))
-   (rule "orRight" (formula "3") (userinteraction))
-   (rule "notRight" (formula "3") (userinteraction))
-   (rule "andLeft" (formula "1") (userinteraction))
-   (rule "notLeft" (formula "2") (userinteraction))
-   (rule "dominatesSetDef" (formula "2") (inst "o=o") (inst "f=f") (userinteraction))
-   (rule "allLeft" (formula "2") (inst "t=f_o") (userinteraction))
-    (builtin "One Step Simplification" (formula "2") (userinteraction))
-   (rule "allLeft" (formula "2") (inst "t=f_f") (userinteraction))
-   (rule "notLeft" (formula "2") (userinteraction))
-   (rule "close" (formula "4") (ifseqformula "1") (userinteraction))
-)
-(branch " dominatesSet(f_o, f_s) ∧ ¬(¬f_o = null ∧ ¬f_o.<created>@f_h = TRUE) FALSE"
-    (builtin "One Step Simplification" (formula "2") (userinteraction))
-   (rule "closeTrue" (formula "2") (userinteraction))
-)
+(rule "undomDef" (formula "1") (term "0,1") (userinteraction))
+(rule "impRight" (formula "1"))
+(rule "notRight" (formula "2"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "3"))
+(rule "notLeft" (formula "1"))
+(rule "notLeft" (formula "1"))
+(rule "close" (formula "2") (ifseqformula "1"))
 )
 }

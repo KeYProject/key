@@ -89,7 +89,7 @@
 (autoModeTime "260")
 
 (branch "dummy ID"
-(rule "undomRefl" (formula "1") (term "0,0,1") (userinteraction))
+(rule "undomSymm" (formula "1") (term "0,0,1") (userinteraction))
 (rule "undomDef" (formula "1") (term "0,0,1") (userinteraction))
 (rule "undomDef" (formula "1") (term "0,0") (userinteraction))
 (rule "impRight" (formula "1"))
