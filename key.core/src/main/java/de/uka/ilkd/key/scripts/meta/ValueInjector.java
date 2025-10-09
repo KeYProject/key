@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts.meta;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 
@@ -287,16 +288,12 @@ public class ValueInjector {
     public <T> T convert(Class<T> targetType, Object val)
             throws NoSpecifiedConverterException, ConversionException {
         var converter = (Converter<Object, Object>) getConverter(targetType, val.getClass());
-        if (converter == null) {
-            throw new NoSpecifiedConverterException(
-                "No converter registered for class: " + targetType + " from " + val.getClass());
-        }
         try {
             return (T) converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(
                 String.format("Could not convert value '%s' from type '%s' to type '%s'",
-                    val, val.getClass(), targetType),
+                    val, val.getClass().getSimpleName(), targetType.getSimpleName()),
                 e);
         }
     }
@@ -306,10 +303,6 @@ public class ValueInjector {
         @SuppressWarnings("unchecked")
         var converter = (Converter<T, Object>) getConverter(type, val.getClass());
 
-        if (converter == null) {
-            throw new NoSpecifiedConverterException(
-                "No converter registered for class: " + type + " from " + val.getClass(), null);
-        }
         try {
             return converter.convert(val);
         } catch (Exception e) {
@@ -347,11 +340,16 @@ public class ValueInjector {
      *         converter is known.
      */
     @SuppressWarnings("unchecked")
-    public <R, T> @Nullable Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
+    public <R, T> @NonNull Converter<R, T> getConverter(Class<R> ret, Class<T> arg) throws NoSpecifiedConverterException {
         if (ret.isAssignableFrom(arg)) {
             return (T it) -> (R) it;
         }
-        return (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
+        Converter<R, T> result = (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
+        if (result == null) {
+            throw new NoSpecifiedConverterException(
+                    "No converter registered for class: " + ret.getName() + " from " + arg.getName());
+        }
+        return result;
     }
 
     @Override

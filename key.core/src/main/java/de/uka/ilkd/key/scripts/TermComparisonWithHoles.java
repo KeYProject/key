@@ -17,6 +17,8 @@ import org.key_project.util.collection.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.uka.ilkd.key.scripts.TermWithHoles.*;
+
 /**
  * A property that can be used for comparisons for terms.
  * All term labels are ignored in this equality check. Additionally, holes (represented by the
@@ -30,14 +32,15 @@ import java.util.List;
  */
 public class TermComparisonWithHoles {
 
-    private static final Name HOLE_NAME = new Name("_");
-    private static final Name HOLE_PREDICATE_NAME = new Name("__");
-
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
     private final JTerm referenceTerm;
 
     TermComparisonWithHoles(JTerm referenceTerm) {
         this.referenceTerm = referenceTerm;
+    }
+
+    TermComparisonWithHoles(TermWithHoles twh) {
+        this.referenceTerm = twh.term();
     }
 
     public static boolean compare(JTerm referenceTerm, JTerm concreteTerm) {
@@ -87,10 +90,10 @@ public class TermComparisonWithHoles {
 
         Operator op = t0.op();
         if(op instanceof SortDependingFunction sdop) {
-            if(sdop.getKind().equals(HOLE_NAME)) {
+            if(sdop.getKind().equals(HOLE_SORT_DEP_NAME)) {
                 return true;
             }
-        } else if(op.name().equals(HOLE_PREDICATE_NAME)) {
+        } else if(op.name().equals(HOLE_PREDICATE_NAME) || op.name().equals(HOLE_NAME)) {
             return true;
         }
 
