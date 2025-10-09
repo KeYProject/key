@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestProofScriptCommand {
 
-    private static final String ONLY_CASE = "witness2.yml";
+    private static final String ONLY_CASE = null;
     private static final Logger LOGGER = LoggerFactory.getLogger(TestProofScriptCommand.class);
 
     public record TestInstance(
@@ -103,6 +103,7 @@ public class TestProofScriptCommand {
         try {
             pse.execute(env.getUi(), script);
         } catch (ScriptException ex) {
+            ex.printStackTrace();
             assertTrue(data.exception != null && !data.exception.isEmpty(),
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.

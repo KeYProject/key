@@ -86,6 +86,8 @@ public class EngineState {
         v.addConverter(JTerm.class, String.class, (str) -> this.toTerm(str, null));
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
+        v.addConverter(TermWithHoles.class, ProofScriptExpressionContext.class,
+                (ctx) -> TermWithHoles.fromParserContext(this, ctx));
 
         addContextTranslator(v, String.class);
         addContextTranslator(v, JTerm.class);

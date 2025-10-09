@@ -132,7 +132,7 @@ public class WitnessCommand extends AbstractCommand {
 
         @Documentation("The formula containing the quantifier for which a witness should be provided. Placeholders are allowed.")
         @Argument
-        public @MonotonicNonNull JTerm formula;
+        public @MonotonicNonNull TermWithHoles formula;
     }
 
 }
