@@ -391,6 +391,7 @@ LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<' | '«' | '‹';
 RGUILLEMETS: '>''>' | '»' | '›';
 IMPLICIT_IDENT: '<' '$'? (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
+MATCH_IDENT: '?' IDENT?;
 
 EQV:	'<->' | '\u2194';
 CHAR_LITERAL
