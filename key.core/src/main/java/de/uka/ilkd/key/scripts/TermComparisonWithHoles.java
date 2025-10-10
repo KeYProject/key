@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.*;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -31,6 +32,7 @@ import static de.uka.ilkd.key.scripts.TermWithHoles.*;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class TermComparisonWithHoles {
 
     private final JTerm referenceTerm;
@@ -46,28 +48,53 @@ public class TermComparisonWithHoles {
         }
 
         PosInTerm focus = findFocus(referenceTerm);
-        if(focus != null) {
-            for(int i = focus.depth() -1; i >= 0; i--) {
-                if(pio.isTopLevel()) {
-                    // focus is deeper than the current term
-                    return false;
-                }
-                int focusIdx = focus.getIndexAt(i);
-                int termIdx = pio.posInTerm().getIndexAt(pio.depth() - 1);
-                if(focusIdx != termIdx) {
-                    // the focus is not at the same position as the current term
-                    return false;
-                }
-                pio = pio.up();
-            }
-            term = (JTerm) pio.subTerm();
+        if(focus == null) {
+            focus = PosInTerm.getTopLevel();
         }
 
-        return unifyHelp(referenceTerm, term,
-                ImmutableSLList.<QuantifiableVariable>nil(),
-                ImmutableSLList.<QuantifiableVariable>nil(),
-                null);
+        List<PosInTerm> focusPaths = new ArrayList<>();
+        expandFocusPaths(focus, pio.posInTerm(), PosInTerm.getTopLevel(), focusPaths);
 
+        for(PosInTerm fpath : focusPaths) {
+            PosInTerm pit = pio.posInTerm().firstN(pio.depth() - fpath.depth());
+            JTerm startTerm = (JTerm) pit.getSubTerm(pio.sequentFormula().formula());
+
+            boolean result = unifyHelp(referenceTerm, startTerm,
+                    ImmutableSLList.<QuantifiableVariable>nil(),
+                    ImmutableSLList.<QuantifiableVariable>nil(),
+                    fpath);
+            if (result) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void expandFocusPaths(PosInTerm focus, PosInTerm input, PosInTerm base, List<PosInTerm> collected) {
+        if(focus.isTopLevel()) {
+            // fully matched:
+            collected.add(base);
+            return;
+        }
+
+        if(input.isTopLevel()) {
+            // input is too shallow
+            return;
+        }
+
+        if(focus.getIndex() == (char)-1) {
+            // ellipsis found, we need to expand
+            expandFocusPaths(focus.up(), input, base, collected);
+            expandFocusPaths(focus, input.up(), base.prepend((char) input.getIndex()), collected);
+        } else {
+            if(focus.getIndex() == input.getIndex()) {
+                expandFocusPaths(focus.up(), input.up(), base.prepend((char) input.getIndex()), collected);
+            } else {
+                // mismatch
+                return;
+            }
+        }
     }
 
     public final boolean matchesToplevel(SequentFormula sf) {
@@ -81,12 +108,20 @@ public class TermComparisonWithHoles {
             if(op.name().equals(TermWithHoles.FOCUS_NAME)) {
                 return PosInTerm.getTopLevel();
             }
+            if(op.name().equals(TermWithHoles.ELLIPSIS_NAME)) {
+                PosInTerm subFocus = findFocus(pattern.sub(0));
+                if(subFocus != null) {
+                    return subFocus.prepend((char)-1);
+                } else {
+                    return null;
+                }
+            }
         }
         for (int i = 0; i < pattern.arity(); i++) {
             Term sub = pattern.sub(i);
             PosInTerm subFocus = findFocus(sub);
             if(subFocus != null) {
-                return PosInTerm.of((char)i, subFocus);
+                return subFocus.prepend((char)i);
             }
         }
         return null;
@@ -106,7 +141,7 @@ public class TermComparisonWithHoles {
     private static boolean unifyHelp(JTerm t0, JTerm t1,
                                      ImmutableList<QuantifiableVariable> ownBoundVars,
                                      ImmutableList<QuantifiableVariable> cmpBoundVars,
-                                     NameAbstractionTable nat) {
+                                     @Nullable PosInTerm expectedFocus) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
             return true;
@@ -120,15 +155,17 @@ public class TermComparisonWithHoles {
         } else if(op.name().equals(HOLE_PREDICATE_NAME) || op.name().equals(HOLE_NAME)) {
             return true;
         } else if(op.name().equals(FOCUS_NAME)) {
-            // ignore the "focus" annotation
-            return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, nat);
+            if(expectedFocus == null || !expectedFocus.isTopLevel()) {
+                // focus annotation not at expected position
+                return false;
+            }
+            return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, null);
         } else if(op.name().equals(ELLIPSIS_NAME)) {
             // return true if it hits one subterm ...
-            Set<JTerm> deepAllSubs = new HashSet<>();
-            computeSubterms(t1, deepAllSubs);
+            Set<Pair<JTerm, PosInTerm>> deepAllSubs = new HashSet<>();
+            computeSubterms(t1, expectedFocus, deepAllSubs);
             var lookfor = t0.sub(0);
-            var finalNat = nat;
-            return deepAllSubs.stream().anyMatch(t -> unifyHelp(lookfor, t, ownBoundVars, cmpBoundVars, finalNat));
+            return deepAllSubs.stream().anyMatch(t -> unifyHelp(lookfor, t.first, ownBoundVars, cmpBoundVars, t.second));
         }
 
 
@@ -154,12 +191,14 @@ public class TermComparisonWithHoles {
 //            return false;
 //        }
 
-        return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
+        return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, expectedFocus);
     }
 
-    private static void computeSubterms(JTerm t, Set<JTerm> deepAllSubs) {
-        deepAllSubs.add(t);
-        t.subs().stream().forEach(sub -> computeSubterms(sub, deepAllSubs));
+    private static void computeSubterms(JTerm t, @Nullable PosInTerm expectedPos, Set<Pair<JTerm, @Nullable PosInTerm>> deepAllSubs) {
+        deepAllSubs.add(new Pair<>(t, expectedPos));
+        for(int i = 0; i < t.arity(); i++) {
+            computeSubterms(t.sub(i), nextFocusPos(expectedPos, i), deepAllSubs);
+        }
     }
 
     private static boolean handleQuantifiableVariable(JTerm t0, JTerm t1,
@@ -172,31 +211,6 @@ public class TermComparisonWithHoles {
         }
         return true;
     }
-
-//    private static NameAbstractionTable handleJava(JTerm t0, JTerm t1,
-//                                                   NameAbstractionTable nat) {
-//
-//        if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
-//            nat = checkNat(nat);
-//            if (!t0.javaBlock().equalsModRenaming(t1.javaBlock(), nat)) {
-//                return FAILED;
-//            }
-//        }
-//
-//        if (!(t0.op() instanceof SchemaVariable)
-//                && t0.op() instanceof ProgramVariable) {
-//            if (!(t1.op() instanceof ProgramVariable)) {
-//                return FAILED;
-//            }
-//            nat = checkNat(nat);
-//            if (!((ProgramVariable) t0.op()).equalsModRenaming(
-//                    (ProgramVariable) t1.op(), nat)) {
-//                return FAILED;
-//            }
-//        }
-//
-//        return nat;
-//    }
 
     /**
      * compare two quantifiable variables if they are equal modulo renaming
@@ -249,7 +263,7 @@ public class TermComparisonWithHoles {
     private static boolean descendRecursively(JTerm t0, JTerm t1,
                                               ImmutableList<QuantifiableVariable> ownBoundVars,
                                               ImmutableList<QuantifiableVariable> cmpBoundVars,
-                                              NameAbstractionTable nat) {
+                                              PosInTerm expectedFocus) {
 
         for (int i = 0; i < t0.arity(); i++) {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
@@ -269,8 +283,10 @@ public class TermComparisonWithHoles {
                 subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
             }
 
+            PosInTerm nextFocus = nextFocusPos(expectedFocus, i);
+
             boolean newConstraint = unifyHelp(t0.sub(i), t1.sub(i),
-                    subOwnBoundVars, subCmpBoundVars, nat);
+                    subOwnBoundVars, subCmpBoundVars, nextFocus);
 
             if (!newConstraint) {
                 return false;
@@ -278,6 +294,15 @@ public class TermComparisonWithHoles {
         }
 
         return true;
+    }
+
+    private static @Nullable PosInTerm nextFocusPos(PosInTerm expectedFocus, int i) {
+        if(expectedFocus != null && !expectedFocus.isTopLevel() && expectedFocus.getIndexAt(0) == i) {
+            // we are on the path to the focus
+            return expectedFocus.lastN(expectedFocus.depth() - 1);
+        } else {
+            return null;
+        }
     }
 
     public List<Pair<Boolean, SequentFormula>> findTopLevelMatchesInSequent(Sequent sequent) {
