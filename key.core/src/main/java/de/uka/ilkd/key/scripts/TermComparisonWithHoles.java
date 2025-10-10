@@ -179,11 +179,7 @@ public class TermComparisonWithHoles {
 
         final Operator op1 = t1.op();
 
-        if (!(op0 instanceof ProgramVariable) && op0 != op1) {
-            return false;
-        }
-
-        if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
+        if (op0 != op1) {
             return false;
         }
 
