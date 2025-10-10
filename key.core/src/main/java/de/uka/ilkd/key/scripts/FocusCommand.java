@@ -67,15 +67,13 @@ public class FocusCommand extends AbstractCommand {
     static class Parameters {
         @Argument
         @Documentation("The sequent containing the formulas to keep. It may contain placeholder symbols.")
-        public @MonotonicNonNull Sequent toKeep;
+        public @MonotonicNonNull SequentWithHoles toKeep;
     }
 
     @Override
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
-        var s = state().getValueInjector().inject(new Parameters(), args);
-
-        Sequent toKeep = s.toKeep;
-        hideAll(toKeep);
+        Parameters s = state().getValueInjector().inject(new Parameters(), args);
+        hideAll(s.toKeep);
     }
 
     @Override
@@ -89,38 +87,19 @@ public class FocusCommand extends AbstractCommand {
      * @param toKeep sequent containing formulas to keep
      * @throws ScriptException if no goal is currently open
      */
-    private void hideAll(Sequent toKeep) throws ScriptException {
+    private void hideAll(SequentWithHoles toKeep) throws ScriptException {
         Goal goal = state.getFirstOpenAutomaticGoal();
         assert goal != null : "not null by contract of the method";
 
-        // The formulas to keep in the antecedent
-        ImmutableList<Term> keepAnte = toKeep.antecedent().asList()
-                .map(SequentFormula::formula);
-        ImmutableList<SequentFormula> ante =
-            goal.sequent().antecedent().asList();
-
-        for (SequentFormula seqFormula : ante) {
-            // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
-            if (!keepAnte.exists(
-                it -> {
-                    Term formula = seqFormula.formula();
-                    return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
-                })) {
+        for (SequentFormula seqFormula : goal.sequent().antecedent().asList()) {
+            if(!toKeep.containsAntecendent(seqFormula)) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
         }
 
-        ImmutableList<Term> keepSucc =
-            toKeep.succedent().asList().map(SequentFormula::formula);
-        ImmutableList<SequentFormula> succ =
-            goal.sequent().succedent().asList();
-        for (SequentFormula seqFormula : succ) {
-            if (!keepSucc.exists(
-                it -> {
-                    Term formula = seqFormula.formula();
-                    return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
-                })) {
+        for (SequentFormula seqFormula : goal.sequent().succedent().asList()) {
+            if(!toKeep.containsSuccedent(seqFormula)) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }

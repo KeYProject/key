@@ -91,4 +91,12 @@ public class SequentWithHoles {
 
         return true;
     }
+
+    public boolean containsAntecendent(SequentFormula seqFormula) {
+        return antecedent.stream().anyMatch(f -> f.matchesToplevel(seqFormula));
+    }
+
+    public boolean containsSuccedent(SequentFormula seqFormula) {
+        return succedent.stream().anyMatch(f -> f.matchesToplevel(seqFormula));
+    }
 }
