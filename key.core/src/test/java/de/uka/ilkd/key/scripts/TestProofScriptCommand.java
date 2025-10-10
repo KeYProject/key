@@ -125,20 +125,20 @@ public class TestProofScriptCommand {
             Assertions.assertEquals(expected, goals.size());
 
             for (String expectedGoal : data.goals()) {
-                assertThat(normaliseSpace(goals.head().toString().trim())).isEqualTo(expectedGoal);
+                assertThat(normaliseSpace(goals.head().toString())).isEqualTo(expectedGoal);
                 goals = goals.tail();
             }
 
             if (data.selectedGoal() != null) {
                 Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
-                assertThat(goal.toString().trim()).isEqualTo(data.goals()[data.selectedGoal()]);
+                assertThat(normaliseSpace(goal.toString())).isEqualTo(data.goals()[data.selectedGoal()]);
             }
         }
     }
 
     // For some layout reasons the toString may add linebreaks and spaces
     private static String normaliseSpace(String str) {
-        return str.replaceAll("\\s+", " ");
+        return str.replaceAll("\\s+", " ").trim();
     }
 
 }
