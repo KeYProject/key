@@ -3,4 +3,4 @@ key: |
 script: |
   witness (\forall int x; (? | x < ?)) as="y";
 goals:
-  - ==> \forall int x; x = x, y >  0 | y < 2
+  - ==> \forall int x; x = x, y > 0 | y < 2

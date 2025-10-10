@@ -33,7 +33,6 @@ import static de.uka.ilkd.key.scripts.TermWithHoles.*;
  */
 public class TermComparisonWithHoles {
 
-    private static final NameAbstractionTable FAILED = new NameAbstractionTable();
     private final JTerm referenceTerm;
 
     TermComparisonWithHoles(JTerm referenceTerm) {
@@ -49,6 +48,10 @@ public class TermComparisonWithHoles {
         PosInTerm focus = findFocus(referenceTerm);
         if(focus != null) {
             for(int i = focus.depth() -1; i >= 0; i--) {
+                if(pio.isTopLevel()) {
+                    // focus is deeper than the current term
+                    return false;
+                }
                 int focusIdx = focus.getIndexAt(i);
                 int termIdx = pio.posInTerm().getIndexAt(pio.depth() - 1);
                 if(focusIdx != termIdx) {

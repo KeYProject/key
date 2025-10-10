@@ -11,6 +11,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 
+import de.uka.ilkd.key.util.ANTLRUtil;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -73,12 +74,11 @@ public record ScriptCommandAst(
         if (value instanceof ScriptBlock b) {
             return b.asCommandLine();
         }
-
         if (value instanceof KeYParser.ProofScriptCodeBlockContext ctx) {
             asReadableString(KeyAst.ProofScript.asAst(null, ctx));
         }
         if (value instanceof ParserRuleContext ctx) {
-            return ctx.getText();
+            return ANTLRUtil.reconstructOriginal(ctx);
         }
         return Objects.toString(value);
     }
