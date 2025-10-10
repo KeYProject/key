@@ -75,9 +75,9 @@ public class TermWithHoles {
         this.term = term;
     }
 
-    public static final Name HOLE_NAME = new Name("_");
-    public static final Name HOLE_PREDICATE_NAME = new Name("__");
-    public static final Name HOLE_SORT_DEP_NAME = new Name("___");
+    public static final Name HOLE_NAME = new Name("?");
+    public static final Name HOLE_PREDICATE_NAME = new Name("?fml");
+    public static final Name HOLE_SORT_DEP_NAME = new Name("?");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TermWithHoles.class);
 
