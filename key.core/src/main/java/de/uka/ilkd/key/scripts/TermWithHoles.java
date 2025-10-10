@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,6 +24,8 @@ import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -43,8 +47,33 @@ import java.util.Map;
 
 import static de.uka.ilkd.key.strategy.StrategyProperties.*;
 
+/*
+
+y < (x+0) + y + (x+0),
+a -> y < (x+0) + y + (x+0)
+
+
+rule plus_zero on: ?????
+
+--->   a -> y < (x+0) + y + FOCUS(x+0)
+
+--->  _ -> (... _ + (_+0) ...)
+
+---> _ -> _find(_ + _focus(_ + 0))
+
+---> ? -> ?find(? + ?focus(? + 0))
+
+---> ?_ -> ?find(?_ + ?focus(_ + 0))
+ */
+
 @NullMarked
-public record TermWithHoles(JTerm term) {
+public class TermWithHoles {
+
+    private final JTerm term;
+
+    public TermWithHoles(JTerm term) {
+        this.term = term;
+    }
 
     public static final Name HOLE_NAME = new Name("_");
     public static final Name HOLE_PREDICATE_NAME = new Name("__");
@@ -53,7 +82,11 @@ public record TermWithHoles(JTerm term) {
     private static final Logger LOGGER = LoggerFactory.getLogger(TermWithHoles.class);
 
     public boolean matches(JTerm other) {
-        return TermComparisonWithHoles.compareModHoles(term, other);
+        return getMatcher().matches(other);
+    }
+
+    public TermComparisonWithHoles getMatcher() {
+        return new TermComparisonWithHoles(term);
     }
 
     private static class NothingSort extends AbstractSort {
@@ -75,8 +108,12 @@ public record TermWithHoles(JTerm term) {
         }
     }
 
+    public static TermWithHoles fromString(EngineState engineState, String str) {
+        KeyAst.Term term = ParsingFacade.parseExpression(CharStreams.fromString(str));
+        return fromParserContext(engineState, term.ctx);
+    }
 
-    public static TermWithHoles fromParserContext(EngineState state, KeYParser.ProofScriptExpressionContext ctx) throws ScriptException {
+    public static TermWithHoles fromParserContext(EngineState state, ParserRuleContext ctx) {
         var expressionBuilder =
                 new ExpressionBuilder(state.getProof().getServices(), enrichState(state));
         expressionBuilder.setAbbrevMap(state.getAbbreviations());

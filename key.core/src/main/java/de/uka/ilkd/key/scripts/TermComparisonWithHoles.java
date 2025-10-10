@@ -4,8 +4,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
-import org.key_project.logic.Property;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.Sequent;
@@ -39,16 +37,7 @@ public class TermComparisonWithHoles {
         this.referenceTerm = referenceTerm;
     }
 
-    TermComparisonWithHoles(TermWithHoles twh) {
-        this.referenceTerm = twh.term();
-    }
-
-    public static boolean compare(JTerm referenceTerm, JTerm concreteTerm) {
-        TermComparisonWithHoles comparator = new TermComparisonWithHoles(referenceTerm);
-        return comparator.compareTo(concreteTerm);
-    }
-
-    public final boolean compareTo(JTerm t) {
+    public final boolean matches(JTerm t) {
         if (referenceTerm == t) {
             return true;
         }
@@ -57,17 +46,6 @@ public class TermComparisonWithHoles {
                 ImmutableSLList.<QuantifiableVariable>nil(),
                 null);
     }
-
-    public static boolean compareModHoles(JTerm t1, JTerm t2) {
-        if (t1 == t2) {
-            return true;
-        }
-        return unifyHelp(t1, t2,
-                ImmutableSLList.<QuantifiableVariable>nil(),
-                ImmutableSLList.<QuantifiableVariable>nil(),
-                null);
-    }
-
 
     /**
      * Compares two terms modulo bound renaming
@@ -244,12 +222,12 @@ public class TermComparisonWithHoles {
     public List<Pair<Boolean, SequentFormula>> findMatchesInSequent(Sequent sequent) {
         List<Pair<Boolean, SequentFormula>> matches = new ArrayList<>();
         for (SequentFormula sf : sequent.antecedent()) {
-            if (compareTo((JTerm) sf.formula())) {
+            if (matches((JTerm) sf.formula())) {
                 matches.add(new Pair<>(true, sf));
             }
         }
         for (SequentFormula sf : sequent.succedent()) {
-            if (compareTo((JTerm) sf.formula())) {
+            if (matches((JTerm) sf.formula())) {
                 matches.add(new Pair<>(false, sf));
             }
         }
