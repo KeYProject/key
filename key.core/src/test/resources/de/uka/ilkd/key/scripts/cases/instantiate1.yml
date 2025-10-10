@@ -3,4 +3,4 @@ key: |
 script: |
   instantiate var="x" with=3 hide:true;
 goals:
-  - ==> 3 >  0
+  - ==> 3 > 0

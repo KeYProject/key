@@ -15,6 +15,8 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
@@ -30,7 +32,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.util.Debug;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -124,7 +125,7 @@ public class TestProofScriptCommand {
             Assertions.assertEquals(expected, goals.size());
 
             for (String expectedGoal : data.goals()) {
-                assertThat(goals.head().toString().trim()).isEqualTo(expectedGoal);
+                assertThat(normaliseSpace(goals.head().toString().trim())).isEqualTo(expectedGoal);
                 goals = goals.tail();
             }
 
@@ -133,6 +134,11 @@ public class TestProofScriptCommand {
                 assertThat(goal.toString().trim()).isEqualTo(data.goals()[data.selectedGoal()]);
             }
         }
+    }
+
+    // For some layout reasons the toString may add linebreaks and spaces
+    private static String normaliseSpace(String str) {
+        return str.replaceAll("\\s+", " ");
     }
 
 }
