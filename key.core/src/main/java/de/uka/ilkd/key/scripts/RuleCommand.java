@@ -368,11 +368,11 @@ public class RuleCommand extends AbstractCommand {
     private List<TacletApp> filterList(Services services, Parameters p,
             ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
+        TermComparisonWithHoles matcher = p.on == null ? null : p.on.getMatcher();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 JTerm term = (JTerm) pta.posInOccurrence().subTerm();
-                boolean add = p.on == null
-                        || TermComparisonWithHoles.compareModHoles(p.on, term);
+                boolean add = p.on == null || p.on.matches(term);
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
@@ -410,7 +410,7 @@ public class RuleCommand extends AbstractCommand {
         @Option(value = "on")
         @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule). " +
                 "This may contain placeholders.")
-        public @Nullable JTerm on;
+        public @Nullable TermWithHoles on;
 
         @Option(value = "formula")
         @Documentation("Top-level formula in which the term appears. This may contain placeholders.")

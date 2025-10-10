@@ -81,6 +81,9 @@ public class EngineState {
         this.engine = engine;
     }
 
+    // Problem is: This is all KeY specific and there should be different converters
+    // for JML. But how to separate this? Probably do this externally after PSE generation.
+    // via some "enrichValueInjector" method in a different class ...
     private ValueInjector createDefaultValueInjector() {
         var v = ValueInjector.createDefault();
         v.addConverter(JTerm.class, String.class, (str) -> this.toTerm(str, null));
@@ -88,6 +91,8 @@ public class EngineState {
         v.addConverter(Sort.class, String.class, this::toSort);
         v.addConverter(TermWithHoles.class, ProofScriptExpressionContext.class,
                 (ctx) -> TermWithHoles.fromParserContext(this, ctx));
+        v.addConverter(TermWithHoles.class, String.class,
+                (str) -> TermWithHoles.fromString(this, str));
 
         addContextTranslator(v, String.class);
         addContextTranslator(v, JTerm.class);

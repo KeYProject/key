@@ -59,7 +59,7 @@ public class WitnessCommand extends AbstractCommand {
         Goal goal = state.getFirstOpenAutomaticGoal();
         Services services = state.getProof().getServices();
 
-        TermComparisonWithHoles comp = new TermComparisonWithHoles(params.formula);
+        TermComparisonWithHoles comp = params.formula.getMatcher();
 
         // First component: true for antecedent, false for succedent
         Pair<Boolean, SequentFormula> match = comp.findUniqueMatchInSequent(goal.node().sequent());
