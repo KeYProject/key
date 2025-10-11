@@ -26,6 +26,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -40,19 +41,20 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 @NullMarked
 public class TermWithHoles {
 
     private final JTerm term;
     public TermWithHoles(JTerm term) {
-        this.term = term;
+        this.term = Objects.requireNonNull(term);
     }
-
 
     public static final Name HOLE_NAME = new Name("?");
     public static final Name HOLE_PREDICATE_NAME = new Name("?fml");
@@ -94,11 +96,27 @@ public class TermWithHoles {
     }
 
     public static TermWithHoles fromString(EngineState engineState, String str) {
-        KeyAst.Term term = ParsingFacade.parseExpression(CharStreams.fromString(str));
-        return fromParserContext(engineState, term.ctx);
+        KeYParser p = ParsingFacade.createParser(CharStreams.fromString(str));
+        p.allowMatchId = true;
+        KeYParser.TermContext term = p.termEOF().term();
+        p.getErrorReporter().throwException();
+        return fromParserContext(engineState, term);
     }
 
-    public static TermWithHoles fromParserContext(EngineState state, ParserRuleContext ctx) {
+    public static TermWithHoles fromProofScriptExpression(EngineState engineState, KeYParser.ProofScriptExpressionContext ctx) throws ConversionException {
+        if(ctx.string_literal() != null) {
+            String text = StringUtil.stripQuotes(ctx.string_literal().getText());
+            return fromString(engineState, text);
+        } else if(ctx.proofScriptCodeBlock() != null) {
+            throw new ConversionException("A block cannot be used as a term");
+        } else if(ctx.seq() != null) {
+            throw new ConversionException("A sequent cannot be used as a term");
+        } else {
+            return fromParserContext(engineState, ctx.getRuleContext(ParserRuleContext.class, 0));
+        }
+    }
+
+    public static TermWithHoles fromParserContext(EngineState state, ParseTree ctx) {
         var expressionBuilder =
                 new ExpressionBuilder(state.getProof().getServices(), enrichState(state));
         expressionBuilder.setAbbrevMap(state.getAbbreviations());

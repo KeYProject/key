@@ -67,6 +67,7 @@ public class ValueInjectorTest {
             null);
         args.put("i", "42");
         args.put("b", "true");
+        args.put("q", "requiredValue");
         args.put("unknownParameter", "unknownValue");
         assertThrows(UnknownArgumentException.class,
             () -> ValueInjector.injection(new PPCommand(), pp, ast));
@@ -79,21 +80,21 @@ public class ValueInjectorTest {
         Map<String, Object> args = new HashMap<>();
         ScriptCommandAst ast = new ScriptCommandAst("pp", args, new LinkedList<>(),
             null);
-        args.put("#literal", "here goes the entire string...");
         args.put("i", "42");
         args.put("b", "true");
         args.put("var_21", "21");
+        args.put("q", "requiredValue");
         args.put("var_other", "otherString");
         ValueInjector.injection(new PPCommand(), pp, ast);
-        assertEquals("21", pp.varargs.get("21"));
-        assertEquals("otherString", pp.varargs.get("other"));
+        assertEquals("21", pp.varargs.get("var_21"));
+        assertEquals("otherString", pp.varargs.get("var_other"));
         assertEquals(2, pp.varargs.size());
     }
 
     @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
         List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class);
-        assertEquals(4, meta.size());
+        assertEquals(5, meta.size());
 
         {
             ProofScriptArgument b = meta.getFirst();
@@ -112,11 +113,29 @@ public class ValueInjectorTest {
         }
 
         {
-            ProofScriptArgument i = meta.get(2);
-            assertEquals("s", i.getName());
-            assertEquals(PP.class.getDeclaredField("s"), i.getField());
-            assertEquals(String.class, i.getType());
-            assertFalse(i.isRequired());
+            ProofScriptArgument s = meta.get(2);
+            assertEquals("s", s.getName());
+            assertEquals(PP.class.getDeclaredField("s"), s.getField());
+            assertEquals(String.class, s.getType());
+            assertFalse(s.isRequired());
+        }
+
+        {
+            ProofScriptArgument q = meta.get(3);
+            assertEquals("q", q.getName());
+            assertEquals(PP.class.getDeclaredField("required"), q.getField());
+            assertEquals(String.class, q.getType());
+            assertTrue(q.isRequired());
+        }
+
+        {
+            ProofScriptArgument vars = meta.get(4);
+            assertEquals("varargs", vars.getName());
+            assertEquals(PP.class.getDeclaredField("varargs"), vars.getField());
+            assertEquals(Map.class, vars.getType());
+            assertEquals("var_", vars.getOptionalVarArgs().prefix());
+            assertSame(String.class, vars.getOptionalVarArgs().as());
+            assertTrue(vars.isOptionalVarArgs());
         }
 
     }
