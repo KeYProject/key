@@ -412,7 +412,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
      */
     public static String format(CharStream stream) {
         // weigl: Not necessary is handled within the lexer
-        //var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
+        // var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
 
         var lexer = ParsingFacade.createLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

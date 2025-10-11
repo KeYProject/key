@@ -121,8 +121,8 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
                 token == KeYLexer.EXISTS ||
                 token == KeYLexer.FORALL ||
                 token == KeYLexer.SEMI)
-                || token==KeYLexer.IFEX
-                || token==KeYLexer.IDENT) {
+                || token == KeYLexer.IFEX
+                || token == KeYLexer.IDENT) {
             output.spaceBeforeNext();
         }
 

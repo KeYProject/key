@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nparser.format;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
+
 import org.antlr.v4.runtime.Token;
 
 /**

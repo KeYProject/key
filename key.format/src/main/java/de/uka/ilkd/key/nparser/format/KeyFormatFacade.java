@@ -11,7 +11,6 @@ package de.uka.ilkd.key.nparser.format;/*
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -104,7 +103,7 @@ public class KeyFormatFacade {
 
             for (var file : files) {
                 try {
-                    System.out.printf("Formatting %s\n",file);
+                    System.out.printf("Formatting %s\n", file);
                     formatSingleFileTo(file);
                 } catch (SyntaxErrorReporter.ParserException e) {
                     LOGGER.error("{} | Parser error", file, e);
@@ -147,7 +146,8 @@ public class KeyFormatFacade {
                         System.out.printf("  ... ok\n");
                     } else {
                         System.out.printf(" ... not ok\n");
-                        formatSingleFile(file, file.getParent().resolve(file.getFileName().toString() + ".formatted"));
+                        formatSingleFile(file,
+                            file.getParent().resolve(file.getFileName().toString() + ".formatted"));
                     }
                 } catch (SyntaxErrorReporter.ParserException e) {
                     LOGGER.error("{} | Syntax errors in file", file, e);
