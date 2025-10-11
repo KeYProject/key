@@ -27,6 +27,7 @@ import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
+import de.uka.ilkd.key.scripts.TermWithHoles;
 import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
@@ -187,6 +188,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             pse.getStateMap().putUserData("jml.obtainVarMap", obtainMap);
             pse.getStateMap().getValueInjector().addConverter(JTerm.class, ObtainAwareTerm.class,
                     oat -> oat.resolve(obtainMap, goal.proof().getServices()));
+            // TODO: Perhaps have holes also in JML?
+            pse.getStateMap().getValueInjector().addConverter(TermWithHoles.class, ObtainAwareTerm.class,
+                    oat -> new TermWithHoles(oat.resolve(obtainMap, goal.proof().getServices())));
             pse.getStateMap().getValueInjector().addConverter(boolean.class, ObtainAwareTerm.class,
                     oat -> Boolean.parseBoolean(oat.term.toString()));
             LOGGER.debug("---- Script");

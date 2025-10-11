@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.ModularJavaDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -71,7 +72,24 @@ public class JavaProfile extends AbstractProfile {
     public static JavaProfile defaultInstance;
     public static JavaProfile defaultInstancePermissions;
 
-    public static final StrategyFactory DEFAULT = new ModularJavaDLStrategyFactory();
+    /**
+     * The default strategy factory to be used if no other strategy factory is
+     * specified.
+     *
+     * Caution: This used to be constructed at class load time, but cyclic reference between
+     * clauses made the field be read while the class was not yet fully initialized leading to
+     * null pointer exceptions. So we now use lazy initialization.
+     *
+     * (solution suggested by AW)
+     */
+    private static StrategyFactory DEFAULT;
+
+    public static StrategyFactory getDefault() {
+        if (DEFAULT == null) {
+            DEFAULT = new ModularJavaDLStrategyFactory();
+        }
+        return DEFAULT;
+    }
 
     private boolean permissions = false;
 
@@ -144,7 +162,7 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
-        set = set.add(DEFAULT);
+        set = set.add(getDefault());
         return set;
     }
 

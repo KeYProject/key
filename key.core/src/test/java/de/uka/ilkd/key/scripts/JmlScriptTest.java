@@ -37,7 +37,7 @@ public class JmlScriptTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(JmlScriptTest.class);
 
     // Set this to a specific case to only run that case for debugging
-    private static final String ONLY_CASE = null;
+    private static final String ONLY_CASE = System.getProperty("key.testJmlScript.only");
     // Set this to true to save the proof after running the script
     private static final boolean SAVE_PROOF = false;
 

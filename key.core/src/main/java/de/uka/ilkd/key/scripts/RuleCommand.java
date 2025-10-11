@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -255,7 +256,11 @@ public class RuleCommand extends AbstractCommand {
 
         if (p.occ < 0) {
             if (matchingApps.size() > 1) {
-                throw new ScriptException("More than one applicable occurrence");
+                // todo make a nice string here!
+                throw new ScriptException("More than one applicable occurrence:\n" +
+                        matchingApps.stream().map(
+                                ap -> ap.posInOccurrence().subTerm() + " " + ap.matchConditions())
+                                .collect(Collectors.joining("\n") ));
             }
             return matchingApps.get(0);
         } else {

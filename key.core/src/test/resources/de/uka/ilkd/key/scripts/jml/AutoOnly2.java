@@ -11,7 +11,6 @@ class Test {
 
         /*@ assert b && c ==> c || d \by {
                auto only:"beta";
-               rule "close";
         } */
     }
 
