@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.misc.Interval;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +31,6 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  */
 public class ProofScriptEngine {
-    public static final int KEY_START_INDEX_PARAMETER = 2;
-    public static final String KEY_SUB_SCRIPT = "#block";
-    private static final int MAX_CHARS_PER_COMMAND = 80;
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptEngine.class);
 
@@ -117,6 +113,11 @@ public class ProofScriptEngine {
         execute(uiControl, script);
     }
 
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptBlock block)
+            throws ScriptException, InterruptedException {
+        execute(uiControl, block.commands());
+    }
+
     public void execute(AbstractUserInterfaceControl uiControl, List<ScriptCommandAst> commands)
             throws InterruptedException, ScriptException {
         if (script.isEmpty()) { // no commands given, no work to do
@@ -196,29 +197,6 @@ public class ProofScriptEngine {
                             .collect(Collectors.joining(" "))
                     : "")
             + ";";
-    }
-
-
-    private Map<String, Object> getArguments(KeYParser.ProofScriptCommandContext commandContext) {
-        var map = new TreeMap<String, Object>();
-        int i = KEY_START_INDEX_PARAMETER;
-
-        if (commandContext.proofScriptParameters() != null) {
-            for (var pc : commandContext.proofScriptParameters().proofScriptParameter()) {
-                String key = pc.pname != null ? pc.pname.getText() : "#" + (i++);
-                map.put(key, pc.expr);
-            }
-        }
-
-        if (commandContext.sub != null) {
-            map.put(KEY_SUB_SCRIPT, commandContext.sub);
-        }
-
-        var in = commandContext.start.getTokenSource().getInputStream();
-        var txt = in.getText(
-            Interval.of(commandContext.start.getStartIndex(), commandContext.stop.getStopIndex()));
-        map.put(ScriptLineParser.LITERAL_KEY, txt);
-        return map;
     }
 
 

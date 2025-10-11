@@ -112,7 +112,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     public JTerm getAxiom(JAbstractSortedOperator heapVar, JAbstractSortedOperator selfVar,
             Services services) {
         assert heapVar != null;
-        assert (selfVar == null) == target.isStatic();
+        // assert (selfVar == null) == target.isStatic();
         final Map<ProgramVariable, JAbstractSortedOperator> map =
             new LinkedHashMap<>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);

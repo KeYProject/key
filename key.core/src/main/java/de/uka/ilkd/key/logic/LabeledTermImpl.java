@@ -33,7 +33,7 @@ import org.key_project.util.java.CollectionUtil;
  * @see JTerm
  * @see TermImpl
  */
-class LabeledTermImpl extends TermImpl {
+public class LabeledTermImpl extends TermImpl {
 
     /**
      * @see #getLabels()
