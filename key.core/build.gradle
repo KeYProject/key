@@ -111,6 +111,7 @@ classes.dependsOn << generateSolverPropsList
 
 tasks.withType(Test) {
     enableAssertions = true
+    systemProperties(System.properties.findAll { key, value -> key.startsWith("key.") })
 }
 
 

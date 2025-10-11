@@ -18,10 +18,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static de.uka.ilkd.key.scripts.TermWithHoles.*;
 
@@ -39,7 +36,7 @@ public class TermComparisonWithHoles {
     private final JTerm referenceTerm;
 
     TermComparisonWithHoles(JTerm referenceTerm) {
-        this.referenceTerm = referenceTerm;
+        this.referenceTerm = Objects.requireNonNull(referenceTerm);
     }
 
     public final boolean matches(PosInOccurrence pio) {

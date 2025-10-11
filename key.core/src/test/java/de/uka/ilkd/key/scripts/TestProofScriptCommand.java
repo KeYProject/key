@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestProofScriptCommand {
 
-    private static final String ONLY_CASE = null;
+    private static final String ONLY_CASES = System.getProperty("key.testProofScript.only");
     private static final Logger LOGGER = LoggerFactory.getLogger(TestProofScriptCommand.class);
 
     public record TestInstance(
@@ -57,8 +61,13 @@ public class TestProofScriptCommand {
         var folder = Paths.get("src/test/resources/de/uka/ilkd/key/scripts/cases")
                 .toAbsolutePath();
 
-        if(ONLY_CASE != null) {
-             folder = folder.resolve(ONLY_CASE);
+        Predicate<Path> filter;
+        if(ONLY_CASES != null && !ONLY_CASES.isEmpty()) {
+            // if ONLY_CASES is set, only run those cases (comma separated)
+            Set<String> only = Set.of(ONLY_CASES.split(" *, *"));
+            filter = p -> only.contains(p.getFileName().toString().substring(0, p.getFileName().toString().length() - 4));
+        } else {
+            filter = p -> true;
         }
 
         try (var walker = Files.walk(folder)) {
@@ -69,6 +78,9 @@ public class TestProofScriptCommand {
 
             List<Arguments> args = new ArrayList<>(files.size());
             for (Path path : files) {
+                if(!filter.test(path)) {
+                    continue;
+                }
                 try {
                     TestInstance instance =
                         objectMapper.readValue(path.toFile(), TestInstance.class);

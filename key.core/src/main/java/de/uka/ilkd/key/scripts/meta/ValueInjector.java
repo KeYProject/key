@@ -225,18 +225,19 @@ public class ValueInjector {
             val = args.namedArgs().get(meta.getName());
             if (val == null) {
                 // can also be given w/o colon or equal sign, e.g., "command hide;"
-                var stringStream = args.positionalArgs().stream()
-                        .map(it -> {
-                            try {
-                                return convert(it, String.class);
-                            } catch (NoSpecifiedConverterException | ConversionException e) {
-                                return "";
-                            }
-                        });
-                // val == true iff the name of the flag appear as a positional argument.
-                val = stringStream.anyMatch(it -> Objects.equals(it, meta.getName()));
+                int argNo = 0;
+                for (Object arg : args.positionalArgs()) {
+                    String s = convert(arg, String.class);
+                    if (s.equals(meta.getName())) {
+                        val = Boolean.TRUE;
+                        handled = List.of(argNo);
+                        break;
+                    }
+                    argNo++;
+                }
+            } else {
+                handled = List.of(meta.getName());
             }
-            handled = List.of(meta.getName());
         }
 
         try {
@@ -293,7 +294,8 @@ public class ValueInjector {
         } catch (Exception e) {
             throw new ConversionException(
                 String.format("Could not convert value '%s' from type '%s' to type '%s'",
-                    val, val.getClass().getSimpleName(), targetType.getSimpleName()),
+                    ScriptCommandAst.asReadableString(val),
+                    val.getClass().getSimpleName(), targetType.getSimpleName()),
                 e);
         }
     }

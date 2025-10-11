@@ -61,6 +61,8 @@ public abstract class AbstractProfile implements Profile {
         standardRules = new RuleCollection(
             RuleSourceFactory.fromDefaultLocation(standardRuleFilename), initBuiltInRules());
         strategies = getStrategyFactories();
+        // NPEs in tests revealed that strategies could contain null elements
+        assert !strategies.contains(null);
         this.supportedGCB = computeSupportedGoalChooserBuilder();
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
