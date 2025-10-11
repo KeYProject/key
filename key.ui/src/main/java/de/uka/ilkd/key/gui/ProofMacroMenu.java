@@ -9,7 +9,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;

@@ -7,9 +7,9 @@ package de.uka.ilkd.key.core;
 /**
  * An event that indicates that the users focused node or proof has changed
  *
- * @param source            the source of this event
+ * @param source the source of this event
  * @param previousSelection the previously selected item
- * @param currentSelection  the previously selected item
+ * @param currentSelection the previously selected item
  */
 public record KeYSelectionEvent<Sel>(
         KeYSelectionModel source, Sel previousSelection, Sel currentSelection) {

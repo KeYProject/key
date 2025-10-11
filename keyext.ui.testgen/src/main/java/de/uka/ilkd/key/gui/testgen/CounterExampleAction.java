@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -21,13 +26,9 @@ import de.uka.ilkd.key.testgen.smt.counterexample.AbstractCounterExampleGenerato
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 
 import org.key_project.prover.sequent.Sequent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 public class CounterExampleAction extends MainWindowAction implements PropertyChangeListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterExampleAction.class);
@@ -66,7 +67,8 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         final Pred hasZ3CE = () -> {
             final Node selNode = getMediator().getSelectedNode();
             // Can be applied only to root nodes
-            return haveZ3CE && selNode != null && selNode.childrenCount() == 0 && !selNode.isClosed();
+            return haveZ3CE && selNode != null && selNode.childrenCount() == 0
+                    && !selNode.isClosed();
         };
 
         enabledOnAnActiveProof();
@@ -120,7 +122,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
             extends AbstractSideProofCounterExampleGenerator {
         @Override
         protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
-                                                              Proof proof) {
+                Proof proof) {
             return new SolverListener(settings, proof);
         }
     }
@@ -147,7 +149,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         @Override
         protected Void doInBackground() throws Exception {
             final NoMainWindowCounterExampleGenerator generator =
-                    new NoMainWindowCounterExampleGenerator();
+                new NoMainWindowCounterExampleGenerator();
             generator.searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
             return null;
         }

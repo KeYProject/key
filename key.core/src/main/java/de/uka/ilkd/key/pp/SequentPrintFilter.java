@@ -82,7 +82,7 @@ public abstract class SequentPrintFilter {
      * entries.
      */
     protected void filterIdentity() {
-        if(originalSequent==null) {
+        if (originalSequent == null) {
             return;
         }
 
