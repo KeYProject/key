@@ -7,6 +7,9 @@ import de.uka.ilkd.key.nparser.KeYLexer;
 
 import org.antlr.v4.runtime.Token;
 
+import java.util.LinkedList;
+import java.util.logging.MemoryHandler;
+
 /**
  * Output class for managing formatted output with indentation.
  * <p>
@@ -21,9 +24,9 @@ class Output {
     public static final int INDENT_STEP = 4;
 
     private final StringBuilder output = new StringBuilder();
-    private int indentLevel = 0;
     private boolean isNewLine = true;
     private boolean spaceBeforeNextToken = false;
+    private LinkedList<Token> indentStack = new LinkedList<>();
 
     /**
      * Generates a string of whitespaces indentation.
@@ -37,7 +40,7 @@ class Output {
     }
 
     private void indent() {
-        output.append(getIndent(indentLevel));
+        output.append(getIndent(indentStack.size()));
         this.isNewLine = false;
         this.spaceBeforeNextToken = false;
     }
@@ -93,18 +96,26 @@ class Output {
     /**
      * Increases the indentation level.
      */
-    public void enterIndent() {
-        indentLevel++;
+    public void enterIndent(Token token) {
+        indentStack.push(token);
     }
 
     /**
      * Decreases the indentation level.
      */
-    public void exitIndent() {
-        if (indentLevel == 0) {
-            throw new IllegalStateException("Unmatched closing RPAREN.");
+    public void exitIndent(Token symbol) {
+        if (indentStack.isEmpty()) {
+            throw new IllegalStateException("Unmatched closing RPAREN @ " +symbol.getLine() + ":" + symbol.getCharPositionInLine());
         }
-        indentLevel--;
+
+        Token closed = indentStack.pop();
+        if (!(symbol.getType() != KeYLexer.RPAREN || closed.getType() == KeYLexer.LPAREN)) {
+            throw new IllegalStateException("Wrong pair %s closed by %s @ ".formatted(closed, symbol));
+
+        }
+        if (!(symbol.getType() != KeYLexer.RBRACE || closed.getType() == KeYLexer.LBRACE)) {
+            throw new IllegalStateException("Wrong pair %s closed by %s @ ".formatted(closed, symbol));
+        }
     }
 
     /**

@@ -122,14 +122,14 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
             visit(ctx.name);
             visit(ctx.COLON());
             output.spaceBeforeNext();
-            output.enterIndent();
+            output.enterIndent(ctx.COLON().getSymbol());
             output.assertNewLineAndIndent();
             firstChild = 2;
         }
 
         visitChildren(ctx, firstChild, ctx.getChildCount());
         if (ctx.name != null) {
-            output.exitIndent();
+            output.exitIndent(ctx.stop);
         }
         return null;
     }
@@ -183,14 +183,15 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
         for (int i = 0; i < ctx.getChildCount(); i++) {
             var child = ctx.getChild(i);
             if (child instanceof TerminalNode) {
-                var token = ((TerminalNode) child).getSymbol().getType();
-                if (token == KeYParser.INCLUDE || token == KeYParser.INCLUDELDTS) {
+                final var token = ((TerminalNode) child).getSymbol();
+                var type = token.getType();
+                if (type == KeYParser.INCLUDE || type == KeYParser.INCLUDELDTS) {
                     output.assertNewLineAndIndent();
-                    output.enterIndent();
+                    output.enterIndent(token);
                 }
 
-                if (token == KeYParser.SEMI) {
-                    output.exitIndent();
+                if (type == KeYParser.SEMI) {
+                    output.exitIndent(token);
                 }
             }
             visit(child);
@@ -361,10 +362,9 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
             token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
         if (isLBrace) {
             output.spaceBeforeNext();
-        } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN
-                || token == KeYLexer.RBRACKET) {
+        } else if (token == KeYLexer.RBRACE || token == KeYLexer.RBRACKET) {
             output.noSpaceBeforeNext();
-            output.exitIndent();
+            output.exitIndent(node.getSymbol());
         }
 
         if (token == KeYLexer.AVOID || token == KeYLexer.SEQARROW) {
@@ -387,7 +387,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         if (isLBrace) {
-            output.enterIndent();
+            output.enterIndent(node.getSymbol());
         }
 
         if (!(isLBrace || noSpaceAround)) {

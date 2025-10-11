@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
-import java.util.Set;
-
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
-
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.Set;
 
 /**
  * Visitor class for formatting expressions in the KeY language.
- *
+ * <p>
  * This class extends the `KeYParserBaseVisitor` and provides custom
  * implementations for visiting terminal nodes and if-then-else terms.
  * It uses an `Output` object to format and output the tokens.
- *
+ * <p>
  * The class handles specific formatting rules for operators, braces,
  * and modalities, ensuring proper indentation and spacing.
  *
@@ -27,27 +27,27 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     private static final Set<Integer> OPERATORS = Set.of(
-        KeYLexer.LESS,
-        KeYLexer.LESSEQUAL,
-        KeYLexer.GREATER,
-        KeYLexer.GREATEREQUAL,
-        KeYLexer.EQUALS,
-        KeYLexer.IMP,
-        KeYLexer.SEQARROW,
-        KeYLexer.NOT_EQUALS,
-        KeYLexer.AND,
-        KeYLexer.OR,
-        KeYLexer.PARALLEL,
-        KeYLexer.EXP,
-        KeYLexer.PERCENT,
-        KeYLexer.STAR,
-        KeYLexer.MINUS,
-        KeYLexer.PLUS,
-        KeYLexer.EQV,
-        KeYLexer.ASSIGN);
+            KeYLexer.LESS,
+            KeYLexer.LESSEQUAL,
+            KeYLexer.GREATER,
+            KeYLexer.GREATEREQUAL,
+            KeYLexer.EQUALS,
+            KeYLexer.IMP,
+            KeYLexer.SEQARROW,
+            KeYLexer.NOT_EQUALS,
+            KeYLexer.AND,
+            KeYLexer.OR,
+            KeYLexer.PARALLEL,
+            KeYLexer.EXP,
+            KeYLexer.PERCENT,
+            KeYLexer.STAR,
+            KeYLexer.MINUS,
+            KeYLexer.PLUS,
+            KeYLexer.EQV,
+            KeYLexer.ASSIGN);
 
     private static final Set<Integer> BRACES = Set.of(
-        KeYLexer.LBRACE, KeYLexer.LPAREN, KeYLexer.LBRACKET, KeYLexer.LGUILLEMETS);
+            KeYLexer.LBRACE, KeYLexer.LPAREN, KeYLexer.LBRACKET, KeYLexer.LGUILLEMETS);
 
     private final CommonTokenStream ts;
     private final Output output;
@@ -57,7 +57,7 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         this.output = output;
     }
 
-    private static void outputModality(String text, Output output) {
+    private static void outputModality(Token token, String text, Output output) {
         var normalized = text.replaceAll("\t", Output.getIndent(1));
         var lines = normalized.split("\n");
         lines[0] = lines[0].trim();
@@ -73,7 +73,7 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
 
         output.token(lines[0]);
         if (lines.length > 1) {
-            output.enterIndent();
+            output.enterIndent(token);
 
             for (int i = 1; i < lines.length; i++) {
                 output.newLine();
@@ -82,55 +82,64 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
                     output.token(line.substring(minIndent));
                 }
             }
-            output.exitIndent();
+            output.exitIndent(token);
         }
         output.spaceBeforeNext();
     }
 
     @Override
     public Void visitTerminal(TerminalNode node) {
-        int token = node.getSymbol().getType();
+        var stream = ts;
+        final var token = node.getSymbol();
+        var pos = token.getTokenIndex();
+        var nextType = pos + 1 < stream.size() ? stream.get(pos + 1).getType() : -1;
 
-        boolean isLBrace = BRACES.contains(token);
-        if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET
-                || token == KeYLexer.RGUILLEMETS) {
+        int type = token.getType();
+
+        if (type == KeYLexer.COLON) {
             output.noSpaceBeforeNext();
-            output.exitIndent();
         }
 
-        var isOperator = OPERATORS.contains(token);
-        var isUnaryMinus = token == KeYLexer.MINUS &&
+        boolean isLBrace = BRACES.contains(type);
+        if (type == KeYLexer.RBRACE || type == KeYLexer.RPAREN || type == KeYLexer.RBRACKET
+                || type == KeYLexer.RGUILLEMETS) {
+            output.noSpaceBeforeNext();
+            output.exitIndent(token);
+        }
+
+        var isOperator = OPERATORS.contains(type);
+        var isUnaryMinus = type == KeYLexer.MINUS &&
                 node.getParent() instanceof KeYParser.Unary_minus_termContext;
-        // Unary minus has a "soft" leading space, we allow it if the token before wants it but
+        // Unary minus has a "soft" leading space, we allow it if the type before wants it but
         // don't require it
-        if ((isOperator && !isUnaryMinus) || token == KeYLexer.AVOID) {
+        if ((isOperator && !isUnaryMinus) || type == KeYLexer.AVOID) {
             output.spaceBeforeNext();
         }
 
-        String text = node.getSymbol().getText();
-        if (token == KeYLexer.MODALITY) {
-            outputModality(text, output);
+        String text = token.getText();
+        if (type == KeYLexer.MODALITY) {
+            outputModality(token, text, output);
         } else {
             output.token(text);
         }
 
         if (!isLBrace && ((isOperator && !isUnaryMinus) ||
-                token == KeYLexer.COMMA ||
-                token == KeYLexer.SUBST ||
-                token == KeYLexer.AVOID ||
-                token == KeYLexer.EXISTS ||
-                token == KeYLexer.FORALL ||
-                token == KeYLexer.SEMI)
-                || token == KeYLexer.IFEX
-                || token == KeYLexer.IDENT) {
+                type == KeYLexer.COMMA ||
+                type == KeYLexer.SUBST ||
+                type == KeYLexer.AVOID ||
+                type == KeYLexer.EXISTS ||
+                type == KeYLexer.FORALL ||
+                type == KeYLexer.SEMI)
+                || type == KeYLexer.IFEX
+                || (type == KeYLexer.IDENT && nextType == KeYLexer.IDENT)) {
             output.spaceBeforeNext();
         }
 
         if (isLBrace) {
-            output.enterIndent();
+            output.enterIndent(token);
         }
 
-        KeyFileFormatter.processHiddenTokensAfterCurrent(node.getSymbol(), ts, output);
+        KeyFileFormatter.processHiddenTokensAfterCurrent(token, ts, output);
         return super.visitTerminal(node);
     }
 
@@ -139,18 +148,19 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         for (int i = 0; i < ctx.getChildCount(); i++) {
             var child = ctx.getChild(i);
             if (child instanceof TerminalNode) {
-                var token = ((TerminalNode) child).getSymbol().getType();
-                if (token == KeYParser.THEN) {
-                    output.enterIndent();
+                final var token = ((TerminalNode) child).getSymbol();
+                var type = token.getType();
+                if (type == KeYParser.THEN) {
+                    output.enterIndent(token);
                 }
 
-                if (token == KeYParser.THEN || token == KeYParser.ELSE) {
+                if (type == KeYParser.THEN || type == KeYParser.ELSE) {
                     output.spaceBeforeNext();
                 }
             }
             visit(child);
         }
-        output.exitIndent();
+        output.exitIndent(ctx.stop);
         return null;
     }
 }

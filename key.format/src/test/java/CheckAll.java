@@ -1,16 +1,18 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+
+import org.antlr.v4.runtime.CharStreams;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.nparser.format.KeyFormatFacade;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static de.uka.ilkd.key.nparser.format.KeyFileFormatter.format;
 
 /**
  * @author Alexander Weigl
@@ -26,7 +28,11 @@ public class CheckAll {
             var sq = s.toList();
             return sq.stream().filter(it -> it.getFileName().toString().endsWith(".key"))
                     .map(it -> DynamicTest.dynamicTest(it.getFileName().toString(),
-                        () -> Assertions.assertTrue(KeyFormatFacade.checkFile(it))));
+                            () -> {
+                                var formatted = format(CharStreams.fromPath(it));
+                                var content = Files.readString(it);
+                                Assertions.assertEquals(content, formatted);
+                            }));
         }
     }
 }
