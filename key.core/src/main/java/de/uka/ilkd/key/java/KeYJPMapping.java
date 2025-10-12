@@ -104,8 +104,6 @@ public class KeYJPMapping {
     public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand) {
         var type = typeMap.get(pe);
 
-        // var ast = pe.asReferenceType().getTypeDeclaration().get().toAst();
-
         if (processOnDemand && type == null && pe.isReferenceType()) {
             try {
                 pe.asReferenceType()
@@ -117,6 +115,10 @@ public class KeYJPMapping {
             }
         }
         return type;
+    }
+
+    public JavaService getJavaServices() {
+        return converter;
     }
 
     public ResolvedType resolveType(KeYJavaType pe) {
@@ -246,6 +248,7 @@ public class KeYJPMapping {
     }
 
     public void registerType(ResolvedType ref, KeYJavaType kjt) {
+        System.out.println("Registered " + ref + "   " + kjt);
         this.typeMap.put(ref, kjt);
         this.typeMapRev.put(kjt, ref);
     }

@@ -328,6 +328,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ClassOrInterfaceDeclaration n, Void arg) {
+        final var ref = new ReferenceTypeImpl(n.resolve());
+        var kjt = createOrCachedKeyJavaType(ref);
+        mapping.registerType(ref, kjt);
+
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ProgramElementName name = createProgramElementName(n.getName());
@@ -343,13 +347,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Extends extending = new Extends(e);
         Implements implementing = new Implements(i);
 
-        // TODO register type
-        // class String { String foo(); }
-        final var ref = new ReferenceTypeImpl(n.resolve());
-        var kjt = getKeYJavaType(ref);
-        // TODO Maybe regsiter the datatype early. typeConverter.register(ref, kjt);
-        mapping.registerType(ref, kjt);
-
 
         TypeDeclaration td;
         if (n.isInterface()) {
@@ -363,6 +360,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         kjt.setJavaType(td);
         return addToMapping(n, td);
+    }
+
+    private KeYJavaType createOrCachedKeyJavaType(ReferenceTypeImpl ref) {
+        var kjt = getCachedKeYJavaType(ref);
+        if (kjt != null) {
+            return kjt;
+        }
+        return typeConverter.addReferenceType(ref);
     }
 
     @NonNull
@@ -497,7 +502,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
 
             // store container type as member when visiting type declaration.
-            final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
+            final KeYJavaType containerKJT =
+                getCachedKeYJavaType(new ReferenceTypeImpl(containing));
             var method =
                 new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
                     heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
@@ -659,8 +665,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
 
+    private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
+        return typeConverter.getKeYJavaType(rtype, true);
+    }
+
     private KeYJavaType getKeYJavaType(ResolvedType rtype) {
-        return typeConverter.getKeYJavaType(rtype);
+        return typeConverter.getKeYJavaType(rtype, false);
     }
 
     private ClassOrInterfaceDeclaration getContainingClass(Node node) {

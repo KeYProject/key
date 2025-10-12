@@ -535,10 +535,8 @@ public class JavaService {
                         .orElse(false))
                 .findFirst()
                 .orElse(null);
-        if (object != null) {
-            converter.processCompilationUnit(object);
-        }
 
+        // converter.processCompilationUnit(object);
         var obj = typeConverter.getObjectType();
         assert obj != null && obj.getJavaType() != null : "java.lang.Object has to be available";
 

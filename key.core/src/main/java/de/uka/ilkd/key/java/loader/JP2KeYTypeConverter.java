@@ -35,6 +35,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
 
 import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.declarations.AssociableToAST;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
@@ -132,6 +133,14 @@ public class JP2KeYTypeConverter {
      * @return a keytype.
      */
     public @NonNull KeYJavaType getKeYJavaType(ResolvedType type) {
+        return getKeYJavaType(type, false);
+    }
+
+    public KeYJavaType createKeYJavaType(ReferenceTypeImpl ref) {
+        return addReferenceType(ref);
+    }
+
+    public @NonNull KeYJavaType getKeYJavaType(ResolvedType type, boolean cachedOnly) {
         if (type == null) {
             throw new NullPointerException("null cannot be converted into a KJT");
         }
@@ -147,6 +156,10 @@ public class JP2KeYTypeConverter {
             if (kjt != null) {
                 return kjt;
             }
+        }
+
+        if (cachedOnly) {
+            return null;
         }
 
         // create a new KeYJavaType
@@ -232,20 +245,31 @@ public class JP2KeYTypeConverter {
         return __cloneableType;
     }
 
+    private boolean objectInit = false;
+
     public KeYJavaType getObjectType() {
         if (__objectType == null) {
-            // __objectType = new
-            // KeYJavaType(services.getNamespaces().sorts().lookup("java.lang.Object"));
-            __objectType = getKeYJavaType("java.lang.Object", true);
+            var ref = new ReferenceTypeImpl(typeSolver.solveType("java.lang.Object"));
+            __objectType = addReferenceType(ref);
+
+            if (!objectInit) {
+                objectInit = true;
+                __objectType = getKeYJavaType("java.lang.Object", true);
+                ref.asReferenceType()
+                        .getTypeDeclaration()
+                        .flatMap(AssociableToAST::toAst)
+                        .ifPresent(jp2KeY.getJavaServices().getConverter(null)::process);
+            }
         }
         return __objectType;
     }
 
-    private void addReferenceType(ResolvedReferenceType type) {
+    public KeYJavaType addReferenceType(ResolvedReferenceType type) {
         var ref = type.asReferenceType().getTypeDeclaration().get();
         if (ref instanceof ResolvedLogicalType) {
-            storeInCache(type, ((ResolvedLogicalType) ref).getKeYJavaType());
-            return;
+            final var kjt = ((ResolvedLogicalType) ref).getKeYJavaType();
+            storeInCache(type, kjt);
+            return kjt;
         }
         var sort = getSortsNamespace().lookup(new Name(type.describe()));
         if (sort == null) {
@@ -262,7 +286,9 @@ public class JP2KeYTypeConverter {
 
         // Important: javaType is null until being set by visiting the class/interface/enum
         // declaration!
-        storeInCache(type, new KeYJavaType(sort));
+        final var kjt = new KeYJavaType(sort);
+        storeInCache(type, kjt);
+        return kjt;
 
         // TODO javaparser has no default constructor
         // var cl = ref.getConstructors();
@@ -454,5 +480,6 @@ public class JP2KeYTypeConverter {
         arrayMethodBuilder =
             new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
     }
+
 
 }
