@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nparser;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -70,7 +71,13 @@ public final class ParsingFacade {
             reached.add(url);
             KeyAst.File ctx = parseFile(url);
             ctxs.add(ctx);
-            Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
+            Path path = null;
+            try {
+                path = Path.of(url.toURI());
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
+            Collection<RuleSource> includes = ctx.getIncludes(path).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
                     queue.push(u.url());
