@@ -179,7 +179,8 @@ public class ProveTest {
     }
 
     private static void toXml(PrintWriter out, Node node) {
-        out.format("\n<node label=\"%s\">", node.getNodeInfo().getBranchLabel());
+        out.format("\n<node label=\"%s\" taclet=\"%s\">", node.getNodeInfo().getBranchLabel(),
+                node.getAppliedRuleApp().rule().name());
         out.format("\n<raw><![CDATA[%s]]>\n</raw>", node.sequent());
         out.format("\n<lpr><![CDATA[%s]]>\n</lpr>",
             LogicPrinter.quickPrintSequent(node.sequent(), node.proof().getServices()));
