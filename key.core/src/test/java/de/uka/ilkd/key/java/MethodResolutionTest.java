@@ -66,6 +66,7 @@ public class MethodResolutionTest {
     public static void init() {
         if (factory == null) {
             var services = TacletForTests.services();
+            services.getJavaService().parseSpecialClasses();
             factory = services.getJavaService().getProgramFactory();
         }
     }

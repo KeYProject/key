@@ -3,18 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.loader;
 
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.*;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.resolution.Navigator;
@@ -24,11 +16,19 @@ import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -148,19 +148,10 @@ public class JavaParserFactory {
          */
         void rebuild() {
             var ct = new CombinedTypeSolver();
-
-            // resolve logical datatypes as \\map or \\seq, or \\dl_Free
             ct.add(new LogicalTypeSolver());
-
-            if (!bootClasses.isEmpty()) {
-                ct.add(new ListTypeSolver(bootClasses));
-            }
-            if (!libraryClasses.isEmpty()) {
-                ct.add(new ListTypeSolver(libraryClasses));
-            }
-            if (!userClasses.isEmpty()) {
-                ct.add(new ListTypeSolver(userClasses));
-            }
+            ct.add(new ListTypeSolver(bootClasses));
+            ct.add(new ListTypeSolver(libraryClasses));
+            ct.add(new ListTypeSolver(userClasses));
             delegate = ct;
         }
 
@@ -191,9 +182,9 @@ public class JavaParserFactory {
         private final Collection<CompilationUnit> units;
 
         private final Cache<String, SymbolReference<ResolvedReferenceTypeDeclaration>> foundTypes =
-            CacheBuilder.newBuilder().softValues()
-                    .maximumSize(1024)
-                    .build();
+                CacheBuilder.newBuilder().softValues()
+                        .maximumSize(1024)
+                        .build();
 
         public ListTypeSolver(Collection<CompilationUnit> units) {
             this.units = units;
@@ -212,7 +203,7 @@ public class JavaParserFactory {
         @Override
         public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
             SymbolReference<ResolvedReferenceTypeDeclaration> cachedValue =
-                foundTypes.getIfPresent(name);
+                    foundTypes.getIfPresent(name);
             if (cachedValue != null) {
                 return cachedValue;
             }
@@ -237,12 +228,12 @@ public class JavaParserFactory {
                 }
 
                 var packageName =
-                    unit.getPackageDeclaration().map(p -> p.getName().asString()).orElse("");
+                        unit.getPackageDeclaration().map(p -> p.getName().asString()).orElse("");
                 if (!name.startsWith(packageName)) {
                     continue;
                 }
                 String localName =
-                    name.substring(Math.min(name.length(), packageName.length() + 1));
+                        name.substring(Math.min(name.length(), packageName.length() + 1));
                 var astTypeDeclaration = Navigator.findType(unit, localName);
                 if (astTypeDeclaration.isPresent()) {
                     return SymbolReference
