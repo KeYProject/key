@@ -13,10 +13,10 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "7.2.1"
+    id "com.diffplug.spotless" version "8.0.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.57"
+    id "org.checkerframework" version "0.6.59"
 
     id("org.sonarqube") version "6.3.1.5724"
 }
@@ -79,7 +79,7 @@ subprojects {
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.18")
+        testImplementation("ch.qos.logback:logback-classic:1.5.19")
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
@@ -91,23 +91,24 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.18")
-        testImplementation("org.assertj:assertj-core:3.27.4")
-        testImplementation("ch.qos.logback:logback-classic:1.5.18")
+        testImplementation("ch.qos.logback:logback-classic:1.5.19")
+        testImplementation("org.assertj:assertj-core:3.27.6")
+        testImplementation("ch.qos.logback:logback-classic:1.5.19")
 
-        testImplementation(platform("org.junit:junit-bom:5.13.4"))
+        testImplementation(platform("org.junit:junit-bom:5.14.0"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation ("org.assertj:assertj-core:3.27.6")
         testImplementation project(':key.util')
 
         // test fixtures
         testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
         testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.4'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.0'
     }
 
     tasks.withType(JavaCompile) {

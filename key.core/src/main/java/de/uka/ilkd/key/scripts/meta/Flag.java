@@ -5,37 +5,40 @@ package de.uka.ilkd.key.scripts.meta;
 
 // Need to switch spotless off for the comment because it replaces @Flag with &#64;Flag
 // spotless:off
-/**
- * Currently not implemented in {@link ArgumentsLifter}
- * <p>
- * Used to mark flag for proof script commands. For example "instantitate formula='...' ... hide" is
- * denoted as
- * </p>
- * <p>
- *
- * <pre>
- * {@code
- *  @Flag(name="hide"}
- *  boolean hideFormula.
- * }
- * </pre>
- * </p>
- * <p>
- * Only applicable to boolean fields!
- * </p>
- *
- * @author Alexander Weigl
- * @version 1 (21.04.17)
- * @see Option
- */
-//spotless:on
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/// An annotation for marking flag (boolean) arguments of proof script commands.
+/// For example `instantiate formula='...' ... hide` has a flag `hide`.
+/// denoted as
+///
+/// ```java
+/// class Parameters {
+/// boolean @Flag hide; ...
+/// }
+/// ```
+///
+/// Only applicable to boolean fields! Value can be passed as named argument `hide=true` or
+/// `hide=false` or
+/// as positional argument ` ... hide;`.
+///
+/// @author Alexander Weigl
+/// @version 1 (21.04.17)
+/// @see Option
+/// @see ArgumentsLifter
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Flag {
     /**
      * Name of the command line argument.
+     * If left blank, the name of the field is used.
      *
      * @return a non-null string
      */
-    String value();
+    String value() default "";
 
     /**
      * The default value of this flag.
@@ -43,12 +46,4 @@ public @interface Flag {
      * @return true iff this field is required (not null)
      */
     boolean defValue() default false;
-
-    /**
-     * A help message for this argument.
-     *
-     * @return a non-null string
-     */
-    String help() default "";
-
 }

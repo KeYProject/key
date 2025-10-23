@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -15,15 +14,19 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.scripts.meta.Varargs;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
-public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
+import org.jspecify.annotations.Nullable;
+
+public class MacroCommand extends AbstractCommand {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
     public MacroCommand() {
@@ -45,20 +48,16 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
     public String getName() {
         return "macro";
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(ScriptCommandAst arguments)
             throws ScriptException, InterruptedException {
-        final Services services = state.getProof().getServices();
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
+
+        final Services services = state().getProof().getServices();
         // look up macro name
         ProofMacro macro = macroMap.get(args.macroName);
         if (macro == null) {
@@ -166,17 +165,21 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     public static class Parameters {
-        /** Macro name parameter */
-        @Option("#2")
+        @Argument
+        @Documentation("Macro name")
         public String macroName;
-        /** Run on formula number "occ" parameter */
-        @Option(value = "occ", required = false)
-        public Integer occ = -1;
+
+        @Documentation("Run on formula number \"occ\" parameter")
+        @Option(value = "occ")
+        public @Nullable Integer occ = -1;
+
         /** Run on formula matching the given regex */
-        @Option(value = "matches", required = false)
-        public String matches = null;
+        @Option(value = "matches")
+        @Documentation("Run on formula matching the given regex")
+        public @Nullable String matches = null;
+
         /** Variable macro parameters */
-        @Varargs(as = String.class, prefix = "arg_")
+        @OptionalVarargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
     }
 

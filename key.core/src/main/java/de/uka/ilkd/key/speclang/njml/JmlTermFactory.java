@@ -90,6 +90,21 @@ public final class JmlTermFactory {
         return overloadedFunctionHandler.replaceSpecMathMode(specMathMode);
     }
 
+    /**
+     * Ensure that <code>term</code> is a boolean term. If it is a formula, convert it to a boolean
+     * term.
+     */
+    public JTerm ensureTerm(JTerm term) {
+        if (term.sort() == JavaDLTheory.FORMULA) {
+            // bugfix (CS): t.getTerm() delivers a formula instead of a
+            // boolean term; obviously the original boolean terms are
+            // converted to formulas somewhere else; however, we need
+            // boolean terms instead of formulas here
+            return tb.convertToBoolean(term);
+        }
+        return term;
+    }
+
     // region reach
     public SLExpression reach(JTerm t, SLExpression e1, SLExpression e2, SLExpression e3) {
         final LogicVariable stepsLV = e3 == null
@@ -860,14 +875,7 @@ public final class JmlTermFactory {
         }
         QuantifiableVariable qv = declVars.head();
         JTerm tt = t.getTerm();
-        if (tt.sort() == JavaDLTheory.FORMULA) {
-            // bugfix (CS): t.getTerm() delivers a formula instead of a
-            // boolean term; obviously the original boolean terms are
-            // converted to formulas somewhere else; however, we need
-            // boolean terms instead of formulas here
-            tt = tb.convertToBoolean(t.getTerm());
-        }
-        JTerm resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), tt);
+        JTerm resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), ensureTerm(tt));
         final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
         return new SLExpression(resultTerm, seqtype);
     }
@@ -973,7 +981,7 @@ public final class JmlTermFactory {
         ImmutableList<JTerm> terms = ImmutableSLList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
-                JTerm t = expr.getTerm();
+                JTerm t = ensureTerm(expr.getTerm());
                 terms = terms.append(t);
             } else {
                 throw exc.createException0("Not a term: " + expr);
@@ -983,10 +991,14 @@ public final class JmlTermFactory {
         return new SLExpression(tb.seq(terms), seqtype);
     }
 
+    public SLExpression seqUpd(JTerm seq, JTerm index, JTerm value) {
+        return new SLExpression(tb.seqUpd(seq, index, ensureTerm(value)));
+    }
+
     public SLExpression createIndexOf(JTerm seq, JTerm elem) {
         final KeYJavaType inttype =
             services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
-        return new SLExpression(tb.indexOf(seq, elem), inttype);
+        return new SLExpression(tb.indexOf(seq, ensureTerm(elem)), inttype);
     }
 
     public @NonNull JTerm createReturns(@Nullable JTerm term) {
