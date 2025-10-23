@@ -20,14 +20,12 @@ import org.key_project.logic.Name;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
- */
+/// Creates a [ModularJavaDLStrategy] and handles strategy settings relevant to it.
 public class ModularJavaDLStrategyFactory implements StrategyFactory {
-    private final List<StrategyFactory> componentFactories = Arrays.asList(new FOLStrategyFactory(),
-        new IntegerStrategyFactory(), new SymExStrategyFactory(), new StringStrategyFactory(),
-        new JavaCardDLStrategyFactory());
+    private final List<StrategyFactory> componentFactories =
+        Arrays.asList(new JFOLStrategyFactory(),
+            new IntegerStrategyFactory(), new SymExStrategyFactory(), new StringStrategyFactory(),
+            new JavaCardDLStrategyFactory());
 
     /**
      * The unique {@link Name} of this {@link StrategyFactory}.

@@ -31,6 +31,16 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
+/// Combines a list of strategies into a unified strategy. Theory combination
+/// is based on the costs computed by each component strategy. Age of the rule
+/// application is used to ensure that any applicable rule will eventually be
+/// applied.
+///
+/// Conflicts (i.e., when more than one component strategy provides a cost
+/// computation for one rule set) have to be resolved explicitly by declaring
+/// a conflict resolution [#resolveConflict(RuleSetDispatchFeature, RuleSet, List)].
+///
+/// Do not create directly. Use [ModularJavaDLStrategyFactory] instead.
 public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     public static final Name NAME = new Name("Modular JavaDL Strategy");
 

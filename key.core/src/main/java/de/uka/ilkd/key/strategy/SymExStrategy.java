@@ -24,7 +24,9 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
 
-/// Strategy for symbolic execution rules
+/// Strategy for symbolic execution rules.
+///
+/// Do not create directly. Use [SymExStrategyFactory] instead.
 public class SymExStrategy extends AbstractFeatureStrategy {
     public static final Name NAME = new Name("SymExStrategy");
 

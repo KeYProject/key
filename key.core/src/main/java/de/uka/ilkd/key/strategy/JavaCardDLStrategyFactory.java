@@ -13,11 +13,9 @@ import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 
 import org.key_project.logic.Name;
 
-
-/**
- *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
- */
+/// Factory for [JavaCardDLStrategy]. Additionally, handles all strategy settings
+/// relevant to it.
+/// @author Kai Wallisch <kai.wallisch@ira.uka.de>
 public class JavaCardDLStrategyFactory implements StrategyFactory {
 
     /**

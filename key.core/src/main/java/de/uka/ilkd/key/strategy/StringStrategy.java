@@ -27,6 +27,9 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
+/// Strategy for string related rules.
+///
+/// Do not create directly; use [StringStrategyFactory] instead.
 public class StringStrategy extends AbstractFeatureStrategy {
     public static final Name NAME = new Name("String Strategy");
 

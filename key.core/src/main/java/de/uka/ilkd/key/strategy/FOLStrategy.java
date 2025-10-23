@@ -35,6 +35,12 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
+/// Strategy for general FOL rules. This does not consider other
+/// theories like integers or Java-specific functions.
+///
+/// In particular, instantiation of quantifiers is not supported by this
+/// strategy, as the current E-matching depends on the theory of integers.
+/// For that reason, instantiation can be found [JFOLStrategy].
 public class FOLStrategy extends AbstractFeatureStrategy {
     public static final Name NAME = new Name("FOL Strategy");
 

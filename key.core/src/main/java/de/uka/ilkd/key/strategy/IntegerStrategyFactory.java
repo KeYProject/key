@@ -10,6 +10,8 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+/// Factory for [IntegerStrategy]. Additionally, handles all strategy settings
+/// relevant to integers.
 public class IntegerStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_ARITHMETIC_BASE = "<html>" + "Basic arithmetic support:"
         + "<ul>" + "<li>Simplification of polynomial expressions</li>"

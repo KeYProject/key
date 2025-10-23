@@ -13,7 +13,9 @@ import org.key_project.logic.Name;
 
 import org.jspecify.annotations.NonNull;
 
-public class FOLStrategyFactory implements StrategyFactory {
+/// Factory for [JFOLStrategy]. Additionally, handles all strategy settings
+/// relevant to it.
+public class JFOLStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_QUANTIFIER_NONE =
         "<html>" + "Do not instantiate quantified formulas automatically" + "</html>";
     public static final String TOOL_TIP_QUANTIFIER_NO_SPLITS = "<html>"

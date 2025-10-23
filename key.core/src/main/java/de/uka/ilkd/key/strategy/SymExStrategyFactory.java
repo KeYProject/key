@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+/// Creates [SymExStrategy]. Handles strategy settings for symbolic execution.
 public class SymExStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_LOOP_INVARIANT =
         "<html>" + "Use loop invariants for loops.<br>" + "Three properties have to be shown:<br>"

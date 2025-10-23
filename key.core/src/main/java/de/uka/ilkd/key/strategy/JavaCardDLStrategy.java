@@ -30,9 +30,11 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoin
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Strategy tailored to be used as long as a java program can be found in the sequent.
- */
+/// This strategy is the catch-all for Java related features that are either
+/// cross-cutting or one of the features that do not fit well into any other
+/// strategy.
+///
+/// Do not create directly, instead use [JavaCardDLStrategyFactory].
 public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();

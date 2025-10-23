@@ -8,6 +8,7 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+/// Creates [StringStrategy].
 public class StringStrategyFactory implements StrategyFactory {
     @Override
     public StringStrategy create(Proof proof, StrategyProperties strategyProperties) {

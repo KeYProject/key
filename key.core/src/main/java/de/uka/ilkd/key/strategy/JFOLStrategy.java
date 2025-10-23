@@ -14,6 +14,12 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+/// This strategy extends the classical [FOLStrategy] with heuristics
+/// for quantifier instantiation based on E-matching, which involves
+/// normalization of quantified formulas, as well as term features depending on
+/// integer theory.
+///
+/// Do not create directly; use [JFOLStrategyFactory] instead.
 public class JFOLStrategy extends FOLStrategy {
 
     public JFOLStrategy(Proof proof, StrategyProperties strategyProperties) {

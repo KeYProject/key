@@ -35,7 +35,12 @@ import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 
 import org.jspecify.annotations.NonNull;
 
-
+/// This strategy implements reasoning for integer arithmetics. In particular,
+/// it supports linear integer arithmetics via Gaussian elimination,
+/// Fourier-Motzkin; and non-linear integer reasoning via cross-multiplication
+/// and Gröbner basis.
+///
+/// Do not create directly, instead use [IntegerStrategyFactory].
 public class IntegerStrategy extends AbstractFeatureStrategy {
 
     public static final Name NAME = new Name("Integer Strategy");
