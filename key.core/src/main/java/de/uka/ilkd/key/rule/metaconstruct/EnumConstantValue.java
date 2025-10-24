@@ -5,21 +5,29 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.conditions.EnumConstantCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.util.collection.Pair;
 
 /**
  * resolve a program variable to an integer literal.
  *
- * If the PV is a enum constant, its index in the enum constant array is returned. If the PC is a
- * reference to the nextToCreate field than the number of enum constants is returned.
+ * If the PV is a enum constant field constant, its index in the enum constant array is returned.
+ * This is the ordinal of the enum constant.
  *
  * @author mulbrich
  */
@@ -39,33 +47,14 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      */
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
-        Operator op = term.op();
 
-        if (op instanceof ProgramVariable pv) {
-            int value;
-
-            // String varname = pv.getProgramElementName().getProgramName();
-
-            if (false) {// varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
-                // <nextToCreate>
-                if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration ecd) {
-                    value = ecd.getNumberOfConstants();
-                } else {
-                    throw new IllegalArgumentException(term + " is not in an enum type.");
-                }
-            } else {
-                // enum constant
-                value = EnumClassDeclaration.indexOf(pv);
-                if (value == -1) {
-                    throw new IllegalArgumentException(term + " is not an enum constant");
-                }
-            }
-
-            final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);
-            term = services.getTypeConverter().convertToLogicElement(valueLiteral);
+        @Nullable Pair<Integer, IProgramVariable> enConst = EnumConstantCondition.resolveEnumFieldConstant(term, services);
+        if(enConst == null) {
+            return term;
         }
 
-        return term;
+        int ordinal = enConst.first;
+        return services.getTermBuilder().zTerm(ordinal);
     }
 
 }

@@ -663,7 +663,6 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | DIFFERENTFIELDS
   | SIMPLIFY_IF_THEN_ELSE_UPDATE
   | CONTAINS_ASSIGNMENT
-  | ISENUMTYPE
   | ISTHISREFERENCE
   | STATICMETHODREFERENCE
   | ISREFERENCEARRAY
@@ -671,7 +670,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISARRAYLENGTH
   | IS_ABSTRACT_OR_INTERFACE
   | IS_FINAL
-  | ENUM_CONST
+  | ISENUMCONST
   | FINAL
   | STATIC
   | ISLOCALVARIABLE

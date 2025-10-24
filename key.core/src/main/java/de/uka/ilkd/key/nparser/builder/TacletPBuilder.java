@@ -546,9 +546,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         String name = ctx.varexpId().getText();
         List<KeYParser.Varexp_argumentContext> arguments = ctx.varexp_argument();
         List<TacletBuilderCommand> suitableManipulators =
-            TacletBuilderManipulators.getConditionBuildersFor(name);
+                TacletBuilderManipulators.getConditionBuildersFor(name);
         List<String> parameters =
-            ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
+                ctx.parameter.stream().map(Token::getText).collect(Collectors.toList());
         boolean applied = false;
         Object[] argCache = new Object[arguments.size()];
         for (TacletBuilderCommand manipulator : suitableManipulators) {
@@ -582,6 +582,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
         } catch (Throwable e) {
+            LOGGER.debug("Unexpected exception while producing variable condition", e);
             return false;
         }
     }

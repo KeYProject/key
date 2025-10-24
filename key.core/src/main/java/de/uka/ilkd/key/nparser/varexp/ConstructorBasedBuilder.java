@@ -9,8 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.key_project.prover.rules.VariableCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConstructorBasedBuilder.class);
     private final Class<? extends VariableCondition> clazz;
     private final boolean negationSupported;
 
@@ -54,8 +58,14 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
                 return (VariableCondition) constructor.newInstance(args);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | IllegalArgumentException ignored) {
+                LOGGER.debug("Constructor " + constructor
+                        + " does not match the given arguments for VariableCondition " + clazz
+                        + ". Trying next constructor.");
             }
         }
-        throw new RuntimeException();
+
+        throw new RuntimeException(
+                "No matching constructor found for VariableCondition " + clazz + " with args "
+                        + Arrays.toString(args));
     }
 }
