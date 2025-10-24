@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -21,6 +20,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -52,7 +53,8 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 
         if (var == reference) {
             // try to find the enum constant field
-            @Nullable Pair<Integer, IProgramVariable> field = resolveEnumFieldConstant(subst, services);
+            @Nullable
+            Pair<Integer, IProgramVariable> field = resolveEnumFieldConstant(subst, services);
             if (field == null)
                 return false;
 
@@ -66,8 +68,9 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
     }
 
     // also used in EnumConstantValue
-    public static @Nullable Pair<Integer, IProgramVariable> resolveEnumFieldConstant(Object obj, Services services) {
-        if(obj instanceof Term term) {
+    public static @Nullable Pair<Integer, IProgramVariable> resolveEnumFieldConstant(Object obj,
+            Services services) {
+        if (obj instanceof Term term) {
             Operator op = term.op();
             if (op instanceof Function func && func.isUnique()
                     && func.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()

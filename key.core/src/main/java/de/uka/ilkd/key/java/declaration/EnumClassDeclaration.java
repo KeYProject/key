@@ -10,11 +10,11 @@ import java.util.Map;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.Pair;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.ExtList;
-
-import org.key_project.util.collection.Pair;
 import recoder.java.declaration.EnumConstantDeclaration;
 
 /**
@@ -37,7 +37,8 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * store the program variables which represent the enum constants
      * in a lookup map from name to (ordinal index, program variable)
      */
-    private final Map<String, Pair<@NonNull Integer, @NonNull IProgramVariable>> constants = new HashMap<>();
+    private final Map<String, Pair<@NonNull Integer, @NonNull IProgramVariable>> constants =
+        new HashMap<>();
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
@@ -98,7 +99,8 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @return a pair of (index, program variable) of the enum constant with the given name or null
      *         if there is no such constant
      */
-    public @Nullable Pair<@NonNull Integer, @NonNull IProgramVariable> getConstant(String fieldName) {
+    public @Nullable Pair<@NonNull Integer, @NonNull IProgramVariable> getConstant(
+            String fieldName) {
         return constants.get(fieldName);
     }
 }

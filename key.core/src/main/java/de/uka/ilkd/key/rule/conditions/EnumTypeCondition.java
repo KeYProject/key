@@ -20,8 +20,9 @@ import org.slf4j.LoggerFactory;
  * This variable condition checks if a type is an enum type.
  *
  * @deprecated As of 2025, this varcond is no longer needed, its functionality is currently
- * handled by {@link EnumConstantCondition} that checks type and constant field in one varcond.
- * Should be removed soon.
+ *             handled by {@link EnumConstantCondition} that checks type and constant field in one
+ *             varcond.
+ *             Should be removed soon.
  *
  * @author mulbrich
  * @since 2006-12-14
