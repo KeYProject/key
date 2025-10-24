@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -119,11 +120,20 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
         return false;
     }
 
+    /**
+     * return true if there is a boolean combination of updated modalities
+     */
     private static boolean isUpdatedModality(Term term) {
         while(term.op() instanceof UpdateApplication) {
             term = term.sub(1);
         }
-        return term.op() instanceof Modality;
+        if(term.op() instanceof Modality) {;
+            return true;
+        }
+        if(term.op() == Junctor.IMP || term.op() == Junctor.AND) {
+            return term.subs().stream().allMatch(SymbolicExecutionOnlyMacro::isUpdatedModality);
+        }
+        return false;
     }
 
     private static class FilterSymbexStrategy extends FilterStrategy {
