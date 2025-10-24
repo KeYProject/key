@@ -152,10 +152,16 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(!hasModality(goal)) {
+            if(!hasModality(goal) || isThrowNullBranch(goal)) {
                 return false;
             }
             return isAdmittedRule(app) && super.isApprovedApp(app, pio, goal);
+        }
+
+        /// Special case: Avoid infinite recursion on the "throw null" branch of tryCatchThrow
+        /// by forbidding continuation on this branch.
+        private boolean isThrowNullBranch(Goal goal) {
+            return "Null reference in throw".equals(goal.node().getNodeInfo().getBranchLabel());
         }
 
         private boolean hasModality(Goal goal) {
