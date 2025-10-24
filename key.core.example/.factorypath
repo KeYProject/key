@@ -1,8 +1,0 @@
-<factorypath>
-    <factorypathentry kind="EXTJAR" id="/home/boby/.gradle/caches/modules-2/files-2.1/io.github.eisop/checker-util/3.49.3-eisop1/b5c5d6736dacd1ae7b185f8ab73fe27b1c2df567/checker-util-3.49.3-eisop1.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/home/boby/.gradle/caches/modules-2/files-2.1/io.github.eisop/checker-qual/3.49.3-eisop1/eb7006e7de634cf2b1ab4fc2ed232580d20394f9/checker-qual-3.49.3-eisop1.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/home/boby/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/3.49.2/98ac669ccce59dba8ca360d3e07891d62b6b946a/checker-qual-3.49.2.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/home/boby/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-util/3.49.2/8e329cd794809c92574f50f4d0a5c071062cd429/checker-util-3.49.2.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/home/boby/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker/3.49.2/e406a8aa6b6bb0159eedb1fcda1591ee7c339132/checker-3.49.2-all.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/home/boby/.gradle/caches/modules-2/files-2.1/io.github.eisop/checker/3.49.3-eisop1/5e293e246606bde217f828e1a3613c7abc72c537/checker-3.49.3-eisop1-all.jar" enabled="true" runInBatchMode="false"/>
-</factorypath>
