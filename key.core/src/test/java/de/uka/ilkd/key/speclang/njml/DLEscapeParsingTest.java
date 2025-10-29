@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -11,10 +10,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -25,10 +21,16 @@ public class DLEscapeParsingTest {
                 .resolve("speclang/dlEscapeParsing/dlEscapeTest.key");
         Assumptions.assumeTrue(Files.exists(keyFile));
         KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
+        // both contracts are provable automatically within a few steps
         Contract contr = env.getProofContracts().getFirst();
-        ContractPO po = contr.createProofObl(env.getInitConfig());
-        Proof proof = env.createProof(po);
-        env.getProofControl().startAndWaitForAutoMode(proof);
-        Assertions.assertTrue(proof.closed());
+        ContractPO po1 = contr.createProofObl(env.getInitConfig());
+        Proof proof1 = env.createProof(po1);
+        env.getProofControl().startAndWaitForAutoMode(proof1);
+        Assertions.assertTrue(proof1.closed());
+
+        ContractPO po2 = contr.createProofObl(env.getInitConfig());
+        Proof proof2 = env.createProof(po2);
+        env.getProofControl().startAndWaitForAutoMode(proof2);
+        Assertions.assertTrue(proof2.closed());
     }
 }
