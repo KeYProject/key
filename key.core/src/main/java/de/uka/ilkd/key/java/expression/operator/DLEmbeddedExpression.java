@@ -106,7 +106,9 @@ public class DLEmbeddedExpression extends Operator {
         String qualifier =
             name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
         name = name.substring(name.lastIndexOf('.') + 1);
-        TypeRef tr = new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
+        ProgramElementName pen = qualifier.isEmpty() ? new ProgramElementName(name)
+            : new ProgramElementName(name, qualifier);
+        TypeRef tr = new TypeRef(pen, 0, null, containingClass);
         ExecutionContext ec = new ExecutionContext(tr, null, null);
 
         for (int i = 0; i < actual; i++) {
