@@ -47,7 +47,7 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
         final Instantiation instantiation = LoopContractExternalRule.INSTANCE
                 .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<LoopContract> contracts =
-            LoopContractExternalRule.getApplicableContracts(instantiation, goal, services);
+            LoopContractExternalRule.INSTANCE.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator =
             new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
                 new LoopContractSelectionPanel(services, true), mainWindow, services,

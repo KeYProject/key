@@ -23,6 +23,9 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.wd.ClassWellDefinedness;
+import de.uka.ilkd.key.wd.MethodWellDefinedness;
+import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
