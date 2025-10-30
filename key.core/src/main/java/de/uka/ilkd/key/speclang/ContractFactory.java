@@ -347,6 +347,7 @@ public class ContractFactory {
         var heap = services.getTypeConverter().getHeapLDT().getHeap();
         final TermBuilder tb = services.getTermBuilder();
         final var owner = services.getNamespaces().functions().lookup("owner");
+        final var dominates = services.getNamespaces().functions().lookup("dominates");
 
         int i = 0;
 
@@ -357,21 +358,27 @@ public class ContractFactory {
             for (var modifier : modifiers) {
                 if (!(modifier instanceof AnnotationUseSpecification)) continue;
                 var specifier = (AnnotationUseSpecification)modifier;
-                if (specifier.getTypeReferenceAt(0).getName().equals("Rep")) {
+                var name = specifier.getTypeReferenceAt(0).getName();
+                if (name.equals("Rep")) {
                     change = true;
                     pres = tb.and(pres, 
                             tb.imp(
                                 tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())), 
                                 tb.equals(tb.var(selfVar), tb.func(owner, tb.var(paramVars.get(i))))));
                     break;
-                } else if (specifier.getTypeReferenceAt(0).getName().equals("Peer")) {
+                } else if (name.equals("Peer")) {
                     change = true;
                     pres = tb.and(pres, 
                             tb.imp(
                                 tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())), 
                                 tb.equals(tb.func(owner, tb.var(selfVar)), tb.func(owner, tb.var(paramVars.get(i))))));
                     break;
-                } else if (specifier.getTypeReferenceAt(0).getName().equals("Payload")) {
+                } else if (name.equals("Dom")) {
+                    change = true;
+                    pres = tb.and(pres, tb.imp(
+                        tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())),
+                        tb.func(dominates, tb.var(paramVars.get(i)), tb.var(selfVar))));
+                } else if (name.equals("Payload")) {
                     change = true;
                     break;
                 }
@@ -389,21 +396,26 @@ public class ContractFactory {
             for (var modifier : modifiers) {
                 if (!(modifier instanceof AnnotationUseSpecification)) continue;
                 var specifier = (AnnotationUseSpecification)modifier;
-                if (specifier.getTypeReferenceAt(0).getName().equals("Rep")) {
+                var name = specifier.getTypeReferenceAt(0).getName();
+                if (name.equals("Rep")) {
                     change = true;
                     posts = tb.and(posts, 
                             tb.imp(
                                 tb.not(tb.equals(tb.var(resultVar), tb.NULL())), 
                                 tb.equals(tb.var(selfVar), tb.func(owner, tb.var(resultVar)))));
                     break;
-                } else if (specifier.getTypeReferenceAt(0).getName().equals("Peer")) {
+                } else if (name.equals("Dom")) {
+                    pres = tb.and(pres, tb.imp(
+                        tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())),
+                        tb.func(dominates, tb.var(resultVar), tb.var(selfVar))));
+                } else if (name.equals("Peer")) {
                     change = true;
                     posts = tb.and(posts, 
                             tb.imp(
                                 tb.not(tb.equals(tb.var(resultVar), tb.NULL())), 
                                 tb.equals(tb.func(owner, tb.var(selfVar)), tb.func(owner, tb.var(resultVar)))));
                     break;
-                } else if (specifier.getTypeReferenceAt(0).getName().equals("Payload")) {
+                } else if (name.equals("Payload")) {
                     change = true;
                     break;
                 }

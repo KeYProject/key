@@ -13,7 +13,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 /**
  * Settings for the javac extension.
  *
- * @author Daniel Grévent
+ * @author PiisRational
  */
 public class JavacSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**

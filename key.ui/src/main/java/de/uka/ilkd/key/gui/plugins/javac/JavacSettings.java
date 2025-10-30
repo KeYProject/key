@@ -9,7 +9,7 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 /**
  * Settings for the javac extention.
  *
- * @author Daniel Grévent
+ * @author PiisRational
  */
 public class JavacSettings extends AbstractPropertiesSettings {
 
