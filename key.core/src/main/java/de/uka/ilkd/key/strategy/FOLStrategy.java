@@ -77,7 +77,7 @@ public class FOLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "closure", -15000);
-        bindRuleSet(d, "alpha", -7000);
+        bindRuleSet(d, "alpha", print("alpha", longConst(-7000)));
         bindRuleSet(d, "delta", -6000);
         bindRuleSet(d, "simplify_boolean", -200);
 
@@ -85,8 +85,8 @@ public class FOLStrategy extends AbstractFeatureStrategy {
             FindDepthFeature.getInstance();
 
         bindRuleSet(d, "concrete",
-            add(longConst(-11000),
-                ScaleFeature.createScaled(findDepthFeature, 10.0)));
+            print("Concrete", add(longConst(-11000),
+                ScaleFeature.createScaled(findDepthFeature, 10.0))));
         bindRuleSet(d, "simplify", -4500);
         bindRuleSet(d, "simplify_enlarging", -2000);
         bindRuleSet(d, "simplify_ENLARGING", -1900);
