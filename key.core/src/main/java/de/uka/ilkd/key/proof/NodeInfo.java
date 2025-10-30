@@ -10,9 +10,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.TermBuilder;

@@ -26,15 +26,17 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  */
 public final class HTMLReport {
     /** to prevent from instantiating */
-    private HTMLReport() {
-    }
+    private HTMLReport() {}
 
     /**
      * Prints out the given check results to a target path.
      *
-     * @param data the check results to print
-     * @param target the target path of the output
-     * @throws IOException if an error occurs when accessing to the target path or the string
+     * @param data
+     *        the check results to print
+     * @param target
+     *        the target path of the output
+     * @throws IOException
+     *         if an error occurs when accessing to the target path or the string
      *         template resources
      */
     public static void print(CheckerData data, Path target) throws IOException {
@@ -66,7 +68,8 @@ public final class HTMLReport {
      * Set up StringTemplate model adaptors and listeners.
      *
      * @return the ST object for rendering the HTML report
-     * @throws IOException if an error occurs accessing the StringTemplate resources
+     * @throws IOException
+     *         if an error occurs accessing the StringTemplate resources
      */
     @SuppressWarnings("rawtypes")
     private static ST prepareStringTemplate() throws IOException {

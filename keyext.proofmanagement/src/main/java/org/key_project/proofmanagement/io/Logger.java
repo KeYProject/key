@@ -12,15 +12,18 @@ public interface Logger {
     /**
      * Prints a message to the logger.
      *
-     * @param message the message to print
+     * @param message
+     *        the message to print
      */
     void print(String message);
 
     /**
      * Prints a message with the given severity level to the logger.
      *
-     * @param logLevel the severity of the message
-     * @param message the message to print
+     * @param logLevel
+     *        the severity of the message
+     * @param message
+     *        the message to print
      */
     void print(LogLevel logLevel, String message);
 }

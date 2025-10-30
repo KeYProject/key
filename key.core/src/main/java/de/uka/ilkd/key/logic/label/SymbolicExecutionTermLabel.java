@@ -11,7 +11,8 @@ import org.key_project.prover.sequent.Sequent;
 /**
  * Label attached to a symbolic execution thread.
  *
- * @param id The unique ID of this term label in the {@link Sequent}.
+ * @param id
+ *        The unique ID of this term label in the {@link Sequent}.
  */
 public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
@@ -27,7 +28,8 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * Constructor.
      *
-     * @param id The unique ID of this term label in the {@link Sequent}.
+     * @param id
+     *        The unique ID of this term label in the {@link Sequent}.
      */
     public SymbolicExecutionTermLabel {
     }

@@ -68,8 +68,10 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     /**
      * Merge namespaces.
      *
-     * @param initiatingProof the initiating proof
-     * @param sideProof the side proof
+     * @param initiatingProof
+     *        the initiating proof
+     * @param sideProof
+     *        the side proof
      */
     protected final void mergeNamespaces(Proof initiatingProof, Proof sideProof) {
         NamespaceSet initiatingProofNS = initiatingProof.getServices().getNamespaces();

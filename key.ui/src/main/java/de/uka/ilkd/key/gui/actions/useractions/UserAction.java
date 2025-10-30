@@ -29,8 +29,10 @@ public abstract class UserAction extends KeyAction {
     /**
      * Set up this user action.
      *
-     * @param mediator mediator
-     * @param proof proof this action is to be applied on
+     * @param mediator
+     *        mediator
+     * @param proof
+     *        proof this action is to be applied on
      */
     protected UserAction(KeYMediator mediator, Proof proof) {
         this.mediator = mediator;

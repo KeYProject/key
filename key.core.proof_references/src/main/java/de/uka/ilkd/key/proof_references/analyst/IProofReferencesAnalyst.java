@@ -29,8 +29,10 @@ public interface IProofReferencesAnalyst {
      * Computes the {@link IProofReference} for the given {@link Node} which can be {@code null} or
      * an empty set if the applied rule is not supported by this {@link IProofReferencesAnalyst}.
      *
-     * @param node The {@link Node} to compute its {@link IProofReference}s.
-     * @param services The {@link Services} to use.
+     * @param node
+     *        The {@link Node} to compute its {@link IProofReference}s.
+     * @param services
+     *        The {@link Services} to use.
      * @return The found {@link IProofReference} or {@code null}/empty set if the applied rule is
      *         not supported.
      */

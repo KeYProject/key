@@ -39,8 +39,10 @@ public final class CloseByReference extends KeyAction {
     /**
      * Construct new action.
      *
-     * @param mediator the mediator
-     * @param node the node
+     * @param mediator
+     *        the mediator
+     * @param node
+     *        the node
      */
     public CloseByReference(CachingExtension cachingExtension, KeYMediator mediator, Node node) {
         this.cachingExtension = cachingExtension;

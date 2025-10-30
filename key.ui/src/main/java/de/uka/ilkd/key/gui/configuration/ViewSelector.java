@@ -31,7 +31,8 @@ public class ViewSelector extends JDialog {
     /**
      * creates a new ViewSelector
      *
-     * @param parent The parent widget of this ViewSelector
+     * @param parent
+     *        The parent widget of this ViewSelector
      */
     public ViewSelector(JFrame parent) {
         super(parent, "Maximum line number for tooltips", true);

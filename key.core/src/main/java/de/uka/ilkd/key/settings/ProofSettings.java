@@ -279,7 +279,8 @@ public class ProofSettings {
     /**
      * Update the proof settings according to the entries on the properties.
      *
-     * @param props a non-<code>null</code> object with KeY properties.
+     * @param props
+     *        a non-<code>null</code> object with KeY properties.
      */
     public void update(Properties props) {
         for (Settings s : settings) {

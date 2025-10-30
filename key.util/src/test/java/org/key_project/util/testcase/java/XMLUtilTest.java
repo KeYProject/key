@@ -39,12 +39,16 @@ public class XMLUtilTest {
     /**
      * Executes a test step of {@link #testReplaceTags()}.
      *
-     * @param text The text to execute
+     * @param text
+     *        The text to execute
      *        {@link XMLUtil#replaceTags(String, org.key_project.util.java.XMLUtil.ITagReplacer)}
      *        on.
-     * @param expectedResult The expected result.N
-     * @param fixedReplacement The fixed replacement to use.
-     * @param expectedTags The expected found tags.
+     * @param expectedResult
+     *        The expected result.N
+     * @param fixedReplacement
+     *        The fixed replacement to use.
+     * @param expectedTags
+     *        The expected found tags.
      */
     protected void assertReplaceTags(String text, String expectedResult, String fixedReplacement,
             String... expectedTags) {
@@ -78,7 +82,8 @@ public class XMLUtilTest {
         /**
          * Constructor.
          *
-         * @param fixedReplacement The fixed replacement to use.
+         * @param fixedReplacement
+         *        The fixed replacement to use.
          */
         public LoggingReplacer(String fixedReplacement) {
             this.fixedReplacement = fixedReplacement;

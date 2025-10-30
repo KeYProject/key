@@ -23,8 +23,10 @@ public class InfFlowContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already loaded {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already loaded {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     @Override

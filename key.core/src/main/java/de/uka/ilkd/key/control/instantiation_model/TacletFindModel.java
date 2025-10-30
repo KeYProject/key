@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
@@ -70,11 +70,16 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * Create new data model for tree.
      *
-     * @param app the TacletApp where to get the necessary entries
-     * @param services services.
-     * @param nss universal namespace of variables, minimum for input in a row.
-     * @param scm the abbreviation map.
-     * @param goal the current goal.
+     * @param app
+     *        the TacletApp where to get the necessary entries
+     * @param services
+     *        services.
+     * @param nss
+     *        universal namespace of variables, minimum for input in a row.
+     * @param scm
+     *        the abbreviation map.
+     * @param goal
+     *        the current goal.
      */
     public TacletFindModel(TacletApp app, Services services, NamespaceSet nss, AbbrevMap scm,
             Goal goal) {
@@ -175,9 +180,12 @@ public class TacletFindModel extends AbstractTableModel {
      * parses the given string that represents the term (or formula) using the given variable
      * namespace and the given namespace for functions and default namespaces for the others
      *
-     * @param s the String to parse
-     * @param varNS the variable namespace
-     * @param functNS the function namespace
+     * @param s
+     *        the String to parse
+     * @param varNS
+     *        the variable namespace
+     * @param functNS
+     *        the function namespace
      */
     private JTerm parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull Function> functNS) throws ParserException {
@@ -230,9 +238,12 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * parses the indicated row and returns a Term corresponding to the entry in the row
      *
-     * @param irow the row to be parsed
-     * @param varNS the variable namespace that will be passed to parseTerm
-     * @param functNS the function namespace that will be passed to parseTerm
+     * @param irow
+     *        the row to be parsed
+     * @param varNS
+     *        the variable namespace that will be passed to parseTerm
+     * @param functNS
+     *        the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
     private JTerm parseRow(int irow, Namespace<@NonNull QuantifiableVariable> varNS,
@@ -263,7 +274,8 @@ public class TacletFindModel extends AbstractTableModel {
      * parses the indicated row and returns an identifier declaration corresponding to the entry in
      * the row
      *
-     * @param irow the row to be parsed
+     * @param irow
+     *        the row to be parsed
      * @return the parsed declaration
      */
     private IdDeclaration parseIdDeclaration(int irow)
@@ -299,7 +311,8 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * parses the indicated row and returns the ProgramElement corresponding to the entry in the row
      *
-     * @param irow the row to be parsed
+     * @param irow
+     *        the row to be parsed
      * @return the parsed term
      */
     private ProgramElement parseRow(int irow) throws SVInstantiationParserException {
@@ -336,7 +349,8 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * @return new rule app with all inserted instantiations in the variable instantiations table
      *
-     * @throws SVInstantiationException if the instantiation is incorrect
+     * @throws SVInstantiationException
+     *         if the instantiation is incorrect
      */
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
 

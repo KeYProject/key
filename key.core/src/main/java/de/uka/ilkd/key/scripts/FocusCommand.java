@@ -69,8 +69,10 @@ public class FocusCommand extends AbstractCommand {
     /**
      * Hide all formulas of the sequent that are not on focus sequent
      *
-     * @param toKeep sequent containing formulas to keep
-     * @throws ScriptException if no goal is currently open
+     * @param toKeep
+     *        sequent containing formulas to keep
+     * @throws ScriptException
+     *         if no goal is currently open
      */
     private void hideAll(Sequent toKeep) throws ScriptException {
         Goal goal = state.getFirstOpenAutomaticGoal();
@@ -119,10 +121,14 @@ public class FocusCommand extends AbstractCommand {
     /**
      * Make tacletApp for one sequent formula to hide on the sequent
      *
-     * @param g the goal on which this hide rule should be applied to
-     * @param toHide the sequent formula to hide
-     * @param tac the taclet top apply (either hide_left or hide_right)
-     * @param antec whether the formula is in the antecedent
+     * @param g
+     *        the goal on which this hide rule should be applied to
+     * @param toHide
+     *        the sequent formula to hide
+     * @param tac
+     *        the taclet top apply (either hide_left or hide_right)
+     * @param antec
+     *        whether the formula is in the antecedent
      */
     private void makeTacletApp(Goal g, SequentFormula toHide,
             Taclet tac, boolean antec) {
