@@ -554,4 +554,20 @@ public final class StringUtil {
         return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
     }
 
+    /**
+     * If the given text starts and ends with quotes (single or double), they will be stripped.
+     *
+     * @param text The text to check.
+     * @return The text without leading and trailing quotes or the original text if no quotes were
+     *         present.
+     */
+    public static String stripQuotes(String text) {
+        if (text.length() >= 2 && text.startsWith("\"") && text.endsWith("\"")) {
+            return text.substring(1, text.length() - 1);
+        }
+        if (text.length() >= 2 && text.startsWith("'") && text.endsWith("'")) {
+            return text.substring(1, text.length() - 1);
+        }
+        return text;
+    }
 }
