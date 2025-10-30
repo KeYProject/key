@@ -925,6 +925,10 @@ public class IntermediateProofReplayer {
             }
 
             String value = s.substring(eq + 1);
+            int colon = value.indexOf(':');
+            if (colon != -1) {
+                value = value.substring(0, colon);
+            }
             app = parseSV2(app, sv, value, currGoal);
         }
 
