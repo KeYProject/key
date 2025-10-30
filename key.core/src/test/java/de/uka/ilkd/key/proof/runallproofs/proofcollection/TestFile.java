@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.runallproofs.ProveTest;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
@@ -166,6 +167,7 @@ public class TestFile implements Serializable {
                 loadedProof = env.getLoadedProof();
                 ReplayResult replayResult;
 
+
                 if (testProperty == TestProperty.NOTLOADABLE) {
                     try {
                         replayResult = env.getReplayResult();
@@ -205,6 +207,11 @@ public class TestFile implements Serializable {
                         || testProperty == TestProperty.NOTPROVABLE) {
                     ProofSaver.saveToFile(new File(keyFile.toAbsolutePath() + ".save.proof"),
                         loadedProof);
+
+                    var path = Paths.get("proofs",
+                            loadedProof.getProofFile().getFileName() + ".proof.xml.gz");
+                    ProveTest.saveProofXml(loadedProof, path);
+                    LOGGER.info("Stored {}", path);
                 }
                 boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
