@@ -55,6 +55,9 @@ processResources.dependsOn << createExamplesZip
 shadowJar {
     archiveClassifier.set("exe")
     archiveBaseName.set("key")
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // needed for mergeServices
+    }
     mergeServiceFiles()
 }
 
