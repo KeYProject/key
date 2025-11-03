@@ -136,7 +136,7 @@ public class ProofSettings {
      * Used by saveSettings() and settingsToString()
      */
     public void settingsToStream(Writer out) {
-        getConfiguration().save(out, "Proof-Settings-Config-File");
+        getConfiguration().save(out, "");
     }
 
     /**
