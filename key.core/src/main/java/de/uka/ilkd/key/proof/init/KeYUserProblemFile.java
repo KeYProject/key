@@ -103,7 +103,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
         // read key file itself (except contracts)
         // should have been read earlier (TODO: find a clean solution)
-        //warnings = warnings.union(super.readExtendedSignature());
+        // warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),

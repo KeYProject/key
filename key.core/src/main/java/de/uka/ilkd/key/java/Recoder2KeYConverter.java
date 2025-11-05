@@ -747,6 +747,7 @@ public class Recoder2KeYConverter {
     /**
      * Resolve the function symbol with the given name. Also supports sort-dependent functions
      * (where the name contains "::").
+     *
      * @param name
      * @param e
      * @return
