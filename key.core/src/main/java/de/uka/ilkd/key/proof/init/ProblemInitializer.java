@@ -524,7 +524,7 @@ public final class ProblemInitializer {
         configureTermLabelSupport(initConfig);
 
         // hacky, but allows to use sorts and functions from user .key files in JML via \dl_ escape
-        if (envInput instanceof KeYFile kf) {
+        if (envInput instanceof KeYUserProblemFile kf) {
             envInput.setInitConfig(initConfig);
             //warnings.add(kf.readSorts());
             warnings.add(kf.readExtendedSignature());
