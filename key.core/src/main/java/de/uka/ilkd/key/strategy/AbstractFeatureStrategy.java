@@ -150,9 +150,6 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
             not(applyTF(superTerm, t))));
     }
 
-    protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState);
-
     protected Feature forEach(TermBuffer<Goal> x, TermGenerator<Goal> gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
@@ -202,6 +199,4 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
-
-    protected abstract RuleSetDispatchFeature getCostDispatcher();
 }

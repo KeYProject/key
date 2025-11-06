@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -35,7 +37,7 @@ import org.jspecify.annotations.NonNull;
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
-public class JavaCardDLStrategy extends AbstractFeatureStrategy {
+public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
     public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
@@ -87,6 +89,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
                 || approvalDispatcher.get(rs) != null;
+    }
+
+    @Override
+    public Set<RuleSet> getResponsibilities() {
+        var set = new HashSet<RuleSet>();
+        set.addAll(costComputationDispatcher.ruleSets());
+        set.addAll(instantiationDispatcher.ruleSets());
+        set.addAll(approvalDispatcher.ruleSets());
+        return set;
     }
 
     protected Feature setupGlobalF(@NonNull Feature dispatcher) {
@@ -539,7 +550,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app,
+    public RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal,
             MutableState mState) {
         var time = System.nanoTime();
@@ -565,7 +576,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleSetDispatchFeature getCostDispatcher() {
+    public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
     }
 }

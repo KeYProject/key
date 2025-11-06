@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -19,6 +17,7 @@ import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -44,30 +43,42 @@ import org.jspecify.annotations.NonNull;
 public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     public static final Name NAME = new Name("Modular JavaDL Strategy");
 
-    private final List<AbstractFeatureStrategy> strategies = new ArrayList<>();
+    private final List<ComponentStrategy> strategies = new ArrayList<>();
     private final StrategyProperties strategyProperties;
     private final Feature reduceCostTillMaxF;
     private final Feature reduceInstTillMaxF;
     private final ArithTermFeatures tf;
     private final RuleSetDispatchFeature conflictCostDispatcher;
+    private final Feature totalCost;
+    private final Map<RuleSet, List<ComponentStrategy>> responsibilityMap;
+    private final Map<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategyMap =
+        new LinkedHashMap<>();
 
-    public ModularJavaDLStrategy(Proof proof, List<AbstractFeatureStrategy> componentStrategies,
+    public ModularJavaDLStrategy(Proof proof, List<ComponentStrategy> componentStrategies,
             StrategyProperties properties) {
         super(proof);
         strategies.addAll(componentStrategies);
         reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost);
-        reduceInstTillMaxF = new ReduceTillMaxFeature(AbstractFeatureStrategy::instantiateApp);
+        reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         conflictCostDispatcher = resolveConflicts();
+        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
+        totalCost =
+            add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
+                reduceCostTillMaxF, conflictCostDispatcher,
+                AgeFeature.INSTANCE, ifMatchedF);
+
+        responsibilityMap = new LinkedHashMap<>(strategies.size());
+        for (ComponentStrategy strategy : strategies) {
+            var res = strategy.getResponsibilities();
+            for (var rs : res) {
+                responsibilityMap.computeIfAbsent(rs, k -> new ArrayList<>()).add(strategy);
+            }
+        }
     }
 
-    @Override
-    protected RuleSetDispatchFeature getCostDispatcher() {
-        return conflictCostDispatcher;
-    }
-
-    private record StratAndDispatcher(AbstractFeatureStrategy strategy,
+    private record StratAndDispatcher(ComponentStrategy strategy,
             RuleSetDispatchFeature dispatcher) {
     }
 
@@ -75,7 +86,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         var dis = new RuleSetDispatchFeature();
         var dispatchers =
             strategies.stream().map(s -> new StratAndDispatcher(s, s.getCostDispatcher())).toList();
-        var map = new HashMap<RuleSet, List<AbstractFeatureStrategy>>();
+        var map = new HashMap<RuleSet, List<ComponentStrategy>>();
         for (var d : dispatchers) {
             var s = d.strategy;
             for (var rs : d.dispatcher.ruleSets()) {
@@ -92,7 +103,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs,
-            List<AbstractFeatureStrategy> value) {
+            List<ComponentStrategy> value) {
         switch (rs.name().toString()) {
             case "order_terms" -> {
                 var folStrat = value.getFirst();
@@ -127,7 +138,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
         enableInstantiate();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
@@ -160,24 +171,10 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private <R> R reduceTillMax(RuleApp app, R init, R max, BiFunction<R, R, R> accumulator,
-            Function<AbstractFeatureStrategy, R> mapper, Object... conflict) {
-        for (AbstractFeatureStrategy strategy : strategies) {
-            var isResponsible = false;
-            var ruleSets = app.rule().ruleSets();
-            if (!ruleSets.hasNext())
-                isResponsible = true;
-            else {
-                while (ruleSets.hasNext()) {
-                    var rs = ruleSets.next();
-                    if (strategy.isResponsibleFor(rs)) {
-                        isResponsible = true;
-                        break;
-                    }
-                }
-            }
-            if (!isResponsible) {
-                continue;
-            }
+            Function<ComponentStrategy, R> mapper) {
+        LinkedHashSet<ComponentStrategy> strats = getResponsibleStrategies(app);
+
+        for (ComponentStrategy strategy : strats) {
             init = accumulator.apply(init, mapper.apply(strategy));
             if (init == max) {
                 break;
@@ -186,21 +183,31 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return init;
     }
 
+    private LinkedHashSet<ComponentStrategy> getResponsibleStrategies(RuleApp app) {
+        LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(app.rule());
+        if (strats == null) {
+            strats = new LinkedHashSet<>();
+            var ruleSets = app.rule().ruleSets();
+            while (ruleSets.hasNext()) {
+                var rs = ruleSets.next();
+                List<ComponentStrategy> s = responsibilityMap.get(rs);
+                if (s != null)
+                    strats.addAll(s);
+            }
+            ruleToStrategyMap.put(app.rule(), strats);
+        }
+        return strats;
+    }
+
     @Override
     public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, GOAL goal, MutableState mState) {
-        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
-        // TODO: This could be inefficient. Maybe we can simplify conflict resolution
-        Feature totalCost =
-            add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
-                reduceCostTillMaxF, conflictCostDispatcher,
-                AgeFeature.INSTANCE, ifMatchedF);
         return totalCost.computeCost(app, pos, goal, mState);
     }
 
     @FunctionalInterface
     private interface StrategyCostFunction {
-        RuleAppCost compute(AbstractFeatureStrategy strategy, RuleApp app,
+        RuleAppCost compute(ComponentStrategy strategy, RuleApp app,
                 PosInOccurrence pos, Goal goal, MutableState mState);
     }
 

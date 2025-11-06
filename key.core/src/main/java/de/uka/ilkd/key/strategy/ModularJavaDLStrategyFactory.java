@@ -123,8 +123,8 @@ public class ModularJavaDLStrategyFactory implements StrategyFactory {
 
     @Override
     public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties) {
-        List<AbstractFeatureStrategy> componentStrategies = componentFactories.stream()
-                .map(f -> (AbstractFeatureStrategy) f.create(proof, strategyProperties))
+        List<ComponentStrategy> componentStrategies = componentFactories.stream()
+                .map(f -> (ComponentStrategy) f.create(proof, strategyProperties))
                 .collect(Collectors.toList());
         return new ModularJavaDLStrategy(proof, componentStrategies, strategyProperties);
     }

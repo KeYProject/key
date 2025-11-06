@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
@@ -30,7 +33,7 @@ import org.jspecify.annotations.NonNull;
 /// Strategy for string related rules.
 ///
 /// Do not create directly; use [StringStrategyFactory] instead.
-public class StringStrategy extends AbstractFeatureStrategy {
+public class StringStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("String Strategy");
 
     /// The features defining the three phases: cost computation, approval,
@@ -58,6 +61,11 @@ public class StringStrategy extends AbstractFeatureStrategy {
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null;
+    }
+
+    @Override
+    public Set<RuleSet> getResponsibilities() {
+        return new HashSet<>(costComputationDispatcher.ruleSets());
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
@@ -165,7 +173,7 @@ public class StringStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
         return longConst(0).computeCost(app, pio, goal, mState);
     }
@@ -182,7 +190,7 @@ public class StringStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleSetDispatchFeature getCostDispatcher() {
+    public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
     }
 }

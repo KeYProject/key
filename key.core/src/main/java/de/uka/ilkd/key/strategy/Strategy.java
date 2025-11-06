@@ -19,6 +19,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.jspecify.annotations.NonNull;
 
 
+
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
  */
@@ -82,4 +83,10 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
     }
 
     default boolean isResponsibleFor(RuleSet rs) { return false; }
+
+    default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            de.uka.ilkd.key.proof.Goal goal,
+            MutableState mState) {
+        return null;
+    }
 }

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -41,7 +44,7 @@ import org.jspecify.annotations.NonNull;
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
 /// For that reason, instantiation can be found [JFOLStrategy].
-public class FOLStrategy extends AbstractFeatureStrategy {
+public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("FOL Strategy");
 
     protected final StrategyProperties strategyProperties;
@@ -187,13 +190,13 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
         return instantiationF.computeCost(app, pio, goal, mState);
     }
 
     @Override
-    protected RuleSetDispatchFeature getCostDispatcher() {
+    public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
     }
 
@@ -211,6 +214,15 @@ public class FOLStrategy extends AbstractFeatureStrategy {
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
                 || approvalDispatcher.get(rs) != null;
+    }
+
+    @Override
+    public Set<RuleSet> getResponsibilities() {
+        var set = new HashSet<RuleSet>();
+        set.addAll(costComputationDispatcher.ruleSets());
+        set.addAll(instantiationDispatcher.ruleSets());
+        set.addAll(approvalDispatcher.ruleSets());
+        return set;
     }
 
     @Override

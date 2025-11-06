@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -41,7 +44,7 @@ import org.jspecify.annotations.NonNull;
 /// and Gröbner basis.
 ///
 /// Do not create directly, instead use [IntegerStrategyFactory].
-public class IntegerStrategy extends AbstractFeatureStrategy {
+public class IntegerStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
 
     public static final Name NAME = new Name("Integer Strategy");
 
@@ -91,6 +94,14 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
+    }
+
+    @Override
+    public Set<RuleSet> getResponsibilities() {
+        var set = new HashSet<RuleSet>();
+        set.addAll(costComputationDispatcher.ruleSets());
+        set.addAll(instantiationDispatcher.ruleSets());
+        return set;
     }
 
     private RuleSetDispatchFeature setupInstantiationF() {
@@ -997,7 +1008,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
         return instantiationDispatcher.computeCost(app, pio, goal, mState);
     }
@@ -1014,7 +1025,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy {
     }
 
     @Override
-    protected RuleSetDispatchFeature getCostDispatcher() {
+    public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
     }
 }

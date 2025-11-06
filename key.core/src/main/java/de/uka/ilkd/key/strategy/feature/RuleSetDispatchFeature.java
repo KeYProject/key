@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -33,7 +34,7 @@ public class RuleSetDispatchFeature implements Feature {
 
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
-    public Iterable<RuleSet> ruleSets() {
+    public Set<RuleSet> ruleSets() {
         return rulesetToFeature.keySet();
     }
 
