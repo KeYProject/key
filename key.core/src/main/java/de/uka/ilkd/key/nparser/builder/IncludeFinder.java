@@ -5,7 +5,9 @@ package de.uka.ilkd.key.nparser.builder;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
@@ -22,15 +24,12 @@ import org.key_project.util.java.StringUtil;
  * @see #getIncludes()
  */
 public class IncludeFinder extends AbstractBuilder<Void> {
-    private final URL base;
+    private final Path base;
     private final Includes includes = new Includes();
-    private final String basePath;
     private boolean ldt = false;
 
-    public IncludeFinder(URL base) {
+    public IncludeFinder(Path base) {
         this.base = base;
-        String a = base.getPath();
-        basePath = a.substring(0, a.lastIndexOf('/'));
     }
 
     @Override
@@ -44,29 +43,29 @@ public class IncludeFinder extends AbstractBuilder<Void> {
     public Void visitOne_include(KeYParser.One_includeContext ctx) {
         String value = StringUtil.trim(ctx.getText(), "\"'");
         try {
-            addInclude(value, ctx.relfile != null);
+            addInclude(value);
         } catch (MalformedURLException e) {
             throw new BuildingException(ctx, e);
         }
         return null;
     }
 
-    private void addInclude(String filename, boolean relativePath) throws MalformedURLException {
+    private void addInclude(String filename) throws MalformedURLException {
         RuleSource source;
         if (!filename.endsWith(".key")) {
             filename += ".key";
         }
 
-        if (relativePath) {
-            filename = filename.replace('/', File.separatorChar); // Not required for Windows, but
-                                                                  // whatsoever
-            filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
-            URL path = new URL(base.getProtocol(), base.getHost(), base.getPort(),
-                basePath + "/" + filename);
-            source = RuleSourceFactory.initRuleFile(path);
-        } else {
-            source = RuleSourceFactory.fromDefaultLocation(filename);
+        filename = filename.replace('/', File.separatorChar); // Not required for Windows, but
+        // whatsoever
+        filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
+        var path = base.resolve(filename).normalize();
+        var uri = URI.create(path.toString());
+        if (uri.getScheme() == null) {
+            uri = URI.create("file:///" + path);
         }
+        URL url = uri.toURL();
+        source = RuleSourceFactory.initRuleFile(url);
         if (ldt) {
             includes.putLDT(filename, source);
         } else {
