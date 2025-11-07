@@ -99,34 +99,33 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         }
         for (var e : map.entrySet()) {
             if (e.getValue().size() > 1) {
-                resolveConflict(dis, e.getKey(), e.getValue());
+                resolveConflict(dis, e.getKey());
             }
         }
         return dis;
     }
 
-    private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs,
-            List<Name> stratNames) {
+    private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs) {
         switch (rs.name().toString()) {
             case "order_terms" -> {
-                var folStrat = nameToStrategyMap.get(stratNames.getFirst());
-                var intStrat = nameToStrategyMap.get(stratNames.get(1));
+                var folStrat = nameToStrategyMap.get(JFOLStrategy.NAME);
+                var intStrat = nameToStrategyMap.get(IntegerStrategy.NAME);
                 bindRuleSet(d, "order_terms",
                     ifZero(applyTF("commEqLeft", tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
                         folStrat.getCostDispatcher().remove(rs)));
             }
             case "apply_equations" -> {
-                var folStrat = nameToStrategyMap.get(stratNames.getFirst());
-                var intStrat = nameToStrategyMap.get(stratNames.get(1));
+                var folStrat = nameToStrategyMap.get(JFOLStrategy.NAME);
+                var intStrat = nameToStrategyMap.get(IntegerStrategy.NAME);
                 bindRuleSet(d, "apply_equations",
                     ifZero(applyTF(FocusProjection.create(0), tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
                         folStrat.getCostDispatcher().remove(rs)));
             }
             case "apply_equations_andOr" -> {
-                var folStrat = nameToStrategyMap.get(stratNames.getFirst());
-                var intStrat = nameToStrategyMap.get(stratNames.get(1));
+                var folStrat = nameToStrategyMap.get(JFOLStrategy.NAME);
+                var intStrat = nameToStrategyMap.get(IntegerStrategy.NAME);
                 if (quantifierInstantiatedEnabled()) {
                     bindRuleSet(d, "apply_equations_andOr",
                         ifZero(applyTF(FocusProjection.create(0), tf.intF),
