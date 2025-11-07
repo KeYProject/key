@@ -688,7 +688,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         return result;
     }
 
-
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------

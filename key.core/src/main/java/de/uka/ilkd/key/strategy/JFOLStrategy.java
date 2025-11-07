@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 
+import org.key_project.logic.Name;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -21,6 +22,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 ///
 /// Do not create directly; use [JFOLStrategyFactory] instead.
 public class JFOLStrategy extends FOLStrategy {
+    public static final Name NAME = new Name("JFOL Strategy");
 
     public JFOLStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof, strategyProperties);
@@ -71,5 +73,10 @@ public class JFOLStrategy extends FOLStrategy {
 
     private Feature clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
         return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
+    }
+
+    @Override
+    public Name name() {
+        return NAME;
     }
 }

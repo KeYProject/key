@@ -128,15 +128,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
 
-        final Feature oneStepSimplificationF =
-            oneStepSimplificationFeature(longConst(-11000));
-
         // final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum(
             // splitF,
             // strengthenConstraints,
-            oneStepSimplificationF,
             // smtF,
             queryF, depSpecF, dispatcher);
     }

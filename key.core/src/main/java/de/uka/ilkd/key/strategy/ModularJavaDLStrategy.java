@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
@@ -53,6 +54,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final Map<RuleSet, List<ComponentStrategy>> responsibilityMap;
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategyMap =
         new LinkedHashMap<>();
+    private final Map<Name, ComponentStrategy> nameToStrategyMap =
+        new HashMap<>();
 
     public ModularJavaDLStrategy(Proof proof, List<ComponentStrategy> componentStrategies,
             StrategyProperties properties) {
@@ -62,20 +65,20 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        responsibilityMap = new LinkedHashMap<>(strategies.size());
+        for (ComponentStrategy strategy : strategies) {
+            nameToStrategyMap.put(strategy.name(), strategy);
+            var res = strategy.getResponsibilities();
+            for (var rs : res) {
+                responsibilityMap.computeIfAbsent(rs, k -> new ArrayList<>()).add(strategy);
+            }
+        }
         conflictCostDispatcher = resolveConflicts();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
         totalCost =
             add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
                 reduceCostTillMaxF, conflictCostDispatcher,
                 AgeFeature.INSTANCE, ifMatchedF);
-
-        responsibilityMap = new LinkedHashMap<>(strategies.size());
-        for (ComponentStrategy strategy : strategies) {
-            var res = strategy.getResponsibilities();
-            for (var rs : res) {
-                responsibilityMap.computeIfAbsent(rs, k -> new ArrayList<>()).add(strategy);
-            }
-        }
     }
 
     private record StratAndDispatcher(ComponentStrategy strategy,
@@ -86,12 +89,12 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         var dis = new RuleSetDispatchFeature();
         var dispatchers =
             strategies.stream().map(s -> new StratAndDispatcher(s, s.getCostDispatcher())).toList();
-        var map = new HashMap<RuleSet, List<ComponentStrategy>>();
+        var map = new HashMap<RuleSet, List<Name>>();
         for (var d : dispatchers) {
             var s = d.strategy;
             for (var rs : d.dispatcher.ruleSets()) {
                 var lst = map.computeIfAbsent(rs, r -> new ArrayList<>());
-                lst.add(s);
+                lst.add(s.name());
             }
         }
         for (var e : map.entrySet()) {
@@ -103,27 +106,27 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs,
-            List<ComponentStrategy> value) {
+            List<Name> stratNames) {
         switch (rs.name().toString()) {
             case "order_terms" -> {
-                var folStrat = value.getFirst();
-                var intStrat = value.get(1);
+                var folStrat = nameToStrategyMap.get(stratNames.getFirst());
+                var intStrat = nameToStrategyMap.get(stratNames.get(1));
                 bindRuleSet(d, "order_terms",
                     ifZero(applyTF("commEqLeft", tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
                         folStrat.getCostDispatcher().remove(rs)));
             }
             case "apply_equations" -> {
-                var folStrat = value.getFirst();
-                var intStrat = value.get(1);
+                var folStrat = nameToStrategyMap.get(stratNames.getFirst());
+                var intStrat = nameToStrategyMap.get(stratNames.get(1));
                 bindRuleSet(d, "apply_equations",
                     ifZero(applyTF(FocusProjection.create(0), tf.intF),
                         intStrat.getCostDispatcher().remove(rs),
                         folStrat.getCostDispatcher().remove(rs)));
             }
             case "apply_equations_andOr" -> {
-                var folStrat = value.getFirst();
-                var intStrat = value.get(1);
+                var folStrat = nameToStrategyMap.get(stratNames.getFirst());
+                var intStrat = nameToStrategyMap.get(stratNames.get(1));
                 if (quantifierInstantiatedEnabled()) {
                     bindRuleSet(d, "apply_equations_andOr",
                         ifZero(applyTF(FocusProjection.create(0), tf.intF),
@@ -187,12 +190,16 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
         if (strats == null) {
             strats = new LinkedHashSet<>();
-            var ruleSets = rule.ruleSets();
-            while (ruleSets.hasNext()) {
-                var rs = ruleSets.next();
-                List<ComponentStrategy> s = responsibilityMap.get(rs);
-                if (s != null)
-                    strats.addAll(s);
+            if (rule instanceof OneStepSimplifier) {
+                strats.add(nameToStrategyMap.get(JFOLStrategy.NAME));
+            } else {
+                var ruleSets = rule.ruleSets();
+                while (ruleSets.hasNext()) {
+                    var rs = ruleSets.next();
+                    List<ComponentStrategy> s = responsibilityMap.get(rs);
+                    if (s != null)
+                        strats.addAll(s);
+                }
             }
             ruleToStrategyMap.put(rule, strats);
         }

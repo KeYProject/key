@@ -21,9 +21,11 @@ import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -71,9 +73,21 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
         approvalDispatcher = setupApprovalDispatcher();
         instantiationDispatcher = setupInstantiationF();
 
-        costComputationF = costComputationDispatcher;
-        instantiationF = instantiationDispatcher;
+        costComputationF = setUpGlobalF(costComputationDispatcher);
+        instantiationF = setUpGlobalF(instantiationDispatcher);
         approvalF = approvalDispatcher;
+    }
+
+    private Feature setUpGlobalF(RuleSetDispatchFeature d) {
+        final Feature oneStepSimplificationF =
+            oneStepSimplificationFeature(longConst(-11000));
+        return add(d, oneStepSimplificationF);
+    }
+
+    private Feature oneStepSimplificationFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
+        return ConditionalFeature.createConditional(filter, cost);
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
