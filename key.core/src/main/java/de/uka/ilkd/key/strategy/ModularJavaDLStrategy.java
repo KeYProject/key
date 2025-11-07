@@ -172,7 +172,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     private <R> R reduceTillMax(RuleApp app, R init, R max, BiFunction<R, R, R> accumulator,
             Function<ComponentStrategy, R> mapper) {
-        LinkedHashSet<ComponentStrategy> strats = getResponsibleStrategies(app);
+        LinkedHashSet<ComponentStrategy> strats = getResponsibleStrategies(app.rule());
 
         for (ComponentStrategy strategy : strats) {
             init = accumulator.apply(init, mapper.apply(strategy));
@@ -183,18 +183,18 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return init;
     }
 
-    private LinkedHashSet<ComponentStrategy> getResponsibleStrategies(RuleApp app) {
-        LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(app.rule());
+    private LinkedHashSet<ComponentStrategy> getResponsibleStrategies(Rule rule) {
+        LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
         if (strats == null) {
             strats = new LinkedHashSet<>();
-            var ruleSets = app.rule().ruleSets();
+            var ruleSets = rule.ruleSets();
             while (ruleSets.hasNext()) {
                 var rs = ruleSets.next();
                 List<ComponentStrategy> s = responsibilityMap.get(rs);
                 if (s != null)
                     strats.addAll(s);
             }
-            ruleToStrategyMap.put(app.rule(), strats);
+            ruleToStrategyMap.put(rule, strats);
         }
         return strats;
     }
