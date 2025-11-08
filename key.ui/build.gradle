@@ -75,6 +75,9 @@ run {
     //systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
+    // enable assertion
+    jvmArgs += "-ea"
+
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
     jvmArgs += "-Dsun.awt.disablegrab=true"
