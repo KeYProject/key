@@ -936,19 +936,32 @@ public class LogicPrinter {
         } else {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
-            boolean alreadyPrinted = false;
+
             if (t.op() instanceof SortDependingFunction op) {
-                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
-                    layouter.print(op.getSortDependingOn().declarationString());
+
+                // remove package prefix from SortDependingFunction
+                if (notationInfo.isHidePackagePrefix()) {
+                    String sort = op.getSortDependingOn().declarationString();
+                    int index = sort.lastIndexOf('.');
+                    sort = sort.substring(index + 1);
+                    layouter.print(sort);
                     layouter.print("::");
-                    layouter.keyWord(op.getKind().toString());
-                    alreadyPrinted = true;
+
+                    name = op.getKind().toString();
+                }
+
+                // mark instance and exactInstance as keywords
+                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0
+                    || op.getKind().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
+                    isKeyword = true;
                 }
             }
             if (isKeyword) {
                 layouter.markStartKeyword();
             }
-            if (!alreadyPrinted) {
+            if (isKeyword) {
+                layouter.keyWord(name);
+            } else {
                 layouter.print(name);
             }
             if (isKeyword) {
@@ -980,7 +993,13 @@ public class LogicPrinter {
 
         layouter.startTerm(t.arity());
         layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
+        String sort = cast.getSortDependingOn().toString();
+        // remove package prefix from sort name
+        if (notationInfo.isHidePackagePrefix()) {
+            int index = sort.lastIndexOf('.');
+            sort = sort.substring(index + 1);
+        }
+        layouter.print(sort);
         layouter.print(post);
         maybeParens(t.sub(0), ass);
     }
