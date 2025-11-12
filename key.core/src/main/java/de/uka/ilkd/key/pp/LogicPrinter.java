@@ -952,7 +952,7 @@ public class LogicPrinter {
 
                 // mark instance and exactInstance as keywords
                 if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0
-                    || op.getKind().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
+                        || op.getKind().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
                     isKeyword = true;
                 }
             }
