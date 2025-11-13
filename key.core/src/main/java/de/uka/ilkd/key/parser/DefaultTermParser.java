@@ -37,9 +37,11 @@ public final class DefaultTermParser {
      * The method reads the input and parses a term with the specified namespaces. The method
      * ensures, that the term has the specified sort.
      *
-     * @param sort The expected sort of the term.
+     * @param sort
+     *        The expected sort of the term.
      * @return The parsed term of the specified sort.
-     * @throws ParserException The method throws a ParserException, if the input could not be parsed
+     * @throws ParserException
+     *         The method throws a ParserException, if the input could not be parsed
      *         correctly or the term has an invalid sort.
      */
     public JTerm parse(Reader in, Sort sort, Services services,
@@ -56,9 +58,11 @@ public final class DefaultTermParser {
      * The method reads the input and parses a term with the specified namespaces. The method
      * ensures, that the term has the specified sort.
      *
-     * @param sort The expected sort of the term; must not be null.
+     * @param sort
+     *        The expected sort of the term; must not be null.
      * @return The parsed term of the specified sort.
-     * @throws ParserException The method throws a ParserException, if the input could not be parsed
+     * @throws ParserException
+     *         The method throws a ParserException, if the input could not be parsed
      *         correctly or the term has an invalid sort.
      */
     public JTerm parse(Reader in, Sort sort, Services services, NamespaceSet nss, AbbrevMap scm)
@@ -86,7 +90,8 @@ public final class DefaultTermParser {
      * The method reads the input and parses a sequent with the specified namespaces.
      *
      * @return the paresed String as Sequent Object
-     * @throws ParserException The method throws a ParserException, if the input could not be parsed
+     * @throws ParserException
+     *         The method throws a ParserException, if the input could not be parsed
      *         correctly
      */
     public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm)

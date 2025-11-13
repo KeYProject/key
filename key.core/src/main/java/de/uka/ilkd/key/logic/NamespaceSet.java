@@ -27,8 +27,7 @@ public class NamespaceSet {
     private Namespace<@NonNull Sort> sortNS = new Namespace<>();
     private Namespace<@NonNull Choice> choiceNS = new Namespace<>();
 
-    public NamespaceSet() {
-    }
+    public NamespaceSet() {}
 
     public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull Function> funcNS,
@@ -148,7 +147,8 @@ public class NamespaceSet {
     /**
      * looks up for the symbol in the namespaces sort, functions and programVariables
      *
-     * @param name the Name to look up
+     * @param name
+     *        the Name to look up
      * @return the element of the given name or null
      */
     public Named lookupLogicSymbol(Name name) {

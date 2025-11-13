@@ -6,9 +6,9 @@ package de.uka.ilkd.key.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -133,8 +133,10 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     /**
      * Returns an equivalent variable with the new name.
      *
-     * @param newName the new name
-     * @param pv the program variable to be renamed
+     * @param newName
+     *        the new name
+     * @param pv
+     *        the program variable to be renamed
      * @return equivalent operator with the new name
      */
     public static ProgramVariable rename(Name newName, ProgramVariable pv) {

@@ -24,8 +24,7 @@ public class BoundVarsVisitor implements DefaultVisitor {
      * creates a Visitor that collects all bound variables for the subterms of the term it is called
      * from.
      */
-    public BoundVarsVisitor() {
-    }
+    public BoundVarsVisitor() {}
 
     /**
      * only called by execPostOrder in Term.

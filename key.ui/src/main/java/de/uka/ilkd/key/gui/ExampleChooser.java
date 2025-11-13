@@ -480,7 +480,8 @@ public final class ExampleChooser extends JDialog {
      * Lists all examples in the given directory. This method is also accessed by the eclipse based
      * projects.
      *
-     * @param examplesDir The examples directory to list examples in.
+     * @param examplesDir
+     *        The examples directory to list examples in.
      * @return The found examples.
      */
     public static List<Example> listExamples(File examplesDir) {

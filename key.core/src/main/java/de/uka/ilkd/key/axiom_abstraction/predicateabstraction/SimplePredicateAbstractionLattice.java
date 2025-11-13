@@ -28,7 +28,8 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
      * Constructs a new {@link SimplePredicateAbstractionLattice} for the given list of applicable
      * predicates. The caller is responsible for making sure that none of the predicates is valid.
      *
-     * @param applicablePredicates The predicates to generate the lattice from.
+     * @param applicablePredicates
+     *        The predicates to generate the lattice from.
      */
     public SimplePredicateAbstractionLattice(List<AbstractionPredicate> applicablePredicates) {
         super();

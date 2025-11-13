@@ -70,9 +70,12 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Customizable preamble and {@link SMTHandler} list for this Translator to use instead of the
      * default values.
      *
-     * @param preamble the preamble to be prepended to smt problems created with this translator
-     * @param handlerOptions arbitrary String options for the SMTHandlers used by this translator
-     * @param handlerNames fully classified class names of the SMTHandlers to be used by this
+     * @param preamble
+     *        the preamble to be prepended to smt problems created with this translator
+     * @param handlerOptions
+     *        arbitrary String options for the SMTHandlers used by this translator
+     * @param handlerNames
+     *        fully classified class names of the SMTHandlers to be used by this
      *        translator
      */
     public ModularSMTLib2Translator(String[] handlerNames, String[] handlerOptions,
@@ -237,7 +240,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     /**
      * remove obvious identities from SMT code.
      *
-     * @param result, a non-null SExpr
+     * @param result,
+     *        a non-null SExpr
      * @return an equivalent smt code with some simplifications
      */
     private SExpr postProcess(SExpr result) {

@@ -211,7 +211,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * generated whenever the underlying Proof changes.
      *
      * @see #removeTreeModelListener
-     * @param l the listener to add
+     * @param l
+     *        the listener to add
      */
     @Override
     public void addTreeModelListener(TreeModelListener l) {
@@ -222,7 +223,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Removes a listener previously added with <B>addTreeModelListener()</B>.
      *
      * @see #addTreeModelListener
-     * @param l the listener to remove
+     * @param l
+     *        the listener to remove
      */
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
@@ -267,8 +269,10 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Set filters active or inactive and update tree if necessary.
      * Always updates the filter and the tree.
      *
-     * @param filter the filter
-     * @param active whether to activate the filter
+     * @param filter
+     *        the filter
+     * @param active
+     *        whether to activate the filter
      */
     public synchronized void setFilter(ProofTreeViewFilter filter, boolean active) {
         if (filter == null) {
@@ -296,7 +300,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * {@code index >= 0 &&
      *  index  < getChildCount(parent)}).
      *
-     * @param parent a node in the tree, obtained from this data source
+     * @param parent
+     *        a node in the tree, obtained from this data source
      * @return the child of {@code parent} at index {@code index}
      */
     @Override
@@ -317,7 +322,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * has
      * no children. {@code parent} must be a node previously obtained from this data source.
      *
-     * @param parent a node in the tree, obtained from this data source
+     * @param parent
+     *        a node in the tree, obtained from this data source
      * @return the number of children of the node {@code parent}
      */
     @Override
@@ -332,8 +338,10 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     /**
      * Returns the index of child in parent.
      *
-     * @param parent a node in the tree, obtained from this data source
-     * @param child a child of parent, obtained from this data source
+     * @param parent
+     *        a node in the tree, obtained from this data source
+     * @param child
+     *        a child of parent, obtained from this data source
      * @return The index of child in parent
      *
      */
@@ -367,7 +375,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * <I>node</I> has no children. A directory in a filesystem, for example, may contain no files;
      * the node representing the directory is not a leaf, but it also has no children.
      *
-     * @param guiNode a node in the tree, obtained from this data source
+     * @param guiNode
+     *        a node in the tree, obtained from this data source
      * @return true if <I>node</I> is a leaf
      */
     @Override
@@ -380,8 +389,10 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * <I>newValue</I>. We throw an exception, as proofs are not meant to be changed via the JTree
      * editing facility.
      *
-     * @param path path to the node that the user has altered.
-     * @param newValue the new value from the TreeCellEditor.
+     * @param path
+     *        path to the node that the user has altered.
+     * @param newValue
+     *        the new value from the TreeCellEditor.
      */
     @Override
     public synchronized void valueForPathChanged(TreePath path, Object newValue) {
@@ -396,7 +407,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * cached Information away and fire an indiscriminating TreeStructureChanged event. This should
      * probably be made more efficient.
      *
-     * @param trn tree node to update.
+     * @param trn
+     *        tree node to update.
      */
     private synchronized void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree

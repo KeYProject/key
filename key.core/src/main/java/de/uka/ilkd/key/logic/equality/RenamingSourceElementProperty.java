@@ -5,11 +5,11 @@ package de.uka.ilkd.key.logic.equality;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -50,12 +50,16 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      * compare the abstract names of the source elements. If no {@link NameAbstractionTable} is
      * supplied, a new one will be created.
      *
-     * @param se1 the first element of the equality check
-     * @param se2 the second element of the equality check
-     * @param v can be a single {@link NameAbstractionTable} for this equality check
+     * @param se1
+     *        the first element of the equality check
+     * @param se2
+     *        the second element of the equality check
+     * @param v
+     *        can be a single {@link NameAbstractionTable} for this equality check
      * @return {@code true} iff {@code se2} is a source element syntactically equal to {@code se1}
      *         modulo renaming
-     * @param <V> is supposed to be {@link NameAbstractionTable} for this equality check
+     * @param <V>
+     *        is supposed to be {@link NameAbstractionTable} for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
@@ -154,8 +158,10 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     /**
      * Handles the standard case of comparing two {@link SyntaxElement}s modulo renaming.
      *
-     * @param se1 the first {@link SyntaxElement} to be compared
-     * @param se2 the second {@link SyntaxElement} to be compared
+     * @param se1
+     *        the first {@link SyntaxElement} to be compared
+     * @param se2
+     *        the second {@link SyntaxElement} to be compared
      * @return {@code true} iff the two source elements are equal under the standard {@code equals}
      *         method
      */
@@ -173,8 +179,10 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      * Handles the special case of comparing a {@link JavaNonTerminalProgramElement} to a
      * {@link SyntaxElement}.
      *
-     * @param jnte the {@link JavaNonTerminalProgramElement} to be compared
-     * @param se the {@link SyntaxElement} to be compared
+     * @param jnte
+     *        the {@link JavaNonTerminalProgramElement} to be compared
+     * @param se
+     *        the {@link SyntaxElement} to be compared
      * @return {@code true} iff {@code se} is of the same class and has the same number of children
      *         as {@code jnte}
      */
@@ -199,9 +207,12 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
     /**
      * Handles the special case of comparing a {@link LabeledStatement} to a {@link SyntaxElement}.
      *
-     * @param ls the {@link LabeledStatement} to be compared
-     * @param se the {@link SyntaxElement} to be compared
-     * @param nat the {@link NameAbstractionTable} the label of {@code ls} should be added to
+     * @param ls
+     *        the {@link LabeledStatement} to be compared
+     * @param se
+     *        the {@link SyntaxElement} to be compared
+     * @param nat
+     *        the {@link NameAbstractionTable} the label of {@code ls} should be added to
      * @return {@code true} iff {@code se} is also a {@link LabeledStatement} and has the same
      *         number of children as {@code ls}
      */
@@ -229,9 +240,12 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      * Handles the special case of comparing a {@link VariableSpecification} to a
      * {@link SyntaxElement}.
      *
-     * @param vs the {@link VariableSpecification} to be compared
-     * @param se the {@link SyntaxElement} to be compared
-     * @param nat the {@link NameAbstractionTable} the variable of {@code vs} should be added to
+     * @param vs
+     *        the {@link VariableSpecification} to be compared
+     * @param se
+     *        the {@link SyntaxElement} to be compared
+     * @param nat
+     *        the {@link NameAbstractionTable} the variable of {@code vs} should be added to
      * @return {@code true} iff {@code se} is of the same class as {@code vs} and has the same
      *         number of children, dimensions and type
      */
@@ -272,10 +286,13 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      * Handles the special case of comparing a {@link ProgramVariable} or a
      * {@link ProgramElementName} to a {@link SyntaxElement}.
      *
-     * @param se1 the first {@link SyntaxElement} which is either a {@link ProgramVariable} or a
+     * @param se1
+     *        the first {@link SyntaxElement} which is either a {@link ProgramVariable} or a
      *        {@link ProgramElementName}
-     * @param se2 the second {@link SyntaxElement} to be compared
-     * @param nat the {@link NameAbstractionTable} that should be used to check whether {@code se1}
+     * @param se2
+     *        the second {@link SyntaxElement} to be compared
+     * @param nat
+     *        the {@link NameAbstractionTable} that should be used to check whether {@code se1}
      *        and {@code se2} have the same abstract name
      * @return {@code true} iff {@code se1} and {@code se2} have the same abstract name
      */
@@ -316,7 +333,8 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
         /**
          * Adds a {@link SourceElement} to the map.
          *
-         * @param element the {@link SourceElement} to be added
+         * @param element
+         *        the {@link SourceElement} to be added
          */
         public void add(SourceElement element) {
             map.put(element, map.size());
@@ -329,7 +347,8 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          * A common case for a look-up of an element that is not in the map, is a built-in datatype,
          * e.g., the {@link ProgramElementName} {@code int}.
          *
-         * @param element the {@link SourceElement} whose abstract name should be returned
+         * @param element
+         *        the {@link SourceElement} whose abstract name should be returned
          * @return the abstract name of the {@link SourceElement} or {@code -1} if the element is
          *         not in the map
          */

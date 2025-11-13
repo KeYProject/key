@@ -8,15 +8,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -30,9 +34,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
     public static final Logger LOGGER = LoggerFactory.getLogger(TypeConverter.class);
@@ -226,7 +230,7 @@ public final class TypeConverter {
         while (!exact && !context.getSort().extendsTrans(s)
                 || exact && !context.getSort().equals(s)) {
             inst = (LocationVariable) services.getJavaInfo()
-                    .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
+                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, context);
             final Function fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
@@ -339,9 +343,6 @@ public final class TypeConverter {
             return convertToInstanceofTerm((Instanceof) pe, ec);
         } else if (pe instanceof Operator) {
             return translateOperator((Operator) pe, ec);
-        } else if (pe instanceof recoder.abstraction.PrimitiveType) {
-            throw new IllegalArgumentException(
-                "TypeConverter could not handle" + " this primitive type");
         } else {
             assert !(pe instanceof MetaClassReference) : "not supported";
         }
@@ -757,15 +758,17 @@ public final class TypeConverter {
         }
 
         ConstantExpressionEvaluator cee = services.getConstantExpressionEvaluator();
-
-        ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
-
-        if (!cee.isCompileTimeConstant(expr, res)
-                || res.getTypeCode() != ConstantEvaluator.INT_TYPE) {
-            return false;
+        try {
+            var e = cee.evaluate(expr.toString());
+            if (e instanceof IntegerLiteralExpr) {
+                int value = ((IntegerLiteralExpr) e).asNumber().intValue();
+                return (minValue <= value) && (value <= maxValue);
+            } else {
+                return false;
+            }
+        } catch (EvaluationException e) {
+            throw new RuntimeException(e);
         }
-        int value = res.getInt();
-        return (minValue <= value) && (value <= maxValue);
     }
 
 

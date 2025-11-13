@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
@@ -41,7 +41,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
      */
     protected static final URL REDUX_URL =
-        KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
+        KeYResourceManager.getManager().getResourceFile(JavaService.class, "JavaRedux/");
 
     /**
      * This matcher matches *.java files.
@@ -326,7 +326,7 @@ public abstract class AbstractFileRepo implements FileRepo {
                     .filter(l -> !l.matches(".*\\\\classpath \".*\";.*"))
                     .map(l -> l.replaceAll("\\\\javaSource \".*\";", "\\\\javaSource \"src\";"))
                     .map(l -> l.replaceAll("\\\\bootclasspath \".*\";",
-                        "\\\\bootclasspath \"bootclasspath\";"))
+                        ""))
                     .collect(Collectors.joining(System.lineSeparator()));
 
             // add classpath (has to be prior to javaSource)
@@ -465,8 +465,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
-    }
+    public void proofDisposing(ProofDisposedEvent e) {}
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {

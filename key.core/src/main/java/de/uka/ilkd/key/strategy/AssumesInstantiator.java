@@ -89,7 +89,8 @@ public class AssumesInstantiator {
     }
 
     /**
-     * @param p_all if true then return all formulas of the particular semisequent, otherwise only
+     * @param p_all
+     *        if true then return all formulas of the particular semisequent, otherwise only
      *        the formulas returned by <code>selectNewFormulas</code>
      * @return a list of potential if-formula instantiations (analogously to
      *         <code>IfFormulaInstSeq.createList</code>)
@@ -194,11 +195,15 @@ public class AssumesInstantiator {
     /**
      * Recursive function for matching the remaining tail of an if sequent
      *
-     * @param p_ifSeqTail tail of the current semisequent as list
-     * @param p_ifSeqTail2nd the following semisequent (i.e. antecedent) or null
-     * @param p_matchCond match conditions until now, i.e. after matching the first formulas of the
+     * @param p_ifSeqTail
+     *        tail of the current semisequent as list
+     * @param p_ifSeqTail2nd
+     *        the following semisequent (i.e. antecedent) or null
+     * @param p_matchCond
+     *        match conditions until now, i.e. after matching the first formulas of the
      *        assumes-sequent
-     * @param p_alreadyMatchedNewFor at least one new formula has already been matched, i.e. a
+     * @param p_alreadyMatchedNewFor
+     *        at least one new formula has already been matched, i.e. a
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(

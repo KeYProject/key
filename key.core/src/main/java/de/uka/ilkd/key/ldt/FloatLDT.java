@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 
@@ -133,29 +133,19 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        if (op instanceof GreaterThan) {
-            return getGreaterThan();
-        } else if (op instanceof LessThan) {
-            return getLessThan();
-        } else if (op instanceof GreaterOrEquals) {
-            return getGreaterOrEquals();
-        } else if (op instanceof LessOrEquals) {
-            return getLessOrEquals();
-        } else if (op instanceof Negative) {
-            return getJavaUnaryMinus();
-        } else if (op instanceof Plus) {
-            return getJavaAdd();
-        } else if (op instanceof Minus) {
-            return getJavaSub();
-        } else if (op instanceof Times) {
-            return getJavaMul();
-        } else if (op instanceof Divide) {
-            return getJavaDiv();
-        } else if (op instanceof Modulo) {
-            return getJavaMod();
-        } else {
-            return null;
-        }
+        return switch (op) {
+            case GreaterThan ignored -> getGreaterThan();
+            case LessThan ignored -> getLessThan();
+            case GreaterOrEquals ignored -> getGreaterOrEquals();
+            case LessOrEquals ignored -> getLessOrEquals();
+            case Negative ignored -> getJavaUnaryMinus();
+            case Plus ignored -> getJavaAdd();
+            case Minus ignored -> getJavaSub();
+            case Times ignored -> getJavaMul();
+            case Divide ignored -> getJavaDiv();
+            case Modulo ignored -> getJavaMod();
+            default -> null;
+        };
     }
 
     @Override

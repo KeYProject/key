@@ -31,7 +31,8 @@ public class LocationVariableTracker implements RuleAppListener {
     /**
      * Register a new tracker on the provided proof.
      *
-     * @param proof proof to track
+     * @param proof
+     *        proof to track
      */
     public static void handleProofLoad(Proof proof) {
         if (proof.lookup(LocationVariableTracker.class) != null) {
@@ -43,7 +44,8 @@ public class LocationVariableTracker implements RuleAppListener {
     }
 
     /**
-     * @param locationVariable some location variable
+     * @param locationVariable
+     *        some location variable
      * @return the rule app that created it, or null
      */
     public RuleApp getCreatedBy(LocationVariable locationVariable) {

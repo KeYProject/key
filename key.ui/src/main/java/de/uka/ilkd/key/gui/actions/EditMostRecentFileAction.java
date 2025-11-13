@@ -90,8 +90,10 @@ public final class EditMostRecentFileAction extends MainWindowAction
         /**
          * Opens the given file in the default editor or opens the given directory.
          *
-         * @param file The file to edit or the folder to open.
-         * @throws IOException Occurred Exception.
+         * @param file
+         *        The file to edit or the folder to open.
+         * @throws IOException
+         *         Occurred Exception.
          */
         public void workWithFile(File file) throws IOException {
             // WP: see #854: this uses the file registered for "Edit" action in Windows,
@@ -118,7 +120,8 @@ public final class EditMostRecentFileAction extends MainWindowAction
         /**
          * Sets the default instance.
          *
-         * @param instance The default instance to set.
+         * @param instance
+         *        The default instance to set.
          */
         public static void setInstance(EditFileActionHandler instance) {
             EditFileActionHandler.instance = instance;

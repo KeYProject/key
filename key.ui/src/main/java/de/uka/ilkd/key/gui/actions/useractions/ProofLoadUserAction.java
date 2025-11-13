@@ -20,8 +20,10 @@ public class ProofLoadUserAction extends UserAction {
     /**
      * Construct a new user action of this kind.
      *
-     * @param mediator mediator
-     * @param proofLoaded the proof just loaded
+     * @param mediator
+     *        mediator
+     * @param proofLoaded
+     *        the proof just loaded
      */
     public ProofLoadUserAction(KeYMediator mediator, Proof proofLoaded) {
         super(mediator, proofLoaded);
@@ -34,8 +36,7 @@ public class ProofLoadUserAction extends UserAction {
     }
 
     @Override
-    protected void apply() {
-    }
+    protected void apply() {}
 
     @Override
     public void undo() {

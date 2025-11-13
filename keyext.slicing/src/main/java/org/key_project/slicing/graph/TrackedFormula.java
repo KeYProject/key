@@ -44,10 +44,14 @@ public class TrackedFormula extends GraphNode {
     /**
      * Construct a new tracked formula.
      *
-     * @param formula sequent formula
-     * @param branchLocation location where formula was derived
-     * @param inAntec polarity of the sequent formula
-     * @param services services
+     * @param formula
+     *        sequent formula
+     * @param branchLocation
+     *        location where formula was derived
+     * @param inAntec
+     *        polarity of the sequent formula
+     * @param services
+     *        services
      */
     public TrackedFormula(
             SequentFormula formula,

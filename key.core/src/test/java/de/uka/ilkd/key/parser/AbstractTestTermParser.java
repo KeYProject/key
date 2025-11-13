@@ -6,7 +6,6 @@ package de.uka.ilkd.key.parser;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -32,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AbstractTestTermParser {
 
+    private static Services SERVICES = null;
+
     protected final TermFactory tf;
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
@@ -43,6 +44,7 @@ public class AbstractTestTermParser {
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
+        // services.activateJava(null);
         io = new KeyIO(services, nss);
     }
 
@@ -66,7 +68,8 @@ public class AbstractTestTermParser {
 
     public JTerm parseProblem(String s) {
         try {
-            new Recoder2KeY(TacletForTests.services(), nss).parseSpecialClasses();
+            TacletForTests.services().getJavaService()
+                    .parseSpecialClasses();
             KeyIO io = new KeyIO(TacletForTests.services(), nss);
             KeyIO.Loader loader = io.load(s);
             return loader.getProblem();
@@ -86,7 +89,8 @@ public class AbstractTestTermParser {
     /**
      * Convert a {@link JTerm} into a {@link String}.
      *
-     * @param t The {@link JTerm} that will be converted.
+     * @param t
+     *        The {@link JTerm} that will be converted.
      */
     protected String printTerm(JTerm t) {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
@@ -138,9 +142,12 @@ public class AbstractTestTermParser {
      * {@link String} and compared with the first argument. The first argument is expected to be in
      * pretty-syntax.
      *
-     * @param prettySyntax {@link JTerm} representation in pretty-syntax.
-     * @param verboseSyntax {@link JTerm} in verbose syntax.
-     * @param optionalStringRepresentations Optionally, additional String representations will be
+     * @param prettySyntax
+     *        {@link JTerm} representation in pretty-syntax.
+     * @param verboseSyntax
+     *        {@link JTerm} in verbose syntax.
+     * @param optionalStringRepresentations
+     *        Optionally, additional String representations will be
      *        tested for correct parsing.
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax,
@@ -154,9 +161,12 @@ public class AbstractTestTermParser {
      * Takes a {@link String} and a {@link JTerm} and checks whether they can be transformed into
      * each other by the operations parsing and printing.
      *
-     * @param prettySyntax Expected result after pretty-printing {@code expectedParseResult}.
-     * @param expectedParseResult Expected result after parsing {@code expectedPrettySyntax}.
-     * @param optionalStringRepresentations Optionally, additional String representations will be
+     * @param prettySyntax
+     *        Expected result after pretty-printing {@code expectedParseResult}.
+     * @param expectedParseResult
+     *        Expected result after parsing {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations
+     *        Optionally, additional String representations will be
      *        tested for correct parsing.
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,

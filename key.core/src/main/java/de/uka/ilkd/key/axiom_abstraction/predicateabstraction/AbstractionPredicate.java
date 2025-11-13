@@ -62,7 +62,8 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * {@link #create(JTerm, LocationVariable, Services)} or
      * {@link #create(Sort, Function, Services)}}.
      *
-     * @param argSort The expected sort for the arguments of the predicate.
+     * @param argSort
+     *        The expected sort for the arguments of the predicate.
      */
     private AbstractionPredicate(Sort argSort) {
         this.argSort = argSort;
@@ -84,10 +85,13 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * This method has been created for testing purposes; you should rather user
      * {@link #create(JTerm, LocationVariable, Services)} instead.
      *
-     * @param argSort The expected sort for the arguments of the predicate.
-     * @param mapping The mapping from input terms of the adequate type to formulae, e.g. "(Term
+     * @param argSort
+     *        The expected sort for the arguments of the predicate.
+     * @param mapping
+     *        The mapping from input terms of the adequate type to formulae, e.g. "(Term
      *        input) -> (tb.gt(input, tb.zero()))" where tb is a {@link TermBuilder}.
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return An abstraction predicate encapsulating the given mapping.
      */
     public static AbstractionPredicate create(final Sort argSort,
@@ -104,9 +108,12 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * contain the given placeholder variable, which is substituted by the argument supplied to the
      * generated mapping.
      *
-     * @param predicate The predicate formula containing the placeholder.
-     * @param placeholder The placeholder to replace in the generated mapping.
-     * @param services The services object.
+     * @param predicate
+     *        The predicate formula containing the placeholder.
+     * @param placeholder
+     *        The placeholder to replace in the generated mapping.
+     * @param services
+     *        The services object.
      * @return An abstraction predicate mapping terms to the predicate with the placeholder
      *         substituted by the respective term.
      */
@@ -178,7 +185,8 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * Returns a parseable String representation of this abstraction predicate of the form
      * "('[[TYPE]] [[PLACEHOLDER]]', '[[PREDICATE]]')".
      *
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return A parseable String representation of this predicate.
      */
     public String toParseableString(final Services services) {
@@ -199,12 +207,17 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
     /**
      * Parses the String representation of an abstraction predicates.
      *
-     * @param s {@link String} to parse.
-     * @param services The {@link Services} object.
-     * @param localNamespaces The local {@link NamespaceSet}.
+     * @param s
+     *        {@link String} to parse.
+     * @param services
+     *        The {@link Services} object.
+     * @param localNamespaces
+     *        The local {@link NamespaceSet}.
      * @return The parsed {@link String}.
-     * @throws ParserException If there is a syntax error.
-     * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
+     * @throws ParserException
+     *         If there is a syntax error.
+     * @throws NameAlreadyBoundException
+     *         If the given placeholder is already known to the system.
      */
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {

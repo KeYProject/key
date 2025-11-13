@@ -60,7 +60,8 @@ public class TaskTree extends JPanel {
          * listen to changes in the delegateView {@link JTree} selections and initiate switch
          * between proofs if necessary
          *
-         * @param e the event that characterizes the change.
+         * @param e
+         *        the event that characterizes the change.
          */
         @Override
         public void valueChanged(TreeSelectionEvent e) {
@@ -208,7 +209,8 @@ public class TaskTree extends JPanel {
      * removed the auto mode is no longer available.
      * </p>
      *
-     * @param proof The {@link Proof} to check.
+     * @param proof
+     *        The {@link Proof} to check.
      * @return {@code true} proof is available in model, {@code false} proof is not available in
      *         model.
      */
@@ -235,7 +237,8 @@ public class TaskTree extends JPanel {
     /**
      * Removes the given proof from the model.
      *
-     * @param proof The proof to remove.
+     * @param proof
+     *        The proof to remove.
      */
     public synchronized void removeProof(Proof proof) {
         if (proof != null) {
@@ -294,7 +297,8 @@ public class TaskTree extends JPanel {
          * released, and clicked event. For example, on Windows the e.isPopupTrigger() information
          * is only available in the released event.
          *
-         * @param e the mouse event that may create the popup
+         * @param e
+         *        the mouse event that may create the popup
          */
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
@@ -351,8 +355,7 @@ public class TaskTree extends JPanel {
         private static final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
 
 
-        private TaskTreeIconCellRenderer() {
-        }
+        private TaskTreeIconCellRenderer() {}
 
         @Override
         public Component getTreeCellRendererComponent(JTree list, Object value, boolean selected,
