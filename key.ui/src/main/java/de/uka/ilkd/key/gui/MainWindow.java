@@ -394,8 +394,11 @@ public final class MainWindow extends JFrame {
     public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
             LOGGER.error(
-                "Error: KeY started in graphical mode, " + "but no graphical environment present.");
-            LOGGER.error("Please use the --auto option to start KeY in batch mode.");
+                "Error: KeY started in graphical mode, but no graphical environment present or supported.");
+            LOGGER.error(
+                "If this is unexpected, ensure that you are not using a headless version of Java " +
+                    "(or force windowed mode with java parameter -Djava.awt.headless=false).");
+            LOGGER.error("Otherwise, please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
         }
