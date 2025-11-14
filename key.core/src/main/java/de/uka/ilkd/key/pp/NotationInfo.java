@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -420,7 +421,8 @@ public final class NotationInfo {
         } else {
             this.notationTable = createDefaultNotation();
         }
-        hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+        ProofIndependentSettings pis = ProofIndependentSettings.DEFAULT_INSTANCE;
+        hidePackagePrefix = pis.getViewSettings().isHidePackagePrefix();
 
         if (services != null && services.getProof() != null) {
             ProofSettings settings = services.getProof().getSettings();
