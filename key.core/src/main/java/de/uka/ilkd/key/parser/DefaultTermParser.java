@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
@@ -21,6 +23,7 @@ import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -43,12 +46,14 @@ public final class DefaultTermParser {
      *         correctly or the term has an invalid sort.
      */
     public JTerm parse(Reader in, Sort sort, Services services,
-            Namespace<QuantifiableVariable> var_ns,
-            Namespace<Function> func_ns,
-            Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
+            Namespace<@NonNull QuantifiableVariable> var_ns,
+            Namespace<@NonNull Function> func_ns,
+            Namespace<@NonNull Sort> sort_ns, Namespace<@NonNull ParametricSortDecl> paraSort_ns,
+            Namespace<@NonNull ParametricFunctionDecl> paraFunc_ns,
+            Namespace<@NonNull IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
         return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
-            new Namespace<>(), new Namespace<>(), progVar_ns), scm);
+            new Namespace<>(), paraSort_ns, paraFunc_ns, new Namespace<>(), progVar_ns), scm);
     }
 
 

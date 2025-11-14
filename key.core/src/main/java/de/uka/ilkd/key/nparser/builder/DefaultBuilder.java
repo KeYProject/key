@@ -18,8 +18,7 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.*;
@@ -30,9 +29,12 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
@@ -141,10 +143,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * @param varfuncName the String with the symbols name
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-            Sort sort) {
+            Sort sort, KeYParser.Formal_sort_argsContext genericArgsCtxt) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            { (JOperatorSV) schemaVariables().lookup(name), variables().lookup(name),
+            { schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
@@ -161,7 +163,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Name fqName =
                 new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                new Operator[] { (JOperatorSV) schemaVariables().lookup(fqName),
+                new Operator[] { schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
                     functions().lookup(fqName),
@@ -183,6 +185,15 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                     return v;
                 }
             }
+        }
+        if (genericArgsCtxt != null) {
+            var d = nss.parametricFunctions().lookup(name);
+            if (d == null) {
+                semanticError(ctx, "Could not find parametric function: %s", name);
+                return null;
+            }
+            var args = getGenericArgs(genericArgsCtxt, d.getParameters());
+            return ParametricFunctionInstance.get(d, args, services);
         }
         semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
         return null;
@@ -323,6 +334,16 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Sort visitSortId(KeYParser.SortIdContext ctx) {
         String primitiveName = ctx.id.getText();
+        if (ctx.formal_sort_args() != null) {
+            // parametric sorts should be instantiated
+            ParametricSortDecl sortDecl = nss.parametricSorts().lookup(primitiveName);
+            if (sortDecl == null) {
+                semanticError(ctx, "Could not find polymorphic sort: %s", primitiveName);
+            }
+            ImmutableList<GenericArgument> params =
+                getGenericArgs(ctx.formal_sort_args(), sortDecl.getParameters());
+            return ParametricSortInstance.get(sortDecl, params, services);
+        }
         // Special handling for byte, char, short, long:
         // these are *not* sorts, but they are nevertheless valid
         // prefixes for array sorts such as byte[], char[][][].
@@ -358,6 +379,21 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
         }
         return s;
+    }
+
+    private ImmutableList<GenericArgument> getGenericArgs(KeYParser.Formal_sort_argsContext ctx,
+            ImmutableList<GenericParameter> params) {
+        if (ctx.sortId().size() != params.size()) {
+            semanticError(ctx, "Expected %d sort arguments, got only %d",
+                params.size(), ctx.sortId().size());
+        }
+        ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+        for (int i = params.size() - 1; i >= 0; i--) {
+            var arg = ctx.sortId(i);
+            var sort = visitSortId(arg);
+            args = args.prepend(new GenericArgument(sort));
+        }
+        return args;
     }
 
     @Override
@@ -407,5 +443,35 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
         return ctx.getText();
+    }
+
+    @Override
+    public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
+            KeYParser.Formal_sort_param_declsContext ctx) {
+        return mapOf(ctx.formal_sort_param_decl());
+    }
+
+    @Override
+    public @Nullable GenericParameter visitFormal_sort_param_decl(
+            KeYParser.Formal_sort_param_declContext ctx) {
+
+        GenericParameter.Variance variance;
+        if (ctx.PLUS() != null) {
+            variance = GenericParameter.Variance.COVARIANT;
+        } else if (ctx.MINUS() != null) {
+            variance = GenericParameter.Variance.CONTRAVARIANT;
+        } else {
+            variance = GenericParameter.Variance.INVARIANT;
+        }
+
+        var name = ctx.simple_ident().getText();
+        Sort paramSort = sorts().lookup(name);
+        if (paramSort == null) {
+            semanticError(ctx, "Parameter sort %s not found", name);
+        }
+        if (!(paramSort instanceof GenericSort)) {
+            semanticError(ctx, "Parameter sort %s is not a generic sort", name);
+        }
+        return new GenericParameter((GenericSort) paramSort, variance);
     }
 }
