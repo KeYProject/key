@@ -1,0 +1,6 @@
+key: |  
+  \problem { ==> 1 + 0 = 1 & 2 + 0 = 2 & 3 + 0 = 3 }
+script: |
+  rule add_zero_right on:(?find(2));
+goals:
+  - ==> 1 + 0 = 1 & 2 = 2 & 3 + 0 = 3

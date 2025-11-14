@@ -7,6 +7,7 @@ parser grammar KeYParser;
 @members {
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+public boolean allowMatchId = false; // used in proof script parsing
 }
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
@@ -147,6 +148,7 @@ string_value: STRING_LITERAL;
 simple_ident
 :
     id=IDENT
+  | {allowMatchId}? id=MATCH_IDENT
 ;
 
 simple_ident_comma_list
@@ -873,7 +875,7 @@ proofScriptExpression:
   | integer
   | floatnum
   | string_literal
-  | LPAREN (term | seq) RPAREN
+  | LPAREN {allowMatchId=true;} (term | seq) {allowMatchId=false;} RPAREN
   | simple_ident
   | abbreviation
   | literals

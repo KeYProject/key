@@ -9,6 +9,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -41,6 +42,14 @@ public interface ImmutableSet<T extends @Nullable Object>
 
     static <T extends @Nullable Object> ImmutableSet<T> empty() {
         return DefaultImmutableSet.nil();
+    }
+
+    static <T> ImmutableSet<T> from(Iterable<T> ts) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+        for (T t : ts) {
+            result = result.add(t);
+        }
+        return result;
     }
 
     /**
