@@ -10,6 +10,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -21,6 +22,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -52,12 +54,8 @@ import de.uka.ilkd.key.gui.settings.FontSizeFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -102,7 +100,7 @@ public final class MainWindow extends JFrame {
      * Tooltip for auto mode button.
      */
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
-    private static final long serialVersionUID = 5853419918923902636L;
+
     private static final String PARA =
         "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
@@ -317,11 +315,12 @@ public final class MainWindow extends JFrame {
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
-        proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
         mainFrame = new MainFrame(this, emptySequent);
         sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
+        proofListView = new JScrollPane(proofList);
+
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
 
@@ -448,10 +447,6 @@ public final class MainWindow extends JFrame {
         for (Window w : Window.getWindows()) {
             SwingUtilities.updateComponentTreeUI(w);
         }
-
-        if (instance != null) {
-            // SwingUtilities.updateComponentTreeUI(instance);
-        }
     }
 
     /**
@@ -484,36 +479,12 @@ public final class MainWindow extends JFrame {
      */
     private void applyGnomeWorkaround() {
         Toolkit xToolkit = Toolkit.getDefaultToolkit();
-        java.lang.reflect.Field awtAppClassNameField;
+        Field awtAppClassNameField;
         try {
             awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
             awtAppClassNameField.setAccessible(true);
             awtAppClassNameField.set(xToolkit, "KeY");
-        } catch (Exception e) {
-        }
-    }
-
-    /**
-     * Tries to set the configured look and feel if the option is activated.
-     */
-    private void setLaF() {
-        try {
-            String className =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
-            // only set look and feel if configured
-            // (previous KeY versions stored [no value set] as "null")
-            if (className != null && !className.equals("null")) {
-                UIManager.setLookAndFeel(className);
-
-                // Workarounds for GTK+
-                // TODO: check whether they apply to other LaFs
-                UIManager.put("Slider.paintValue", Boolean.FALSE);
-                UIManager.put("Menu.background", Color.GRAY); // menu background is still white....
-
-                SwingUtilities.updateComponentTreeUI(this);
-            }
-        } catch (Exception e) {
-            LOGGER.error("failed to set look and feel ", e);
+        } catch (Exception ignored) {
         }
     }
 
@@ -615,29 +586,10 @@ public final class MainWindow extends JFrame {
 
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
-        proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
-        GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
+        proofListView.setPreferredSize(new Dimension(350, 100));
+        proofListView.setBorder(new TitledBorder("Proofs"));
 
-        // JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView,
-        // mainWindowTabbedPane);
-        // leftPane.setName("leftPane");
-        // leftPane.setOneTouchExpandable(true);
-
-        // JPanel rightPane = new JPanel();
-        // rightPane.setLayout(new BorderLayout());
-        // rightPane.add(mainFrame, BorderLayout.CENTER);
         mainFrame.add(sequentViewSearchBar, BorderLayout.SOUTH);
-
-        // JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
-        // pane.setResizeWeight(0.5);
-        // pane.setOneTouchExpandable(true);
-        // pane.setName("split2");
-
-        // JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
-        // splitPane.setResizeWeight(0); // the right pane is more important
-        // splitPane.setOneTouchExpandable(true);
-        // splitPane.setName("splitPane");
-        // getContentPane().add(splitPane, BorderLayout.CENTER);
 
         dockControl.putProperty(StackDockStation.TAB_PLACEMENT, TabPlacement.TOP_OF_DOCKABLE);
 
@@ -888,7 +840,7 @@ public final class MainWindow extends JFrame {
         SwingUtilities.invokeLater(this::updateSequentView);
     }
 
-    private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    private void addToProofList(ProofAggregate plist) {
         proofList.addProof(plist);
         // TODO/Check: the code below emulates phantom actions. Check if this can be solved
         // differently
@@ -899,9 +851,6 @@ public final class MainWindow extends JFrame {
         for (Proof proof : plist.getProofs()) {
             new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
         }
-        // GUI
-        proofList.setSize(proofList.getPreferredSize());
-        proofListView.setViewportView(proofList);
     }
 
     /**
@@ -1225,7 +1174,7 @@ public final class MainWindow extends JFrame {
         return currentGoalView;
     }
 
-    public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public void addProblem(final ProofAggregate plist) {
         Runnable guiUpdater = () -> {
             disableCurrentGoalView = true;
             addToProofList(plist);
