@@ -16,81 +16,81 @@ public class JavacSettings extends AbstractPropertiesSettings {
     public static final String CATEGORY = "Type Checking";
 
     /**
-     * Config key for {@link #checkers}.
+     * Config key for {@link #useProcessors}.
      */
-    private static final String KEY_USE_CHECKERS = "useCheckers";
+    private static final String KEY_USE_PROCESSORS = "useProcessors";
 
     /**
-     * Config key for {@link #checkers}.
+     * Config key for {@link #processors}.
      */
-    private static final String KEY_CHECKERS = "checkers";
+    private static final String KEY_PROCESSORS = "processors";
 
     /**
-     * Config key for {@link #checkerPaths}.
+     * Config key for {@link #classPaths}.
      */
-    private static final String KEY_CHECKER_PATHS = "checkerPaths";
+    private static final String KEY_CLASS_PATHS = "classPaths";
 
     /**
-     * The type checkers (processors) to be run.
+     * The type annotation processors to be run.
      */
-    private final PropertyEntry<Boolean> useCheckers = 
-        createBooleanProperty(KEY_USE_CHECKERS, false);
+    private final PropertyEntry<Boolean> useProcessors = 
+        createBooleanProperty(KEY_USE_PROCESSORS, false);
 
     /**
-     * The type checkers (processors) to be run.
+     * The type annotation processors to be run.
      */
-    private final PropertyEntry<String> checkers = 
-        createStringProperty(KEY_CHECKERS, "");
+    private final PropertyEntry<String> processors = 
+        createStringProperty(KEY_PROCESSORS, "");
 
     /**
-     * The paths needed for the checkers (processors).
+     * Additional class paths, needed for example by annotation processors
      */
-    private final PropertyEntry<String> checkerPaths = 
-        createStringProperty(KEY_CHECKER_PATHS, "");
+    private final PropertyEntry<String> classPaths = 
+        createStringProperty(KEY_CLASS_PATHS, "");
 
     public JavacSettings() {
         super(CATEGORY);
     }
 
     /**
-     * @param useCheckers if the type checkers should be used
+     * @param useProcessors if the annotation processors should be run
      */
-    public void setUseCheckers(boolean useCheckers) {
-        this.useCheckers.set(useCheckers);
+    public void setUseProcessors(boolean useProcessors) {
+        this.useProcessors.set(useProcessors);
     }
 
     /**
-     * @param checkers the type checkers to use
+     * @param processor the annotation processors to run
      */
-    public void setCheckers(String checkers) {
-        this.checkers.set(checkers);
+    public void setProcessors(String processor) {
+        this.processors.set(processor);
     }
 
     /**
-     * @param paths the paths on which the type checkers are
+     * @param paths the additional class paths
      */
-    public void setCheckerPaths(String paths) {
-        this.checkerPaths.set(paths);
+    public void setClassPaths(String paths) {
+        this.classPaths.set(paths);
     }
 
     /**
-     * @return true iff the checkers should be used
+     * @return true iff the annotation processors should be used
      */
-    public boolean getUseCheckers() {
-        return useCheckers.get();
+    public boolean getUseProcessors() {
+        return useProcessors.get();
     }
 
     /**
-     * @return all the checkers in a comma separated string
+     * @return the annotation processors separated by newlines
      */
-    public String getCheckers() {
-        return checkers.get();
+    public String getProcessors() {
+        return processors.get();
     }
 
     /**
-     * @return all checker paths spearated by a colon
+     * @return the additional class paths separated by newlines
      */
-    public String getCheckerPaths() {
-        return checkerPaths.get();
+    public String getClassPaths() {
+        return classPaths.get();
     }
 }

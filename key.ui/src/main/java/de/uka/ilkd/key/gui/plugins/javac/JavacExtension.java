@@ -153,14 +153,14 @@ public class JavacExtension
             List<File> classpath = jm.getClassPathEntries();
             JavacSettings settings = JavacSettingsProvider.getJavacSettings();
 
-            List<String> checkers = null;
-            if (settings.getUseCheckers()) {
+            List<String> processors = null;
+            if (settings.getUseProcessors()) {
                 if (classpath == null) classpath = new ArrayList<>();
 
-                classpath.addAll(Arrays.asList(settings.getCheckerPaths().split(System.lineSeparator()))
+                classpath.addAll(Arrays.asList(settings.getClassPaths().split(System.lineSeparator()))
                     .stream().map(p -> new File(p)).toList());
 
-                checkers = Arrays.asList(settings.getCheckers().split(System.lineSeparator()));
+                processors = Arrays.asList(settings.getProcessors().split(System.lineSeparator()));
             }
 
             File javaPath = new File(jm.getModelDir());
@@ -170,7 +170,7 @@ public class JavacExtension
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, checkers);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, processors);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");
