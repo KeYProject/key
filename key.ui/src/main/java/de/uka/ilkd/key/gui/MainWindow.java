@@ -306,7 +306,9 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
-        KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+        KeYGuiExtensionFacade.getStartupExtensions()
+                .stream().filter(Objects::nonNull)
+                .forEach(it -> it.preInit(this, mediator));
 
         Config.DEFAULT.setDefaultFonts();
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();

@@ -42,6 +42,8 @@ dependencies {
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")
     runtimeOnly project(":keyext.isabelletranslation")
+
+    runtimeOnly project(":keyext.llm")
 }
 
 tasks.register('createExamplesZip', Zip) {
