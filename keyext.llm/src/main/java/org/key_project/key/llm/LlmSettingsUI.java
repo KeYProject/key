@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
 
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
-
 import javax.swing.*;
+
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 /**
  *
@@ -19,12 +22,13 @@ public class LlmSettingsUI extends SettingsPanel {
     public LlmSettingsUI(LlmSettings settings) {
         model = new LlmSettings(settings);
 
-        txtApiBaseUrl = addTextField("API Base URL", model.getApiEndpoint(), "", model::setApiEndpoint);
+        txtApiBaseUrl =
+            addTextField("API Base URL", model.getApiEndpoint(), "", model::setApiEndpoint);
         txtAuthToken = addTextField("Auth Token", model.getAuthToken(), "", model::setAuthToken);
         cboDefaultModel = addComboBox("Default model", "Select the default model",
-                0,
-                model::setDefaultModel,
-                model.getAvailableModels().toArray(new String[0]));
+            0,
+            model::setDefaultModel,
+            model.getAvailableModels().toArray(new String[0]));
 
         model.addPropertyChangeListener("availableModels", evt -> {
             var seq = model.getAvailableModels().toArray(new String[0]);
@@ -34,7 +38,7 @@ public class LlmSettingsUI extends SettingsPanel {
         });
 
         selAvailableModels = addListBox("Available Models", "",
-                model::setAvailableModels, model.getAvailableModels(), s -> s);
+            model::setAvailableModels, model.getAvailableModels(), s -> s);
     }
 
     public LlmSettings getModel() {
