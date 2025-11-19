@@ -28,7 +28,7 @@ import java.util.List;
 public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
     private KeyAction actionStartLlmPromptForCurrentProof;
-    private TabPanel uiPrompt = new LlmPrompt();
+    private TabPanel uiPrompt;
 
     @Override
     public @NonNull List<Action> getContextActions(
@@ -54,6 +54,7 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
 
     @Override
     public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
+        uiPrompt = new LlmPrompt(window,mediator);
         return List.of(uiPrompt);
     }
 
