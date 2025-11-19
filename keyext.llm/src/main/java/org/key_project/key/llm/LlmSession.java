@@ -6,6 +6,7 @@ package org.key_project.key.llm;
  * @version 1 (11/18/25)
  */
 public class LlmSession {
+    private String model = "azure.gpt-4.1-mini";
     private String apiEndpoint;
     private String authToken;
 
@@ -28,5 +29,13 @@ public class LlmSession {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 }

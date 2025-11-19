@@ -51,11 +51,9 @@ public class LlmPrompt extends JPanel implements TabPanel {
                     var node = MainWindow.getInstance().getMediator().getSelectedNode();
 
                     LlmSession session = LlmUtils.getSession(proof);
-                    LlmClient client = new LlmClient(session);
-
                     var txt = txtInput.getText();
-                    addBox(txt);
-
+                    LlmClient client = new LlmClient(session, new LlmContext(), txt);
+                    addInput(txt);
                     txtInput.setText("");
 
                     var sw = new SwingWorker<Map<String, Object>, Void>() {
@@ -68,9 +66,9 @@ public class LlmPrompt extends JPanel implements TabPanel {
                         protected void done() {
                             try {
                                 handle(resultNow());
-                            } catch (Exception ex) {
-                                LOGGER.error(ex.getMessage(), ex);
-                                handle(ex);
+                            } catch (IllegalStateException ex) {
+                                LOGGER.error("Exceptional case", exceptionNow());
+                                handle(exceptionNow());
                             }
                         }
                     };
@@ -88,6 +86,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         public OutputBox(T userData) {
             this(userData, userData.toString());
+            output.add(menu);
         }
 
         public OutputBox(T userData, String text) {
