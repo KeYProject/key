@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
+
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -11,13 +19,9 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *
@@ -26,13 +30,15 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, description = "LLM support for KeY")
 public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.LeftPanel, KeYGuiExtension.MainMenu {
+        KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.LeftPanel,
+        KeYGuiExtension.MainMenu {
     private KeyAction actionStartLlmPromptForCurrentProof;
     private TabPanel uiPrompt = new LlmPrompt();
 
     @Override
     public @NonNull List<Action> getContextActions(
-            @NonNull KeYMediator mediator, @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
+            @NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
+            @NonNull Object underlyingObject) {
         return List.of();
     }
 
@@ -53,7 +59,8 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
     }
 
     @Override
-    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         return List.of(uiPrompt);
     }
 
