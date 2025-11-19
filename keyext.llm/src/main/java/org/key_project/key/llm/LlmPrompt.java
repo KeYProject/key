@@ -1,20 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
 
-import com.google.gson.GsonBuilder;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+
+import com.google.gson.GsonBuilder;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -38,24 +42,24 @@ public class LlmPrompt extends JPanel implements TabPanel {
         splitPane.add(new JScrollPane(txtInput));
 
         handle(new Exception("Test Exception"));
-        handle(new GsonBuilder().create().fromJson("{\"id\":\"chatcmpl-CdLvyHhYLoKFk3F28rE6JgNJVGZHU\",\"created\":1763495142,\"model\":\"gpt-4.1-mini-2025-04-14\",\"object\":\"chat.completion\",\"system_fingerprint\":\"fp_3dcd5944f5\",\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"content\":\"Die Rayleigh-Streuung beschreibt die Streuung von Licht an kleinen Teilchen, deren Größe viel kleiner ist als die Lichtwellenlänge. Dabei wird kurzwelliges Licht (blaues und violettes) stärker gestreut als langwelliges (rotes), was z.B. den blauen Himmel erklärt. Die Intensität der Streuung ist proportional zur vierten Potenz der Frequenz des Lichts.\",\"role\":\"assistant\",\"annotations\":[]},\"provider_specific_fields\":{\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"protected_material_text\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}}],\"usage\":{\"completion_tokens\":91,\"prompt_tokens\":36,\"total_tokens\":127,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}},\"prompt_filter_results\":[{\"prompt_index\":0,\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"jailbreak\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}]}",
-                Map.class));
+        handle(new GsonBuilder().create().fromJson(
+            "{\"id\":\"chatcmpl-CdLvyHhYLoKFk3F28rE6JgNJVGZHU\",\"created\":1763495142,\"model\":\"gpt-4.1-mini-2025-04-14\",\"object\":\"chat.completion\",\"system_fingerprint\":\"fp_3dcd5944f5\",\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"content\":\"Die Rayleigh-Streuung beschreibt die Streuung von Licht an kleinen Teilchen, deren Größe viel kleiner ist als die Lichtwellenlänge. Dabei wird kurzwelliges Licht (blaues und violettes) stärker gestreut als langwelliges (rotes), was z.B. den blauen Himmel erklärt. Die Intensität der Streuung ist proportional zur vierten Potenz der Frequenz des Lichts.\",\"role\":\"assistant\",\"annotations\":[]},\"provider_specific_fields\":{\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"protected_material_text\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}}],\"usage\":{\"completion_tokens\":91,\"prompt_tokens\":36,\"total_tokens\":127,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}},\"prompt_filter_results\":[{\"prompt_index\":0,\"content_filter_results\":{\"hate\":{\"filtered\":false,\"severity\":\"safe\"},\"jailbreak\":{\"filtered\":false,\"detected\":false},\"self_harm\":{\"filtered\":false,\"severity\":\"safe\"},\"sexual\":{\"filtered\":false,\"severity\":\"safe\"},\"violence\":{\"filtered\":false,\"severity\":\"safe\"}}}]}",
+            Map.class));
         addInput(">>> Input data");
 
 
         txtInput.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyChar() == KeyEvent.VK_ENTER && (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER
+                        && (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) {
                     var proof = MainWindow.getInstance().getMediator().getSelectedProof();
                     var node = MainWindow.getInstance().getMediator().getSelectedNode();
 
                     LlmSession session = LlmUtils.getSession(proof);
-                    LlmClient client = new LlmClient(session);
-
                     var txt = txtInput.getText();
-                    addBox(txt);
-
+                    LlmClient client = new LlmClient(session, new LlmContext(), txt);
+                    addInput(txt);
                     txtInput.setText("");
 
                     var sw = new SwingWorker<Map<String, Object>, Void>() {
@@ -68,9 +72,9 @@ public class LlmPrompt extends JPanel implements TabPanel {
                         protected void done() {
                             try {
                                 handle(resultNow());
-                            } catch (Exception ex) {
-                                LOGGER.error(ex.getMessage(), ex);
-                                handle(ex);
+                            } catch (IllegalStateException ex) {
+                                LOGGER.error("Exceptional case", exceptionNow());
+                                handle(exceptionNow());
                             }
                         }
                     };
@@ -88,6 +92,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         public OutputBox(T userData) {
             this(userData, userData.toString());
+            output.add(menu);
         }
 
         public OutputBox(T userData, String text) {
@@ -115,12 +120,13 @@ public class LlmPrompt extends JPanel implements TabPanel {
         @Override
         public void setBackground(Color bg) {
             super.setBackground(bg);
-            if (output != null) output.setBackground(bg);
+            if (output != null)
+                output.setBackground(bg);
         }
     }
 
     private OutputBox<String> addInput(String text) {
-        var o= addBox(text, new RepromptAction(text));
+        var o = addBox(text, new RepromptAction(text));
         o.setBackground(new Color(130, 180, 220, 255));
         return o;
     }
@@ -134,7 +140,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
     private void handle(Map<String, Object> jsonResponse) {
         LOGGER.info("LLM prompt {}", jsonResponse);
         var o = new OutputBox<>(jsonResponse,
-                ((Map<String, Object>) ((Map<String, Object>) ((List<?>) jsonResponse.get("choices")).get(0)).get("message")).get("content").toString());
+            ((Map<String, Object>) ((Map<String, Object>) ((List<?>) jsonResponse.get("choices"))
+                    .get(0)).get("message")).get("content").toString());
         pOutput.add(o);
     }
 
