@@ -120,7 +120,7 @@ public interface KeYGuiExtension {
 
         }
 
-        void init(MainWindow window, KeYMediator mediator);
+        default void init(MainWindow window, KeYMediator mediator) {};
     }
 
     /**
