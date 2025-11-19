@@ -4,17 +4,6 @@
 package de.uka.ilkd.key.gui.settings;
 
 
-import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import net.miginfocom.layout.AC;
-import net.miginfocom.layout.CC;
-import net.miginfocom.layout.LC;
-import net.miginfocom.swing.MigLayout;
-import org.jspecify.annotations.Nullable;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -22,6 +11,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+
+import net.miginfocom.layout.AC;
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to create a nice
@@ -39,19 +40,19 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
     protected SettingsPanel() {
         pCenter.setLayout(new MigLayout(
-                // set up rows:
-                new LC().fillX()
-                        // remove the padding after the help icon
-                        .insets(null, null, null, "0").wrapAfter(3),
-                // set up columns:
-                new AC().count(3).fill(1)
-                        // label column does not grow
-                        .grow(0f, 0)
-                        // input area does grow
-                        .grow(1000f, 1)
-                        // help icon always has the same size
-                        .size("16px", 2)
-                        .align("right", 0)));
+            // set up rows:
+            new LC().fillX()
+                    // remove the padding after the help icon
+                    .insets(null, null, null, "0").wrapAfter(3),
+            // set up columns:
+            new AC().count(3).fill(1)
+                    // label column does not grow
+                    .grow(0f, 0)
+                    // input area does grow
+                    .grow(1000f, 1)
+                    // help icon always has the same size
+                    .size("16px", 2)
+                    .align("right", 0)));
     }
 
     /**
@@ -122,7 +123,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected JCheckBox addCheckBox(String title, String info, boolean value,
-                                    final Validator<Boolean> validator) {
+            final Validator<Boolean> validator) {
         JCheckBox checkBox = createCheckBox(title, value, validator);
         addRowWithHelp(info, new JLabel(), checkBox);
         return checkBox;
@@ -138,7 +139,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected JTextField addFileChooserPanel(String title, String file, String info, boolean isSave,
-                                             final Validator<String> validator) {
+            final Validator<String> validator) {
         JTextField textField = new JTextField(file);
         textField.addActionListener(e -> {
             try {
@@ -167,7 +168,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
                 fileChooser = KeYFileChooser.getFileChooser("Save file");
                 fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
                 result = fileChooser.showSaveDialog((Component) e.getSource(),
-                        new File(textField.getText()));
+                    new File(textField.getText()));
             } else {
                 fileChooser = KeYFileChooser.getFileChooser("Open file");
                 fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
@@ -187,16 +188,16 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Adds a new combobox to the panel.
      *
-     * @param title          label of the combo box
-     * @param info           help text
+     * @param title label of the combo box
+     * @param info help text
      * @param selectionIndex which item to initially select
-     * @param validator      validator
-     * @param items          the items
-     * @param <T>            the type of the items
+     * @param validator validator
+     * @param items the items
+     * @param <T> the type of the items
      * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
-                                           @Nullable Validator<T> validator, T... items) {
+            @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
@@ -236,8 +237,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     protected <T> JList<T> addListBox(String title, String info,
-                                      final Validator<List<T>> validator,
-                                      List<T> seq, Function<String, T> converter) {
+            final Validator<List<T>> validator,
+            List<T> seq, Function<String, T> converter) {
         var model = new DefaultListModel<T>();
         model.addAll(seq);
 
@@ -286,7 +287,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         btnAdd.addActionListener(addItem);
 
         ActionListener removeItem = e -> {
-            if(list.getSelectedIndex() != -1) {
+            if (list.getSelectedIndex() != -1) {
                 model.removeElementAt(list.getSelectedIndex());
             }
         };
@@ -296,14 +297,14 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     protected JTextArea addTextArea(String title, String text, String info,
-                                    final Validator<String> validator) {
+            final Validator<String> validator) {
         JScrollPane field = createTextArea(text, validator);
         addTitledComponent(title, field, info);
         return (JTextArea) field.getViewport().getView();
     }
 
     protected JTextArea addTextAreaWithoutScroll(String title, String text, String info,
-                                                 final Validator<String> validator) {
+            final Validator<String> validator) {
         JTextArea field = createTextAreaWithoutScroll(text, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -318,7 +319,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected JTextField addTextField(String title, String text, String info,
-                                      final Validator<String> validator) {
+            final Validator<String> validator) {
         JTextField field = createTextField(text, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -326,7 +327,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
 
     protected JTextField addTextField(String title, String text, String info,
-                                      final Validator<String> validator, JComponent additionalActions) {
+            final Validator<String> validator, JComponent additionalActions) {
         JTextField field = createTextField(text, validator);
         JLabel label = new JLabel(title);
         label.setLabelFor(field);
@@ -349,18 +350,18 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * text
      * field), otherwise the {@link Validator} will fail.
      *
-     * @param title     the title of the text field
-     * @param min       the minimum value that can be entered
-     * @param max       the maximum value that can be entered
-     * @param step      the step size used when changing the entered value using the JSpinner's arrow
-     *                  buttons
-     * @param info      arbitrary information about the text field
+     * @param title the title of the text field
+     * @param min the minimum value that can be entered
+     * @param max the maximum value that can be entered
+     * @param step the step size used when changing the entered value using the JSpinner's arrow
+     *        buttons
+     * @param info arbitrary information about the text field
      * @param validator a validator for checking the entered values
-     * @param <T>       the class of the minimum value
+     * @param <T> the class of the minimum value
      * @return the created JSpinner
      */
     protected <T extends Number & Comparable<T>> JSpinner addNumberField(String title, T min,
-                                                                         Comparable<T> max, Number step, String info, final Validator<Number> validator) {
+            Comparable<T> max, Number step, String info, final Validator<Number> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;

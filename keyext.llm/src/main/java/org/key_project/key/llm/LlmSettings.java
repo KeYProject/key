@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
-
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 /**
  *
@@ -15,9 +18,12 @@ public class LlmSettings extends AbstractPropertiesSettings {
     private static final String CATEGORY = "llm";
 
     private final PropertyEntry<String> authToken = createStringProperty("authToken", "");
-    private final PropertyEntry<String> apiEndpoint = createStringProperty("apiEndpoint", "https://ki-toolbox.scc.kit.edu/v1");
-    private final PropertyEntry<String> defaultModel = createStringProperty("defaultModel", "azure.gpt-4.1-mini");
-    private final PropertyEntry<List<String>> availableModels = createStringListProperty("availableModels",
+    private final PropertyEntry<String> apiEndpoint =
+        createStringProperty("apiEndpoint", "https://ki-toolbox.scc.kit.edu/v1");
+    private final PropertyEntry<String> defaultModel =
+        createStringProperty("defaultModel", "azure.gpt-4.1-mini");
+    private final PropertyEntry<List<String>> availableModels =
+        createStringListProperty("availableModels",
             "azure.gpt-4.1-mini,gpt-oss:120b,mixtral:8x22b,qwen3-vl:235b-a22b-instruct");
 
 
