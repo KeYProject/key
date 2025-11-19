@@ -46,11 +46,20 @@
             <pattern>[%relative] %highlight(%-5level) %cyan(%logger{0}): %msg %n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
+            <level>DEBUG</level>
         </filter>
     </appender>
+
     <logger name="key.devel" level="DEBUG">
         <appender-ref ref="STDERR"/>
     </logger>
 
+	<logger name="org.apache.hc.client5.http.headers" level="DEBUG">
+		<appender-ref ref="STDERR"/>
+
+	</logger>
+	<logger name="org.apache.hc.client5.http.wire">
+		<appender-ref ref="STDERR"/>
+
+	</logger>
 </configuration>
