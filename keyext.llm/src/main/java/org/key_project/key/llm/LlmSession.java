@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
 
+import java.net.URI;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  *
  * @author Alexander Weigl
@@ -12,6 +16,7 @@ public class LlmSession {
     private String model = "azure.gpt-4.1-mini";
     private String apiEndpoint;
     private String authToken;
+    private Set<URI> selectedFiles = new TreeSet<>();
 
     public LlmSession(String apiEndpoint, String authToken) {
         this.apiEndpoint = apiEndpoint;
@@ -40,5 +45,13 @@ public class LlmSession {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public Set<URI> getSelectedFiles() {
+        return selectedFiles;
+    }
+
+    public void setSelectedFiles(Set<URI> selectedFiles) {
+        this.selectedFiles = selectedFiles;
     }
 }
