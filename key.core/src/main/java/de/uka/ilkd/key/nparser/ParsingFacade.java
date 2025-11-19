@@ -77,6 +77,7 @@ public final class ParsingFacade {
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }
+            path = path.getParent();
             Collection<RuleSource> includes = ctx.getIncludes(path).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
