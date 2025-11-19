@@ -5,7 +5,7 @@
 package org.key_project.key.llm;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -25,9 +25,13 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
  */
 public class LlmClient implements Callable<Map<String, Object>> {
     private final LlmSession llmSession;
+    private final LlmContext context;
+    private final LlmContext.LlmMessage prompt;
 
-    public LlmClient(LlmSession llmSession) {
+    public LlmClient(LlmSession llmSession, LlmContext context, String message) {
         this.llmSession = llmSession;
+        this.context = context;
+        this.prompt = new LlmContext.LlmMessage("user", message);
     }
 
     @Override
@@ -39,11 +43,13 @@ public class LlmClient implements Callable<Map<String, Object>> {
         request.addHeader("Content-Type", "application/json");
         request.addHeader("Accept", "application/json");
 
+        var msg = new ArrayList<>(context.getMessages());
+        msg.add(prompt);
+
         var data = Map.of(
-            "model", "azure.gpt-4.1-mini",
-            "messages", List.of(
-                createMessage("system", "Du bist ein hilfreicher Assistent am KIT."),
-                createMessage("user", "Erkläre das Prinzip der Rayleigh-Streuung indrei Sätzen.")));
+            "model", llmSession.getModel(),
+            "messages", msg);
+
         var gson = new GsonBuilder().create();
         var stringBody = gson.toJson(data);
         request.setEntity(new StringEntity(stringBody));
@@ -51,10 +57,6 @@ public class LlmClient implements Callable<Map<String, Object>> {
         try (var client = HttpClients.createDefault()) {
             return client.execute(request, new GsonHttpClientResponseHandler());
         }
-    }
-
-    private Map<String, Object> createMessage(String role, String content) {
-        return Map.of("role", role, "content", content);
     }
 
 
