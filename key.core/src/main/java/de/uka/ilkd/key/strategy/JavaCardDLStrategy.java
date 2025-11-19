@@ -573,6 +573,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     @Override
     public boolean isResponsibleFor(BuiltInRule rule) {
-        return rule instanceof QueryExpand;
+        return rule instanceof QueryExpand || rule instanceof UseDependencyContractRule;
     }
 }
