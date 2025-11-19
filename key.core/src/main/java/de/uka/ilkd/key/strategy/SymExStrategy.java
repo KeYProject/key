@@ -8,6 +8,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
@@ -255,5 +257,16 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
     @Override
     public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
+    }
+
+    @Override
+    public boolean isResponsibleFor(BuiltInRule rule) {
+        return rule instanceof WhileInvariantRule || rule instanceof LoopScopeInvariantRule
+                || rule instanceof BlockContractInternalRule
+                || rule instanceof BlockContractExternalRule
+                || rule instanceof LoopContractInternalRule
+                || rule instanceof LoopContractExternalRule
+                || rule instanceof LoopApplyHeadRule || rule instanceof UseOperationContractRule
+                || rule instanceof MergeRule;
     }
 }

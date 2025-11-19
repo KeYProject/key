@@ -11,12 +11,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
-import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -135,12 +136,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // strengthenConstraints,
             // smtF,
             queryF, depSpecF, dispatcher);
-    }
-
-    private Feature oneStepSimplificationFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
-        return ConditionalFeature.createConditional(filter, cost);
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -574,5 +569,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     @Override
     public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
+    }
+
+    @Override
+    public boolean isResponsibleFor(BuiltInRule rule) {
+        return rule instanceof QueryExpand;
     }
 }

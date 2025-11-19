@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
@@ -189,8 +189,12 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
         if (strats == null) {
             strats = new LinkedHashSet<>();
-            if (rule instanceof OneStepSimplifier) {
-                strats.add(nameToStrategyMap.get(JFOLStrategy.NAME));
+            if (rule instanceof BuiltInRule bir) {
+                for (var cs : strategies) {
+                    if (cs.isResponsibleFor(bir)) {
+                        strats.add(cs);
+                    }
+                }
             } else {
                 var ruleSets = rule.ruleSets();
                 while (ruleSets.hasNext()) {

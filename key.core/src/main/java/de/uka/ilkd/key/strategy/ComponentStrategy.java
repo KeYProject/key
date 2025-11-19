@@ -6,12 +6,19 @@ package de.uka.ilkd.key.strategy;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.RuleSet;
 
 public interface ComponentStrategy extends Strategy<Goal> {
+    /// The strategy's cost dispatcher.
     RuleSetDispatchFeature getCostDispatcher();
 
+    /// The rule sets this strategy is designed to handle.
     Set<RuleSet> getResponsibilities();
+
+    /// Whether this strategy is responsible for the given [BuiltInRule]. This is necessary as
+    /// built-in rules have no rule sets.
+    boolean isResponsibleFor(BuiltInRule rule);
 }

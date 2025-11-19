@@ -12,6 +12,7 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 
@@ -192,5 +193,10 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     @Override
     public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
+    }
+
+    @Override
+    public boolean isResponsibleFor(BuiltInRule rule) {
+        return false;
     }
 }

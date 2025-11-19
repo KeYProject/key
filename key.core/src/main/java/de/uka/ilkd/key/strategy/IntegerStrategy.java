@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
@@ -1027,5 +1028,10 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     @Override
     public RuleSetDispatchFeature getCostDispatcher() {
         return costComputationDispatcher;
+    }
+
+    @Override
+    public boolean isResponsibleFor(BuiltInRule rule) {
+        return false;
     }
 }

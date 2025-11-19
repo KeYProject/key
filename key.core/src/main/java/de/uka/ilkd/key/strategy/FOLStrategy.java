@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
@@ -614,5 +616,10 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     private boolean normalSplitting() {
         return StrategyProperties.SPLITTING_NORMAL
                 .equals(strategyProperties.getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY));
+    }
+
+    @Override
+    public boolean isResponsibleFor(BuiltInRule rule) {
+        return rule instanceof OneStepSimplifier;
     }
 }
