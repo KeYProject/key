@@ -3,7 +3,11 @@ package org.key_project.key.llm;
 import com.google.gson.GsonBuilder;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,18 +28,31 @@ import java.util.concurrent.ForkJoinPool;
  */
 public class LlmPrompt extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(LlmPrompt.class);
+    public static final ColorSettings.ColorProperty COLOR_BG_INPUT = ColorSettings.define(
+            "llm.output.bg.input",
+            "Background color in chat of LLM answers", new Color(130, 180, 220, 255));
+
+    public static final ColorSettings.ColorProperty COLOR_BG_ERROR
+            = ColorSettings.define("llm.output.bg.error", "Background color in chat of LLM answers", new Color(255, 180, 180, 255));
+
+    private static final ColorSettings.ColorProperty COLOR_BG_ANSWER
+            = ColorSettings.define("llm.output.bg.answer", "Background color in chat of LLM answers", Color.LIGHT_GRAY);
+
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
     private final JEditorPane txtInput = new JEditorPane();
 
-    private final Box pOutput = new Box(BoxLayout.Y_AXIS);
+    private final JPanel pOutput = new JPanel(new MigLayout(new LC().fillX().debug().topToBottom().wrapAfter(1)));
 
     private final KeyAction actionSwitchOrientation = new SwitchOrientationAction();
+    private final SendPromptAction actionSendPrompt = new SendPromptAction();
 
     public LlmPrompt() {
         setLayout(new BorderLayout());
         add(splitPane, BorderLayout.CENTER);
-        splitPane.add(new JScrollPane(pOutput));
+        final var comp = new JScrollPane(pOutput);
+        comp.getVerticalScrollBar().setUnitIncrement(16);
+        splitPane.add(comp);
         splitPane.add(new JScrollPane(txtInput));
 
         handle(new Exception("Test Exception"));
@@ -47,42 +65,17 @@ public class LlmPrompt extends JPanel implements TabPanel {
             @Override
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == KeyEvent.VK_ENTER && (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) {
-                    var proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                    var node = MainWindow.getInstance().getMediator().getSelectedNode();
-
-                    LlmSession session = LlmUtils.getSession(proof);
-                    var txt = txtInput.getText();
-                    LlmClient client = new LlmClient(session, new LlmContext(), txt);
-                    addInput(txt);
-                    txtInput.setText("");
-
-                    var sw = new SwingWorker<Map<String, Object>, Void>() {
-                        @Override
-                        protected Map<String, Object> doInBackground() throws Exception {
-                            return client.call();
-                        }
-
-                        @Override
-                        protected void done() {
-                            try {
-                                handle(resultNow());
-                            } catch (IllegalStateException ex) {
-                                LOGGER.error("Exceptional case", exceptionNow());
-                                handle(exceptionNow());
-                            }
-                        }
-                    };
-                    ForkJoinPool.commonPool().submit(sw);
+                    actionSendPrompt.run();
                 }
             }
         });
     }
 
     public static class OutputBox<T> extends JPanel {
-        private final T userData;
-        private final JEditorPane output = new JEditorPane();
-        private final JPanel buttons = new JPanel();
-        private final JPopupMenu menu = new JPopupMenu();
+        protected final T userData;
+        protected final JEditorPane output = new JEditorPane();
+        protected final JPanel buttons = new JPanel();
+        protected final JPopupMenu menu = new JPopupMenu();
 
         public OutputBox(T userData) {
             this(userData, userData.toString());
@@ -119,14 +112,17 @@ public class LlmPrompt extends JPanel implements TabPanel {
     }
 
     private OutputBox<String> addInput(String text) {
-        var o= addBox(text, new RepromptAction(text));
-        o.setBackground(new Color(130, 180, 220, 255));
+        var o = addBox(text, new RepromptAction(text));
+        o.setBackground(COLOR_BG_INPUT.get());
         return o;
     }
 
-    private <T> OutputBox<T> addBox(T data, Action... action) {
+    private <T> OutputBox<T> addBox(T data, Action... actions) {
         OutputBox<T> box = new OutputBox<>(data);
-        pOutput.add(box);
+        for (Action it : actions) {
+            box.menu.add(it);
+        }
+        pOutput.add(box, new CC().growX());
         return box;
     }
 
@@ -134,13 +130,14 @@ public class LlmPrompt extends JPanel implements TabPanel {
         LOGGER.info("LLM prompt {}", jsonResponse);
         var o = new OutputBox<>(jsonResponse,
                 ((Map<String, Object>) ((Map<String, Object>) ((List<?>) jsonResponse.get("choices")).get(0)).get("message")).get("content").toString());
-        pOutput.add(o);
+        pOutput.add(o, new CC().growX());
+        o.setBackground(COLOR_BG_ANSWER.get());
     }
 
     private void handle(Throwable e) {
         LOGGER.error("Error during LLM prompt", e);
         var box = addBox(e);
-        box.setBackground(new Color(255, 180, 180, 255));
+        box.setBackground(COLOR_BG_ERROR.get());
     }
 
     @Override
@@ -181,9 +178,42 @@ public class LlmPrompt extends JPanel implements TabPanel {
     }
 
     class SendPromptAction extends KeyAction {
+        public SendPromptAction() {
+            setName("Send Prompt");
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            String prompt = txtInput.getText();
+            run();
+        }
+
+        public void run() {
+            var proof = MainWindow.getInstance().getMediator().getSelectedProof();
+            var node = MainWindow.getInstance().getMediator().getSelectedNode();
+
+            LlmSession session = LlmUtils.getSession(proof);
+            var txt = txtInput.getText();
+            LlmClient client = new LlmClient(session, new LlmContext(), txt);
+            addInput(txt);
+            txtInput.setText("");
+
+            var sw = new SwingWorker<Map<String, Object>, Void>() {
+                @Override
+                protected Map<String, Object> doInBackground() throws Exception {
+                    return client.call();
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        handle(resultNow());
+                    } catch (IllegalStateException ex) {
+                        LOGGER.error("Exceptional case", exceptionNow());
+                        handle(exceptionNow());
+                    }
+                }
+            };
+            ForkJoinPool.commonPool().submit(sw);
         }
     }
 
