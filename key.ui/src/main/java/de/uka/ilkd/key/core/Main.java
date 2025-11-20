@@ -238,6 +238,15 @@ public final class Main implements Callable<Integer> {
     public Integer call() throws Exception {
         Debug.ENABLE_DEBUG = debug;
 
+        try {
+            // weigl: You can set assertion status via the system class loader,
+            // but can not get its current status. Here a workaround.
+            assert false;
+            LOGGER.info("Assertion evaluation is disabled.");
+        } catch (AssertionError e) {
+            LOGGER.info("Assertion evaluation is enabled.");
+        }
+
         if (tacletDir != null) {
             System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
                 tacletDir.toAbsolutePath().toString());
@@ -300,11 +309,7 @@ public final class Main implements Callable<Integer> {
             LOGGER.info("Running in debug mode");
         }
 
-        if (Debug.ENABLE_ASSERTION) {
-            LOGGER.info("Using assertions");
-        } else {
-            LOGGER.info("Not using assertions");
-        }
+        LOGGER.info("Debug.ENABLE_ASSERTION = {}", Debug.ENABLE_ASSERTION);
 
         if (riflFileName != null) {
             LOGGER.info("Loading RIFL specification from {}", riflFileName);
@@ -349,11 +354,6 @@ public final class Main implements Callable<Integer> {
         }
 
         AbstractMediatorUserInterfaceControl ui = createUserInterface(inputFiles);
-
-        System.out.println(inputFiles.isEmpty());
-        System.out.println(examplesFolder);
-        System.out.println(ui);
-        System.out.println(showExampleChooserIfExamplesDirIsDefined);
 
         if (inputFiles.isEmpty()) {
             if (examplesFolder != null
