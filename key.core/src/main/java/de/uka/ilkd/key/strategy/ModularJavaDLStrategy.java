@@ -55,7 +55,11 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final Map<RuleSet, List<ComponentStrategy>> costResponsibilityMap;
     private final Map<RuleSet, List<ComponentStrategy>> instantiationResponsibilityMap;
     private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap;
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategyMap =
+    private final Map<Rule, LinkedHashSet<ComponentStrategy>> costRuleToStrategyMap =
+        new LinkedHashMap<>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy>> instantiationRuleToStrategyMap =
+        new LinkedHashMap<>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy>> approvalRuleToStrategyMap =
         new LinkedHashMap<>();
     private final Map<Name, ComponentStrategy> nameToStrategyMap =
         new HashMap<>();
@@ -64,8 +68,6 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             StrategyProperties properties) {
         super(proof);
         strategies.addAll(componentStrategies);
-        reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost);
-        reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         costResponsibilityMap = new LinkedHashMap<>(strategies.size());
@@ -78,6 +80,11 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
         conflictCostDispatcher = resolveConflicts();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
+        reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost,
+            (rule) -> getResponsibleStrategies(rule, costResponsibilityMap, costRuleToStrategyMap));
+        reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp,
+            (rule) -> getResponsibleStrategies(rule, instantiationResponsibilityMap,
+                instantiationRuleToStrategyMap));
         totalCost =
             add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
                 reduceCostTillMaxF, conflictCostDispatcher,
@@ -85,7 +92,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void initializeResponsibilityMap(StrategyAspect aspect,
-                                             Map<RuleSet, List<ComponentStrategy>> responsibilityMap) {
+            Map<RuleSet, List<ComponentStrategy>> responsibilityMap) {
         for (ComponentStrategy strategy : strategies) {
             nameToStrategyMap.put(strategy.name(), strategy);
             var res = strategy.getResponsibilities(aspect);
@@ -102,7 +109,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private RuleSetDispatchFeature resolveConflicts() {
         var dis = new RuleSetDispatchFeature();
         var dispatchers =
-            strategies.stream().map(s -> new StratAndDispatcher(s, s.getDispatcher(StrategyAspect.Cost))).toList();
+            strategies.stream()
+                    .map(s -> new StratAndDispatcher(s, s.getDispatcher(StrategyAspect.Cost)))
+                    .toList();
         var map = new HashMap<RuleSet, List<Name>>();
         for (var d : dispatchers) {
             var s = d.strategy;
@@ -177,8 +186,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         boolean isApproved =
             NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
                 new MutableState()) != TopRuleAppCost.INSTANCE;
-        return reduceTillMax(app, isApproved, false, Boolean::logicalAnd,
-            s -> s.isApprovedApp(app, pio, goal), getResponsibleStrategies(StrategyAspect.Approval));
+        return reduceTillMax(isApproved, false, Boolean::logicalAnd,
+            s -> s.isApprovedApp(app, pio, goal), getResponsibleStrategies(app.rule(),
+                approvalResponsibilityMap, approvalRuleToStrategyMap));
     }
 
     @Override
@@ -186,7 +196,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return NAME;
     }
 
-    private <R> R reduceTillMax(RuleApp app, R init, R max, BiFunction<R, R, R> accumulator,
+    private <R> R reduceTillMax(R init, R max, BiFunction<R, R, R> accumulator,
             Function<ComponentStrategy, R> mapper, LinkedHashSet<ComponentStrategy> strats) {
 
         for (ComponentStrategy strategy : strats) {
@@ -199,7 +209,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private LinkedHashSet<ComponentStrategy> getResponsibleStrategies(Rule rule,
-                                                                      Map responsibilityMap) {
+            Map<RuleSet, List<ComponentStrategy>> responsibilityMap,
+            Map<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategyMap) {
         LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
         if (strats == null) {
             strats = new LinkedHashSet<>();
@@ -237,16 +248,20 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     private class ReduceTillMaxFeature implements Feature {
         private final StrategyCostFunction mapper;
+        private final Function<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategy;
 
-        ReduceTillMaxFeature(StrategyCostFunction mapper) {
+        ReduceTillMaxFeature(StrategyCostFunction mapper,
+                Function<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategy) {
             this.mapper = mapper;
+            this.ruleToStrategy = ruleToStrategy;
         }
 
         @Override
         public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
                 PosInOccurrence pos, GOAL goal, MutableState mState) {
-            return reduceTillMax(app, NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
-                RuleAppCost::add, s -> mapper.compute(s, app, pos, (Goal) goal, mState));
+            return reduceTillMax(NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
+                RuleAppCost::add, s -> mapper.compute(s, app, pos, (Goal) goal, mState),
+                ruleToStrategy.apply(app.rule()));
         }
     }
 

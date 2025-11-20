@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleSet;
 
 public interface ComponentStrategy extends Strategy<Goal> {

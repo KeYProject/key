@@ -443,13 +443,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                     /*
                      * can be applied if sv_heap is instantiated or not present
                      */
-                    not(needsInstantiation), approveInst));//, NonDuplicateAppFeature.INSTANCE));
+                    not(needsInstantiation), approveInst));// , NonDuplicateAppFeature.INSTANCE));
             } else {
                 bindRuleSet(d, "classAxiom", add(
                     /*
                      * can be applied if sv_heap is instantiated or not present
                      */
-                    not(needsInstantiation), approveInst));//, NonDuplicateAppFeature.INSTANCE));
+                    not(needsInstantiation), approveInst));// , NonDuplicateAppFeature.INSTANCE));
             }
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());

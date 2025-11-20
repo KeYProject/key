@@ -163,8 +163,10 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         return true;
-                /* NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
-            new MutableState()) != TopRuleAppCost.INSTANCE;*/
+        /*
+         * NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
+         * new MutableState()) != TopRuleAppCost.INSTANCE;
+         */
     }
 
     @Override

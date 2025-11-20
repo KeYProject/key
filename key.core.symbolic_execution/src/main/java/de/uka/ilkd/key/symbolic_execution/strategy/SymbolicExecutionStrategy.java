@@ -84,7 +84,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                 .equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY))) {
             // Make sure that an immediately alias check is performed by doing cuts of objects to
             // find out if they can be the same or not
-            RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
+            RuleSetDispatchFeature instRsd = getDispatcher(StrategyAspect.Instantiation);
             enableInstantiate();
             final TermBuffer<Goal> buffer = new TermBuffer<>();
             Feature originalCut = instRsd.get(getHeuristic("cut"));
