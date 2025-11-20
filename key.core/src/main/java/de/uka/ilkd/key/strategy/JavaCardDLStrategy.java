@@ -78,27 +78,31 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         approvalF = add(setupApprovalF(), approvalDispatcher);
     }
 
+
     protected final RuleSetDispatchFeature getCostComputationDispatcher() {
         return costComputationDispatcher;
     }
 
-    protected final RuleSetDispatchFeature getInstantiationDispatcher() {
-        return instantiationDispatcher;
+    @Override
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
+        var set = new HashSet<RuleSet>();
+        set.addAll(getDispatcher(aspect).ruleSets());
+        return set;
+    }
+
+    @Override
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case StrategyAspect.Cost -> costComputationDispatcher;
+            case StrategyAspect.Instantiation -> instantiationDispatcher;
+            case StrategyAspect.Approval -> approvalDispatcher;
+        };
     }
 
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
                 || approvalDispatcher.get(rs) != null;
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities() {
-        var set = new HashSet<RuleSet>();
-        set.addAll(costComputationDispatcher.ruleSets());
-        set.addAll(instantiationDispatcher.ruleSets());
-        set.addAll(approvalDispatcher.ruleSets());
-        return set;
     }
 
     protected Feature setupGlobalF(@NonNull Feature dispatcher) {
@@ -389,7 +393,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
 
-        return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
+        return depSpecF; // add(NonDuplicateAppFeature.INSTANCE, depSpecF);
     }
 
     private RuleSetDispatchFeature setupApprovalDispatcher() {
@@ -439,13 +443,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                     /*
                      * can be applied if sv_heap is instantiated or not present
                      */
-                    not(needsInstantiation), approveInst, NonDuplicateAppFeature.INSTANCE));
+                    not(needsInstantiation), approveInst));//, NonDuplicateAppFeature.INSTANCE));
             } else {
                 bindRuleSet(d, "classAxiom", add(
                     /*
                      * can be applied if sv_heap is instantiated or not present
                      */
-                    not(needsInstantiation), approveInst, NonDuplicateAppFeature.INSTANCE));
+                    not(needsInstantiation), approveInst));//, NonDuplicateAppFeature.INSTANCE));
             }
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
@@ -564,11 +568,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     public boolean isStopAtFirstNonCloseableGoal() {
         return strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                 .equals(StrategyProperties.STOPMODE_NONCLOSE);
-    }
-
-    @Override
-    public RuleSetDispatchFeature getCostDispatcher() {
-        return costComputationDispatcher;
     }
 
     @Override

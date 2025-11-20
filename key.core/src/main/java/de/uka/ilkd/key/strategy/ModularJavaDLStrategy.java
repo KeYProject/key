@@ -10,6 +10,7 @@ import java.util.function.Function;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.strategy.ComponentStrategy.StrategyAspect;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
@@ -51,7 +52,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final ArithTermFeatures tf;
     private final RuleSetDispatchFeature conflictCostDispatcher;
     private final Feature totalCost;
-    private final Map<RuleSet, List<ComponentStrategy>> responsibilityMap;
+    private final Map<RuleSet, List<ComponentStrategy>> costResponsibilityMap;
+    private final Map<RuleSet, List<ComponentStrategy>> instantiationResponsibilityMap;
+    private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap;
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> ruleToStrategyMap =
         new LinkedHashMap<>();
     private final Map<Name, ComponentStrategy> nameToStrategyMap =
@@ -65,20 +68,31 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp);
         this.strategyProperties = (StrategyProperties) properties.clone();
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
-        responsibilityMap = new LinkedHashMap<>(strategies.size());
-        for (ComponentStrategy strategy : strategies) {
-            nameToStrategyMap.put(strategy.name(), strategy);
-            var res = strategy.getResponsibilities();
-            for (var rs : res) {
-                responsibilityMap.computeIfAbsent(rs, k -> new ArrayList<>()).add(strategy);
-            }
-        }
+        costResponsibilityMap = new LinkedHashMap<>(strategies.size());
+        instantiationResponsibilityMap = new LinkedHashMap<>(strategies.size());
+        approvalResponsibilityMap = new LinkedHashMap<>(strategies.size());
+
+        initializeResponsibilityMap(StrategyAspect.Cost, costResponsibilityMap);
+        initializeResponsibilityMap(StrategyAspect.Instantiation, instantiationResponsibilityMap);
+        initializeResponsibilityMap(StrategyAspect.Approval, approvalResponsibilityMap);
+
         conflictCostDispatcher = resolveConflicts();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
         totalCost =
             add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
                 reduceCostTillMaxF, conflictCostDispatcher,
                 AgeFeature.INSTANCE, ifMatchedF);
+    }
+
+    private void initializeResponsibilityMap(StrategyAspect aspect,
+                                             Map<RuleSet, List<ComponentStrategy>> responsibilityMap) {
+        for (ComponentStrategy strategy : strategies) {
+            nameToStrategyMap.put(strategy.name(), strategy);
+            var res = strategy.getResponsibilities(aspect);
+            for (var rs : res) {
+                responsibilityMap.computeIfAbsent(rs, k -> new ArrayList<>()).add(strategy);
+            }
+        }
     }
 
     private record StratAndDispatcher(ComponentStrategy strategy,
@@ -88,7 +102,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private RuleSetDispatchFeature resolveConflicts() {
         var dis = new RuleSetDispatchFeature();
         var dispatchers =
-            strategies.stream().map(s -> new StratAndDispatcher(s, s.getCostDispatcher())).toList();
+            strategies.stream().map(s -> new StratAndDispatcher(s, s.getDispatcher(StrategyAspect.Cost))).toList();
         var map = new HashMap<RuleSet, List<Name>>();
         for (var d : dispatchers) {
             var s = d.strategy;
@@ -112,16 +126,16 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
                 var intStrat = nameToStrategyMap.get(IntegerStrategy.NAME);
                 bindRuleSet(d, "order_terms",
                     ifZero(applyTF("commEqLeft", tf.intF),
-                        intStrat.getCostDispatcher().remove(rs),
-                        folStrat.getCostDispatcher().remove(rs)));
+                        intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
+                        folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
             }
             case "apply_equations" -> {
                 var folStrat = nameToStrategyMap.get(JFOLStrategy.NAME);
                 var intStrat = nameToStrategyMap.get(IntegerStrategy.NAME);
                 bindRuleSet(d, "apply_equations",
                     ifZero(applyTF(FocusProjection.create(0), tf.intF),
-                        intStrat.getCostDispatcher().remove(rs),
-                        folStrat.getCostDispatcher().remove(rs)));
+                        intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
+                        folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
             }
             case "apply_equations_andOr" -> {
                 var folStrat = nameToStrategyMap.get(JFOLStrategy.NAME);
@@ -129,8 +143,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
                 if (quantifierInstantiatedEnabled()) {
                     bindRuleSet(d, "apply_equations_andOr",
                         ifZero(applyTF(FocusProjection.create(0), tf.intF),
-                            intStrat.getCostDispatcher().remove(rs),
-                            folStrat.getCostDispatcher().remove(rs)));
+                            intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
+                            folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
                 } else {
                     bindRuleSet(d, "apply_equations_andOr", inftyConst());
                 }
@@ -164,7 +178,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
                 new MutableState()) != TopRuleAppCost.INSTANCE;
         return reduceTillMax(app, isApproved, false, Boolean::logicalAnd,
-            s -> s.isApprovedApp(app, pio, goal));
+            s -> s.isApprovedApp(app, pio, goal), getResponsibleStrategies(StrategyAspect.Approval));
     }
 
     @Override
@@ -173,8 +187,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     }
 
     private <R> R reduceTillMax(RuleApp app, R init, R max, BiFunction<R, R, R> accumulator,
-            Function<ComponentStrategy, R> mapper) {
-        LinkedHashSet<ComponentStrategy> strats = getResponsibleStrategies(app.rule());
+            Function<ComponentStrategy, R> mapper, LinkedHashSet<ComponentStrategy> strats) {
 
         for (ComponentStrategy strategy : strats) {
             init = accumulator.apply(init, mapper.apply(strategy));
@@ -185,7 +198,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return init;
     }
 
-    private LinkedHashSet<ComponentStrategy> getResponsibleStrategies(Rule rule) {
+    private LinkedHashSet<ComponentStrategy> getResponsibleStrategies(Rule rule,
+                                                                      Map responsibilityMap) {
         LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
         if (strats == null) {
             strats = new LinkedHashSet<>();

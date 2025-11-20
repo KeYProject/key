@@ -9,14 +9,20 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleSet;
 
 public interface ComponentStrategy extends Strategy<Goal> {
+
+    enum StrategyAspect {
+        Cost, Instantiation, Approval;
+    }
+
     /// The strategy's cost dispatcher.
-    RuleSetDispatchFeature getCostDispatcher();
+    RuleSetDispatchFeature getDispatcher(StrategyAspect aspect);
 
     /// The rule sets this strategy is designed to handle.
-    Set<RuleSet> getResponsibilities();
+    Set<RuleSet> getResponsibilities(StrategyAspect aspect);
 
     /// Whether this strategy is responsible for the given [BuiltInRule]. This is necessary as
     /// built-in rules have no rule sets.

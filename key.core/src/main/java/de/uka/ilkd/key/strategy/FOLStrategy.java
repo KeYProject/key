@@ -212,8 +212,25 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     }
 
     @Override
-    public RuleSetDispatchFeature getCostDispatcher() {
-        return costComputationDispatcher;
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
+        var set = new HashSet<RuleSet>();
+        set.addAll(getDispatcher(aspect).ruleSets());
+        return set;
+    }
+
+    @Override
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case StrategyAspect.Cost -> costComputationDispatcher;
+            case StrategyAspect.Instantiation -> instantiationDispatcher;
+            case StrategyAspect.Approval -> approvalDispatcher;
+        };
+    }
+
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
+                || approvalDispatcher.get(rs) != null;
     }
 
     @Override
@@ -224,21 +241,6 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         return approvalF.computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE;
-    }
-
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
-                || approvalDispatcher.get(rs) != null;
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities() {
-        var set = new HashSet<RuleSet>();
-        set.addAll(costComputationDispatcher.ruleSets());
-        set.addAll(instantiationDispatcher.ruleSets());
-        set.addAll(approvalDispatcher.ruleSets());
-        return set;
     }
 
     @Override

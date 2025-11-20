@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.termProjection.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -23,7 +22,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
@@ -62,11 +60,6 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     @Override
     public boolean isResponsibleFor(RuleSet rs) {
         return costComputationDispatcher.get(rs) != null;
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities() {
-        return new HashSet<>(costComputationDispatcher.ruleSets());
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
@@ -169,8 +162,9 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
-            new MutableState()) != TopRuleAppCost.INSTANCE;
+        return true;
+                /* NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
+            new MutableState()) != TopRuleAppCost.INSTANCE;*/
     }
 
     @Override
@@ -191,8 +185,21 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     }
 
     @Override
-    public RuleSetDispatchFeature getCostDispatcher() {
-        return costComputationDispatcher;
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
+        var set = new HashSet<RuleSet>();
+        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
+        if (dispatcher != null) {
+            set.addAll(dispatcher.ruleSets());
+        }
+        return set;
+    }
+
+    @Override
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case StrategyAspect.Cost -> costComputationDispatcher;
+            default -> null;
+        };
     }
 
     @Override

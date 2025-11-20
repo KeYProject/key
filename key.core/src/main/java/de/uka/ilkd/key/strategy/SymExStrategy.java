@@ -64,12 +64,24 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
     }
 
     @Override
-    public Set<RuleSet> getResponsibilities() {
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
         var set = new HashSet<RuleSet>();
-        set.addAll(costComputationDispatcher.ruleSets());
-        set.addAll(instantiationDispatcher.ruleSets());
+        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
+        if (dispatcher != null) {
+            set.addAll(dispatcher.ruleSets());
+        }
         return set;
     }
+
+    @Override
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case StrategyAspect.Cost -> costComputationDispatcher;
+            case StrategyAspect.Instantiation -> instantiationDispatcher;
+            default -> null;
+        };
+    }
+
 
     private Feature setupGlobalF(Feature dispatcher) {
         final Feature methodSpecF;
@@ -252,11 +264,6 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
     public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, GOAL goal, MutableState mState) {
         return costComputationF.computeCost(app, pos, goal, mState);
-    }
-
-    @Override
-    public RuleSetDispatchFeature getCostDispatcher() {
-        return costComputationDispatcher;
     }
 
     @Override

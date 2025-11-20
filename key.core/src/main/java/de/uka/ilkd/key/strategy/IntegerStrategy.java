@@ -97,14 +97,6 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
     }
 
-    @Override
-    public Set<RuleSet> getResponsibilities() {
-        var set = new HashSet<RuleSet>();
-        set.addAll(costComputationDispatcher.ruleSets());
-        set.addAll(instantiationDispatcher.ruleSets());
-        return set;
-    }
-
     private RuleSetDispatchFeature setupInstantiationF() {
         enableInstantiate();
 
@@ -1026,8 +1018,19 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     }
 
     @Override
-    public RuleSetDispatchFeature getCostDispatcher() {
-        return costComputationDispatcher;
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
+        var set = new HashSet<RuleSet>();
+        set.addAll(getDispatcher(aspect).ruleSets());
+        return set;
+    }
+
+    @Override
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case StrategyAspect.Cost -> costComputationDispatcher;
+            case StrategyAspect.Instantiation -> instantiationDispatcher;
+            case StrategyAspect.Approval -> approvalDispatcher;
+        };
     }
 
     @Override
