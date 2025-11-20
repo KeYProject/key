@@ -80,11 +80,14 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
         conflictCostDispatcher = resolveConflicts();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
+
         reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost,
             (rule) -> getResponsibleStrategies(rule, costResponsibilityMap, costRuleToStrategyMap));
+
         reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp,
             (rule) -> getResponsibleStrategies(rule, instantiationResponsibilityMap,
                 instantiationRuleToStrategyMap));
+
         totalCost =
             add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
                 reduceCostTillMaxF, conflictCostDispatcher,
@@ -186,6 +189,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         boolean isApproved =
             NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal,
                 new MutableState()) != TopRuleAppCost.INSTANCE;
+        if (!isApproved) {
+            return false;
+        }
         return reduceTillMax(isApproved, false, Boolean::logicalAnd,
             s -> s.isApprovedApp(app, pio, goal), getResponsibleStrategies(app.rule(),
                 approvalResponsibilityMap, approvalRuleToStrategyMap));
