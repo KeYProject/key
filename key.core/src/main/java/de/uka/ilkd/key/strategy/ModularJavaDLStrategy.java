@@ -52,17 +52,19 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final ArithTermFeatures tf;
     private final RuleSetDispatchFeature conflictCostDispatcher;
     private final Feature totalCost;
-    private final Map<RuleSet, List<ComponentStrategy>> costResponsibilityMap;
-    private final Map<RuleSet, List<ComponentStrategy>> instantiationResponsibilityMap;
-    private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap;
+    private final Map<RuleSet, List<ComponentStrategy>> costResponsibilityMap =
+        new LinkedHashMap<>();
+    private final Map<RuleSet, List<ComponentStrategy>> instantiationResponsibilityMap =
+        new LinkedHashMap<>();
+    private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap =
+        new LinkedHashMap<>();
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> costRuleToStrategyMap =
         new LinkedHashMap<>();
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> instantiationRuleToStrategyMap =
         new LinkedHashMap<>();
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> approvalRuleToStrategyMap =
         new LinkedHashMap<>();
-    private final Map<Name, ComponentStrategy> nameToStrategyMap =
-        new HashMap<>();
+    private final Map<Name, ComponentStrategy> nameToStrategyMap = new HashMap<>();
 
     public ModularJavaDLStrategy(Proof proof, List<ComponentStrategy> componentStrategies,
             StrategyProperties properties) {
@@ -70,17 +72,14 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         strategies.addAll(componentStrategies);
         this.strategyProperties = (StrategyProperties) properties.clone();
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
-        costResponsibilityMap = new LinkedHashMap<>(strategies.size());
-        instantiationResponsibilityMap = new LinkedHashMap<>(strategies.size());
-        approvalResponsibilityMap = new LinkedHashMap<>(strategies.size());
 
         initializeResponsibilityMap(StrategyAspect.Cost, costResponsibilityMap);
         initializeResponsibilityMap(StrategyAspect.Instantiation, instantiationResponsibilityMap);
         initializeResponsibilityMap(StrategyAspect.Approval, approvalResponsibilityMap);
 
         conflictCostDispatcher = resolveConflicts();
-        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
 
+        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
         reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost,
             (rule) -> getResponsibleStrategies(rule, costResponsibilityMap, costRuleToStrategyMap));
 
@@ -89,9 +88,8 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
                 instantiationRuleToStrategyMap));
 
         totalCost =
-            add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
-                reduceCostTillMaxF, conflictCostDispatcher,
-                AgeFeature.INSTANCE, ifMatchedF);
+            add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
+                reduceCostTillMaxF, conflictCostDispatcher, AgeFeature.INSTANCE);
     }
 
     private void initializeResponsibilityMap(StrategyAspect aspect,
@@ -170,10 +168,10 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             MutableState mState) {
         enableInstantiate();
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
-        Feature totalCost =
-            add(AutomatedRuleFeature.getInstance(), NonDuplicateAppFeature.INSTANCE,
-                reduceInstTillMaxF,
-                AgeFeature.INSTANCE, ifMatchedF);
+        final Feature conflictCostDispatcher = resolveConflicts();
+        final Feature totalCost =
+            add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
+                conflictCostDispatcher, reduceInstTillMaxF, AgeFeature.INSTANCE);
         disableInstantiate();
         return totalCost.computeCost(app, pio, goal, mState);
     }
@@ -204,7 +202,6 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     private <R> R reduceTillMax(R init, R max, BiFunction<R, R, R> accumulator,
             Function<ComponentStrategy, R> mapper, LinkedHashSet<ComponentStrategy> strats) {
-
         for (ComponentStrategy strategy : strats) {
             init = accumulator.apply(init, mapper.apply(strategy));
             if (init == max) {
