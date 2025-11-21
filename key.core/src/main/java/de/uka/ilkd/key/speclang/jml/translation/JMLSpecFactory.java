@@ -1015,7 +1015,7 @@ public class JMLSpecFactory {
             result = result.add(contract);
         } else {
             // create two contracts for each diamond and box modality
-            Map<LocationVariable, Term> boxPres = new LinkedHashMap<>(pres);
+            Map<LocationVariable, JTerm> boxPres = new LinkedHashMap<>(pres);
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (clauses.requires.get(heap) != null) {
                     var div = tb.convertToFormula(clauses.diverges);
