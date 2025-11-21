@@ -26,9 +26,12 @@ public interface GoalListener {
     /**
      * Informs the listener that the automatic state {@link Goal#isAutomatic()} has changed.
      *
-     * @param source The changed {@link Goal}.
-     * @param oldAutomatic The old state.
-     * @param newAutomatic The new state.
+     * @param source
+     *        The changed {@link Goal}.
+     * @param oldAutomatic
+     *        The old state.
+     * @param newAutomatic
+     *        The new state.
      */
     void automaticStateChanged(Goal source, boolean oldAutomatic, boolean newAutomatic);
 }

@@ -102,8 +102,10 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
     /**
      * Checks if the call stack size limit is reached.
      *
-     * @param initialCallStackSize The call stack size of the initial set node.
-     * @param currentCallStackSize The call stack size of the current set node.
+     * @param initialCallStackSize
+     *        The call stack size of the initial set node.
+     * @param currentCallStackSize
+     *        The call stack size of the current set node.
      * @return {@code true} limit reached, {@code false} limit node reached.
      */
     protected abstract boolean isCallStackSizeReached(int initialCallStackSize,
@@ -176,8 +178,10 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
         /**
          * Constructor.
          *
-         * @param node The initial {@link Node} of a {@link Goal} on that the auto mode was started.
-         * @param nodeCallStackSize The call stack size of {@link #node}.
+         * @param node
+         *        The initial {@link Node} of a {@link Goal} on that the auto mode was started.
+         * @param nodeCallStackSize
+         *        The call stack size of {@link #node}.
          */
         public NodeStartEntry(Node node, int nodeCallStackSize) {
             super();

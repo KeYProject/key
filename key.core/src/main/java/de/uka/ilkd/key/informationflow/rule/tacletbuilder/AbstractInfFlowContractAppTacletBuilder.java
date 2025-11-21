@@ -68,7 +68,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     /**
      * Builds the taclet.
      *
-     * @param goal the goal
+     * @param goal
+     *        the goal
      * @return the taclet
      */
     public Taclet buildTaclet(Goal goal) {
@@ -94,7 +95,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * the specified node, i.e., a string which encodes branching on the path from the root to the
      * specified node.
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return a string which uniquely identifies the smallest branch of the proof tree containing
      *         the specified node.
      */
@@ -138,8 +140,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     /**
      * Generate schema assumes term.
      *
-     * @param schemaDataAssumes the proof obligation variables for the schema data assumes
-     * @param services the services
+     * @param schemaDataAssumes
+     *        the proof obligation variables for the schema data assumes
+     * @param services
+     *        the services
      * @return the term
      */
     abstract JTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services);
@@ -147,8 +151,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     /**
      * Generate schema find term.
      *
-     * @param schemaDataFind the proof obligation variables for the schema data find
-     * @param services the services
+     * @param schemaDataFind
+     *        the proof obligation variables for the schema data find
+     * @param services
+     *        the services
      * @return the term
      */
     abstract JTerm generateSchemaFind(ProofObligationVars schemaDataFind, Services services);
@@ -156,7 +162,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     /**
      * Gets the contract application predicate.
      *
-     * @param appData the proof obligation variables for the application data
+     * @param appData
+     *        the proof obligation variables for the application data
      * @return the contract application predicate
      */
     abstract JTerm getContractApplPred(ProofObligationVars appData);
@@ -164,9 +171,12 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     /**
      * Generate application data schema variables.
      *
-     * @param schemaPrefix the schema prefix
-     * @param appData the proof obligation variables for the application data
-     * @param services the services object
+     * @param schemaPrefix
+     *        the schema prefix
+     * @param appData
+     *        the proof obligation variables for the application data
+     * @param services
+     *        the services object
      * @return the proof obligation variables
      */
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix, ProofObligationVars appData,
@@ -287,8 +297,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     private static class InfFlowContractAppRewriteTacletBuilder
             extends RewriteTacletBuilder<InfFlowContractAppTaclet> {
 
-        InfFlowContractAppRewriteTacletBuilder() {
-        }
+        InfFlowContractAppRewriteTacletBuilder() {}
 
         @Override
         public InfFlowContractAppTaclet getRewriteTaclet() {

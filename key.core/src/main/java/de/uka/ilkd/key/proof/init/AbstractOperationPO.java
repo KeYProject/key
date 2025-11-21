@@ -8,16 +8,17 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.ast.statement.Try;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -38,6 +39,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -919,25 +921,24 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
+                                KeyTransactionStatement.TransactionType.BEGIN),
                             nullStat, tryStat,
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) }
+                                KeyTransactionStatement.TransactionType.FINISH) }
                         : new Statement[] { nullStat, tryStat });
             } else {
                 sb2 = new StatementBlock(transaction
                         ? new Statement[] {
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
+                                KeyTransactionStatement.TransactionType.BEGIN),
                             nullStat, beforeTry, tryStat,
                             new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) }
+                                KeyTransactionStatement.TransactionType.FINISH) }
                         : new Statement[] { nullStat, beforeTry, tryStat });
             }
         }
         // create java block
-        JavaBlock result = JavaBlock.createJavaBlock(sb2);
-        return result;
+        return JavaBlock.createJavaBlock(sb2);
     }
 
     /**

@@ -23,8 +23,10 @@ public final class GotoReferenceAction extends KeyAction {
     /**
      * Construct a new action.
      *
-     * @param mediator KeY mediator
-     * @param node the node to jump from
+     * @param mediator
+     *        KeY mediator
+     * @param node
+     *        the node to jump from
      */
     public GotoReferenceAction(KeYMediator mediator, Node node) {
         this.mediator = mediator;

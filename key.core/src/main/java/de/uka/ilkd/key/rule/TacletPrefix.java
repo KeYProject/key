@@ -26,8 +26,10 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
     /**
      * creates the prefix
      *
-     * @param prefix the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
-     * @param context a boolean marker
+     * @param prefix
+     *        the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
+     * @param context
+     *        a boolean marker
      */
     public TacletPrefix(ImmutableSet<SchemaVariable> prefix,
             boolean context) {
@@ -60,7 +62,8 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
     /**
      * returns a new TacletPrefix with the context flag set to the given boolean value
      *
-     * @param setTo the boolean to which the TacletPrefix is set to
+     * @param setTo
+     *        the boolean to which the TacletPrefix is set to
      * @return a newly created TacletPrefix
      */
     public TacletPrefix setContext(boolean setTo) {
@@ -70,7 +73,8 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
     /**
      * creates a new TacletPrefix with a new prefix entry
      *
-     * @param var the SchemaVariable to be added
+     * @param var
+     *        the SchemaVariable to be added
      * @return the new prefix
      */
     public TacletPrefix put(SchemaVariable var) {
@@ -83,7 +87,8 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
     /**
      * removes a SchemaVariable from the prefix
      *
-     * @param var the SchemaVariable to be removed
+     * @param var
+     *        the SchemaVariable to be removed
      * @return the new prefix
      */
     public TacletPrefix remove(SchemaVariable var) {

@@ -105,7 +105,8 @@ public class SMTFunction {
     }
 
     /**
-     * @param domainSorts the domainSorts to set
+     * @param domainSorts
+     *        the domainSorts to set
      */
     public void setDomainSorts(List<SMTSort> domainSorts) {
         this.domainSorts = domainSorts;

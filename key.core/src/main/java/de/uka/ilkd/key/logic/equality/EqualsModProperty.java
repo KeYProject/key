@@ -26,7 +26,8 @@ import org.key_project.logic.Property;
  * </ol>
  * </l>
  *
- * @param <T> the type of the objects that are checked for equality or hashed
+ * @param <T>
+ *        the type of the objects that are checked for equality or hashed
  *
  * @author Tobias Reinhold
  */
@@ -42,11 +43,15 @@ public interface EqualsModProperty<T> {
      * To get an overview of the currently implemented properties, see the documentation of
      * {@link EqualsModProperty}.
      *
-     * @param o the object that is checked for equality
-     * @param property the property to be ignored in the equality check
-     * @param v the additional arguments needed by {@code property} for the equality check
+     * @param o
+     *        the object that is checked for equality
+     * @param property
+     *        the property to be ignored in the equality check
+     * @param v
+     *        the additional arguments needed by {@code property} for the equality check
      * @return whether this object is equal to <code>o</code>
-     * @param <V> the type of the additional parameters needed by {@code property} for the
+     * @param <V>
+     *        the type of the additional parameters needed by {@code property} for the
      *        comparison
      */
     <V> boolean equalsModProperty(Object o, Property<T> property, V... v);
@@ -54,7 +59,8 @@ public interface EqualsModProperty<T> {
     /**
      * Computes the hash code according to the given ignored {@code property}.
      *
-     * @param property the ignored property according to which the hash code is computed
+     * @param property
+     *        the ignored property according to which the hash code is computed
      * @return the hash code of this object
      */
     int hashCodeModProperty(Property<? super T> property);

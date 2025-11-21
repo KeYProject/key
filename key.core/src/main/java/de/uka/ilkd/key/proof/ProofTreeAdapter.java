@@ -92,6 +92,5 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * {@inheritDoc}
      */
     @Override
-    public void notesChanged(ProofTreeEvent e) {
-    }
+    public void notesChanged(ProofTreeEvent e) {}
 }

@@ -9,13 +9,21 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
 
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
 
 /**
  * A container to hold parsed configurations. Configurations are a mapping between property names

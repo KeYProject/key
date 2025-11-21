@@ -188,7 +188,7 @@
          (rule "variableDeclaration" (formula "10") (term "1") (newnames "t_7"))
          (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "10") (term "1") (inst "#v0=t_8"))
          (rule "variableDeclaration" (formula "10") (term "1") (newnames "t_8"))
-         (rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_<createObject>_0,savedHeapBefore_<createObject>"))
+         (rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_$createObject_0,savedHeapBefore_$createObject"))
          (builtin "One Step Simplification" (formula "10"))
          (rule "variableDeclaration" (formula "10") (term "1") (newnames "__NEW___1"))
          (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "10") (term "1") (inst "#v0=t_9"))
@@ -208,16 +208,16 @@
          (rule "assignment" (formula "13") (term "1"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallWithinClass" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<prepareEnter>_0,savedHeapBefore_<prepareEnter>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$prepareEnter_0,savedHeapBefore_$prepareEnter"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallSuper" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<prepare>_2,savedHeapBefore_<prepare>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$prepare_2,savedHeapBefore_$prepare"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallSuper" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<prepare>_3,savedHeapBefore_<prepare>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$prepare_3,savedHeapBefore_$prepare"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallSuper" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<prepare>_4,savedHeapBefore_<prepare>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$prepare_4,savedHeapBefore_$prepare"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallEmpty" (formula "13") (term "1"))
          (rule "blockEmpty" (formula "13") (term "1"))
@@ -237,16 +237,16 @@
          (rule "blockEmpty" (formula "13") (term "1"))
          (rule "assignment" (formula "13") (term "1"))
          (builtin "One Step Simplification" (formula "13"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<init>_3,savedHeapBefore_<init>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$init_3,savedHeapBefore_$init"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallSuper" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<init>_4,savedHeapBefore_<init>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$init_4,savedHeapBefore_$init"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallSuper" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<init>_5,savedHeapBefore_<init>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$init_5,savedHeapBefore_$init"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallSuper" (formula "13") (term "1"))
-         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<init>_6,savedHeapBefore_<init>"))
+         (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_$init_6,savedHeapBefore_$init"))
          (builtin "One Step Simplification" (formula "13"))
          (rule "methodCallEmpty" (formula "13") (term "1"))
          (rule "blockEmpty" (formula "13") (term "1"))
@@ -380,7 +380,7 @@
                               (builtin "One Step Simplification" (formula "15"))
                               (rule "notRight" (formula "15"))
                               (rule "ifthenelse_split" (formula "16") (term "2,2,2,0"))
-                              (branch "f_9 = <created> & o_9 = t_9 TRUE"
+                              (branch "f_9 = $created & o_9 = t_9 TRUE"
                                  (rule "andLeft" (formula "1"))
                                  (rule "replace_known_left" (formula "18") (term "1,0,0") (ifseqformula "2"))
                                  (builtin "One Step Simplification" (formula "18") (ifInst ""  (formula "2")) (ifInst ""  (formula "2")))
@@ -393,7 +393,7 @@
                                  (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                  (rule "close" (formula "13") (ifseqformula "3"))
                               )
-                              (branch "f_9 = <created> & o_9 = t_9 FALSE"
+                              (branch "f_9 = $created & o_9 = t_9 FALSE"
                                  (rule "ifthenelse_split" (formula "17") (term "2,2,0"))
                                  (branch "f_9 = cause & o_9 = t_9 TRUE"
                                     (builtin "One Step Simplification" (formula "18"))
@@ -415,7 +415,7 @@
                                  )
                                  (branch "f_9 = cause & o_9 = t_9 FALSE"
                                     (rule "ifthenelse_split" (formula "18") (term "0"))
-                                    (branch "f_9 = <initialized> & o_9 = t_9 TRUE"
+                                    (branch "f_9 = $initialized & o_9 = t_9 TRUE"
                                        (rule "andLeft" (formula "1"))
                                        (rule "eqSymm" (formula "20"))
                                        (rule "replace_known_left" (formula "19") (term "1") (ifseqformula "2"))
@@ -435,7 +435,7 @@
                                        (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                        (rule "close" (formula "13") (ifseqformula "3"))
                                     )
-                                    (branch "f_9 = <initialized> & o_9 = t_9 FALSE"
+                                    (branch "f_9 = $initialized & o_9 = t_9 FALSE"
                                        (rule "ifthenelse_split" (formula "19") (term "0"))
                                        (branch "f_9 = message & o_9 = t_9 TRUE"
                                           (rule "andLeft" (formula "1"))
@@ -522,7 +522,7 @@
                               (builtin "One Step Simplification" (formula "16"))
                               (rule "notRight" (formula "16"))
                               (rule "ifthenelse_split" (formula "17") (term "2,2,2,0"))
-                              (branch "f_9 = <created> & o_9 = t_9 TRUE"
+                              (branch "f_9 = $created & o_9 = t_9 TRUE"
                                  (rule "andLeft" (formula "1"))
                                  (rule "replace_known_left" (formula "19") (term "1,0,0") (ifseqformula "2"))
                                  (builtin "One Step Simplification" (formula "19") (ifInst ""  (formula "2")) (ifInst ""  (formula "2")))
@@ -535,7 +535,7 @@
                                  (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                  (rule "close" (formula "14") (ifseqformula "3"))
                               )
-                              (branch "f_9 = <created> & o_9 = t_9 FALSE"
+                              (branch "f_9 = $created & o_9 = t_9 FALSE"
                                  (rule "ifthenelse_split" (formula "18") (term "2,0"))
                                  (branch "f_9 = message & o_9 = t_9 TRUE"
                                     (rule "andLeft" (formula "1"))
@@ -554,7 +554,7 @@
                                  )
                                  (branch "f_9 = message & o_9 = t_9 FALSE"
                                     (rule "ifthenelse_split" (formula "19") (term "0"))
-                                    (branch "f_9 = <initialized> & o_9 = t_9 TRUE"
+                                    (branch "f_9 = $initialized & o_9 = t_9 TRUE"
                                        (rule "andLeft" (formula "1"))
                                        (rule "eqSymm" (formula "21"))
                                        (rule "replace_known_left" (formula "19") (term "1") (ifseqformula "2"))
@@ -565,7 +565,7 @@
                                        (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                        (rule "close" (formula "14") (ifseqformula "3"))
                                     )
-                                    (branch "f_9 = <initialized> & o_9 = t_9 FALSE"
+                                    (branch "f_9 = $initialized & o_9 = t_9 FALSE"
                                        (rule "ifthenelse_split" (formula "20") (term "0"))
                                        (branch "f_9 = cause & o_9 = t_9 TRUE"
                                           (rule "andLeft" (formula "1"))
@@ -683,7 +683,7 @@
                      (rule "variableDeclaration" (formula "11") (term "1") (newnames "t_3"))
                      (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "11") (term "1") (inst "#v0=t_4"))
                      (rule "variableDeclaration" (formula "11") (term "1") (newnames "t_4"))
-                     (rule "methodBodyExpand" (formula "11") (term "1") (newnames "heapBefore_<createObject>,savedHeapBefore_<createObject>"))
+                     (rule "methodBodyExpand" (formula "11") (term "1") (newnames "heapBefore_$createObject,savedHeapBefore_$createObject"))
                      (builtin "One Step Simplification" (formula "11"))
                      (rule "variableDeclaration" (formula "11") (term "1") (newnames "__NEW__"))
                      (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "11") (term "1") (inst "#v0=t_5"))
@@ -703,16 +703,16 @@
                      (rule "assignment" (formula "14") (term "1"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallWithinClass" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<prepareEnter>,savedHeapBefore_<prepareEnter>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$prepareEnter,savedHeapBefore_$prepareEnter"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallSuper" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<prepare>,savedHeapBefore_<prepare>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$prepare,savedHeapBefore_$prepare"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallSuper" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<prepare>_0,savedHeapBefore_<prepare>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$prepare_0,savedHeapBefore_$prepare"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallSuper" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<prepare>_1,savedHeapBefore_<prepare>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$prepare_1,savedHeapBefore_$prepare"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallEmpty" (formula "14") (term "1"))
                      (rule "blockEmpty" (formula "14") (term "1"))
@@ -732,16 +732,16 @@
                      (rule "blockEmpty" (formula "14") (term "1"))
                      (rule "assignment" (formula "14") (term "1"))
                      (builtin "One Step Simplification" (formula "14"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<init>,savedHeapBefore_<init>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$init,savedHeapBefore_$init"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallSuper" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<init>_0,savedHeapBefore_<init>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$init_0,savedHeapBefore_$init"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallSuper" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<init>_1,savedHeapBefore_<init>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$init_1,savedHeapBefore_$init"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallSuper" (formula "14") (term "1"))
-                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_<init>_2,savedHeapBefore_<init>"))
+                     (rule "methodBodyExpand" (formula "14") (term "1") (newnames "heapBefore_$init_2,savedHeapBefore_$init"))
                      (builtin "One Step Simplification" (formula "14"))
                      (rule "methodCallEmpty" (formula "14") (term "1"))
                      (rule "blockEmpty" (formula "14") (term "1"))
@@ -901,7 +901,7 @@
                                        )
                                        (branch "f_8 = message & o_8 = t_5 FALSE"
                                           (rule "ifthenelse_split" (formula "18") (term "2,2,0"))
-                                          (branch "f_8 = <created> & o_8 = t_5 TRUE"
+                                          (branch "f_8 = $created & o_8 = t_5 TRUE"
                                              (rule "andLeft" (formula "1"))
                                              (rule "replace_known_left" (formula "20") (term "1,0,2,0") (ifseqformula "2"))
                                              (builtin "One Step Simplification" (formula "20") (ifInst ""  (formula "2")))
@@ -915,7 +915,7 @@
                                              (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                              (rule "close" (formula "13") (ifseqformula "3"))
                                           )
-                                          (branch "f_8 = <created> & o_8 = t_5 FALSE"
+                                          (branch "f_8 = $created & o_8 = t_5 FALSE"
                                              (rule "ifthenelse_split" (formula "19") (term "2,0"))
                                              (branch "f_8 = cause & o_8 = t_5 TRUE"
                                                 (rule "andLeft" (formula "1"))
@@ -940,7 +940,7 @@
                                              )
                                              (branch "f_8 = cause & o_8 = t_5 FALSE"
                                                 (rule "ifthenelse_split" (formula "20") (term "0"))
-                                                (branch "f_8 = <initialized> & o_8 = t_5 TRUE"
+                                                (branch "f_8 = $initialized & o_8 = t_5 TRUE"
                                                    (rule "andLeft" (formula "1"))
                                                    (rule "eqSymm" (formula "22"))
                                                    (rule "replace_known_left" (formula "19") (term "1") (ifseqformula "2"))
@@ -953,7 +953,7 @@
                                                    (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                                    (rule "close" (formula "13") (ifseqformula "3"))
                                                 )
-                                                (branch "f_8 = <initialized> & o_8 = t_5 FALSE"
+                                                (branch "f_8 = $initialized & o_8 = t_5 FALSE"
                                                    (builtin "One Step Simplification" (formula "21"))
                                                    (rule "closeTrue" (formula "21"))
                                                 )
@@ -1051,7 +1051,7 @@
                                           )
                                           (branch "f_8 = message & o_8 = t_5 FALSE"
                                              (rule "ifthenelse_split" (formula "20") (term "0"))
-                                             (branch "f_8 = <initialized> & o_8 = t_5 TRUE"
+                                             (branch "f_8 = $initialized & o_8 = t_5 TRUE"
                                                 (rule "andLeft" (formula "1"))
                                                 (rule "eqSymm" (formula "22"))
                                                 (rule "replace_known_left" (formula "20") (term "1") (ifseqformula "2"))
@@ -1065,9 +1065,9 @@
                                                 (rule "applyEq" (formula "3") (term "1,0") (ifseqformula "2"))
                                                 (rule "close" (formula "14") (ifseqformula "3"))
                                              )
-                                             (branch "f_8 = <initialized> & o_8 = t_5 FALSE"
+                                             (branch "f_8 = $initialized & o_8 = t_5 FALSE"
                                                 (rule "ifthenelse_split" (formula "21") (term "0"))
-                                                (branch "f_8 = <created> & o_8 = t_5 TRUE"
+                                                (branch "f_8 = $created & o_8 = t_5 TRUE"
                                                    (rule "andLeft" (formula "1"))
                                                    (rule "eqSymm" (formula "23"))
                                                    (rule "replace_known_left" (formula "20") (term "1") (ifseqformula "2"))
@@ -1090,7 +1090,7 @@
                                                    (rule "castTrueImpliesOriginalTrue" (formula "19") (ifseqformula "3"))
                                                    (rule "closeTrue" (formula "19"))
                                                 )
-                                                (branch "f_8 = <created> & o_8 = t_5 FALSE"
+                                                (branch "f_8 = $created & o_8 = t_5 FALSE"
                                                    (builtin "One Step Simplification" (formula "22"))
                                                    (rule "closeTrue" (formula "22"))
                                                 )
@@ -1479,11 +1479,11 @@
                                     (builtin "One Step Simplification" (formula "26"))
                                     (rule "add_literals" (formula "26") (term "1,0,0,0,1,0,0"))
                                     (rule "ifthenelse_split" (formula "23") (term "0"))
-                                    (branch "self_5.<created> = TRUE TRUE"
+                                    (branch "self_5.$created = TRUE TRUE"
                                        (builtin "One Step Simplification" (formula "24"))
                                        (rule "closeTrue" (formula "24"))
                                     )
-                                    (branch "self_5.<created> = TRUE FALSE"
+                                    (branch "self_5.$created = TRUE FALSE"
                                        (rule "replace_known_right" (formula "27") (term "0,1,0") (ifseqformula "23"))
                                        (builtin "One Step Simplification" (formula "27"))
                                        (rule "cut_direct" (formula "2") (term "0"))
@@ -1544,11 +1544,11 @@
                                                 (rule "replace_known_right" (formula "30") (term "1,0,2,0") (ifseqformula "29"))
                                                 (builtin "One Step Simplification" (formula "30") (ifInst ""  (formula "28")))
                                                 (rule "ifthenelse_split" (formula "30") (term "0,0,1,0,0"))
-                                                (branch "o_7.<created> = TRUE TRUE"
+                                                (branch "o_7.$created = TRUE TRUE"
                                                    (builtin "One Step Simplification" (formula "31"))
                                                    (rule "closeTrue" (formula "31"))
                                                 )
-                                                (branch "o_7.<created> = TRUE FALSE"
+                                                (branch "o_7.$created = TRUE FALSE"
                                                    (rule "replace_known_right" (formula "29") (term "0,1") (ifseqformula "30"))
                                                    (builtin "One Step Simplification" (formula "29"))
                                                    (rule "notRight" (formula "29"))
@@ -1720,11 +1720,11 @@
                                                 (rule "replace_known_right" (formula "31") (term "0,0,0,2,0") (ifseqformula "29"))
                                                 (builtin "One Step Simplification" (formula "31") (ifInst ""  (formula "30")))
                                                 (rule "ifthenelse_split" (formula "31") (term "0,0,1,0,0"))
-                                                (branch "o_6.<created> = TRUE TRUE"
+                                                (branch "o_6.$created = TRUE TRUE"
                                                    (builtin "One Step Simplification" (formula "32"))
                                                    (rule "closeTrue" (formula "32"))
                                                 )
-                                                (branch "o_6.<created> = TRUE FALSE"
+                                                (branch "o_6.$created = TRUE FALSE"
                                                    (rule "replace_known_right" (formula "30") (term "0,1") (ifseqformula "31"))
                                                    (builtin "One Step Simplification" (formula "30"))
                                                    (rule "notRight" (formula "30"))
@@ -3327,17 +3327,17 @@
                                     (builtin "One Step Simplification" (formula "37"))
                                     (rule "true_left" (formula "37"))
                                     (rule "ifthenelse_split" (formula "39") (term "0"))
-                                    (branch " if (self_4.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, self_4, <created>)) = TRUE TRUE"
+                                    (branch " if (self_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, self_4, $created)) = TRUE TRUE"
                                        (builtin "One Step Simplification" (formula "40"))
                                        (rule "closeTrue" (formula "40"))
                                     )
-                                    (branch " if (self_4.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, self_4, <created>)) = TRUE FALSE"
+                                    (branch " if (self_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, self_4, $created)) = TRUE FALSE"
                                        (rule "ifthenelse_split" (formula "41") (term "0"))
-                                       (branch "result_3.<created> = TRUE TRUE"
+                                       (branch "result_3.$created = TRUE TRUE"
                                           (builtin "One Step Simplification" (formula "42"))
                                           (rule "closeTrue" (formula "42"))
                                        )
-                                       (branch "result_3.<created> = TRUE FALSE"
+                                       (branch "result_3.$created = TRUE FALSE"
                                           (rule "cut_direct" (formula "2") (term "0"))
                                           (branch "CUT: s.a = null TRUE"
                                              (builtin "One Step Simplification" (formula "3"))
@@ -3380,15 +3380,15 @@
                                              (rule "replace_known_right" (formula "33") (term "0") (ifseqformula "45"))
                                              (builtin "One Step Simplification" (formula "33"))
                                              (rule "ifthenelse_split" (formula "39") (term "0"))
-                                             (branch "self_4.<created> = TRUE TRUE"
+                                             (branch "self_4.$created = TRUE TRUE"
                                                 (builtin "One Step Simplification" (formula "40"))
                                                 (rule "closeTrue" (formula "40"))
                                              )
-                                             (branch "self_4.<created> = TRUE FALSE"
+                                             (branch "self_4.$created = TRUE FALSE"
                                                 (rule "replace_known_right" (formula "49") (term "0,1,0") (ifseqformula "39"))
                                                 (builtin "One Step Simplification" (formula "49"))
                                                 (rule "cut_direct" (formula "26") (term "0,1,0"))
-                                                (branch "CUT: java.lang.Object.<created> = TRUE TRUE"
+                                                (branch "CUT: java.lang.Object.$created = TRUE TRUE"
                                                    (builtin "One Step Simplification" (formula "27") (ifInst ""  (formula "25")))
                                                    (rule "true_left" (formula "27"))
                                                    (rule "replace_known_left" (formula "27") (term "1,0,0") (ifseqformula "26"))
@@ -3627,11 +3627,11 @@
                                                             (rule "replace_known_right" (formula "51") (term "0,0,0,2,0") (ifseqformula "49"))
                                                             (builtin "One Step Simplification" (formula "51") (ifInst ""  (formula "49")) (ifInst ""  (formula "50")))
                                                             (rule "ifthenelse_split" (formula "51") (term "0,0,0,0,1,0,0"))
-                                                            (branch "o_5.<created> = TRUE TRUE"
+                                                            (branch "o_5.$created = TRUE TRUE"
                                                                (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "1")))
                                                                (rule "closeTrue" (formula "52"))
                                                             )
-                                                            (branch "o_5.<created> = TRUE FALSE"
+                                                            (branch "o_5.$created = TRUE FALSE"
                                                                (rule "replace_known_right" (formula "52") (term "0,0,0,1,0,2,0") (ifseqformula "51"))
                                                                (builtin "One Step Simplification" (formula "52"))
                                                                (rule "replace_known_right" (formula "50") (term "0,1") (ifseqformula "51"))
@@ -3875,7 +3875,7 @@
                                                       (rule "closeFalse" (formula "15"))
                                                    )
                                                 )
-                                                (branch "CUT: java.lang.Object.<created> = TRUE FALSE"
+                                                (branch "CUT: java.lang.Object.$created = TRUE FALSE"
                                                    (builtin "One Step Simplification" (formula "26"))
                                                    (rule "true_left" (formula "26"))
                                                    (rule "replace_known_right" (formula "26") (term "1,0,0") (ifseqformula "37"))
@@ -3884,7 +3884,7 @@
                                                    (builtin "One Step Simplification" (formula "17"))
                                                    (rule "true_left" (formula "17"))
                                                    (rule "cut_direct" (formula "25") (term "0,1,0"))
-                                                   (branch "CUT: boolean::select(anonHeap_build, null, <created>) = TRUE TRUE"
+                                                   (branch "CUT: boolean::select(anonHeap_build, null, $created) = TRUE TRUE"
                                                       (builtin "One Step Simplification" (formula "26") (ifInst ""  (formula "24")))
                                                       (rule "true_left" (formula "26"))
                                                       (rule "cut_direct" (formula "48") (term "1,0,0"))
@@ -4117,20 +4117,20 @@
                                                                (rule "replace_known_right" (formula "52") (term "0,0,0,2,0") (ifseqformula "50"))
                                                                (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "50")) (ifInst ""  (formula "51")))
                                                                (rule "ifthenelse_split" (formula "52") (term "0,0,1,0,0"))
-                                                               (branch " if (o_4.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_4, <created>)) = TRUE TRUE"
+                                                               (branch " if (o_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_4, $created)) = TRUE TRUE"
                                                                   (builtin "One Step Simplification" (formula "53") (ifInst ""  (formula "1")))
                                                                   (rule "closeTrue" (formula "53"))
                                                                )
-                                                               (branch " if (o_4.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_4, <created>)) = TRUE FALSE"
+                                                               (branch " if (o_4.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_4, $created)) = TRUE FALSE"
                                                                   (rule "replace_known_right" (formula "53") (term "0,1,0,2,0") (ifseqformula "52"))
                                                                   (builtin "One Step Simplification" (formula "53"))
                                                                   (rule "ifthenelse_negated" (formula "53") (term "2,0"))
                                                                   (rule "ifthenelse_split" (formula "52") (term "0"))
-                                                                  (branch "o_4.<created> = TRUE TRUE"
+                                                                  (branch "o_4.$created = TRUE TRUE"
                                                                      (builtin "One Step Simplification" (formula "53"))
                                                                      (rule "closeTrue" (formula "53"))
                                                                   )
-                                                                  (branch "o_4.<created> = TRUE FALSE"
+                                                                  (branch "o_4.$created = TRUE FALSE"
                                                                      (rule "replace_known_right" (formula "51") (term "0,1") (ifseqformula "52"))
                                                                      (builtin "One Step Simplification" (formula "51"))
                                                                      (rule "notRight" (formula "51"))
@@ -4373,7 +4373,7 @@
                                                          (rule "closeFalse" (formula "23"))
                                                       )
                                                    )
-                                                   (branch "CUT: boolean::select(anonHeap_build, null, <created>) = TRUE FALSE"
+                                                   (branch "CUT: boolean::select(anonHeap_build, null, $created) = TRUE FALSE"
                                                       (builtin "One Step Simplification" (formula "25"))
                                                       (rule "true_left" (formula "25"))
                                                       (rule "cut_direct" (formula "48") (term "1,0,0"))
@@ -4606,7 +4606,7 @@
                                                                (rule "replace_known_right" (formula "52") (term "0,0,0,2,0") (ifseqformula "50"))
                                                                (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "50")) (ifInst ""  (formula "51")))
                                                                (rule "ifthenelse_split" (formula "52") (term "0"))
-                                                               (branch " !o_3 = null & ! if ( if (o_3.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_3, <created>)) = TRUE) then (TRUE) else (boolean::select(anonHeap_build_0, o_3, <created>)) = TRUE TRUE"
+                                                               (branch " !o_3 = null & ! if ( if (o_3.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_3, $created)) = TRUE) then (TRUE) else (boolean::select(anonHeap_build_0, o_3, $created)) = TRUE TRUE"
                                                                   (rule "andLeft" (formula "1"))
                                                                   (rule "notLeft" (formula "1"))
                                                                   (rule "notLeft" (formula "1"))
@@ -4617,13 +4617,13 @@
                                                                   (builtin "One Step Simplification" (formula "38"))
                                                                   (rule "closeTrue" (formula "38"))
                                                                )
-                                                               (branch " !o_3 = null & ! if ( if (o_3.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_3, <created>)) = TRUE) then (TRUE) else (boolean::select(anonHeap_build_0, o_3, <created>)) = TRUE FALSE"
+                                                               (branch " !o_3 = null & ! if ( if (o_3.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_3, $created)) = TRUE) then (TRUE) else (boolean::select(anonHeap_build_0, o_3, $created)) = TRUE FALSE"
                                                                   (rule "ifthenelse_split" (formula "53") (term "0,0,1,0,0"))
-                                                                  (branch "o_3.<created> = TRUE TRUE"
+                                                                  (branch "o_3.$created = TRUE TRUE"
                                                                      (builtin "One Step Simplification" (formula "54"))
                                                                      (rule "closeTrue" (formula "54"))
                                                                   )
-                                                                  (branch "o_3.<created> = TRUE FALSE"
+                                                                  (branch "o_3.$created = TRUE FALSE"
                                                                      (rule "replace_known_right" (formula "51") (term "0,1") (ifseqformula "53"))
                                                                      (builtin "One Step Simplification" (formula "51"))
                                                                      (rule "notRight" (formula "51"))
@@ -4903,11 +4903,11 @@
                                              (builtin "One Step Simplification" (formula "32"))
                                              (rule "applyEq" (formula "32") (term "1,0") (ifseqformula "33"))
                                              (rule "ifthenelse_split" (formula "37") (term "0"))
-                                             (branch "self_4.<created> = TRUE TRUE"
+                                             (branch "self_4.$created = TRUE TRUE"
                                                 (builtin "One Step Simplification" (formula "38"))
                                                 (rule "closeTrue" (formula "38"))
                                              )
-                                             (branch "self_4.<created> = TRUE FALSE"
+                                             (branch "self_4.$created = TRUE FALSE"
                                                 (rule "replace_known_right" (formula "47") (term "0,1,0") (ifseqformula "37"))
                                                 (builtin "One Step Simplification" (formula "47"))
                                                 (rule "cut_direct" (formula "47") (term "1,0,0"))
@@ -5140,20 +5140,20 @@
                                                          (rule "replace_known_right" (formula "51") (term "0,0,0,2,2,0") (ifseqformula "49"))
                                                          (builtin "One Step Simplification" (formula "51") (ifInst ""  (formula "49")) (ifInst ""  (formula "50")))
                                                          (rule "ifthenelse_split" (formula "51") (term "0,0,1,0,0"))
-                                                         (branch " if (o_2.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_2, <created>)) = TRUE TRUE"
+                                                         (branch " if (o_2.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_2, $created)) = TRUE TRUE"
                                                             (builtin "One Step Simplification" (formula "52") (ifInst ""  (formula "1")))
                                                             (rule "closeTrue" (formula "52"))
                                                          )
-                                                         (branch " if (o_2.<created> = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_2, <created>)) = TRUE FALSE"
+                                                         (branch " if (o_2.$created = TRUE) then (TRUE) else (boolean::select(anonHeap_build, o_2, $created)) = TRUE FALSE"
                                                             (rule "replace_known_right" (formula "52") (term "0,1,0,2,0") (ifseqformula "51"))
                                                             (builtin "One Step Simplification" (formula "52"))
                                                             (rule "ifthenelse_negated" (formula "52") (term "2,0"))
                                                             (rule "ifthenelse_split" (formula "51") (term "0"))
-                                                            (branch "o_2.<created> = TRUE TRUE"
+                                                            (branch "o_2.$created = TRUE TRUE"
                                                                (builtin "One Step Simplification" (formula "52"))
                                                                (rule "closeTrue" (formula "52"))
                                                             )
-                                                            (branch "o_2.<created> = TRUE FALSE"
+                                                            (branch "o_2.$created = TRUE FALSE"
                                                                (rule "replace_known_right" (formula "50") (term "0,1") (ifseqformula "51"))
                                                                (builtin "One Step Simplification" (formula "50"))
                                                                (rule "notRight" (formula "50"))
@@ -5503,7 +5503,7 @@
                                        (rule "replace_known_right" (formula "29") (term "0,0,2,0") (ifseqformula "27"))
                                        (builtin "One Step Simplification" (formula "29"))
                                        (rule "ifthenelse_split" (formula "20") (term "0,0,0"))
-                                       (branch "exc_6.<created> = TRUE TRUE"
+                                       (branch "exc_6.$created = TRUE TRUE"
                                           (builtin "One Step Simplification" (formula "21"))
                                           (rule "true_left" (formula "21"))
                                           (rule "cut_direct" (formula "2") (term "0"))
@@ -5558,7 +5558,7 @@
                                              )
                                           )
                                        )
-                                       (branch "exc_6.<created> = TRUE FALSE"
+                                       (branch "exc_6.$created = TRUE FALSE"
                                           (rule "cut_direct" (formula "2") (term "0"))
                                           (branch "CUT: s.a = null TRUE"
                                              (builtin "One Step Simplification" (formula "3"))
@@ -5802,7 +5802,7 @@
                                     (rule "add_literals" (formula "1") (term "0,0"))
                                     (rule "add_zero_left" (formula "1") (term "0"))
                                     (rule "cut_direct" (formula "18") (term "0,1,0"))
-                                    (branch "CUT: java.lang.Object.<created> = TRUE TRUE"
+                                    (branch "CUT: java.lang.Object.$created = TRUE TRUE"
                                        (builtin "One Step Simplification" (formula "19") (ifInst ""  (formula "17")))
                                        (rule "true_left" (formula "19"))
                                        (rule "arrayLengthNotNegative" (formula "4") (term "0"))
@@ -5977,7 +5977,7 @@
                                           )
                                        )
                                     )
-                                    (branch "CUT: java.lang.Object.<created> = TRUE FALSE"
+                                    (branch "CUT: java.lang.Object.$created = TRUE FALSE"
                                        (builtin "One Step Simplification" (formula "18"))
                                        (rule "true_left" (formula "18"))
                                        (rule "arrayLengthNotNegative" (formula "4") (term "0"))

@@ -21,7 +21,8 @@ public class QuickLoadAction extends MainWindowAction {
     /**
      * Create a new action.
      *
-     * @param mainWindow the main window.
+     * @param mainWindow
+     *        the main window.
      */
     public QuickLoadAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -33,7 +34,8 @@ public class QuickLoadAction extends MainWindowAction {
      * Load the file saved at the location described by
      * {@link QuickSaveAction#quickSave(MainWindow)}.
      *
-     * @param mainWindow the main window.
+     * @param mainWindow
+     *        the main window.
      */
     public static void quickLoad(MainWindow mainWindow) {
         final String filename = QuickSaveAction.QUICK_SAVE_PATH;

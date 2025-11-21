@@ -41,9 +41,12 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     /**
      * Constructor
      *
-     * @param kind The reference kind as human readable {@link String}.
-     * @param node Node to access the source {@link Proof} (or null).
-     * @param target The target source member.
+     * @param kind
+     *        The reference kind as human readable {@link String}.
+     * @param node
+     *        Node to access the source {@link Proof} (or null).
+     * @param target
+     *        The target source member.
      */
     public DefaultProofReference(String kind, Node node, T target) {
         this.kind = kind;

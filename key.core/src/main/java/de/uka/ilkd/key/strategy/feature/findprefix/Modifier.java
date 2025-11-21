@@ -16,7 +16,8 @@ interface Modifier {
     /**
      * Function which delivers a new position based on pos.
      *
-     * @param pos the position to be modified
+     * @param pos
+     *        the position to be modified
      * @return the (new) position
      */
     PosInOccurrence modifyPosition(PosInOccurrence pos);

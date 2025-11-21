@@ -11,28 +11,28 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodOrConstructorReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.MethodOrConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SuperReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -96,8 +96,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     // constructors
     // -------------------------------------------------------------------------
 
-    private UseOperationContractRule() {
-    }
+    private UseOperationContractRule() {}
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -174,11 +173,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                     // execContext are in different packages we have to
                     // simulate visibility rules like being in prefixType
                     result = methRef.method(services, staticType,
-                        methRef.getMethodSignature(services, ec), staticType);
+                        methRef.getMethodSignature(services, ec));
                 }
             } else {
                 result = methRef.method(services, staticType,
-                    methRef.getMethodSignature(services, ec), staticType);
+                    methRef.getMethodSignature(services, ec));
             }
         } else {
             New n = (New) mr;
@@ -223,8 +222,10 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * Returns the operation contracts which are applicable for the passed instantiation.
      *
-     * @param inst the operation contract rule instantiation
-     * @param services the services object
+     * @param inst
+     *        the operation contract rule instantiation
+     * @param services
+     *        the services object
      * @return all applicable contracts
      */
     public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
@@ -241,10 +242,14 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Returns the operation contracts which are applicable for the passed operation and the passed
      * modality.
      *
-     * @param services the services object
-     * @param pm the program method
-     * @param kjt the KeYJavaType of the class
-     * @param modalityKind the modality
+     * @param services
+     *        the services object
+     * @param pm
+     *        the program method
+     * @param kjt
+     *        the KeYJavaType of the class
+     * @param modalityKind
+     *        the modality
      * @return all applicable contracts
      */
     private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
@@ -885,16 +890,26 @@ public final class UseOperationContractRule implements BuiltInRule {
         /**
          * Creates a new instantiation for the contract rule and the given variables.
          *
-         * @param u the enclosing update term
-         * @param progPost the post condition of the program method
-         * @param modality the modality
-         * @param actualResult the result expression
-         * @param actualSelf the self term
-         * @param staticType the static type
-         * @param mr TODO
-         * @param pm the program method
-         * @param actualParams the actual parameter terms
-         * @param transaction TODO
+         * @param u
+         *        the enclosing update term
+         * @param progPost
+         *        the post condition of the program method
+         * @param modality
+         *        the modality
+         * @param actualResult
+         *        the result expression
+         * @param actualSelf
+         *        the self term
+         * @param staticType
+         *        the static type
+         * @param mr
+         *        TODO
+         * @param pm
+         *        the program method
+         * @param actualParams
+         *        the actual parameter terms
+         * @param transaction
+         *        TODO
          */
         public Instantiation(JTerm u, JTerm progPost, JModality modality, Expression actualResult,
                 JTerm actualSelf, KeYJavaType staticType, MethodOrConstructorReference mr,
@@ -932,9 +947,12 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * Returns the correct pre-heap variables.
      *
-     * @param heapContext the heap variables
-     * @param services the services object
-     * @param inst the instantiation for the operation contract rule
+     * @param heapContext
+     *        the heap variables
+     * @param services
+     *        the services object
+     * @param inst
+     *        the instantiation for the operation contract rule
      * @return a list of the resulting pre-heap variables
      */
     public static Map<LocationVariable, LocationVariable> computeAtPreVars(
@@ -945,12 +963,18 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * Returns the correct self term.
      *
-     * @param baseHeapTerm the heap term
-     * @param atPres the pre-heap variables as terms
-     * @param baseHeap the heap variable
-     * @param inst the instantiation for the operation contract rule
-     * @param resultTerm the term of the result variable
-     * @param tf the term factory
+     * @param baseHeapTerm
+     *        the heap term
+     * @param atPres
+     *        the pre-heap variables as terms
+     * @param baseHeap
+     *        the heap variable
+     * @param inst
+     *        the instantiation for the operation contract rule
+     * @param resultTerm
+     *        the term of the result variable
+     * @param tf
+     *        the term factory
      * @return the resulting self term
      */
     public static JTerm computeSelf(JTerm baseHeapTerm, Map<LocationVariable, JTerm> atPres,
@@ -962,11 +986,16 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * Returns the correct parameter terms.
      *
-     * @param baseHeapTerm the heap term
-     * @param atPres the pre-heap variables as terms
-     * @param baseHeap the heap variable
-     * @param inst the instantiation for the operation contract rule
-     * @param tf the term factory
+     * @param baseHeapTerm
+     *        the heap term
+     * @param atPres
+     *        the pre-heap variables as terms
+     * @param baseHeap
+     *        the heap variable
+     * @param inst
+     *        the instantiation for the operation contract rule
+     * @param tf
+     *        the term factory
      * @return a list of the resulting parameter terms
      */
     public static ImmutableList<JTerm> computeParams(JTerm baseHeapTerm,
@@ -978,8 +1007,10 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * Computes the result variable for this instantiation.
      *
-     * @param inst the instantiation for the operation contract rule
-     * @param services the services object
+     * @param inst
+     *        the instantiation for the operation contract rule
+     * @param services
+     *        the services object
      * @return the result variable
      */
     public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {

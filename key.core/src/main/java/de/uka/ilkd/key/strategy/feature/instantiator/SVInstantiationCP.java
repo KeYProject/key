@@ -121,7 +121,9 @@ public class SVInstantiationCP implements Feature {
                 public void choose() {}
 
                 @Override
-                public RuleApp getRuleAppForBranch() { return newApp; }
+                public RuleApp getRuleAppForBranch() {
+                    return newApp;
+                }
             };
 
             return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();

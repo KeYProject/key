@@ -18,8 +18,10 @@ import org.key_project.util.collection.ImmutableList;
 public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
-     * @param rule the rule being applied
-     * @param occurrence the position at which the rule is applied
+     * @param rule
+     *        the rule being applied
+     * @param occurrence
+     *        the position at which the rule is applied
      */
     public JmlAssertBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence occurrence) {
@@ -27,9 +29,12 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     /**
-     * @param rule the rule being applied
-     * @param pio the position at which the rule is applied
-     * @param ifInsts information flow related information
+     * @param rule
+     *        the rule being applied
+     * @param pio
+     *        the position at which the rule is applied
+     * @param ifInsts
+     *        information flow related information
      */
     public JmlAssertBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio,
