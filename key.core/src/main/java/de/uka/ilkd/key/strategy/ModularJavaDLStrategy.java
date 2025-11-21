@@ -52,12 +52,18 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     private final ArithTermFeatures tf;
     private final RuleSetDispatchFeature conflictCostDispatcher;
     private final Feature totalCost;
+
+    // map rulesets to the strategies that participate in their cost computations, instantiation or
+    // approval decisions
     private final Map<RuleSet, List<ComponentStrategy>> costResponsibilityMap =
         new LinkedHashMap<>();
     private final Map<RuleSet, List<ComponentStrategy>> instantiationResponsibilityMap =
         new LinkedHashMap<>();
     private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap =
         new LinkedHashMap<>();
+
+    // map rules to the strategies that participate in their cost computations, instantiation or
+    // approval decisions
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> costRuleToStrategyMap =
         new LinkedHashMap<>();
     private final Map<Rule, LinkedHashSet<ComponentStrategy>> instantiationRuleToStrategyMap =
@@ -77,6 +83,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         initializeResponsibilityMap(StrategyAspect.Instantiation, instantiationResponsibilityMap);
         initializeResponsibilityMap(StrategyAspect.Approval, approvalResponsibilityMap);
 
+        // if more than one strategy is responsible for a _ruleset_ we need to determine how to
+        // resolve the
+        // competing computations
         conflictCostDispatcher = resolveConflicts();
 
         final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
@@ -87,11 +96,18 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             (rule) -> getResponsibleStrategies(rule, instantiationResponsibilityMap,
                 instantiationRuleToStrategyMap));
 
+        // the feature for the cost computation
         totalCost =
             add(AutomatedRuleFeature.getInstance(), ifMatchedF, NonDuplicateAppFeature.INSTANCE,
                 reduceCostTillMaxF, conflictCostDispatcher, AgeFeature.INSTANCE);
     }
 
+    /**
+     * Caches the information which strategies are responsible for which ruleset
+     *
+     * @param aspect the StrategyAspect for which the cache is created
+     * @param responsibilityMap the map used as cache for the specified aspect
+     */
     private void initializeResponsibilityMap(StrategyAspect aspect,
             Map<RuleSet, List<ComponentStrategy>> responsibilityMap) {
         for (ComponentStrategy strategy : strategies) {
@@ -107,6 +123,13 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             RuleSetDispatchFeature dispatcher) {
     }
 
+    /**
+     * checks for conflicts and resolves known ones (in case an unknown conflict is encountered the
+     * method fails
+     * with a runtime exception
+     *
+     * @return the feature implementing the conflict resolution
+     */
     private RuleSetDispatchFeature resolveConflicts() {
         var dis = new RuleSetDispatchFeature();
         var dispatchers =
@@ -129,6 +152,13 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         return dis;
     }
 
+    /**
+     * resolves known conflicts
+     *
+     * @param d the RuleSetDispatchFeature to which the conflict resolution will be bound
+     * @param rs the RuleSet for which a conflict resolution is required
+     * @throws IllegalArgumentException if the conflict cannot be resolved
+     */
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs) {
         switch (rs.name().toString()) {
             case "order_terms" -> {
