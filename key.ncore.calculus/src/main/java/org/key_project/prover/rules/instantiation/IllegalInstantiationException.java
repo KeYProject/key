@@ -4,9 +4,7 @@
 package org.key_project.prover.rules.instantiation;
 
 
-/**
- * this exception is thrown if an invalid instantiation for a schema variable was given
- */
+/// this exception is thrown if an invalid instantiation for a schema variable was given
 public class IllegalInstantiationException extends RuntimeException {
     public IllegalInstantiationException(String description) {
         super(description);

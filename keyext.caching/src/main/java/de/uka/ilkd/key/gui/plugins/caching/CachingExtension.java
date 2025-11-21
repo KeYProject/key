@@ -119,7 +119,7 @@ public class CachingExtension
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         Proof p = e.getSource().getSelectedProof();
         if (p == null || trackedProofs.contains(p)) {
             return;

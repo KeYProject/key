@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.strategy.costbased.feature;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -26,9 +27,7 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
     private final ProjectionToTerm<Goal> s2;
     private final int comparator;
 
-    /**
-     * creates a new comparison term feature
-     */
+    /// creates a new comparison term feature
     private SortComparisonFeature(ProjectionToTerm<Goal> s1, ProjectionToTerm<Goal> s2,
             int comparator) {
         this.s1 = s1;
@@ -39,16 +38,15 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
     @Override
     protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
             G goal, MutableState mState) {
-        final Sort sort1 = s1.toTerm(app, pos, (Goal) goal, mState).sort();
-        final Sort sort2 = s2.toTerm(app, pos, (Goal) goal, mState).sort();
-
-        return compare(sort1, sort2);
+        final Term term1 = s1.toTerm(app, pos, (Goal) goal, mState);
+        final Term term2 = s2.toTerm(app, pos, (Goal) goal, mState);
+        assert term1 != null && term2 != null
+                : "@AssumeAssertion(nullness): When using this comparison feature, term1 and term2 must be non-null";
+        return compare(term1.sort(), term2.sort());
     }
 
-    /**
-     * @param sort1
-     * @param sort2
-     */
+    /// @param sort1
+    /// @param sort2
     protected boolean compare(final Sort sort1, final Sort sort2) {
         if (comparator == SUBSORT) {
             return sort1.extendsTrans(sort2);

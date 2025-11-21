@@ -9,11 +9,12 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Operator;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,7 +50,7 @@ public class Polynomial {
 
     public static Polynomial create(Term polyTerm, Services services) {
         final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-        polyTerm = TermLabelManager.removeIrrelevantLabels((de.uka.ilkd.key.logic.Term) polyTerm,
+        polyTerm = TermLabelManager.removeIrrelevantLabels((JTerm) polyTerm,
             services);
 
         Polynomial res;
@@ -236,8 +237,8 @@ public class Polynomial {
         if (it.hasNext()) {
             res = it.next().toTerm(services);
             while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(add, (de.uka.ilkd.key.logic.Term) res,
-                    (de.uka.ilkd.key.logic.Term) it.next().toTerm(services));
+                res = services.getTermFactory().createTerm(add, (JTerm) res,
+                    (JTerm) it.next().toTerm(services));
             }
         }
 
@@ -246,8 +247,8 @@ public class Polynomial {
         if (res == null) {
             res = cTerm;
         } else if (!BigInteger.ZERO.equals(constantPart)) {
-            res = services.getTermFactory().createTerm(add, (de.uka.ilkd.key.logic.Term) cTerm,
-                (de.uka.ilkd.key.logic.Term) res);
+            res = services.getTermFactory().createTerm(add, (JTerm) cTerm,
+                (JTerm) res);
         }
 
         return res;

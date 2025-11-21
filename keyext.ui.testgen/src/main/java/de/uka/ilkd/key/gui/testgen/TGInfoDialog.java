@@ -10,7 +10,9 @@ import javax.swing.text.DefaultCaret;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.testgen.TGReporter;
+import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.slf4j.Logger;
@@ -65,25 +67,26 @@ public class TGInfoDialog extends JDialog {
         }
     };
 
-    private final TestGenerationLog logger = new TestGenerationLog() {
+    private final TestGenerationLifecycleListener logger = new TestGenerationLifecycleListener() {
         @Override
-        public void write(String t) {
-            textArea.append(t);
+        public void writeln(Object sender, String message) {
+            ThreadUtilities.invokeOnEventQueue(() -> textArea.append(message + "\n"));
         }
 
         @Override
-        public void writeln(String line) {
-            ThreadUtilities.invokeOnEventQueue(() -> textArea.append(line + "\n"));
+        public void writeException(Object sender, Throwable throwable) {
+            LOGGER.warn("Exception", throwable);
+            ThreadUtilities
+                    .invokeOnEventQueue(() -> textArea.append("Error: " + throwable.getMessage()));
         }
 
         @Override
-        public void writeException(Throwable t) {
-            LOGGER.warn("Exception", t);
-            ThreadUtilities.invokeOnEventQueue(() -> textArea.append("Error: " + t.getMessage()));
+        public void phase(Object sender, TGPhase phase) {
+
         }
 
         @Override
-        public void testGenerationCompleted() {
+        public void finish(Object sender) {
             ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
         }
     };
@@ -134,7 +137,7 @@ public class TGInfoDialog extends JDialog {
         return actionStart;
     }
 
-    public TestGenerationLog getLogger() {
-        return logger;
+    public TGReporter getLogger() {
+        return new TGReporter(logger);
     }
 }

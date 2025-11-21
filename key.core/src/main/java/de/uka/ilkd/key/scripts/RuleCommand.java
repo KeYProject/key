@@ -5,7 +5,6 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.*;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -14,11 +13,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.scripts.meta.Varargs;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -27,6 +28,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -43,7 +47,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * <li>inst_= instantiation</li>
  * </ol>
  */
-public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
+public class RuleCommand extends AbstractCommand {
 
     public RuleCommand() {
         super(Parameters.class);
@@ -72,16 +76,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(ScriptCommandAst params)
             throws ScriptException, InterruptedException {
-        RuleApp theApp = makeRuleApp(args, state);
-        Goal g = state.getFirstOpenAutomaticGoal();
+        var args = state().getValueInjector().inject(new Parameters(), params);
+
+        RuleApp theApp = makeRuleApp(args, state());
+        Goal g = state().getFirstOpenAutomaticGoal();
 
         if (theApp instanceof TacletApp tacletApp) {
 
@@ -116,7 +116,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
 
-        if (!maybeBuiltInRule.isPresent() && !maybeTaclet.isPresent()) {
+        if (maybeBuiltInRule.isEmpty() && maybeTaclet.isEmpty()) {
             /*
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by hide_left etc.
              */
@@ -197,7 +197,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         for (SchemaVariable sv : result.uninstantiatedVars()) {
             if (result.isInstantiationRequired(sv)) {
-                Term inst = p.instantiations.get(sv.name().toString());
+                JTerm inst = p.instantiations.get(sv.name().toString());
                 if (inst == null) {
                     throw new ScriptException("missing instantiation for " + sv);
                 }
@@ -353,12 +353,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p,
             SequentFormula sf, Services services)
             throws ScriptException {
-        org.key_project.logic.Term term = sf.formula();
+        Term term = sf.formula();
         final boolean satisfiesFormulaParameter =
             p.formula != null && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula);
 
         final boolean satisfiesMatchesParameter = p.matches != null
-                && formatTermString(LogicPrinter.quickPrintTerm((Term) sf.formula(), services))
+                && formatTermString(LogicPrinter.quickPrintTerm((JTerm) sf.formula(), services))
                         .matches(".*" + p.matches + ".*");
 
         return (p.formula == null && p.matches == null) || satisfiesFormulaParameter
@@ -384,13 +384,13 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                Term term = (Term) pta.posInOccurrence().subTerm();
+                JTerm term = (JTerm) pta.posInOccurrence().subTerm();
                 boolean add =
                     p.on == null || RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.on);
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
-                    Term userInst = p.instantiations.get(sv.name().toString());
+                    JTerm userInst = p.instantiations.get(sv.name().toString());
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
@@ -407,22 +407,27 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option(value = "#2")
-        public String rulename;
-        @Option(value = "on", required = false)
-        public Term on;
-        @Option(value = "formula", required = false)
-        public Term formula;
-        @Option(value = "occ", required = false)
-        public int occ = -1;
+        @Argument
+        public @MonotonicNonNull String rulename;
+
+        @Option(value = "on")
+        public @Nullable JTerm on;
+
+        @Option(value = "formula")
+        public @Nullable JTerm formula;
+
+        @Option(value = "occ")
+        public @Nullable int occ = -1;
+
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
-        @Option(value = "matches", required = false)
-        public String matches = null;
-        @Varargs(as = Term.class, prefix = "inst_")
-        public Map<String, Term> instantiations = new HashMap<>();
+        @Option(value = "matches")
+        public @Nullable String matches = null;
+
+        @OptionalVarargs(as = JTerm.class, prefix = "inst_")
+        public Map<String, JTerm> instantiations = new HashMap<>();
     }
 
     private static class TacletNameFilter extends TacletFilter {

@@ -203,11 +203,11 @@ public class Queue {
         return result;
     }
 
-    public Enumeration elements() {
+    public Enumeration<Object> elements() {
         return new QueueEnumeration();
     }
 
-    protected class QueueEnumeration implements Enumeration {
+    protected class QueueEnumeration implements Enumeration<Object> {
 
         int currPos;
 

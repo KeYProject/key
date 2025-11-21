@@ -4,20 +4,21 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
 public class ClashFreeSubst {
     protected final QuantifiableVariable v;
-    protected final Term s;
+    protected final JTerm s;
     protected final ImmutableSet<QuantifiableVariable> svars;
     protected final TermBuilder tb;
 
-    public ClashFreeSubst(QuantifiableVariable v, Term s, TermBuilder tb) {
+    public ClashFreeSubst(QuantifiableVariable v, JTerm s, TermBuilder tb) {
         this.v = v;
         this.s = s;
         this.tb = tb;
@@ -28,7 +29,7 @@ public class ClashFreeSubst {
         return v;
     }
 
-    protected Term getSubstitutedTerm() {
+    protected JTerm getSubstitutedTerm() {
         return s;
     }
 
@@ -36,7 +37,7 @@ public class ClashFreeSubst {
      * substitute <code>s</code> for <code>v</code> in <code>t</code>, avoiding collisions by
      * replacing bound variables in <code>t</code> if necessary.
      */
-    public Term apply(Term t) {
+    public JTerm apply(JTerm t) {
         if (!t.freeVars().contains(v)) {
             return t;
         } else {
@@ -49,7 +50,7 @@ public class ClashFreeSubst {
      * replacing bound variables in <code>t</code> if necessary. It is assumed, that <code>t</code>
      * contains a free occurrence of <code>v</code>.
      */
-    protected Term apply1(Term t) {
+    protected JTerm apply1(JTerm t) {
         if (t.op() == v) {
             return s;
         } else {
@@ -81,9 +82,9 @@ public class ClashFreeSubst {
      * new term. It is assumed, that one of the subterms contains a free occurrence of
      * <code>v</code>, and that the case <code>v==t<code> is already handled.
      */
-    private Term applyOnSubterms(Term t) {
+    private JTerm applyOnSubterms(JTerm t) {
         final int arity = t.arity();
-        final Term[] newSubterms = new Term[arity];
+        final JTerm[] newSubterms = new JTerm[arity];
         @SuppressWarnings("unchecked")
         final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
         for (int i = 0; i < arity; i++) {
@@ -97,7 +98,7 @@ public class ClashFreeSubst {
      * <code>completeTerm</code>. The result is stored in <code>newSubterms</code> and
      * <code>newBoundVars</code> (at index <code>subtermIndex</code>)
      */
-    protected void applyOnSubterm(Term completeTerm, int subtermIndex, Term[] newSubterms,
+    protected void applyOnSubterm(JTerm completeTerm, int subtermIndex, JTerm[] newSubterms,
             ImmutableArray<QuantifiableVariable>[] newBoundVars) {
         if (subTermChanges(completeTerm.varsBoundHere(subtermIndex),
             completeTerm.sub(subtermIndex))) {
@@ -124,7 +125,7 @@ public class ClashFreeSubst {
      * <code>varInd</code> upwards..
      */
     private void applyOnSubterm(int varInd, ImmutableArray<QuantifiableVariable> boundVars,
-            QuantifiableVariable[] newBoundVars, int subInd, Term subTerm, Term[] newSubterms) {
+            QuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply1(subTerm);
         } else {
@@ -163,7 +164,7 @@ public class ClashFreeSubst {
      * subterm. It is however assumed that no more clash can occurr.
      */
     private void applyOnSubterm1(int varInd, ImmutableArray<QuantifiableVariable> boundVars,
-            QuantifiableVariable[] newBoundVars, int subInd, Term subTerm, Term[] newSubterms) {
+            QuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply(subTerm);
         } else {
@@ -188,7 +189,8 @@ public class ClashFreeSubst {
      * @returns true if <code>subTerm</code> bound by <code>boundVars</code> would change under
      *          application of this substitution
      */
-    protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars, Term subTerm) {
+    protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
+            JTerm subTerm) {
         if (!subTerm.freeVars().contains(v)) {
             return false;
         } else {

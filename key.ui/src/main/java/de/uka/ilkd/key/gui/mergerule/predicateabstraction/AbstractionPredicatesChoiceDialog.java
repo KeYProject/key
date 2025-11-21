@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -542,7 +544,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToString(AbstractionPredicate pred) {
         final Services services = MainWindow.getInstance().getMediator().getServices();
-        final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
+        final Pair<LocationVariable, JTerm> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
         return "(" + predFormWithPh.first + ","
             + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
@@ -783,7 +785,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The loaded proof.
      */
     static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
-        java.io.File proofFile = new java.io.File("examples/" + proofFileName);
+        Path proofFile = Paths.get("examples/", proofFileName);
 
         try {
             de.uka.ilkd.key.control.KeYEnvironment<?> environment =

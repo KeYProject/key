@@ -117,23 +117,23 @@ public abstract class Operator extends JavaNonTerminalProgramElement
 
     public SourceElement getFirstElement() {
         return switch (getNotation()) {
-        case INFIX, POSTFIX -> children.get(0).getFirstElement();
-        default -> this;
+            case INFIX, POSTFIX -> children.get(0).getFirstElement();
+            default -> this;
         };
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
         return switch (getNotation()) {
-        case INFIX, POSTFIX -> children.get(0).getFirstElementIncludingBlocks();
-        default -> this;
+            case INFIX, POSTFIX -> children.get(0).getFirstElementIncludingBlocks();
+            default -> this;
         };
     }
 
     public SourceElement getLastElement() {
         return switch (getNotation()) {
-        case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
-        default -> this;
+            case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
+            default -> this;
         };
     }
 

@@ -1,20 +1,23 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
+
 plugins {
     id 'application'
 
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
-    // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "8.1.1"
+    // https://github.com/GradleUp/shadow
+    id 'com.gradleup.shadow' version "9.2.2"
 }
 
-description "User interface for the deductive verification of Java programs"
+description = "User interface for the deductive verification of Java programs"
 
 dependencies {
     implementation project(":key.core")
     implementation project(":key.core.rifl")
+
+    implementation("com.formdev:flatlaf:3.6.2")
 
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
@@ -22,8 +25,10 @@ dependencies {
 
     api 'com.miglayout:miglayout-swing:11.4.2'
 
+    implementation("info.picocli:picocli:4.7.7")
+
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.5.18'
+    implementation 'ch.qos.logback:logback-classic:1.5.20'
 
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
@@ -36,9 +41,9 @@ dependencies {
     runtimeOnly project(":keyext.isabelletranslation")
 }
 
-task createExamplesZip(type: Zip) {
-    description 'Create "examples.zip" containing all KeY examples'
-    destinationDirectory = file("$buildDir/resources/main/")
+tasks.register('createExamplesZip', Zip) {
+    description = 'Create "examples.zip" containing all KeY examples'
+    destinationDirectory = layout.buildDirectory.dir("resources/main/").getOrNull()
     archiveFileName = "examples.zip"
     from "examples"
     include scanReadmeFiles()  // see end of file
@@ -50,6 +55,9 @@ processResources.dependsOn << createExamplesZip
 shadowJar {
     archiveClassifier.set("exe")
     archiveBaseName.set("key")
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // needed for mergeServices
+    }
     mergeServiceFiles()
 }
 
@@ -67,15 +75,18 @@ run {
     //systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
+    // enable assertion
+    jvmArgs += "-ea"
+
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
     jvmArgs += "-Dsun.awt.disablegrab=true"
 }
 
-task runWithProfiler(type: JavaExec) {
-    group("application")
-    description("""Run key.ui with flight recoder enabled. 
-                   See https://www.baeldung.com/java-flight-recorder-monitoring for a how to.""")
+tasks.register('runWithProfiler', JavaExec) {
+    group = "application"
+    description = """Run key.ui with flight recoder enabled. 
+                   See https://www.baeldung.com/java-flight-recorder-monitoring for a how to."""
 
     classpath = sourceSets.main.runtimeClasspath
     mainClass.set("de.uka.ilkd.key.core.Main")
@@ -86,6 +97,13 @@ task runWithProfiler(type: JavaExec) {
         println "A file key_profile.jfr has been created in folder 'key.ui' by JRE (FlightRecoder)."
         println "You can open key_profile.jfr in IntelliJ to inspect the performance measurement."
     }
+}
+
+tasks.register('runInExperimentalMode', JavaExec) {
+    group = "application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set("de.uka.ilkd.key.core.Main")
+    args("--experimental")
 }
 
 /**

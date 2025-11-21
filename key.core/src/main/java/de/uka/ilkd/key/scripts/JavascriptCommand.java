@@ -3,20 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.prover.sequent.Sequent;
 
-public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
+public class JavascriptCommand extends AbstractCommand {
 
     private static final String PREAMBLE = """
             var goal = __state.getSelectedGoal();
@@ -28,12 +29,14 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), params);
+
         ScriptEngineManager factory = new ScriptEngineManager();
         // create JavaScript engine
         ScriptEngine engine = factory.getEngineByName("JavaScript");
         // evaluate JavaScript code from given file - specified by first argument
-        JavascriptInterface jsIntf = new JavascriptInterface(proof, state);
+        JavascriptInterface jsIntf = new JavascriptInterface(proof, state());
 
         engine.getBindings(ScriptContext.GLOBAL_SCOPE).put("__state", jsIntf);
         try {
@@ -45,19 +48,13 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
     public String getName() {
         return "javascript";
     }
 
     public static class Parameters {
-        @Option("#2")
-        public String script;
+        @Argument
+        public @MonotonicNonNull String script;
     }
 
     public static class JavascriptInterface {
@@ -75,7 +72,7 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
             return state.getFirstOpenAutomaticGoal().sequent();
         }
 
-        public void setVar(String var, Term term) throws ScriptException {
+        public void setVar(String var, JTerm term) throws ScriptException {
 
             if (!var.matches("@[a-zA-Z0-9_]")) {
                 throw new ScriptException("Is not a variable name: " + var);

@@ -6,8 +6,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.FormulaTag;
-import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -16,9 +14,11 @@ import de.uka.ilkd.key.strategy.IfInstantiationCachePool.AssumesInstantiationCac
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.indexing.FormulaTagManager;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -168,8 +168,7 @@ public class AssumesInstantiator {
 
         final FormulaTagManager tagManager = goal.getFormulaTagManager();
 
-        final FormulaTag tag = tagManager.getTagForPos(pio);
-        final long formulaAge = tagManager.getAgeForTag(tag);
+        final long formulaAge = tagManager.getAgeForPos(pio);
 
         // The strict relation can be used, because when applying a rule the
         // age of a goal is increased before the actual modification of the
@@ -231,7 +230,7 @@ public class AssumesInstantiator {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        Iterator<? extends org.key_project.prover.rules.instantiation.MatchConditions> itMC =
+        Iterator<? extends MatchResultInfo> itMC =
             mr.matchConditions().iterator();
         p_ifSeqTail = p_ifSeqTail.tail();
         for (final AssumesFormulaInstantiation ifInstantiation : mr.candidates()) {

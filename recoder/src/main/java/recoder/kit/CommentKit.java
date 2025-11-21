@@ -158,21 +158,21 @@ public class CommentKit {
         }
         String ty = guessDocumentation(tn, false);
         switch (tr.getDimensions()) {
-        case 0:
-            if (returned) {
-                return "the " + ty;
-            }
-            if ("aeiouAEIOU".indexOf(ty.charAt(0)) >= 0) {
-                return "an " + ty;
-            } else {
-                return "a " + ty;
-            }
-        case 1:
-            return (returned ? "the" : "an") + " array of " + ty;
-        case 2:
-            return (returned ? "the" : "a") + " matrix of " + ty;
-        default:
-            return (returned ? "the" : "a") + " multi-dimensional array of " + ty;
+            case 0:
+                if (returned) {
+                    return "the " + ty;
+                }
+                if ("aeiouAEIOU".indexOf(ty.charAt(0)) >= 0) {
+                    return "an " + ty;
+                } else {
+                    return "a " + ty;
+                }
+            case 1:
+                return (returned ? "the" : "an") + " array of " + ty;
+            case 2:
+                return (returned ? "the" : "a") + " matrix of " + ty;
+            default:
+                return (returned ? "the" : "a") + " multi-dimensional array of " + ty;
         }
     }
 

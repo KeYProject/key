@@ -5,7 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -132,7 +132,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
                     PosInOccurrence pos, Goal goal, MutableState mState) {
                 return pos != null
-                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel((Term) pos.subTerm());
+                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel((JTerm) pos.subTerm());
             }
         }), longConst(-3000)));
         // Make sure that the modality which executes a loop body is preferred against the
@@ -286,7 +286,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Strategy create(Proof proof, StrategyProperties sp) {
+        public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties sp) {
             return new SymbolicExecutionStrategy(proof, sp);
         }
 

@@ -13,6 +13,8 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
+
 // a simple cache for the results of the method <code>createList</code>
 public final class AssumesFormulaInstantiationCache {
 
@@ -25,7 +27,7 @@ public final class AssumesFormulaInstantiationCache {
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
 
-    public ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
+    public @Nullable ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
         try {
             readLock.lock();
             final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =

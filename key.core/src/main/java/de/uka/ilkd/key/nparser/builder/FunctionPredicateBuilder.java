@@ -17,8 +17,10 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -65,11 +67,25 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 Sort argSort = accept(constructorContext.sortId(i));
                 args[i] = argSort;
                 var argName = argNames.get(i).getText();
-                var alreadyDefinedFn = dtNamespace.lookup(argName);
+                SortedOperator alreadyDefinedFn = dtNamespace.lookup(argName);
+                if (alreadyDefinedFn == null) {
+                    alreadyDefinedFn = namespaces().functions().lookup(argName);
+                }
+                if (alreadyDefinedFn == null) {
+                    alreadyDefinedFn = namespaces().programVariables().lookup(argName);
+                }
                 if (alreadyDefinedFn != null
                         && (!alreadyDefinedFn.sort().equals(argSort)
-                                || !alreadyDefinedFn.argSort(0).equals(sort))) {
-                    throw new RuntimeException("Name already in namespace: " + argName);
+                                || !alreadyDefinedFn.argSorts().equals(ImmutableList.of(sort)))) {
+                    // The condition checks whether there is already a function with the same name
+                    // but different signature. This is necessarily true if there is a globally
+                    // defined function
+                    // of the same name and may or may not be true if there is another constructor
+                    // argument of the
+                    // same name.
+                    semanticError(argNames.get(i), "Name already in namespace: %s" +
+                        ". Identifiers in datatype definitions must be unique (also wrt. global functions).",
+                        argName);
                 }
                 Function fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
                     false, false);

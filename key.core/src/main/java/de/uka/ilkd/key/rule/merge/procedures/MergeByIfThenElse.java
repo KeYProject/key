@@ -7,7 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -64,9 +64,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
@@ -98,13 +98,13 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>, where the cI
      *         are the path conditions of stateI.
      */
-    public static Term createIfThenElseTerm(final SymbolicExecutionState state1,
-            final SymbolicExecutionState state2, final Term ifTerm, final Term elseTerm,
-            Term distinguishingFormula, final Services services) {
+    public static JTerm createIfThenElseTerm(final SymbolicExecutionState state1,
+            final SymbolicExecutionState state2, final JTerm ifTerm, final JTerm elseTerm,
+            JTerm distinguishingFormula, final Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term cond, ifForm, elseForm;
+        JTerm cond, ifForm, elseForm;
 
         if (distinguishingFormula == null) {
             DistanceFormRightSide distFormAndRightSidesForITEUpd =
@@ -152,8 +152,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-        Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+        JTerm rightSide1 = getUpdateRightSideFor(state1.first, v);
+        JTerm rightSide2 = getUpdateRightSideFor(state2.first, v);
 
         if (rightSide1 == null) {
             rightSide1 = tb.var(v);
@@ -191,22 +191,22 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         component).
      */
     static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
-            SymbolicExecutionState state1, SymbolicExecutionState state2, Term ifTerm,
-            Term elseTerm, Services services) {
+            SymbolicExecutionState state1, SymbolicExecutionState state2, JTerm ifTerm,
+            JTerm elseTerm, Services services) {
 
         // We only need the distinguishing subformula; the equal part
         // is not needed. For soundness, it suffices that the "distinguishing"
         // formula is implied by the original path condition; for completeness,
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+        Optional<Pair<JTerm, JTerm>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(state1.second, state2.second, services);
-        Term distinguishingFormula = distinguishingAndEqualFormula1
+        JTerm distinguishingFormula = distinguishingAndEqualFormula1
                 .map(termTermPair -> termTermPair.first).orElse(null);
 
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+        Optional<Pair<JTerm, JTerm>> distinguishingAndEqualFormula2 =
             getDistinguishingFormula(state2.second, state1.second, services);
-        Term distinguishingFormula2 = distinguishingAndEqualFormula2
+        JTerm distinguishingFormula2 = distinguishingAndEqualFormula2
                 .map(termTermPair -> termTermPair.first).orElse(null);
 
         // NOTE (DS): This assertion does not prevent the merging of states with
@@ -273,9 +273,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @param elseTerm a term
      * @param sideCommuted true if ifTerm and elseTerm have been swapped.
      * @see #createDistFormAndRightSidesForITEUpd(SymbolicExecutionState, SymbolicExecutionState,
-     *      Term, Term, Services)
+     *      JTerm, JTerm, Services)
      */
-    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm,
+    public record DistanceFormRightSide(JTerm distinguishingFormula, JTerm ifTerm, JTerm elseTerm,
             boolean sideCommuted) {
     }
 }
