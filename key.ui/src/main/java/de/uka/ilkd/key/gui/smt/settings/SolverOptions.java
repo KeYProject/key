@@ -177,7 +177,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public JPanel getPanel(MainWindow window) {
-        setSmtSettings(SettingsManager.getSmtPiSettings().clone());
+        setSmtSettings(SettingsManager.getSmtPiSettings().copy());
         return this;
     }
 
@@ -216,7 +216,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             // SettingsManager.getSmtPiSettings().setParameters(solverType, params);
             window.updateSMTSelectMenu();
 
-            setSmtSettings(SettingsManager.getSmtPiSettings().clone()); // refresh gui
+            setSmtSettings(SettingsManager.getSmtPiSettings().copy()); // refresh gui
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
         }

@@ -98,28 +98,6 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     @Override
-    public void readSettings(Properties props) {
-        activatedFeatures.clear();
-        var prefix = "[" + CATEGORY + "]";
-        for (Map.Entry<Object, Object> entries : props.entrySet()) {
-            final var s = entries.getKey().toString();
-            if (s.startsWith(prefix) && isTrue(entries.getValue())) {
-                final var feature = s.substring(prefix.length());
-                activate(feature);
-                LOGGER.info("Activate feature: {}", feature);
-            }
-        }
-    }
-
-    @Override
-    public void writeSettings(Properties props) {
-        var prefix = "[" + CATEGORY + "]";
-        for (String activatedFeature : activatedFeatures) {
-            props.put(prefix + activatedFeature, "true");
-        }
-    }
-
-    @Override
     public void readSettings(@NonNull Configuration props) {
         activatedFeatures.clear();
         for (String s : props.getStringList(CATEGORY)) {

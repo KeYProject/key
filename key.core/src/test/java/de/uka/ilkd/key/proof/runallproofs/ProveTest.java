@@ -5,9 +5,7 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.StringReader;
 import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -84,10 +82,11 @@ public class ProveTest {
         LOGGER.info("{}: Run Test: {} with {}", caseId, file, testProperty);
 
         // Initialize KeY settings.
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(globalSettings);
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromJSONStream(new StringReader(globalSettings));
         if (localSettings != null && !localSettings.isEmpty()) {
             // local settings must be complete to have desired effect
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(localSettings);
+            ProofSettings.DEFAULT_SETTINGS
+                    .loadSettingsFromJSONStream(new StringReader(localSettings));
         }
 
         LOGGER.info("({}) Active Settings: {}", caseId,
