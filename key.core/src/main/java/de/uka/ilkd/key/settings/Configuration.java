@@ -544,7 +544,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printMap(Map<?, ?> value) {
-            out.format("{ ");
+            out.format("{");
             indent += 4;
             newline().printIndent();
             for (Iterator<? extends Map.Entry<?, ?>> iterator =
@@ -571,7 +571,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printSeq(Collection<?> value) {
-            out.format("[ ");
+            out.format("[");
             indent += 4;
             newline();
             printIndent();

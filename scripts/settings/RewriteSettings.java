@@ -1,7 +1,6 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,15 +17,29 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-/**
- * @author Alexander Weigl
- * @version 1 (4/6/25)
- */
+/// This is a java program for rewriting the settings of KeY files from the old format to the new format.
+/// The old format was a string contain a properties file (`key=value`). The new format is JSON-like tree structure
+/// with the advantage of type safety and structureness.
+///
+/// ## How to run the program
+/// 1. Compile key to receive a fatjar
+/// ```sh
+/// key> gradle assemble
+/// ```
+///
+/// 2. Run this program using the shadow jar. Requires a rather new JDK/JRE:
+/// ```sh
+/// java -cp ../../key.ui/build/libs/key-2.12.4-dev-exe.jar RewriteSettings.java <files>
+/// ```
+/// (no compilation needed)
+///
+/// @author Alexander Weigl
+/// @version 1 (4/6/25)
 public class RewriteSettings {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             args = new String[] {
-                "key.core/src/test/resources/testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof" };
+                "../../key.core/src/test/resources/testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof" };
         }
 
         for (String arg : args) {
