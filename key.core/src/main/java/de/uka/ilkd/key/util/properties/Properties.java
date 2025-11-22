@@ -6,8 +6,6 @@ package de.uka.ilkd.key.util.properties;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings.PropertyEntry;
-import de.uka.ilkd.key.settings.Configuration;
 
 
 /// WEIGL: These classes are redundant with {@link PropertyEntry}
