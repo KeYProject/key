@@ -47,7 +47,8 @@ public class GenerateUnitTests {
         run(outputFolder, collections);
     }
 
-    public static void run(Path outputFolder, List<ProofCollection> collections) throws IOException {
+    public static void run(Path outputFolder, List<ProofCollection> collections)
+            throws IOException {
         LOGGER.info("Output folder {}", outputFolder);
 
         GenerateUnitTests.outputFolder = outputFolder.toAbsolutePath();

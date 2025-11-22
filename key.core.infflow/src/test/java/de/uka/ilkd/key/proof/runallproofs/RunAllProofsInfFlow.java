@@ -31,6 +31,7 @@ public final class RunAllProofsInfFlow {
     }
 
     public static void main(String[] args) throws IOException {
-        GenerateUnitTests.run(Paths.get("build/generated-src/"), List.of(InfFlowProofCollection.automaticInfFlow()));
+        GenerateUnitTests.run(Paths.get("build/generated-src/"),
+            List.of(InfFlowProofCollection.automaticInfFlow()));
     }
 }
