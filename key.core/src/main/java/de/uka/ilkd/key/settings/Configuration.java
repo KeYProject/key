@@ -519,9 +519,8 @@ public class Configuration {
         }
 
         public ConfigurationWriter printValue(Object value) {
-            if (value instanceof String) {
-                // TODO What about '"' inside value?
-                out.format("\"%s\"", value);
+            if (value instanceof String s) {
+                out.format("\"%s\"", s.replace("\"", "\\"));
             } else if (value instanceof Long || value instanceof Integer
                     || value instanceof Double || value instanceof Float
                     || value instanceof Short || value instanceof Byte
