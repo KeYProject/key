@@ -1,0 +1,10 @@
+plugins {
+    id("java-convention")
+}
+
+description = "Example project to use KeY's APIs"
+
+dependencies {
+    implementation (project(":key.core"))
+    implementation (project(":key.core.symbolic_execution"))
+}

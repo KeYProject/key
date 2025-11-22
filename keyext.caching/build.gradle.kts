@@ -1,0 +1,12 @@
+plugins {
+    id("java-convention")
+}
+
+description = "Caching of provable nodes to make proving with KeY faster."
+
+dependencies {
+    implementation( project(":key.core"))
+    implementation (project(":key.ui"))
+
+    implementation (project(":keyext.slicing"))
+}

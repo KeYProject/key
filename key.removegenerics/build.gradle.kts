@@ -1,19 +1,20 @@
 plugins {
-    id 'application'
-    id 'com.gradleup.shadow' version "9.2.2"
+    id("java-convention")
+    application
+    id("com.gradleup.shadow")
 }
 
 description = "Helper to remove generics from Java source code"
 
 dependencies {
-    implementation project(":key.core")
+    implementation (project(":key.core"))
 }
 
 application {
     mainClass.set("de.uka.ilkd.key.util.removegenerics.Main")
 }
 
-shadowJar {
+tasks.shadowJar {
     archiveClassifier = "exe"
     archiveBaseName = "key.removegenerics"
 }

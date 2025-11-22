@@ -1,5 +1,6 @@
 plugins {
-    id 'application'
+    id("java-convention")
+    application
 }
 
 description = "Example project to use KeY's APIs"
@@ -9,6 +10,6 @@ application {
 }
 
 dependencies {
-    implementation project(":key.core")
-    implementation 'ch.qos.logback:logback-classic:1.5.20'
+    implementation(project(":key.core"))
+    implementation(libs.logback)
 }

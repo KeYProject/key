@@ -1,0 +1,10 @@
+plugins {
+    id("java-convention")
+}
+
+description = "Proof slicing (removing of unnecessary nodes) for the KeY system."
+
+dependencies {
+    implementation (project(":key.core"))
+    implementation (project(":key.ui"))
+}
