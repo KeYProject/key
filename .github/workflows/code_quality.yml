@@ -35,3 +35,46 @@ jobs:
           cache: 'gradle'
       - name: Build with Gradle
         run: ./gradlew --parallel --continue spotlessCheck
+
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+          cache: 'gradle'
+
+      - run: git merge-base HEAD origin/main
+      - run: git diff -U0 $(git merge-base HEAD origin/main)
+
+      - name: Build with Gradle
+        run: ./gradlew --parallel --continue checkstyleMain
+
+      - name: Merge sarif files into single file.
+        run: |
+          ./gradlew --parallel --continue sarifCopy
+          ls build/sarif-results/*
+        if: (success() || failure())
+
+      - name: "Job summary"
+        run: "cat */build/reports/checkstyle/main.md >> $GITHUB_STEP_SUMMARY"
+        if: (success() || failure())
+
+      - name: Upload checkstyle report
+        uses: actions/upload-artifact@v4
+        if: (success() || failure())
+        with:
+          name: checkstyle-report
+          path: "**/build/reports/checkstyle/main.html"
+
+      - name: "Publish in Github code scanning"
+        uses: github/codeql-action/upload-sarif@v3
+        if: (success() || failure())
+        with:
+          sarif_file: "build/sarif-results/checkstyle.sarif"
