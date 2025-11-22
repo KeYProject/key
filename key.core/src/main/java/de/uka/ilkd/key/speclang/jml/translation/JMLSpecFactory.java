@@ -180,7 +180,9 @@ public class JMLSpecFactory {
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData);
+                if (symbData != null) {
+                    symbDatas = symbDatas.add(symbData);
+                }
             } else if (clauses.diverges.equals(tb.tt())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
@@ -188,7 +190,9 @@ public class JMLSpecFactory {
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData);
+                if (symbData != null) {
+                    symbDatas = symbDatas.add(symbData);
+                }
             } else {
                 InformationFlowContract symbData1 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
@@ -197,13 +201,19 @@ public class JMLSpecFactory {
                     clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
+                if (symbData1 != null) {
+                    symbDatas = symbDatas.add(symbData1);
+                }
+
                 InformationFlowContract symbData2 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
                     JModality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData1).add(symbData2);
+                if (symbData2 != null) {
+                    symbDatas = symbDatas.add(symbData2);
+                }
             }
         }
         return symbDatas;
