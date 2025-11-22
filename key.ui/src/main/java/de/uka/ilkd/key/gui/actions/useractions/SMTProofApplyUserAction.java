@@ -74,9 +74,9 @@ public class SMTProofApplyUserAction extends UserAction {
                 SMTFocusResults.getUnsatCore(problem.getProblem());
             IBuiltInRuleApp app;
             if (unsatCore != null) {
-                app = SMTRuleApp.RULE.createApp(problem.getSolver().name(), unsatCore);
+                app = SMTRule.INSTANCE.createApp(problem.getSolver().name(), unsatCore);
             } else {
-                app = SMTRuleApp.RULE.createApp(problem.getSolver().name());
+                app = SMTRule.INSTANCE.createApp(problem.getSolver().name());
             }
             app = AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, false);
             if (app == null) {

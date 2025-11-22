@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule.MergeRuleProgressListener;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
@@ -27,6 +26,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Rule application class for merge rule applications. Is complete iff the mergePartners field as
  * well as the concrete {@link MergeProcedure} to be used have been set by the corresponding setter
@@ -34,29 +36,31 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * @author Dominic Scheurer
  */
-public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
 
     // TODO: Make fields final and remove setters (create new app instead)
-    private Node mergeNode = null;
-    private ImmutableList<MergePartner> mergePartners = null;
-    private MergeProcedure concreteRule = null;
+    private @Nullable Node mergeNode = null;
+    private @Nullable ImmutableList<MergePartner> mergePartners = null;
+    private @Nullable MergeProcedure concreteRule = null;
 
-    private SymbolicExecutionStateWithProgCnt thisSEState = null;
-    private ImmutableList<SymbolicExecutionState> mergePartnerStates = null;
-    private JTerm distForm = null;
+    private @Nullable SymbolicExecutionStateWithProgCnt thisSEState = null;
+    private @Nullable ImmutableList<SymbolicExecutionState> mergePartnerStates = null;
+    private @Nullable JTerm distForm = null;
 
-    private ArrayList<MergeRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
+    private final ArrayList<MergeRule.MergeRuleProgressListener> progressListeners =
+        new ArrayList<>();
 
-    public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
+    public MergeRuleBuiltInRuleApp(MergeRule builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
-    protected MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+    protected MergeRuleBuiltInRuleApp(MergeRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
-    public MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+    public MergeRuleBuiltInRuleApp(MergeRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
             ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
@@ -69,23 +73,22 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.thisSEState = thisSEState;
         this.mergePartnerStates = mergePartnerStates;
         this.distForm = distForm;
-        this.progressListeners = progressListeners;
+        this.progressListeners.addAll(progressListeners);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public @Nullable MergeRuleBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
     }
 
     @Override
-    public IBuiltInRuleApp setAssumesInsts(
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
 
     @Override
-    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public MergeRuleBuiltInRuleApp tryToInstantiate(Goal goal) {
         // We assume that this method is *only* called for situations where the
         // current active statement is a MergePointStatement. Manual state
         // merging is still possible, but then this method shouldn't be called
@@ -211,7 +214,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public void clearProgressListeners() {
-        progressListeners = new ArrayList<>();
+        progressListeners.clear();
     }
 
     public boolean removeProgressListener(MergeRule.MergeRuleProgressListener listener) {

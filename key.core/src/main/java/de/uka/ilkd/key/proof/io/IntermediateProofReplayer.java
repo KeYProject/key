@@ -599,7 +599,7 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (SMTRuleApp.RULE.name().toString().equals(ruleName)) {
+        if (SMTRule.INSTANCE.name().toString().equals(ruleName)) {
             if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
@@ -646,9 +646,9 @@ public class IntermediateProofReplayer {
                 ImmutableList<PosInOccurrence> unsatCore =
                     SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
-                    return SMTRuleApp.RULE.createApp(name, unsatCore);
+                    return SMTRule.INSTANCE.createApp(name, unsatCore);
                 } else {
-                    return SMTRuleApp.RULE.createApp(name);
+                    return SMTRule.INSTANCE.createApp(name);
                 }
             }
         }
