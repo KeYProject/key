@@ -8,6 +8,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -38,6 +40,10 @@ import java.util.zip.GZIPOutputStream;
 /// @author Alexander Weigl
 /// @version 1 (4/6/25)
 public class RewriteSettings {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RewriteSettings.class);
+    private static boolean ERROR = false;
+    private static boolean ALWAYS_WRITE = false;
+
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             args = new String[]{
@@ -45,6 +51,10 @@ public class RewriteSettings {
         }
 
         for (String arg : args) {
+            if ("-f".equals(arg)) {
+                ALWAYS_WRITE = true;
+            }
+
             var path = Paths.get(arg);
             var files = Files.isDirectory(
                     path) ? Files.walk(path).filter(it -> Files.isRegularFile(it)
@@ -55,12 +65,13 @@ public class RewriteSettings {
             for (var file : files) {
                 rewrite(file);
             }
-
         }
+        System.exit(ERROR ? 1 : 0);
     }
 
     private static void rewrite(Path file) throws IOException {
         boolean isGzip = file.getFileName().toString().endsWith(".gz");
+        LOGGER.info("Rewriting: {} (isGzip:{})", file.getFileName(), isGzip);
         KeYLexer lex;
         if (isGzip) {
             var input = CharStreams.fromStream(new GZIPInputStream(Files.newInputStream(file)));
@@ -102,12 +113,21 @@ public class RewriteSettings {
         }
 
         if (!hit) {
-            System.err.printf("No settings in file %s found%n", file);
+            LOGGER.warn("No settings in file {} found", file);
             return;
         }
 
+        boolean write = true;
         try {
             ParsingFacade.parseFile(CharStreams.fromString(output.toString()));
+        } catch (ParseCancellationException e) {
+            write = false;
+            LOGGER.error("Error parsing after rewrite file {}: {}", file, e.getMessage(), e);
+            System.err.println(output);
+        }
+
+        if (write || ALWAYS_WRITE) {
+
             if (!isGzip) {
                 Files.writeString(file, output.toString());
             } else {
@@ -115,10 +135,9 @@ public class RewriteSettings {
                     out.write(output.toString().getBytes(Charset.defaultCharset()));
                 }
             }
-        } catch (ParseCancellationException e) {
-            System.err.printf("Error parsing after rewrite file %s: %s", file, e.getMessage());
-            System.err.println(output);
-            System.exit(1);
+            LOGGER.info("File translated, tested and written: {}", file);
+        } else {
+            ERROR = true;
         }
     }
 }
