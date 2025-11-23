@@ -74,13 +74,13 @@ public class LemmataAutoModeOptions {
      * Contains the internal version of KeY. It is needed for saving proofs.
      */
     private final String internalVersion;
-    private final String homePath;
+    private final Path homePath;
 
     public LemmataAutoModeOptions() {
         this(KeYConstants.INTERNAL_VERSION, PathConfig.getKeyConfigDir());
     }
 
-    public LemmataAutoModeOptions(String internalVersion, String homePath) {
+    public LemmataAutoModeOptions(String internalVersion, Path homePath) {
         this.internalVersion = internalVersion;
         this.homePath = homePath;
         checkForValidity();
@@ -90,7 +90,7 @@ public class LemmataAutoModeOptions {
         return pathOfDefinitionFile;
     }
 
-    public String getHomePath() {
+    public Path getHomePath() {
         return homePath;
     }
 
