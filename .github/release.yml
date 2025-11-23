@@ -14,15 +14,23 @@ changelog:
     - title: Breaking Changes 🗲
       labels:
         - "Breaking Change"
+        - "Breaks API"
     - title: Exciting New Features 🎉
       labels:
         - "Exciting New Feature"
+    - title: Features
+      labels:
+        - "Feature"
     - title: Enhancement
       labels:
         - "Enhancement"
     - title: Bug Fixes
       labels:
-        - "🐞 Bug"
+        - ":lady_beetle: Bug"
+        - "✋ Soundness"
+    - title: Dependencies
+      labels:
+        - dependencies
     - title: Other Changes
       labels:
         - "*"
