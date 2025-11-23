@@ -5,6 +5,7 @@ package de.uka.ilkd.key.smt.solvertypes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +41,8 @@ import org.slf4j.LoggerFactory;
 /// classpath.
 ///
 /// Local configuration overwrites user configuration overwrites classpath configuration.
-/// All configuration is overwritten using the {@link ProofIndependentSettings#getSMTSettings()}.
+/// All configuration is overwritten using the {@link
+/// de.uka.ilkd.key.settings.ProofIndependentSettings#getSMTSettings()}.
 ///
 /// Use (1) and (2) rather to add new SMT solvers to KeY.
 ///
@@ -293,20 +295,47 @@ public class SolverPropertiesLoader {
         // the solver specific preamble, may be null
         String preambleFile = props.getString(PREAMBLE_FILE);
         if (preambleFile != null) {
-            var loader = SolverPropertiesLoader.class.getClassLoader();
-            InputStream fileContent = loader.getResourceAsStream(preambleFile);
-            if (fileContent != null) {
-                try {
-                    preamble = Streams.toString(fileContent);
-                } catch (IOException ignored) {
-                }
-            }
+            preamble = loadPreamble(preambleFile);
         }
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
             timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
             preamble);
+    }
+
+    private static @Nullable String loadPreamble(String preambleFile) {
+        final var FILE_PREFIX = "file:";
+        if (preambleFile.startsWith(FILE_PREFIX)) {
+            preambleFile = preambleFile.substring(FILE_PREFIX.length());
+            try {
+                return Files.readString(Paths.get(preambleFile));
+            } catch (IOException e) {
+                LOGGER.info("Error reading file '{}' as preamble.", preambleFile, e);
+                return null;
+            }
+        }
+
+        final var HTTP_PREFIX = "http:";
+        if (preambleFile.startsWith(HTTP_PREFIX)) {
+            try (InputStream stream = URI.create(preambleFile).toURL().openStream()) {
+                return Streams.toString(stream);
+            } catch (IOException e) {
+                LOGGER.info("Could not read from URL '{}'.",
+                    preambleFile, e);
+            }
+        }
+
+        var loader = SolverPropertiesLoader.class.getClassLoader();
+        var stream = loader.getResourceAsStream(preambleFile);
+        if (stream != null) {
+            try {
+                return Streams.toString(stream);
+            } catch (IOException e) {
+                LOGGER.error("Could not read preamble from classpath '{}.", preambleFile, e);
+            }
+        }
+        return null;
     }
 
     /**

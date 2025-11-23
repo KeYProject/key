@@ -45,7 +45,7 @@
     "command": "cvc5",
     "version": "--version",
     "socketClass": "de.uka.ilkd.key.smt.communication.Cvc5Socket",
-    "handlerOptions":"getUnsatCore",
+    "handlerOptions":["getUnsatCore"],
     "handlers": [
       "de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler",
       "de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler",
@@ -142,7 +142,7 @@
       "de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler",
       "de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler"
     ],
-    "handlerOptions": "getUnsatCore"
+    "handlerOptions": ["getUnsatCore"]
   },
   "Z3Legacy": {
     "experimental": true,
@@ -177,6 +177,6 @@
       "de.uka.ilkd.key.smt.newsmt2.FloatHandler",
       "de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler"
     ],
-    "handlerOptions": "getUnsatCore"
+    "handlerOptions":  ["getUnsatCore"]
   }
 }

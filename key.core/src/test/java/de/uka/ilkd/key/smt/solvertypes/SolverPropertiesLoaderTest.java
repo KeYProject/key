@@ -7,6 +7,8 @@ import de.uka.ilkd.key.settings.Configuration;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,7 +76,8 @@ class SolverPropertiesLoaderTest {
         assertEquals("--version", cvc5.getString("version"));
         assertEquals("cvc5", cvc5.getString("command"));
         assertEquals(-1, cvc5.getInt("timeout"));
-        assertEquals("getUnsatCore", cvc5.getString("handlerOptions"));
+        assertThat(cvc5.getStringList("handlerOptions")).containsExactly("getUnsatCore");
+
 
         assertThat(cvc5.getStringList("handlers"))
                 .containsExactly(
@@ -185,7 +188,7 @@ class SolverPropertiesLoaderTest {
         assertEquals("--version", z3.getString("version"));
         assertEquals("z3", z3.getString("command"));
         assertEquals(-1, z3.getInt("timeout"));
-        assertEquals("getUnsatCore", z3.getString("handlerOptions"));
+        assertThat(z3.getStringList("handlerOptions")).containsExactly("getUnsatCore");
 
         assertThat(z3.getStringList("handlers")).containsExactly(
             "de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler",
@@ -204,7 +207,7 @@ class SolverPropertiesLoaderTest {
         assertEquals("--version", z3.getString("version"));
         assertEquals("z3", z3.getString("command"));
         assertEquals(-1, z3.getInt("timeout"));
-        assertEquals("getUnsatCore", z3.getString("handlerOptions"));
+        assertThat(z3.getStringList("handlerOptions")).containsExactly("getUnsatCore");
 
         assertThat(z3.getStringList("handlers")).containsExactly(
             "de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler",
