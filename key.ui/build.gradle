@@ -69,8 +69,11 @@ run {
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
+    jvmArgs += "-Dsun.awt.disablegrab=true "
+
+    // this is needed to be able to load checker framework checkers in the javac
+    // extension
     jvmArgs += [
-        "-Dsun.awt.disablegrab=true ",
         "--add-exports", 
         "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
         "--add-exports", 

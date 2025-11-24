@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extensions provides Javac checks for recent-loaded Java files.
+ * Extension provides Javac checks for recent-loaded Java files.
  * <p>
  * Provides an entry in the status line for access.
  *
