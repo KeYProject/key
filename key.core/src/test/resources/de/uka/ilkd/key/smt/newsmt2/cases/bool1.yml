@@ -1,0 +1,7 @@
+contains:
+  - (assert (not (=> (or (and u_b u_b) u_b) (= (not u_b) (and true false)))))
+expected: VALID
+keySrc: |-
+  \predicates { b; }
+
+  \problem { b&b | b -> (!b <-> true & false) }

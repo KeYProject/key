@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Argument;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -23,6 +23,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -40,25 +42,22 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * @author Created by sarah on 1/12/17.
  * @author Mattias Ulbrich, 2023
  */
-public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
+public class FocusCommand extends AbstractCommand {
 
     public FocusCommand() {
         super(Parameters.class);
     }
 
     static class Parameters {
-        @Option("#2")
-        public Sequent toKeep;
+        @Argument
+        public @MonotonicNonNull Sequent toKeep;
     }
 
     @Override
-    public void execute(Parameters s) throws ScriptException, InterruptedException {
-        if (s == null) {
-            throw new ScriptException("Missing 'sequent' argument for focus");
-        }
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
+        var s = state().getValueInjector().inject(new Parameters(), args);
 
         Sequent toKeep = s.toKeep;
-
         hideAll(toKeep);
     }
 
@@ -87,7 +86,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
                 it -> {
-                    org.key_project.logic.Term formula = seqFormula.formula();
+                    Term formula = seqFormula.formula();
                     return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
                 })) {
                 Taclet tac = getHideTaclet("left");
@@ -102,7 +101,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         for (SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(
                 it -> {
-                    org.key_project.logic.Term formula = seqFormula.formula();
+                    Term formula = seqFormula.formula();
                     return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
                 })) {
                 Taclet tac = getHideTaclet("right");
@@ -141,7 +140,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
         TacletApp app =
             PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
-        app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) toHide.formula(),
+        app = app.addCheckedInstantiation(sv, (JTerm) toHide.formula(),
             proof.getServices(), true);
         g.apply(app);
 

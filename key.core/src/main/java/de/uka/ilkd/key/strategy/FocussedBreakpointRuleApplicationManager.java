@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import java.util.Optional;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.Taclet;
@@ -20,6 +18,8 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
@@ -29,20 +29,22 @@ public class FocussedBreakpointRuleApplicationManager
         implements DelegationBasedRuleApplicationManager<Goal> {
 
     private final RuleApplicationManager<Goal> delegate;
-    private final Optional<String> breakpoint;
+    private final @Nullable String breakpoint;
 
     private FocussedBreakpointRuleApplicationManager(RuleApplicationManager<Goal> delegate,
-            Optional<String> breakpoint) {
+            @Nullable String breakpoint) {
         this.delegate = delegate;
         this.breakpoint = breakpoint;
     }
 
     public FocussedBreakpointRuleApplicationManager(RuleApplicationManager<Goal> delegate,
-            Goal goal, Optional<PosInOccurrence> focussedSubterm,
-            Optional<String> breakpoint) {
+            Goal goal,
+            @Nullable PosInOccurrence focussedSubterm,
+            @Nullable String breakpoint) {
         // noinspection unchecked
-        this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
-                .map(RuleApplicationManager.class::cast).orElse(delegate),
+        this(focussedSubterm != null
+                ? new FocussedRuleApplicationManager(delegate, goal, focussedSubterm)
+                : delegate,
             breakpoint);
 
         clearCache();
@@ -100,13 +102,13 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
-        if (!breakpoint.isPresent()) {
+        if (breakpoint == null) {
             return true;
         }
 
         if ((!(rule instanceof Taclet) || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {
-            var term = (Term) pos.subTerm();
+            var term = (JTerm) pos.subTerm();
             final SourceElement activeStmt = //
                 JavaTools.getActiveStatement(term.javaBlock());
             final String currStmtString = activeStmt.toString();
@@ -114,16 +116,16 @@ public class FocussedBreakpointRuleApplicationManager
             return currStmtString == null || //
                     !(currStmtString.contains("{")
                             ? currStmtString.substring(0, currStmtString.indexOf('{'))
-                            : currStmtString).trim().equals(breakpoint.get());
+                            : currStmtString).trim().equals(breakpoint);
         }
 
         return true;
     }
 
-    private static boolean isJavaPIO(PosInOccurrence pio) {
+    private static boolean isJavaPIO(@Nullable PosInOccurrence pio) {
         if (pio == null)
             return false;
-        var term = (Term) pio.subTerm();
+        var term = (JTerm) pio.subTerm();
         return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
     }
 

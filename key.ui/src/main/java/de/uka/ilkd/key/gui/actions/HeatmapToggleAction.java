@@ -12,6 +12,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -43,14 +44,14 @@ public class HeatmapToggleAction extends MainWindowAction {
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
                 setEnabled(proof != null);
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                selectedNodeChanged(null);
             }
         };
         getMediator().addKeYSelectionListener(selListener);

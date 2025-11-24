@@ -31,8 +31,8 @@ import org.jspecify.annotations.NonNull;
  */
 public class ForEachCP implements Feature {
 
-    private final TermBuffer var;
-    private final TermGenerator generator;
+    private final TermBuffer<@NonNull Goal> var;
+    private final TermGenerator<@NonNull Goal> generator;
     private final Feature body;
 
     /**
@@ -41,26 +41,28 @@ public class ForEachCP implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature create(TermBuffer var, TermGenerator generator,
+    public static Feature create(TermBuffer<@NonNull Goal> var,
+            TermGenerator<@NonNull Goal> generator,
             Feature body) {
         return new ForEachCP(var, generator, body);
     }
 
-    private ForEachCP(TermBuffer var, TermGenerator generator, Feature body) {
+    private ForEachCP(TermBuffer<@NonNull Goal> var, TermGenerator<@NonNull Goal> generator,
+            Feature body) {
         this.var = var;
         this.generator = generator;
         this.body = body;
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(final RuleApp app,
-            final PosInOccurrence pos, final Goal goal,
+    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(final RuleApp app,
+            final PosInOccurrence pos, final GOAL goal,
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(new CP(app, pos, (de.uka.ilkd.key.proof.Goal) goal, mState), this);
+        manager.passChoicePoint(new CP(app, pos, (Goal) goal, mState), this);
 
         final RuleAppCost res;
         if (var.getContent(mState) != null) {
@@ -116,7 +118,7 @@ public class ForEachCP implements Feature {
 
         private final PosInOccurrence pos;
         private final RuleApp app;
-        private final Goal goal;
+        private final @NonNull Goal goal;
         private final MutableState mState;
 
         private CP(RuleApp app, PosInOccurrence pos, Goal goal,

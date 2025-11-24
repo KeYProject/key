@@ -6,8 +6,7 @@ package de.uka.ilkd.key.settings;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.logic.Choice;
-
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.util.collection.DefaultImmutableSet;

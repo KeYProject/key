@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
@@ -24,7 +24,7 @@ public class CountPosDPathFeature extends AbstractBetaFeature {
     private CountPosDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(PosInOccurrence pos, JTerm findTerm, ServiceCaches caches) {
         return NumberRuleAppCost.create(maxPosPath(findTerm, !pos.isInAntec(), caches));
     }
 

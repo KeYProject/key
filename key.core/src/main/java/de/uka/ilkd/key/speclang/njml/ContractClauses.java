@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
@@ -18,27 +18,27 @@ import org.key_project.util.collection.Pair;
 import org.jspecify.annotations.Nullable;
 
 class ContractClauses {
-    public @Nullable Term measuredBy;
-    public @Nullable Term decreases;
-    public @Nullable Term signals;
-    public @Nullable Term signalsOnly;
-    public @Nullable Term diverges;
-    public @Nullable Term returns;
+    public @Nullable JTerm measuredBy;
+    public @Nullable JTerm decreases;
+    public @Nullable JTerm signals;
+    public @Nullable JTerm signalsOnly;
+    public @Nullable JTerm diverges;
+    public @Nullable JTerm returns;
 
-    static final Clauses<Label, Term> BREAKS = new Clauses<>();
-    static final Clauses<Label, Term> CONTINUES = new Clauses<>();
+    static final Clauses<Label, JTerm> BREAKS = new Clauses<>();
+    static final Clauses<Label, JTerm> CONTINUES = new Clauses<>();
 
     /**
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    static final Clauses<LocationVariable, Term> ASSIGNABLE = new Clauses<>();
-    static final Clauses<LocationVariable, Term> ACCESSIBLE = new Clauses<>();
-    static final Clauses<LocationVariable, Term> ENSURES = new Clauses<>();
-    static final Clauses<LocationVariable, Term> ENSURES_FREE = new Clauses<>();
-    static final Clauses<LocationVariable, Term> REQUIRES = new Clauses<>();
-    static final Clauses<LocationVariable, Term> REQUIRES_FREE = new Clauses<>();
-    static final Clauses<LocationVariable, Term> AXIOMS = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> ASSIGNABLE = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> ACCESSIBLE = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> ENSURES = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> ENSURES_FREE = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> REQUIRES = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> REQUIRES_FREE = new Clauses<>();
+    static final Clauses<LocationVariable, JTerm> AXIOMS = new Clauses<>();
     static final Clauses<LocationVariable, Boolean> HAS_MODS = new Clauses<>();
 
 

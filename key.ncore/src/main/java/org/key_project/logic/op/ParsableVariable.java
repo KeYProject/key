@@ -4,8 +4,6 @@
 package org.key_project.logic.op;
 
 
-/**
- * This interface represents the variables that can be recognized by one of the parsers.
- */
+/// This interface represents the variables that can be recognized by one of the parsers.
 public interface ParsableVariable extends SortedOperator {
 }

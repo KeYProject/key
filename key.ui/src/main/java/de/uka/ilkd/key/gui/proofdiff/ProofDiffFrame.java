@@ -204,23 +204,25 @@ public class ProofDiffFrame extends JFrame {
         sb.append("<pre>");
         for (Diff diff : diffs) {
             switch (diff.operation) {
-            case EQUAL -> sb.append(toHtml(diff.text));
-            case DELETE -> {
-                if (onlySpaces(diff.text)) {
-                    sb.append(diff.text);
-                } else {
-                    sb.append("<span style='background-color: #ff8080;'>").append(toHtml(diff.text))
-                            .append("</span>");
+                case EQUAL -> sb.append(toHtml(diff.text));
+                case DELETE -> {
+                    if (onlySpaces(diff.text)) {
+                        sb.append(diff.text);
+                    } else {
+                        sb.append("<span style='background-color: #ff8080;'>")
+                                .append(toHtml(diff.text))
+                                .append("</span>");
+                    }
                 }
-            }
-            case INSERT -> {
-                if (onlySpaces(diff.text)) {
-                    sb.append(diff.text);
-                } else {
-                    sb.append("<span style='background-color: #80ff80;'>").append(toHtml(diff.text))
-                            .append("</span>");
+                case INSERT -> {
+                    if (onlySpaces(diff.text)) {
+                        sb.append(diff.text);
+                    } else {
+                        sb.append("<span style='background-color: #80ff80;'>")
+                                .append(toHtml(diff.text))
+                                .append("</span>");
+                    }
                 }
-            }
             }
         }
         sb.append("</pre>");

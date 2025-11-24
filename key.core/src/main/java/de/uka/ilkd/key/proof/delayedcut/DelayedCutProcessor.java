@@ -75,7 +75,7 @@ public class DelayedCutProcessor implements Runnable {
     private final LinkedList<DelayedCutListener> listeners = new LinkedList<>();
     private final Proof proof;
     private final Node node;
-    private final Term descisionPredicate;
+    private final JTerm descisionPredicate;
     private final int mode;
     private boolean used = false;
 
@@ -93,7 +93,7 @@ public class DelayedCutProcessor implements Runnable {
         return list;
     }
 
-    public DelayedCutProcessor(Proof proof, Node node, Term descisionPredicate, int mode) {
+    public DelayedCutProcessor(Proof proof, Node node, JTerm descisionPredicate, int mode) {
         super();
         this.proof = proof;
         this.node = node;
@@ -285,7 +285,7 @@ public class DelayedCutProcessor implements Runnable {
             for (var entry : insts.getInstantiationMap()) {
                 final SchemaVariable sv = entry.key();
                 if (sv instanceof SkolemTermSV) {
-                    final Term inst = (Term) insts.getInstantiation(sv);
+                    final JTerm inst = (JTerm) insts.getInstantiation(sv);
                     services.getNamespaces().functions().remove(inst.op().name());
                 }
             }

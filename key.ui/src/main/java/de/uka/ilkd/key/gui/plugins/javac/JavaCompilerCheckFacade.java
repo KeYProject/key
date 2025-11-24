@@ -52,16 +52,16 @@ public class JavaCompilerCheckFacade {
      *
      * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
      *        about any issues found in the target Java program
-     * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classPath the {@link List} of {@link File}s referring to the directory that make up
+     * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
+     * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
-     * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @param javaPath the {@link Path} to the source of the target Java program
      * @param processors the {@link List} of {@link String}s referring to the annotation processors to be run
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath, 
+            Path bootClassPath, List<Path> classPath, Path javaPath
             List<String> processors) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
@@ -91,12 +91,14 @@ public class JavaCompilerCheckFacade {
 
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
-            options.add(bootClassPath.getAbsolutePath());
+            options.add(bootClassPath.toAbsolutePath().toString());
         }
         if (classPath != null && !classPath.isEmpty()) {
             options.add("-classpath");
             options.add(
-                classPath.stream().map(File::getAbsolutePath).collect(Collectors.joining(":")));
+                classPath.stream().map(Path::toAbsolutePath)
+                        .map(Objects::toString)
+                        .collect(Collectors.joining(":")));
         }
 
         if (processors != null && !processors.isEmpty()) {
@@ -105,8 +107,8 @@ public class JavaCompilerCheckFacade {
         }
 
         ArrayList<Path> files = new ArrayList<>();
-        if (javaPath.isDirectory()) {
-            try (var s = Files.walk(javaPath.toPath())) {
+        if (Files.isDirectory(javaPath)) {
+            try (var s = Files.walk(javaPath)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
@@ -114,7 +116,7 @@ public class JavaCompilerCheckFacade {
                 LOGGER.info("", e);
             }
         } else {
-            files.add(javaPath.toPath());
+            files.add(javaPath);
         }
 
         Iterable<? extends JavaFileObject> compilationUnits =
@@ -135,8 +137,10 @@ public class JavaCompilerCheckFacade {
                     it.getMessage(Locale.ENGLISH),
                     new Location(
                         fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
-                        Position.newOneBased((int) it.getLineNumber(),
-                            (int) it.getColumnNumber())),
+                        it.getPosition() != Diagnostic.NOPOS
+                                ? Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())
+                                : Position.UNDEFINED),
                     it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });

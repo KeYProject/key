@@ -14,12 +14,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.jspecify.annotations.NonNull;
 
 
-/**
- * Interface for objects that generate lists/sequences of terms or formulas. This interface is used
- * in the feature <code>ForEachCP</code> in order to instantiate schema variables with different
- * terms/formulas.
- */
-public interface TermGenerator<Goal extends ProofGoal<@NonNull Goal>> {
+/// Interface for objects that generate lists/sequences of terms or formulas. This interface is used
+/// in the feature <code>ForEachCP</code> in order to instantiate schema variables with different
+/// terms/formulas.
+public interface TermGenerator<@NonNull Goal extends ProofGoal<@NonNull Goal>> {
     Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState);
 }

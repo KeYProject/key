@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -620,9 +621,9 @@ public abstract class AbstractProofControl implements ProofControl {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 
-            final RuleApplicationManager realManager = goal.getRuleAppManager();
+            final RuleApplicationManager<Goal> realManager = goal.getRuleAppManager();
             goal.setRuleAppManager(null);
-            final RuleApplicationManager focusManager =
+            final RuleApplicationManager<Goal> focusManager =
                 new FocussedRuleApplicationManager(realManager, goal, focus);
             goal.setRuleAppManager(focusManager);
         }
@@ -654,13 +655,13 @@ public abstract class AbstractProofControl implements ProofControl {
             for (final Goal goal : proof.openGoals()) {
                 // remove any filtering rule app managers that are left in the
                 // proof goals
-                final RuleApplicationManager ruleAppManager = goal.getRuleAppManager();
+                final RuleApplicationManager<Goal> ruleAppManager = goal.getRuleAppManager();
                 if (ruleAppManager instanceof FocussedRuleApplicationManager
                         || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
-                    final DelegationBasedRuleApplicationManager focusManager = //
-                        (DelegationBasedRuleApplicationManager) ruleAppManager;
+                    final DelegationBasedRuleApplicationManager<@NonNull Goal> focusManager = //
+                        (DelegationBasedRuleApplicationManager<@NonNull Goal>) ruleAppManager;
                     goal.setRuleAppManager(null);
-                    final RuleApplicationManager realManager = focusManager.getDelegate();
+                    final RuleApplicationManager<Goal> realManager = focusManager.getDelegate();
                     realManager.clearCache();
                     goal.setRuleAppManager(realManager);
                 }

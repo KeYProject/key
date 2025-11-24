@@ -31,9 +31,9 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -212,27 +212,27 @@ public class PrettyPrinter implements Visitor {
         if (children != null) {
             layouter.beginC();
             switch (x.getArity()) {
-            case 2 -> {
-                children.get(0).visit(this);
-                layouter.print(" ");
-                layouter.print(symbol);
-                layouter.brk();
-                children.get(1).visit(this);
-            }
-            case 1 -> {
-                switch (x.getNotation()) {
-                case Operator.PREFIX -> {
-                    layouter.print(symbol);
+                case 2 -> {
                     children.get(0).visit(this);
-                }
-                case Operator.POSTFIX -> {
-                    children.get(0).visit(this);
+                    layouter.print(" ");
                     layouter.print(symbol);
+                    layouter.brk();
+                    children.get(1).visit(this);
                 }
-                default -> {
+                case 1 -> {
+                    switch (x.getNotation()) {
+                        case Operator.PREFIX -> {
+                            layouter.print(symbol);
+                            children.get(0).visit(this);
+                        }
+                        case Operator.POSTFIX -> {
+                            children.get(0).visit(this);
+                            layouter.print(symbol);
+                        }
+                        default -> {
+                        }
+                    }
                 }
-                }
-            }
             }
             layouter.end();
         }
@@ -1950,7 +1950,7 @@ public class PrettyPrinter implements Visitor {
             if (spec == null) {
                 layouter.print(jmlAssert.getCondition().getText().trim());
             } else {
-                Term t = spec.term(JmlAssert.INDEX_CONDITION);
+                JTerm t = spec.term(JmlAssert.INDEX_CONDITION);
                 String text = printInLogicPrinter(t);
                 layouter.print(text);
             }
@@ -1973,8 +1973,8 @@ public class PrettyPrinter implements Visitor {
         if (services != null) {
             var spec =
                 Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-            Term target = spec.term(SetStatement.INDEX_TARGET);
-            Term value = spec.term(SetStatement.INDEX_VALUE);
+            JTerm target = spec.term(SetStatement.INDEX_TARGET);
+            JTerm value = spec.term(SetStatement.INDEX_VALUE);
             layouter.print(printInLogicPrinter(target));
             layouter.print(" = ");
             layouter.print(printInLogicPrinter(value));
@@ -1990,7 +1990,7 @@ public class PrettyPrinter implements Visitor {
         layouter.end();
     }
 
-    public String printInLogicPrinter(Term t) {
+    public String printInLogicPrinter(JTerm t) {
         var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         lp.printTerm(t);
         return lp.result();

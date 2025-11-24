@@ -16,12 +16,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -83,14 +78,15 @@ public final class AutoModeAction extends MainWindowAction {
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
             }
 
             /**
-             * the selected proof has changed. Enable or disable action depending whether a proof is
+             * the selected proof has changed. Enable or disable action depending on whether a proof
+             * is
              * available or not
              */
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 if (associatedProof != null) {
                     associatedProof.removeProofTreeListener(ptl);
                 }

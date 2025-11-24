@@ -219,7 +219,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     public List<MemberReference> getReferences(Method m) {
         Debug.assertNonnull(m);
         updateModel();
-        Set references = element2references.get(m);
+        Set<Reference> references = element2references.get(m);
         if (references == null) {
             return new ArrayList<>(0);
         }
@@ -269,7 +269,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     public List<VariableReference> getReferences(Variable v) {
         Debug.assertNonnull(v);
         updateModel();
-        Set references = element2references.get(v);
+        Set<Reference> references = element2references.get(v);
         if (references == null) {
             return new ArrayList<>(0);
         }
@@ -294,7 +294,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     public List<FieldReference> getReferences(Field f) {
         Debug.assertNonnull(f);
         updateModel();
-        Set references = element2references.get(f);
+        Set<Reference> references = element2references.get(f);
         if (references == null) {
             return new ArrayList<>(0);
         }
@@ -371,7 +371,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
             // ThisReference
             return;
         }
-        Set set = element2references.get(pme);
+        Set<Reference> set = element2references.get(pme);
         if (set == null) {
             // ThisReference
         } else {
@@ -472,7 +472,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         int c1 = 0, c2 = 0, c3 = 0, c4 = 0, c5 = 0;
         int r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0;
         for (ProgramModelElement pme : element2references.keySet()) {
-            Set set = element2references.get(pme);
+            Set<Reference> set = element2references.get(pme);
             int size = set == null ? 0 : set.size();
             if (pme instanceof Variable) {
                 c1 += 1;

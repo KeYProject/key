@@ -95,51 +95,51 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         if (!proxy1 && !proxy2) {
             // This is the standard case where no proxy sorts are involved
             return switch (mode) {
-            case SAME -> fstSort == sndSort;
-            case NOT_SAME -> fstSort != sndSort;
-            case IS_SUBTYPE -> fstSort.extendsTrans(sndSort);
-            case STRICT_SUBTYPE -> fstSort != sndSort && fstSort.extendsTrans(sndSort);
-            case NOT_IS_SUBTYPE -> !fstSort.extendsTrans(sndSort);
-            case DISJOINTMODULONULL -> checkDisjointness(fstSort, sndSort, services);
+                case SAME -> fstSort == sndSort;
+                case NOT_SAME -> fstSort != sndSort;
+                case IS_SUBTYPE -> fstSort.extendsTrans(sndSort);
+                case STRICT_SUBTYPE -> fstSort != sndSort && fstSort.extendsTrans(sndSort);
+                case NOT_IS_SUBTYPE -> !fstSort.extendsTrans(sndSort);
+                case DISJOINTMODULONULL -> checkDisjointness(fstSort, sndSort, services);
             };
         } else {
             switch (mode) {
-            case SAME -> {
-                return fstSort == sndSort;
-            }
-            case IS_SUBTYPE -> {
-                if (proxy2) {
+                case SAME -> {
+                    return fstSort == sndSort;
+                }
+                case IS_SUBTYPE -> {
+                    if (proxy2) {
+                        return false;
+                    }
+                    // If one of the extended types is a subtype to sndSort, then so
+                    // is the proxy sort.
+                    assert proxy1;
+                    for (Sort extSort : fstSort.extendsSorts()) {
+                        if (extSort.extendsTrans(sndSort)) {
+                            return true;
+                        }
+                    }
                     return false;
                 }
-                // If one of the extended types is a subtype to sndSort, then so
-                // is the proxy sort.
-                assert proxy1;
-                for (Sort extSort : fstSort.extendsSorts()) {
-                    if (extSort.extendsTrans(sndSort)) {
-                        return true;
+                case STRICT_SUBTYPE -> {
+                    if (proxy2) {
+                        return false;
                     }
-                }
-                return false;
-            }
-            case STRICT_SUBTYPE -> {
-                if (proxy2) {
+                    // If one of the extended types is a subtype to sndSort, then so
+                    // is the proxy sort.
+                    assert proxy1;
+                    for (Sort extSort : fstSort.extendsSorts()) {
+                        if (extSort != sndSort && extSort.extendsTrans(sndSort)) {
+                            return true;
+                        }
+                    }
                     return false;
                 }
-                // If one of the extended types is a subtype to sndSort, then so
-                // is the proxy sort.
-                assert proxy1;
-                for (Sort extSort : fstSort.extendsSorts()) {
-                    if (extSort != sndSort && extSort.extendsTrans(sndSort)) {
-                        return true;
-                    }
+                case NOT_SAME, DISJOINTMODULONULL, NOT_IS_SUBTYPE -> {
+                    // There are cases where - based on the bounds - true could be returned.
+                    // Implement them if needed. There is the Null type to consider as subtype.
+                    return false;
                 }
-                return false;
-            }
-            case NOT_SAME, DISJOINTMODULONULL, NOT_IS_SUBTYPE -> {
-                // There are cases where - based on the bounds - true could be returned.
-                // Implement them if needed. There is the Null type to consider as subtype.
-                return false;
-            }
             }
         }
 
@@ -263,13 +263,13 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return switch (mode) {
-        case SAME -> "\\same(" + fst + ", " + snd + ")";
-        case NOT_SAME -> "\\not\\same(" + fst + ", " + snd + ")";
-        case IS_SUBTYPE -> "\\sub(" + fst + ", " + snd + ")";
-        case STRICT_SUBTYPE -> "\\strict\\sub(" + fst + ", " + snd + ")";
-        case NOT_IS_SUBTYPE -> "\\not\\sub(" + fst + ", " + snd + ")";
-        case DISJOINTMODULONULL -> "\\disjointModuloNull(" + fst + ", " + snd + ")";
-        default -> "invalid type comparison mode";
+            case SAME -> "\\same(" + fst + ", " + snd + ")";
+            case NOT_SAME -> "\\not\\same(" + fst + ", " + snd + ")";
+            case IS_SUBTYPE -> "\\sub(" + fst + ", " + snd + ")";
+            case STRICT_SUBTYPE -> "\\strict\\sub(" + fst + ", " + snd + ")";
+            case NOT_IS_SUBTYPE -> "\\not\\sub(" + fst + ", " + snd + ")";
+            case DISJOINTMODULONULL -> "\\disjointModuloNull(" + fst + ", " + snd + ")";
+            default -> "invalid type comparison mode";
         };
     }
 }

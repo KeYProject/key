@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
@@ -63,7 +64,7 @@ public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension
             @NonNull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 panel.setGoal(mediator.getSelectedGoal());
             }
         });
@@ -453,23 +454,23 @@ class KeyboardTacletModel {
 
     public void processChar(char c) {
         switch (c) {
-        case '\u001B' -> // escape
-            reset();
-        case '\b' -> {
-            if (currentPrefix.length() <= 1) {
-                setCurrentPrefix("");
-            } else {
-                setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
+            case '\u001B' -> // escape
+                reset();
+            case '\b' -> {
+                if (currentPrefix.length() <= 1) {
+                    setCurrentPrefix("");
+                } else {
+                    setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
+                }
             }
-        }
-        default -> {
-            if ('0' <= c && c <= '9') {
-                setCurrentPos(c - '0');
+            default -> {
+                if ('0' <= c && c <= '9') {
+                    setCurrentPos(c - '0');
+                }
+                if (charValid(c)) {
+                    setCurrentPrefix(currentPrefix + c);
+                }
             }
-            if (charValid(c)) {
-                setCurrentPrefix(currentPrefix + c);
-            }
-        }
         }
     }
 

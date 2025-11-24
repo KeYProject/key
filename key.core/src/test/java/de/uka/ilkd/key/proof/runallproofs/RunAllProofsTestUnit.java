@@ -86,24 +86,24 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         ForkMode forkMode = settings.getForkMode();
         switch (forkMode) {
-        case PERGROUP -> testResults =
-            ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
-        case NOFORK -> {
-            testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                TestResult testResult = testFile.runKey();
-                testResults.add(testResult);
+            case PERGROUP -> testResults =
+                ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
+            case NOFORK -> {
+                testResults = new ArrayList<>();
+                for (TestFile testFile : testFiles) {
+                    TestResult testResult = testFile.runKey();
+                    testResults.add(testResult);
+                }
             }
-        }
-        case PERFILE -> {
-            testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                TestResult testResult =
-                    ForkedTestFileRunner.processTestFile(testFile, getTempDir());
-                testResults.add(testResult);
+            case PERFILE -> {
+                testResults = new ArrayList<>();
+                for (TestFile testFile : testFiles) {
+                    TestResult testResult =
+                        ForkedTestFileRunner.processTestFile(testFile, getTempDir());
+                    testResults.add(testResult);
+                }
             }
-        }
-        default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
+            default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
         }
 
         if (verbose) {
@@ -127,7 +127,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             TestFile file = testFiles.get(i);
             var time = System.currentTimeMillis() - start;
             TestResult testResult = testResults.get(i);
-            xml.addTestcase(file.getKeYFile().getName(), this.testName,
+            xml.addTestcase(file.getKeYFile().getFileName().toString(), this.testName,
                 (testResult.success() ? JunitXmlWriter.TestCaseState.SUCCESS
                         : JunitXmlWriter.TestCaseState.FAILED),
                 "",
@@ -135,7 +135,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             success &= testResult.success();
             message.append(testResult.message()).append("\n");
             summary.append(String.format("  %s (%s): %s%n",
-                file.getKeYFile().getName(),
+                file.getKeYFile().getFileName().toString(),
                 file.getTestProperty(),
                 testResult.success() ? "success" : "FAILURE"));
         }

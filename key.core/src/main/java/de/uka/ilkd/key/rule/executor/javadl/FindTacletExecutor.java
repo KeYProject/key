@@ -15,7 +15,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
@@ -41,14 +41,14 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)
      *        result of applying the taclet
      * @param posOfFind the {@link PosInOccurrence} belonging to the find expression
-     * @param matchCond the {@link MatchConditions} with all required instantiations
+     * @param matchCond the {@link MatchResultInfo} with all required instantiations
      * @param goal the {@link Goal} on which the taclet is applied
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
-            PosInOccurrence posOfFind, MatchConditions matchCond,
+            PosInOccurrence posOfFind, MatchResultInfo matchCond,
             Goal goal, TacletApp ruleApp, Services services);
 
 
@@ -65,7 +65,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      *        new formulas close to that position)
      * @param posOfFind the {@link PosInOccurrence} providing the position information where the
      *        match took place
-     * @param matchCond the {@link MatchConditions} with all required instantiations
+     * @param matchCond the {@link MatchResultInfo} with all required instantiations
      * @param goal the Goal where the taclet is applied to
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Java model information
@@ -74,7 +74,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
             SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
-            MatchConditions matchCond, Goal goal,
+            MatchResultInfo matchCond, Goal goal,
             TacletApp ruleApp, Services services);
 
 
@@ -93,7 +93,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         final int numberOfNewGoals = taclet.goalTemplates().size();
 
         final TacletApp tacletApp = (TacletApp) ruleApp;
-        final MatchConditions mc = tacletApp.matchConditions();
+        final MatchResultInfo mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
             checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);

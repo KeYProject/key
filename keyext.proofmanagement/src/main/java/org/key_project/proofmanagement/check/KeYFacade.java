@@ -3,14 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.JavaSourceElement;
@@ -168,7 +163,7 @@ public final class KeYFacade {
         /////////////////// comparison to AbstractProblemLoader load
         /////////////////// createEnvInput
         KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
-            path.toFile(), fileRepo, control, profile, false);
+            path, fileRepo, control, profile, false);
         line.envInput = keyFile; // store in CheckerData for later use (e.g. in ReplayChecker)
 
         /////////////////// createEnvInput
@@ -426,21 +421,19 @@ public final class KeYFacade {
         try {
             // load all contracts from source files
             ProofBundleHandler pbh = data.getPbh();
-            File src = pbh.getPath("src").toFile();
-            List<File> cp = null;
+            Path src = pbh.getPath("src");
+            List<Path> cp = null;
             if (!pbh.getClasspathFiles().isEmpty()) {
-                cp = pbh.getClasspathFiles().stream()
-                        .map(Path::toFile)
-                        .collect(Collectors.toList());
+                cp = new ArrayList<>(pbh.getClasspathFiles());
             }
-            File bcp = null;
+            Path bcp = null;
             if (pbh.getBootclasspath() != null) {
-                bcp = pbh.getBootclasspath().toFile();
+                bcp = pbh.getBootclasspath();
             }
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            SLEnvInput slenv = new SLEnvInput(src.toString(), cp, bcp, profile, null);
+            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, null);
             data.setSlenv(slenv);
             data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
             data.print(LogLevel.DEBUG, "Java sources successfully loaded!");

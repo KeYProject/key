@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturnValue;
@@ -27,7 +27,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
      */
-    Term getReturnValue() throws ProofInputException;
+    JTerm getReturnValue() throws ProofInputException;
 
     /**
      * Returns the return value as human readable {@link String}.
@@ -52,7 +52,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The optional condition under which the return value is valid.
      * @throws ProofInputException Occurred Exception.
      */
-    Term getCondition() throws ProofInputException;
+    JTerm getCondition() throws ProofInputException;
 
     /**
      * Returns the optional condition under which the return value is valid as human readable

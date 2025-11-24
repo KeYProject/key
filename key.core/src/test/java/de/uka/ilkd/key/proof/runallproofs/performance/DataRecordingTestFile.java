@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -18,6 +18,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+
+import org.jspecify.annotations.NonNull;
 
 class DataRecordingTestFile extends TestFile {
     public final ProfilingDirectories directories;
@@ -44,11 +46,12 @@ class DataRecordingTestFile extends TestFile {
     }
 
     @Override
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success) {
+    protected void reload(boolean verbose, Path proofFile, Proof loadedProof, boolean success) {
         // we skip reloading for these test cases
     }
 
-    private static ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
+    private static ApplyStrategyInfo<@NonNull Proof, Goal> applyStrategy(Proof proof,
+            Strategy<@NonNull Goal> strategy) {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(
             proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()

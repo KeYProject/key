@@ -38,6 +38,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
  *
@@ -47,7 +49,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The condition for this Breakpoint (set by user).
      */
-    private Term condition;
+    private JTerm condition;
 
     /**
      * The flag if the the condition for the associated Breakpoint is enabled
@@ -286,9 +288,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Computes the Term that can be evaluated, from the user given condition
      *
      * @param condition the condition given by the user
-     * @return the {@link Term} that represents the condition
+     * @return the {@link JTerm} that represents the condition
      */
-    private Term computeTermForCondition(String condition) {
+    private JTerm computeTermForCondition(String condition) {
         if (condition == null) {
             return getProof().getServices().getTermBuilder().tt();
         }
@@ -353,12 +355,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @return true if the condition evaluates to true
      */
     protected boolean conditionMet(RuleApp ruleApp, Node node) {
-        ApplyStrategyInfo info = null;
+        ApplyStrategyInfo<@NonNull Proof, Goal> info = null;
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            var t = pio.subTerm();
-            Term term = TermBuilder.goBelowUpdates(t);
+            JTerm t = (JTerm) pio.subTerm();
+            JTerm term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), getProof().getServices());
             // put values into map which have to be replaced
@@ -369,9 +371,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             final TermBuilder tb = getProof().getServices().getTermBuilder();
             OpReplacer replacer =
                 new OpReplacer(getVariableNamingMap(), tb.tf());
-            Term termForSideProof = replacer.replace(condition);
+            JTerm termForSideProof = replacer.replace(condition);
             // start side proof
-            Term toProof = tb.equals(tb.tt(), termForSideProof);
+            JTerm toProof = tb.equals(tb.tt(), termForSideProof);
             // New OneStepSimplifier is required because it has an internal state and the default
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
@@ -455,7 +457,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the condition of the associated Breakpoint
      */
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 

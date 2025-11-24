@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -50,9 +51,9 @@ public class TestTermTacletAppIndex {
 
     @BeforeEach
     public void setUp() {
-        File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
-        assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
+        Path tacletFile = HelperClassForTests.TESTCASE_DIRECTORY.resolve(
+            "../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+        assertTrue(Files.exists(tacletFile), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
         ruleRewriteNonH1H2 =
@@ -122,7 +123,7 @@ public class TestTermTacletAppIndex {
         ruleIdx.add(remove_f);
         ruleIdx.add(remove_zero);
 
-        Term term = TacletForTests.parseTerm("f(f(f(zero)))=one");
+        JTerm term = TacletForTests.parseTerm("f(f(f(zero)))=one");
         SequentFormula cfma = new SequentFormula(term);
 
         PosInOccurrence pio =
@@ -140,7 +141,7 @@ public class TestTermTacletAppIndex {
         checkTermIndex(pio, termIdx);
 
         // now a real change
-        Term term2 = TacletForTests.parseTerm("f(f(zero))=one");
+        JTerm term2 = TacletForTests.parseTerm("f(f(zero))=one");
         SequentFormula cfma2 = new SequentFormula(term2);
         PosInOccurrence pio2 =
             new PosInOccurrence(cfma2, PosInTerm.getTopLevel(), false);

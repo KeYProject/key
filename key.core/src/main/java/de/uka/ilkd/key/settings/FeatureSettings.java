@@ -92,8 +92,8 @@ public class FeatureSettings extends AbstractSettings {
      */
     private boolean isTrue(Object value) {
         return switch (value.toString().toLowerCase()) {
-        case "true", "yes", "on" -> true;
-        default -> false;
+            case "true", "yes", "on" -> true;
+            default -> false;
         };
     }
 

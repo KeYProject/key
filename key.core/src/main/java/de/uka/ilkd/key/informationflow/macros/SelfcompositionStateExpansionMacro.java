@@ -65,7 +65,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
@@ -130,14 +130,14 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
-                PosInOccurrence pio, Goal p_goal, MutableState mState) {
-            final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
+        public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, G p_goal, MutableState mState) {
+            final var goal = (Goal) p_goal;
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 JavaCardDLStrategyFactory strategyFactory = new JavaCardDLStrategyFactory();
-                Strategy javaDlStrategy =
+                Strategy<@NonNull Goal> javaDlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
                 RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal, mState);
                 if ("orLeft".equals(name)) {

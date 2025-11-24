@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
-import java.io.File;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 
@@ -148,9 +149,8 @@ public class JavacExtension
                 return;
             }
 
-            File bootClassPath =
-                jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
-            List<File> classpath = jm.getClassPathEntries();
+            Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
+            List<Path> classpath = jm.getClassPath();
             JavacSettings settings = JavacSettingsProvider.getJavacSettings();
 
             List<String> processors = null;
@@ -158,12 +158,12 @@ public class JavacExtension
                 if (classpath == null) classpath = new ArrayList<>();
 
                 classpath.addAll(Arrays.asList(settings.getClassPaths().split(System.lineSeparator()))
-                    .stream().map(p -> new File(p)).toList());
+                    .stream().map(p -> Paths.get(p)).toList());
 
                 processors = Arrays.asList(settings.getProcessors().split(System.lineSeparator()));
             }
 
-            File javaPath = new File(jm.getModelDir());
+            Path javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
             lblStatus.setText("Javac runs");
@@ -238,12 +238,12 @@ public class JavacExtension
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         /* ignored */
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         loadProof(e.getSource().getSelectedProof());
     }
 
