@@ -61,7 +61,7 @@ public class JavaCompilerCheckFacade {
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            Path bootClassPath, List<Path> classPath, Path javaPath
+            Path bootClassPath, List<Path> classPath, Path javaPath,
             List<String> processors) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
