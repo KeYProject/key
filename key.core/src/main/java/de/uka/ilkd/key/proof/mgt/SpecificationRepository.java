@@ -1408,7 +1408,7 @@ public final class SpecificationRepository {
      * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not
      *         available.
      */
-    public ProofOblInput getProofOblInput(Proof proof) {
+    public @Nullable ProofOblInput getProofOblInput(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();

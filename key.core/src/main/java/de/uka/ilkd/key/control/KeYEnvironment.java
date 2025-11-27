@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
-public class KeYEnvironment<U extends UserInterfaceControl> {
+public class KeYEnvironment<U extends UserInterfaceControl> implements AutoCloseable{
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
@@ -353,5 +353,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             }
         }
         return proofContracts;
+    }
+
+    @Override
+    public void close() throws Exception {
+        dispose();
     }
 }
