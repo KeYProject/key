@@ -745,6 +745,44 @@ public class UseOperationContractRule implements BuiltInRule {
                     ? contract.getMby(heapTerms, contractSelf, contractParams, atPres, services)
                     : null;
 
+            // prepare common stuff for the three branches
+            for (LocationVariable heap : heapContext) {
+                final AnonUpdateData tAnon;
+                if (!contract.hasModifiable(heap)) {
+                    tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
+                            tb.var(heap));
+                } else {
+                    tAnon = createAnonUpdate(heap, inst.pm, modifiables.get(heap), services);
+                }
+                anonUpdateDatas = anonUpdateDatas.append(tAnon);
+                if (anonAssumption == null) {
+                    anonAssumption = tAnon.assumption;
+                } else {
+                    anonAssumption = tb.and(anonAssumption, tAnon.assumption);
+                }
+                if (anonUpdate == null) {
+                    anonUpdate = tAnon.anonUpdate;
+                } else {
+                    anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
+                }
+                if (wellFormedAnon == null) {
+                    wellFormedAnon = tb.wellFormed(tAnon.anonHeap);
+                } else {
+                    wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
+                }
+                final JTerm up = tb.elementary(atPreVars.get(heap), tb.var(heap));
+                if (atPreUpdates == null) {
+                    atPreUpdates = up;
+                } else {
+                    atPreUpdates = tb.parallel(atPreUpdates, up);
+                }
+                if (reachableState == null) {
+                    reachableState = tb.wellFormed(heap);
+                } else {
+                    reachableState = tb.and(reachableState, tb.wellFormed(heap));
+                }
+            }
+
             excNull = tb.equals(tb.var(excVar), tb.NULL());
             excCreated = tb.created(tb.var(excVar));
             freePost = getFreePost(heapContext, inst.pm, inst.staticType, contractResult,
@@ -789,45 +827,6 @@ public class UseOperationContractRule implements BuiltInRule {
             excPostGoal
                     .setBranchLabel(
                         "Exceptional Post (%s)".formatted(contract.getTarget().getName()));
-
-            // prepare common stuff for the three branches
-            for (LocationVariable heap : heapContext) {
-                final AnonUpdateData tAnon;
-                if (!contract.hasModifiable(heap)) {
-                    tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
-                        tb.var(heap));
-                } else {
-                    tAnon = createAnonUpdate(heap, inst.pm, modifiables.get(heap), services);
-                }
-                anonUpdateDatas = anonUpdateDatas.append(tAnon);
-                if (anonAssumption == null) {
-                    anonAssumption = tAnon.assumption;
-                } else {
-                    anonAssumption = tb.and(anonAssumption, tAnon.assumption);
-                }
-                if (anonUpdate == null) {
-                    anonUpdate = tAnon.anonUpdate;
-                } else {
-                    anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
-                }
-                if (wellFormedAnon == null) {
-                    wellFormedAnon = tb.wellFormed(tAnon.anonHeap);
-                } else {
-                    wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
-                }
-                final JTerm up = tb.elementary(atPreVars.get(heap), tb.var(heap));
-                if (atPreUpdates == null) {
-                    atPreUpdates = up;
-                } else {
-                    atPreUpdates = tb.parallel(atPreUpdates, up);
-                }
-                if (reachableState == null) {
-                    reachableState = tb.wellFormed(heap);
-                } else {
-                    reachableState = tb.and(reachableState, tb.wellFormed(heap));
-                }
-            }
-
 
             // create "Pre" branch
             if (nullGoal != null) {
