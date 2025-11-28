@@ -49,11 +49,11 @@ import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.keyproject.key.api.data.*;
+import org.keyproject.key.api.data.ExampleDesc;
 import org.keyproject.key.api.data.KeyIdentifications.*;
-import org.keyproject.key.api.internal.NodeText;
-import org.keyproject.key.api.remoteapi.ExampleDesc;
+import org.keyproject.key.api.data.NodeText;
+import org.keyproject.key.api.data.PrintOptions;
 import org.keyproject.key.api.remoteapi.KeyApi;
-import org.keyproject.key.api.remoteapi.PrintOptions;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
 import static de.uka.ilkd.key.proof.ProofNodeDescription.collectPathInformation;

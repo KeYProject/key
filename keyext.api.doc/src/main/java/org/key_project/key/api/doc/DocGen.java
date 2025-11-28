@@ -34,7 +34,7 @@ public class DocGen implements Supplier<String> {
             printHeader();
 
             out.format("## Types%n");
-            metamodel.types()
+            metamodel.types().values()
                     .stream().sorted(Comparator.comparing(Metamodel.Type::name))
                     .forEach(this::printType);
 
@@ -92,23 +92,33 @@ public class DocGen implements Supplier<String> {
         out.format("### Type: %s%n", type.name());
         if (type instanceof Metamodel.ObjectType ot) {
             out.format("""
+                    %s
                     ```
                     type %s {
                      %s
                     }
                     ```
-                    """.formatted(type.name(),
+                    """.formatted(
+                type.documentation(),
+                type.name(),
                 ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
-                        .map(it -> "\t%s : %s".formatted(it.name(), it.type()))
+                        .map(it -> "  /* %s */\n  %s : %s".formatted(it.documentation(), it.name(),
+                            it.type()))
                         .collect(Collectors.joining("\n"))));
         }
 
         if (type instanceof Metamodel.EnumType et) {
             out.format("""
                     ```
+                    %s
                     enum %s { %s }
                     ```
-                    """.formatted(type.name(), String.join(", ", et.values())));
+                    """.formatted(
+                type.documentation(),
+                type.name(),
+                et.values().stream()
+                        .map(it -> "  /* %s */\n  %s".formatted(it.documentation(), it.value()))
+                        .collect(Collectors.joining("\n"))));
             out.format(type.documentation());
         }
         out.format(type.documentation());
