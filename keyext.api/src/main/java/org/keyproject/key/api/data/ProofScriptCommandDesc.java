@@ -11,7 +11,7 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
  */
 public record ProofScriptCommandDesc(String macroId, String documentation)
         implements KeYDataTransferObject {
-    public static ProofScriptCommandDesc from(ProofScriptCommand<?> proofScriptCommand) {
+    public static ProofScriptCommandDesc from(ProofScriptCommand proofScriptCommand) {
         return new ProofScriptCommandDesc(proofScriptCommand.getName(),
             proofScriptCommand.getDocumentation());
     }

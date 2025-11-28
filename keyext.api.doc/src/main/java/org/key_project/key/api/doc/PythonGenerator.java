@@ -11,6 +11,7 @@ package org.key_project.key.api.doc;/*
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -82,8 +83,15 @@ public abstract class PythonGenerator implements Supplier<String> {
     }
 
     protected Metamodel.Type findType(String typeName) {
-        return this.metamodel.types().stream().filter(it -> it.name().equals(typeName)).findFirst()
-                .orElseThrow(() -> new RuntimeException("Could not find type: " + typeName));
+        return this.metamodel.types().values().stream()
+                .filter(it -> {
+                    if (it instanceof Metamodel.ListType lt)
+                        return lt.type().name().equals(typeName);
+                    return it.name().equals(typeName);
+                })
+                .findFirst()
+                .orElse(new Metamodel.ObjectType("...", "...", List.of(), ""));
+        // new RuntimeException("Could not find type: " + typeName));
     }
 
 
@@ -206,15 +214,15 @@ public abstract class PythonGenerator implements Supplier<String> {
                     from abc import abstractmethod, ABCMeta
 
                     """);
-            metamodel.types().forEach(this::printType);
+            metamodel.types().values().forEach(this::printType);
 
             var names =
-                metamodel.types().stream()
+                metamodel.types().values().stream()
                         .map(it -> "\"%s\": %s".formatted(it.identifier(), it.name()))
                         .collect(Collectors.joining(","));
             out.format("KEY_DATA_CLASSES = { %s }%n%n", names);
             var names_reverse =
-                metamodel.types().stream()
+                metamodel.types().values().stream()
                         .map(it -> "\"%s\": \"%s\"".formatted(it.name(), it.identifier()))
                         .collect(Collectors.joining(","));
             out.format("KEY_DATA_CLASSES_REV = { %s }%n%n", names_reverse);

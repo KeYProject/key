@@ -13,6 +13,8 @@ import java.util.List;
  * @param bootClassPath
  * @param includes
  */
-public record LoadParams(Path problemFile, List<Path> classPath, Path bootClassPath,
+public record LoadParams(Path problemFile,
+        List<Path> classPath,
+        Path bootClassPath,
         List<Path> includes) implements KeYDataTransferObject {
 }

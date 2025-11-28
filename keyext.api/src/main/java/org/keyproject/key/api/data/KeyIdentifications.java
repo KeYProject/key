@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.keyproject.key.api.internal.NodeText;
 
 /**
  * @author Alexander Weigl
