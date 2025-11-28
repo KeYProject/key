@@ -4,7 +4,7 @@ plugins {
 
 description "Example project to use KeY's APIs"
 
-mainClassName ="org.key_project.Main"
+//mainClassName ="org.key_project.Main"
 
 dependencies {
     implementation project(":key.core")
