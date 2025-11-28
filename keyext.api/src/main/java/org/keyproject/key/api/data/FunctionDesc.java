@@ -12,7 +12,8 @@ import org.key_project.logic.op.Function;
  * @author Alexander Weigl
  * @version 1 (15.10.23)
  */
-public record FunctionDesc(String name, String sort, SortDesc retSort, List<SortDesc> argSorts,
+public record FunctionDesc(String name, String sort, SortDesc retSort,
+        List<SortDesc> argSorts,
         boolean rigid,
         boolean unique, boolean skolemConstant) implements KeYDataTransferObject {
     public static FunctionDesc from(Function fn) {
