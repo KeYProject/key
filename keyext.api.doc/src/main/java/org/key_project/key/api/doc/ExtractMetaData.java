@@ -12,13 +12,14 @@ import java.io.File;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.proof.Proof;
 
-import com.github.therapi.runtimejavadoc.ClassJavadoc;
-import com.github.therapi.runtimejavadoc.FieldJavadoc;
-import com.github.therapi.runtimejavadoc.MethodJavadoc;
-import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
+import org.key_project.key.api.doc.Metamodel.HelpText;
+import org.key_project.key.api.doc.Metamodel.HelpTextEntry;
+
+import com.github.therapi.runtimejavadoc.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
@@ -41,9 +42,12 @@ import picocli.CommandLine;
 public class ExtractMetaData implements Callable<Integer> {
     private final List<Metamodel.Endpoint> endpoints = new LinkedList<>();
     private final Map<Class<?>, Metamodel.Type> types = new HashMap<>();
-    private final Metamodel.KeyApi keyApi = new Metamodel.KeyApi(endpoints, types);
+    private final Map<String, HelpText> segDocumentation = new TreeMap<>();
+    private final Metamodel.KeyApi keyApi =
+        new Metamodel.KeyApi(endpoints, types, segDocumentation);
 
-    public ExtractMetaData() {}
+    public ExtractMetaData() {
+    }
 
     @Override
     public Integer call() throws IOException {
@@ -66,35 +70,14 @@ public class ExtractMetaData implements Callable<Integer> {
             addClientEndpoint(method);
         }
 
-        Files.createDirectories(output);
-
-        runGenerator("api.meta.json", (a) -> () -> getGson().toJson(a));
-        runGenerator("api.meta.md", DocGen::new);
-        runGenerator("keydata.py", PythonGenerator.PyDataGen::new);
-        runGenerator("server.py", PythonGenerator.PyApiGen::new);
-
-        return 0;
-    }
-
-    private void runGenerator(String target, Function<Metamodel.KeyApi, Supplier<String>> api) {
-        try {
-            var n = api.apply(keyApi);
-            Files.writeString(output.resolve(target), n.get());
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (var anInterface : KeyApi.class.getInterfaces()) {
+            var js = anInterface.getAnnotation(JsonSegment.class);
+            if (js != null) {
+                var key = js.value();
+                var doc = findDocumentation(anInterface);
+                segDocumentation.put(key, doc);
+            }
         }
-    }
-
-    private static Gson getGson() {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(Type.class,
-                    (JsonSerializer<Metamodel.Type>) (src, typeOfSrc, context) -> {
-                        JsonObject json = (JsonObject) context.serialize(src);
-                        json.addProperty("kind", src.kind());
-                        return json;
-                    })
-                .create();
     }
 
     private void addServerEndpoint(Method method) {
@@ -136,21 +119,24 @@ public class ExtractMetaData implements Callable<Integer> {
             "Method " + method + " is neither a request nor a notification");
     }
 
-    private String findDocumentation(Method method) {
+    private @Nullable HelpText findDocumentation(Method method) {
         MethodJavadoc javadoc = RuntimeJavadoc.getJavadoc(method);
-        return javadoc.getParams().toString() +
-                javadoc.getThrows() +
-                javadoc.getReturns().toString();
+        if (javadoc.isEmpty())
+            return null;
 
-        /*
-         * return findCompilationUnit(method.getDeclaringClass())
-         * .map(it -> it.getMethodsByName(method.getName()))
-         * .map(List::getFirst)
-         * .flatMap(NodeWithJavadoc::getJavadoc)
-         * .map(Javadoc::getDescription)
-         * .map(JavadocDescription::toText)
-         * .orElse("");
-         */
+        final var visitor = new ToHtmlStringCommentVisitor();
+        javadoc.getComment().visit(visitor);
+
+        var t = javadoc.getThrows().stream()
+                .map(it -> new HelpTextEntry(it.getName(), it.getComment().toString()));
+
+        var p = javadoc.getParams().stream()
+                .map(it -> new HelpTextEntry(it.getName(), it.getComment().toString()));
+
+        var r = Stream.of(new HelpTextEntry("returns", javadoc.getReturns().toString()));
+
+        return new HelpText(visitor.build(),
+            Stream.concat(r, Stream.concat(p, t)).toList());
     }
 
     private List<Metamodel.Argument> translate(Parameter[] parameters) {
@@ -197,7 +183,7 @@ public class ExtractMetaData implements Callable<Integer> {
         if (type == List.class) {
             // TODO try to get the type below.
             var subType = getOrFindType(type.getTypeParameters()[0]);
-            return new Metamodel.ListType(subType, "");
+            return new Metamodel.ListType(subType);
         }
 
         if (type == Class.class || type == Constructor.class || type == Proof.class) {
@@ -214,35 +200,40 @@ public class ExtractMetaData implements Callable<Integer> {
     }
 
     private Metamodel.Type createType(Class<?> type) {
-
         final var documentation = findDocumentation(type);
-        if (type.isEnum())
+        if (type.isEnum()) {
             return new Metamodel.EnumType(type.getSimpleName(), type.getName(),
                 Arrays.stream(type.getEnumConstants())
                         .map(
                             it -> new Metamodel.EnumConstant(it.toString(),
-                                findDocumentation(type, it)))
+                                findDocumentationEnum(type, it)))
                         .toList(),
                 documentation);
-
+        }
 
         var obj = new Metamodel.ObjectType(type.getSimpleName(), type.getName(), new ArrayList<>(),
             documentation);
         final var list = Arrays.stream(type.getDeclaredFields())
                 .map(it -> new Metamodel.Field(it.getName(), getOrFindTypeName(it.getGenericType()),
-                    findDocumentation(it)))
+                    type.isRecord()
+                            ? findDocumentationRecord(type, it.getName())
+                            : findDocumentation(it)))
                 .toList();
         obj.fields().addAll(list);
         return obj;
     }
 
-    private String findDocumentation(Field it) {
+    private @Nullable HelpText findDocumentation(Field it) {
         var javadoc = RuntimeJavadoc.getJavadoc(it);
+        if (javadoc.isEmpty())
+            return null;
         return printFieldDocumentation(javadoc);
     }
 
-    private @Nullable String findDocumentation(Class<?> type, Object enumConstant) {
+    private @Nullable HelpText findDocumentationEnum(Class<?> type, Object enumConstant) {
         ClassJavadoc javadoc = RuntimeJavadoc.getJavadoc(type);
+        if (javadoc.isEmpty())
+            return null;
         for (var cdoc : javadoc.getEnumConstants()) {
             if (cdoc.getName().equalsIgnoreCase(enumConstant.toString())) {
                 return printFieldDocumentation(cdoc);
@@ -251,18 +242,46 @@ public class ExtractMetaData implements Callable<Integer> {
         return null;
     }
 
-    private static String printFieldDocumentation(FieldJavadoc cdoc) {
-        return cdoc.getComment().toString() +
-                (cdoc.getOther().isEmpty() ? "" : cdoc.getOther().toString()) +
-                (cdoc.getSeeAlso().isEmpty() ? "" : cdoc.getSeeAlso().toString());
+    private @Nullable HelpText findDocumentationRecord(Class<?> type, String name) {
+        ClassJavadoc javadoc = RuntimeJavadoc.getJavadoc(type);
+        if (javadoc.isEmpty())
+            return null;
+        for (var cdoc : javadoc.getRecordComponents()) {
+            if (cdoc.getName().equalsIgnoreCase(name)) {
+                return new HelpText(cdoc.getComment().toString(), List.of());
+            }
+        }
+        return null;
     }
 
-    private String findDocumentation(Class<?> type) {
+    private static HelpText printFieldDocumentation(FieldJavadoc javadoc) {
+        final var visitor = new ToHtmlStringCommentVisitor();
+        javadoc.getComment().visit(visitor);
+
+        var t = javadoc.getOther().stream()
+                .map(it -> new HelpTextEntry(it.getName(), it.getComment().toString()));
+
+        var p = javadoc.getSeeAlso().stream().map(
+            it -> new HelpTextEntry(it.getSeeAlsoType().toString(), it.getStringLiteral()));
+
+        return new HelpText(visitor.build(), Stream.concat(p, t).toList());
+    }
+
+    private @Nullable HelpText findDocumentation(Class<?> type) {
         ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(type);
         if (!classDoc.isEmpty()) { // optionally skip absent documentation
-            return classDoc.getComment().toString() + classDoc.getOther() + classDoc.getSeeAlso();
+            var other = classDoc.getOther()
+                    .stream().map(it -> new HelpTextEntry(it.getName(),
+                        it.getComment().toString()));
+            var also = classDoc.getSeeAlso()
+                    .stream().map(it -> new HelpTextEntry(it.getSeeAlsoType().toString(),
+                        it.getStringLiteral()));
+
+            return new HelpText(
+                classDoc.getComment().toString(),
+                Stream.concat(other, also).toList());
         }
-        return "";
+        return null;
     }
 
     private void addClientEndpoint(Method method) {
@@ -292,7 +311,8 @@ public class ExtractMetaData implements Callable<Integer> {
         }
     }
 
-    private static String callMethodName(String method, String segment, @Nullable String userValue,
+    private static String callMethodName(String method, String segment,
+            @Nullable String userValue,
             boolean useSegment) {
         if (!useSegment) {
             if (userValue == null || userValue.isBlank()) {
@@ -396,16 +416,16 @@ public class ExtractMetaData implements Callable<Integer> {
                 }
                 if (Objects.equals(pt.getRawType().getTypeName(), List.class.getTypeName())) {
                     var base = getOrFindType(pt.getActualTypeArguments()[0]);
-                    return new Metamodel.ListType(base, "");
+                    return new Metamodel.ListType(base);
                 }
 
                 if (Objects.equals(pt.getRawType().getTypeName(), Either.class.getTypeName())) {
                     var base1 = getOrFindType(pt.getActualTypeArguments()[0]);
                     var base2 = getOrFindType(pt.getActualTypeArguments()[1]);
-                    return new Metamodel.EitherType(base1, base2, "");
+                    return new Metamodel.EitherType(base1, base2);
                 }
             }
-            case null, default -> {
+            default -> {
             }
         }
 

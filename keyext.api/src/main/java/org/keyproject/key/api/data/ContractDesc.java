@@ -7,8 +7,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
- * @param contractId
+ * Description of a loadable contract in KeY.
+ *
+ * Contracts can be arbitrary objects, representing a functional, dependency, information flow, etc.
+ * contract.
+ * Contracts can be loaded into proofs.
+ *
+ * @param contractId an identifier of the contract
  * @param name Name of the contract
+ * @param displayName Showable name
+ * @param typeName the typename which is associated with this contract
+ * @param htmlText content of the contract as html text
+ * @param plainText content of the contract as plain text
  *
  * @author Alexander Weigl
  * @version 1 (13.10.23)

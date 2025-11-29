@@ -23,6 +23,7 @@ import edu.kit.iti.formal.keyextclientjava.rpc.KeyRemote;
 import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
+import org.jspecify.annotations.NullMarked;
 import org.keyproject.key.api.KeyApiImpl;
 import org.keyproject.key.api.StartServer;
 import org.keyproject.key.api.data.KeyIdentifications;
@@ -35,6 +36,7 @@ import org.keyproject.key.api.remoteclient.*;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+@NullMarked
 public class MyKeyClient {
     public static final String JAR_FILE = "";
     private final ToolBar toolbar = new ToolBar();
@@ -115,12 +117,8 @@ public class MyKeyClient {
         }
     }
 
+    @NullMarked
     private static class SimpleClient implements ClientApi {
-        @Override
-        public void sayHello(String e) {
-
-        }
-
         @Override
         public void logTrace(LogTraceParams params) {
 
@@ -132,7 +130,8 @@ public class MyKeyClient {
         }
 
         @Override
-        public CompletableFuture<MessageActionItem> userResponse(ShowMessageRequestParams params) {
+        public CompletableFuture<MessageActionItem> showMessageWithActions(
+                ShowMessageRequestParams params) {
             return null;
         }
 

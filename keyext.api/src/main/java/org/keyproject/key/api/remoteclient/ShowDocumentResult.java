@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteclient;
 
-public record ShowDocumentResult(
-        /**
-         * A boolean indicating if the show was successful.
-         */
-        boolean success) {
-
+/**
+ * @param success A boolean indicating if the show was successful.
+ */
+public record ShowDocumentResult(boolean success) {
 }
