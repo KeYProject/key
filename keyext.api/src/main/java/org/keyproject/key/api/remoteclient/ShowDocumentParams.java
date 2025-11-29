@@ -7,6 +7,8 @@ import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.data.TextRange;
 
 /**
+ * Information to show a document on the client side.
+ *
  * @param uri The uri to show.
  * @param external Indicates to show the resource in an external program.
  *        To show, for example, `https://code.visualstudio.com/`
@@ -20,7 +22,6 @@ import org.keyproject.key.api.data.TextRange;
  *        external program is started or the file is not a text
  *        file.
  */
-
 public record ShowDocumentParams(
         String uri,
         boolean external,

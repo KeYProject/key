@@ -6,16 +6,13 @@ package org.keyproject.key.api;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
+import org.jspecify.annotations.NullMarked;
 import org.keyproject.key.api.data.TaskFinishedInfo;
 import org.keyproject.key.api.data.TaskStartedInfo;
 import org.keyproject.key.api.remoteclient.*;
 
+@NullMarked
 class SimpleClient implements ClientApi {
-
-    @Override
-    public void sayHello(String e) {
-        System.out.format("Hello, %s%n", e);
-    }
 
     @Override
     public void logTrace(LogTraceParams params) {
@@ -29,7 +26,8 @@ class SimpleClient implements ClientApi {
 
     @Nullable
     @Override
-    public CompletableFuture<MessageActionItem> userResponse(ShowMessageRequestParams params) {
+    public CompletableFuture<MessageActionItem> showMessageWithActions(
+            ShowMessageRequestParams params) {
         return null;
     }
 

@@ -3,15 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.remoteclient;
 
-public record ShowMessageParams(
-        /**
-         * The message type. See {@link MessageType}.
-         */
-        MessageType type,
-
-        /**
-         * The actual message.
-         */
-        String message) {
-
+/**
+ * @param type The message type. See {@link MessageType}.
+ * @param message the actual message
+ */
+public record ShowMessageParams(MessageType type, String message) {
 }
