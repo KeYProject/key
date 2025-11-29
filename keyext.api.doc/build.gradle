@@ -1,5 +1,5 @@
 dependencies {
     implementation(project(":keyext.api"))
-    //implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.1")
+    implementation("org.freemarker:freemarker:2.3.34")
     implementation("info.picocli:picocli:4.7.6")
 }

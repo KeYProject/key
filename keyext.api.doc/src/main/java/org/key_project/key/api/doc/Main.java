@@ -49,7 +49,7 @@ public class Main implements Callable<Integer> {
         Files.createDirectories(output);
 
         runGenerator(metadata.getApi(), "api.meta.json", (a) -> () -> getGson().toJson(a));
-        runGenerator(metadata.getApi(), "api.meta.md", DocGen::new);
+        runGenerator(metadata.getApi(), "api.meta.html", DocGen::new);
         runGenerator(metadata.getApi(), "keydata.py", PythonGenerator.PyDataGen::new);
         runGenerator(metadata.getApi(), "server.py", PythonGenerator.PyApiGen::new);
         return 0;
