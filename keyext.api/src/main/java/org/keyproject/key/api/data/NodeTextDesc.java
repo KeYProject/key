@@ -4,10 +4,16 @@
 package org.keyproject.key.api.data;
 
 
+import org.keyproject.key.api.data.KeyIdentifications.NodeTextId;
+
 /**
+ * A printed sequent.
+ *
+ * @param id a handle identifying this print-out
+ * @param result the plain textual notation of the sequent
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */
-public record NodeTextDesc(KeyIdentifications.NodeTextId id, String result)
+public record NodeTextDesc(NodeTextId id, String result)
         implements KeYDataTransferObject {
 }

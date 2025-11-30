@@ -24,11 +24,9 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
-import picocli.CommandLine;
 
 /**
  * @author Alexander Weigl

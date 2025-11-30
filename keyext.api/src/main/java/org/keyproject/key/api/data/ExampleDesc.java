@@ -6,6 +6,11 @@ package org.keyproject.key.api.data;
 import de.uka.ilkd.key.gui.Example;
 
 /**
+ * This class represents a built-in example.
+ * TODO (weigl,rpc) Also deliver the contents of the example (files)?
+ *
+ * @param name the name of the example, also used as an identifer
+ * @param description a description of the example
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */

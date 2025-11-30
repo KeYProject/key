@@ -51,8 +51,6 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.data.ExampleDesc;
 import org.keyproject.key.api.data.KeyIdentifications.*;
-import org.keyproject.key.api.data.NodeText;
-import org.keyproject.key.api.data.PrintOptions;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
@@ -238,19 +236,12 @@ public final class KeyApiImpl implements KeyApi {
     private NodeDesc asNodeDescRecursive(ProofId proofId, Node root) {
         final List<NodeDesc> list =
             root.childrenStream().map(it -> asNodeDescRecursive(proofId, it)).toList();
-        return new NodeDesc(new NodeId(proofId, root.serialNr()),
+        return new NodeDesc(new NodeId(proofId, "" + root.serialNr()),
             root.getNodeInfo().getBranchLabel(),
             root.getNodeInfo().getScriptRuleApplication(),
             list, collectPathInformation(root));
     }
 
-    @Override
-    public CompletableFuture<NodeDesc> root(ProofId proofId) {
-        return CompletableFuture.supplyAsync(() -> {
-            var proof = data.find(proofId);
-            return asNodeDesc(proofId, proof.root());
-        });
-    }
 
     @Override
     public CompletableFuture<List<NodeDesc>> children(NodeId nodeId) {
@@ -280,6 +271,15 @@ public final class KeyApiImpl implements KeyApi {
         return CompletableFuture.completedFuture(
             TreeNodeDesc.from(proof, data.find(proof).root()));
     }
+
+    @Override
+    public CompletableFuture<NodeDesc> root(ProofId proofId) {
+        return CompletableFuture.supplyAsync(() -> {
+            var proof = data.find(proofId);
+            return asNodeDesc(proofId, proof.root());
+        });
+    }
+
 
     @Override
     public CompletableFuture<List<TreeNodeDesc>> treeChildren(ProofId proof, TreeNodeId nodeId) {
@@ -369,13 +369,13 @@ public final class KeyApiImpl implements KeyApi {
     private final IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter();
 
     @Override
-    public CompletableFuture<List<TermActionDesc>> actions(NodeTextId printId, int pos) {
+    public CompletableFuture<List<TermActionDesc>> actions(NodeTextId printId, int caretPos) {
         return CompletableFuture.supplyAsync(() -> {
             var node = data.find(printId.nodeId());
             var proof = data.find(printId.nodeId().proofId());
             var goal = proof.getOpenGoal(node);
             var nodeText = data.find(printId);
-            var pis = nodeText.table().getPosInSequent(pos, filter);
+            var pis = nodeText.table().getPosInSequent(caretPos, filter);
             return new TermActionUtil(printId, data.find(printId.nodeId().proofId().env()), pis,
                 goal)
                     .getActions();
@@ -384,8 +384,8 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<List<TermActionDesc>> applyAction(TermActionId id) {
-        return null;
+    public CompletableFuture<Boolean> applyAction(TermActionId id) {
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override
@@ -400,17 +400,17 @@ public final class KeyApiImpl implements KeyApi {
     private final DefaultUserInterfaceControl control = new MyDefaultUserInterfaceControl();
 
     @Override
-    public CompletableFuture<ProofId> loadExample(String id) {
+    public CompletableFuture<ProofId> loadExample(String name) {
         return CompletableFutures.computeAsync((c) -> {
             var examples = ExampleChooser.listExamples(ExampleChooser.lookForExamples())
-                    .stream().filter(it -> it.getName().equals(id)).findFirst();
+                    .stream().filter(it -> it.getName().equals(name)).findFirst();
             if (examples.isPresent()) {
                 var ex = examples.get();
                 Proof proof = null;
                 KeYEnvironment<?> env = null;
                 try {
                     var loader = control.load(JavaProfile.getDefaultProfile(),
-                        ex.getObligationFile().toPath(),
+                        ex.getObligationFile(),
                         null, null, null, null, true, null);
                     InitConfig initConfig = loader.getInitConfig();
 
@@ -492,10 +492,13 @@ public final class KeyApiImpl implements KeyApi {
             KeYEnvironment<?> env;
             try {
                 var loader = control.load(JavaProfile.getDefaultProfile(),
-                    params.problemFile(),
-                    params.classPath(),
-                    params.bootClassPath(),
-                    params.includes(),
+                    params.problemFile() != null ? params.problemFile().asPath() : null,
+                    params.classPath() != null
+                            ? params.classPath().stream().map(Uri::asPath).toList()
+                            : null,
+                    params.bootClassPath() != null ? params.bootClassPath().asPath() : null,
+                    params.includes() != null ? params.includes().stream().map(Uri::asPath).toList()
+                            : null,
                     null,
                     true,
                     null);
