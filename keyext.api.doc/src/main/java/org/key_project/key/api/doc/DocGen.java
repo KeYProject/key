@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 
+import freemarker.core.HTMLOutputFormat;
 import freemarker.ext.beans.ZeroArgumentNonVoidMethodPolicy;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 
 /**
  * Generation of Markdown documentation.
@@ -36,11 +38,11 @@ public class DocGen implements Supplier<String> {
             var cfg = new Configuration(Configuration.VERSION_2_3_32);
             cfg.setClassForTemplateLoading(DocGen.class, "/templates"); // classpath
             cfg.setDefaultEncoding("UTF-8");
-            // cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
             cfg.setLogTemplateExceptions(false);
             cfg.setWrapUncheckedExceptions(true);
             cfg.setFallbackOnNullLoopVariable(false);
-            // cfg.setOutputFormat(HTMLOutputFormat.INSTANCE);
+            cfg.setOutputFormat(HTMLOutputFormat.INSTANCE);
 
             // Use DefaultObjectWrapper to expose fields of objects in the data model
             DefaultObjectWrapper wrapper = new DefaultObjectWrapper(Configuration.VERSION_2_3_32);

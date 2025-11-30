@@ -15,40 +15,107 @@ import org.keyproject.key.api.data.ProofStatus;
 import org.keyproject.key.api.data.StrategyOptions;
 
 /**
+ *
  * @author Alexander Weigl
  * @version 1 (13.10.23)
  */
 @JsonSegment("proof")
 public interface ProofApi {
+    /**
+     *
+     * @param proofId
+     * @return
+     */
     @JsonRequest
-    CompletableFuture<MacroStatistic> script(ProofId proof, String scriptLine,
-            StrategyOptions options);
+    CompletableFuture<NodeDesc> root(ProofId proofId);
 
+    /**
+     * Executes the given {@code script} against the proof using the given {@code options}.
+     *
+     * @param proof handle of a proof
+     * @param script proof script
+     * @param options options towards the proof strategy
+     * @return the run-time statistics
+     */
+    @JsonRequest
+    CompletableFuture<MacroStatistic> script(ProofId proof, String script, StrategyOptions options);
+
+    /**
+     * Executes the macro given by {@code macroName} against the proof
+     * using the given {@code options}.
+     *
+     * @param proof handle of a proof
+     * @param macroName proof script
+     * @param options options towards the proof strategy
+     * @return the run-time statistics
+     */
     @JsonRequest
     CompletableFuture<MacroStatistic> macro(ProofId proof, String macroName,
             StrategyOptions options);
 
+    /**
+     * Auto against the proof
+     *
+     * @param proof handle of a proof
+     * @param options options towards the proof strategy
+     * @return
+     */
     @JsonRequest
     CompletableFuture<ProofStatus> auto(ProofId proof, StrategyOptions options);
 
+    /**
+     * Frees the resources occupied by the proof.
+     *
+     * @param proof
+     * @return
+     */
     @JsonRequest
     CompletableFuture<Boolean> dispose(ProofId proof);
 
+    /**
+     *
+     * @param proof
+     * @param onlyOpened
+     * @param onlyEnabled
+     * @return
+     */
     @JsonRequest
     CompletableFuture<List<NodeDesc>> goals(ProofId proof, boolean onlyOpened, boolean onlyEnabled);
 
+    /**
+     *
+     * @param proof
+     * @return
+     */
     @JsonRequest
     CompletableFuture<NodeDesc> tree(ProofId proof);
 
-    @JsonRequest
-    CompletableFuture<NodeDesc> root(ProofId proof);
-
+    /**
+     *
+     * @param nodeId
+     * @return
+     */
     @JsonRequest
     CompletableFuture<List<NodeDesc>> children(NodeId nodeId);
 
+    /**
+     * Prunes the proof branch from the leafs to the given {@code nodeId}.
+     *
+     * @param nodeId
+     * @return
+     */
     @JsonRequest
     CompletableFuture<List<NodeDesc>> pruneTo(NodeId nodeId);
 
-    // @JsonRequest
-    // CompletableFuture<Statistics> statistics(ProofId proof);
+    /**
+     *
+     * TODO
+     *
+     * @param proof
+     * @return
+     */
+    @JsonRequest
+    default CompletableFuture<Void> statistics(ProofId proof) {
+        return CompletableFuture.completedFuture(null);
+    }
 }

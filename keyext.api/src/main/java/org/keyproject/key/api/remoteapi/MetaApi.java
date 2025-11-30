@@ -12,14 +12,28 @@ import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.data.ProofMacroDesc;
 import org.keyproject.key.api.data.ProofScriptCommandDesc;
 
+/**
+ * The meta segments provides functionalities around the KeY systems and environment.
+ */
 @JsonSegment("meta")
 public interface MetaApi {
+    /**
+     * The current version string.
+     *
+     * @return version of KeY
+     */
     @JsonRequest("version")
     CompletableFuture<String> getVersion();
 
+    /**
+     * @return a list of available proof macros
+     */
     @JsonRequest("available_macros")
     CompletableFuture<List<ProofMacroDesc>> getAvailableMacros();
 
+    /**
+     * @return a list of available proof script commands
+     */
     @JsonRequest("available_script_commands")
     CompletableFuture<List<ProofScriptCommandDesc>> getAvailableScriptCommands();
 }

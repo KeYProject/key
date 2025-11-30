@@ -97,6 +97,15 @@
                     </#list>
                 </ul>
             </div>
+
+            <#if (type.jsonExample)??>
+                <div>
+                    <details>
+                        <summary>Example</summary>
+                        <code class="highlight" style="white-space: pre">${type.jsonExample}</code>
+                    </details>
+                </div>
+            </#if>
         </#if>
     </div>
 </#list>

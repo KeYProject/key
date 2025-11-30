@@ -26,11 +26,7 @@ import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
 import org.jspecify.annotations.NullMarked;
 import org.keyproject.key.api.KeyApiImpl;
 import org.keyproject.key.api.StartServer;
-import org.keyproject.key.api.data.KeyIdentifications;
-import org.keyproject.key.api.data.LoadParams;
-import org.keyproject.key.api.data.PrintOptions;
-import org.keyproject.key.api.data.TaskFinishedInfo;
-import org.keyproject.key.api.data.TaskStartedInfo;
+import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.*;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
@@ -104,7 +100,7 @@ public class MyKeyClient {
         if (sel != null) {
             try {
                 loadedProof = keyApi.load(
-                    new LoadParams(sel.toPath(), null, null, null))
+                    new LoadParams(Uri.from(sel), null, null, null))
                         .get().getRight();
                 var root = keyApi.root(loadedProof).get();
                 var sequent =

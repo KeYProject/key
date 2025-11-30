@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.Node;
 public record TreeNodeDesc(KeyIdentifications.NodeId id, String name)
         implements KeYDataTransferObject {
     public static TreeNodeDesc from(KeyIdentifications.ProofId proofId, Node root) {
-        return new TreeNodeDesc(new KeyIdentifications.NodeId(proofId, root.serialNr()),
+        return new TreeNodeDesc(new KeyIdentifications.NodeId(proofId, "" + root.serialNr()),
             root.name());
     }
 }

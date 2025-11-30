@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -74,59 +73,59 @@ public class Example {
      */
     public static final String EXPORT_FILE_PREFIX = "example.exportFile.";
 
-    public final File exampleFile;
-    public final File directory;
+    public final Path exampleFile;
+    public final Path directory;
     public final String description;
     public final Properties properties;
 
-    public Example(File file) throws IOException {
+    public Example(Path file) throws IOException {
         this.exampleFile = file;
-        this.directory = file.getParentFile();
+        this.directory = file.getParent();
         this.properties = new Properties();
         StringBuilder sb = new StringBuilder();
         extractDescription(file, sb, properties);
         this.description = sb.toString();
     }
 
-    public File getDirectory() {
+    public Path getDirectory() {
         return directory;
     }
 
-    public File getProofFile() {
-        return new File(directory, properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
+    public Path getProofFile() {
+        return directory.resolve(properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
     }
 
-    public File getObligationFile() {
-        return new File(directory, properties.getProperty(KEY_FILE, KEY_FILE_NAME));
+    public Path getObligationFile() {
+        return directory.resolve(properties.getProperty(KEY_FILE, KEY_FILE_NAME));
     }
 
     public String getName() {
-        return properties.getProperty(KEY_NAME, directory.getName());
+        return properties.getProperty(KEY_NAME, directory.getFileName().toString());
     }
 
     public String getDescription() {
         return description;
     }
 
-    public File getExampleFile() {
+    public Path getExampleFile() {
         return exampleFile;
     }
 
-    public List<File> getAdditionalFiles() {
-        var result = new ArrayList<File>();
+    public List<Path> getAdditionalFiles() {
+        var result = new ArrayList<Path>();
         int i = 1;
         while (properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
-            result.add(new File(directory, properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
+            result.add(directory.resolve(properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
             i++;
         }
         return result;
     }
 
-    public List<File> getExportFiles() {
-        ArrayList<File> result = new ArrayList<>();
+    public List<Path> getExportFiles() {
+        var result = new ArrayList<Path>();
         int i = 1;
         while (properties.containsKey(EXPORT_FILE_PREFIX + i)) {
-            result.add(new File(directory, properties.getProperty(EXPORT_FILE_PREFIX + i)));
+            result.add(directory.resolve(properties.getProperty(EXPORT_FILE_PREFIX + i)));
             i++;
         }
         return result;
@@ -169,24 +168,23 @@ public class Example {
         return properties.containsKey(KEY_PROOF_FILE);
     }
 
-    private static StringBuilder extractDescription(File file, StringBuilder sb,
+    private static StringBuilder extractDescription(Path file, StringBuilder sb,
             Properties properties) {
-        try (BufferedReader r = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            String line;
+        try {
             boolean emptyLineSeen = false;
-            while ((line = r.readLine()) != null) {
+            for (var line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
                 if (emptyLineSeen) {
                     sb.append(line).append("\n");
                 } else {
                     String trimmed = line.trim();
-                    if (trimmed.length() == 0) {
+                    if (trimmed.isEmpty()) {
                         emptyLineSeen = true;
-                    } else if (trimmed.startsWith("#")) {
-                        // ignore
                     } else {
-                        String[] entry = trimmed.split(" *[:=] *", 2);
-                        if (entry.length > 1) {
-                            properties.put(entry[0], entry[1]);
+                        if (!trimmed.startsWith("#")) {
+                            String[] entry = trimmed.split(" *[:=] *", 2);
+                            if (entry.length > 1) {
+                                properties.put(entry[0], entry[1]);
+                            }
                         }
                     }
                 }
