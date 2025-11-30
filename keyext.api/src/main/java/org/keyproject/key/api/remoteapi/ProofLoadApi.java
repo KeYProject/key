@@ -23,27 +23,28 @@ import org.keyproject.key.api.data.ProblemDefinition;
  */
 @JsonSegment("loading")
 public interface ProofLoadApi {
-    /**
-     * I am not sure whether this is helpful. Mainly a feature for testing?!
-     *
-     * @param id
-     * @return
-     */
-    @JsonRequest
-    CompletableFuture<ProofId> loadExample(String id);
 
     /**
      *
+     * @param problem
+     * @return
      */
     @JsonRequest
     CompletableFuture<ProofId> loadProblem(ProblemDefinition problem);
 
     /**
      *
+     * @param content
+     * @return
      */
     @JsonRequest
     CompletableFuture<ProofId> loadKey(String content);
 
+    /**
+     *
+     * @param term
+     * @return
+     */
     @JsonRequest
     CompletableFuture<ProofId> loadTerm(String term);
 

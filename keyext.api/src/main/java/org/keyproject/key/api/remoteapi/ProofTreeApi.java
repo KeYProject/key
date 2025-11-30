@@ -13,17 +13,38 @@ import org.keyproject.key.api.data.KeyIdentifications.TreeNodeId;
 import org.keyproject.key.api.data.TreeNodeDesc;
 
 /**
+ * Operations on the proof tree.
+ *
  * @author Alexander Weigl
  * @version 1 (13.10.23)
  */
 @JsonSegment("proofTree")
 public interface ProofTreeApi {
+    /**
+     * Returns the node root of the tree.
+     *
+     * @param id
+     * @return
+     */
     @JsonRequest("root")
     CompletableFuture<TreeNodeDesc> treeRoot(ProofId id);
 
+    /**
+     *
+     * @param proof
+     * @param nodeId
+     * @return
+     */
     @JsonRequest("children")
     CompletableFuture<List<TreeNodeDesc>> treeChildren(ProofId proof, TreeNodeId nodeId);
 
+    /**
+     *
+     * @param proof
+     * @param nodeId
+     *        TODO param depth
+     * @return
+     */
     @JsonRequest("subtree")
     CompletableFuture<List<TreeNodeDesc>> treeSubtree(ProofId proof, TreeNodeId nodeId);
 }

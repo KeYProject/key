@@ -3,18 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
-import java.nio.file.Path;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  *
- * @param problemFile
- * @param classPath
- * @param bootClassPath
- * @param includes
+ * @param problemFile URI to the problem file to be loaded
+ * @param classPath optional
+ * @param bootClassPath xxx
+ * @param includes xxx
  */
-public record LoadParams(Path problemFile,
-        List<Path> classPath,
-        Path bootClassPath,
-        List<Path> includes) implements KeYDataTransferObject {
+public record LoadParams(@Nullable Uri problemFile,
+        @Nullable List<Uri> classPath,
+        @Nullable Uri bootClassPath,
+        @Nullable List<Uri> includes)
+        implements KeYDataTransferObject {
 }

@@ -6,12 +6,12 @@ package de.uka.ilkd.key.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public final class ExampleChooser extends JDialog {
     /**
      * The result value of the dialog. <code>null</code> if nothing to be loaded
      */
-    private File fileToLoad = null;
+    private Path fileToLoad = null;
 
     /**
      * The currently selected example. <code>null</code> if none selected
@@ -69,15 +70,13 @@ public final class ExampleChooser extends JDialog {
     private Example selectedExample;
 
 
-
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    private ExampleChooser(File examplesDir) {
+    private ExampleChooser(Path examplesDir) {
         super(MainWindow.getInstance(), "Load Example", true);
         assert examplesDir != null;
-        assert examplesDir.isDirectory();
 
         // create list panel
         final JPanel listPanel = new JPanel();
@@ -190,10 +189,10 @@ public final class ExampleChooser extends JDialog {
     // internal methods
     // -------------------------------------------------------------------------
 
-    public static File lookForExamples() {
+    public static Path lookForExamples() {
         // weigl: using java properties: -Dkey.examples.dir="..."
         if (System.getProperty(KEY_EXAMPLE_DIR) != null) {
-            return new File(System.getProperty(KEY_EXAMPLE_DIR));
+            return Paths.get(System.getProperty(KEY_EXAMPLE_DIR));
         }
 
         // greatly simplified version without parent path lookup.
@@ -201,18 +200,17 @@ public final class ExampleChooser extends JDialog {
         if (!folder.exists()) {
             folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH);
         }
-        return folder;
+        return folder.toPath();
     }
 
-    private static String fileAsString(File f) {
+    private static String fileAsString(Path f) {
         try {
-            return IOUtil.readFrom(f);
+            return Files.readString(f);
         } catch (IOException e) {
             LOGGER.error("Could not read file '{}'", f, e);
             return "<Error reading file: " + f + ">";
         }
     }
-
 
 
     private void updateDescription() {
@@ -235,8 +233,8 @@ public final class ExampleChooser extends JDialog {
                 if (p >= 0) {
                     addTab(fileAsString.substring(p), "Proof Obligation", false);
                 }
-                for (File file : example.getAdditionalFiles()) {
-                    addTab(fileAsString(file), file.getName(), false);
+                for (Path file : example.getAdditionalFiles()) {
+                    addTab(fileAsString(file), file.getFileName().toString(), false);
                 }
                 loadButton.setEnabled(true);
                 loadProofButton.setEnabled(example.hasProof());
@@ -268,16 +266,16 @@ public final class ExampleChooser extends JDialog {
      * Shows the dialog, using the passed examples directory. If null is passed, tries to find
      * examples directory on its own.
      */
-    public static File showInstance(String examplesDirString) {
+    public static @Nullable Path showInstance(Path examplesDirString) {
         // get examples directory
-        File examplesDir;
+        Path examplesDir;
         if (examplesDirString == null) {
             examplesDir = lookForExamples();
         } else {
-            examplesDir = new File(examplesDirString);
+            examplesDir = examplesDirString;
         }
 
-        if (!examplesDir.isDirectory()) {
+        if (!Files.isDirectory(examplesDir)) {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
                 "The examples directory cannot be found.\n" + "Please install them at "
                     + (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
@@ -304,19 +302,17 @@ public final class ExampleChooser extends JDialog {
      * @param examplesDir The examples directory to list examples in.
      * @return The found examples.
      */
-    public static List<Example> listExamples(File examplesDir) {
-        List<Example> result = new LinkedList<>();
+    public static List<Example> listExamples(Path examplesDir) {
+        List<Example> result = new ArrayList<>(64);
 
-        String line;
-        final File index = new File(new File(examplesDir, "index"), "samplesIndex.txt");
-        try (BufferedReader br =
-            new BufferedReader(new FileReader(index, StandardCharsets.UTF_8))) {
-            while ((line = br.readLine()) != null) {
+        final Path index = examplesDir.resolve("index").resolve("samplesIndex.txt");
+        try {
+            for (var line : Files.readAllLines(index)) {
                 line = line.trim();
                 if (line.startsWith("#") || line.isEmpty()) {
                     continue;
                 }
-                File f = new File(examplesDir, line);
+                Path f = examplesDir.resolve(line);
                 try {
                     result.add(new Example(f));
                 } catch (IOException e) {
