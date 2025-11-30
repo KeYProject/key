@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.keyproject.key.api.data.DataExamples;
 
 /**
  * @author Alexander Weigl
@@ -129,7 +130,6 @@ public class Metamodel {
         String name();
 
         String identifier();
-
     }
 
 
@@ -182,6 +182,11 @@ public class Metamodel {
 
         public String identifier() {
             return typeFullName;
+        }
+
+        ///
+        public @Nullable String jsonExample() {
+            return DataExamples.get(typeFullName);
         }
     }
 

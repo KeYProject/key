@@ -18,7 +18,8 @@ public record NodeDesc(KeyIdentifications.NodeId nodeid,
         String description) implements KeYDataTransferObject {
     public NodeDesc(KeyIdentifications.ProofId proofId, int serialNr, String branchLabel,
             boolean scriptRuleApplication, String description) {
-        this(new KeyIdentifications.NodeId(proofId, serialNr), branchLabel, scriptRuleApplication,
+        this(new KeyIdentifications.NodeId(proofId, "" + serialNr), branchLabel,
+            scriptRuleApplication,
             null, description);
     }
 }
