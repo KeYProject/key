@@ -106,7 +106,10 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         // "replace_known_right",
 
         // others
-        "castDel", "nonNull", "nonNullZero", "allRight", "exLeft");
+        "castDel", "nonNull", "nonNullZero", "allRight", "exLeft",
+
+        // universe rules
+        "dominatesInverse", "dominatesNotEqual", "createdRepfpElement");
 
 
     @Override
