@@ -8,7 +8,7 @@ jobs:
   doc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: ls -ld
       - run: ls -lh 'gradle'
 
