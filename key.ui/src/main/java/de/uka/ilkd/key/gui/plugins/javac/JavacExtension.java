@@ -179,9 +179,6 @@ public class JavacExtension
                     updateLabel(data);
                 })).get();
             } catch (InterruptedException | ExecutionException ex) {
-                lblStatus.setForeground(COLOR_ERROR.get());
-                lblStatus.setIcon(ICON_ERROR.get(16));
-                lblStatus.setText("Javac error");
                 throw new RuntimeException(ex);
             }
         }

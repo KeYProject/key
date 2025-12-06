@@ -13,10 +13,7 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
  */
 public class JavacSettings extends AbstractPropertiesSettings {
 
-    /**
-     * The name of the category in the settings.
-     */
-    public static final String CATEGORY = "Javac Extension";
+    public static final String CATEGORY = "Type Checking";
 
     /**
      * Config key for {@link #useProcessors}.

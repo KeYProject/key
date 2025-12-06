@@ -525,7 +525,7 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format("}");
+            out.format(" }");
             return this;
         }
 
@@ -555,7 +555,7 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format("]");
+            out.format(" ]");
             return this;
         }
 
