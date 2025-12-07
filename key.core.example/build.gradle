@@ -10,5 +10,5 @@ application {
 
 dependencies {
     implementation project(":key.core")
-    implementation 'ch.qos.logback:logback-classic:1.5.20'
+    implementation 'ch.qos.logback:logback-classic:1.5.21'
 }
