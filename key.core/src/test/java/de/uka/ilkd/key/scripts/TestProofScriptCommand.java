@@ -10,14 +10,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +34,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,15 +44,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
+
+    private static final String ONLY_CASES = System.getProperty("key.testProofScript.only");
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProofScriptCommand.class);
+
     public record TestInstance(
             String name,
-            String key, String script, @Nullable String exception,
-            String[] goals, Integer selectedGoal) {
+            String key,
+            String script,
+            @Nullable String exception,
+            String[] goals,
+            Integer selectedGoal) {
     }
 
     public static List<Arguments> data() throws IOException, URISyntaxException {
         var folder = Paths.get("src/test/resources/de/uka/ilkd/key/scripts/cases")
                 .toAbsolutePath();
+
+        Predicate<Path> filter;
+        if(ONLY_CASES != null && !ONLY_CASES.isEmpty()) {
+            // if ONLY_CASES is set, only run those cases (comma separated)
+            Set<String> only = Set.of(ONLY_CASES.split(" *, *"));
+            filter = p -> only.contains(p.getFileName().toString().substring(0, p.getFileName().toString().length() - 4));
+        } else {
+            filter = p -> true;
+        }
+
         try (var walker = Files.walk(folder)) {
             List<Path> files =
                 walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
@@ -52,10 +78,16 @@ public class TestProofScriptCommand {
 
             List<Arguments> args = new ArrayList<>(files.size());
             for (Path path : files) {
+                if(!filter.test(path)) {
+                    continue;
+                }
                 try {
                     TestInstance instance =
                         objectMapper.readValue(path.toFile(), TestInstance.class);
-                    args.add(Arguments.of(instance));
+                    var name = instance.name == null ?
+                            path.getFileName().toString().substring(0, path.getFileName().toString().length() - 4) :
+                            instance.name;
+                    args.add(Arguments.of(instance, name));
                 } catch (Exception e) {
                     System.out.println(path);
                     e.printStackTrace();
@@ -66,24 +98,25 @@ public class TestProofScriptCommand {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{1}")
     @MethodSource("data")
-    void testProofScript(TestInstance data) throws Exception {
-        var name = data.name();
+    void testProofScript(TestInstance data, String name) throws Exception {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
+        LOGGER.info("Testing {} using file", name, tmpKey);
         Files.writeString(tmpKey, data.key());
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
         Proof proof = env.getLoadedProof();
 
-        var script = ParsingFacade.parseScript(data.script());
-        ProofScriptEngine pse = new ProofScriptEngine(script);
+        KeyAst.ProofScript script = ParsingFacade.parseScript(data.script());
+        ProofScriptEngine pse = new ProofScriptEngine(proof);
 
         boolean hasException = data.exception() != null;
         try {
-            pse.execute(env.getUi(), proof);
+            pse.execute(env.getUi(), script);
         } catch (ScriptException ex) {
+            ex.printStackTrace();
             assertTrue(data.exception != null && !data.exception.isEmpty(),
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.
@@ -104,15 +137,20 @@ public class TestProofScriptCommand {
             Assertions.assertEquals(expected, goals.size());
 
             for (String expectedGoal : data.goals()) {
-                assertThat(goals.head().toString().trim()).isEqualTo(expectedGoal);
+                assertThat(normaliseSpace(goals.head().toString())).isEqualTo(expectedGoal);
                 goals = goals.tail();
             }
 
             if (data.selectedGoal() != null) {
                 Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
-                assertThat(goal.toString().trim()).isEqualTo(data.goals()[data.selectedGoal()]);
+                assertThat(normaliseSpace(goal.toString())).isEqualTo(data.goals()[data.selectedGoal()]);
             }
         }
+    }
+
+    // For some layout reasons the toString may add linebreaks and spaces
+    private static String normaliseSpace(String str) {
+        return str.replaceAll("\\s+", " ").trim();
     }
 
 }

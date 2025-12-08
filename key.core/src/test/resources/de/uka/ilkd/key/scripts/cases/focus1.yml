@@ -1,0 +1,7 @@
+key: |  
+  \programVariables { int a; }
+  \problem { ==> a + 0 = a + 0 & 1 = 1 }
+script: |
+  rule add_zero_right on:(a+0 = ?focus(a+0));
+goals:
+  - ==> a + 0 = a & 1 = 1
