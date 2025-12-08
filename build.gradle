@@ -70,6 +70,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url = 'https://git.key-project.org/api/v4/projects/35/packages/maven'
@@ -81,7 +82,6 @@ subprojects {
         implementation("org.slf4j:slf4j-api:2.0.17")
         testImplementation("ch.qos.logback:logback-classic:1.5.20")
 
-
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
         def eisop_version = "3.49.3-eisop1"
@@ -90,6 +90,8 @@ subprojects {
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
+
+        implementation "piisrational:universe:0.1"
 
         testImplementation("ch.qos.logback:logback-classic:1.5.20")
         testImplementation("org.assertj:assertj-core:3.27.6")

@@ -150,7 +150,7 @@ public class JavacExtension
                 return;
             }
 
-            Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
+            Path bootClassPath = jm.getBootClassPath(); // may be null
             List<Path> classpath = jm.getClassPath();
             JavacSettings settings = JavacSettingsProvider.getJavacSettings();
 
