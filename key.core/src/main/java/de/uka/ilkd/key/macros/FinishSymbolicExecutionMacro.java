@@ -53,7 +53,8 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     /**
      * Checks if a rule is forbidden for symbolic execution macros.
      *
-     * @param rule the rule to check
+     * @param rule
+     *        the rule to check
      * @return true if this rule should not be executed by a symbolic execution macro
      */
     public static boolean isForbiddenRule(Rule rule) {

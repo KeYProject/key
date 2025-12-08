@@ -22,7 +22,8 @@ public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
      * visits term t in post order ({@link JTerm#execPostOrder(Visitor)}) and
      * collects all bound schema variables
      *
-     * @param visited the Term to be visited (<code>t</code> must not be <code>null</code>
+     * @param visited
+     *        the Term to be visited (<code>t</code> must not be <code>null</code>
      */
     @Override
     public void visit(Term visited) {

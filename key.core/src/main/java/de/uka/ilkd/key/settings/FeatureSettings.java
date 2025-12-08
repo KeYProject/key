@@ -50,8 +50,10 @@ public class FeatureSettings extends AbstractSettings {
     /**
      * Helper function for notification on feature flag changes.
      *
-     * @param feature the feature to be listening on
-     * @param update a callback function which gets informed on changes with the new value
+     * @param feature
+     *        the feature to be listening on
+     * @param update
+     *        a callback function which gets informed on changes with the new value
      */
     public static void on(Feature feature, Consumer<Boolean> update) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings().addPropertyChangeListener(
@@ -61,8 +63,10 @@ public class FeatureSettings extends AbstractSettings {
     /**
      * Helper function for notification on feature flag changes which also calls the consumer.
      *
-     * @param feature the feature to be listening on
-     * @param update a callback function which gets informed on changes with the new value
+     * @param feature
+     *        the feature to be listening on
+     * @param update
+     *        a callback function which gets informed on changes with the new value
      */
     public static void onAndActivate(Feature feature, Consumer<Boolean> update) {
         on(feature, update);

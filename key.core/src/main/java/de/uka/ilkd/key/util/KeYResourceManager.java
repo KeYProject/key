@@ -4,9 +4,15 @@
 package de.uka.ilkd.key.util;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
@@ -34,8 +40,7 @@ public class KeYResourceManager {
     private String sha1 = null;
     private String branch = null;
 
-    private KeYResourceManager() {
-    }
+    private KeYResourceManager() {}
 
     /**
      * Return an instance of the ResourceManager
@@ -120,11 +125,14 @@ public class KeYResourceManager {
      * Copies the specified resource to targetLocation if such a file does not exist yet. The
      * created file is removed automatically after finishing JAVA.
      *
-     * @param o an Object the directory from where <code>resourcename</code> is copied is determined
+     * @param o
+     *        an Object the directory from where <code>resourcename</code> is copied is determined
      *        by looking on the package where <code>o.getClass()</code> is declared
-     * @param resourcename String the name of the file to search (only relative pathname to the path
+     * @param resourcename
+     *        String the name of the file to search (only relative pathname to the path
      *        of the calling class)
-     * @param targetLocation target for copying
+     * @param targetLocation
+     *        target for copying
      * @return true if resource was copied
      */
     public boolean copyIfNotExists(Object o, String resourcename, String targetLocation) {
@@ -188,8 +196,10 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param cl the Class used to determine the resource
-     * @param resourcename the String that contains the name of the resource
+     * @param cl
+     *        the Class used to determine the resource
+     * @param resourcename
+     *        the String that contains the name of the resource
      * @return the URL of the resource
      */
     public @Nullable URL getResourceFile(Class<?> cl, String resourcename) {
@@ -203,8 +213,10 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param o the Object used to determine the resource
-     * @param resourcename the String that contains the name of the resource
+     * @param o
+     *        the Object used to determine the resource
+     * @param resourcename
+     *        the String that contains the name of the resource
      * @return the URL of the resource
      */
     public @Nullable URL getResourceFile(Object o, String resourcename) {
@@ -220,5 +232,24 @@ public class KeYResourceManager {
     public String getUserInterfaceTitle() {
         return String.format("KeY %s%s", this.getVersion(),
             visibleBranch() ? " [" + getBranch() + "]" : "");
+    }
+
+    static {
+        // Needed to be able to use Path.of(jar:jarFile/bla)
+        // see
+        // https://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
+        try {
+            var jar = KeYResourceManager.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI();
+            if (Files.isRegularFile(Path.of(jar))) {
+                var uri = new URI("jar:" + jar.toString());
+                FileSystems.newFileSystem(uri, Map.of("create", "true"));
+            }
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

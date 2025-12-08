@@ -141,9 +141,12 @@ public class IOUtilTest {
     /**
      * Performs a test step of {@link #testUnifyLineBreaks()}.
      *
-     * @param toTest The {@link String} to test.
-     * @param expected The expected result.
-     * @throws IOException Occurred Exception.
+     * @param toTest
+     *        The {@link String} to test.
+     * @param expected
+     *        The expected result.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void doTestUnifyLineBreaks(String toTest, String expected) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(toTest.getBytes(StandardCharsets.UTF_8));
@@ -165,7 +168,8 @@ public class IOUtilTest {
         /**
          * Constructor.
          *
-         * @param text The fixed text.
+         * @param text
+         *        The fixed text.
          */
         public TextInputStream(String text) {
             super(text.getBytes(StandardCharsets.UTF_8));
@@ -394,10 +398,14 @@ public class IOUtilTest {
     /**
      * Executes a test for {@link #testLineInformationNormalizeColumn()}.
      *
-     * @param text The text to use.
-     * @param tabWidth The tab width to use.
-     * @param expectedIndices The expected normalized indices.
-     * @throws IOException Occurred Exception.
+     * @param text
+     *        The text to use.
+     * @param tabWidth
+     *        The tab width to use.
+     * @param expectedIndices
+     *        The expected normalized indices.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void doTestLineInformationNormalizeColumn(String text, int tabWidth,
             int[] expectedIndices) throws IOException {
@@ -446,11 +454,15 @@ public class IOUtilTest {
      * possible to commit/checkout the test data files directly.
      * </p>
      *
-     * @param source The {@link File} with the source text.
-     * @param newFileName The new file name.
-     * @param lineBreak The line break to use.
+     * @param source
+     *        The {@link File} with the source text.
+     * @param newFileName
+     *        The new file name.
+     * @param lineBreak
+     *        The line break to use.
      * @return The created {@link File} with the same text but with new line breaks.
-     * @throws IOException Occurred Exception
+     * @throws IOException
+     *         Occurred Exception
      */
     protected File convertTextFile(File source, String newFileName, String lineBreak)
             throws IOException {
@@ -480,9 +492,12 @@ public class IOUtilTest {
     /**
      * Makes sure that for the given text the correct line start indices are computed.
      *
-     * @param file The text to test.
-     * @param expectedIndices The expected line indices.
-     * @throws IOException Occurred Exception.
+     * @param file
+     *        The text to test.
+     * @param expectedIndices
+     *        The expected line indices.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void assertLineInformation(File file, int... expectedIndices) throws IOException {
         LineInformation[] result = IOUtil.computeLineInformation(file);
@@ -508,8 +523,10 @@ public class IOUtilTest {
      * Executes the tests for {@link #testComputeLineInformation_InputStream()} with the given line
      * break sign.
      *
-     * @param newLine The line break sign to use.
-     * @throws IOException Occurred Exception.
+     * @param newLine
+     *        The line break sign to use.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void doTestComputeLineInformation_InputStream(String newLine) throws IOException {
         // Test empty string
@@ -548,9 +565,12 @@ public class IOUtilTest {
     /**
      * Constructs a text for the given lines and tests the computed start line indices.
      *
-     * @param newLine The new line sign to use.
-     * @param textLines The lines of text.
-     * @throws IOException Occurred Exception.
+     * @param newLine
+     *        The new line sign to use.
+     * @param textLines
+     *        The lines of text.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void assertLineInformation(String newLine, String... textLines) throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -580,9 +600,12 @@ public class IOUtilTest {
     /**
      * Makes sure that for the given text the correct line start indices are computed.
      *
-     * @param text The text to test.
-     * @param expectedInfos The expected line informations.
-     * @throws IOException Occurred Exception.
+     * @param text
+     *        The text to test.
+     * @param expectedInfos
+     *        The expected line informations.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void assertLineInformation(String text, LineInformation... expectedInfos)
             throws IOException {
@@ -642,10 +665,13 @@ public class IOUtilTest {
     /**
      * Performs test steps of {@link #testWriteTo_Charstet()}.
      *
-     * @param text The text to write.
-     * @param encoding The encoding to use.
+     * @param text
+     *        The text to write.
+     * @param encoding
+     *        The encoding to use.
      * @return The written bytes.
-     * @throws Exception Occurred Exception.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected byte[] doWriteCharsetAsXmlTest(String text, Charset encoding) throws Exception {
         // Create XML
@@ -800,8 +826,10 @@ public class IOUtilTest {
     /**
      * Executes the assertions for {@link #testCopy()}.
      *
-     * @param text The text to check.
-     * @throws IOException Occurred Exception.
+     * @param text
+     *        The text to check.
+     * @throws IOException
+     *         Occurred Exception.
      */
     protected void doTestCopy(String text) throws IOException {
         byte[] inBytes = text.getBytes(StandardCharsets.UTF_8);
@@ -834,7 +862,8 @@ public class IOUtilTest {
     /**
      * Tests {@link IOUtil#toURI(java.net.URL)}
      *
-     * @throws MalformedURLException Occurred Exception
+     * @throws MalformedURLException
+     *         Occurred Exception
      * @see IOUtil#toURI(java.net.URL)
      */
     @Test
@@ -865,7 +894,8 @@ public class IOUtilTest {
     /**
      * Tests {@link IOUtil#toFile(URL)}
      *
-     * @throws MalformedURLException Occurred Exception
+     * @throws MalformedURLException
+     *         Occurred Exception
      * @see IOUtil#toFile(URL)
      */
     @Test
@@ -883,7 +913,8 @@ public class IOUtilTest {
     /**
      * Tests {@link IOUtil#toFileString(URL)}
      *
-     * @throws MalformedURLException Occurred Exception
+     * @throws MalformedURLException
+     *         Occurred Exception
      * @see IOUtil#toFileString(URL)
      */
     @Test()

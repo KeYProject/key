@@ -1,0 +1,485 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.java.ast.declaration;
+
+import java.util.List;
+
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Method;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
+import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
+
+/**
+ * Method declaration.
+ * taken from COMPOST and changed to achieve an immutable structure
+ */
+public class MethodDeclaration extends JavaDeclaration
+        implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement,
+        ParameterContainer, Method,
+        VariableScope {
+
+    /**
+     * The return type of the method.
+     */
+    protected final TypeReference returnType;
+    /**
+     * In case of void return type: comments associated with the method.
+     */
+    protected final Comment[] voidComments;
+    /**
+     * The name of the method.
+     */
+    protected final ProgramElementName name;
+    /**
+     * Parameters of the method.
+     */
+    protected final ImmutableArray<ParameterDeclaration> parameters;
+    /**
+     * 'throws' part of the method. Indicates which exceptions the method may throw.
+     * May be null.
+     */
+    protected final Throws exceptions;
+    /**
+     * Body of the method.
+     * May be null, in which case the body is referenced in a file using {@link #posInfo}.
+     */
+    protected final StatementBlock body;
+    /**
+     * JML modifiers of the referenced method. Includes e.g. {@code pure}.
+     */
+    protected final JMLModifiers jmlModifiers;
+
+    /**
+     * JML modifiers of a method
+     *
+     * @param pure
+     *        pure
+     * @param strictlyPure
+     *        strictly pure
+     * @param helper
+     *        helper
+     * @param specMathMode
+     *        spec math mode
+     */
+    public record JMLModifiers(
+            boolean pure, boolean strictlyPure, boolean helper,
+            SpecMathMode specMathMode) {
+    }
+
+
+    /**
+     * this field stores if parent is an InterfaceDeclaration because we will be
+     * unable to walk the tree upwards to check this
+     */
+    protected final boolean parentIsInterfaceDeclaration;
+
+
+    public MethodDeclaration(
+            PositionInfo pi, List<Comment> comments,
+            @NonNull ImmutableArray<Modifier> modArray,
+            TypeReference returnType,
+            Comment[] voidComments, ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
+            StatementBlock body, boolean parentIsInterfaceDeclaration) {
+        super(pi, comments, modArray);
+        this.returnType = returnType;
+        this.voidComments = voidComments;
+        this.name = name;
+        this.parameters = parameters;
+        this.exceptions = exceptions;
+        this.body = body;
+        this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
+    }
+
+    /**
+     * Method declaration.
+     *
+     * @param children
+     *        an ExtList of children. Must include: a TypeReference (as a reference to the
+     *        return type),
+     *        a {@link ProgramElementName} (as Name of the method),
+     *        one or more {@link ParameterDeclaration} (as parameters of the declared method),
+     *        optionally a {@link StatementBlock} (as body of the declared method),
+     *        optionally a {@link Throws} to indicate exceptional behaviour
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff parent is an InterfaceDeclaration
+     * @param voidComments
+     *        in case of void return type: comments associated with the method
+     */
+    public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
+            Comment[] voidComments) {
+        super(children);
+        returnType = children.get(TypeReference.class);
+        this.voidComments = voidComments;
+        name = children.get(ProgramElementName.class);
+        this.parameters = new ImmutableArray<>(children.collect(ParameterDeclaration.class));
+        exceptions = children.get(Throws.class);
+        body = children.get(StatementBlock.class);
+        this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        assert returnType == null || voidComments == null;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
+    }
+
+
+    /**
+     * Method declaration.
+     *
+     * @param modifiers
+     *        a modifier array
+     * @param returnType
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff
+     *        parent is an InterfaceDeclaration
+     */
+    public MethodDeclaration(
+            Modifier[] modifiers,
+            TypeReference returnType,
+            ProgramElementName name,
+            ParameterDeclaration[] parameters,
+            Throws exceptions,
+            StatementBlock body,
+            boolean parentIsInterfaceDeclaration) {
+        this(modifiers,
+            returnType,
+            name,
+            new ImmutableArray<>(parameters),
+            exceptions,
+            body,
+            parentIsInterfaceDeclaration);
+    }
+
+
+    /**
+     * Method declaration.
+     *
+     * @param modifiers
+     *        a modifier array
+     * @param returnType
+     *        a type reference.
+     * @param name
+     *        an identifier.
+     * @param parameters
+     *        a parameter declaration mutable list.
+     * @param exceptions
+     *        a throws.
+     * @param body
+     *        a statement block.
+     * @param parentIsInterfaceDeclaration
+     *        a boolean set true iff
+     *        parent is an InterfaceDeclaration
+     */
+    public MethodDeclaration(
+            Modifier[] modifiers,
+            TypeReference returnType,
+            ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> parameters,
+            Throws exceptions,
+            StatementBlock body,
+            boolean parentIsInterfaceDeclaration) {
+        super(modifiers);
+        this.returnType = returnType;
+        this.voidComments = null;
+        this.name = name;
+        this.parameters = parameters;
+        this.exceptions = exceptions;
+        this.body = body;
+        this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
+    }
+
+
+    @Override
+    public ProgramElementName getProgramElementName() {
+        return name;
+    }
+
+
+    @NonNull
+    @Override
+    public SourceElement getFirstElement() {
+        return getChildAt(0);
+    }
+
+
+    @NonNull
+    @Override
+    public SourceElement getLastElement() {
+        return getChildAt(this.getChildCount() - 1).getLastElement();
+    }
+
+
+    @Override
+    public int getChildCount() {
+        int result = 0;
+        if (modArray != null)
+            result += modArray.size();
+        if (returnType != null)
+            result++;
+        if (name != null)
+            result++;
+        if (parameters != null)
+            result += parameters.size();
+        if (exceptions != null)
+            result++;
+        if (body != null)
+            result++;
+        return result;
+    }
+
+
+    @Override
+    public ProgramElement getChildAt(int index) {
+        int len;
+        if (modArray != null) {
+            len = modArray.size();
+            if (len > index) {
+                return modArray.get(index);
+            }
+            index -= len;
+        }
+        if (returnType != null) {
+            if (index == 0)
+                return returnType;
+            index--;
+        }
+        if (name != null) {
+            if (index == 0)
+                return name;
+            index--;
+        }
+        if (parameters != null) {
+            len = parameters.size();
+            if (len > index) {
+                return parameters.get(index);
+            }
+            index -= len;
+        }
+        if (exceptions != null) {
+            if (index == 0)
+                return exceptions;
+            index--;
+        }
+        if (body != null) {
+            if (index == 0)
+                return body;
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+
+    @Override
+    public int getStatementCount() {
+        return (body != null) ? 1 : 0;
+    }
+
+
+    @Override
+    public Statement getStatementAt(int index) {
+        if (body != null && index == 0) {
+            return body;
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+
+    @Override
+    public int getTypeReferenceCount() {
+        return (returnType != null) ? 1 : 0;
+    }
+
+
+    @Override
+    public TypeReference getTypeReferenceAt(int index) {
+        if (returnType != null && index == 0) {
+            return returnType;
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+
+    @Override
+    public int getParameterDeclarationCount() {
+        return (parameters != null) ? parameters.size() : 0;
+    }
+
+
+    @Override
+    public ParameterDeclaration getParameterDeclarationAt(int index) {
+        if (parameters != null) {
+            return parameters.get(index);
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+
+    /**
+     * Get return type.
+     *
+     * @return the type reference.
+     */
+    public TypeReference getTypeReference() {
+        return returnType;
+    }
+
+
+    /**
+     * Get the "void comments" of this method declaration.
+     * Only non-null if the method has void return type.
+     *
+     * @return the "void comments"
+     */
+    public Comment[] getVoidComments() {
+        return voidComments;
+    }
+
+
+    @Override
+    public final String getName() {
+        return (name == null) ? null : name.toString();
+    }
+
+
+    public ImmutableArray<ParameterDeclaration> getParameters() {
+        return parameters;
+    }
+
+
+    @Override
+    public String getFullName() {
+        return getName();
+    }
+
+
+    public Throws getThrown() {
+        return exceptions;
+    }
+
+
+    public StatementBlock getBody() {
+        return body;
+    }
+
+
+    @Override
+    public boolean isFinal() {
+        return super.isFinal();
+    }
+
+
+    @Override
+    public boolean isPrivate() {
+        return super.isPrivate();
+    }
+
+
+    @Override
+    public boolean isProtected() {
+        return super.isProtected();
+    }
+
+
+    /**
+     * Test whether the declaration is public. Methods of interfaces
+     * are always public.
+     */
+    @Override
+    public boolean isPublic() {
+        return parentIsInterfaceDeclaration || super.isPublic();
+    }
+
+
+    @Override
+    public boolean isStatic() {
+        return super.isStatic();
+    }
+
+
+    @Override
+    public boolean isModel() {
+        return super.isModel();
+    }
+
+    @Override
+    public int getStateCount() {
+        return super.getStateCount();
+    }
+
+    public boolean isVoid() {
+        return returnType == null || returnType.getKeYJavaType() == KeYJavaType.VOID_TYPE;
+    }
+
+    /**
+     * test whether the declaration is a method with a variable number of arguments (i.e. the
+     * ellipsis ...)
+     *
+     * @return true iff so
+     */
+    public boolean isVarArgMethod() {
+        if (parameters == null || parameters.size() == 0)
+            return false;
+        return parameters.get(parameters.size() - 1).isVarArg();
+    }
+
+
+    @Override
+    public boolean isStrictFp() {
+        return super.isStrictFp();
+    }
+
+
+    /**
+     * Test whether the declaration is abstract. Methods of interfaces
+     * are always abstract.
+     */
+    @Override
+    public boolean isAbstract() {
+        return parentIsInterfaceDeclaration || super.isAbstract();
+    }
+
+
+    /**
+     * Test whether the declaration is native. Constructors
+     * are never native.
+     */
+    @Override
+    public boolean isNative() {
+        return super.isNative();
+    }
+
+
+    @Override
+    public boolean isSynchronized() {
+        return super.isSynchronized();
+    }
+
+
+    @Override
+    public void visit(Visitor v) {
+        v.performActionOnMethodDeclaration(this);
+    }
+
+    public JMLModifiers getJmlModifiers() {
+        return jmlModifiers;
+    }
+}

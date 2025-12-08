@@ -90,7 +90,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * components and assemblies them. After every splitting step the method calls
      * <code>changeTerm</code>. This mechanism can be used to exchange subterms.
      *
-     * @param term the term to rebuild.
+     * @param term
+     *        the term to rebuild.
      * @return returns the new term.
      */
 
@@ -182,8 +183,10 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * 110<br>
      * 111<br>
      *
-     * @param objectCount the number of objects.
-     * @param bucketCount the number of buckets.
+     * @param objectCount
+     *        the number of objects.
+     * @param bucketCount
+     *        the number of buckets.
      * @return an array of dimension objectCount^bucketCount x bucketCount
      */
     public static byte[][] generateReferenceTable(int objectCount, int bucketCount) {
@@ -281,7 +284,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     /**
      * Quantifies a term, i.d. every free variable is bounded by a allquantor.
      *
-     * @param term the term to be quantify.
+     * @param term
+     *        the term to be quantify.
      * @return the quantified term.
      */
     protected static JTerm quantifyTerm(JTerm term, TermServices services)
@@ -305,8 +309,10 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Returns a new logic variable with the given name and sort. If already a logic variable exists
      * with the same name and sort this variable is returned instead of a new logic variable.
      *
-     * @param name name of the logic variable.
-     * @param sort sort of the logic variable.
+     * @param name
+     *        name of the logic variable.
+     * @param sort
+     *        sort of the logic variable.
      * @return logic variable with the given name and sort.
      */
     public LogicVariable getLogicVariable(Name name, Sort sort) {
@@ -369,7 +375,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Override this method if you want to change the term, i.e. exchanging schema variables for
      * logic variables. See <code>rebuildTerm</code>.
      *
-     * @param term the term to be changed.
+     * @param term
+     *        the term to be changed.
      * @return the new term.
      */
     protected JTerm changeTerm(JTerm term) {

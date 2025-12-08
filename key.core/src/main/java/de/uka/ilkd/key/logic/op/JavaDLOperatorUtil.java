@@ -10,8 +10,10 @@ public class JavaDLOperatorUtil {
     /**
      * comparator to compare operators; for modalities only their kind is compared
      *
-     * @param fst the first Operator
-     * @param snd th second Operator
+     * @param fst
+     *        the first Operator
+     * @param snd
+     *        th second Operator
      * @return true iff both operators have same identity and for modalities if both are of the same
      *         kind
      */

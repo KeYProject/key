@@ -38,8 +38,10 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
-     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
+     * @param ui
+     *        The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
+     * @param defaultProverTaskListener
+     *        The default {@link ProverTaskListener} which will be added
      *        to all started {@link ApplyStrategy} instances.
      */
     public DefaultProofControl(UserInterfaceControl ui,
@@ -51,10 +53,13 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * Constructor.
      *
-     * @param ui The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
-     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
+     * @param ui
+     *        The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
+     * @param defaultProverTaskListener
+     *        The default {@link ProverTaskListener} which will be added
      *        to all started {@link ApplyStrategy} instances.
-     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
+     * @param ruleCompletionHandler
+     *        An optional {@link RuleCompletionHandler}.
      */
     public DefaultProofControl(UserInterfaceControl ui,
             DefaultUserInterfaceControl defaultProverTaskListener,

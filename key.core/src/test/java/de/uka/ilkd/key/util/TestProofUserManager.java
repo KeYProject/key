@@ -82,21 +82,36 @@ public class TestProofUserManager {
     /**
      * Tests the given {@link Proof}s.
      *
-     * @param firstProof The first {@link Proof}.
-     * @param secondProof The second {@link Proof}.
-     * @param thirdProof The third {@link Proof}.
-     * @param expectedFirstDisposed Is first {@link Proof} disposed?
-     * @param expectedSecondDisposed Is second {@link Proof} disposed?
-     * @param expectedThirdDisposed Is third {@link Proof} disposed?
-     * @param expectedFirstProofUsers Expected user of the first {@link Proof}.
-     * @param expectedSecondProofUsers Expected user of the second {@link Proof}.
-     * @param expectedThirdProofUsers Expected user of the third {@link Proof}.
-     * @param firstEnv The first {@link KeYEnvironment}.
-     * @param firstEnvDisposed Is first {@link KeYEnvironment} disposed?
-     * @param firstEnvProofs The expected {@link Proof}s of the first {@link KeYEnvironment}.
-     * @param secondEnv The second {@link KeYEnvironment}.
-     * @param secondEnvDisposed Is second {@link KeYEnvironment} disposed?
-     * @param secondEnvProofs The expected {@link Proof}s of the second {@link KeYEnvironment}.
+     * @param firstProof
+     *        The first {@link Proof}.
+     * @param secondProof
+     *        The second {@link Proof}.
+     * @param thirdProof
+     *        The third {@link Proof}.
+     * @param expectedFirstDisposed
+     *        Is first {@link Proof} disposed?
+     * @param expectedSecondDisposed
+     *        Is second {@link Proof} disposed?
+     * @param expectedThirdDisposed
+     *        Is third {@link Proof} disposed?
+     * @param expectedFirstProofUsers
+     *        Expected user of the first {@link Proof}.
+     * @param expectedSecondProofUsers
+     *        Expected user of the second {@link Proof}.
+     * @param expectedThirdProofUsers
+     *        Expected user of the third {@link Proof}.
+     * @param firstEnv
+     *        The first {@link KeYEnvironment}.
+     * @param firstEnvDisposed
+     *        Is first {@link KeYEnvironment} disposed?
+     * @param firstEnvProofs
+     *        The expected {@link Proof}s of the first {@link KeYEnvironment}.
+     * @param secondEnv
+     *        The second {@link KeYEnvironment}.
+     * @param secondEnvDisposed
+     *        Is second {@link KeYEnvironment} disposed?
+     * @param secondEnvProofs
+     *        The expected {@link Proof}s of the second {@link KeYEnvironment}.
      */
     private void assertProofsAndEnvironments(Proof firstProof, Proof secondProof, Proof thirdProof,
             boolean expectedFirstDisposed, boolean expectedSecondDisposed,
@@ -269,15 +284,24 @@ public class TestProofUserManager {
     /**
      * Tests the given {@link Proof}s.
      *
-     * @param firstProof The first {@link Proof}.
-     * @param secondProof The second {@link Proof}.
-     * @param thirdProof The third {@link Proof}.
-     * @param expectedFirstDisposed Is first {@link Proof} disposed?
-     * @param expectedSecondDisposed Is second {@link Proof} disposed?
-     * @param expectedThirdDisposed Is third {@link Proof} disposed?
-     * @param expectedFirstProofUsers Expected user of the first {@link Proof}.
-     * @param expectedSecondProofUsers Expected user of the second {@link Proof}.
-     * @param expectedThirdProofUsers Expected user of the third {@link Proof}.
+     * @param firstProof
+     *        The first {@link Proof}.
+     * @param secondProof
+     *        The second {@link Proof}.
+     * @param thirdProof
+     *        The third {@link Proof}.
+     * @param expectedFirstDisposed
+     *        Is first {@link Proof} disposed?
+     * @param expectedSecondDisposed
+     *        Is second {@link Proof} disposed?
+     * @param expectedThirdDisposed
+     *        Is third {@link Proof} disposed?
+     * @param expectedFirstProofUsers
+     *        Expected user of the first {@link Proof}.
+     * @param expectedSecondProofUsers
+     *        Expected user of the second {@link Proof}.
+     * @param expectedThirdProofUsers
+     *        Expected user of the third {@link Proof}.
      */
     protected void assertProofs(Proof firstProof, Proof secondProof, Proof thirdProof,
             boolean expectedFirstDisposed, boolean expectedSecondDisposed,
@@ -312,8 +336,10 @@ public class TestProofUserManager {
     /**
      * Makes sure that the given {@link Proof} has the given users.
      *
-     * @param proof The {@link Proof} to test its users.
-     * @param expectedUsers The expected users.
+     * @param proof
+     *        The {@link Proof} to test its users.
+     * @param expectedUsers
+     *        The expected users.
      */
     private void assertUser(Proof proof, Object... expectedUsers) {
         Object[] users = ProofUserManager.getInstance().getUsers(proof);
@@ -327,7 +353,8 @@ public class TestProofUserManager {
     /**
      * Makes sure that the given {@link Proof}s are registered.
      *
-     * @param expectedProofs The expected registered {@link Proof}s.
+     * @param expectedProofs
+     *        The expected registered {@link Proof}s.
      */
     private void assertProofs(Proof... expectedProofs) {
         Proof[] proofs = ProofUserManager.getInstance().getProofs();

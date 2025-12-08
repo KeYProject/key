@@ -15,14 +15,16 @@ public interface NodeInfoVisualizerListener {
     /**
      * Called when a new visualizer has been registered.
      *
-     * @param vis the registered visualizer.
+     * @param vis
+     *        the registered visualizer.
      */
     void visualizerRegistered(NodeInfoVisualizer vis);
 
     /**
      * Called when a visualizer has been unregistered.
      *
-     * @param vis the unregistered visualizer.
+     * @param vis
+     *        the unregistered visualizer.
      */
     void visualizerUnregistered(NodeInfoVisualizer vis);
 }

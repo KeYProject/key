@@ -25,9 +25,12 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
      *
-     * @param app the RuleApp
-     * @param pos position where <code>app</code> is to be applied
-     * @param goal the goal on which <code>app</code> is to be applied
+     * @param app
+     *        the RuleApp
+     * @param pos
+     *        position where <code>app</code> is to be applied
+     * @param goal
+     *        the goal on which <code>app</code> is to be applied
      * @return the cost of the rule application expressed as a
      *         <code>RuleAppCost</code> object. <code>TopRuleAppCost.INSTANCE</code>
      *         indicates that the rule shall not be applied at all (it is discarded by
@@ -66,8 +69,10 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      * Updates the {@link Strategy} for the given {@link Proof} by setting the {@link Strategy}'s
      * {@link StrategyProperties} to the given ones.
      *
-     * @param proof The {@link Proof} the strategy of which should be updated.
-     * @param p The new {@link StrategyProperties}
+     * @param proof
+     *        The {@link Proof} the strategy of which should be updated.
+     * @param p
+     *        The new {@link StrategyProperties}
      */
     static void updateStrategySettings(Proof proof, StrategyProperties p) {
         final Strategy<de.uka.ilkd.key.proof.Goal> strategy = proof.getActiveStrategy();

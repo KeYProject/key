@@ -50,8 +50,7 @@ public final class KeyStrokeManager {
      */
     static final Map<String, WeakReference<Action>> actions = new HashMap<>(100);
 
-    private KeyStrokeManager() {
-    }
+    private KeyStrokeManager() {}
 
     /**
      * Get a {@link KeyStroke} for the given <code>key</code>. If no {@link KeyStroke} is defined,
@@ -59,8 +58,10 @@ public final class KeyStrokeManager {
      * <p>
      * Also thsi method sets the determined key stroke in the settings.
      *
-     * @param key key
-     * @param defaultValue default value
+     * @param key
+     *        key
+     * @param defaultValue
+     *        default value
      * @return nullable
      * @see KeyStrokeSettings
      */

@@ -54,14 +54,20 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
     /**
      * Creates the anonymizing update for the given loop specification.
      *
-     * @param isTransaction set to true iff we're in a transaction modality (then, there are more
+     * @param isTransaction
+     *        set to true iff we're in a transaction modality (then, there are more
      *        heaps available).
-     * @param isPermissions set to true if the permissions profile is active (then, the permissions
+     * @param isPermissions
+     *        set to true if the permissions profile is active (then, the permissions
      *        heap is available).
-     * @param anonHeapTerm The term with the Skolem heap.
-     * @param anonSavedHeapTerm The term with the Skolem saved heap.
-     * @param anonPermissionsHeapTerm The term with the Skolem permissions heap.
-     * @param services The {@link Services} object (for the {@link TermBuilder}).
+     * @param anonHeapTerm
+     *        The term with the Skolem heap.
+     * @param anonSavedHeapTerm
+     *        The term with the Skolem saved heap.
+     * @param anonPermissionsHeapTerm
+     *        The term with the Skolem permissions heap.
+     * @param services
+     *        The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static JTerm createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,

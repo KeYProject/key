@@ -25,8 +25,10 @@ public class ExecutionLink implements IExecutionLink {
     /**
      * Constructor.
      *
-     * @param source The source {@link IExecutionNode}.
-     * @param target The target {@link IExecutionNode}.
+     * @param source
+     *        The source {@link IExecutionNode}.
+     * @param target
+     *        The target {@link IExecutionNode}.
      */
     public ExecutionLink(IExecutionNode<?> source, IExecutionNode<?> target) {
         this.source = source;

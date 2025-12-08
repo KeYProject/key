@@ -33,9 +33,12 @@ public class DependencyNodeData {
     /**
      * Construct a new container for dependency node data.
      *
-     * @param inputs graph nodes used by the proof step
-     * @param outputs graph nodes created by the proof step
-     * @param label label for this node
+     * @param inputs
+     *        graph nodes used by the proof step
+     * @param outputs
+     *        graph nodes created by the proof step
+     * @param label
+     *        label for this node
      */
     public DependencyNodeData(List<Pair<GraphNode, Boolean>> inputs, List<GraphNode> outputs,
             String label) {

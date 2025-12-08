@@ -26,8 +26,10 @@ public class ShowCreatedByAction extends MainWindowAction {
     /**
      * Construct a new action.
      *
-     * @param mw main window
-     * @param node node to switch to
+     * @param mw
+     *        main window
+     * @param node
+     *        node to switch to
      */
     public ShowCreatedByAction(MainWindow mw, Node node) {
         super(mw);

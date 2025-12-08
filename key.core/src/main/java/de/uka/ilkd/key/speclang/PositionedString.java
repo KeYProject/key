@@ -96,7 +96,8 @@ public class PositionedString {
     /**
      * checks if the given label is attached to the positioned string
      *
-     * @param label the ITermLabel for which to look (must not be null)
+     * @param label
+     *        the ITermLabel for which to look (must not be null)
      */
     public boolean containsLabel(TermLabel label) {
         return false;

@@ -36,8 +36,10 @@ public class CheckedProcessBuilder {
     /**
      * Create a new builder and check for the given program.
      *
-     * @param program the program
-     * @param programCheck program invocation used to check (e.g. --version)
+     * @param program
+     *        the program
+     * @param programCheck
+     *        program invocation used to check (e.g. --version)
      */
     public CheckedProcessBuilder(String program, String[] programCheck) {
         this.program = program;
@@ -60,9 +62,12 @@ public class CheckedProcessBuilder {
      * Start and wait for the program with the given argument list.
      * If the program is not available, no action is done.
      *
-     * @param args arguments (without program name)
-     * @throws IOException on start error (unlikely)
-     * @throws InterruptedException on wait error
+     * @param args
+     *        arguments (without program name)
+     * @throws IOException
+     *         on start error (unlikely)
+     * @throws InterruptedException
+     *         on wait error
      */
     public void start(String... args) throws IOException, InterruptedException {
         if (args.length == 0) {

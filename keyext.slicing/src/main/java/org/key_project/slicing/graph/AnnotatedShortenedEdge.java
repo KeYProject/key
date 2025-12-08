@@ -25,9 +25,12 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
     /**
      * Create a new shortened edge.
      *
-     * @param initial the initial node for this shortened chain
-     * @param last the last node of this shortened chain
-     * @param consumesInput whether the input graph node is consumed
+     * @param initial
+     *        the initial node for this shortened chain
+     * @param last
+     *        the last node of this shortened chain
+     * @param consumesInput
+     *        whether the input graph node is consumed
      */
     public AnnotatedShortenedEdge(Node initial, Node last, boolean consumesInput) {
         super(last, consumesInput);
