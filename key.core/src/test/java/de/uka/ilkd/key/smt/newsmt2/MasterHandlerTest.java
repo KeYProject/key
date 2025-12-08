@@ -12,11 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
@@ -27,9 +28,9 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.Streams;
 
+import org.antlr.v4.runtime.CharStreams;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.assertj.core.api.Assertions;
@@ -164,8 +165,10 @@ public class MasterHandlerTest {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 proof.getSettings().getNewSMTSettings(), proof);
 
-            if (smtSettings != null) {
-                settings.getNewSettings().readSettings(smtSettings);
+            String updates = props.get("smt-settings");
+            if (updates != null) {
+                var map = ParsingFacade.readConfigurationFile(CharStreams.fromString(updates));
+                settings.getNewSettings().readSettings(map);
             }
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();

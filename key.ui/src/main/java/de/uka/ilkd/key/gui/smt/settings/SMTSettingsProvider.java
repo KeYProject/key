@@ -170,7 +170,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     @Override
     public JPanel getPanel(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
-        setSmtSettings(pi.clone());
+        setSmtSettings(pi.copy());
         return this;
     }
 
@@ -178,7 +178,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     public void applySettings(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         pi.copy(settings);
-        setSmtSettings(pi.clone());
+        setSmtSettings(pi.copy());
     }
 
     private JSpinner createLocSetBoundField() {
