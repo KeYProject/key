@@ -14,8 +14,7 @@ import org.key_project.logic.Name;
 public non-sealed class EmptyMSetLiteral extends Literal {
     public static final EmptyMSetLiteral INSTANCE = new EmptyMSetLiteral();
 
-    private EmptyMSetLiteral() {
-    }
+    private EmptyMSetLiteral() {}
 
     @Override
     public boolean equals(Object o) {

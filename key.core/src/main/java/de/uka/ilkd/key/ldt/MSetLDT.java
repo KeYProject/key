@@ -81,7 +81,8 @@ public class MSetLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm[] subs, Services services,
             ExecutionContext ec) {
-        return op instanceof MSetCard || op instanceof MSetMul || op instanceof MSetSingle
+        return op instanceof MSetCard || op instanceof MSetMul
+                || op instanceof de.uka.ilkd.key.java.ast.expression.operator.mst.MSetSingle
                 || op instanceof MSetIntersect ||
                 op instanceof MSetDiff || op instanceof MSetUnion || op instanceof MSetSum;
     }
@@ -89,7 +90,8 @@ public class MSetLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
-        return op instanceof MSetUnion || op instanceof MSetIntersect || op instanceof MSetSum
+        return op instanceof MSetUnion || op instanceof MSetIntersect
+                || op instanceof de.uka.ilkd.key.java.ast.expression.operator.mst.MSetSum
                 || op instanceof MSetDiff;
     }
 
