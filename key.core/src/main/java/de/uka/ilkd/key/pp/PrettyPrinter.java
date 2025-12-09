@@ -17,10 +17,7 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.mst.MSetCard;
-import de.uka.ilkd.key.java.expression.operator.mst.MSetMul;
-import de.uka.ilkd.key.java.expression.operator.mst.MSetSingle;
-import de.uka.ilkd.key.java.expression.operator.mst.MSetUnion;
+import de.uka.ilkd.key.java.expression.operator.mset.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -328,10 +325,12 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) {
         printDLFunctionOperator("\\singleton", x);
     }
+
     @Override
     public void performActionOnSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) {
         printDLFunctionOperator("\\set_union", x);
     }
+
     @Override
     public void performActionOnIntersect(Intersect x) {
         printDLFunctionOperator("\\intersect", x);
@@ -415,27 +414,28 @@ public class PrettyPrinter implements Visitor {
 
 
     @Override
-    public void  performActionOnMSetUnion(de.uka.ilkd.key.java.expression.operator.mst.MSetUnion x){
-        printDLFunctionOperator("\\mset_union" , x);
+    public void performActionOnMSetUnion(MSetUnion x) {
+        printDLFunctionOperator("\\mset_union", x);
     }
 
     @Override
-    public void performActionOnMSetIntersect(de.uka.ilkd.key.java.expression.operator.mst.MSetIntersect x){
+    public void performActionOnMSetIntersect(MSetIntersect x) {
         printDLFunctionOperator("\\mset_intersection", x);
     }
 
     @Override
-    public void performActionOnMSetSum(de.uka.ilkd.key.java.expression.operator.mst.MSetSum x){
-        printDLFunctionOperator("\\mset_sum" , x);
-    }
-    @Override
-    public void performActionOnMSetDiff(de.uka.ilkd.key.java.expression.operator.mst.MSetDiff x){
-        printDLFunctionOperator("\\mset_diff" , x);
+    public void performActionOnMSetSum(MSetSum x) {
+        printDLFunctionOperator("\\mset_sum", x);
     }
 
     @Override
-    public void performActionOnMSetSingle(de.uka.ilkd.key.java.expression.operator.mst.MSetSingle x){
-        printDLFunctionOperator("\\mset_single" , x);
+    public void performActionOnMSetDiff(MSetDiff x) {
+        printDLFunctionOperator("\\mset_diff", x);
+    }
+
+    @Override
+    public void performActionOnMSetSingle(MSetSingle x) {
+        printDLFunctionOperator("\\mset_single", x);
     }
 
     @Override
@@ -447,12 +447,12 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnMSetCard(MSetCard x){
+    public void performActionOnMSetCard(MSetCard x) {
         x.getChildAt(0).visit(this);
         layouter.print(".length");
     }
 
-    
+
     @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         layouter.print("\\dl_" + x.getFunctionSymbol().name());

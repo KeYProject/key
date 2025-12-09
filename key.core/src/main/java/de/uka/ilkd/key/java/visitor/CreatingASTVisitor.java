@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.expression.operator.mst.*;
+import de.uka.ilkd.key.java.expression.operator.mset.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -1474,20 +1474,20 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-        public void performActionOnMSetUnion(MSetUnion x) {
+    public void performActionOnMSetUnion(MSetUnion x) {
 
-            DefaultAction def = new DefaultAction(x) {
-                @Override
-                ProgramElement createNewElement(ExtList changeList) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
 
-                    return new MSetUnion(changeList);
-                }
+                return new MSetUnion(changeList);
+            }
 
-            };
+        };
 
-                def.doAction(x);
+        def.doAction(x);
 
-        }
+    }
 
     @Override
     public void performActionOnMSetIntersect(MSetIntersect x) {
@@ -1501,7 +1501,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnMSetSum(MSetSum x){
+    public void performActionOnMSetSum(MSetSum x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
@@ -1513,7 +1513,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnMSetDiff(MSetDiff x){
+    public void performActionOnMSetDiff(MSetDiff x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
@@ -1524,6 +1524,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
 
     }
+
     @Override
     public void performActionOnMSetSingle(MSetSingle x) {
         DefaultAction def = new DefaultAction(x) {
@@ -1547,12 +1548,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnMSetMul(MSetMul x){
+    public void performActionOnMSetMul(MSetMul x) {
 
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-               return new MSetMul(changeList);
+                return new MSetMul(changeList);
             }
         };
         def.doAction(x);

@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
-import de.uka.ilkd.key.java.recoderext.mst.EmptyMSetLiteral;
+import de.uka.ilkd.key.java.recoderext.mset.EmptyMSetLiteral;
 import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;

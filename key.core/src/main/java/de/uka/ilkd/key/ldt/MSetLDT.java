@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
@@ -8,7 +11,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.EmptyMSetLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.expression.operator.mst.*;
+import de.uka.ilkd.key.java.expression.operator.mset.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -41,11 +44,12 @@ public class MSetLDT extends LDT {
         msetSum = addFunction(services, "msetSum");
         msetDiff = addFunction(services, "msetDiff");
         msetCard = addFunction(services, "msetCard");
-        msetRange = addFunction(services , "msetRange");
+        msetRange = addFunction(services, "msetRange");
     }
 
 
-    public JFunction getMsetRange(){ return msetRange;}
+    public JFunction getMsetRange() { return msetRange; }
+
     public JFunction getMsetMul() {
         return msetMul;
     }
@@ -73,19 +77,24 @@ public class MSetLDT extends LDT {
     public JFunction getMsetRemove() {
         return msetDiff;
     }
+
     @Override
     public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
-       return op instanceof MSetCard || op instanceof MSetMul || op instanceof MSetSingle || op instanceof MSetIntersect ||
-               op instanceof MSetDiff || op instanceof MSetUnion || op instanceof MSetSum;
+        return op instanceof MSetCard || op instanceof MSetMul || op instanceof MSetSingle
+                || op instanceof MSetIntersect ||
+                op instanceof MSetDiff || op instanceof MSetUnion || op instanceof MSetSum;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services, ExecutionContext ec) {
-        return op instanceof MSetUnion || op instanceof MSetIntersect || op instanceof MSetSum || op instanceof MSetDiff;
+    public boolean isResponsible(Operator op, Term left, Term right, Services services,
+            ExecutionContext ec) {
+        return op instanceof MSetUnion || op instanceof MSetIntersect || op instanceof MSetSum
+                || op instanceof MSetDiff;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, Term sub, TermServices services,
+            ExecutionContext ec) {
         return op instanceof MSetSingle || op instanceof MSetMul || op instanceof MSetCard;
     }
 
@@ -129,11 +138,12 @@ public class MSetLDT extends LDT {
             return EmptyMSetLiteral.INSTANCE;
         }
         assert false;
-        return null;    }
+        return null;
+    }
 
     @Override
     public Type getType(Term t) {
-       assert false;
+        assert false;
         return null;
     }
 }

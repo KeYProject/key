@@ -59,7 +59,7 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_TYPE =
         new PrimitiveType("\\TYPE", NullLiteral.NULL, SortLDT.NAME);
     public static final PrimitiveType JAVA_MSET =
-            new PrimitiveType("\\mset" , EmptyMSetLiteral.INSTANCE , MSetLDT.NAME);
+        new PrimitiveType("\\mset", EmptyMSetLiteral.INSTANCE, MSetLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 

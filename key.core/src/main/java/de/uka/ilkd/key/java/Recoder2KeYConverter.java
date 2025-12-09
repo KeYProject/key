@@ -23,10 +23,9 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.expression.operator.mst.*;
+import de.uka.ilkd.key.java.expression.operator.mset.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.expression.literal.EmptyMSetLiteral;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -726,41 +725,41 @@ public class Recoder2KeYConverter {
     }
 
 
-    public EmptyMSetLiteral convert(de.uka.ilkd.key.java.recoderext.mst.EmptyMSetLiteral e) {
+    public EmptyMSetLiteral convert(de.uka.ilkd.key.java.recoderext.mset.EmptyMSetLiteral e) {
         return EmptyMSetLiteral.INSTANCE;
     }
 
-    public MSetUnion convert(de.uka.ilkd.key.java.recoderext.mst.MSetUnion e){
+    public MSetUnion convert(de.uka.ilkd.key.java.recoderext.mset.MSetUnion e) {
         ExtList children = collectChildren(e);
         return new MSetUnion(children);
     }
 
-    public MSetSum convert(de.uka.ilkd.key.java.recoderext.mst.MSetSum e){
+    public MSetSum convert(de.uka.ilkd.key.java.recoderext.mset.MSetSum e) {
         ExtList children = collectChildren(e);
         return new MSetSum(children);
     }
 
-    public MSetDiff convert(de.uka.ilkd.key.java.recoderext.mst.MSetDiff e){
+    public MSetDiff convert(de.uka.ilkd.key.java.recoderext.mset.MSetDiff e) {
         ExtList children = collectChildren(e);
         return new MSetDiff(children);
     }
 
-    public MSetIntersect convert(de.uka.ilkd.key.java.recoderext.mst.MSetIntersect e){
+    public MSetIntersect convert(de.uka.ilkd.key.java.recoderext.mset.MSetIntersect e) {
         ExtList children = collectChildren(e);
         return new MSetIntersect(children);
     }
 
-    public MSetSingle convert(de.uka.ilkd.key.java.recoderext.mst.MSetSingle e){
+    public MSetSingle convert(de.uka.ilkd.key.java.recoderext.mset.MSetSingle e) {
         ExtList children = collectChildren(e);
         return new MSetSingle(children);
     }
 
-    public MSetMul convert(de.uka.ilkd.key.java.recoderext.mst.MSetMul e) {
+    public MSetMul convert(de.uka.ilkd.key.java.recoderext.mset.MSetMul e) {
 
         return new MSetMul(collectChildren(e));
     }
 
-    public MSetCard convert(de.uka.ilkd.key.java.recoderext.mst.MSetCard e) {
+    public MSetCard convert(de.uka.ilkd.key.java.recoderext.mset.MSetCard e) {
 
         return new MSetCard(collectChildren(e));
     }
