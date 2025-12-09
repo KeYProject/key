@@ -7,6 +7,9 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.ccatch.*;
@@ -673,7 +676,8 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printTypeReference(ReferencePrefix prefix, @Nullable KeYJavaType type,
+    private void printTypeReference(ReferencePrefix prefix,
+            @Nullable KeYJavaType type,
             ProgramElementName name,
             boolean fullTypeNames) {
         printReferencePrefix(prefix);

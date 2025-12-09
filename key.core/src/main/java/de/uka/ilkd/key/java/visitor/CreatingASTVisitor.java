@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.expression.operator.mst.*;
+import de.uka.ilkd.key.java.ast.expression.operator.mst.MSetSum;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
