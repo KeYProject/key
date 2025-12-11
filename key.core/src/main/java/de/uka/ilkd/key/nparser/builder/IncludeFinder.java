@@ -60,9 +60,11 @@ public class IncludeFinder extends AbstractBuilder<Void> {
         // whatsoever
         filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
         var path = base.resolve(filename).normalize();
-        var uri = URI.create(path.toString());
+        String pathString = path.toString().replace(File.separatorChar, '/'); // URIs on Windows
+                                                                              // needs slash
+        var uri = URI.create(pathString);
         if (uri.getScheme() == null) {
-            uri = URI.create("file://" + path);
+            uri = URI.create("file://" + pathString);
         }
         URL url = uri.toURL();
         source = RuleSourceFactory.initRuleFile(url);
