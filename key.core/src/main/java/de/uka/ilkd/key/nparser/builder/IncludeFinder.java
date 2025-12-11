@@ -64,7 +64,7 @@ public class IncludeFinder extends AbstractBuilder<Void> {
                                                                               // needs slash
         var uri = URI.create(pathString);
         if (uri.getScheme() == null) {
-            uri = URI.create("file://" + pathString);
+            uri = URI.create("file:///" + pathString);
         }
         URL url = uri.toURL();
         source = RuleSourceFactory.initRuleFile(url);
