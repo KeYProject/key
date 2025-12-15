@@ -62,3 +62,12 @@ java.util.ListIteratorImpl
 java.util.Date
 java.util.LinkedHashMap
 java.util.LinkedList
+universe.qual.Any
+universe.qual.Dom
+universe.qual.Payload
+universe.qual.Rep
+universe.qual.Self
+universe.qual.Bottom
+universe.qual.Lost
+universe.qual.Peer
+universe.qual.RepOnly

@@ -91,8 +91,6 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        implementation "piisrational:universe:0.1"
-
         testImplementation("ch.qos.logback:logback-classic:1.5.20")
         testImplementation("org.assertj:assertj-core:3.27.6")
         testImplementation("ch.qos.logback:logback-classic:1.5.20")

@@ -18,6 +18,7 @@ dependencies {
     implementation project(":key.core.rifl")
 
     implementation("com.formdev:flatlaf:3.6.2")
+    implementation("piisrational:universe:0.1")
 
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
@@ -69,7 +70,13 @@ application {
     mainClass.set("de.uka.ilkd.key.core.Main")
 }
 
+task copyToLib(type: Copy) {
+    into "$buildDir/output/libs"
+    from configurations.runtimeClasspath
+}
+
 run {
+    dependsOn(copyToLib)
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["slf4j.detectLoggerNameMismatch"] = true
     //systemProperties["KeyDebugFlag"] = "on"
