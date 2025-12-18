@@ -487,6 +487,10 @@ public class IntermediateProofReplayer {
                 } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
                     throw new TacletAppConstructionException("The taclet " + taclet.name()
                         + " can not be applied to a formula/term in antecedent.");
+                } else if (!pos.isTopLevel()
+                        && (taclet instanceof AntecTaclet || taclet instanceof SuccTaclet)) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " must be applied at the top level; got " + pos);
                 }
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
