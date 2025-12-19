@@ -942,6 +942,9 @@ public class ProofCollections {
         // There are two possible candidates to instantiate the assumes sequent.
         g.notloadable("proofLoadRepair/insufficient-manipulated.proof");
 
+        // SuccTaclet is applied at a non-top-level position
+        g.notloadable("proofLoadRepair/if.key.proof");
+
         // Verify that taclet instantiations read from proof files are checked
         // for correct polarity (Issue //1716).
         g.notloadable(
