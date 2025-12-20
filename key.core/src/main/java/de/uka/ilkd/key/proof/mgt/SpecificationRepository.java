@@ -34,6 +34,10 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.wd.ClassWellDefinedness;
+import de.uka.ilkd.key.wd.MethodWellDefinedness;
+import de.uka.ilkd.key.wd.StatementWellDefinedness;
+import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
@@ -1404,7 +1408,7 @@ public final class SpecificationRepository {
      * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not
      *         available.
      */
-    public ProofOblInput getProofOblInput(Proof proof) {
+    public @Nullable ProofOblInput getProofOblInput(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
