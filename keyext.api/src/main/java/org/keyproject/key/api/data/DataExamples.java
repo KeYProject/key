@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
@@ -15,6 +17,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.KeyApiImpl;
+import org.keyproject.key.api.data.KeyIdentifications.EnvironmentId;
+import org.keyproject.key.api.data.KeyIdentifications.ProofId;
 import org.keyproject.key.api.remoteapi.ServerManagement;
 import org.keyproject.key.api.remoteclient.ShowDocumentParams;
 import org.keyproject.key.api.remoteclient.ShowDocumentResult;
@@ -73,12 +77,18 @@ public class DataExamples {
         return new ProofStatus(getProofId(), 10, 23);
     }
 
-    public KeyIdentifications.ProofId getProofId() {
-        return new KeyIdentifications.ProofId(getEnvId(), "proof-5");
+    public LoadParams getLoadParams() {
+        return new LoadParams(Uri.from(new File("/home/weigl/test.key")),
+            List.of(), null, List.of());
     }
 
-    public KeyIdentifications.EnvironmentId getEnvId() {
-        return new KeyIdentifications.EnvironmentId("env-1");
+
+    public ProofId getProofId() {
+        return new ProofId(getEnvId(), "proof-5");
+    }
+
+    public EnvironmentId getEnvId() {
+        return new EnvironmentId("env-1");
     }
 
     public ShowDocumentParams getSDP() {
