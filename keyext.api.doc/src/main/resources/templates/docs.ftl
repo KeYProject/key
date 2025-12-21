@@ -5,9 +5,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="https://keyproject.github.io/key-docs/assets/stylesheets/main.618322db.min.css"/>
+    <!--<link rel="stylesheet" href="https://keyproject.github.io/key-docs/assets/stylesheets/main.618322db.min.css"/>
     <link rel="stylesheet" href="https://keyproject.github.io/key-docs/assets/stylesheets/palette.ab4e12ef.min.css">
-    <title></title>
+-->    <title></title>
 </head>
 <body>
 
@@ -16,6 +16,9 @@
         font-family: sans-serif;
         width: 60em;
         margin: auto;
+    }
+    body {
+		    font-size: 12pt;
     }
 
     div.data-type {
@@ -52,7 +55,19 @@
     }
 </style>
 
+<#list types as type>
+	<a href="#${type.name}">${type.name()}</a>
+</#list>
+
+
+<#list endpoints as ep>
+	<a href="#${ep.name}">${ep.name()}</a>
+</#list>
+
+
+
 <h3>Types</h3>
+
 <#list types as type>
     <#assign isEnum = true>
     <#if type.fields??>
