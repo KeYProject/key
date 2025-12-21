@@ -100,7 +100,7 @@ public class RunAllProofsAction extends MainWindowAction {
         super(mainWindow);
 
         Main.ensureExamplesAvailable();
-        exampleDir = Paths.get(Main.getExamplesDir());
+        exampleDir = Main.getExamplesDir();
 
         try {
             files = loadFiles();
