@@ -52,8 +52,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     /**
-     * @param info
-     * @return
+     * Factory method for the construction of informational displays using
+     * text areas.
+     *
+     * @param info information to be shown
+     * @return a new {@link JTextArea} showing the given information
      */
     protected static JTextArea createInfoArea(String info) {
         JTextArea textArea = new JTextArea(info);
