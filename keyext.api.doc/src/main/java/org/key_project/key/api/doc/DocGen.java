@@ -5,10 +5,12 @@ package org.key_project.key.api.doc;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 import freemarker.core.HTMLOutputFormat;
 import freemarker.ext.beans.ZeroArgumentNonVoidMethodPolicy;
@@ -38,6 +40,7 @@ public class DocGen implements Supplier<String> {
             var cfg = new Configuration(Configuration.VERSION_2_3_32);
             cfg.setClassForTemplateLoading(DocGen.class, "/templates"); // classpath
             cfg.setDefaultEncoding("UTF-8");
+            cfg.setAutoEscapingPolicy(Configuration.DISABLE_AUTO_ESCAPING_POLICY);
             cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
             cfg.setLogTemplateExceptions(false);
             cfg.setWrapUncheckedExceptions(true);
@@ -64,11 +67,22 @@ public class DocGen implements Supplier<String> {
                         .stream().sorted(Comparator.comparing(Metamodel.Endpoint::name))
                         .toList());
 
+            final Map<String, List<Metamodel.Endpoint>> collect = metamodel.endpoints()
+                    .stream().sorted(Comparator.comparing(Metamodel.Endpoint::name))
+                    .collect(Collectors.groupingBy(Metamodel.Endpoint::segment, TreeMap::new,
+                        Collectors.toList()));
+
+            model.put("endpointsBySegment", collect);
+
             model.put("types",
                 metamodel.types().values()
                         .stream().sorted(Comparator.comparing(Metamodel.Type::name))
                         .toList());
 
+            model.put("version",
+                KeYResourceManager.getManager().getVersion() +
+                    " (" + KeYConstants.INTERNAL_VERSION.substring(0, 8) + ")");
+            model.put("date", new Date());
 
             // 3) Get template
             var tpl = cfg.getTemplate("docs.ftl");
