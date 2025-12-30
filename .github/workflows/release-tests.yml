@@ -1,0 +1,158 @@
+name: Broad Release Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * 1' # every monday morning
+
+env:
+  z3: '4.13.4' # default z3 version
+  cvc5: '1.3.2' # default cvc5 version
+
+
+jobs:
+  unit-tests:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        java: [ 21, 25 ]
+    continue-on-error: false
+    runs-on: ${{ matrix.os }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
+        with:
+          cvc5Version: ${{ env.cvc5 }}
+          z3Version: ${{ env.z3 }}
+
+      - name: z3 version
+        run: z3 --version
+
+      - name: cvc5 version
+        run: cvc5 --version
+
+      - name: Setup Gradle
+        uses:
+          gradle/actions/setup-gradle@v5
+
+      - name: Test mandatory modules with Gradle
+        run: ./gradlew test --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test
+
+      - name: Test optional modules with Gradle
+        run: ./gradlew :key.core.symbolic_execution:test -x :key.core.proof_references:test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v6
+        if: success() || failure()
+        with:
+          name: unit-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}
+          path: |
+            **/build/test-results/*/*.xml
+            **/build/reports/
+            !**/jacocoTestReport.xml
+  
+  
+
+  integration-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    continue-on-error: false
+    strategy:
+      fail-fast: true
+      matrix:
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testProveSMTLemmas, testStrictSMT ]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        java: [ 21, 25 ]
+        z3: [ '4.13.4', '4.14.1', '4.15.4' ]
+        cvc5: [ '1.3.2', '1.2.1' ]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
+        with:
+          cvc5Version: ${{ env.cvc5 }}
+          z3Version: ${{ env.z3 }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: "Running tests: ${{ matrix.test }}"
+        run: ./gradlew --continue ${{ matrix.test }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v6
+        if: success() || failure()        # run this step even if a previous step failed
+        with:
+          name: integration-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}
+          path: |
+            **/build/test-results/*/*.xml
+            key.core/build/reports/runallproofs/*
+            **/build/reports/
+            !**/jacocoTestReport.xml
+
+  smt-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    continue-on-error: false
+    strategy:
+      fail-fast: true
+      matrix:
+        test: [ testProveSMTLemmas, testStrictSMT ]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        java: [ 21 ]
+        z3: [ '4.13.4', '4.14.1', '4.15.4' ]
+        cvc5: [ '1.3.2', '1.2.1' ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0.3.0
+        with:
+          cvc5Version: ${{ matrix.cvc5 }}
+          z3Version: ${{ matrix.z3 }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: "Running tests: ${{ matrix.test }}"
+        run: ./gradlew --continue ${{ matrix.test }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v6
+        if: success() || failure()        # run this step even if a previous step failed
+        with:
+          name: smt-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}-${{matrix.z3}}-${{matrix.cvc5}}
+          path: |
+            **/build/test-results/*/*.xml
+            key.core/build/reports/runallproofs/*
+            **/build/reports/
+            !**/jacocoTestReport.xml
+
