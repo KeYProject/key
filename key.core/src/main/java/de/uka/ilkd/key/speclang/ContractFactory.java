@@ -30,9 +30,10 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
-import static de.uka.ilkd.key.logic.label.OriginTermLabel.LOGGER;
 import static de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 
 /**
@@ -42,6 +43,7 @@ import static de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
  *
  */
 public class ContractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContractFactory.class);
 
     /**
      * The base name for symbolic execution contracts.
@@ -55,6 +57,7 @@ public class ContractFactory {
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
+
     private final Services services;
     private final TermBuilder tb;
 
@@ -256,13 +259,12 @@ public class ContractFactory {
                 shouldWarnInfFlowMissing = false;
                 LOGGER.warn("An implementation of InformationFlowContractSupplier is missing. " +
                     "You can ignore this warning if you do not want to use information flow POs. " +
-                    "Such an implementation is defined in key.core.infflow and usually delivered with key.ui."
+                    "Such an implementation is defined in key.core.infflow and usually delivered with `key.ui`. "
                     +
-                    "On test execution in key.core etc. it is not present at all. " +
+                    "On test execution in `key.core` etc. it is not present at all. " +
                     "This warning appear only once when an information flow contract is discovered");
             }
             return null;
-            // throw new IllegalStateException("No InformationFlowContractSupplier found");
         }
 
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
