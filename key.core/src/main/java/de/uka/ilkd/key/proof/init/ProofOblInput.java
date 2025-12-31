@@ -42,7 +42,8 @@ public interface ProofOblInput {
     KeYJavaType getContainerType();
 
 
-    /// A way to do some stuff before this obligation get stored by [de.uka.ilkd.key.proof.io.ProofSaver].
+    /// A way to do some stuff before this obligation get stored by
+    /// [de.uka.ilkd.key.proof.io.ProofSaver].
     default void prepareSave(StrategyProperties strategyProperties, Proof proof) {
 
     }

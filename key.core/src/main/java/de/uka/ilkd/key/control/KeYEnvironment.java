@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
-public class KeYEnvironment<U extends UserInterfaceControl> implements AutoCloseable{
+public class KeYEnvironment<U extends UserInterfaceControl> implements AutoCloseable {
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */

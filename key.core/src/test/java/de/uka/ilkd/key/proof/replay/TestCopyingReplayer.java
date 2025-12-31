@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -33,11 +32,11 @@ class TestCopyingReplayer {
         GeneralSettings.noPruningClosed = false;
 
         final var file = testCaseDirectory.resolve(
-                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof");
+            "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof");
         assertTrue(Files.exists(file));
 
         try (var env = KeYEnvironment.load(file);
-             var env2 = KeYEnvironment.load(file)) {
+                var env2 = KeYEnvironment.load(file)) {
             assertNotNull(env.getLoadedProof());
             assertTrue(env.getLoadedProof().closed());
 
@@ -51,7 +50,7 @@ class TestCopyingReplayer {
             proof2.pruneProof(proof2.root());
             proof2.getServices().resetCounters();
             new CopyingProofReplayer(proof1, proof2).copy(proof1.root(),
-                    proof2.getOpenGoal(proof2.root()), new HashSet<>());
+                proof2.getOpenGoal(proof2.root()), new HashSet<>());
 
             assertTrue(proof2.closed());
             Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());

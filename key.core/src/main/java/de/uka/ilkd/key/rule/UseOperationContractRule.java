@@ -750,7 +750,7 @@ public class UseOperationContractRule implements BuiltInRule {
                 final AnonUpdateData tAnon;
                 if (!contract.hasModifiable(heap)) {
                     tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
-                            tb.var(heap));
+                        tb.var(heap));
                 } else {
                     tAnon = createAnonUpdate(heap, inst.pm, modifiables.get(heap), services);
                 }
