@@ -3,26 +3,28 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.helper.FindResources;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestReferenceSearcher {
     private static final Path testCaseDirectory =
-            Objects.requireNonNull(FindResources.getTestCasesDirectory());
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     @Test
     void testFindsReferenceInSameProof() throws Exception {
@@ -34,12 +36,12 @@ class TestReferenceSearcher {
         // This only verifies that an exactly equivalent branch is found.
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(testCaseDirectory.resolve(
-                        "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+            KeYEnvironment.load(testCaseDirectory.resolve(
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-                KeYEnvironment.load(testCaseDirectory.resolve(
-                        "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
+            KeYEnvironment.load(testCaseDirectory.resolve(
+                "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p2 = env2.getLoadedProof();
 
         try {
@@ -117,16 +119,16 @@ class TestReferenceSearcher {
         // Reference searcher should not find proof 1 when considering proof 2.
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(testCaseDirectory.resolve(
-                        "proofCaching/proofWithRule.proof"));
+            KeYEnvironment.load(testCaseDirectory.resolve(
+                "proofCaching/proofWithRule.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-                KeYEnvironment.load(testCaseDirectory.resolve(
-                        "proofCaching/proofWithoutRule.proof"));
+            KeYEnvironment.load(testCaseDirectory.resolve(
+                "proofCaching/proofWithoutRule.proof"));
         Proof p2 = env2.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env3 =
-                KeYEnvironment.load(testCaseDirectory.resolve(
-                        "proofCaching/proofWithRule.proof"));
+            KeYEnvironment.load(testCaseDirectory.resolve(
+                "proofCaching/proofWithRule.proof"));
         Proof p3 = env3.getLoadedProof();
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();
