@@ -397,12 +397,11 @@ public class SpecificationRepository {
         final ImmutableSet<IObserverFunction> newTargets = oldTargets.add(targetMethod);
         contractTargets.put(targetKJT, newTargets);
 
+        // Special treatment
         if (contract instanceof FunctionalOperationContract operationContract) {
             operationContracts.put(new Pair<>(targetKJT, (IProgramMethod) targetMethod),
                     getOperationContracts(targetKJT, (IProgramMethod) targetMethod)
                             .add(operationContract));
-        } else {
-            LOGGER.warn("Unknown contract handed in: {}", contract);
         }
     }
 
