@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.wd.po;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,6 +12,10 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.AbstractPO;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
@@ -256,7 +260,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         // add axioms
         collectClassAxioms(getKJT(), proofConfig);
 
-        generateWdTaclets(proofConfig);
+        generateDynamicTaclets(proofConfig);
     }
 
     private Services postInit() {

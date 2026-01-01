@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -130,4 +132,10 @@ public interface Profile {
     TermLabelManager getTermLabelManager();
 
     boolean isSpecificationInvolvedInRuleApp(RuleApp app);
+
+    /// Create an instance of a specification repository suitable for the given profile.
+    /// For example WD requires a special instance.
+    default SpecificationRepository createSpecificationRepository(Services services) {
+        return new SpecificationRepository(services);
+    }
 }

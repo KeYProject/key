@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
+import de.uka.ilkd.key.wd.po.WellDefinednessPO.Variables;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 

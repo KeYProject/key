@@ -322,7 +322,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         assignPOTerms(validity);
 
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
-        generateWdTaclets(proofConfig);
+        generateDynamicTaclets(proofConfig);
     }
 
     /**
