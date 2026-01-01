@@ -46,9 +46,8 @@ import org.jspecify.annotations.NonNull;
  * </ol>
  * </p>
  *
- * @see BlockContractInternalBuiltInRuleApp
- *
  * @author wacker, lanzinger
+ * @see BlockContractInternalBuiltInRuleApp
  */
 public class BlockContractInternalRule extends AbstractBlockContractRule {
 
@@ -194,7 +193,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp<BlockContractInternalRule> createApp(
+    public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
             final PosInOccurrence occurrence, TermServices services) {
         return new BlockContractInternalBuiltInRuleApp<>(this, occurrence);
     }

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -97,6 +98,12 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
     private InfFlowBlockContractInternalRule() {
         super();
+    }
+
+    @Override
+    public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
+            PosInOccurrence occurrence, TermServices services) {
+        return new InfFlowBlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 
     /**
@@ -584,9 +591,6 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             super(rule, occurrence, ifInstantiations, statement, contract, heaps);
         }
 
-        /**
-         * @see #getInformationFlowProofObligationVars()
-         */
         protected IFProofObligationVars infFlowVars;
 
         /**
