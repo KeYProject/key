@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.wd.DependencyContractImpl;
+import de.uka.ilkd.key.speclang.DependencyContractImpl;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;

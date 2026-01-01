@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.macros.WellDefinednessMacro;
+import de.uka.ilkd.key.wd.macro.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -115,7 +115,7 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
         // however only completeness is lost, soundness is guaranteed
         final BlockWellDefinedness bwd =
             new BlockWellDefinedness(contract, variables, localIns, services);
-        services.getSpecificationRepository().addWdStatement(bwd);
+        ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(bwd);
         final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
         final JTerm anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
         final SequentFormula wdBlock = bwd.generateSequent(

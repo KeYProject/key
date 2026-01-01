@@ -1,8 +1,11 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof.init;
+package de.uka.ilkd.key.wd.po;
 
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
@@ -26,7 +29,7 @@ public class WellDefinednessPOLoader implements ProofObligationLoader {
      */
     @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
-            Configuration properties) {
+                                                     Configuration properties) {
         String contractName = properties.getString("wd check");
         final Contract contract =
             initConfig.getServices().getSpecificationRepository().getContractByName(contractName);

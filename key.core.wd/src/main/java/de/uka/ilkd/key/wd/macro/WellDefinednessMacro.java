@@ -1,17 +1,18 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.macros;
+package de.uka.ilkd.key.wd.macro;
 
+import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.WellDefinednessPO;
+import de.uka.ilkd.key.wd.po.*;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.wd.WellDefinednessCheck;
+import de.uka.ilkd.key.wd.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
