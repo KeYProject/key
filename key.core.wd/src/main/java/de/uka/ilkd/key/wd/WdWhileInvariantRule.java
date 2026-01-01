@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.wd;
 
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.wd.macro.WellDefinednessMacro;
 
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
@@ -50,7 +50,7 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
             } else {
                 self = null;
             }
-            services.getSpecificationRepository().addWdStatement(lwd);
+            ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(lwd);
             LocationVariable heap = heapContext.getFirst();
             final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
                 inst.u(), localAnonUpdate, services);

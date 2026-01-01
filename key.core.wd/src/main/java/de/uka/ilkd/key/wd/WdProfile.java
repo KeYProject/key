@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.wd;
 
+import java.util.Objects;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -19,12 +23,17 @@ public class WdProfile extends JavaProfile {
     public static final WdProfile INSTANCE = new WdProfile();
 
     @Override
+    public SpecificationRepository createSpecificationRepository(Services services) {
+        return new SpecificationRepositoryWD(services);
+    }
+
+    @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         var javaRules = super.initBuiltInRules();
         return javaRules.map(it -> {
-            if (it == BlockContractInternalRule.INSTANCE) {
+            if (Objects.equals(it, BlockContractInternalRule.INSTANCE)) {
                 return WdBlockContractInternalRule.INSTANCE;
-            } else if (it == WhileInvariantRule.INSTANCE) {
+            } else if (Objects.equals(WhileInvariantRule.INSTANCE, it)) {
                 return WdWhileInvariantRule.INSTANCE;
             } else
                 return it;
