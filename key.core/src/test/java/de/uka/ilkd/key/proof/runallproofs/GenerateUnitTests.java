@@ -32,10 +32,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GenerateUnitTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTests.class);
-    /**
-     * Output folder. Set on command line.
-     */
-    private static Path outputFolder;
 
     public static void main(String[] args) throws IOException {
         var collections = List.of(ProofCollections.automaticJavaDL());
@@ -43,7 +39,7 @@ public class GenerateUnitTests {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
         }
-        outputFolder = Paths.get(args[0]);
+        var outputFolder = Paths.get(args[0]);
         run(outputFolder, collections);
     }
 
@@ -51,12 +47,12 @@ public class GenerateUnitTests {
             throws IOException {
         LOGGER.info("Output folder {}", outputFolder);
 
-        GenerateUnitTests.outputFolder = outputFolder.toAbsolutePath();
+        outputFolder = outputFolder.toAbsolutePath();
         Files.createDirectories(outputFolder);
 
         for (var col : collections) {
             for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
-                createUnitClass(unit);
+                createUnitClass(outputFolder, unit);
             }
         }
     }
@@ -98,7 +94,7 @@ public class GenerateUnitTests {
      * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(RunAllProofsTestUnit unit)
+    private static void createUnitClass(Path outputFolder, RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();

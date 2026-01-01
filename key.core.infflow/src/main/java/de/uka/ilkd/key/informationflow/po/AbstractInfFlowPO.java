@@ -66,7 +66,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
     public boolean printProofObligation(PrintWriter ps, Proof proof) throws IOException {
         if (proof instanceof InfFlowProof ifProof) {
             if (!(this instanceof InfFlowCompositePO) && ifProof.getIFSymbols().isFreshContract()) {
-                return printProofObligation(ps, proof);
+                return super.printProofObligation(ps, proof);
             }
         }
         LoggerFactory.getLogger(AbstractInfFlowPO.class)
