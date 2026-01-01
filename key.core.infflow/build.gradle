@@ -1,3 +1,5 @@
+
+
 dependencies {
     api(project(":key.core"))
     testImplementation(project(":key.core").sourceSets.test.output)
@@ -10,4 +12,14 @@ tasks.register('testRunAllInfProofs', Test) {
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
     }
+}
+
+
+def rapDir = layout.buildDirectory.dir("generated-src/rap/").getOrNull()
+sourceSets.test.java.srcDirs(rapDir)
+
+tasks.register('generateRAPUnitTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass.set("de.uka.ilkd.key.informationflow.GenerateUnitTests")
+    args(rapDir)
 }

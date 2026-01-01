@@ -46,9 +46,8 @@ import org.jspecify.annotations.NonNull;
  * </ol>
  * </p>
  *
- * @see BlockContractInternalBuiltInRuleApp
- *
  * @author wacker, lanzinger
+ * @see BlockContractInternalBuiltInRuleApp
  */
 public class BlockContractInternalRule extends AbstractBlockContractRule {
 
@@ -77,94 +76,94 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param contract the contract being applied.
-     * @param self the self term.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
+     * @param contract                    the contract being applied.
+     * @param self                        the self term.
+     * @param heaps                       the heaps.
+     * @param localInVariables            all free program variables in the block.
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @param services services.
+     * @param services                    services.
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final BlockContract contract, final JTerm self,
-            final List<LocationVariable> heaps,
-            final ImmutableSet<LocationVariable> localInVariables,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-            final Services services) {
+                                               final List<LocationVariable> heaps,
+                                               final ImmutableSet<LocationVariable> localInVariables,
+                                               final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+                                               final Services services) {
         final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
         final JTerm wellFormedHeapsCondition =
-            conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final JTerm reachableInCondition =
-            conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+                conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final JTerm selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
-            contract.getMethod(), contract.getKJT(), self, services);
-        return new JTerm[] { precondition, wellFormedHeapsCondition, reachableInCondition,
-            selfConditions };
+                contract.getMethod(), contract.getKJT(), self, services);
+        return new JTerm[]{precondition, wellFormedHeapsCondition, reachableInCondition,
+                selfConditions};
     }
 
     /**
      *
-     * @param localOutVariables all free program variables modified by the block.
-     * @param anonymisationHeaps the anonymization heaps.
+     * @param localOutVariables           all free program variables modified by the block.
+     * @param anonymisationHeaps          the anonymization heaps.
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
     private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+                                             final Map<LocationVariable, Function> anonymisationHeaps,
+                                             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final JTerm postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final JTerm wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
         final JTerm reachableOutCondition =
-            conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
+                conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final JTerm atMostOneFlagSetCondition =
-            conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-        return new JTerm[] { postcondition, wellFormedAnonymisationHeapsCondition,
-            reachableOutCondition, atMostOneFlagSetCondition };
+                conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
+        return new JTerm[]{postcondition, wellFormedAnonymisationHeapsCondition,
+                reachableOutCondition, atMostOneFlagSetCondition};
     }
 
     /**
      *
-     * @param contextUpdate the context update.
-     * @param heaps the heaps.
+     * @param contextUpdate      the context update.
+     * @param heaps              the heaps.
      * @param anonymisationHeaps the anonymization heaps.
-     * @param variables the variables.
-     * @param modifiableClauses the modified clauses.
-     * @param services services.
+     * @param variables          the variables.
+     * @param modifiableClauses  the modified clauses.
+     * @param services           services.
      * @return the updates.
      */
     private static JTerm[] createUpdates(final JTerm contextUpdate,
-            final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final BlockContract.Variables variables,
-            final Map<LocationVariable, JTerm> modifiableClauses, final Services services) {
+                                         final List<LocationVariable> heaps,
+                                         final Map<LocationVariable, Function> anonymisationHeaps,
+                                         final BlockContract.Variables variables,
+                                         final Map<LocationVariable, JTerm> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final JTerm anonymisationUpdate =
-            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
-        return new JTerm[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
+                updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
+        return new JTerm[]{contextUpdate, remembranceUpdate, anonymisationUpdate};
     }
 
     /**
      *
-     * @param goal the current goal.
-     * @param contract the contract being applied.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
+     * @param goal               the current goal.
+     * @param contract           the contract being applied.
+     * @param heaps              the heaps.
+     * @param localInVariables   all free program variables in the block.
      * @param anonymisationHeaps the anonymization heaps.
-     * @param contextUpdate the context update.
-     * @param remembranceUpdate the remembrance update.
-     * @param localOutVariables all free program variables modified by the block.
-     * @param configurator a configurator.
-     * @param services services.
+     * @param contextUpdate      the context update.
+     * @param remembranceUpdate  the remembrance update.
+     * @param localOutVariables  all free program variables modified by the block.
+     * @param configurator       a configurator.
+     * @param services           services.
      * @return a list containing the new goals.
      */
     protected ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
-            final List<LocationVariable> heaps,
-            final ImmutableSet<LocationVariable> localInVariables,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final JTerm contextUpdate,
-            final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
-            final GoalsConfigurator configurator, final Services services) {
+                                                 final List<LocationVariable> heaps,
+                                                 final ImmutableSet<LocationVariable> localInVariables,
+                                                 final Map<LocationVariable, Function> anonymisationHeaps,
+                                                 final JTerm contextUpdate,
+                                                 final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
+                                                 final GoalsConfigurator configurator, final Services services) {
         return goal.split(3);
     }
 
@@ -194,8 +193,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp<BlockContractInternalRule> createApp(
-            final PosInOccurrence occurrence, TermServices services) {
+    public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule>
+    createApp(final PosInOccurrence occurrence, TermServices services) {
         return new BlockContractInternalBuiltInRuleApp<>(this, occurrence);
     }
 
@@ -206,7 +205,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         var application = (BlockContractInternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
-            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
+                instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
@@ -215,55 +214,55 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         final var services = goal.getOverlayServices();
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<LocationVariable> localInVariables =
-            MiscTools.getLocalIns(instantiation.statement(), services);
+                MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
-            MiscTools.getLocalOuts(instantiation.statement(), services);
+                MiscTools.getLocalOuts(instantiation.statement(), services);
         final Map<LocationVariable, Function> anonymisationHeaps =
-            createAndRegisterAnonymisationVariables(heaps, contract, services);
+                createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
-                    .createAndRegister(instantiation.self(), true);
+                new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
+                        .createAndRegister(instantiation.self(), true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-            new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
-                services);
+                new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
+                        services);
         final JTerm[] preconditions = createPreconditions(contract, instantiation.self(), heaps,
-            localInVariables, conditionsAndClausesBuilder, services);
+                localInVariables, conditionsAndClausesBuilder, services);
         final JTerm freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Map<LocationVariable, JTerm> modifiableClauses =
-            conditionsAndClausesBuilder.buildModifiableClauses();
+                conditionsAndClausesBuilder.buildModifiableClauses();
         final Map<LocationVariable, JTerm> freeModifiableClauses =
-            conditionsAndClausesBuilder.buildFreeModifiableClauses();
+                conditionsAndClausesBuilder.buildFreeModifiableClauses();
         final JTerm frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(
-                modifiableClauses, freeModifiableClauses);
+                conditionsAndClausesBuilder.buildFrameCondition(
+                        modifiableClauses, freeModifiableClauses);
         final JTerm[] assumptions =
-            createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
+                createAssumptions(localOutVariables, anonymisationHeaps, conditionsAndClausesBuilder);
         final JTerm freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final JTerm[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
-            variables, modifiableClauses, services);
+                variables, modifiableClauses, services);
 
         final GoalsConfigurator configurator =
-            new GoalsConfigurator(application, new TermLabelState(), instantiation,
-                contract.getLabels(), variables, application.posInOccurrence(), services, this);
+                new GoalsConfigurator(application, new TermLabelState(), instantiation,
+                        contract.getLabels(), variables, application.posInOccurrence(), services, this);
         final ImmutableList<Goal> result = splitIntoGoals(goal, contract, heaps, localInVariables,
-            anonymisationHeaps, updates[0], updates[1], localOutVariables, configurator, services);
+                anonymisationHeaps, updates[0], updates[1], localOutVariables, configurator, services);
 
         configurator.setUpPreconditionGoal(result.tail().head(), contextUpdate, preconditions);
         configurator.setUpUsageGoal(result.head(), updates,
-            ArrayUtil.add(assumptions, freePostcondition));
+                ArrayUtil.add(assumptions, freePostcondition));
 
         final boolean isInfFlow = false;// InfFlowCheckInfo.isInfFlow(goal);
         setUpValidityGoal(result, contract, application, instantiation, heaps,
-            anonymisationHeaps, localInVariables, localOutVariables, variables,
-            ArrayUtil.add(preconditions, freePrecondition), assumptions, frameCondition, updates,
-            configurator, conditionsAndClausesBuilder, services);
+                anonymisationHeaps, localInVariables, localOutVariables, variables,
+                ArrayUtil.add(preconditions, freePrecondition), assumptions, frameCondition, updates,
+                configurator, conditionsAndClausesBuilder, services);
         return result;
     }
 
     @Override
     public boolean isApplicable(Goal goal,
-            PosInOccurrence occurrence) {
+                                PosInOccurrence occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -272,12 +271,12 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             return false;
         }
         final Instantiation instantiation =
-            instantiate((JTerm) occurrence.subTerm(), goal);
+                instantiate((JTerm) occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }
         final ImmutableSet<BlockContract> contracts =
-            getApplicableContracts(instantiation, goal, goal.proof().getServices());
+                getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
         // If we are using internal rules, we can apply the respective loop contract directly,
         // without first applying this block contract.
@@ -287,39 +286,39 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     /**
      * Sets up the validity goal as the first goal in the list.
      *
-     * @param result the new goals.
-     * @param contract the block contract being applied.
-     * @param application the rule application.
-     * @param instantiation the instantiation.
-     * @param heaps the heaps.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param localInVariables all free program variables in the block.
-     * @param localOutVariables all free program variables modified by the block.
-     * @param variables the variables.
-     * @param preconditions the preconditions.
-     * @param assumptions the postconditions.
-     * @param frameCondition the framing condition.
-     * @param updates the updates.
-     * @param configurator a Configurator.
+     * @param result                      the new goals.
+     * @param contract                    the block contract being applied.
+     * @param application                 the rule application.
+     * @param instantiation               the instantiation.
+     * @param heaps                       the heaps.
+     * @param anonymisationHeaps          the anonymization heaps.
+     * @param localInVariables            all free program variables in the block.
+     * @param localOutVariables           all free program variables modified by the block.
+     * @param variables                   the variables.
+     * @param preconditions               the preconditions.
+     * @param assumptions                 the postconditions.
+     * @param frameCondition              the framing condition.
+     * @param updates                     the updates.
+     * @param configurator                a Configurator.
      * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
-     * @param services services.
+     * @param services                    services.
      */
     protected void setUpValidityGoal(final ImmutableList<Goal> result,
-            final BlockContract contract, final BlockContractInternalBuiltInRuleApp<?> application,
-            final Instantiation instantiation, final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final ImmutableSet<LocationVariable> localInVariables,
-            final ImmutableSet<LocationVariable> localOutVariables,
-            final BlockContract.Variables variables, final JTerm[] preconditions,
-            final JTerm[] assumptions, final JTerm frameCondition, final JTerm[] updates,
-            final GoalsConfigurator configurator,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-            final Services services) {
+                                     final BlockContract contract, final BlockContractInternalBuiltInRuleApp<?> application,
+                                     final Instantiation instantiation, final List<LocationVariable> heaps,
+                                     final Map<LocationVariable, Function> anonymisationHeaps,
+                                     final ImmutableSet<LocationVariable> localInVariables,
+                                     final ImmutableSet<LocationVariable> localOutVariables,
+                                     final BlockContract.Variables variables, final JTerm[] preconditions,
+                                     final JTerm[] assumptions, final JTerm frameCondition, final JTerm[] updates,
+                                     final GoalsConfigurator configurator,
+                                     final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+                                     final Services services) {
         Goal validityGoal = result.tail().tail().head();
         final ProgramVariable exceptionParameter =
-            createLocalVariable("e", variables.exception.getKeYJavaType(), services);
-        configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
-            preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
-            conditionsAndClausesBuilder.terms);
+                createLocalVariable("e", variables.exception.getKeYJavaType(), services);
+        configurator.setUpValidityGoal(validityGoal, new JTerm[]{updates[0], updates[1]},
+                preconditions, new JTerm[]{assumptions[0], frameCondition}, exceptionParameter,
+                conditionsAndClausesBuilder.terms);
     }
 }
