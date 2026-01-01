@@ -46,7 +46,7 @@ jobs:
         run: ./gradlew --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: success() || failure()
         with:
           name: unit-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}
@@ -86,7 +86,7 @@ jobs:
         run: ./gradlew --continue ${{ matrix.test }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: success() || failure()        # run this step even if a previous step failed
         with:
           name: integration-test-results-${{matrix.test}}-${{ matrix.os }}-${{ matrix.java }}

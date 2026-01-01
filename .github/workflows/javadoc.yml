@@ -27,7 +27,7 @@ jobs:
         run: tar cvfj javadoc.tar.bz2 build/docs/javadoc
 
       - name: Upload Javadoc
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: javadoc
           path: "javadoc.tar.bz2"
