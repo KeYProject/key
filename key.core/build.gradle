@@ -1,5 +1,5 @@
 plugins {
-    id 'org.javacc.javacc' version '4.0.1'
+    id 'org.javacc.javacc' version '4.0.3'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
