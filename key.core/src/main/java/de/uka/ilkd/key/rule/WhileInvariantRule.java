@@ -382,9 +382,9 @@ public class WhileInvariantRule implements BuiltInRule {
         }
 
         protected void prepareGoals(ImmutableList<Goal> result) {
-            Goal initGoal = result.get(0);
+            Goal initGoal = result.get(2);
             Goal preserveGoal = result.get(1);
-            Goal useGoal = result.get(2);
+            Goal useGoal = result.get(0);
 
             prepareInvInitiallyValidBranch(initGoal);
             prepareBodyPreservesBranch(preserveGoal);
