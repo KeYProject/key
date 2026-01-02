@@ -115,10 +115,10 @@ class EndToEndTests {
     void sliceJavaProof() throws Exception {
         sliceProof(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-                3697, 1539, true, false).dispose();
+                3238, 1336, true, false).dispose();
         sliceProofOffline(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-                3697, 1539, true, false).dispose();
+                3238, 1336, true, false).dispose();
     }
 
     /**
