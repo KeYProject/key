@@ -26,6 +26,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import universe.UniverseChecker;
+
 /**
  * This facade checks whether the Java program to be verified is compilable using <code>javac</code>
  * via
@@ -101,7 +103,12 @@ public class JavaCompilerCheckFacade {
                         .collect(Collectors.joining(":")));
         }
 
+        boolean universe = false;
+
         if (processors != null && !processors.isEmpty()) {
+            // there is no guarantee that remove is supported else
+            processors = new LinkedList<>(processors); 
+            universe = processors.remove("universe.UniverseChecker");
             options.add("-processor");
             options.add(processors.stream().collect(Collectors.joining(",")));
         }
@@ -124,6 +131,10 @@ public class JavaCompilerCheckFacade {
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
             options, classes, compilationUnits);
+
+        if (universe) {
+            task.setProcessors(Collections.singletonList(new UniverseChecker()));
+        }
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
