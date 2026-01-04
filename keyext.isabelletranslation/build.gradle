@@ -14,8 +14,4 @@ dependencies {
  */
 configurations.configureEach {
     exclude group: 'org.slf4j', module: 'slf4j-simple'
-
-    // interferes with the checker framework used by the universe checker
-    // but is not used by the dependency
-    exclude group: 'org.checkerframework', module: 'checker-qual:3.42.0'
 }
