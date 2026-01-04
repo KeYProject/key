@@ -50,7 +50,13 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class InfFlowWhileInvariantRule extends WhileInvariantRule {
+    private static final Name NAME = new Name("InfFlow Loop Invariant");
     public static InfFlowWhileInvariantRule INSTANCE = new InfFlowWhileInvariantRule();
+
+    @Override
+    public Name name() {
+        return NAME;
+    }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, final RuleApp ruleApp) throws RuleAbortException {

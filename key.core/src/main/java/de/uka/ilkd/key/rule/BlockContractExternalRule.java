@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
@@ -57,7 +58,7 @@ import org.jspecify.annotations.NullMarked;
  * @author lanzinger
  */
 @NullMarked
-public final class BlockContractExternalRule extends AbstractBlockContractRule {
+public final class BlockContractExternalRule extends AbstractBlockContractRule implements ComplexJustificationable {
 
     /**
      * The only instance of this class.
