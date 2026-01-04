@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -45,7 +46,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
-public class UseOperationContractRule implements BuiltInRule {
+public class UseOperationContractRule implements BuiltInRule, ComplexJustificationable {
     /**
      * Hint to refactor the final pre term.
      */

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -26,7 +27,7 @@ import org.jspecify.annotations.NullMarked;
  * @version 1 (8/3/25)
  */
 @NullMarked
-public class InfFlowUseOperationContractRule extends UseOperationContractRule {
+public class InfFlowUseOperationContractRule extends UseOperationContractRule implements ComplexJustificationable {
     public static InfFlowUseOperationContractRule INSTANCE = new InfFlowUseOperationContractRule();
 
     protected InfFlowUseOperationContractRule() {
@@ -47,8 +48,8 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule {
         protected JTerm getFinalPreTerm() {
             // termination has already been shown in the functional proof,
             // thus we do not need to show it again in information flow proofs.
-            return tb.applySequential(new JTerm[] { inst.u(), atPreUpdates },
-                tb.and(new JTerm[] { pre, reachableState }));
+            return tb.applySequential(new JTerm[]{inst.u(), atPreUpdates},
+                    tb.and(new JTerm[]{pre, reachableState}));
         }
 
         private void applyInfFlow(Goal goal) {
@@ -61,7 +62,7 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule {
             // prepare information flow analysis
             assert anonUpdateDatas.size() == 1
                     : "information flow extension " + "is at the moment not "
-                        + "compatible with the " + "non-base-heap setting";
+                    + "compatible with the " + "non-base-heap setting";
             AnonUpdateData anonUpdateData = anonUpdateDatas.head();
 
             final JTerm heapAtPre = anonUpdateData.methodHeapAtPre();
@@ -73,15 +74,15 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule {
             final boolean hasExc = exception != null;
 
             final StateVars preVars = new StateVars(hasSelf ? contractSelf : null, contractParams,
-                hasRes ? contractResult : null, hasExc ? exception : null, heapAtPre, mby);
+                    hasRes ? contractResult : null, hasExc ? exception : null, heapAtPre, mby);
             final StateVars postVars = new StateVars(hasSelf ? contractSelf : null, contractParams,
-                hasRes ? contractResult : null, hasExc ? exception : null, heapAtPost, mby);
+                    hasRes ? contractResult : null, hasExc ? exception : null, heapAtPost, mby);
             final ProofObligationVars poVars = new ProofObligationVars(preVars, postVars, services);
 
             // generate information flow contract application predicate
             // and associated taclet
             InfFlowMethodContractTacletBuilder ifContractBuilder =
-                new InfFlowMethodContractTacletBuilder(services);
+                    new InfFlowMethodContractTacletBuilder(services);
             ifContractBuilder.setContract(contract);
             ifContractBuilder.setContextUpdate(atPreUpdates, inst.u());
             ifContractBuilder.setProofObligationVars(poVars);
@@ -92,7 +93,7 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule {
             // add term and taclet to post goal
             goal.addFormula(new SequentFormula(contractApplPredTerm), true, false);
             goal.addTaclet(informationFlowContractApp, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                true);
+                    true);
 
             // information flow proofs might get easier if we add the (proved)
             // method contract precondition as an assumption to the post goal

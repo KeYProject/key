@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
@@ -58,7 +59,7 @@ import org.jspecify.annotations.NullMarked;
  * @author lanzinger
  */
 @NullMarked
-public final class LoopContractExternalRule extends AbstractLoopContractRule {
+public final class LoopContractExternalRule extends AbstractLoopContractRule implements ComplexJustificationable {
 
     /**
      * The only instance of this class.
