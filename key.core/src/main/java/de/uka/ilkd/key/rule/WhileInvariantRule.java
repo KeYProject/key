@@ -124,7 +124,7 @@ public class WhileInvariantRule implements BuiltInRule {
 
     @Override
     public String toString() {
-        return NAME.toString();
+        return name().toString();
     }
 
 

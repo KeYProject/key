@@ -5,6 +5,7 @@ package de.uka.ilkd.key.informationflow;
 
 import de.uka.ilkd.key.InfFlowUseOperationContractRule;
 import de.uka.ilkd.key.informationflow.rule.InfFlowBlockContractInternalRule;
+import de.uka.ilkd.key.informationflow.rule.InfFlowWhileInvariantRule;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.*;
 
@@ -26,6 +27,10 @@ public class JavaInfFlowProfile extends JavaProfile {
             if (it instanceof UseOperationContractRule) {
                 return InfFlowUseOperationContractRule.INSTANCE;
             }
+            if (it instanceof WhileInvariantRule) {
+                return InfFlowWhileInvariantRule.INSTANCE;
+            }
+
             return it;
         })
                 .filter(it -> it != BlockContractExternalRule.INSTANCE)

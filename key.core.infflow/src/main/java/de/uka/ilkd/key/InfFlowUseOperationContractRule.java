@@ -10,6 +10,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -26,7 +27,8 @@ import org.jspecify.annotations.NullMarked;
  * @version 1 (8/3/25)
  */
 @NullMarked
-public class InfFlowUseOperationContractRule extends UseOperationContractRule {
+public class InfFlowUseOperationContractRule extends UseOperationContractRule
+        implements ComplexJustificationable {
     public static InfFlowUseOperationContractRule INSTANCE = new InfFlowUseOperationContractRule();
 
     protected InfFlowUseOperationContractRule() {
