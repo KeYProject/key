@@ -31,7 +31,7 @@ public class WDTacletGenerator implements TacletPOGenerator {
     @Override
     public void generate(AbstractPO abstractPO, InitConfig proofConfig,
             SpecificationRepository specRepos) {
-        if (!WellDefinednessCheck.isOn()) {
+        if (!WellDefinednessCheck.isOn(proofConfig.getProfile())) {
             return;
         }
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
