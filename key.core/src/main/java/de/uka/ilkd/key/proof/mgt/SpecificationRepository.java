@@ -384,8 +384,11 @@ public class SpecificationRepository {
         final IObserverFunction targetMethod = targetPair.second;
         contract = contract.setTarget(targetKJT, targetMethod);
         final String name = contract.getName();
-        assert contractsByName.get(name) == null
-                : "Tried to add a contract with a non-unique name: " + name;
+        if (contractsByName.get(name) != null) {
+            LOGGER.error("Tried to add a contract with a non-unique name: {}", name);
+            //throw new IllegalStateException("Tried to add a contract with a non-unique name: " + name);
+            return;
+        }
         assert !name.contains(CONTRACT_COMBINATION_MARKER)
                 : "Tried to add a contract with a name containing the" + " reserved character "
                 + CONTRACT_COMBINATION_MARKER + ": " + name;

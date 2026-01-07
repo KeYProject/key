@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
+import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.SequentFormula;
@@ -20,11 +21,18 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class WdWhileInvariantRule extends WhileInvariantRule {
+    private static final Name NAME = new Name("WdWhileInvariantRule");
+
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         return new WdWhileInvariantRuleApplier(goal, (LoopInvariantBuiltInRuleApp<?>) ruleApp)
                 .apply();
+    }
+
+    @Override
+    public Name name() {
+        return NAME;
     }
 
     protected static class WdWhileInvariantRuleApplier extends WhileInvariantRuleApplier {

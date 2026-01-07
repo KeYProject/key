@@ -1,3 +1,22 @@
 dependencies {
     api(project(":key.core"))
+    testImplementation(project(":key.core").sourceSets.test.output)
+}
+
+tasks.register('testRunAllWdProofs', Test) {
+    description = 'Prove/reload all keyfiles tagged for regression testing'
+    group = "verification"
+    filter {
+        includeTestsMatching "RunAllProofsWd"
+    }
+}
+
+
+def rapDir = layout.buildDirectory.dir("generated-src/rap/").getOrNull()
+sourceSets.test.java.srcDirs(rapDir)
+
+tasks.register('generateRAPUnitTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass.set("de.uka.ilkd.key.wd.GenerateUnitTests")
+    args(rapDir)
 }

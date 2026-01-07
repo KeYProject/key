@@ -1006,7 +1006,7 @@ public class ProofCollections {
     }
 
 
-    private static String loadFromFile(String name) throws IOException {
+    public static String loadFromFile(String name) throws IOException {
         var stream = ProofCollections.class.getResourceAsStream(name);
         Assertions.assertNotNull(stream, "Failed to find " + name);
         return IOUtil.readFrom(stream);

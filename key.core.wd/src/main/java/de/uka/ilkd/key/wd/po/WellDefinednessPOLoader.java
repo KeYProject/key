@@ -9,8 +9,9 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
-
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Loader for proof obligation arises from well definedness.
@@ -20,6 +21,8 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public class WellDefinednessPOLoader implements ProofObligationLoader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WellDefinednessPOLoader.class);
+
     /**
      * Instantiates a new proof obligation with the given settings.
      *
@@ -28,12 +31,18 @@ public class WellDefinednessPOLoader implements ProofObligationLoader {
      * @return The instantiated proof obligation.
      */
     @Override
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
-                                                     Configuration properties) {
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties) {
         String contractName = properties.getString("wd check");
         final Contract contract =
-            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
+                initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {
+            LOGGER.error("Contract {} not found.", contractName);
+            var c = initConfig.getServices().getSpecificationRepository();
+            LOGGER.info("Available contracts: ");
+            for (var contr : c.getAllContracts()) {
+                LOGGER.info("Name:{}, Display: {}", contr.getName(), contr.getDisplayName());
+            }
+
             throw new RuntimeException("Contract not found: " + contractName);
         } else {
             final ProofOblInput po = contract.createProofObl(initConfig);
