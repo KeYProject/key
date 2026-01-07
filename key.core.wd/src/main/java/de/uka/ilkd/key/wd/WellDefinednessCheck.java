@@ -20,6 +20,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.wd.po.WellDefinednessPO;
 import de.uka.ilkd.key.wd.po.WellDefinednessPO.Variables;
@@ -53,6 +54,7 @@ public abstract class WellDefinednessCheck implements Contract {
     public static final String INV_TACLET = "wd_Invariant";
     public static final String OP_TACLET = "wd_Operation";
     public static final String OP_EXC_TACLET = "wd_Exc_Operation";
+
 
     enum Type {
         CLASS_INVARIANT, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT
@@ -945,7 +947,13 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @return true if on and false if off
      */
-    public static boolean isOn() {
+    public static boolean isOn(Profile profile) {
+         return profile instanceof WdProfile;
+    }
+
+    public static boolean isOn(Services services) {
+        return isOn(services.getProfile());
+        /*
         final String setting =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
         if (setting == null) {
@@ -958,7 +966,7 @@ public abstract class WellDefinednessCheck implements Contract {
         } else {
             throw new RuntimeException(
                 "The setting for the wdProofs-option is not valid: " + setting);
-        }
+        }*/
     }
 
     /**

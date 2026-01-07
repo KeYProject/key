@@ -59,7 +59,7 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
             final ImmutableSet<LocationVariable> localOutVariables, final BlockContract bc,
             final AuxiliaryContractBuilders.GoalsConfigurator configurator,
             final Services services, final TermBuilder tb) {
-        if (WellDefinednessCheck.isOn()) {
+        if (WellDefinednessCheck.isOn(services)) {
             final JTerm wdUpdate = services.getTermBuilder().parallel(updates[1], updates[2]);
 
             JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services, tb);

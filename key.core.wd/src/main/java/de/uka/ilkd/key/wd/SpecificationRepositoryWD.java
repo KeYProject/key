@@ -34,10 +34,9 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     }
 
     @Override
-    protected void registerContract(Contract contract,
-                                    Pair<KeYJavaType, IObserverFunction> targetPair) {
+    protected void registerContract(Contract contract, Pair<KeYJavaType, IObserverFunction> targetPair) {
         LOGGER.trace("Contract registered {}", contract);
-        if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) {
+        if (!WellDefinednessCheck.isOn(services) && contract instanceof WellDefinednessCheck) {
             return;
         }
         super.registerContract(contract, targetPair);
@@ -49,7 +48,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
             // Create new well-definedness check
             final MethodWellDefinedness mwd =
                     new MethodWellDefinedness((FunctionalOperationContract) contract, services);
-            registerContract(mwd);
+            registerContract(mwd, targetPair);
         } else if (contract instanceof DependencyContract && contract.getOrigVars().atPres.isEmpty()
                 && Objects.equals(targetMethod.getContainerType(), services.getJavaInfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
@@ -68,7 +67,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
                 oldCwd.addInv(cwd.getInvariant().getInv(oldCwd.getOrigVars().self, services));
                 cwd = oldCwd.combine(cwd, services);
             }
-            registerContract(cwd);
+            registerContract(cwd, targetPair);
         } else if (contract instanceof DependencyContract
                 && contract.getOrigVars().atPres.isEmpty()) {
             // Create or extend a well-definedness check for a model field
@@ -82,14 +81,14 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
                 unregisterContract(oldMwd);
                 mwd = mwd.combine(oldMwd, services);
             }
-            registerContract(mwd);
+            registerContract(mwd, targetPair);
         } else if (contract instanceof WellDefinednessCheck) {
             registerWdCheck((WellDefinednessCheck) contract);
         }
-        contractsByName.put(contract.getName(), contract);
+       /* contractsByName.put(contract.getName(), contract);
         final ImmutableSet<IObserverFunction> oldTargets = getContractTargets(targetKJT);
         final ImmutableSet<IObserverFunction> newTargets = oldTargets.add(targetMethod);
-        contractTargets.put(targetKJT, newTargets);
+        contractTargets.put(targetKJT, newTargets);*/
     }
 
 
@@ -274,13 +273,13 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     @Override
     public ImmutableSet<Contract> getAllContracts() {
         var result = super.getAllContracts();
-        return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
+        return WellDefinednessCheck.isOn(services) ? result : removeWdChecks(result);
     }
 
     @Override
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt, IObserverFunction target) {
         var result = super.getContracts(kjt, target);
-        if (WellDefinednessCheck.isOn()) return result;
+        if (WellDefinednessCheck.isOn(services)) return result;
         else return removeWdChecks(result);
     }
 

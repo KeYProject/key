@@ -65,7 +65,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
             PosInOccurrence posInOcc) {
-        if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn()) {
+        if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn(proof.getServices())) {
             return false;
         }
         final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);
