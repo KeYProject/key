@@ -44,10 +44,10 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(
-            RuleApp app, PosInOccurrence pio,
-            Goal goal,
-            MutableState mState) {
+    public <GOAL extends ProofGoal<@NonNull GOAL>> @NonNull RuleAppCost computeCost(
+            @NonNull RuleApp app, @NonNull PosInOccurrence pio,
+            @NonNull GOAL goal,
+            @NonNull MutableState mState) {
         long begin = System.nanoTime();
         RuleAppCost result = super.computeCost(app, pio, goal, mState);
         long end = System.nanoTime();
@@ -56,8 +56,9 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            RuleAppCostCollector collector) {
+    public void instantiateApp(@NonNull RuleApp app, @NonNull PosInOccurrence pio,
+            @NonNull Goal goal,
+            @NonNull RuleAppCostCollector collector) {
         long begin = System.nanoTime();
         super.instantiateApp(app, pio, goal, collector);
         long end = System.nanoTime();
