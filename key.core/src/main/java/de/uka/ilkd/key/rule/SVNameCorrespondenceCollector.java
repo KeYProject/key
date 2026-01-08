@@ -44,7 +44,8 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
     /**
      * is called by the execPostOrder-method of a term
      *
-     * @param t the Term if the toplevel operator of this term is a substitution of schema
+     * @param t
+     *        the Term if the toplevel operator of this term is a substitution of schema
      *        variables, then this pair is added to the map "nameCorrespondences"
      */
     public void visit(Term t) {
@@ -80,7 +81,8 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
     /**
      * collects all correspondences in a semisequent
      *
-     * @param semiseq the Semisequent to visit
+     * @param semiseq
+     *        the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
         for (SequentFormula cf : semiseq) {
@@ -91,7 +93,8 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
     /**
      * collects all correspondences in a sequent
      *
-     * @param seq the Sequent to visit
+     * @param seq
+     *        the Sequent to visit
      */
     public void visit(Sequent seq) {
         visit(seq.antecedent());
@@ -101,8 +104,10 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
     /**
      * collects all correspondences in a taclet
      *
-     * @param taclet the Taclet where the correspondences have to be collected
-     * @param visitAddrules a boolean that contols if the addrule sections are to be ignored (iff
+     * @param taclet
+     *        the Taclet where the correspondences have to be collected
+     * @param visitAddrules
+     *        a boolean that contols if the addrule sections are to be ignored (iff
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {

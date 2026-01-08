@@ -88,13 +88,19 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * if it is shorter than c1. Moreover, equal parts of c1 and c2 could be omitted, since the
      * condition shall only distinguish between the states.
      *
-     * @param state1 First state to evaluate.
-     * @param state2 Second state to evaluate.
-     * @param ifTerm The term t1 (in the context of state1).
-     * @param elseTerm The term t2 (in the context of state2).
-     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
+     * @param state1
+     *        First state to evaluate.
+     * @param state2
+     *        Second state to evaluate.
+     * @param ifTerm
+     *        The term t1 (in the context of state1).
+     * @param elseTerm
+     *        The term t2 (in the context of state2).
+     * @param distinguishingFormula
+     *        The user-specified distinguishing formula. May be null (for
      *        automatic generation).
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>, where the cI
      *         are the path conditions of stateI.
      */
@@ -135,10 +141,14 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * the discriminating condition, the second and third elements are the respective parts for the
      * if and else branch.
      *
-     * @param v Variable to return the update for.
-     * @param state1 First state to evaluate.
-     * @param state2 Second state to evaluate.
-     * @param services The services object.
+     * @param v
+     *        Variable to return the update for.
+     * @param state1
+     *        First state to evaluate.
+     * @param state2
+     *        Second state to evaluate.
+     * @param services
+     *        The services object.
      * @return Input to construct an elementary update like
      *         <code>{ v := \if (first) \then (second) \else (third) }</code>, where first, second
      *         and third are the respective components of the returned triple. The fourth component
@@ -178,11 +188,16 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * the triple is the discriminating condition, the second and third elements are the respective
      * parts for the if and else branch.
      *
-     * @param state1 First state to evaluate.
-     * @param state2 Second state to evaluate.
-     * @param ifTerm The if term.
-     * @param elseTerm The else term.
-     * @param services The services object.
+     * @param state1
+     *        First state to evaluate.
+     * @param state2
+     *        Second state to evaluate.
+     * @param ifTerm
+     *        The if term.
+     * @param elseTerm
+     *        The else term.
+     * @param services
+     *        The services object.
      * @return Input to construct an elementary update like
      *         <code>{ v := \if (first) \then (second) \else (third) }</code>, where first, second
      *         and third are the respective components of the returned triple. The fourth component
@@ -216,19 +231,18 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // nodes which we want to merge (possibly after a hide right / hide
         // left); this
         // should be allowed (although they are of course indistinguishable).
-        assert distinguishingFormula != null || distinguishingFormula2 != null
-                : String.format(
-                    """
+        assert distinguishingFormula != null || distinguishingFormula2 != null : String.format(
+            """
 
-                            A computed distinguishing formula is trivial ("true"); please verify that everything is OK. Symbolic execution states were:
+                    A computed distinguishing formula is trivial ("true"); please verify that everything is OK. Symbolic execution states were:
 
-                            --- State 1 ---
-                            %s
+                    --- State 1 ---
+                    %s
 
-                            ---State 2---
-                            %s
-                            """,
-                    state1, state2);
+                    ---State 2---
+                    %s
+                    """,
+            state1, state2);
 
         boolean commuteSides = false;
         if (distinguishingFormula == null) {

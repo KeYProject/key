@@ -23,8 +23,10 @@ public final class FindResources {
      * List directory contents for a resource folder. Not recursive. This is basically a brute-force
      * implementation. Works for regular files and also JARs.
      *
-     * @param clazz Any java class that lives in the same place as the resources you want.
-     * @param path Should end with "/", but not start with one.
+     * @param clazz
+     *        Any java class that lives in the same place as the resources you want.
+     * @param path
+     *        Should end with "/", but not start with one.
      * @return Just the name of each member item, not the full paths.
      * @throws URISyntaxException
      * @throws IOException
@@ -138,9 +140,12 @@ public final class FindResources {
      * You can specify whether the folder should exists or not. If the should exists the method
      * could return null.
      *
-     * @param property a key for {@link System#getProperty(String)}
-     * @param exists flag whether the folder should exists
-     * @param candidates a list of candidates, used if <code>propertyName</code> is not set by the
+     * @param property
+     *        a key for {@link System#getProperty(String)}
+     * @param exists
+     *        flag whether the folder should exists
+     * @param candidates
+     *        a list of candidates, used if <code>propertyName</code> is not set by the
      *        user
      */
     public static @Nullable Path findFolder(boolean exists, String property, String... candidates) {

@@ -214,7 +214,8 @@ public class SequentViewSearchBar extends SearchBar {
     /**
      * searches for the given string and displays the search-bar.
      *
-     * @param searchTerm string to search for. If regex is enabled, the string will be escaped
+     * @param searchTerm
+     *        string to search for. If regex is enabled, the string will be escaped
      */
     public void searchFor(String searchTerm) {
         if (regExpCheckBox.isSelected()) {

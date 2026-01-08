@@ -24,9 +24,11 @@ public class SolverTypeCollection implements Iterable<SolverType> {
 
     /**
      *
-     * @param type at least on solver type must be passed.
+     * @param type
+     *        at least on solver type must be passed.
      * @param types
-     * @param minUsableSolvers specifies how many solvers at leas must be usable, so that
+     * @param minUsableSolvers
+     *        specifies how many solvers at leas must be usable, so that
      *        <code>isUsable</code> returns true.
      */
     public SolverTypeCollection(String name, int minUsableSolvers, SolverType type,
@@ -40,9 +42,12 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     /**
      * Instantiates a new solver type collection.
      *
-     * @param name the name of the solver
-     * @param minUsableSolvers the min number of usable solvers
-     * @param types the types to add
+     * @param name
+     *        the name of the solver
+     * @param minUsableSolvers
+     *        the min number of usable solvers
+     * @param types
+     *        the types to add
      */
     public SolverTypeCollection(String name, int minUsableSolvers, Collection<SolverType> types) {
         this.name = name;

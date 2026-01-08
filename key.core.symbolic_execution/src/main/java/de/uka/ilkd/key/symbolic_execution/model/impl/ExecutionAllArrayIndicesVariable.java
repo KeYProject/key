@@ -60,13 +60,19 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
     /**
      * Constructor.
      *
-     * @param parentNode The parent {@link IExecutionNode}.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param parentNode
+     *        The parent {@link IExecutionNode}.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
-     * @param parentValue The parent {@link IExecutionValue} representing the array.
-     * @param arrayProgramVariable The {@link IProgramVariable} of the array.
-     * @param additionalCondition An optional additional condition to consider.
+     * @param modalityPIO
+     *        The {@link PosInOccurrence} of the modality of interest.
+     * @param parentValue
+     *        The parent {@link IExecutionValue} representing the array.
+     * @param arrayProgramVariable
+     *        The {@link IProgramVariable} of the array.
+     * @param additionalCondition
+     *        An optional additional condition to consider.
      */
     public ExecutionAllArrayIndicesVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO, ExecutionValue parentValue,
@@ -97,7 +103,8 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
     /**
      * Computes the value for {@link #getValues()} lazily when the method is called the first time.
      *
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();

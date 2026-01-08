@@ -5,9 +5,9 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -38,7 +38,7 @@ public class ExpressionTranslatorTest {
             return;
         }
         services = TacletForTests.services();
-        Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
+        JavaService r2k = services.getJavaService();
         r2k.parseSpecialClasses();
     }
 

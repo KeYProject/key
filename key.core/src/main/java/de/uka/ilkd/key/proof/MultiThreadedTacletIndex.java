@@ -132,12 +132,18 @@ final class MultiThreadedTacletIndex extends TacletIndex {
          * to {@code upper} excluding against the term at position {@code pos}. Only taclets passing
          * the filter {@code ruleFilter} are considered
          *
-         * @param toMatch the list containing the taclets to be matched
-         * @param lower the index (incl.) where to start
-         * @param upper the index (excl.) where to stop
-         * @param pos the {@link PosInOccurrence} refering to the term to match
-         * @param ruleFilter {@link RuleFilter} constraining the taclets to be matched
-         * @param services the {@link Services}
+         * @param toMatch
+         *        the list containing the taclets to be matched
+         * @param lower
+         *        the index (incl.) where to start
+         * @param upper
+         *        the index (excl.) where to stop
+         * @param pos
+         *        the {@link PosInOccurrence} refering to the term to match
+         * @param ruleFilter
+         *        {@link RuleFilter} constraining the taclets to be matched
+         * @param services
+         *        the {@link Services}
          */
         public TacletSetMatchTask(NoPosTacletApp[] toMatch, int lower, int upper,
                 PosInOccurrence pos, RuleFilter ruleFilter,

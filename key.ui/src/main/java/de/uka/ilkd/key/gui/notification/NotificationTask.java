@@ -33,7 +33,8 @@ public abstract class NotificationTask {
     /**
      * adds an notificatin action this task.
      *
-     * @param action the NotificationAction to be added
+     * @param action
+     *        the NotificationAction to be added
      */
     public void addNotificationAction(NotificationAction action) {
         this.notificationActions.add(action);
@@ -44,8 +45,10 @@ public abstract class NotificationTask {
      * called to execute the notification task, but this method only takes care that we are in the
      * even dispatcher thread
      *
-     * @param event the NotificationEvent triggering this task
-     * @param manager the NotificationManager to which this tasks belongs to
+     * @param event
+     *        the NotificationEvent triggering this task
+     * @param manager
+     *        the NotificationManager to which this tasks belongs to
      */
     public void execute(NotificationEvent event, NotificationManager manager) {
         // if we are in automode execute task only if it is
@@ -68,8 +71,10 @@ public abstract class NotificationTask {
      *
      * called to execute the notification task
      *
-     * @param manager the NotificationManager to which this tasks belongs to
-     * @param event the NotificationEvent triggering this task
+     * @param manager
+     *        the NotificationManager to which this tasks belongs to
+     * @param event
+     *        the NotificationEvent triggering this task
      */
     protected void executeActions(NotificationEvent event, NotificationManager manager) {
         for (final NotificationAction action : getNotificationActions()) {

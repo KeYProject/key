@@ -72,9 +72,11 @@ public class KeyIO {
     /**
      * Given an input string, this function returns a term if parsable.
      *
-     * @param expr a valid stream
+     * @param expr
+     *        a valid stream
      * @return a valid term
-     * @throws BuildingException if an unrecoverable error during construction or parsing happened
+     * @throws BuildingException
+     *         if an unrecoverable error during construction or parsing happened
      */
     public @NonNull JTerm parseExpression(@NonNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
@@ -83,9 +85,11 @@ public class KeyIO {
     /**
      * Given an input stream, this function returns an term if parsable.
      *
-     * @param stream a valid stream
+     * @param stream
+     *        a valid stream
      * @return a valid term
-     * @throws BuildingException if an unrecoverable error during construction or parsing happened
+     * @throws BuildingException
+     *         if an unrecoverable error during construction or parsing happened
      */
     public @NonNull JTerm parseExpression(@NonNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
@@ -107,9 +111,11 @@ public class KeyIO {
     /**
      * Given an input stream, this function returns a sequent if parsable.
      *
-     * @param stream a valid stream
+     * @param stream
+     *        a valid stream
      * @return a valid sequent
-     * @throws BuildingException if an unrecoverable error during construction or parsing happened
+     * @throws BuildingException
+     *         if an unrecoverable error during construction or parsing happened
      */
     public @NonNull Sequent parseSequent(@NonNull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);

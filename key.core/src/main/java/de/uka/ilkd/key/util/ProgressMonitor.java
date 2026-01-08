@@ -21,14 +21,16 @@ public interface ProgressMonitor {
      * Set the progress achieved so far. The parameter <code>progress</code> has to be &gt;=0 and
      * &lt;= to the maximum value previously set with {@link ProgressMonitor#setMaximum}.
      *
-     * @param progress number of steps completed
+     * @param progress
+     *        number of steps completed
      */
     void setProgress(int progress);
 
     /**
      * Set the maximum number of steps for this task.
      *
-     * @param maximum maximum number of steps, &gt;=0.
+     * @param maximum
+     *        maximum number of steps, &gt;=0.
      */
     void setMaximum(int maximum);
 

@@ -128,21 +128,24 @@ public class SMTTermITE extends SMTTerm {
     }
 
     /**
-     * @param condition the condition to set
+     * @param condition
+     *        the condition to set
      */
     public void setCondition(SMTTerm condition) {
         this.condition = condition;
     }
 
     /**
-     * @param trueCase the trueCase to set
+     * @param trueCase
+     *        the trueCase to set
      */
     public void setTrueCase(SMTTerm trueCase) {
         this.trueCase = trueCase;
     }
 
     /**
-     * @param falseCase the falseCase to set
+     * @param falseCase
+     *        the falseCase to set
      */
     public void setFalseCase(SMTTerm falseCase) {
         this.falseCase = falseCase;

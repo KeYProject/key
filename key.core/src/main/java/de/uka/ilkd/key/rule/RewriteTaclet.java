@@ -90,7 +90,8 @@ public class RewriteTaclet extends FindTaclet {
      * the top level operator has to be a simultaneous update. This method checks if the assignment
      * pairs of the update contain free logic variables and gives a veto if positive
      *
-     * @param t the Term to check
+     * @param t
+     *        the Term to check
      * @return false if vetoing
      */
     private boolean veto(JTerm t) {
