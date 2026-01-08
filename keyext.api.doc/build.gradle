@@ -1,0 +1,13 @@
+plugins {
+    id "application"
+}
+
+dependencies {
+    implementation(project(":keyext.api"))
+    implementation("org.freemarker:freemarker:2.3.34")
+    implementation("info.picocli:picocli:4.7.6")
+}
+
+application {
+    mainClass.set("org.key_project.key.api.doc.Main")
+}
