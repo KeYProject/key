@@ -82,7 +82,8 @@ public class OutputStreamProofSaver {
      * Whether the proof steps should be output (usually true).
      */
     protected final boolean saveProofSteps;
-
+    /// Whether steps by the [OneStepSimplifier] should be expanded.
+    protected final boolean expandOneStepSimplifier;
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -97,7 +98,7 @@ public class OutputStreamProofSaver {
             final int begin = header.indexOf('\"', i);
             final int end = header.indexOf('\"', begin + 1);
             final String sourceLocation = header.substring(begin + 1, end);
-            if (sourceLocation.length() > 0) {
+            if (!sourceLocation.isEmpty()) {
                 return new File(sourceLocation);
             }
         }
@@ -112,6 +113,7 @@ public class OutputStreamProofSaver {
         this.proof = proof;
         this.internalVersion = internalVersion;
         this.saveProofSteps = true;
+        this.expandOneStepSimplifier = true;
     }
 
     /**
@@ -121,10 +123,12 @@ public class OutputStreamProofSaver {
      * @param internalVersion currently running KeY version
      * @param saveProofSteps whether to save the performed proof steps
      */
-    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps) {
+    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps,
+            boolean expandOneStepSimplifier) {
         this.proof = proof;
         this.internalVersion = internalVersion;
         this.saveProofSteps = saveProofSteps;
+        this.expandOneStepSimplifier = expandOneStepSimplifier;
     }
 
     /**
@@ -349,7 +353,6 @@ public class OutputStreamProofSaver {
 
     private void printSingleTacletApp(TacletApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
-
         output.append(prefix);
         output.append("(rule \"");
         output.append(appliedRuleApp.rule().name().toString());
@@ -546,7 +549,7 @@ public class OutputStreamProofSaver {
     private void printSingleBuiltInRuleApp(IBuiltInRuleApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(prefix);
-        output.append(" (builtin \"");
+        output.append("(builtin \"");
         output.append(appliedRuleApp.rule().name().toString());
         output.append("\"");
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
@@ -610,8 +613,32 @@ public class OutputStreamProofSaver {
 
         if (appliedRuleApp instanceof TacletApp) {
             printSingleTacletApp((TacletApp) appliedRuleApp, node, prefix, output);
+        } else if (expandOneStepSimplifier
+                && appliedRuleApp instanceof OneStepSimplifierRuleApp ossa) {
+            printExpandedOneStepSimplifierRuleApp(ossa, node, prefix, output);
         } else if (appliedRuleApp instanceof IBuiltInRuleApp) {
             printSingleBuiltInRuleApp((IBuiltInRuleApp) appliedRuleApp, node, prefix, output);
+        }
+    }
+
+    private void printExpandedOneStepSimplifierRuleApp(OneStepSimplifierRuleApp ossa, Node node,
+            String prefix, Appendable output) throws IOException {
+        OneStepSimplifier.Protocol protocol = ossa.getProtocol();
+        for (int i = 0; i < protocol.size(); i++) {
+            var app = protocol.get(i);
+            Node n = new Node(node.proof());
+            if (i == 0) {
+                n.setNameRecorder(node.getNameRecorder());
+            }
+            int seqFNum = node.sequent().formulaNumberInSequent(ossa.posInOccurrence());
+            Sequent seq = node.sequent()
+                    .replaceFormula(seqFNum, app.posInOccurrence().sequentFormula()).sequent();
+            n.setSequent(seq);
+            if (app instanceof TacletApp ta) {
+                printSingleTacletApp(ta, n, prefix, output);
+            } else if (app instanceof IBuiltInRuleApp ba) {
+                printSingleBuiltInRuleApp(ba, n, prefix, output);
+            }
         }
     }
 
@@ -624,7 +651,6 @@ public class OutputStreamProofSaver {
      * @throws IOException an exception thrown when printing fails
      */
     private void collectProof(Node node, String prefix, Appendable output) throws IOException {
-
         printSingleNode(node, prefix, output);
         Iterator<Node> childrenIt;
 

@@ -419,7 +419,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, (JTerm) pio.sequentFormula().formula(), lastProof.getServices());
+        svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
 
         PosInOccurrence applicatinPIO =
             new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
@@ -431,9 +431,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                                // renamings and term labels
         ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst = ifInst.append(new AssumesFormulaInstDirect(pio.sequentFormula()));
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
+        return PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
             lastProof.getServices());
-        return ta;
     }
 
     /**
