@@ -350,9 +350,22 @@ public class OutputStreamProofSaver {
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
      */
-
     private void printSingleTacletApp(TacletApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
+        printSingleTacletApp(appliedRuleApp, node, prefix, output, false);
+    }
+
+    /**
+     * Print applied taclet rule for a single taclet rule application into the passed writer.
+     *
+     * @param appliedRuleApp the rule application to be printed
+     * @param prefix a string which the printed rule is concatenated to
+     * @param output the writer in which the rule is printed
+     * @param isOSSStep whether this node is an expanded OSS rule app step
+     * @throws IOException an exception thrown when printing fails
+     */
+    private void printSingleTacletApp(TacletApp appliedRuleApp, Node node, String prefix,
+            Appendable output, boolean isOSSStep) throws IOException {
         output.append(prefix);
         output.append("(rule \"");
         output.append(appliedRuleApp.rule().name().toString());
@@ -367,6 +380,9 @@ public class OutputStreamProofSaver {
         }
         output.append("");
         userInteraction2Proof(node, output);
+        if (isOSSStep) {
+            output.append(" (ossStep)");
+        }
         notes2Proof(node, output);
         output.append(")\n");
     }
@@ -635,8 +651,10 @@ public class OutputStreamProofSaver {
                     .replaceFormula(seqFNum, app.posInOccurrence().sequentFormula()).sequent();
             n.setSequent(seq);
             if (app instanceof TacletApp ta) {
-                printSingleTacletApp(ta, n, prefix, output);
+                printSingleTacletApp(ta, n, prefix, output, true);
             } else if (app instanceof IBuiltInRuleApp ba) {
+                // This case does not currently happen, but just in case any built-ins get added to
+                // the OSS...
                 printSingleBuiltInRuleApp(ba, n, prefix, output);
             }
         }
