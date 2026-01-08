@@ -19,9 +19,10 @@ import org.key_project.util.collection.ImmutableSLList;
 public class DelegatingRuleAppManager implements RuleApplicationManager<Goal> {
 
     private static String[] ruleSetNames =
-        { "alpha", "concrete", "simplify", "simplify_prog", "simplify_prog_subset",
-            "simplify_expression", "update_elim", "update_apply_on_update", "update_apply",
-            "update_join", "elimQuantifier" };
+        { "alpha", "concrete", "simplify_prog", "simplify_prog_subset",
+            "simplify_expression", "simplify_literals",
+            "update_elim", "update_apply_on_update", "update_apply", "update_join",
+            "elimQuantifier" };
 
     private HashSet<String> ruleSets = new HashSet<>();
 
