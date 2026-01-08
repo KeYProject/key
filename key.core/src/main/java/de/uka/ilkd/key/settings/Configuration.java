@@ -466,6 +466,10 @@ public class Configuration {
         }
 
         public ConfigurationWriter printComment(String comment) {
+            if (comment == null || comment.isBlank()) {
+                return this;
+            }
+
             if (comment.contains("\n")) {
                 out.format("/* %s */\n", comment);
             } else {
@@ -509,7 +513,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printMap(Map<?, ?> value) {
-            out.format("{ ");
+            out.format("{");
             indent += 4;
             newline().printIndent();
             for (Iterator<? extends Map.Entry<?, ?>> iterator =
@@ -525,7 +529,7 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format(" }");
+            out.format("}");
             return this;
         }
 
@@ -536,7 +540,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printSeq(Collection<?> value) {
-            out.format("[ ");
+            out.format("[");
             indent += 4;
             newline();
             printIndent();
@@ -555,7 +559,7 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format(" ]");
+            out.format("]");
             return this;
         }
 
