@@ -6,9 +6,13 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Documentation(category = "Control", value = """
+        Leave the current goal as it is. Technically, this
+        marks the current goal to be 'interactive' that is ignored by script commands or calls to automation.""")
 public class LeaveCommand extends NoArgumentCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaveCommand.class.getName());
 

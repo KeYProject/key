@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptException;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -46,7 +48,8 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
     /**
      * The proof script engine.
      */
-    private final ProofScriptEngine engine;
+    private @MonotonicNonNull ProofScriptEngine engine;
+
     private final JDialog monitor = new JDialog(MainWindow.getInstance(),
         "Running Script ...", ModalityType.MODELESS);
     private final JTextArea logArea = new JTextArea();
@@ -75,14 +78,15 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
         this.mediator = mediator;
         this.script = script;
         this.initiallySelectedGoal = initiallySelectedGoal;
-        engine = new ProofScriptEngine(script, initiallySelectedGoal);
     }
 
     @Override
     protected @Nullable Object doInBackground() throws Exception {
         try {
+            engine = new ProofScriptEngine(mediator.getSelectedProof());
+            engine.setInitiallySelectedGoal(initiallySelectedGoal);
             engine.setCommandMonitor(observer);
-            engine.execute(mediator.getUI(), mediator.getSelectedProof());
+            engine.execute(mediator.getUI(), script);
         } catch (InterruptedException ex) {
             LOGGER.debug("Proof macro has been interrupted:", ex);
         }
@@ -171,7 +175,8 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
 
     private void selectGoalOrNode() {
         final KeYSelectionModel selectionModel = mediator.getSelectionModel();
-        if (!mediator.getSelectedProof().closed()) {
+        final Proof proof = mediator.getSelectedProof();
+        if (proof != null && !proof.closed() && engine != null) {
             try {
                 selectionModel
                         .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());

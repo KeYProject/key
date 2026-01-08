@@ -117,7 +117,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
          */
         @Override
         public StrategySettingsDefinition getSettingsDefinition() {
-            return JavaProfile.DEFAULT.getSettingsDefinition();
+            return JavaProfile.getDefault().getSettingsDefinition();
         }
     }
 }

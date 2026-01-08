@@ -19,13 +19,18 @@ import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.Nullable;
-
+/**
+ * Command to invoke a user-defined macro (like from UI)
+ *
+ * See Parameters for documentation.
+ */
 public class MacroCommand extends AbstractCommand {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
@@ -164,10 +169,22 @@ public class MacroCommand extends AbstractCommand {
                 .replace(" +", " ");
     }
 
+    @Documentation(category = "Fundamental", value = """
+            The MacroCommand invokes one of KeY's macros. The macro must be registered to KeY's services.
+
+            The command takes the name of the macro as first argument, followed by optional
+            parameters to configure the macro.
+
+            The macro is applied to the first open automatic goal in the proof.
+
+            #### Examples:
+            * `macro "prop-split"`
+            * `macro "auto-pilot"`
+            """)
     public static class Parameters {
         @Argument
         @Documentation("Macro name")
-        public String macroName;
+        public @MonotonicNonNull String macroName;
 
         @Documentation("Run on formula number \"occ\" parameter")
         @Option(value = "occ")
@@ -179,6 +196,7 @@ public class MacroCommand extends AbstractCommand {
         public @Nullable String matches = null;
 
         /** Variable macro parameters */
+        @Documentation("Macro parameters, given as varargs with prefix 'arg_'. E.g. arg_param1=value1")
         @OptionalVarargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
     }
