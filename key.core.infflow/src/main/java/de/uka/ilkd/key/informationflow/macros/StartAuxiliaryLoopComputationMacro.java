@@ -64,7 +64,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof InfFlowLoopInvariantBuiltInRuleApp<?> loopInvRuleApp)) {
+        if (!(app instanceof InfFlowLoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
@@ -88,7 +88,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         final var loopInvRuleApp =
-            (InfFlowLoopInvariantBuiltInRuleApp<?>) goals.head().node().parent()
+            (InfFlowLoopInvariantBuiltInRuleApp) goals.head().node().parent()
                     .getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();

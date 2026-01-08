@@ -44,14 +44,15 @@ import org.jspecify.annotations.Nullable;
 public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         extends AbstractBuiltInRuleApp<T> {
 
-    private final While loop;
+    protected final While loop;
 
-    private LoopSpecification spec;
-    private final List<LocationVariable> heapContext;
-    private ExecutionContext executionContext;
-    private JTerm guard;
+    protected @Nullable LoopSpecification spec;
+    @Nullable
+    protected final List<LocationVariable> heapContext;
+    private @Nullable ExecutionContext executionContext;
+    private @Nullable JTerm guard;
 
-    private final TermServices services;
+    protected final TermServices services;
 
     public LoopInvariantBuiltInRuleApp(T rule, PosInOccurrence pos, TermServices services) {
         this(rule, pos, null, null, null, services);
@@ -285,8 +286,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, spec, heapContext,
+    public LoopInvariantBuiltInRuleApp<T> replacePos(PosInOccurrence newPos) {
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, newPos, ifInsts, spec, heapContext,
             services);
     }
 
@@ -295,19 +296,19 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp setAssumesInsts(
+    public LoopInvariantBuiltInRuleApp<T> setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
 
     }
 
-    public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
+    public LoopInvariantBuiltInRuleApp<T> setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
         if (this.loop == inv.getLoop()) {
             this.spec = inv;
         }
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, pio, ifInsts, inv, heapContext,
             services);
     }
 
@@ -321,14 +322,14 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public LoopInvariantBuiltInRuleApp<T> tryToInstantiate(Goal goal) {
         if (spec != null) {
             return this;
         }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, pio, ifInsts, inv,
             HeapContext.getModifiableHeaps(services, m.transaction()), services);
     }
 

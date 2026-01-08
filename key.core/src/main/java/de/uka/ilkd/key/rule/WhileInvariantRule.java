@@ -168,8 +168,16 @@ public class WhileInvariantRule implements BuiltInRule {
     }
 
     protected static class WhileInvariantRuleApplier {
+        /// Position of init goal within the goal list
+        public static final int IDX_GOAL_INIT = 2;
+        /// Position of preserve goal within the goal list
+        public static final int IDX_GOAL_PRESERVE = 1;
+        /// Position of use goal within the goal list
+        public static final int IDX_GOAL_USE = 0;
+
+
         protected final Goal goal;
-        protected final LoopInvariantBuiltInRuleApp ruleApp;
+        protected final LoopInvariantBuiltInRuleApp<?> ruleApp;
         protected final TermLabelState termLabelState;
         protected final Services services;
         protected final KeYJavaType booleanKJT;
@@ -206,7 +214,7 @@ public class WhileInvariantRule implements BuiltInRule {
         protected final JTerm localAnonUpdate;
 
 
-        public WhileInvariantRuleApplier(Goal goal, LoopInvariantBuiltInRuleApp ruleApp) {
+        public WhileInvariantRuleApplier(Goal goal, LoopInvariantBuiltInRuleApp<?> ruleApp) {
             this.goal = goal;
             this.ruleApp = ruleApp;
             termLabelState = new TermLabelState();
@@ -382,9 +390,9 @@ public class WhileInvariantRule implements BuiltInRule {
         }
 
         protected void prepareGoals(ImmutableList<Goal> result) {
-            Goal initGoal = result.get(2);
-            Goal preserveGoal = result.get(1);
-            Goal useGoal = result.get(0);
+            Goal initGoal = result.get(IDX_GOAL_INIT);
+            Goal preserveGoal = result.get(IDX_GOAL_PRESERVE);
+            Goal useGoal = result.get(IDX_GOAL_USE);
 
             prepareInvInitiallyValidBranch(initGoal);
             prepareBodyPreservesBranch(preserveGoal);

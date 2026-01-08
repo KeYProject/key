@@ -23,6 +23,11 @@ public class WdProfile extends JavaProfile {
     public static final WdProfile INSTANCE = new WdProfile();
 
     @Override
+    public String name() {
+        return "WD Java Profile";
+    }
+
+    @Override
     public SpecificationRepository createSpecificationRepository(Services services) {
         return new SpecificationRepositoryWD(services);
     }

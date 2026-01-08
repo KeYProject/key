@@ -18,6 +18,11 @@ public class JavaInfFlowProfile extends JavaProfile {
     public static final String NAME = "Java InfFlow Profile";
 
     @Override
+    public String name() {
+        return NAME;
+    }
+
+    @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         var rules = super.initBuiltInRules();
         return rules.map(it -> {
@@ -36,6 +41,5 @@ public class JavaInfFlowProfile extends JavaProfile {
                 .filter(it -> it != BlockContractExternalRule.INSTANCE)
                 .filter(it -> !(it instanceof LoopScopeInvariantRule))
                 .filter(it -> !(it instanceof LoopContractExternalRule));
-
     }
 }
