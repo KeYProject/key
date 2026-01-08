@@ -4,7 +4,11 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
+
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -25,12 +29,13 @@ import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extensions provides Javac checks for recent-loaded Java files.
+ * Extension provides Javac checks for recent-loaded Java files.
  * <p>
  * Provides an entry in the status line for access.
  *
@@ -43,7 +48,7 @@ import org.slf4j.LoggerFactory;
     experimental = false)
 public class JavacExtension
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup,
-        KeYSelectionListener {
+        KeYSelectionListener, KeYGuiExtension.Settings {
     /**
      * Color used for the label if javac didn't produce any diagnostics.
      */
@@ -147,6 +152,18 @@ public class JavacExtension
 
             Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
             List<Path> classpath = jm.getClassPath();
+            JavacSettings settings = JavacSettingsProvider.getJavacSettings();
+
+            List<String> processors = null;
+            if (settings.getUseProcessors()) {
+                if (classpath == null) classpath = new ArrayList<>();
+
+                classpath.addAll(Arrays.asList(settings.getClassPaths().split(System.lineSeparator()))
+                    .stream().map(p -> Paths.get(p)).toList());
+
+                processors = Arrays.asList(settings.getProcessors().split(System.lineSeparator()));
+            }
+
             Path javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
@@ -154,7 +171,7 @@ public class JavacExtension
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, processors);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");
@@ -226,6 +243,10 @@ public class JavacExtension
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         loadProof(e.getSource().getSelectedProof());
+    }
+
+    public SettingsProvider getSettings() {
+        return new JavacSettingsProvider();
     }
 }
 

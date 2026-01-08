@@ -52,15 +52,17 @@ public class JavaCompilerCheckFacade {
      *
      * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
      *        about any issues found in the target Java program
-     * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classPath the {@link List} of {@link File}s referring to the directory that make up
+     * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
+     * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
-     * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @param javaPath the {@link Path} to the source of the target Java program
+     * @param processors the {@link List} of {@link String}s referring to the annotation processors to be run
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            Path bootClassPath, List<Path> classPath, Path javaPath) {
+            Path bootClassPath, List<Path> classPath, Path javaPath,
+            List<String> processors) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -86,6 +88,7 @@ public class JavaCompilerCheckFacade {
 
         // gather configured bootstrap classpath and regular classpath
         List<String> options = new ArrayList<>();
+
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
             options.add(bootClassPath.toAbsolutePath().toString());
@@ -97,6 +100,12 @@ public class JavaCompilerCheckFacade {
                         .map(Objects::toString)
                         .collect(Collectors.joining(":")));
         }
+
+        if (processors != null && !processors.isEmpty()) {
+            options.add("-processor");
+            options.add(processors.stream().collect(Collectors.joining(",")));
+        }
+
         ArrayList<Path> files = new ArrayList<>();
         if (Files.isDirectory(javaPath)) {
             try (var s = Files.walk(javaPath)) {
