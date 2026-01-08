@@ -17,10 +17,7 @@ import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTa
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -40,6 +37,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -59,13 +57,20 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
     }
 
     @Override
+    public InfFlowLoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos,
+            TermServices services) {
+        return new InfFlowLoopInvariantBuiltInRuleApp(this, pos, services);
+    }
+
+    @Override
     public ImmutableList<Goal> apply(Goal goal, final RuleApp ruleApp) throws RuleAbortException {
-        return new InfFlowWhileInvariantRuleApplier(goal, (LoopInvariantBuiltInRuleApp<?>) ruleApp)
+        return new InfFlowWhileInvariantRuleApplier(goal,
+            (InfFlowLoopInvariantBuiltInRuleApp) ruleApp)
                 .apply();
     }
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
-            InfFlowLoopInvariantBuiltInRuleApp<?> ruleApp, Instantiation inst,
+            InfFlowLoopInvariantBuiltInRuleApp ruleApp, Instantiation inst,
             JavaBlock guardJb,
             ImmutableSet<LocationVariable> localIns,
             ImmutableSet<LocationVariable> localOuts,
@@ -77,7 +82,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
         final TermBuilder tb = services.getTermBuilder();
 
-        // reset validiy branch
+        // reset validity branch
         infFlowGoal.setBranchLabel("Information Flow Validity");
 
         // clear goal
@@ -357,20 +362,19 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         protected void prepareGoals(ImmutableList<Goal> result) {
             super.prepareGoals(result);
 
-            Goal preserve = result.get(1);
-            Goal terminate = result.get(2);
+            Goal preserve = result.get(IDX_GOAL_PRESERVE);
+            Goal terminate = result.get(IDX_GOAL_USE);
             if (InfFlowCheckInfo.isInfFlow(preserve) && inst.inv().hasInfFlowSpec(services)) {
                 // set up information flow validity goal
                 InfFlowData infFlowData = setUpInfFlowValidityGoal(preserve,
-                    (InfFlowLoopInvariantBuiltInRuleApp<?>) ruleApp, inst, guardJb,
+                    (InfFlowLoopInvariantBuiltInRuleApp) ruleApp, inst, guardJb,
                     localIns, localOuts, anonUpdateDatas, anonUpdate, services);
 
                 // set up information flow part of useGoal:
                 // add infFlowAssumptions, add term and taclet to post goal
                 setUpInfFlowPartOfUseGoal(infFlowData,
                     Objects.requireNonNull(anonUpdateDatas.head()).loopHeapAtPre(),
-                    terminate,
-                    services);
+                    terminate, services);
             }
 
         }

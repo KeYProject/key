@@ -57,8 +57,7 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
         final Services services = initiatingProof.getServices();
 
         final var loopInvRuleApp =
-            (InfFlowLoopInvariantBuiltInRuleApp<?>) initiatingGoal.node().parent()
-                    .getAppliedRuleApp();
+            (InfFlowLoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
         LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();

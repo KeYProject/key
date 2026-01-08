@@ -10,6 +10,8 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class InfFlowProofCollection {
     public static ProofCollection automaticInfFlow() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
@@ -1027,6 +1029,18 @@ public class InfFlowProofCollection {
             "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.m.key");
         g.provable(
             "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.m.key");
+
+        for (var testFile : g.getTestFiles()) {
+            try {
+                assertThat(testFile.getKeYFile())
+                        .exists()
+                        .content().contains("\\profile \"java-infflow\";");
+            } catch (AssertionError e) {
+                System.err.println(testFile.getKeYFile());
+                throw e;
+            }
+        }
+
         return c;
     }
 }
