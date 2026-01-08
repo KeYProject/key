@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.settings;
 
 
-import java.util.Properties;
-
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ProofDependentSMTSettings extends AbstractSettings {
     public static final String CATEGORY = "SMTSettings";
 
@@ -26,7 +26,6 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     public static final String INTEGERS_MINIMUM = "integersMinimum";
     public static final String INVARIANT_FORALL = "invariantForall";
 
-    public static final String PROP_LEGACY_TRANSLATION = "legacyTranslation";
     private static final String PROP_SUPPORTED_TACLETS = "supportedTaclets";
 
     private boolean useExplicitTypeHierarchy = false;
@@ -38,10 +37,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     private int maxGenericSorts = 2;
     private int maxInteger = 2147483645;
     private int minInteger = -2147483645;
-    private boolean useLegacyTranslation = false;
 
-
-    private SupportedTaclets supportedTaclets;
+    private SupportedTaclets supportedTaclets = SupportedTaclets.REFERENCE;
 
     private ProofDependentSMTSettings() {
         setSupportedTaclets(SupportedTaclets.REFERENCE);
@@ -69,61 +66,13 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     private static final ProofDependentSMTSettings DEFAULT_DATA = new ProofDependentSMTSettings();
 
     public static ProofDependentSMTSettings getDefaultSettingsData() {
-        return DEFAULT_DATA.clone();
+        return DEFAULT_DATA.copy();
     }
 
-
-    @Override
-    public ProofDependentSMTSettings clone() {
+    public ProofDependentSMTSettings copy() {
         return new ProofDependentSMTSettings(this);
     }
 
-
-    @Override
-    public void readSettings(Properties props) {
-        var prefix = "[" + CATEGORY + "]";
-        setUseExplicitTypeHierarchy(
-            SettingsConverter.read(props, prefix + EXPLICIT_TYPE_HIERARCHY,
-                useExplicitTypeHierarchy));
-        setUseNullInstantiation(
-            SettingsConverter.read(props, prefix + INSTANTIATE_NULL_PREDICATES,
-                useNullInstantiation));
-        setUseBuiltInUniqueness(
-            SettingsConverter.read(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
-        setMaxGenericSorts(
-            SettingsConverter.read(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts));
-        setUseUIMultiplication(
-            SettingsConverter.read(props, prefix + USE_UNINTERPRETED_MULTIPLICATION,
-                useUIMultiplication));
-        setUseConstantsForIntegers(
-            SettingsConverter.read(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-                useConstantsForIntegers));
-
-        setMaxInteger(SettingsConverter.read(props, prefix + INTEGERS_MAXIMUM, maxInteger));
-        setMinInteger(SettingsConverter.read(props, prefix + INTEGERS_MINIMUM, minInteger));
-        setInvariantForall(
-            SettingsConverter.read(props, prefix + INVARIANT_FORALL, invariantForall));
-        supportedTaclets.selectTaclets(SettingsConverter.read(props, prefix + TACLET_SELECTION,
-            supportedTaclets.getNamesOfSelectedTaclets()));
-    }
-
-    @Override
-    public void writeSettings(Properties props) {
-        var prefix = "[" + CATEGORY + "]";
-        SettingsConverter.store(props, prefix + EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
-        SettingsConverter.store(props, prefix + INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
-        SettingsConverter.store(props, prefix + MAX_GENERIC_SORTS, maxGenericSorts);
-        SettingsConverter.store(props, prefix + TACLET_SELECTION,
-            supportedTaclets.getNamesOfSelectedTaclets());
-        SettingsConverter.store(props, prefix + USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
-        SettingsConverter.store(props, prefix + USE_UNINTERPRETED_MULTIPLICATION,
-            useUIMultiplication);
-        SettingsConverter.store(props, prefix + USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-            useConstantsForIntegers);
-        SettingsConverter.store(props, prefix + INTEGERS_MAXIMUM, maxInteger);
-        SettingsConverter.store(props, prefix + INTEGERS_MINIMUM, minInteger);
-        SettingsConverter.store(props, prefix + INVARIANT_FORALL, invariantForall);
-    }
 
     @Override
     public void readSettings(Configuration props) {
@@ -262,15 +211,5 @@ public class ProofDependentSMTSettings extends AbstractSettings {
         var old = this.supportedTaclets;
         this.supportedTaclets = supportedTaclets;
         firePropertyChange(PROP_SUPPORTED_TACLETS, old, supportedTaclets);
-    }
-
-    public boolean isUseLegacyTranslation() {
-        return useLegacyTranslation;
-    }
-
-    public void setUseLegacyTranslation(boolean useLegacyTranslation) {
-        var old = this.useLegacyTranslation;
-        this.useLegacyTranslation = useLegacyTranslation;
-        firePropertyChange(PROP_LEGACY_TRANSLATION, old, useLegacyTranslation);
     }
 }

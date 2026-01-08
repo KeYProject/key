@@ -366,6 +366,9 @@ public class Configuration {
     }
 
     public Object set(String name, Object obj) {
+        if (!allowedValueType(obj)) {
+            throw new RuntimeException("Unallowed value type used: " + obj.getClass());
+        }
         return data.put(name, obj);
     }
 
@@ -417,6 +420,33 @@ public class Configuration {
 
     public void overwriteWith(Configuration other) {
         data.putAll(other.data);
+    }
+
+    /**
+     * Predicte for allowed value objects inside the configuration hierarchy and
+     * can be printed.
+     *
+     * @param value an arbitrary {@link Object}
+     * @return true if the value is allowed in the hierarchy.
+     */
+    public static boolean allowedValueType(@Nullable Object value) {
+        return value instanceof String
+                || value instanceof Long
+                || value instanceof Integer
+                || value instanceof Double
+                || value instanceof Float
+                || value instanceof Short
+                || value instanceof Byte
+                || value instanceof Boolean
+                || value instanceof Collection
+                || value instanceof Map
+                || value instanceof Configuration
+                || value instanceof Enum<?>
+                || value == null;
+    }
+
+    public Set<String> getKeys() {
+        return this.data.keySet();
     }
 
     // TODO Add documentation for this.

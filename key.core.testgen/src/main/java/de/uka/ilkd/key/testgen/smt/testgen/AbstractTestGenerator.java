@@ -154,9 +154,9 @@ public abstract class AbstractTestGenerator {
 
         // create special smt settings for test case generation
         final ProofIndependentSMTSettings piSettings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().copy();
         piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
-        final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
+        final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().copy();
         final NewSMTTranslationSettings newSettings =
             new NewSMTTranslationSettings(proof.getSettings().getNewSMTSettings());
         pdSettings.setInvariantForall(settings.invariantForAll());

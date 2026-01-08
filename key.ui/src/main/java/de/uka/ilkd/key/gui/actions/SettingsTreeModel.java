@@ -3,48 +3,41 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.Properties;
+import java.util.Collection;
+import java.util.Map;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
-import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.Settings;
+import de.uka.ilkd.key.settings.*;
 
 import org.key_project.logic.Choice;
 
 /**
- *
  * A swing model for {@link ShowActiveSettingsAction}.
  *
  * @author Mihai Herda, 2018
  */
 
 public class SettingsTreeModel extends DefaultTreeModel {
-
-    private static final long serialVersionUID = -3282304543262262159L;
-
     private final ProofSettings proofSettings;
-
     private final ProofIndependentSettings independentSettings;
-    private OptionContentNode tacletOptionsItem;
+    private DefaultMutableTreeNode tacletOptionsItem;
 
     public SettingsTreeModel(ProofSettings proofSettings,
             ProofIndependentSettings independentSettings) {
         super(new DefaultMutableTreeNode("All Settings"));
+
         this.proofSettings = proofSettings;
         this.independentSettings = independentSettings;
+
         generateTree();
     }
 
     private void generateTree() {
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getRoot();
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("All Settings");
 
         if (proofSettings == null) {
             OptionContentNode proofSettingsNode =
@@ -56,69 +49,36 @@ public class SettingsTreeModel extends DefaultTreeModel {
                     "These are the proof dependent settings.");
             root.add(proofSettingsNode);
 
-            // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
-            ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
-            tacletOptionsItem = generateTableNode("Taclet Options", choiceSettings);
-            proofSettingsNode.add(tacletOptionsItem);
-
-            Settings strategySettings = proofSettings.getStrategySettings();
-            proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
-
-            Settings smtSettings = proofSettings.getSMTSettings();
-            proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+            configurationTable(proofSettingsNode, proofSettings.asConfiguration());
         }
 
-        OptionContentNode independentSettingsNode = generateOptionContentNode(
+        var independentSettingsNode = generateOptionContentNode(
             "Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);
+        configurationTable(independentSettingsNode, independentSettings.asConfiguration());
 
-        Settings generalSettings = independentSettings.getGeneralSettings();
-        independentSettingsNode.add(generateTableNode("General", generalSettings));
-        Settings lemmaSettings = independentSettings.getLemmaGeneratorSettings();
-        independentSettingsNode.add(generateTableNode("Lemma Generator", lemmaSettings));
-        Settings indSMTSettings = independentSettings.getSMTSettings();
-        independentSettingsNode.add(generateTableNode("SMT", indSMTSettings));
-        // Settings testgenSettings =independentSettings.getTestGenerationSettings();
-        // independentSettingsNode.add(generateTableNode("Testcase Generation", testgenSettings));
-        Settings viewSettings = independentSettings.getViewSettings();
-        independentSettingsNode.add(generateTableNode("View", viewSettings));
-        Settings termLabelSettings = independentSettings.getTermLabelSettings();
-        // Previously, the termLabelSettings were added to the proofSettingsNode, but judging by the
-        // previous line,
-        // it should really be added to the independentSettingsNode
-        independentSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
+        setRoot(root);
     }
-
 
 
     public JComponent getStartComponent() {
         return generateScrollPane("Here are all settings.");
     }
 
-
-    private Properties getChoicesAsProperties(ChoiceSettings settings) {
-        Properties prop = new Properties();
-
-        for (Choice choice : settings.getDefaultChoicesAsSet()) {
-            prop.put(choice.category(), choice.name());
-        }
-
-        return prop;
+    private MutableTreeNode generateTableNode(String title, Settings settings) {
+        Configuration c = new Configuration();
+        settings.writeSettings(c);
+        var n = new DefaultMutableTreeNode(title);
+        configurationTable(n, c);
+        return n;
     }
 
-    private OptionContentNode generateTableNode(String title, Settings settings) {
-
-        Properties props = new Properties();
-        settings.writeSettings(props);
-
-        return new OptionContentNode(title, generateJTable(props));
-
-    }
-
-    private OptionContentNode generateTableNode(String title, ChoiceSettings settings) {
-        Properties props = getChoicesAsProperties(settings);
-        return new OptionContentNode(title, generateJTable(props));
-
+    private DefaultMutableTreeNode generateTableNode(String title, ChoiceSettings settings) {
+        Configuration c = new Configuration();
+        settings.writeSettings(c);
+        var node = new DefaultMutableTreeNode(title);
+        configurationTable(node, c);
+        return node;
     }
 
 
@@ -127,50 +87,53 @@ public class SettingsTreeModel extends DefaultTreeModel {
         ta.append(text);
         ta.setEditable(false);
         ta.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JScrollPane scrollpane = new JScrollPane(ta);
-        return scrollpane;
+        return new JScrollPane(ta);
     }
 
-    private JComponent generateJTable(Properties properties) {
-        String[] columnNames = { "Name", "Value" };
-        Object[][] data = new Object[properties.size()][2];
-
-        int i = 0;
-        for (Entry<Object, Object> entry : properties.entrySet()) {
-            data[i][0] = entry.getKey();
-            data[i][1] = entry.getValue();
-            i++;
+    private void configurationTable(DefaultMutableTreeNode parent, Object value) {
+        if (value == null) {
+            parent.add(new DefaultMutableTreeNode(" <not set>"));
+        } else if (value instanceof String || value instanceof Long || value instanceof Integer
+                || value instanceof Double || value instanceof Float
+                || value instanceof Short || value instanceof Byte
+                || value instanceof Boolean || value instanceof Enum<?>) {
+            parent.add(new DefaultMutableTreeNode(value));
+        } else if (value instanceof Collection<?> col) {
+            configurationTable(parent, col);
+        } else if (value instanceof Map map) {
+        } else if (value instanceof Configuration map) {
+            configurationTable(parent, map);
         }
-
-        Arrays.sort(data, (a, b) -> a[0].toString().compareToIgnoreCase(b[0].toString()));
-
-        JTable table = new JTable();
-
-        DefaultTableModel tableModel = new DefaultTableModel() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // all cells false
-                return false;
-            }
-        };
-
-        tableModel.setDataVector(data, columnNames);
-        table.setModel(tableModel);
-        table.setRowHeight(table.getRowHeight() + 10);
-
-        JScrollPane scrollpane = new JScrollPane(table);
-        return scrollpane;
     }
 
+    private void configurationTable(DefaultMutableTreeNode parent, Configuration value) {
+        var names = value.getKeys().stream().sorted().toList();
+
+        for (String name : names) {
+            var v = value.get(name);
+
+            if (v instanceof Collection || v instanceof Map || v instanceof Configuration) {
+                var newChild = new DefaultMutableTreeNode(name);
+                parent.add(newChild);
+                configurationTable(newChild, v);
+            } else {
+                parent.add(new DefaultMutableTreeNode(name + ": " + v));
+            }
+        }
+    }
+
+    private void configurationTable(DefaultMutableTreeNode parent, Collection<?> values) {
+        for (var value : values) {
+            configurationTable(parent, value);
+        }
+    }
 
 
     private OptionContentNode generateOptionContentNode(String title, String text) {
         return new OptionContentNode(title, generateScrollPane(text));
     }
 
-    public OptionContentNode getTacletOptionsItem() {
+    public DefaultMutableTreeNode getTacletOptionsItem() {
         return tacletOptionsItem;
     }
 }

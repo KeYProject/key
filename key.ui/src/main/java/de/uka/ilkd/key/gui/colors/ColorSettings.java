@@ -10,14 +10,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
-import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +30,13 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public class ColorSettings {
     public static final File SETTINGS_FILE_NEW =
         new File(PathConfig.getKeyConfigDir(), "colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
 
-    private static ColorSettings INSTANCE;
+    private static @Nullable ColorSettings INSTANCE;
     private final Map<String, Object> properties = new TreeMap<>();
     private final List<ColorProperty> propertyEntries = new ArrayList<>(64);
 
@@ -96,7 +97,10 @@ public class ColorSettings {
     public void save() {
         LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
-            var config = new Configuration(properties);
+            var config = new Configuration();
+            for (PropertyEntry<?> entry : propertyEntries) {
+                config.set(entry.getKey(), entry.value());
+            }
             config.save(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
@@ -154,102 +158,16 @@ public class ColorSettings {
     /**
      * A property for handling colors.
      */
-    public class ColorProperty {
-        private final String key;
+    public class ColorProperty extends DefaultPropertyEntry<Color> {
         private final String description;
-        private Color defaultLightValue;
-        private Color defaultDarkValue;
-
-        private Color lightValue;
-        private Color darkValue;
-
 
         public ColorProperty(String key, String description, Color defaultValue) {
-            this(key, description, defaultValue, defaultValue);
-        }
-
-        public ColorProperty(String key, String description, Color defaultLightValue,
-                Color defaultDarkValue) {
-            this.key = key;
+            super(key, defaultValue, ColorSettings::fromHex, ColorSettings::toHex);
             this.description = description;
-            if (!properties.containsKey(key)) {
-                this.defaultLightValue = defaultLightValue;
-                this.defaultDarkValue = defaultDarkValue;
-            }
-        }
-
-        public Color getCurrentColor() {
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()) {
-                return getDarkValue();
-            } else {
-                return getLightValue();
-            }
-        }
-
-        public Color getLightValue() {
-            if (lightValue == null) {
-                update();
-            }
-            return lightValue;
-        }
-
-        public void setLightValue(Color lightValue) {
-            var old = this.lightValue;
-            this.lightValue = lightValue;
-            firePropertyChange(getKey(), old, lightValue);
-        }
-
-        public Color getDarkValue() {
-            if (darkValue == null) {
-                update();
-            }
-            return darkValue;
-        }
-
-        public void setDarkValue(Color darkValue) {
-            var old = this.darkValue;
-            this.darkValue = darkValue;
-            firePropertyChange(getKey(), old, lightValue);
-        }
-
-        public void update() {
-            Object v = properties.get(key);
-            if (v == null) {
-                setLightValue(defaultLightValue);
-                setDarkValue(defaultDarkValue);
-                return;
-            }
-
-            if (v instanceof Color c) {
-                setDarkValue(c);
-                setLightValue(c);
-            } else if (v instanceof String s) {
-                var c = fromHex(s);
-                setDarkValue(c);
-                setLightValue(c);
-            } else if (v instanceof List<?> seq) {
-                setLightValue(fromHex(seq.get(0).toString()));
-                setDarkValue(fromHex(seq.get(1).toString()));
-            } else {
-                throw new IllegalArgumentException(
-                    "Unexpected types for color " + key + " with value " + v);
-            }
-        }
-
-        public Color fromObject(@Nullable Object o) {
-            return fromHex(o.toString());
-        }
-
-        public String getKey() {
-            return key;
         }
 
         public String getDescription() {
             return description;
-        }
-
-        public Color get() {
-            return getCurrentColor();
         }
     }
 }

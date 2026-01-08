@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.settings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -158,8 +159,8 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
 
-        txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
-        txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
+        txtClutterRules.setText(String.join("\n", vs.clutterRules().get()));
+        txtClutterRuleSets.setText(String.join("\n", vs.clutterRuleSets().get()));
 
         for (int i = 0; i < LAF_CLASSES.size(); i++) {
             if (LAF_CLASSES.get(i).equals(vs.getLookAndFeel())) {
@@ -201,8 +202,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
-        vs.clutterRules().parseFrom(txtClutterRules.getText().replace('\n', ','));
-        vs.clutterRuleSets().parseFrom(txtClutterRuleSets.getText().replace('\n', ','));
+        vs.clutterRules().set(
+            Arrays.stream(txtClutterRules.getText().split("\n")).collect(Collectors.toSet()));
+        vs.clutterRuleSets().set(
+            Arrays.stream(txtClutterRuleSets.getText().split("\n")).collect(Collectors.toSet()));
 
         vs.setShowLoadExamplesDialog(chkShowLoadExamplesDialog.isSelected());
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());

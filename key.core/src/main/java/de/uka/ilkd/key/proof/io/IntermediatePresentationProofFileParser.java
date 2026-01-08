@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -143,26 +144,16 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 TacletInformation tacletInfo = (TacletInformation) ruleInfo;
                 tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList.append(str);
             }
-            case KeY_USER -> { // UserLog
-                if (proof.userLog == null) {
-                    proof.userLog = new ArrayList<>();
-                }
-                proof.userLog.add(str);
-            }
-            case KeY_VERSION -> { // Version log
-                if (proof.keyVersionLog == null) {
-                    proof.keyVersionLog = new ArrayList<>();
-                }
-                proof.keyVersionLog.add(str);
-            }
-            case KeY_SETTINGS -> // ProofSettings
-                loadPreferences(str);
-            case BUILT_IN_RULE -> { // BuiltIn rules
-                {
-                    final AppNodeIntermediate newNode = new AppNodeIntermediate();
-                    currNode.addChild(newNode);
-                    currNode = newNode;
-                }
+        case KeY_USER -> // UserLog
+            proof.userLog.add(str);
+        case KeY_VERSION -> // Version log
+            proof.keyVersionLog.add(str);
+        case KeY_SETTINGS -> // ProofSettings
+            loadPreferences(str);
+        case BUILT_IN_RULE -> { // BuiltIn rules
+            final AppNodeIntermediate newNode = new AppNodeIntermediate();
+            currNode.addChild(newNode);
+            currNode = newNode;
                 ruleInfo = new BuiltinRuleInformation(str);
             }
             case CONTRACT -> ((BuiltinRuleInformation) ruleInfo).currContract = str;
@@ -330,7 +321,11 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private void loadPreferences(String preferences) {
         final ProofSettings proofSettings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-        proofSettings.loadSettingsFromPropertyString(preferences);
+        try {
+            proofSettings.loadSettingsFromJSONStream(new StringReader(preferences));
+        } catch (IOException e) {
+            throw new RuntimeException(e); // no I/O exception on strings.
+        }
     }
 
     /**

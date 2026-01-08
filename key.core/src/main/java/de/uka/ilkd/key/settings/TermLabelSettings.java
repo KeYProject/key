@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.util.Properties;
-
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author lanzinger
  */
+@NullMarked
 public class TermLabelSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(TermLabelSettings.class);
 
@@ -26,27 +26,12 @@ public class TermLabelSettings extends AbstractSettings {
     private boolean useOriginLabels = true;
 
     @Override
-    public void readSettings(Properties props) {
-        String str = props.getProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS);
-
-        if (str != null && (str.equals("true") || str.equals("false"))) {
-            setUseOriginLabels(Boolean.parseBoolean(str));
-        } else {
-            setUseOriginLabels(true);
-        }
-    }
-
-    @Override
-    public void writeSettings(Properties props) {
-        props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS,
-            Boolean.toString(useOriginLabels));
-    }
-
-    @Override
     public void readSettings(Configuration props) {
         var category = props.getSection(CATEGORY);
-        if (category == null)
+        if (category == null) {
             return;
+        }
+
         try {
             setUseOriginLabels(category.getBool(USE_ORIGIN_LABELS));
         } catch (Exception e) {

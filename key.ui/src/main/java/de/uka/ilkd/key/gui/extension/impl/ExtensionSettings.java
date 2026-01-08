@@ -16,7 +16,7 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
      * Class names of disabled extensions.
      */
     private final PropertyEntry<Set<String>> forbiddenClasses =
-        createStringSetProperty(KEY_DISABLED, "");
+        createStringSetProperty(KEY_DISABLED, new TreeSet<>());
 
     public ExtensionSettings() {
         super(NAME);
