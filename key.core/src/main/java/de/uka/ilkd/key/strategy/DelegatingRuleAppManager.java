@@ -19,7 +19,8 @@ import org.key_project.util.collection.ImmutableSLList;
 public class DelegatingRuleAppManager implements RuleApplicationManager<Goal> {
 
     private static String[] ruleSetNames =
-        { "alpha", "concrete", "simplify", "simplify_prog", "simplify_expression" };
+        { "alpha", "concrete", "simplify", "simplify_prog", "simplify_prog_subset",
+            "simplify_expression" };
 
     private HashSet<String> ruleSets = new HashSet<>();
 
@@ -76,8 +77,9 @@ public class DelegatingRuleAppManager implements RuleApplicationManager<Goal> {
 
     @Override
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
-        if (rule instanceof NoPosTacletApp tapp && tapp.taclet().getRuleSets().size() == 1 &&
-                tapp.taclet().getRuleSets().exists(rs -> ruleSets.contains(rs.name().toString()))) {
+        if (rule instanceof NoPosTacletApp tapp &&
+                tapp.taclet().getRuleSets().stream()
+                        .allMatch(rs -> ruleSets.contains(rs.name().toString()))) {
             queue = queue.prepend(new FindTacletAppContainer(tapp, pos,
                 NumberRuleAppCost.getZeroCost(), goal, goal.getTime()));
         } else {
