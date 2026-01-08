@@ -7,6 +7,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
@@ -154,5 +156,11 @@ public abstract class KeyAction extends AbstractAction {
      */
     protected void setPriority(int priority) {
         putValue(PRIORITY, priority);
+    }
+
+    public CAction toCAction() {
+        final var btn = new CButton(getName(), null);
+        btn.addActionListener(this);
+        return btn;
     }
 }
