@@ -252,7 +252,6 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(assumptions, freePostcondition));
 
-        final boolean isInfFlow = false;// InfFlowCheckInfo.isInfFlow(goal);
         setUpValidityGoal(result, contract, application, instantiation, heaps,
             anonymisationHeaps, localInVariables, localOutVariables, variables,
             ArrayUtil.add(preconditions, freePrecondition), assumptions, frameCondition, updates,

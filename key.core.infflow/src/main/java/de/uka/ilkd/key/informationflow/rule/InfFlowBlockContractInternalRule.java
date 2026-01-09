@@ -35,7 +35,6 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
-import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.Taclet;
@@ -104,75 +103,6 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
             PosInOccurrence occurrence, TermServices services) {
         return new InfFlowBlockContractInternalBuiltInRuleApp(this, occurrence);
-    }
-
-    /**
-     *
-     * @param contract the contract being applied.
-     * @param self the self term.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @param services services.
-     * @return the preconditions.
-     */
-    private static JTerm[] createPreconditions(final BlockContract contract, final JTerm self,
-            final List<LocationVariable> heaps,
-            final ImmutableSet<LocationVariable> localInVariables,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-            final Services services) {
-        final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
-        final JTerm wellFormedHeapsCondition =
-            conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
-        final JTerm reachableInCondition =
-            conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
-        final JTerm selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
-            contract.getMethod(), contract.getKJT(), self, services);
-        return new JTerm[] { precondition, wellFormedHeapsCondition, reachableInCondition,
-            selfConditions };
-    }
-
-    /**
-     *
-     * @param localOutVariables all free program variables modified by the block.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @return the postconditions.
-     */
-    private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final JTerm postcondition = conditionsAndClausesBuilder.buildPostcondition();
-        final JTerm wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
-                .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final JTerm reachableOutCondition =
-            conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
-        final JTerm atMostOneFlagSetCondition =
-            conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-        return new JTerm[] { postcondition, wellFormedAnonymisationHeapsCondition,
-            reachableOutCondition, atMostOneFlagSetCondition };
-    }
-
-    /**
-     *
-     * @param contextUpdate the context update.
-     * @param heaps the heaps.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param variables the variables.
-     * @param modifiableClauses the modified clauses.
-     * @param services services.
-     * @return the updates.
-     */
-    private static JTerm[] createUpdates(final JTerm contextUpdate,
-            final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonymisationHeaps,
-            final BlockContract.Variables variables,
-            final Map<LocationVariable, JTerm> modifiableClauses, final Services services) {
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
-        final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final JTerm anonymisationUpdate =
-            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
-        return new JTerm[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
     /**
@@ -276,9 +206,11 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
                 contract, anonymisationHeaps, services, variables, exceptionParameter, heaps,
                 localInVariables, localOutVariables, app, instantiation);
             // do additional inf flow preparations on the usage goal
-            setUpInfFlowPartOfUsageGoal(Objects.requireNonNull(result.head()), infFlowValidityData,
+            setUpInfFlowPartOfUsageGoal(Objects.requireNonNull(result.head()),
+                infFlowValidityData,
                 updates[0],
-                updates[1], updates[2], tb);
+                updates[1],
+                updates[2], tb);
         } else {
             // nothing to prove -> set up trivial goal
             validityGoal.addFormula(new SequentFormula(tb.tt()), false, true);
@@ -578,6 +510,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
     public static class InfFlowBlockContractInternalBuiltInRuleApp
             extends BlockContractInternalBuiltInRuleApp<InfFlowBlockContractInternalRule> {
+        protected IFProofObligationVars infFlowVars;
+
         public InfFlowBlockContractInternalBuiltInRuleApp(InfFlowBlockContractInternalRule rule,
                 PosInOccurrence occurrence) {
             super(rule, occurrence);
@@ -590,8 +524,6 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
                 @Nullable List<LocationVariable> heaps) {
             super(rule, occurrence, ifInstantiations, statement, contract, heaps);
         }
-
-        protected IFProofObligationVars infFlowVars;
 
         /**
          *
