@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.wd;
 
+import java.io.IOException;
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
-
-import java.io.IOException;
-import java.util.stream.Stream;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.

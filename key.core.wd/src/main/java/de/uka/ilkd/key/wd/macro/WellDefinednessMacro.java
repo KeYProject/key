@@ -9,10 +9,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.wd.po.*;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.wd.*;
+import de.uka.ilkd.key.wd.po.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -65,7 +65,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
             PosInOccurrence posInOcc) {
-        if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn(proof.getServices())) {
+        if (proof == null || proof.isDisposed()
+                || !WellDefinednessCheck.isOn(proof.getServices())) {
             return false;
         }
         final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);

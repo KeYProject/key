@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
+
+import java.util.Objects;
+import java.util.ServiceLoader;
+import javax.swing.*;
 
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+
 import net.miginfocom.layout.AC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
-
-import javax.swing.*;
-import java.util.Objects;
-import java.util.ServiceLoader;
 
 public class KeYFileChooserLoadingOptions extends JPanel {
     private final JLabel lblProfile = new JLabel("Profile:");
@@ -29,6 +32,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
         add(lblProfile);
         add(cboProfile);
     }
+
     public Profile getSelectedProfile() {
         var selected = getSelectedProfileName();
         var items = ServiceLoader.load(DefaultProfileResolver.class)
@@ -37,6 +41,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
         return items.map(it -> it.get().getDefaultProfile())
                 .orElse(null);
     }
+
     public String getSelectedProfileName() {
         return (String) cboProfile.getSelectedItem();
     }

@@ -22,14 +22,13 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.wd.po.WellDefinednessPO;
-import de.uka.ilkd.key.wd.po.WellDefinednessPO.Variables;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.wd.po.WellDefinednessPO;
+import de.uka.ilkd.key.wd.po.WellDefinednessPO.Variables;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -948,25 +947,26 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return true if on and false if off
      */
     public static boolean isOn(Profile profile) {
-         return profile instanceof WdProfile;
+        return profile instanceof WdProfile;
     }
 
     public static boolean isOn(Services services) {
         return isOn(services.getProfile());
         /*
-        final String setting =
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
-        if (setting == null) {
-            return false;
-        }
-        if (setting.equals(OPTION + ":on")) {
-            return true;
-        } else if (setting.equals(OPTION + ":off")) {
-            return false;
-        } else {
-            throw new RuntimeException(
-                "The setting for the wdProofs-option is not valid: " + setting);
-        }*/
+         * final String setting =
+         * ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
+         * if (setting == null) {
+         * return false;
+         * }
+         * if (setting.equals(OPTION + ":on")) {
+         * return true;
+         * } else if (setting.equals(OPTION + ":off")) {
+         * return false;
+         * } else {
+         * throw new RuntimeException(
+         * "The setting for the wdProofs-option is not valid: " + setting);
+         * }
+         */
     }
 
     /**

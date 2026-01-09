@@ -28,8 +28,9 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
  * @author Martin Hentschel
  */
 public final class ProblemLoader extends AbstractProblemLoader {
-    // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses multiple Threads
-    //       (UI and SwingWorker)?
+    // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses
+    // multiple Threads
+    // (UI and SwingWorker)?
 
     private final ProverTaskListener ptl;
 

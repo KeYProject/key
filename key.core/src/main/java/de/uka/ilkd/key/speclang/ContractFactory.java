@@ -259,7 +259,8 @@ public class ContractFactory {
                 shouldWarnInfFlowMissing = false;
                 LOGGER.warn("An implementation of InformationFlowContractSupplier is missing. " +
                     "You can ignore this warning if you do not want to use information flow POs. " +
-                    "Such an implementation is defined in key.core.infflow and usually delivered with `key.ui`. " +
+                    "Such an implementation is defined in key.core.infflow and usually delivered with `key.ui`. "
+                    +
                     "On test execution in `key.core` etc. it is not present at all. " +
                     "This warning appear only once when an information flow contract is discovered");
             }

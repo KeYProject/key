@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.wd;
 
+import java.io.IOException;
+import java.util.Date;
+
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-
-import java.io.IOException;
-import java.util.Date;
 
 import static de.uka.ilkd.key.proof.runallproofs.ProofCollections.loadFromFile;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,9 +104,9 @@ public class WdProofCollection {
         g.notprovable("./firstTouch/06-BinarySearch/searchWD.key");
         // does not exists anymore
         // g.notprovable("./firstTouch/07-Cell/CellClient_mWD.key");
-        //g.provable("./firstTouch/07-Cell/Cell_CellWD.key");
-        //g.provable("./firstTouch/07-Cell/Cell_getXWD.key");
-        //g.provable("./firstTouch/07-Cell/Cell_setXWD.key");
+        // g.provable("./firstTouch/07-Cell/Cell_CellWD.key");
+        // g.provable("./firstTouch/07-Cell/Cell_getXWD.key");
+        // g.provable("./firstTouch/07-Cell/Cell_setXWD.key");
 
         g = c.group("wd_java5");
         g.provable("./firstTouch/08-Java5/For_infiniteLoopWD.key");
@@ -190,7 +190,7 @@ public class WdProofCollection {
                 assertThat(testFile.getKeYFile())
                         .exists()
                         .content().contains("\\profile \"java-wd\";");
-            }catch (AssertionError e){
+            } catch (AssertionError e) {
                 System.err.println(testFile.getKeYFile());
                 throw e;
             }

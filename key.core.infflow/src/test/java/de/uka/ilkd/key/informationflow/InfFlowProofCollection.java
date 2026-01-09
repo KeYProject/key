@@ -1036,7 +1036,7 @@ public class InfFlowProofCollection {
                 assertThat(testFile.getKeYFile())
                         .exists()
                         .content().contains("\\profile \"java-infflow\";");
-            }catch (AssertionError e){
+            } catch (AssertionError e) {
                 System.err.println(testFile.getKeYFile());
                 throw e;
             }

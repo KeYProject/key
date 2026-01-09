@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.wd;
 
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.wd.macro.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.wd.macro.WellDefinednessMacro;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;

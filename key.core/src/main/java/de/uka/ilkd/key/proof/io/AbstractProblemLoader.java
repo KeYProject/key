@@ -224,7 +224,8 @@ public abstract class AbstractProblemLoader {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
-        setProfileOfNewProofs(profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile());
+        setProfileOfNewProofs(
+            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile());
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile;

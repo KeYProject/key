@@ -57,13 +57,15 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
     }
 
     @Override
-    public InfFlowLoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public InfFlowLoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos,
+            TermServices services) {
         return new InfFlowLoopInvariantBuiltInRuleApp(this, pos, services);
     }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, final RuleApp ruleApp) throws RuleAbortException {
-        return new InfFlowWhileInvariantRuleApplier(goal, (InfFlowLoopInvariantBuiltInRuleApp) ruleApp)
+        return new InfFlowWhileInvariantRuleApplier(goal,
+            (InfFlowLoopInvariantBuiltInRuleApp) ruleApp)
                 .apply();
     }
 

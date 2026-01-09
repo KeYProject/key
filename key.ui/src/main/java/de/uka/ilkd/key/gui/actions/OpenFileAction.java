@@ -10,15 +10,14 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.KeYFileChooserLoadingOptions;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.jspecify.annotations.Nullable;
 
 public class OpenFileAction extends MainWindowAction {
     public File lastSelectedPath;
+
     public OpenFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Load...");
@@ -65,9 +64,9 @@ public class OpenFileAction extends MainWindowAction {
             }
 
             var selectedProfile = options.getSelectedProfile();
-            if(selectedProfile==null) {
+            if (selectedProfile == null) {
                 mainWindow.loadProblem(file);
-            }else{
+            } else {
                 mainWindow.loadProblem(file, selectedProfile);
             }
         }
