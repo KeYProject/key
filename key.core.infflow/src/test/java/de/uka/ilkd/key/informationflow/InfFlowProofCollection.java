@@ -428,6 +428,7 @@ public class InfFlowProofCollection {
 
 
         // // Tests for information flow to be executed without information flow proof macro
+        c = new ProofCollection(settings);
 
         g = c.group("ToyVoting_nomacro");
         g.notprovable("ToyVoting/Voter(Voter__insecure_voting()).Non-interference contract.0.key");
