@@ -20,11 +20,25 @@ import org.key_project.util.collection.ImmutableList;
  * @version 1 (7/27/25)
  */
 public class WdProfile extends JavaProfile {
+    public static final String PROFILE_ID = "java-wd";
+    public static final String DISPLAY_NAME = "Java Profile + Well-Definedness Checks";
+
     public static final WdProfile INSTANCE = new WdProfile();
 
     @Override
-    public String name() {
-        return "WD Java Profile";
+    public String ident() {
+        return PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
+        return DISPLAY_NAME;
+    }
+
+    @Override
+    public String description() {
+        return "A profile for the verification of Java programs with incl. " +
+            "well-definedness checks for JML specification. **Stability unknown**";
     }
 
     @Override

@@ -16,10 +16,22 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class JavaInfFlowProfile extends JavaProfile {
     public static final String NAME = "Java InfFlow Profile";
+    public static final String PROFILE_ID = "java-infflow";
 
     @Override
-    public String name() {
+    public String ident() {
+        return PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
         return NAME;
+    }
+
+    @Override
+    public String description() {
+        return "Profile with Built-In rules for Information Flow proofs. " +
+            "Required for 'non-inference' proof obligations.";
     }
 
     @Override

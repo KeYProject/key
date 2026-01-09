@@ -56,7 +56,7 @@ import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -1397,8 +1397,9 @@ public final class MainWindow extends JFrame {
         openExampleAction.actionPerformed(null);
     }
 
-    public void loadProblem(Path file, Profile profile) {
-        getUserInterface().loadProblem(file, profile);
+    /// @see WindowUserInterfaceControl#loadProblem(Path, Consumer)
+    public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
+        getUserInterface().loadProblem(file, configure);
     }
 
     public void loadProblem(Path file) {

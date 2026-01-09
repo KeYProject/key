@@ -64,11 +64,12 @@ public class OpenFileAction extends MainWindowAction {
             }
 
             var selectedProfile = options.getSelectedProfile();
-            if (selectedProfile == null) {
-                mainWindow.loadProblem(file);
-            } else {
-                mainWindow.loadProblem(file, selectedProfile);
-            }
+            mainWindow.loadProblem(file, pl -> {
+                if (selectedProfile != null) {
+                    pl.setProfileOfNewProofs(selectedProfile);
+                }
+                pl.setLoadSingleJavaFile(options.isOnlyLoadSingleJavaFile());
+            });
         }
     }
 }

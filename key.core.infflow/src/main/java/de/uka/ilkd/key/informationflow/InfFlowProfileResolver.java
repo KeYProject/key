@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 public class InfFlowProfileResolver implements DefaultProfileResolver {
     @Override
     public String getProfileName() {
-        return "java-infflow";
+        return JavaInfFlowProfile.PROFILE_ID;
     }
 
     @Override

@@ -33,8 +33,30 @@ import org.key_project.util.collection.ImmutableSet;
  *
  */
 public class JavaProfile extends AbstractProfile {
-    public static final String NAME = "Java Profile";
+    public static final String PROFILE_ID = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
+
+    /**
+     * the name of the profile
+     *
+     * @return the name
+     */
+    @Override
+    public String ident() {
+        return permissions ? NAME_WITH_PERMISSIONS : PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
+        return permissions ? NAME_WITH_PERMISSIONS : (PROFILE_ID + " (Default)");
+    }
+
+    @Override
+    public String description() {
+        return permissions
+                ? "Java programs with support for permissions"
+                : "The default for Java programs";
+    }
 
     /**
      * <p>
@@ -189,16 +211,6 @@ public class JavaProfile extends AbstractProfile {
         }
     }
 
-
-    /**
-     * the name of the profile
-     *
-     * @return the name
-     */
-    @Override
-    public String name() {
-        return permissions ? NAME_WITH_PERMISSIONS : NAME;
-    }
 
     /**
      * the default strategy factory to be used
