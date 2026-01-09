@@ -24,7 +24,7 @@ public class ProfileNameInStatusBar
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                lblProfileName.setText("Profile: " + mediator.getProfile().name());
+                lblProfileName.setText("Profile: " + mediator.getProfile().ident());
             }
         });
     }

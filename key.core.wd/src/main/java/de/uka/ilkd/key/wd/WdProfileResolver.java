@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 public class WdProfileResolver implements DefaultProfileResolver {
     @Override
     public String getProfileName() {
-        return "java-wd";
+        return WdProfile.PROFILE_ID;
     }
 
     @Override

@@ -40,7 +40,7 @@ import org.jspecify.annotations.NonNull;
  * etc.
  * </p>
  * <p>
- * Each {@link Profile} has a unique name {@link #name()}.
+ * Each {@link Profile} has a unique name {@link #ident()}.
  * </p>
  * <p>
  * It is recommended to have only one instance of each {@link Profile}. The default instances for
@@ -62,8 +62,18 @@ public interface Profile {
     /** returns the rule source containg all taclets for this profile */
     RuleCollection getStandardRules();
 
-    /** the name of this profile */
-    String name();
+    /** the name of this profile used to for storing into key files, and for loading */
+    String ident();
+
+    /** the name of this profile presentable for humans */
+    default String displayName() {
+        return ident();
+    }
+
+    /// A description of this profile for the user
+    default String description() {
+        return "";
+    }
 
     /** returns the strategy factories for the supported strategies */
     ImmutableSet<StrategyFactory> supportedStrategies();

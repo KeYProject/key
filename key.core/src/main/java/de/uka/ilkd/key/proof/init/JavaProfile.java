@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
-
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -33,8 +32,30 @@ import org.key_project.util.collection.ImmutableSet;
  *
  */
 public class JavaProfile extends AbstractProfile {
-    public static final String NAME = "Java Profile";
+    public static final String PROFILE_ID = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
+
+    /**
+     * the name of the profile
+     *
+     * @return the name
+     */
+    @Override
+    public String ident() {
+        return permissions ? NAME_WITH_PERMISSIONS : PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
+        return permissions ? NAME_WITH_PERMISSIONS : (PROFILE_ID + " (Default)");
+    }
+
+    @Override
+    public String description() {
+        return permissions
+                ? "Java programs with support for permissions"
+                : "The default for Java programs";
+    }
 
     /**
      * <p>
@@ -75,46 +96,46 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
-            ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
+                ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
         ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
-            ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
+                ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result =
-            result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
-                new SingletonLabelFactory<>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
+                result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
+                        new SingletonLabelFactory<>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
-            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
-            new SingletonLabelFactory<>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
+                ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
+                new SingletonLabelFactory<>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
         result = result.prepend(
-            new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
-                new SingletonLabelFactory<>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+                new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
+                        new SingletonLabelFactory<>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
         result = result.prepend(
-            new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
-                new SingletonLabelFactory<>(
-                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
+                new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
+                        new SingletonLabelFactory<>(
+                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
         result = result.prepend(
-            new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
-                new SingletonLabelFactory<>(
-                    ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
+                new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
+                        new SingletonLabelFactory<>(
+                                ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
-            ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
-            new SingletonLabelFactory<>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+                ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
+                new SingletonLabelFactory<>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
-            ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
-            new SingletonLabelFactory<>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+                ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
+                new SingletonLabelFactory<>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
         result = result.prepend(
-            new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
-                new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
+                new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+                        new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
-            new OriginTermLabelFactory(), originTermLabelPolicyList,
-            null, null,
-            null, null,
-            originTermLabelRefactorings, null));
+                new OriginTermLabelFactory(), originTermLabelPolicyList,
+                null, null,
+                null, null,
+                originTermLabelRefactorings, null));
 
         result =
-            result.prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
-                new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
+                result.prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
+                        new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
 
         return result;
     }
@@ -189,16 +210,6 @@ public class JavaProfile extends AbstractProfile {
         }
     }
 
-
-    /**
-     * the name of the profile
-     *
-     * @return the name
-     */
-    @Override
-    public String name() {
-        return permissions ? NAME_WITH_PERMISSIONS : NAME;
-    }
 
     /**
      * the default strategy factory to be used

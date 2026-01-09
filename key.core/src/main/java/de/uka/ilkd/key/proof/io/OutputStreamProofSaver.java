@@ -151,7 +151,7 @@ public class OutputStreamProofSaver {
     }
 
     public String writeProfile(Profile profile) {
-        return "\\profile \"" + escapeCharacters(profile.name()) + "\";\n";
+        return "\\profile \"" + escapeCharacters(profile.ident()) + "\";\n";
     }
 
     public String writeSettings(ProofSettings ps) {

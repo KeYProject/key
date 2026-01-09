@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.nio.file.Path;
-import javax.swing.*;
-
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.nio.file.Path;
 
 public class OpenFileAction extends MainWindowAction {
     public File lastSelectedPath;
@@ -54,21 +54,22 @@ public class OpenFileAction extends MainWindowAction {
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()
                     && file.toString().endsWith(".java")) {
                 JCheckBox checkbox = new JCheckBox("Don't show this warning again");
-                Object[] message = { "When you load a Java file, all java files in the current",
-                    "directory and all subdirectories will be loaded as well.", checkbox };
+                Object[] message = {"When you load a Java file, all java files in the current",
+                        "directory and all subdirectories will be loaded as well.", checkbox};
                 JOptionPane.showMessageDialog(mainWindow, message, "Please note",
-                    JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE);
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .setNotifyLoadBehaviour(!checkbox.isSelected());
                 ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();
             }
 
             var selectedProfile = options.getSelectedProfile();
-            if (selectedProfile == null) {
-                mainWindow.loadProblem(file);
-            } else {
-                mainWindow.loadProblem(file, selectedProfile);
-            }
+            mainWindow.loadProblem(file, pl -> {
+                if (selectedProfile != null) {
+                    pl.setProfileOfNewProofs(selectedProfile);
+                }
+                pl.setLoadSingleJavaFile(options.isOnlyLoadSingleJavaFile());
+            });
         }
     }
 }
