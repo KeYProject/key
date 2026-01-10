@@ -48,7 +48,8 @@ public final class DependencyContractImpl implements DependencyContract {
     // constructors
     // -------------------------------------------------------------------------
 
-    DependencyContractImpl(String baseName, String name, KeYJavaType kjt, IObserverFunction target,
+    public DependencyContractImpl(String baseName, String name, KeYJavaType kjt,
+            IObserverFunction target,
             KeYJavaType specifiedIn, Map<LocationVariable, JTerm> pres, JTerm mby,
             Map<LocationVariable, JTerm> deps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,

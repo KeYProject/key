@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
@@ -38,7 +42,7 @@ import org.jspecify.annotations.NonNull;
  * etc.
  * </p>
  * <p>
- * Each {@link Profile} has a unique name {@link #name()}.
+ * Each {@link Profile} has a unique name {@link #ident()}.
  * </p>
  * <p>
  * It is recommended to have only one instance of each {@link Profile}. The default instances for
@@ -60,8 +64,18 @@ public interface Profile {
     /** returns the rule source containg all taclets for this profile */
     RuleCollection getStandardRules();
 
-    /** the name of this profile */
-    String name();
+    /** the name of this profile used to for storing into key files, and for loading */
+    String ident();
+
+    /** the name of this profile presentable for humans */
+    default String displayName() {
+        return ident();
+    }
+
+    /// A description of this profile for the user
+    default String description() {
+        return "";
+    }
 
     /** returns the strategy factories for the supported strategies */
     ImmutableSet<StrategyFactory> supportedStrategies();
@@ -130,4 +144,19 @@ public interface Profile {
     TermLabelManager getTermLabelManager();
 
     boolean isSpecificationInvolvedInRuleApp(RuleApp app);
+
+    /// Create an instance of a specification repository suitable for the given profile.
+    /// For example WD requires a special instance.
+    default SpecificationRepository createSpecificationRepository(Services services) {
+        return new SpecificationRepository(services);
+    }
+
+    ///
+    default <T extends BuiltInRule> T findInstanceFor(Class<T> clazz) {
+        return (T) getStandardRules()
+                .standardBuiltInRules().stream()
+                .filter(r -> clazz.isAssignableFrom(r.getClass()) )
+                .findFirst()
+                .orElseThrow();
+    }
 }

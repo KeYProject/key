@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.smt.SMTRuleApp;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -135,11 +135,13 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (SMTRuleApp.RULE.displayName().equals(ruleName)) {
-            return SMTRuleApp.RULE.createApp(null, proof.getServices());
+        final SMTRule smtRule = proof.getServices().getProfile().findInstanceFor(SMTRule.class);
+
+        if (smtRule.displayName().equals(ruleName)) {
+            return smtRule.createApp(null, proof.getServices());
         }
 
-        IBuiltInRuleApp ourApp = null;
+        IBuiltInRuleApp ourApp;
         PosInOccurrence pos = null;
 
         if (originalStep.getAppliedRuleApp().posInOccurrence() != null) { // otherwise we have no
@@ -153,18 +155,17 @@ public abstract class AbstractProofReplayer {
         }
 
         if (currContract != null) {
-            AbstractContractRuleApp contractApp = null;
+            AbstractContractRuleApp<?> contractApp = null;
 
-            BuiltInRule useContractRule;
+            BuiltInRule useContractRule = proof.getServices().getProfile().findInstanceFor(UseOperationContractRule.class);
+
             if (currContract instanceof OperationContract) {
-                useContractRule = UseOperationContractRule.INSTANCE;
                 contractApp = (((UseOperationContractRule) useContractRule)
                         .createApp(pos)).setContract(currContract);
             } else {
-                useContractRule = UseDependencyContractRule.INSTANCE;
                 // copy over the mysterious "step"
                 PosInOccurrence step =
-                    findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                    findInNewSequent(((UseDependencyContractApp<?>) ruleApp).step(),
                         currGoal.sequent());
                 contractApp = (((UseDependencyContractRule) useContractRule)
                         .createApp(pos)).setContract(currContract).setStep(step);
