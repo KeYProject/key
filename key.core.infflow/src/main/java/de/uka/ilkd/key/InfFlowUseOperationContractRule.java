@@ -15,11 +15,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -29,13 +29,20 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class InfFlowUseOperationContractRule extends UseOperationContractRule
         implements ComplexJustificationable {
+    private static final Name NAME = new Name("InfFlow Use Operation Contract");
+
     public static InfFlowUseOperationContractRule INSTANCE = new InfFlowUseOperationContractRule();
 
     protected InfFlowUseOperationContractRule() {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public Name name() {
+        return NAME;
+    }
+
+    @Override
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         return new InfFlowUseOperationContractRuleApplier(goal, ruleApp).apply();
     }
 

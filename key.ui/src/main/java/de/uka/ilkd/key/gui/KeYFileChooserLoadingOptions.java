@@ -95,7 +95,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     }
 
     public @Nullable String getSelectedProfileName() {
-        return (String) cboProfile.getSelectedItem();
+        return ((ProfileWrapper) cboProfile.getSelectedItem()).profile().ident();
     }
 
     public boolean isOnlyLoadSingleJavaFile() {

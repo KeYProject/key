@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -147,5 +148,14 @@ public interface Profile {
     /// For example WD requires a special instance.
     default SpecificationRepository createSpecificationRepository(Services services) {
         return new SpecificationRepository(services);
+    }
+
+    ///
+    default <T extends BuiltInRule> T findInstanceFor(Class<T> clazz) {
+        return (T) getStandardRules()
+                .standardBuiltInRules().stream()
+                .filter(r -> clazz.isAssignableFrom(r.getClass()))
+                .findFirst()
+                .orElseThrow();
     }
 }
