@@ -485,7 +485,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
     @Override
     public String displayName() {
-        return NAME.toString();
+        return name().toString();
     }
 
     @Override

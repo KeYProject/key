@@ -126,7 +126,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     public KeYFileChooserBookmarkPanel addBookmarkPanel() {
         var p = new KeYFileChooserBookmarkPanel(this);
-        getAccessory().add(p, 1);
+        getAccessory().add(p);
         return p;
     }
 
