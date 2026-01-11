@@ -9,6 +9,9 @@ import recoder.java.ProgramElement;
 import recoder.java.expression.Operator;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
+import recoder.java.declaration.AnnotationUseSpecification;
+
+import recoder.list.generic.ASTList;
 
 /**
  * Type operator.
@@ -22,6 +25,11 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * Type reference.
      */
     protected TypeReference typeReference;
+
+    /**
+     * Annotations.
+     */
+    protected ASTList<AnnotationUseSpecification> annotations;
 
     /**
      * Type operator.
@@ -60,9 +68,15 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     protected TypeOperator(TypeOperator proto) {
         super(proto);
+        if (proto.annotations != null) {
+            annotations = proto.annotations.deepClone();
+        }
+
         if (proto.typeReference != null) {
             typeReference = proto.typeReference.deepClone();
         }
+
+        makeParentRoleValid();
     }
 
     /**
@@ -72,6 +86,12 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         super.makeParentRoleValid();
         if (typeReference != null) {
             typeReference.setParent(this);
+        }
+
+        if (annotations != null) {
+            for (int i = annotations.size() - 1; i >= 0; i -= 1) {
+                annotations.get(i).setParent(this);
+            }
         }
     }
 
@@ -166,6 +186,10 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         return typeReference;
     }
 
+    public ASTList<AnnotationUseSpecification> getAnnotations() {
+        return annotations;
+    }
+
     /**
      * Set type reference.
      *
@@ -174,5 +198,15 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     public void setTypeReference(TypeReference t) {
         typeReference = t;
+    }
+
+    /**
+     * Set Annotations.
+     *
+     * @param l a list of annotations.
+     */
+
+    public void setAnnotations(ASTList<AnnotationUseSpecification> l) {
+        annotations = l;
     }
 }

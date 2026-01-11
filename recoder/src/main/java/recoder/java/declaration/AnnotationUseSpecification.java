@@ -8,6 +8,7 @@ import recoder.abstraction.AnnotationUse;
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
+import recoder.java.expression.operator.TypeOperator;
 import recoder.list.generic.ASTList;
 
 /**
@@ -18,7 +19,6 @@ import recoder.list.generic.ASTList;
  */
 public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
         implements AnnotationUse, DeclarationSpecifier, TypeReferenceContainer, Expression {
-
     /**
      * serialization id
      */
@@ -50,8 +50,8 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
      */
     public AnnotationUseSpecification(AnnotationUseSpecification proto) {
         super(proto);
-        this.reference = (TypeReference) proto.parent.deepClone();
-        this.elementValuePairs = proto.elementValuePairs.deepClone();
+        this.reference = proto.reference;
+        this.elementValuePairs = proto.elementValuePairs == null ? null :proto.elementValuePairs.deepClone();
         makeParentRoleValid();
     }
 
@@ -211,6 +211,10 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
         this.parent = parent;
     }
 
+    public void setParent(TypeOperator parent) {
+        this.parent = parent;
+    }
+
     public TypeReference getTypeReference() {
         return reference;
     }
@@ -266,4 +270,8 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
         parent = c;
     }
 
+    @Override
+    public String toString() {
+        return "@" + reference.getName();
+    }
 }

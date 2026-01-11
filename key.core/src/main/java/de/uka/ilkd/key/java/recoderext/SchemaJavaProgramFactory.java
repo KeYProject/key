@@ -33,7 +33,11 @@ import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SchemaJavaProgramFactory extends JavaProgramFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaJavaProgramFactory.class);
 
     protected Namespace<SchemaVariable> svns;
 

@@ -69,7 +69,6 @@ import static java.lang.String.format;
  * This is the public interface to the jml.translation package.
  */
 public class JMLSpecFactory {
-
     public static final String AT_PRE = "AtPre";
     protected final TermBuilder tb;
     protected final Services services;

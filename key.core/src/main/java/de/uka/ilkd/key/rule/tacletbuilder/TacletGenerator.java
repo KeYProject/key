@@ -245,6 +245,10 @@ public class TacletGenerator {
         final Pair<JTerm, ImmutableSet<Taclet>> limited = limitTerm(schemaRhs, toLimit, services);
         final JTerm limitedRhs = limited.first;
         result = result.union(limited.second);
+        final TermAndBoundVarPair schemaRepresentsLimited = 
+            new TermAndBoundVarPair(
+                    OpReplacer.replace(schemaRepresents.term.sub(1), limitedRhs, schemaRepresents.term, services.getTermFactory()), 
+                    schemaRepresents.boundVars);
 
         // create if sequent
         final boolean finalClass = kjt.getJavaType() instanceof ClassDeclaration
@@ -326,7 +330,7 @@ public class TacletGenerator {
         if (satisfiability) {
             tacletBuilder.addRuleSet(new RuleSet(new Name("split")));
         }
-        for (VariableSV boundSV : schemaRepresents.boundVars) {
+        for (VariableSV boundSV : schemaRepresentsLimited.boundVars) {
             for (SchemaVariable heapSV : heapSVs) {
                 tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
             }
@@ -343,7 +347,7 @@ public class TacletGenerator {
 
         if (satisfiability) {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs, selfSV, paramSVs,
-                schemaRepresents, tacletBuilder);
+                schemaRepresentsLimited, tacletBuilder);
         }
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));

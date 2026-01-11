@@ -159,6 +159,7 @@ MAXEXPANDMETHOD : '\\mayExpandMethod';
 STRICT    : '\\strict';
 TYPEOF : '\\typeof';
 INSTANTIATE_GENERIC : '\\instantiateGeneric';
+HAS_ANNOTATION: '\\hasAnnotation';
 
 // Quantifiers, binding, substitution
 FORALL : '\\forall' | '\u2200';

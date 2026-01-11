@@ -69,6 +69,12 @@ application {
     mainClass.set("de.uka.ilkd.key.core.Main")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     //systemProperties["slf4j.detectLoggerNameMismatch"] = true
@@ -80,7 +86,27 @@ run {
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
-    jvmArgs += "-Dsun.awt.disablegrab=true"
+    jvmArgs += [
+        "-Dsun.awt.disablegrab=true ",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+        "--add-exports", 
+        "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        "--add-opens", 
+        "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED" 
+    ]
 }
 
 tasks.register('runWithProfiler', JavaExec) {
