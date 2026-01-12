@@ -343,7 +343,7 @@ public class SolverPropertiesLoader {
      * "de/uka/ilkd/key/smt/solvertypes".
      */
     static Configuration loadSolvers() {
-        try { // load single solvers.txt files from the same location everywhere in the classpath
+        try {
             var filesInClasspath =
                 Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
                         .getResources(PACKAGE_PATH + SOLVER_LIST_FILE)).toList();
@@ -351,19 +351,19 @@ public class SolverPropertiesLoader {
 
             Path user = getUserSmtSolverPath();
             if (Files.exists(user)) {
-                LOGGER.info("Loading a SMT solver definitions from {}", user);
+                LOGGER.info("Loading SMT solver definitions from {}", user);
                 solverFiles.add(user.toUri().toURL());
             }
 
             Path sysProp = getSystemPropertySmtSolverPath();
             if (sysProp != null && Files.exists(sysProp)) {
-                LOGGER.info("Loading a SMT solver definitions from {}", sysProp);
+                LOGGER.info("Loading SMT solver definitions from {}", sysProp);
                 solverFiles.add(sysProp.toUri().toURL());
             }
 
             Path local = getLocalSmtSolverPath();
-            if (Files.exists(user)) {
-                LOGGER.info("Loading a SMT solver definitions from {}", local);
+            if (Files.exists(local)) {
+                LOGGER.info("Loading SMT solver definitions from {}", local);
                 solverFiles.add(local.toUri().toURL());
             }
 
