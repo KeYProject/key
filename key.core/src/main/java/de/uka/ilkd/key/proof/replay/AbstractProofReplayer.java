@@ -157,19 +157,16 @@ public abstract class AbstractProofReplayer {
         if (currContract != null) {
             AbstractContractRuleApp<?> contractApp = null;
 
-            BuiltInRule useContractRule =
-                proof.getServices().getProfile().getUseDependencyContractRule();
-
             if (currContract instanceof OperationContract) {
-                contractApp = (((UseOperationContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseOperationContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
             } else {
+                var rule = proof.getServices().getProfile().getUseDependencyContractRule();
                 // copy over the mysterious "step"
                 PosInOccurrence step =
                     findInNewSequent(((UseDependencyContractApp<?>) ruleApp).step(),
                         currGoal.sequent());
-                contractApp = (((UseDependencyContractRule) useContractRule)
-                        .createApp(pos)).setContract(currContract).setStep(step);
+                contractApp = rule.createApp(pos).setContract(currContract).setStep(step);
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {

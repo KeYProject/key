@@ -671,18 +671,15 @@ public class IntermediateProofReplayer {
 
         if (currContract != null) {
             AbstractContractRuleApp<?> contractApp;
-            BuiltInRule useContractRule;
 
             if (currContract instanceof OperationContract) {
                 var rule = proof.getServices().getProfile().getUseOperationContractRule();
-                useContractRule = rule;
                 contractApp = rule.createApp(pos).setContract(currContract);
             } else {
                 var rule = proof.getServices().getProfile().getUseDependencyContractRule();
-                useContractRule = rule;
                 contractApp = rule.createApp(pos).setContract(currContract);
                 // restore "step" if needed
-                var depContractApp = ((UseDependencyContractApp) contractApp);
+                var depContractApp = ((UseDependencyContractApp<?>) contractApp);
                 if (depContractApp.step() == null) {
                     contractApp = depContractApp.setStep(builtinIfInsts.head());
                 }
