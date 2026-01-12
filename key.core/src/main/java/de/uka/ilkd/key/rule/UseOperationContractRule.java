@@ -711,7 +711,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             // translate the contract
             final JTerm baseHeapTerm = tb.getBaseHeap();
             contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst, tb.tf());
-            final JTerm contractResult =
+            contractResult =
                 inst.pm.isConstructor() || resultVar == null ? null : tb.var(resultVar);
             contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, inst,
                 contractResult == null && resultVar != null ? tb.var(resultVar) : contractResult,
