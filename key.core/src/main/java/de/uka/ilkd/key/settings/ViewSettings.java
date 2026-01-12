@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -157,7 +158,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String NOTIFICATION_AFTER_MACRO = "[View]notificationAfterMacro";
 
-    private static final String LOOK_AND_FEEL_DEFAULT = "com.formdev.flatlaf.FlatLightLaf";
+    private static final String LOOK_AND_FEEL_DEFAULT = UIManager.getCrossPlatformLookAndFeelClassName();
 
     public static final String NOTIFICATION_ALWAYS = "Always";
     public static final String NOTIFICATION_UNFOCUSED = "When not focused";
