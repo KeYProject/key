@@ -3,12 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.wd;
 
+import java.net.URL;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -20,6 +29,25 @@ public class WdProfile extends JavaProfile {
     public static final String DISPLAY_NAME = "Java Profile + Well-Definedness Checks";
 
     public static final WdProfile INSTANCE = new WdProfile();
+
+    private final RuleCollection wdStandardRules;
+
+    public WdProfile() {
+        super();
+
+        var defRules = super.getStandardRules();
+
+        final URL wdDotKey =
+            KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/wd.key");
+
+        RuleSource tacletBaseWd = RuleSourceFactory.initRuleFile(
+            Objects.requireNonNull(wdDotKey,
+                "Could not find rule file 'rules/wd.key' in classpath"));
+
+        wdStandardRules = new RuleCollection(defRules.getTacletBase()
+                .append(tacletBaseWd),
+            defRules.standardBuiltInRules());
+    }
 
     @Override
     public String ident() {
@@ -57,5 +85,21 @@ public class WdProfile extends JavaProfile {
                 .filter(it -> !(it instanceof LoopContractExternalRule))
                 .filter(it -> !(it instanceof LoopScopeInvariantRule));
         return rules;
+    }
+
+    @Override
+    public boolean withPermissions() {
+        return false;
+    }
+
+    @Override
+    public RuleCollection getStandardRules() {
+        return wdStandardRules;
+    }
+
+    @Override
+    public void prepareInitConfig(InitConfig baseConfig) {
+        var wdChoice = baseConfig.choiceNS().lookup(new Name("wdChecks:on"));
+        baseConfig.activateChoice(wdChoice);
     }
 }

@@ -457,4 +457,13 @@ public class InitConfig {
     public void setFileRepo(FileRepo fileRepo) {
         this.fileRepo = fileRepo;
     }
+
+    /// Enforce the given choice. Remove choices of the same category from the current set.
+    public void activateChoice(Choice choice) {
+        setActivatedChoices(
+            getActivatedChoices()
+                    .stream().filter(it -> choice.category().equals(it.category()))
+                    .collect(ImmutableSet.collector())
+                    .add(choice));
+    }
 }
