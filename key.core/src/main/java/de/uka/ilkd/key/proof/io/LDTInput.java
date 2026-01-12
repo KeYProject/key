@@ -192,7 +192,7 @@ public class LDTInput implements EnvInput {
 
     @Override
     public Project getProject() {
-        return Project.DUMMY;
+        return Project.createDummy();
     }
 
     @Override

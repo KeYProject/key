@@ -18,7 +18,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
@@ -212,7 +212,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             Profile profile = mainWindow.getMediator().getProfile();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(),
-                    new Services(Project.DUMMY, profile),
+                    new Services(HeavyweightProject.DUMMY, profile),
                     mainWindow.getUserInterface());
 
             TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(

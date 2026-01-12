@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -50,7 +52,7 @@ import org.key_project.util.collection.ImmutableSet;
  * EnvInput for standalone specification language front ends.
  */
 public final class SLEnvInput extends AbstractEnvInput {
-    private final Project project;
+    private final HeavyweightProject project;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -60,7 +62,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             List<File> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
-        project = new Project();
+        project = Project.createHeavyweight(Paths.get(javaPath));
     }
 
 

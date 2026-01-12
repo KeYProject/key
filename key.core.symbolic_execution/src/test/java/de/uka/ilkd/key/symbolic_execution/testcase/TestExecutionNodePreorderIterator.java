@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
@@ -39,7 +39,7 @@ public class TestExecutionNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -89,7 +89,7 @@ public class TestExecutionNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -130,7 +130,7 @@ public class TestExecutionNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node child1 = appendNode(proof, root);
         Node child2 = appendNode(proof, root);
@@ -171,7 +171,7 @@ public class TestExecutionNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Create execution test model
         TreeSettings settings = new TreeSettings(false, false, false, false, false);

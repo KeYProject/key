@@ -21,6 +21,7 @@ import de.uka.ilkd.key.nparser.builder.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.parsing.BuildingException;
@@ -65,7 +66,7 @@ public class KeyIO {
     }
 
     public KeyIO() {
-        this(new Services(Project.DUMMY, new JavaProfile()));
+        this(new Services(Project.createDummy(), new JavaProfile()));
     }
 
 

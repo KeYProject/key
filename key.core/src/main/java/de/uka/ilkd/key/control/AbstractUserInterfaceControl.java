@@ -21,7 +21,7 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -247,7 +247,7 @@ public abstract class AbstractUserInterfaceControl
      * @param profile The {@link Profile} to use.
      * @return The instantiated {@link ProblemInitializer}.
      */
-    protected ProblemInitializer createProblemInitializer(Project project, Profile profile) {
+    protected ProblemInitializer createProblemInitializer(HeavyweightProject project, Profile profile) {
         return new ProblemInitializer(this, new Services(project, profile), this);
     }
 

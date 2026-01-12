@@ -5,38 +5,34 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.mgt.DependencyRepository;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.Project;
-import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.PositionedString;
 
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableSet;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import org.jspecify.annotations.NonNull;
 
 public class KeYProjectFile implements EnvInput {
     private final KeYUserProblemFile projectKeYFile;
     private final Path projectFolder;
     private final FileRepo fileRepo;
-    private final ProblemLoaderControl control;
     private final Profile profile;
+    private final ProblemLoaderControl control;
     private InitConfig initConfig;
-    private Path dependenciesPath;
-    private Dependencies dependencies;
-    private final Project project;
+    private final HeavyweightProject project;
 
     public KeYProjectFile(File folder, FileRepo fileRepo, ProblemLoaderControl control,
             Profile profile) {
@@ -46,9 +42,7 @@ public class KeYProjectFile implements EnvInput {
         this.fileRepo = fileRepo;
         this.control = control;
         this.profile = profile;
-        dependenciesPath = projectFolder.resolve("src").resolve("main").resolve("key")
-                .resolve("dependencies.json");
-        project = Project.create(this);
+        project = Project.createHeavyweight(projectFolder);
     }
 
     @Override
@@ -90,7 +84,9 @@ public class KeYProjectFile implements EnvInput {
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
         var warnings = projectKeYFile.read();
-        return warnings.union(readDependencies());
+        warnings = warnings.union(project.readDependencies());
+        readStoredProofs();
+        return warnings;
     }
 
     @Override
@@ -112,63 +108,22 @@ public class KeYProjectFile implements EnvInput {
         return projectFolder;
     }
 
-    private ImmutableSet<PositionedString> readDependencies() {
-        // TODO: check license of GSON!
-        Gson gson = new Gson();
-        ImmutableSet<PositionedString> warnings = ImmutableSet.empty();
+    private void readStoredProofs() {
+        Map<String, Contract> filename2Contract = new HashMap<>();
+        initConfig.getServices().getSpecificationRepository().getAllContracts().stream().forEach(c -> filename2Contract.put(MiscTools.toValidFileName(c.getName()) + ".proof", c));
         try {
-            String content = Files.readString(dependenciesPath);
-            this.dependencies = gson.fromJson(content, Dependencies.class);
-
-            // add entries from json file to DependencyRepository
-            DependencyRepository depRepo = initConfig.getServices().getProject().getDepRepo();
-            SpecificationRepository specRepo =
-                initConfig.getServices().getSpecificationRepository();
-            depRepo.registerContracts(specRepo);
-            for (ContractInfo c : dependencies.contracts()) {
-                Contract from = specRepo.getContractByName(c.name());
-                for (DependencyEntry d : c.dependencies()) {
-                    Contract to = specRepo.getContractByName(d.name());
-                    depRepo.addDependency(from, to);
+            Files.walk(projectFolder.resolve(project.getProofDir()), 1, FileVisitOption.FOLLOW_LINKS).filter(p -> p.toString().endsWith(".proof")).forEach(p -> {
+                Contract c = filename2Contract.get(p.getFileName().toString());
+                if (c != null) {
+                    project.addStoredProof(c, p);
+                } else {
+                    // this proof is definitely outdated, the contract it refers to does not exist anymore
+                    project.addOutdatedProof(p);
                 }
-            }
-        } catch (JsonParseException e) {
-            warnings = warnings.add(new PositionedString(e.getMessage(), dependenciesPath.toUri()));
-        } catch (IOException e) {
-            // TODO: Create empty dependencies file?
-            throw new RuntimeException(e);
-        }
-        return warnings;
-    }
-
-    /**
-     * Writes all the dependencies of the project into {@code dependencies.json}.
-     */
-    public void flush() {
-        List<ContractInfo> cis = new ArrayList<>();
-        for (Contract c : project.getDepRepo().getContractsWithDependencies()) {
-            List<DependencyEntry> deps = new ArrayList<>();
-            for (Contract d : project.getDepRepo().getDependencies(c)) {
-                deps.add(new DependencyEntry(d.getName(), d.hashCode()));
-            }
-            cis.add(new ContractInfo(c.getName(), c.hashCode(), -1, ProofStatus.OPEN, deps));
-        }
-        Dependencies dependencies = new Dependencies(cis);
-        // Write
-        Gson gson = new Gson();
-        try {
-            Files.writeString(dependenciesPath, gson.toJson(dependencies), StandardCharsets.UTF_8);
+            });
         } catch (IOException e) {
             // TODO: DD: Logging
             throw new RuntimeException(e);
         }
     }
-
-    private record Dependencies(List<ContractInfo> contracts) {
-    }
-
-    private record ContractInfo(String name, int hash, int srcHash, ProofStatus state,
-            List<DependencyEntry> dependencies) {}
-
-    private record DependencyEntry(String name, int hash) {}
 }

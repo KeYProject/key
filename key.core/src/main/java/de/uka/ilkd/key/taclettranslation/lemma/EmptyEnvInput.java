@@ -34,6 +34,6 @@ public class EmptyEnvInput extends AbstractEnvInput {
 
     @Override
     public Project getProject() {
-        return Project.DUMMY;
+        return Project.createDummy();
     }
 }

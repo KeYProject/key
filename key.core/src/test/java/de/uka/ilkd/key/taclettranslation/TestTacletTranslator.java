@@ -15,7 +15,7 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -50,7 +50,7 @@ public class TestTacletTranslator {
     @BeforeEach
     public void setUp() throws Exception {
         nss = new NamespaceSet();
-        services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
+        services = new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile());
         io = new KeyIO(services, nss);
     }
 

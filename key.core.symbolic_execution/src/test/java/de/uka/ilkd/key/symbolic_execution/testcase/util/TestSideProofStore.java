@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
@@ -57,7 +57,7 @@ public class TestSideProofStore {
         try {
             SideProofStore.DEFAULT_INSTANCE.addProofStoreListener(listener);
             // Create proofs
-            Services services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
+            Services services = new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile());
             InitConfig ic = new InitConfig(services);
             ProofEnvironment pe = new ProofEnvironment(ic);
             Proof p1 = new Proof("TestSideProofStore 1", ic.deepCopy());

@@ -34,7 +34,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -467,7 +467,7 @@ public final class ProofManagementDialog extends JDialog {
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();
 
-            Project project = initConfig.getServices().getProject();
+            HeavyweightProject project = initConfig.getServices().getProject();
             @Nullable
             Path storedProof = project.findStoredProof(contract);
             if (storedProof != null) {

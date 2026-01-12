@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class TestNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -67,7 +67,7 @@ public class TestNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         appendNode(proof, l1);
@@ -96,7 +96,7 @@ public class TestNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         appendNode(proof, root);
         appendNode(proof, root);
@@ -115,7 +115,7 @@ public class TestNodePreorderIterator {
         // Create tree to test
         Proof proof =
             new Proof("target",
-                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+                new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Test tree
         assertRoot(root, createExpectedNodes(0));

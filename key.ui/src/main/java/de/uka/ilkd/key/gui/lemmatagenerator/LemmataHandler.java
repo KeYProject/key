@@ -18,7 +18,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.lemma.AutomaticProver;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
@@ -65,7 +65,7 @@ public class LemmataHandler implements TacletFilter {
         Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =
-            new ProblemInitializer(null, new Services(Project.DUMMY, profile), new Listener());
+            new ProblemInitializer(null, new Services(HeavyweightProject.DUMMY, profile), new Listener());
 
         TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null, new Listener(),
             problemInitializer, profile, file, filesForAxioms);

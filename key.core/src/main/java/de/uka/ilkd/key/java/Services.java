@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
@@ -72,7 +72,7 @@ public class Services implements TermServices, LogicServices {
      */
     private SpecificationRepository specRepos;
 
-    private Project project;
+    private HeavyweightProject project;
 
     /*
      * the Java model (with all paths)
@@ -98,7 +98,7 @@ public class Services implements TermServices, LogicServices {
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
      */
-    public Services(Project project, Profile profile) {
+    public Services(HeavyweightProject project, Profile profile) {
         assert profile != null;
         this.profile = profile;
         this.counters = new LinkedHashMap<>();
@@ -114,8 +114,8 @@ public class Services implements TermServices, LogicServices {
         nameRecorder = new NameRecorder();
     }
 
-    private Services(Project project, Profile profile, KeYCrossReferenceServiceConfiguration crsc,
-            KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(HeavyweightProject project, Profile profile, KeYCrossReferenceServiceConfiguration crsc,
+                     KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -373,7 +373,7 @@ public class Services implements TermServices, LogicServices {
         TermProgramVariableCollector create(Services services);
     }
 
-    public Project getProject() {
+    public HeavyweightProject getProject() {
         return project;
     }
 

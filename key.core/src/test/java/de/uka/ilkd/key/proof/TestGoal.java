@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.collection.ImmutableList;
@@ -34,7 +34,7 @@ public class TestGoal {
     public void setUp() {
         TacletForTests.parse();
         proof = new Proof("",
-            new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
     }
 
     @AfterEach
@@ -49,7 +49,7 @@ public class TestGoal {
                 .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
 
         final InitConfig initConfig =
-            new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()));
+            new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile()));
         proof = new Proof("", seq, "", initConfig.createTacletIndex(),
             initConfig.createBuiltInRuleIndex(), initConfig);
 

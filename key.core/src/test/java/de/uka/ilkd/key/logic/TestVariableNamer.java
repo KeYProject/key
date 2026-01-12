@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -37,7 +37,7 @@ public class TestVariableNamer {
 
 
     private final Proof proof = new Proof("TestVariableNamer",
-        new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+        new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
     private final Services services = proof.getServices();
     private final LocationVariable x = constructProgramVariable("x");
     private final LocationVariable xx = constructProgramVariable("x");

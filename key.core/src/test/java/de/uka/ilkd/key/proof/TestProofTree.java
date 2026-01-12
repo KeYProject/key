@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
@@ -85,7 +85,7 @@ public class TestProofTree {
             Semisequent.EMPTY_SEMISEQUENT);
 
         p = new Proof("TestProofTree",
-            new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile())));
 
         n1 = new Node(p, s1);
         n2 = new Node(p, s2);

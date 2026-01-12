@@ -12,7 +12,7 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class ProofSaverTest {
         KeyIO.Loader loader = io.load(content);
         Sequent seq = loader.parseFile().loadProblem().getProblem();
         final InitConfig initConfig =
-            new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()));
+            new InitConfig(new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile()));
         Proof proof = new Proof("test", seq, "", initConfig, null);
         File file = File.createTempFile("proofSaveTest", ".key");
         file.deleteOnExit();

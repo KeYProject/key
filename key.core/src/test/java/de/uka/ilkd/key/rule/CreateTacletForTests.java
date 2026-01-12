@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.mgt.Project;
+import de.uka.ilkd.key.proof.mgt.HeavyweightProject;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
@@ -76,7 +76,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public final Services services;
 
     public CreateTacletForTests() {
-        services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
+        services = new Services(HeavyweightProject.DUMMY, AbstractProfile.getDefaultProfile());
         tf = services.getTermFactory();
     }
 
