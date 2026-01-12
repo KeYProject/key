@@ -17,12 +17,14 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 @NullMarked
 public class WdWhileInvariantRule extends WhileInvariantRule {
-    private static final Name NAME = new Name("WdWhileInvariantRule");
+    private static final Name NAME = new Name("WD Loop Invariant");
     public static final int IDX_GOAL_WD = 1 + WhileInvariantRuleApplier.IDX_GOAL_INIT;
+    public static final WdWhileInvariantRule INSTANCE = new WdWhileInvariantRule();
 
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
@@ -36,6 +38,11 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
         return NAME;
     }
 
+    @Override
+    public @Nullable String getOrigin() {
+        return super.getOrigin();
+    }
+
     protected static class WdWhileInvariantRuleApplier extends WhileInvariantRuleApplier {
         public WdWhileInvariantRuleApplier(Goal goal, LoopInvariantBuiltInRuleApp<?> ruleApp) {
             super(goal, ruleApp);
@@ -44,7 +51,7 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
         @Override
         public @NonNull ImmutableList<Goal> apply() {
             final ImmutableList<Goal> result = goal.split(4);
-            prepareGoals(result);
+            super.prepareGoals(result);
             setupWdGoal(result.get(IDX_GOAL_WD));
             return result;
 

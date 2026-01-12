@@ -24,6 +24,8 @@ import static de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
  * @version 1 (7/27/25)
  */
 public class WdBlockContractInternalRule extends BlockContractInternalRule {
+    public static final WdBlockContractInternalRule INSTANCE = new WdBlockContractInternalRule();
+
     @Override
     protected ImmutableList<Goal> splitIntoGoals(Goal goal, BlockContract contract,
             List<LocationVariable> heaps,

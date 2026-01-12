@@ -1201,7 +1201,8 @@ public abstract class TacletApp implements RuleApp {
                     return false;
                 }
             } else {
-                System.out.println("ERROR! " + instantiation);
+                System.err.println(
+                    "ERROR! " + instantiation + " of class " + instantiation.getClass());
             }
         }
         return true;

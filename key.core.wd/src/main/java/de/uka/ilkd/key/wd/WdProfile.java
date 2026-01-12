@@ -3,15 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.wd;
 
-import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -49,14 +45,17 @@ public class WdProfile extends JavaProfile {
     @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         var javaRules = super.initBuiltInRules();
-        return javaRules.map(it -> {
-            if (Objects.equals(it, BlockContractInternalRule.INSTANCE)) {
+        var rules = javaRules.map(it -> {
+            if (it instanceof BlockContractInternalRule) {
                 return WdBlockContractInternalRule.INSTANCE;
-            } else if (Objects.equals(WhileInvariantRule.INSTANCE, it)) {
+            } else if (it instanceof WhileInvariantRule) {
                 return WdWhileInvariantRule.INSTANCE;
             } else
                 return it;
         })
+                .filter(it -> it != BlockContractExternalRule.INSTANCE)
+                .filter(it -> !(it instanceof LoopContractExternalRule))
                 .filter(it -> !(it instanceof LoopScopeInvariantRule));
+        return rules;
     }
 }
