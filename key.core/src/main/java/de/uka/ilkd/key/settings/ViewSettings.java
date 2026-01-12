@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import javax.swing.*;
 
 /**
  * This class encapsulates information about: 1) relative font size in the prover view 2) the
@@ -158,7 +158,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String NOTIFICATION_AFTER_MACRO = "[View]notificationAfterMacro";
 
-    private static final String LOOK_AND_FEEL_DEFAULT = UIManager.getCrossPlatformLookAndFeelClassName();
+    private static final String LOOK_AND_FEEL_DEFAULT =
+        UIManager.getCrossPlatformLookAndFeelClassName();
 
     public static final String NOTIFICATION_ALWAYS = "Always";
     public static final String NOTIFICATION_UNFOCUSED = "When not focused";
