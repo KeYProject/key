@@ -33,7 +33,7 @@ import org.jspecify.annotations.NonNull;
  * <li>the goal selection strategy</li>
  * <li>the way how term labels are maintained</li>
  * </ul>
- *
+ * <p>
  * Currently this is only rudimentary: possible extensions are
  * <ul>
  * <li>program model to use (java, misrac, csharp)</li>
@@ -61,13 +61,19 @@ import org.jspecify.annotations.NonNull;
  */
 public interface Profile {
 
-    /** returns the rule source containg all taclets for this profile */
+    /**
+     * returns the rule source containg all taclets for this profile
+     */
     RuleCollection getStandardRules();
 
-    /** the name of this profile used to for storing into key files, and for loading */
+    /**
+     * the name of this profile used to for storing into key files, and for loading
+     */
     String ident();
 
-    /** the name of this profile presentable for humans */
+    /**
+     * the name of this profile presentable for humans
+     */
     default String displayName() {
         return ident();
     }
@@ -77,7 +83,9 @@ public interface Profile {
         return "";
     }
 
-    /** returns the strategy factories for the supported strategies */
+    /**
+     * returns the strategy factories for the supported strategies
+     */
     ImmutableSet<StrategyFactory> supportedStrategies();
 
     /**
@@ -123,7 +131,9 @@ public interface Profile {
      */
     <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getSelectedGoalChooserBuilder();
 
-    /** returns the (default) justification for the given rule */
+    /**
+     * returns the (default) justification for the given rule
+     */
     RuleJustification getJustification(Rule r);
 
 
@@ -151,12 +161,27 @@ public interface Profile {
         return new SpecificationRepository(services);
     }
 
+    /// Returns the implementation of a [UseDependencyContractRule] for this profile.
     ///
+    /// @see de.uka.ilkd.key.proof.io.IntermediateProofReplayer
     default UseDependencyContractRule getUseDependencyContractRule() {
         return UseDependencyContractRule.INSTANCE;
     }
 
+    /// Returns the implementation of a [UseOperationContractRule] for this profile
+    ///
+    /// @see de.uka.ilkd.key.proof.io.IntermediateProofReplayer
     default UseOperationContractRule getUseOperationContractRule() {
         return UseOperationContractRule.INSTANCE;
+    }
+
+    /// Let a profile visit a freshly created init profile. Allows the setting of properties after
+    /// the
+    /// Taclet base has been loaded, but before Java sources are loaded or the environment is
+    /// established.
+    ///
+    /// @see ProblemInitializer
+    default void prepareInitConfig(InitConfig baseConfig) {
+
     }
 }
