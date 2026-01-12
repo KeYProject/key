@@ -61,7 +61,7 @@ jobs:
         run: ./gradlew --continue -DjacocoEnabled=true :${{ matrix.modules }}:test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: success() || failure()
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.modules }}
@@ -102,7 +102,7 @@ jobs:
         run: ./gradlew --continue ${{ matrix.test }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results-${{ matrix.test }}
