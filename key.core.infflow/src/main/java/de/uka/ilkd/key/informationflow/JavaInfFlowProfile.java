@@ -35,7 +35,7 @@ public class JavaInfFlowProfile extends JavaProfile {
     }
 
     @Override
-    public UseOperationContractRule getUseDependencyContractRule() {
+    public UseOperationContractRule getUseOperationContractRule() {
         return InfFlowUseOperationContractRule.INSTANCE;
     }
 

@@ -10,6 +10,8 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
@@ -150,7 +152,11 @@ public interface Profile {
     }
 
     ///
-    default UseOperationContractRule getUseDependencyContractRule() {
+    default UseDependencyContractRule getUseDependencyContractRule() {
+        return UseDependencyContractRule.INSTANCE;
+    }
+
+    default UseOperationContractRule getUseOperationContractRule() {
         return UseOperationContractRule.INSTANCE;
     }
 }
