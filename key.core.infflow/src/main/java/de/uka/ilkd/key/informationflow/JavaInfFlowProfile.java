@@ -35,6 +35,11 @@ public class JavaInfFlowProfile extends JavaProfile {
     }
 
     @Override
+    public UseOperationContractRule getUseDependencyContractRule() {
+        return InfFlowUseOperationContractRule.INSTANCE;
+    }
+
+    @Override
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         var rules = super.initBuiltInRules();
         return rules.map(it -> {

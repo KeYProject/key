@@ -673,7 +673,7 @@ public class IntermediateProofReplayer {
             AbstractContractRuleApp<?> contractApp;
 
             var useContractRule =
-                proof.getServices().getProfile().findInstanceFor(UseOperationContractRule.class);
+                proof.getServices().getProfile().getUseDependencyContractRule();
             if (currContract instanceof OperationContract) {
                 contractApp = useContractRule.createApp(pos).setContract(currContract);
             } else {

@@ -135,7 +135,7 @@ public abstract class AbstractProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        final SMTRule smtRule = proof.getServices().getProfile().findInstanceFor(SMTRule.class);
+        final SMTRule smtRule = SMTRule.INSTANCE;
 
         if (smtRule.displayName().equals(ruleName)) {
             return smtRule.createApp(null, proof.getServices());
@@ -158,7 +158,7 @@ public abstract class AbstractProofReplayer {
             AbstractContractRuleApp<?> contractApp = null;
 
             BuiltInRule useContractRule =
-                proof.getServices().getProfile().findInstanceFor(UseOperationContractRule.class);
+                proof.getServices().getProfile().getUseDependencyContractRule();
 
             if (currContract instanceof OperationContract) {
                 contractApp = (((UseOperationContractRule) useContractRule)
