@@ -109,8 +109,10 @@ public class JavaCompilerCheckFacade {
             // there is no guarantee that remove is supported else
             processors = new LinkedList<>(processors); 
             universe = processors.remove("universe.UniverseChecker");
-            options.add("-processor");
-            options.add(processors.stream().collect(Collectors.joining(",")));
+            if (!processors.isEmpty()) {
+                options.add("-processor");
+                options.add(processors.stream().collect(Collectors.joining(",")));
+            }
         }
 
         ArrayList<Path> files = new ArrayList<>();

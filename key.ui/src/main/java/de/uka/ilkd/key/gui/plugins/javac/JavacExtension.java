@@ -34,6 +34,9 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.stream.Collectors;
+import java.util.Objects;
+
 /**
  * Extension provides Javac checks for recent-loaded Java files.
  * <p>
@@ -158,8 +161,11 @@ public class JavacExtension
             if (settings.getUseProcessors()) {
                 if (classpath == null) classpath = new ArrayList<>();
 
-                classpath.addAll(Arrays.asList(settings.getClassPaths().split(System.lineSeparator()))
-                    .stream().map(p -> Paths.get(p)).toList());
+                String classpaths = settings.getClassPaths();
+                if (!classpaths.isEmpty()) {
+                    classpath.addAll(Arrays.asList(classpaths.split(System.lineSeparator()))
+                        .stream().map(p -> Paths.get(p)).toList());
+                }
 
                 processors = Arrays.asList(settings.getProcessors().split(System.lineSeparator()));
             }
