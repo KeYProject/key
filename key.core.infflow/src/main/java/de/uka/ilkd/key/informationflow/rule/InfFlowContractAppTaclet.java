@@ -17,7 +17,6 @@ import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
 import org.key_project.prover.rules.TacletPrefix;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -37,33 +36,10 @@ import org.jspecify.annotations.NonNull;
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final String USE_IF = "Use information flow contract for ";
-    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.nil();
-
-
 
     public static boolean hasType(Rule rule) {
         return rule != null && rule.name().toString().startsWith(USE_IF);
     }
-
-
-    public static boolean registered(Name name) {
-        return name != null && alreadyRegistered.contains(name);
-    }
-
-
-    public static void register(Name name) {
-        alreadyRegistered = alreadyRegistered.add(name);
-    }
-
-
-    public static boolean unregister(Name name) {
-        final boolean registered = registered(name);
-        if (registered) {
-            alreadyRegistered = alreadyRegistered.remove(name);
-        }
-        return registered;
-    }
-
 
     public InfFlowContractAppTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,

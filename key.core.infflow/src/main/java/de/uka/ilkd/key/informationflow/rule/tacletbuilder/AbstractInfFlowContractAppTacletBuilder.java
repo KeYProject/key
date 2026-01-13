@@ -5,6 +5,8 @@ package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
@@ -78,14 +80,23 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     abstract Name generateName();
 
+    record InfFlowUsedTacletNames(Set<String> names) {
+    }
+
     private static Name makeUnique(Name name, Goal goal) {
-        int i = 0;
-        final String s = name.toString();
-        name = new Name(s + "_" + getBranchUID(goal.node()));
-        while (InfFlowContractAppTaclet.registered(name)) {
-            name = new Name(s + "_" + i++);
+        var used = goal.proof().lookup(InfFlowUsedTacletNames.class);
+        if (used == null) {
+            used = new InfFlowUsedTacletNames(new TreeSet<>());
+            goal.proof().register(used, InfFlowUsedTacletNames.class);
         }
-        InfFlowContractAppTaclet.register(name);
+
+        int i = 0;
+        var base = name.toString() + "_" + getBranchUID(goal.node());
+        var s = base;
+        while (used.names.contains(s)) {
+            s = s + "_" + i++;
+        }
+        used.names.add(base);
         return name;
     }
 
