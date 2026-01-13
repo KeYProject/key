@@ -118,9 +118,9 @@ public class ProofIndependentSettings {
 
     public void saveSettings() {
         if (!filename.getName().endsWith(".json")) {
-            Properties result = lastReadProperties == null 
-                ? new Properties()
-                : new Properties(lastReadProperties);
+            Properties result = lastReadProperties == null
+                    ? new Properties()
+                    : new Properties(lastReadProperties);
 
             for (Settings settings : settings) {
                 settings.writeSettings(result);
