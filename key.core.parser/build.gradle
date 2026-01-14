@@ -1,0 +1,22 @@
+plugins {
+    id 'org.javacc.javacc' version '4.0.3'
+}
+
+description = "KeY Parser"
+
+dependencies {
+    // JavaCC
+    implementation("net.java.dev.javacc:javacc:7.0.13")
+    javacc("net.java.dev.javacc:javacc:7.0.13")
+}
+
+// The target directory for JavaCC (parser generation)
+def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
+def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+sourceSets.main.java.srcDir(javaCCOutputDirMain)
+
+// Generate code from JavaCC grammars.
+compileJavacc {
+    outputDirectory = javaCCOutputDirMain
+    inputDirectory = file("src/main/javacc")
+}
