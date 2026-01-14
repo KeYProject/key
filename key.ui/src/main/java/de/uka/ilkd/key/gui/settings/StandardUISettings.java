@@ -31,9 +31,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
         + "which are rules with less priority in the taclet menu";
     private static final String LOOK_AND_FEEL_INFO = """
-            Look and feel used by KeY.
-            'System' tries to mimic the default looks, 'Metal' is the Java default.
+            Look and feel used by KeY. 'Metal' is the Java default.
             KeY must be restarted to apply changes.""";
+    private static final String LOOL_AND_FEEL_DECORATED_INFO = """
+            Use look and feel for windows decorations (if available).
+            Only applies to newly created windows.""";
 
     static {
         FlatLightLaf.installLafInfo();
@@ -44,14 +46,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         FlatMacDarkLaf.installLafInfo();
     }
 
-
     /**
      * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
      */
     private static final List<String> LAF_LABELS =
         Arrays.stream(UIManager.getInstalledLookAndFeels()).map(UIManager.LookAndFeelInfo::getName)
                 .toList();
-
 
     /**
      * Classnames corresponding to the labels in {@link #LAF_LABELS}.
@@ -61,6 +61,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 .map(UIManager.LookAndFeelInfo::getClassName).toList();
 
     private final JComboBox<String> lookAndFeel;
+    private final JCheckBox chkDefaultLookAndFeelDecorated;
     private final JSpinner spFontSizeGlobal;
     private final JSpinner txtMaxTooltipLines;
     private final JCheckBox chkShowLoadExamplesDialog;
@@ -87,6 +88,9 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         lookAndFeel = createSelection(LAF_LABELS.toArray(new String[0]), emptyValidator());
         addTitledComponent("Look and feel", lookAndFeel, LOOK_AND_FEEL_INFO);
 
+        chkDefaultLookAndFeelDecorated = addCheckBox("Window decorations by look and feel",
+            LOOL_AND_FEEL_DECORATED_INFO, false, emptyValidator());
+
         spFontSizeGlobal =
             createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1), emptyValidator());
         addTitledComponent("Global font factor", spFontSizeGlobal, "");
@@ -96,7 +100,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         spFontSizeTreeSequent = this.createSelection(sizes, emptyValidator());
         addTitledComponent("Tree and sequent font size", spFontSizeTreeSequent, "");
 
-
         String info = """
                 Maximum size (line count) of the tooltips of applicable rules
                 with schema variable instantiations displayed.
@@ -104,7 +107,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 """;
         txtMaxTooltipLines =
             addNumberField("Maximum line number for tooltips", 1, 100, 5, info, emptyValidator());
-
 
         chkShowLoadExamplesDialog =
             addCheckBox("Show load examples dialog on startup", "", true, emptyValidator());
@@ -157,7 +159,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         GeneralSettings generalSettings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-
         txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
         txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
@@ -167,6 +168,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 break;
             }
         }
+        chkDefaultLookAndFeelDecorated.setSelected(vs.isDefaultLookAndFeelDecorated());
         spFontSizeGlobal.setValue(vs.getUIFontSizeFactor());
         txtMaxTooltipLines.setValue(vs.getMaxTooltipLines());
         chkShowLoadExamplesDialog.setSelected(vs.getShowLoadExamplesDialog());
@@ -198,6 +200,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         vs.setLookAndFeel(LAF_CLASSES.get(lookAndFeel.getSelectedIndex()));
+        vs.setDefaultLookAndFeelDecorated(chkDefaultLookAndFeelDecorated.isSelected());
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
