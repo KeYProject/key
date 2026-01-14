@@ -165,14 +165,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     private int graphEdgesNr = 0;
     /**
-     * Indicates whether graph statistics ({@link #graphNodes}, {@link #graphEdges}) need to be
-     * updated based on {@link #graphNodesNr} and {@link #graphEdgesNr}.
+     * Timer to regularly update dependency graph statistics and other UI state when loading a
+     * proof.
      */
-    private boolean updateGraphLabels = false;
-    /**
-     * Timer to regularly update dependency graph statistics when loading a proof.
-     */
-    private Timer updateGraphLabelsTimer;
+    private Timer updateUiStateTimer;
 
     /**
      * Construct a new panel for this extension.
@@ -194,11 +190,17 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         this.mediator = mediator;
         this.extension = extension;
 
-        updateGraphLabelsTimer = new Timer(100, e -> {
-            if (updateGraphLabels) {
+        updateUiStateTimer = new Timer(500, e -> {
+            var tracker = extension.trackers.get(currentProof);
+            if (tracker != null) {
+                graphNodesNr = tracker.getDependencyGraph().countNodes();
+                graphEdgesNr = tracker.getDependencyGraph().countEdges();
                 displayGraphLabels();
-                updateGraphLabelsTimer.stop();
+            } else {
+                resetGraphLabels();
             }
+            updateUIState();
+            updateUiStateTimer.stop();
         });
     }
 
@@ -552,22 +554,16 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * Notify the panel that a rule has been applied on the currently opened proof.
      *
-     * @param proof proof
-     * @param tracker dependency tracker of that proof
+     * @param proof currently opened proof
      */
-    public void ruleAppliedOnProof(Proof proof, DependencyTracker tracker) {
+    public void ruleAppliedOnProof(Proof proof) {
         currentProof = proof;
-        graphNodesNr = tracker.getDependencyGraph().countNodes();
-        graphEdgesNr = tracker.getDependencyGraph().countEdges();
-        updateGraphLabels = true;
-        updateGraphLabelsTimer.start();
-
-        updateUIState();
+        updateUiStateTimer.start();
     }
 
     @Override
     public void proofPruned(ProofTreeEvent e) {
-        ruleAppliedOnProof(e.getSource(), extension.trackers.get(e.getSource()));
+        ruleAppliedOnProof(e.getSource());
     }
 
     private void updateUIState() {
