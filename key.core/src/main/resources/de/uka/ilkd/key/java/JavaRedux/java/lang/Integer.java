@@ -10,6 +10,8 @@ public final class Integer implements java.lang.Comparable
    public final static java.lang.Class TYPE;
    public final static int SIZE = 32;
 
+   private /*@ spec_public @*/ final int value;
+
    public static java.lang.String toString(int arg0, int arg1);
    public static java.lang.String toHexString(int arg0);
    public static java.lang.String toOctalString(int arg0);
@@ -19,11 +21,19 @@ public final class Integer implements java.lang.Comparable
    public static int parseInt(java.lang.String arg0) throws java.lang.NumberFormatException;
    public static java.lang.Integer valueOf(java.lang.String arg0, int arg1) throws java.lang.NumberFormatException;
    public static java.lang.Integer valueOf(java.lang.String arg0) throws java.lang.NumberFormatException;
+   /*@ public normal_behavior
+     @ ensures \result.value == arg0;
+     @ assignable \nothing;
+     @*/
    public static java.lang.Integer valueOf(int arg0);
    public Integer(int arg0);
    public Integer(java.lang.String arg0) throws java.lang.NumberFormatException;
    public byte byteValue();
    public short shortValue();
+    /*@ public normal_behavior
+      @ ensures \result == value;
+      @ assignable \strictly_nothing;
+      @*/
    public int intValue();
    public long longValue();
 //   public float floatValue();
