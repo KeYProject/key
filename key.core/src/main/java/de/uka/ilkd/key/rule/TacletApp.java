@@ -1182,7 +1182,7 @@ public abstract class TacletApp implements RuleApp {
             final var sv = pair.key();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
-                    || sv instanceof SkolemTermSV) {
+                    || sv instanceof SkolemTermSV || sv instanceof TermLabelSV) {
                 continue;
             }
 
