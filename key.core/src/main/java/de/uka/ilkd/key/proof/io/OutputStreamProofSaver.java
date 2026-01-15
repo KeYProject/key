@@ -825,7 +825,6 @@ public class OutputStreamProofSaver {
                                     sequentFormula))
                         .append("\")");
             } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
-
                 final String directInstantiation =
                     printTerm((JTerm) sequentFormula.formula(), node.proof().getServices());
 

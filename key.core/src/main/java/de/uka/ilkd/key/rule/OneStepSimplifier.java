@@ -39,7 +39,7 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.LRUCache;
@@ -50,7 +50,6 @@ import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -348,7 +347,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (pos != null) {
             ifInsts.add(pos);
             if (protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos, goal.sequent()));
             }
             JTerm result =
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
@@ -410,7 +409,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     private RuleApp makeReplaceKnownTacletApp(JTerm formula,
             boolean inAntecedent,
-            PosInOccurrence pio) {
+            PosInOccurrence pio, Sequent seq) {
         FindTaclet taclet;
         if (pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig()
@@ -433,7 +432,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                                // pio.constrainedFormula().formula() are only equals module
                                // renamings and term labels
         ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
-        ifInst = ifInst.append(new AssumesFormulaInstDirect(pio.sequentFormula()));
+        ifInst =
+            ifInst.append(new AssumesFormulaInstSeq(seq, pio.isInAntec(), pio.sequentFormula()));
         return PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
             lastProof.getServices());
     }
@@ -772,8 +772,9 @@ public final class OneStepSimplifier implements BuiltInRule {
                 obj = ((TermReplacementKey) obj).term;
             }
             if (obj instanceof JTerm t) {
-                return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); // Ignore naming and
-                                                                              // term
+                return term.equals(t);// RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); //
+                                      // Ignore naming and
+                                      // term
                 // labels in the way a
                 // taclet rule does.
             } else {

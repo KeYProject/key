@@ -408,8 +408,7 @@ public class IntermediateProofReplayer {
      */
     private void addChildren(Iterator<Node> children, LinkedList<NodeIntermediate> intermChildren) {
         int i = 0;
-        while (!currGoal.node().isClosed() && children.hasNext() && intermChildren.size() > 0) {
-
+        while (!currGoal.node().isClosed() && children.hasNext() && !intermChildren.isEmpty()) {
             // NOTE: In the case of an unfinished proof, there
             // is another node after the last application which
             // is not represented by an intermediate
