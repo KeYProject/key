@@ -58,7 +58,8 @@ import org.jspecify.annotations.NullMarked;
  * @author lanzinger
  */
 @NullMarked
-public final class BlockContractExternalRule extends AbstractBlockContractRule implements ComplexJustificationable {
+public final class BlockContractExternalRule extends AbstractBlockContractRule
+        implements ComplexJustificationable {
 
     /**
      * The only instance of this class.

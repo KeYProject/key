@@ -59,7 +59,8 @@ import org.jspecify.annotations.NullMarked;
  * @author lanzinger
  */
 @NullMarked
-public final class LoopContractExternalRule extends AbstractLoopContractRule implements ComplexJustificationable {
+public final class LoopContractExternalRule extends AbstractLoopContractRule
+        implements ComplexJustificationable {
 
     /**
      * The only instance of this class.

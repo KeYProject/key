@@ -27,7 +27,7 @@ public class JavaInfFlowProfile extends JavaProfile {
             if (it instanceof UseOperationContractRule) {
                 return InfFlowUseOperationContractRule.INSTANCE;
             }
-            if(it instanceof WhileInvariantRule){
+            if (it instanceof WhileInvariantRule) {
                 return InfFlowWhileInvariantRule.INSTANCE;
             }
 

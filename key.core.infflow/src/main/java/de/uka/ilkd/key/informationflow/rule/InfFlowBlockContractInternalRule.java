@@ -101,8 +101,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule>
-    createApp(PosInOccurrence occurrence, TermServices services) {
+    public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
+            PosInOccurrence occurrence, TermServices services) {
         return new InfFlowBlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 

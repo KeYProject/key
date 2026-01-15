@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.informationflow;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;

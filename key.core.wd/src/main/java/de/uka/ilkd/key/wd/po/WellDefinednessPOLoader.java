@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.loader.ProofObligationLoader;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
+
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,11 @@ public class WellDefinednessPOLoader implements ProofObligationLoader {
      * @return The instantiated proof obligation.
      */
     @Override
-    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties) {
+    public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
+            Configuration properties) {
         String contractName = properties.getString("wd check");
         final Contract contract =
-                initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
+            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {
             LOGGER.error("Contract {} not found.", contractName);
             var c = initConfig.getServices().getSpecificationRepository();
