@@ -209,7 +209,7 @@ public class TestFile implements Serializable {
                         loadedProof);
 
                     var path = Paths.get("proofs",
-                            loadedProof.getProofFile().getFileName() + ".proof.xml.gz");
+                        loadedProof.getProofFile().getFileName() + ".proof.xml.gz");
                     ProveTest.saveProofXml(loadedProof, path);
                     LOGGER.info("Stored {}", path);
                 }
