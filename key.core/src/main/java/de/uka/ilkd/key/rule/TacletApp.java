@@ -1178,7 +1178,6 @@ public abstract class TacletApp implements RuleApp {
     protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
             @Nullable PosInOccurrence pos) {
-
         for (var pair : instantiations.getInstantiationMap()) {
             final var sv = pair.key();
 
@@ -1195,14 +1194,9 @@ public abstract class TacletApp implements RuleApp {
 
             final Set<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet((TacletPrefix) prefix, instantiations, pos);
-            var instantiation = instantiations.getInstantiation(sv);
-            if (instantiation instanceof Term inst) {
-                if (inst.freeVars().exists(Predicate.not(boundVarSet::contains))) {
-                    return false;
-                }
-            } else {
-                System.err.println(
-                    "ERROR! " + instantiation + " of class " + instantiation.getClass());
+            var inst = (Term) instantiations.getInstantiation(sv);
+            if (inst.freeVars().exists(Predicate.not(boundVarSet::contains))) {
+                return false;
             }
         }
         return true;
