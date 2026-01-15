@@ -261,8 +261,11 @@ public final class OneStepSimplifier implements BuiltInRule {
                 }
             }
             RewriteTaclet taclet = (RewriteTaclet) app.rule();
+            TermLabelState termLabelState = new TermLabelState();
             SequentFormula result =
-                taclet.getRewriteResult(goal, new TermLabelState(), services, app);
+                taclet.getRewriteResult(goal, termLabelState, services, app);
+            TermLabelManager.refactorSequent(termLabelState, services, pos, taclet, goal, null,
+                null);
             if (protocol != null) {
                 protocol.add(app);
             }
@@ -730,7 +733,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Instances of this class are used in the {@link Map} of
      * {@link OneStepSimplifier#replaceKnown} to
-     * forece the same behavior as in Taclet rules where names of logical variables and
+     * force the same behavior as in Taclet rules where names of logical variables and
      * {@link TermLabel}s are ignored.
      *
      * @author Martin Hentschel
