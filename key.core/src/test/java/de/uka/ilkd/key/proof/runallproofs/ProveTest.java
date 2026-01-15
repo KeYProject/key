@@ -3,15 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -25,11 +16,18 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.settings.ProofSettings;
-
+import org.key_project.logic.Name;
 import org.key_project.util.collection.Pair;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,7 +93,7 @@ public class ProveTest {
         }
 
         LOGGER.info("({}) Active Settings: {}", caseId,
-            ProofSettings.DEFAULT_SETTINGS.settingsToString());
+                ProofSettings.DEFAULT_SETTINGS.settingsToString());
 
         assertTrue(Files.exists(keyFile), "File " + keyFile + " does not exists");
 
@@ -126,7 +124,7 @@ public class ProveTest {
 
             if (testProperty == TestProperty.NOTLOADABLE) {
                 assertTrue(replayResult.hasErrors(),
-                    "Loading problem file succeeded but it shouldn't");
+                        "Loading problem file succeeded but it shouldn't");
                 success = true;
             } else {
                 assertFalse(replayResult.hasErrors(), "Loading problem file failed");
@@ -140,11 +138,11 @@ public class ProveTest {
                     boolean closed = loadedProof.closed();
                     success = (testProperty == TestProperty.PROVABLE) == closed;
                     LOGGER.info("({}) Finished proof: {}", caseId,
-                        (closed ? "closed." : "open goal(s)"));
+                            (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile.toFile());
 
                     var path = Paths.get("proofs",
-                        loadedProof.getProofFile().getFileName() + ".proof.xml");
+                            loadedProof.getProofFile().getFileName() + ".proof.xml");
                     saveProofXml(loadedProof, path);
 
                     if (success) {
@@ -162,9 +160,9 @@ public class ProveTest {
         }
 
         String message = String.format("(%s) %sVerifying property \"%s\"%sfor file: %s",
-            caseId,
-            success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
-            success ? " was successful " : " failed ", keyFile);
+                caseId,
+                success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
+                success ? " was successful " : " failed ", keyFile);
 
         if (!success) {
             fail(message);
@@ -172,18 +170,24 @@ public class ProveTest {
     }
 
     public static void saveProofXml(Proof loadedProof, Path path) throws IOException {
-        Files.createDirectories(path.getParent());
-        try (var out = new PrintWriter(new GZIPOutputStream(Files.newOutputStream(path)))) {
-            toXml(out, loadedProof.root());
-        }
+        // Files.createDirectories(path.getParent());
+        //      try (var out = new PrintWriter(new GZIPOutputStream(Files.newOutputStream(path)))) {
+        //        toXml(out, loadedProof.root());
+        //   }
     }
 
     private static void toXml(PrintWriter out, Node node) {
+        Name name1;
+        try {
+            name1 = node.getAppliedRuleApp().rule().name();
+        } catch (NullPointerException e) {
+            name1 = new Name("<null>");
+        }
         out.format("\n<node label=\"%s\" taclet=\"%s\">", node.getNodeInfo().getBranchLabel(),
-            node.getAppliedRuleApp().rule().name());
+                name1);
         out.format("\n<raw><![CDATA[%s]]>\n</raw>", node.sequent());
         out.format("\n<lpr><![CDATA[%s]]>\n</lpr>",
-            LogicPrinter.quickPrintSequent(node.sequent(), node.proof().getServices()));
+                LogicPrinter.quickPrintSequent(node.sequent(), node.proof().getServices()));
         out.format("\n<children>\n");
         for (Node child : node.children()) {
             toXml(out, child);
@@ -203,7 +207,7 @@ public class ProveTest {
             boolean reloadedClosed = reloadProof(proofFile);
 
             assertEquals(loadedProof.closed(), reloadedClosed,
-                "Reloaded proof did not close: " + proofFile);
+                    "Reloaded proof did not close: " + proofFile);
             debugOut("... success: reloaded.");
         }
     }
@@ -213,7 +217,7 @@ public class ProveTest {
      * want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            KeyAst.ProofScript script) throws Exception {
+                          KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -263,7 +267,7 @@ public class ProveTest {
             return reloadedProof.closed();
         } catch (Throwable t) {
             throw new Exception(
-                "Exception while loading proof (see cause for details): " + proofFile, t);
+                    "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
             if (reloadedProof != null) {
                 reloadedProof.dispose();
