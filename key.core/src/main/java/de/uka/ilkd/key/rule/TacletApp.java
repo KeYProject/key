@@ -1194,13 +1194,9 @@ public abstract class TacletApp implements RuleApp {
 
             final Set<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet((TacletPrefix) prefix, instantiations, pos);
-            var instantiation = instantiations.getInstantiation(sv);
-            if (instantiation instanceof Term inst) {
-                if (inst.freeVars().exists(Predicate.not(boundVarSet::contains))) {
-                    return false;
-                }
-            } else {
-                System.out.println("ERROR! " + instantiation);
+            var inst = (Term) instantiations.getInstantiation(sv);
+            if (inst.freeVars().exists(Predicate.not(boundVarSet::contains))) {
+                return false;
             }
         }
         return true;
