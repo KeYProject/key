@@ -77,7 +77,7 @@ subprojects {
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.23")
+        testImplementation("ch.qos.logback:logback-classic:1.5.24")
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
@@ -89,12 +89,11 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.23")
+        testImplementation("ch.qos.logback:logback-classic:1.5.24")
         testImplementation("org.assertj:assertj-core:3.27.6")
-        testImplementation("ch.qos.logback:logback-classic:1.5.23")
+        testImplementation("ch.qos.logback:logback-classic:1.5.24")
 
-        testImplementation(platform("org.junit:junit-bom:5.14.1"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
+        testImplementation(platform("org.junit:junit-bom:5.14.2"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
@@ -106,7 +105,7 @@ subprojects {
         testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1")
         testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.14.2'
     }
 
     tasks.withType(JavaCompile) {

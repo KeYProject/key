@@ -7,6 +7,8 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -35,11 +37,11 @@ import org.slf4j.LoggerFactory;
 public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
-    public static final File PROVER_CONFIG_FILE =
-        new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
+    public static final Path PROVER_CONFIG_FILE =
+        PathConfig.getKeyConfigDir().resolve("proof-settings.props");
 
-    public static final File PROVER_CONFIG_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "proof-settings.json");
+    public static final Path PROVER_CONFIG_FILE_NEW =
+        PathConfig.getKeyConfigDir().resolve("proof-settings.json");
 
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
@@ -144,11 +146,11 @@ public class ProofSettings {
      */
     public void saveSettings() {
         try {
-            if (!PROVER_CONFIG_FILE_NEW.exists()) {
-                PROVER_CONFIG_FILE.getParentFile().mkdirs();
+            if (!Files.exists(PROVER_CONFIG_FILE_NEW)) {
+                Files.createDirectories(PROVER_CONFIG_FILE.getParent());
             }
-            try (Writer out = new BufferedWriter(
-                new FileWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8))) {
+            try (Writer out =
+                Files.newBufferedWriter(PROVER_CONFIG_FILE_NEW, StandardCharsets.UTF_8)) {
                 settingsToStream(out);
             }
         } catch (IOException e) {
@@ -207,9 +209,9 @@ public class ProofSettings {
         if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
             LOGGER.warn("The settings in {} are *not* read.", PROVER_CONFIG_FILE);
         } else {
-            var isOldFormat = !PROVER_CONFIG_FILE_NEW.exists();
+            var isOldFormat = !Files.exists(PROVER_CONFIG_FILE_NEW);
             var fileToUse = isOldFormat ? PROVER_CONFIG_FILE : PROVER_CONFIG_FILE_NEW;
-            try (var in = new BufferedReader(new FileReader(fileToUse, StandardCharsets.UTF_8))) {
+            try (var in = Files.newBufferedReader(fileToUse, StandardCharsets.UTF_8)) {
                 LOGGER.info("Load proof dependent settings from file {}", fileToUse);
                 if (isOldFormat) {
                     loadDefaultJSONSettings();

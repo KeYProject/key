@@ -125,7 +125,8 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public String toString() {
-        return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
+        return "BuiltInRule: " + rule().name() + " at pos "
+            + (pio != null ? pio.subTerm() : "[pio is null]");
     }
 
 }
