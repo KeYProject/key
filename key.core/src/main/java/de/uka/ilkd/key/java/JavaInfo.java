@@ -1022,14 +1022,14 @@ public final class JavaInfo {
      * returns the KeYJavaType for class java.lang.Clonable
      */
     public KeYJavaType getJavaLangCloneable() {
-        return services.getJavaInfo().getJavaLangCloneable();
+        return services.getJavaService().getTypeConverter().getCloneableType();
     }
 
     /**
      * returns the KeYJavaType for class <tt>java.io.Serializable</tt>
      */
     public KeYJavaType getJavaIoSerializable() {
-        return services.getJavaInfo().getJavaIoSerializable();
+        return services.getJavaService().getTypeConverter().getSerializableType();
     }
 
     /**

@@ -535,12 +535,24 @@ public class KeYProgModelInfo {
         return asKeYJavaTypes(getAllRecoderSubtypes(ct).stream());
     }
 
+    /// Returns all {@link KeYJavaType},
+    /// ```
+    /// for all loaded type declarations td
+    ///                 if  td <: ct and implements method with name
+    ///                    add to the returning list
+    ///                 endif
+    /// endfor
+    /// ```
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
             ImmutableList<KeYJavaType> signature) {
         var type = rec2key().resolveType(ct);
         if (!type.isReferenceType()) {
             return ImmutableList.of();
         }
+
+
+
+
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
