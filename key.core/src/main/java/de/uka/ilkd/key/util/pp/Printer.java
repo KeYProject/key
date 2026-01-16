@@ -98,7 +98,7 @@ class Printer<M> {
     /**
      * write a break. <code>followingLength</code> should be the space needed by the material up to
      * the next corresponding closeBlock() or printBreak(), and is used to decide whether the
-     * current line is continues, or a new (indented) line is begun.
+     * current line is continued, or a new (indented) line is begun.
      */
     void printBreak(int width, int offset, int followingLength) {
         if (topBreak() == CONSISTENT

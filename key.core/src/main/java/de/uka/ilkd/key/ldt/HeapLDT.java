@@ -145,7 +145,7 @@ public final class HeapLDT extends LDT {
             int index = fieldPV.toString().indexOf("::");
             if (index <= 0)
                 return fieldPVName;
-            return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
+            return fieldPVName.substring(0, index) + "::#" + fieldPVName.substring(index + 2);
         }
     }
 

@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 public final class SpecificationRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationRepository.class);
 
-    public static final String CONTRACT_COMBINATION_MARKER = "#";
+    public static final String CONTRACT_COMBINATION_MARKER = "§";
 
     /**
      * @see #limitObs(IObserverFunction)
