@@ -12,19 +12,21 @@ import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.MethodUsage;
@@ -203,8 +205,7 @@ public class KeYProgModelInfo {
      * Returns the ProgramMethods locally defined within the given
      * class type.
      *
-     * @param ct
-     *        a class type.
+     * @param ct a class type.
      */
     public List<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
         var result = new ArrayList<ProgramMethod>();
@@ -230,8 +231,7 @@ public class KeYProgModelInfo {
      * class type. If the type is represented in source code,
      * the returned list matches the syntactic order.
      *
-     * @param ct
-     *        a class type.
+     * @param ct a class type.
      */
 
     public List<IProgramMethod> getConstructors(KeYJavaType ct) {
@@ -256,10 +256,8 @@ public class KeYProgModelInfo {
      * retrieves the most specific constructor declared in the given type with
      * respect to the given signature
      *
-     * @param ct
-     *        the KeYJavyType where to look for the constructor
-     * @param signature
-     *        IList<KeYJavaType> representing the signature of the constructor
+     * @param ct the KeYJavyType where to look for the constructor
+     * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
     @Nullable
@@ -274,7 +272,7 @@ public class KeYProgModelInfo {
                     continue;
                 }
 
-                if (sig.size() == 0) { // fast track for default constructor calls!
+                if (sig.isEmpty()) { // fast track for default constructor calls!
                     var ast = constructor.toAst().get();
                     return (IProgramMethod) mapping.nodeToKeY(ast);
                 }
@@ -324,12 +322,9 @@ public class KeYProgModelInfo {
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      *
-     * @param ct
-     *        the class type to get methods from.
-     * @param name
-     *        the name of the methods in question.
-     * @param signature
-     *        the statical type signature of a callee.
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
+     * @param signature the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
@@ -364,12 +359,9 @@ public class KeYProgModelInfo {
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      *
-     * @param ct
-     *        the class type to get methods from.
-     * @param name
-     *        the name of the methods in question.
-     * @param signature
-     *        the statical type signature of a callee.
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
+     * @param signature the statical type signature of a callee.
      * @return the IProgramMethods, if one is found,
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
@@ -393,8 +385,7 @@ public class KeYProgModelInfo {
      * If the type is represented in source code, the returned list
      * matches the syntactic order.
      *
-     * @param ct
-     *        the class type whose fields are returned
+     * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
     public List<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
@@ -415,8 +406,7 @@ public class KeYProgModelInfo {
      * If the type is represented in source code, the returned list
      * matches the syntactic order.
      *
-     * @param ct
-     *        the class type whose fields are returned
+     * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
     public List<Field> getAllVisibleFields(KeYJavaType ct) {
@@ -432,8 +422,7 @@ public class KeYProgModelInfo {
     /**
      * returns all fields of and visible in an array field
      *
-     * @param arrayType
-     *        the KeYJavaType of the array
+     * @param arrayType the KeYJavaType of the array
      * @return the list of visible fields
      */
     private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
@@ -508,8 +497,7 @@ public class KeYProgModelInfo {
      * returns a list of KeYJavaTypes representing the given recoder types in
      * the same order
      *
-     * @param rctl
-     *        the ASTList<ClassType> to be converted
+     * @param rctl the ASTList<ClassType> to be converted
      * @return list of KeYJavaTypes representing the given recoder types in
      *         the same order
      */
@@ -525,8 +513,7 @@ public class KeYProgModelInfo {
      * Returns all known supertypes of the given class type with the type itself
      * as first element.
      *
-     * @param ct
-     *        a class type
+     * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
     public List<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
@@ -541,8 +528,7 @@ public class KeYProgModelInfo {
     /**
      * Returns all proper subtypes of the given class type
      *
-     * @param ct
-     *        a class type
+     * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
     public List<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
@@ -558,91 +544,108 @@ public class KeYProgModelInfo {
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-        throw new UnsupportedOperationException("findImplementations");
-        // TODO javaparser
+
+        // TODO(weigl): From here on: Implemented by @Drodt, no idea if it's correct
 
         // If ct is an interface, but does not declare the method, we
         // need to start the search "upstairs"
-        // while (rct.toAst(ClassOrInterfaceDeclaration.class).get().isInterface()
-        // && !isDeclaringInterface(rct, name, rsignature)) {
-        // rct = rct.getAllSupertypes().get(1);
-        // }
-        //
-        // ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
-        // classList = recFindImplementations(rct, name, rsignature, classList);
-        //
-        //
-        // if (!declaresApplicableMethods(rct, name, rsignature)) {
-        // // ct has no implementation, go up
-        // List<recoder.abstraction.ClassType> superTypes = rct.getAllSupertypes();
-        // int k = 0;
-        // while (k < superTypes.size() && !declaresApplicableMethods(superTypes.get(k), name,
-        // rsignature)) k++;
-        // if (k < superTypes.size()) {
-        // rct = superTypes.get(k);
-        // KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
-        // if (r == null) {
-        // LOGGER.info("Type {}", rct.getName());
-        // } else {
-        // classList = classList.append(r);
-        // }
-        // } // no implementation is needed if classes above are abstract
-        // }
+        while (rct.toAst(ClassOrInterfaceDeclaration.class).get().isInterface()
+                && !isDeclaringInterface(rct, name, jpSignature)) {
+            rct = rct.getAncestors().get(1).getTypeDeclaration().orElseThrow();
+        }
 
-        // return classList;
+        ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
+        classList = recFindImplementations(rct, name, jpSignature, classList);
+
+        if (!declaresApplicableMethods(rct, name, jpSignature)) {
+            // ct has no implementation, go up
+            List<ResolvedReferenceType> superTypes = rct.getAncestors();
+            int k = 0;
+            while (k < superTypes.size() && !declaresApplicableMethods(
+                superTypes.get(k).getTypeDeclaration().orElseThrow(), name,
+                jpSignature))
+                k++;
+            if (k < superTypes.size()) {
+                rct = superTypes.get(k).getTypeDeclaration().orElseThrow();
+                KeYJavaType r = (KeYJavaType) mapping.resolvedDeclarationToKeY(rct);
+                if (r == null) {
+                    LOGGER.info("Type {}", rct.getName());
+                } else {
+                    classList = classList.append(r);
+                }
+            } // no implementation is needed if classes above are abstract
+        }
+
+        return classList;
     }
 
 
-    private ImmutableList<KeYJavaType> recFindImplementations(TypeDeclaration ct,
-            String name, List<Type> signature, ImmutableList<KeYJavaType> result) {
-        // TODO weigl does not compile, no idea what this should be
-        // if (declaresApplicableMethods(ct, name, signature)) {
-        // KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
-        // if (r == null) {
-        // LOGGER.info("Type {}: {} not found", ct.getFullName(), name);
-        // } else if (!result.contains(r)) {
-        // result = result.prepend(r);
-        // }
-        // }
-        //
-        // List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);
-        //
-        // //alpha sorting to make order deterministic
-        // recoder.abstraction.ClassType[] classesArray = classes.toArray(new ClassType[0]);
-        // java.util.Arrays.sort(classesArray, (o1, o2) ->
-        // o2.getFullName().compareTo(o1.getFullName()));
-        //
-        // for (recoder.abstraction.ClassType c : classesArray) {
-        // result = recFindImplementations(c, name, signature, result);
-        // }
-        // return result;
-        return null;
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private ImmutableList<KeYJavaType> recFindImplementations(ResolvedTypeDeclaration ct,
+            String name, List<ResolvedType> signature, ImmutableList<KeYJavaType> result) {
+        if (declaresApplicableMethods(ct, name, signature)) {
+            KeYJavaType r = (KeYJavaType) mapping.resolvedDeclarationToKeY(ct);
+            if (r == null) {
+                LOGGER.info("Type {}: {} not found", ct.getQualifiedName(), name);
+                return result;
+            } else if (!result.contains(r)) {
+                result = result.prepend(r);
+            }
+        }
+
+        List<ResolvedReferenceTypeDeclaration> classes = getAllRecoderSubtypes(result.head());
+
+        // alpha sorting to make order deterministic
+        var classesArray = classes.toArray(new ResolvedTypeDeclaration[0]);
+        java.util.Arrays.sort(classesArray,
+            (o1, o2) -> o2.getQualifiedName().compareTo(o1.getQualifiedName()));
+
+        for (var c : classesArray) {
+            result = recFindImplementations(c, name, signature, result);
+        }
+        return result;
     }
 
 
-    private boolean declaresApplicableMethods(MethodResolutionCapability ct, String name,
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private boolean declaresApplicableMethods(ResolvedTypeDeclaration rt, String name,
             List<ResolvedType> signature) {
-        var method = ct.solveMethod(name, signature, false);
-        return method.isSolved();
+        if (rt instanceof MethodResolutionCapability mrc) {
+            var method = mrc.solveMethod(name, signature, false);
+            return method.isSolved();
+        }
+        return false;
     }
 
-    private boolean isDeclaringInterface(/*
-                                          * recoder.abstraction.ClassType ct, String name,
-                                          * List<recoder.abstraction.Type> signature
-                                          */) {
-        // TODO Weigl does not compile
-        // Debug.assertTrue(ct.isInterface());
-        // List<recoder.abstraction.Method> list = si.getMethods(ct);
-        // int s = list.size();
-        // int i = 0;
-        // while (i < s) {
-        // recoder.abstraction.Method m = list.get(i);
-        // if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature()) &&
-        // si.isVisibleFor(m, ct))
-        // return true;
-        // else i++;
-        // }
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private boolean isDeclaringInterface(
+            ResolvedTypeDeclaration ct, String name,
+            List<ResolvedType> signature) {
+        Debug.assertTrue(ct.isInterface());
+        var id = ct.asInterface();
+        var set = id.getDeclaredMethods();
+        for (var m : set) {
+            // TODO: check if m is visible for ct
+            if (name.equals(m.getName())
+                    && isCompatibleSignature(signature, m.formalParameterTypes()))
+                return true;
+        }
         return false;
+    }
+
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private boolean isCompatibleSignature(List<ResolvedType> sig1, List<ResolvedType> sig2) {
+        int sl1 = sig1.size();
+        int sl2 = sig2.size();
+        if (sl1 != sl2)
+            return false;
+        for (int i = 0; i < sl1; ++i) {
+            var t1 = sig1.get(i);
+            var t2 = sig2.get(i);
+            if (!isSubtype(t2, t1))
+                return false;
+        }
+        return true;
     }
 
     private void putImplicitMethod(IProgramMethod m, KeYJavaType t) {

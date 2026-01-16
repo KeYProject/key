@@ -879,7 +879,7 @@ public final class JavaInfo {
      * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
     public ProgramVariable getAttribute(String programName, String qualifiedClassName) {
-        if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
+        if (qualifiedClassName == null || qualifiedClassName.isEmpty()) {
             throw new IllegalArgumentException("Missing qualified classname");
         }
 
