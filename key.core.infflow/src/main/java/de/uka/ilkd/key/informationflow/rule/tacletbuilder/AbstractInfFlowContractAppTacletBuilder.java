@@ -12,7 +12,7 @@ import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -92,12 +92,12 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         int i = 0;
         var base = name.toString() + "_" + getBranchUID(goal.node());
-        var s = base;
-        while (used.names.contains(s)) {
-            s = s + "_" + i++;
-        }
-        used.names.add(base);
-        return name;
+        String s;
+        do {
+            s = base + "_" + i++;
+        } while (used.names.contains(s));
+        used.names.add(s);
+        return new Name(s);
     }
 
     /**
