@@ -545,22 +545,20 @@ public class KeYProgModelInfo {
     /// ```
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
             ImmutableList<KeYJavaType> signature) {
+
         var type = rec2key().resolveType(ct);
+
+        // only reference types has overridable methods
         if (!type.isReferenceType()) {
             return ImmutableList.of();
         }
 
-
-
-
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
-        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-
-        // TODO(weigl): From here on: Implemented by @Drodt, no idea if it's correct
 
         // If ct is an interface, but does not declare the method, we
         // need to start the search "upstairs"
+
         while (rct.toAst(ClassOrInterfaceDeclaration.class).get().isInterface()
                 && !isDeclaringInterface(rct, name, jpSignature)) {
             rct = rct.getAncestors().get(1).getTypeDeclaration().orElseThrow();
@@ -593,10 +591,11 @@ public class KeYProgModelInfo {
 
 
     // TODO(weigl): Implemented by @Drodt, no idea if it's correct
-    private ImmutableList<KeYJavaType> recFindImplementations(ResolvedTypeDeclaration ct,
+    private ImmutableList<KeYJavaType> recFindImplementations(
+            ResolvedTypeDeclaration ct,
             String name, List<ResolvedType> signature, ImmutableList<KeYJavaType> result) {
         if (declaresApplicableMethods(ct, name, signature)) {
-            KeYJavaType r = (KeYJavaType) mapping.resolvedDeclarationToKeY(ct);
+            var r = typeConverter.getKeYJavaType(ct.getQualifiedName());
             if (r == null) {
                 LOGGER.info("Type {}: {} not found", ct.getQualifiedName(), name);
                 return result;
@@ -610,7 +609,8 @@ public class KeYProgModelInfo {
         // alpha sorting to make order deterministic
         var classesArray = classes.toArray(new ResolvedTypeDeclaration[0]);
         java.util.Arrays.sort(classesArray,
-            (o1, o2) -> o2.getQualifiedName().compareTo(o1.getQualifiedName()));
+            (o1, o2) ->
+                    o2.getQualifiedName().compareTo(o1.getQualifiedName()));
 
         for (var c : classesArray) {
             result = recFindImplementations(c, name, signature, result);

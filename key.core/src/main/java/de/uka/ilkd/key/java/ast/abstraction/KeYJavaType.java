@@ -98,9 +98,12 @@ public class KeYJavaType implements Type {
     }
 
     public String getName() {
-        return Optional.ofNullable(getJavaType()).map(Type::getName)
-                .orElse(
-                    getSort() != null ? getSort().name().toString() : "This should never be seen");
+        if(javaType!=null) {
+            return javaType.getName();
+        }else{
+            assert sort != null;
+            return sort.name().toString();
+        }
     }
 
     @Override

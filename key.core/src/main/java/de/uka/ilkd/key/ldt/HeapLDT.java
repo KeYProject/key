@@ -138,7 +138,7 @@ public final class HeapLDT extends LDT {
 
     private String getFieldSymbolName(LocationVariable fieldPV) {
         if (fieldPV.isImplicit()) {
-            return fieldPV.name().toString();
+            return fieldPV.getProgramElementName().toString().replace("::","::#");
         } else {
             // FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
@@ -403,14 +403,21 @@ public final class HeapLDT extends LDT {
      * to the namespace as a side effect.
      */
     public Function getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
-        assert fieldPV.isMember();
-        assert fieldPV != services.getJavaInfo().getArrayLength();
+        if (!fieldPV.isMember()) {
+            throw new IllegalArgumentException("%s is not a member variable".formatted(fieldPV));
+        }
+
+        if (fieldPV == services.getJavaInfo().getArrayLength()) {
+            throw new IllegalArgumentException("%s is an array length".formatted(fieldPV));
+        }
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
         Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
-            assert index > 0;
+            if (index <= 0) {
+                throw new IllegalArgumentException("Given field %s (resolved to %s) does not contain DOUBLECOLON ::".formatted(fieldPV, name));
+            }
             final Name kind = new Name(name.toString().substring(index + 2));
 
             SortDependingFunction firstInstance =

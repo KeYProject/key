@@ -16,6 +16,7 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -33,22 +34,17 @@ public class InstanceAllocationMethodBuilder extends JavaTransformer {
         super(services);
     }
 
-    private MethodDeclaration addAllocateMethod(TypeDeclaration<?> type) {
-        NodeList<Modifier> modifiers = new NodeList<>();
-        modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
-        modifiers.add(new Modifier(Modifier.Keyword.STATIC));
-        MethodDeclaration md = type.addMethod(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE,
-            Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
-        md.setType(new ClassOrInterfaceType(null, type.getFullyQualifiedName().get()));
-        return md;
+    @Override
+    public void apply(CompilationUnit cu) {
+        super.apply(cu);
     }
-
 
     @Override
     public void apply(TypeDeclaration<?> td) {
-        // TODO javaparser only for classes?
-        if (td.isRecordDeclaration() && td.isClassOrInterfaceDeclaration()) {
-            addAllocateMethod(td);
+        if (td.isRecordDeclaration() || td.isClassOrInterfaceDeclaration()) {
+            MethodDeclaration md = td.addMethod(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE,
+                    Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+            md.setType(new ClassOrInterfaceType(null, td.getName(), null));
         }
     }
 
