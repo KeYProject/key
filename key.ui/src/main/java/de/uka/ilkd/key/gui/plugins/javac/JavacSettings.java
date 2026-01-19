@@ -2,7 +2,6 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.javac;
-import java.lang.Boolean;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
@@ -36,19 +35,19 @@ public class JavacSettings extends AbstractPropertiesSettings {
     /**
      * The type annotation processors to be run.
      */
-    private final PropertyEntry<Boolean> useProcessors = 
+    private final PropertyEntry<Boolean> useProcessors =
         createBooleanProperty(KEY_USE_PROCESSORS, false);
 
     /**
      * The type annotation processors to be run.
      */
-    private final PropertyEntry<String> processors = 
+    private final PropertyEntry<String> processors =
         createStringProperty(KEY_PROCESSORS, "");
 
     /**
      * Additional class paths, needed for example by annotation processors
      */
-    private final PropertyEntry<String> classPaths = 
+    private final PropertyEntry<String> classPaths =
         createStringProperty(KEY_CLASS_PATHS, "");
 
     public JavacSettings() {

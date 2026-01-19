@@ -48,7 +48,7 @@ class JavaCompilerCheckFacadeTest {
             };
         var promise =
             JavaCompilerCheckFacade.check(emptyListener, null, Collections.emptyList(),
-                src.toPath());
+                src.toPath(), new JavacSettings());
         promise.get();
     }
 

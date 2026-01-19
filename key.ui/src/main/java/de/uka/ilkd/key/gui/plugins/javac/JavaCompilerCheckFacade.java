@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -56,13 +57,14 @@ public class JavaCompilerCheckFacade {
      * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
      * @param javaPath the {@link Path} to the source of the target Java program
-     * @param processors the {@link List} of {@link String}s referring to the annotation processors to be run
+     * @param settings the {@link JavacSettings} that describe what other options the compiler
+     *        should be called with
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
             Path bootClassPath, List<Path> classPath, Path javaPath,
-            List<String> processors) {
+            JavacSettings settings) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -89,10 +91,32 @@ public class JavaCompilerCheckFacade {
         // gather configured bootstrap classpath and regular classpath
         List<String> options = new ArrayList<>();
 
+        if (settings.getUseProcessors()) {
+
+            String newlineClassPath = settings.getClassPaths();
+            if (!newlineClassPath.isEmpty()) {
+                List<Path> processorClassPath =
+                    Arrays.asList(newlineClassPath.split(System.lineSeparator()))
+                            .stream().map(p -> Paths.get(p)).toList();
+
+                classPath = new ArrayList<>(classPath);
+                classPath.addAll(processorClassPath);
+            }
+
+            List<String> processors = Arrays.asList(settings.getProcessors()
+                    .split(System.lineSeparator()));
+
+            if (!processors.isEmpty()) {
+                options.add("-processor");
+                options.add(processors.stream().collect(Collectors.joining(",")));
+            }
+        }
+
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
             options.add(bootClassPath.toAbsolutePath().toString());
         }
+
         if (classPath != null && !classPath.isEmpty()) {
             options.add("-classpath");
             options.add(
@@ -101,10 +125,6 @@ public class JavaCompilerCheckFacade {
                         .collect(Collectors.joining(":")));
         }
 
-        if (processors != null && !processors.isEmpty()) {
-            options.add("-processor");
-            options.add(processors.stream().collect(Collectors.joining(",")));
-        }
 
         ArrayList<Path> files = new ArrayList<>();
         if (Files.isDirectory(javaPath)) {

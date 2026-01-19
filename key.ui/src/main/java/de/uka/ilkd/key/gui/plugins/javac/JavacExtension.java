@@ -4,11 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
-
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -26,10 +22,10 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,17 +148,6 @@ public class JavacExtension
 
             Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
             List<Path> classpath = jm.getClassPath();
-            JavacSettings settings = JavacSettingsProvider.getJavacSettings();
-
-            List<String> processors = null;
-            if (settings.getUseProcessors()) {
-                if (classpath == null) classpath = new ArrayList<>();
-
-                classpath.addAll(Arrays.asList(settings.getClassPaths().split(System.lineSeparator()))
-                    .stream().map(p -> Paths.get(p)).toList());
-
-                processors = Arrays.asList(settings.getProcessors().split(System.lineSeparator()));
-            }
 
             Path javaPath = jm.getModelDir();
 
@@ -170,8 +155,10 @@ public class JavacExtension
             lblStatus.setText("Javac runs");
             lblStatus.setIcon(ICON_WAIT.get(16));
 
+            JavacSettings settings = JavacSettingsProvider.getJavacSettings();
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, processors);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath,
+                    settings);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");
