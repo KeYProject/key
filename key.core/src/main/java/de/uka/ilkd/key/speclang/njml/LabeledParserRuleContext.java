@@ -10,15 +10,15 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
  */
 public class LabeledParserRuleContext {
-    @Nonnull
+    @NonNull
     public final ParserRuleContext first;
     @Nullable
     public final TermLabel second;

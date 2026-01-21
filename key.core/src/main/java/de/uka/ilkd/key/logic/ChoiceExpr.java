@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.logic;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,14 +43,14 @@ public abstract class ChoiceExpr {
      * @param current activated choices
      * @return true if the expr is true given the assignment in {@code current}
      */
-    public abstract boolean eval(@Nonnull Set<Choice> current);
+    public abstract boolean eval(@NonNull Set<Choice> current);
 
     @Override
     public abstract String toString();
 
     private static class True extends ChoiceExpr {
         @Override
-        public boolean eval(@Nonnull Set<Choice> current) {
+        public boolean eval(@NonNull Set<Choice> current) {
             return true;
         }
 
@@ -63,14 +63,14 @@ public abstract class ChoiceExpr {
 
 
     private static class Proposition extends ChoiceExpr {
-        public final @Nonnull Choice choice;
+        public final @NonNull Choice choice;
 
         public Proposition(String category, String option) {
             this.choice = new Choice(option, category);
         }
 
         @Override
-        public boolean eval(@Nonnull Set<Choice> current) {
+        public boolean eval(@NonNull Set<Choice> current) {
             return current.contains(choice);
         }
 
@@ -96,16 +96,16 @@ public abstract class ChoiceExpr {
     }
 
     private static class And extends ChoiceExpr {
-        public final @Nonnull ChoiceExpr left;
-        public final @Nonnull ChoiceExpr right;
+        public final @NonNull ChoiceExpr left;
+        public final @NonNull ChoiceExpr right;
 
-        public And(@Nonnull ChoiceExpr left, @Nonnull ChoiceExpr right) {
+        public And(@NonNull ChoiceExpr left, @NonNull ChoiceExpr right) {
             this.left = left;
             this.right = right;
         }
 
         @Override
-        public boolean eval(@Nonnull Set<Choice> current) {
+        public boolean eval(@NonNull Set<Choice> current) {
             return left.eval(current) && right.eval(current);
         }
 
@@ -131,16 +131,16 @@ public abstract class ChoiceExpr {
     }
 
     private static class Or extends ChoiceExpr {
-        public final @Nonnull ChoiceExpr left;
-        public final @Nonnull ChoiceExpr right;
+        public final @NonNull ChoiceExpr left;
+        public final @NonNull ChoiceExpr right;
 
-        public Or(@Nonnull ChoiceExpr left, @Nonnull ChoiceExpr right) {
+        public Or(@NonNull ChoiceExpr left, @NonNull ChoiceExpr right) {
             this.left = left;
             this.right = right;
         }
 
         @Override
-        public boolean eval(@Nonnull Set<Choice> current) {
+        public boolean eval(@NonNull Set<Choice> current) {
             return left.eval(current) || right.eval(current);
         }
 
@@ -173,7 +173,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean eval(@Nonnull Set<Choice> current) {
+        public boolean eval(@NonNull Set<Choice> current) {
             return !sub.eval(current);
         }
 

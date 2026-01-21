@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -31,33 +31,33 @@ public class Style {
     public static final Key<String> KEY_TOOLTIP = new Key<>(String.class);
     public static final Key<String> KEY_TEXT = new Key<>(String.class);
 
-    @Nonnull
-    public <T> Style set(@Nonnull Key<T> key, @Nullable T value) {
+    @NonNull
+    public <T> Style set(@NonNull Key<T> key, @Nullable T value) {
         if (!sealed.contains(key)) {
             styles.put(key, value);
         }
         return this;
     }
 
-    @Nonnull
-    public <T> Style setAndSeal(@Nonnull Key<T> key, @Nullable T value) {
+    @NonNull
+    public <T> Style setAndSeal(@NonNull Key<T> key, @Nullable T value) {
         set(key, value);
         sealed.add(key);
         return this;
     }
 
-    public <T> boolean contains(@Nonnull Key<T> key) {
+    public <T> boolean contains(@NonNull Key<T> key) {
         return styles.containsKey(key);
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public <T> T get(@Nonnull Key<T> key, @Nullable T defaultValue) {
+    public <T> T get(@NonNull Key<T> key, @Nullable T defaultValue) {
         return (T) styles.getOrDefault(key, defaultValue);
     }
 
     @Nullable
-    public <T> T get(@Nonnull Key<T> key) {
+    public <T> T get(@NonNull Key<T> key) {
         return get(key, null);
     }
 

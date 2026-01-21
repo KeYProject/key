@@ -7,8 +7,8 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -873,7 +873,7 @@ public class Proof implements Named {
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
-    public @Nullable Node findAny(@Nonnull Predicate<Node> pred) {
+    public @Nullable Node findAny(@NonNull Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
@@ -1380,7 +1380,7 @@ public class Proof implements Named {
      *
      * @return the associated lookup
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null)
             userData = new Lookup();
         return userData;

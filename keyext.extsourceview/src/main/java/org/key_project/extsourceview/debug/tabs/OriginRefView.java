@@ -15,7 +15,7 @@ import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.*;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -58,7 +58,7 @@ public class OriginRefView extends DebugTab {
 
     private Tuple<PosInSequent, Term> shownTerm = null;
 
-    public OriginRefView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public OriginRefView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         // add a listener for hover in the proof tree
@@ -87,7 +87,7 @@ public class OriginRefView extends DebugTab {
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         taSource = new JTextArea();
@@ -201,19 +201,19 @@ public class OriginRefView extends DebugTab {
         this.add(pnlConf, BorderLayout.NORTH);
     }
 
-    private void refreshShownTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void refreshShownTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         if (shownTerm != null) {
             showTerm(window, mediator, shownTerm.getA(), shownTerm.getB());
         }
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "TermOrigin Inspector";
     }
 
-    private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void highlightTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
         try {
             SourceView sv = window.getSourceViewFrame().getSourceView();
 
@@ -282,7 +282,7 @@ public class OriginRefView extends DebugTab {
         }
     }
 
-    private void unhighlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void unhighlightTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         SourceView sv = window.getSourceViewFrame().getSourceView();
 
         sv.removeHighlights(HL_KEY);
@@ -294,7 +294,7 @@ public class OriginRefView extends DebugTab {
 
     }
 
-    private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void showTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
         shownTerm = new Tuple<>(pos, t);
 
         var proof = mediator.getSelectedProof();
@@ -482,7 +482,7 @@ public class OriginRefView extends DebugTab {
         return "["+f0+"|"+f1+"|"+f2+"] " + o.toString();
     }
 
-    private void unshowTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void unshowTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         shownTerm = null;
 
         taSource.setText("");

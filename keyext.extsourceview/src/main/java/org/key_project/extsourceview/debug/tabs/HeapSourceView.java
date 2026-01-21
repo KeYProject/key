@@ -14,7 +14,7 @@ import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.HeapSourceCollection;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URI;
@@ -36,13 +36,13 @@ public class HeapSourceView extends DebugTab {
 
     private JTextArea taSource;
 
-    public HeapSourceView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public HeapSourceView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         taSource = new JTextArea();
@@ -60,13 +60,13 @@ public class HeapSourceView extends DebugTab {
         this.add(btn, BorderLayout.NORTH);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Heap Sources";
     }
 
-    private void calculateSources(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void calculateSources(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
 
         taSource.setText("");
 

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandle
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.Map;
 
 public abstract class LDTHandler implements JMLOperatorHandler {

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract base class for implementations of the Sort interface.

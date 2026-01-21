@@ -19,7 +19,7 @@ import org.key_project.extsourceview.transformer.HeapReference;
 import org.key_project.extsourceview.transformer.InternTransformException;
 import org.key_project.util.collection.ImmutableArray;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -15,8 +15,8 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -116,7 +116,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     @Override
-    public @Nonnull Collection<CAction> getTitleCActions() {
+    public @NonNull Collection<CAction> getTitleCActions() {
         CButton helpButton = new CButton(null, IconFactory.HELP.get());
         helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
         return Collections.singleton(helpButton);
@@ -134,9 +134,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * @param dtm a tree model which is filled with nodes
      * @param parent the corresponding entry of {@code n} in the tree model
      */
-    private void findExplorationChildren(@Nonnull Node node,
-            final @Nonnull ArrayList<Node> foundNodes, @Nonnull DefaultTreeModel dtm,
-            @Nonnull MyTreeNode parent) {
+    private void findExplorationChildren(@NonNull Node node,
+            final @NonNull ArrayList<Node> foundNodes, @NonNull DefaultTreeModel dtm,
+            @NonNull MyTreeNode parent) {
         Set<Node> reached = new HashSet<>(512000);
         ArrayDeque<Node> nodes = new ArrayDeque<>(8);
         nodes.add(node);
@@ -219,13 +219,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         return buttonPanel;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Exploration Steps";
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         return this;

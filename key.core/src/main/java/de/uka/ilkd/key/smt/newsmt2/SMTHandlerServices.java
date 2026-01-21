@@ -6,7 +6,7 @@ import org.key_project.util.Streams;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -170,7 +170,7 @@ public class SMTHandlerServices {
      * @throws IOException if the resources cannot be read
      */
 
-    public List<SMTHandler> getFreshHandlers(Services services, @Nonnull String[] handlerNames,
+    public List<SMTHandler> getFreshHandlers(Services services, @NonNull String[] handlerNames,
             String[] handlerOptions, MasterHandler mh) throws IOException {
 
         List<SMTHandler> result = new ArrayList<>();

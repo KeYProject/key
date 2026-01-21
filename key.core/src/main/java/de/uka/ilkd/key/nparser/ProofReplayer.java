@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.*;
 
@@ -47,7 +47,7 @@ public class ProofReplayer {
      * @param source the source of the stream, used for producing exceptions with locations
      * @see #run(CharStream, IProofFileParser, int, URL)
      */
-    public static void run(@Nonnull Token token, CharStream input, IProofFileParser prl,
+    public static void run(@NonNull Token token, CharStream input, IProofFileParser prl,
             URL source) {
         input.seek(1 + token.getStopIndex()); // ends now on \proof|
         run(input, prl, token.getLine(), source);

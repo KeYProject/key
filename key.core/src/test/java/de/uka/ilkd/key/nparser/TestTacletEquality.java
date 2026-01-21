@@ -16,7 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -130,7 +130,7 @@ public class TestTacletEquality {
         Assertions.assertEquals(normalise(expected).trim(), normalise(actual).trim());
     }
 
-    @Nonnull
+    @NonNull
     private String normalise(String expected) {
         return expected.replaceAll("\\s+", "\n").replaceAll("Choices:\\s*\\{.*?\\}", "");
     }

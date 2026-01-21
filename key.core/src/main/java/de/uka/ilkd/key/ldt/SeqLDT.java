@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 public final class SeqLDT extends LDT {

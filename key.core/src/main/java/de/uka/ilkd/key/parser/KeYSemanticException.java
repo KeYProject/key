@@ -4,7 +4,7 @@ import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 
 public class KeYSemanticException extends RecognitionException implements HasLocation {

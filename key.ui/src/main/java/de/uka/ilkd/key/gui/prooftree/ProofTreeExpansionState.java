@@ -8,7 +8,7 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.*;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.JTree;
 import javax.swing.event.*;
 import javax.swing.tree.TreeModel;
@@ -82,7 +82,7 @@ import javax.swing.tree.TreePath;
 class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     /** the JTree of the ProofTreeView */
-    private final @Nonnull JTree tree;
+    private final @NonNull JTree tree;
 
     /**
      * Stores all paths that are currently expanded. This includes those which are hidden because
@@ -91,10 +91,10 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @implNote We always use a LinkedHashSet now since this makes the path traversal order
      *           predictable.
      */
-    private final @Nonnull Set<TreePath> paths = new LinkedHashSet<>();
+    private final @NonNull Set<TreePath> paths = new LinkedHashSet<>();
 
     /** Listens for changes in the proof tree as well as for expansion/collapse of GUI nodes. */
-    private final @Nonnull Listener listener = new Listener();
+    private final @NonNull Listener listener = new Listener();
 
     /**
      * For the given JTree. Assumes only the root is expanded, if at all (for example, a freshly
@@ -102,7 +102,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      *
      * @param t the JTree of the ProofTreeView
      */
-    public ProofTreeExpansionState(@Nonnull JTree t) {
+    public ProofTreeExpansionState(@NonNull JTree t) {
         tree = t;
         tree.addTreeExpansionListener(listener);
 
@@ -125,7 +125,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param tree the JTree this ProofExpansionState refers to
      * @param state the collection of paths to expand initially
      */
-    public ProofTreeExpansionState(@Nonnull JTree tree, @Nonnull Collection<TreePath> state) {
+    public ProofTreeExpansionState(@NonNull JTree tree, @NonNull Collection<TreePath> state) {
         this(tree);
         setPaths(tree, state);
     }
@@ -225,7 +225,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      *
      * @return a shallow copy of the collection of expanded paths
      */
-    public @Nonnull Collection<TreePath> copyState() {
+    public @NonNull Collection<TreePath> copyState() {
         // we need a copy here, such that the set is not shared between multiple trees!
         return new LinkedHashSet<>(paths);
     }
@@ -462,7 +462,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param paths the paths to expand. All other paths will be collapsed. Note that collapsed
      *        parent paths may hide their children, even if those are expanded.
      */
-    public static void setPaths(@Nonnull JTree tree, @Nonnull Collection<TreePath> paths) {
+    public static void setPaths(@NonNull JTree tree, @NonNull Collection<TreePath> paths) {
         TreeModel data = tree.getModel();
 
         if (data == null) {
@@ -496,8 +496,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         tree.fireTreeExpanded(new TreePath(root));
     }
 
-    private static void setPathsImpl(@Nonnull JTree tree, @Nonnull TreeModel data,
-            @Nonnull TreePath start, int maxLevel, @Nonnull Collection<TreePath> paths) {
+    private static void setPathsImpl(@NonNull JTree tree, @NonNull TreeModel data,
+            @NonNull TreePath start, int maxLevel, @NonNull Collection<TreePath> paths) {
         // only expand up to depth maxLevel starting from the given start path
         if (maxLevel > 0) {
             Object node = start.getLastPathComponent();

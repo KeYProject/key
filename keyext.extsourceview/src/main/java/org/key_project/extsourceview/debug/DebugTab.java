@@ -1,6 +1,6 @@
 package org.key_project.extsourceview.debug;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import java.awt.*;
 
@@ -23,6 +23,6 @@ public abstract class DebugTab extends JPanel {
     public DebugTab() {
     }
 
-    @Nonnull
+    @NonNull
     public abstract String getTitle();
 }

@@ -4,8 +4,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -96,7 +96,7 @@ public class TermImpl implements Term {
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
-            @Nonnull ImmutableArray<OriginRef> originRef) {
+            @NonNull ImmutableArray<OriginRef> originRef) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -697,11 +697,11 @@ public class TermImpl implements Term {
         this.origin = origin;
     }
 
-    public @Nonnull ImmutableArray<OriginRef> getOriginRef() {
+    public @NonNull ImmutableArray<OriginRef> getOriginRef() {
         return originRef;
     }
 
-    public @Nonnull List<OriginRef> getOriginRefRecursive() {
+    public @NonNull List<OriginRef> getOriginRefRecursive() {
         ArrayList<OriginRef> r = new ArrayList<>(this.getOriginRef().toList());
 
         for (Term t : subs()) {

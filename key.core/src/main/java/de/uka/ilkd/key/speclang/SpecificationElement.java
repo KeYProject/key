@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**

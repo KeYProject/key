@@ -1,45 +1,31 @@
 plugins {
-    id 'ca.coglinc.javacc' version '2.4.0'
-    id 'antlr'
+    id 'org.javacc.javacc' version '4.0.3'
 }
 
-//repositories { jcenter() }
+description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
 dependencies {
     api project(':key.util')
+    //api project(':key.ncore')
+    //api project(':key.ncore.calculus')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
+
+    // JavaCC
     implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
-    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
-
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.9.3"
-    api "org.antlr:antlr4-runtime:4.9.3"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    antlr4 "org.antlr:antlr4:4.13.2"
+    api "org.antlr:antlr4-runtime:4.13.2"
 }
 
 // The target directory for JavaCC (parser generation)
-def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
+def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
-
-// Generate code from ANTLR grammars.
-generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-listener", "-long-messages"]
-}
-
-// Generate code from ANTLR grammars in testing.
-generateTestGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-listener", "-long-messages"]
-}
 
 // Generate code from JavaCC grammars.
 compileJavacc {
@@ -55,14 +41,26 @@ compileJavacc {
             from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/Token.java")
             into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
         }
+        copy {
+            from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/JavaCharStream.java")
+            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
+        }
+        copy {
+            from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/JavaCharStream.java")
+            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
+        }
     }
 }
 
-task generateSMTListings {
+tasks.register('generateSMTListings') {
     def pack = "de/uka/ilkd/key/smt/newsmt2"
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
     // ${project.buildDir}
+    inputs.files fileTree("$resourcesDir/$pack", {
+        exclude "$resourcesDir/$pack/DefinedSymbolsHandler.preamble.xml"
+    })
+    outputs.files file("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml")
     doLast {
         new File("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml").withWriter { list ->
             list.writeLine '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
@@ -79,11 +77,15 @@ task generateSMTListings {
     }
 }
 
-task generateSolverPropsList {
+tasks.register('generateSolverPropsList') {
     def pack = "de/uka/ilkd/key/smt/solvertypes"
     def resourcesDir = "${project.projectDir}/src/main/resources"
     def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
     // ${project.buildDir}
+    inputs.files fileTree("$outputDir/$pack/", {
+        exclude "./solvers.txt"
+    })
+    outputs.files file("$outputDir/$pack/solvers.txt")
     doLast {
         def list = []
         def dir = new File("$outputDir/$pack/")
@@ -92,14 +94,13 @@ task generateSolverPropsList {
                 list.add(file.name)
             }
         })
-        if (!file("$outputDir/$pack/solvers.txt").exists()) {
-            String files = ''
-            for (String propsFile : list) {
-                files += propsFile + System.lineSeparator()
-            }
-            new File("$outputDir/$pack/solvers.txt").withWriter { listSolvers ->
-                listSolvers.write files
-            }
+        list.sort()
+        String files = ''
+        for (String propsFile : list) {
+            files += propsFile + System.lineSeparator()
+        }
+        new File("$outputDir/$pack/solvers.txt").withWriter { listSolvers ->
+            listSolvers.write files
         }
     }
 }
@@ -113,33 +114,33 @@ tasks.withType(Test) {
 }
 
 
-task testProveRules(type: Test) {
-    description 'Proves KeY taclet rules tagged as lemma'
-    group "verification"
+tasks.register('testProveRules', Test) {
+    description = 'Proves KeY taclet rules tagged as lemma'
+    group = "verification"
     filter { includeTestsMatching "ProveRulesTest" }
     //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
-task testRunAllFunProofs(type: Test) {
-    description 'Prove/reload all keyfiles tagged for regression testing'
-    group "verification"
+tasks.register('testRunAllFunProofs', Test) {
+    description = 'Prove/reload all keyfiles tagged for regression testing'
+    group = "verification"
     filter {
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
 
-task testRunAllInfProofs(type: Test) {
-    description 'Prove/reload all keyfiles tagged for regression testing'
-    group "verification"
+tasks.register('testRunAllInfProofs', Test) {
+    description = 'Prove/reload all keyfiles tagged for regression testing'
+    group = "verification"
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
     }
 }
 
 
-task testProveSMTLemmas(type: Test) {
-    description 'Prove (or load proofs for) lemmas used in the SMT translation'
-    group "verification"
+tasks.register('testProveSMTLemmas', Test) {
+    description = 'Prove (or load proofs for) lemmas used in the SMT translation'
+    group = "verification"
     filter {
         includeTestsMatching "ProveSMTLemmasTest"
     }
@@ -147,9 +148,9 @@ task testProveSMTLemmas(type: Test) {
 
 // Run the tests for the new smt translation in strict mode
 // where "unknown" is less accepted
-task testStrictSMT(type: Test) {
-    description 'Run the tests for the new smt translation in strict mode'
-    group 'verification'
+tasks.register('testStrictSMT', Test) {
+    description = 'Run the tests for the new smt translation in strict mode'
+    group = 'verification'
     systemProperty("key.newsmt2.stricttests", "true")
     filter {
         includeTestsMatching "MasterHandlerTest"
@@ -157,15 +158,16 @@ task testStrictSMT(type: Test) {
 }
 
 //Generation of the three version files within the resources by executing `git'.
-task generateVersionFiles() {
+tasks.register('generateVersionFiles') {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
     def sha1 = new File(outputFolder, "sha1")
     def branch = new File(outputFolder, "branch")
     def versionf = new File(outputFolder, "version")
 
+    inputs.files "$project.rootDir/.git/HEAD"
     outputs.files sha1, branch, versionf
 
-    def gitRevision = gitRevParse('--short HEAD')
+    def gitRevision = gitRevParse('HEAD')
     def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
     doLast {
@@ -175,11 +177,21 @@ task generateVersionFiles() {
     }
 }
 
+// Helper function that calls "git rev-parse" to
+// find names/SHAs for commits
+static def gitRevParse(String args) {
+    try {
+        return "git rev-parse $args".execute().text.trim()
+    } catch (Exception e) {
+        return ""
+    }
+}
+
 // @AW: Say something here. From POV this explain by itself.
-processResources.dependsOn generateVersionFiles
+processResources.dependsOn generateVersionFiles, generateSolverPropsList, generateSMTListings
 
 def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
-task runAntlr4Key(type: JavaExec) {
+tasks.register('runAntlr4Key', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
     outputs.dir antlr4OutputKey
@@ -196,7 +208,7 @@ task runAntlr4Key(type: JavaExec) {
 }
 compileJava.dependsOn runAntlr4Key
 
-task debugKeyLexer(type: JavaExec) {
+tasks.register('debugKeyLexer', JavaExec) {
     mainClass.set("de.uka.ilkd.key.nparser.DebugKeyLexer")
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -206,7 +218,7 @@ task debugKeyLexer(type: JavaExec) {
 processResources.dependsOn generateVersionFiles
 
 def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
-task runAntlr4Jml(type: JavaExec) {
+tasks.register('runAntlr4Jml', JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.files "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"
     outputs.dir antlr4OutputJml
@@ -223,22 +235,22 @@ task runAntlr4Jml(type: JavaExec) {
 }
 compileJava.dependsOn runAntlr4Jml
 
-task debugJmlLexer(type: JavaExec) {
+tasks.register('debugJmlLexer', JavaExec) {
     mainClass.set("de.uka.ilkd.key.speclang.njml.DebugJmlLexer")
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
 
-task ptest(type: Test) { group "verification" }
+tasks.register('ptest', Test) { group = "verification" }
 
-task generateRAPUnitTests(type: JavaExec) {
+def rapDir = layout.buildDirectory.dir("generated-src/rap/").getOrNull()
+
+tasks.register('generateRAPUnitTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass.set("de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests")
-    args("$buildDir/generated-src/rap/")
+    args(rapDir)
 }
-sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
+sourceSets.test.java.srcDirs(rapDir)
 
-// @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
-// check.dependsOn << testProofRules << testRunAllProofs
-
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc)

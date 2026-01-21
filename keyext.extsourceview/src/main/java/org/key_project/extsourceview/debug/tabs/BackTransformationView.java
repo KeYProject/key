@@ -9,7 +9,7 @@ import org.key_project.extsourceview.ExtSourceViewExtension;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.*;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
@@ -34,7 +34,7 @@ public class BackTransformationView extends DebugTab {
 
     private final MainWindow mainWindow;
 
-    public BackTransformationView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public BackTransformationView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         mainWindow = window;
@@ -42,7 +42,7 @@ public class BackTransformationView extends DebugTab {
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         var pnlConf = new JPanel(new GridBagLayout());
@@ -223,7 +223,7 @@ public class BackTransformationView extends DebugTab {
         refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.update(window, mediator));
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Transformer";

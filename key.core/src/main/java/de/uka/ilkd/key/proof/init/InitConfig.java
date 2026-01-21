@@ -3,7 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import java.util.*;
 
 import de.uka.ilkd.key.rule.*;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -121,7 +121,7 @@ public class InitConfig {
      *
      * @return true if the default was successfully set
      */
-    public boolean addCategoryDefaultChoice(@Nonnull String category, @Nonnull String choice) {
+    public boolean addCategoryDefaultChoice(@NonNull String category, @NonNull String choice) {
         if (!category2DefaultChoice.containsKey(category)) {
             category2DefaultChoice.put(category, choice);
             return true;
@@ -132,7 +132,7 @@ public class InitConfig {
     /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@Nonnull Map<String, String> init) {
+    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
             changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;

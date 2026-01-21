@@ -19,7 +19,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.io.File;
 import java.util.Iterator;
 
@@ -308,7 +308,7 @@ public class MergeRuleTests {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    @Nonnull
+    @NonNull
     public static Proof loadProof(File directory, String proofFileName) {
         File proofFile = new File(directory, proofFileName);
         assertTrue(proofFile.exists(),

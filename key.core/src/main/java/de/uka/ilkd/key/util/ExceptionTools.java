@@ -6,8 +6,8 @@ import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.runtime.RecognitionException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 
 /**
@@ -31,7 +31,7 @@ public final class ExceptionTools {
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static @Nullable Location getLocation(@Nonnull Throwable exc)
+    public static @Nullable Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         Location location = null;
         if (exc instanceof HasLocation) {

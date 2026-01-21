@@ -45,7 +45,7 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.*;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -496,7 +496,7 @@ public class JMLSpecFactory {
         }
     }
 
-    @Nonnull
+    @NonNull
     private LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(JmlFacade.parseClause("assignable \\nothing;"),
             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
@@ -973,9 +973,9 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
-    public ClassInvariant createJMLClassInvariant(@Nonnull KeYJavaType kjt,
+    public ClassInvariant createJMLClassInvariant(@NonNull KeYJavaType kjt,
             VisibilityModifier visibility, boolean isStatic,
-            @Nonnull LabeledParserRuleContext originalInv) {
+            @NonNull LabeledParserRuleContext originalInv) {
         // create variable for self
         ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
@@ -1009,8 +1009,8 @@ public class JMLSpecFactory {
         return new ClassInvariantImpl(name, display, kjt, getVisibility(textualInv), inv, selfVar);
     }
 
-    public InitiallyClause createJMLInitiallyClause(@Nonnull KeYJavaType kjt,
-            VisibilityModifier visibility, @Nonnull LabeledParserRuleContext original) {
+    public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
+            VisibilityModifier visibility, @NonNull LabeledParserRuleContext original) {
         // create variable for self
         ProgramVariable selfVar = tb.selfVar(kjt, false);
 
@@ -1030,8 +1030,8 @@ public class JMLSpecFactory {
         return createJMLInitiallyClause(kjt, getVisibility(textualInv), textualInv.getInv());
     }
 
-    public ClassAxiom createJMLRepresents(@Nonnull KeYJavaType kjt, VisibilityModifier visibility,
-            @Nonnull LabeledParserRuleContext originalRep, boolean isStatic)
+    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, VisibilityModifier visibility,
+            @NonNull LabeledParserRuleContext originalRep, boolean isStatic)
             throws SLTranslationException {
 
         // create variable for self
@@ -1092,7 +1092,7 @@ public class JMLSpecFactory {
      * @param textual textual representation
      * @return created {@link ClassAxiom}
      */
-    public ClassAxiom createJMLClassAxiom(@Nonnull KeYJavaType kjt, TextualJMLClassAxiom textual) {
+    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {
         LabeledParserRuleContext originalRep = textual.getAxiom();
         if (originalRep == null)
             throw new NullPointerException();

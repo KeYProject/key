@@ -23,7 +23,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**

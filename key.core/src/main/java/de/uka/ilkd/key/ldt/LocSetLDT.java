@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 public final class LocSetLDT extends LDT {

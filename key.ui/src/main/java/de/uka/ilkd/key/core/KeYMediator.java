@@ -2,8 +2,8 @@ package de.uka.ilkd.key.core;
 
 import java.util.EventObject;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
@@ -691,7 +691,7 @@ public class KeYMediator {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null)
             userData = new Lookup();
         return userData;
@@ -998,7 +998,7 @@ public class KeYMediator {
      *
      * @see DefaultListModel#addListDataListener
      */
-    public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+    public @NonNull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
     }
 }

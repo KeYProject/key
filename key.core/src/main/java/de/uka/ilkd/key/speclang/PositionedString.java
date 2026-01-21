@@ -9,8 +9,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 /**
@@ -22,18 +22,18 @@ public class PositionedString {
 
     public static final String UNDEFINED_FILE = "<unknown>";
 
-    @Nonnull
+    @NonNull
     public final String text;
 
-    @Nonnull
+    @NonNull
     public final String fileName;
 
-    @Nonnull
+    @NonNull
     public final Position pos;
 
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
-    public PositionedString(@Nonnull String text, @Nullable String fileName,
+    public PositionedString(@NonNull String text, @Nullable String fileName,
             @Nullable Position pos) {
         if (text == null) {
             throw new IllegalArgumentException();
@@ -50,12 +50,12 @@ public class PositionedString {
         this.pos = pos;
     }
 
-    public PositionedString(@Nonnull String text, Token t) {
+    public PositionedString(@NonNull String text, Token t) {
         this(text, t.getInputStream().getSourceName(),
             new Position(t.getLine(), t.getCharPositionInLine()));
     }
 
-    public PositionedString(@Nonnull String text, String fileName) {
+    public PositionedString(@NonNull String text, String fileName) {
         this(text, fileName, null);
     }
 

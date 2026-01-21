@@ -20,7 +20,7 @@ import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.*;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -50,7 +50,7 @@ public class JavaPosView extends DebugTab {
 
     private boolean triggerOnClick = false;
 
-    public JavaPosView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public JavaPosView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         // add a listener for hover in the proof tree
@@ -80,7 +80,7 @@ public class JavaPosView extends DebugTab {
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         taSource = new JTextArea();
@@ -105,13 +105,13 @@ public class JavaPosView extends DebugTab {
         this.add(pnlConf, BorderLayout.NORTH);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Java Stmt Pos";
     }
 
-    private void show(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void show(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
         if (t.javaBlock().isEmpty()) {
             taSource.setText("NO JAVA BLOCK");
             return;
@@ -224,7 +224,7 @@ public class JavaPosView extends DebugTab {
         return str;
     }
 
-    private void unshow(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void unshow(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         taSource.setText("");
     }
 

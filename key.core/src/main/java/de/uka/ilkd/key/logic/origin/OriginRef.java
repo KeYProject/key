@@ -4,8 +4,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -127,7 +127,7 @@ public class OriginRef {
         return (File != null);
     }
 
-    public @Nonnull Optional<String> sourceString() {
+    public @NonNull Optional<String> sourceString() {
         if (!sourceStringCached) {
 
             if (File != null) {

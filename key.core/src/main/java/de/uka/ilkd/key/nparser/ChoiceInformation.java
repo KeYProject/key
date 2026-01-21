@@ -2,7 +2,7 @@ package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 

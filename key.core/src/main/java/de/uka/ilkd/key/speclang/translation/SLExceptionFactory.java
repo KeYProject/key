@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.service.KeYCrossReferenceSourceInfo;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class SLExceptionFactory {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLExceptionFactory(@Nonnull Parser parser, String fileName, Position offsetPos) {
+    public SLExceptionFactory(@NonNull Parser parser, String fileName, Position offsetPos) {
         this.line = parser.input.LT(1).getLine();
         this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName = fileName;

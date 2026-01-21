@@ -7,7 +7,7 @@ import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 
 /**

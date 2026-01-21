@@ -3,7 +3,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -19,7 +19,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     private Map<Name, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
 
     public TextualJMLDepends(ImmutableList<String> mods, Name[] heaps,
-            @Nonnull LabeledParserRuleContext depends) {
+            @NonNull LabeledParserRuleContext depends) {
         super(mods);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             this.depends.put(hName, ImmutableSLList.nil());

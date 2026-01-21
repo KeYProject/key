@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,7 +34,7 @@ public class JmlMarkerDecision {
      *
      * @param markers a collection of keys without prefix ([+-])
      */
-    public void setEnabledKeys(@Nonnull Collection<String> markers) {
+    public void setEnabledKeys(@NonNull Collection<String> markers) {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 

@@ -2,8 +2,8 @@ package org.key_project.exploration;
 
 import de.uka.ilkd.key.proof.Node;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 /**
@@ -15,7 +15,7 @@ public class ExplorationNodeData {
 
     private String explorationAction;
 
-    public static @Nonnull ExplorationNodeData get(@Nonnull Node node) {
+    public static @NonNull ExplorationNodeData get(@NonNull Node node) {
         @Nullable
         ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
         if (data == null) {

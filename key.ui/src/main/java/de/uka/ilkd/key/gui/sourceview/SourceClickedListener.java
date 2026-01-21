@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.awt.event.MouseEvent;
 import java.util.EventListener;
 

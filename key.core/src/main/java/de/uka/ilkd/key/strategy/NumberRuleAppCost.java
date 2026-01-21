@@ -4,7 +4,7 @@ import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.util.Debug;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
@@ -51,9 +51,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      */
     public abstract long getValue();
 
-    @Nonnull
+    @NonNull
     @Override
-    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+    public RuleAppCost mul(@NonNull RuleAppCost cost) {
         if (cost instanceof TopRuleAppCost) {
             return cost.mul(this);
         }

@@ -4,8 +4,8 @@ package de.uka.ilkd.key.smt.communication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.io.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -157,7 +157,7 @@ class LegacyPipe implements Pipe {
     }
 
     @Override
-    public synchronized void sendMessage(@Nonnull String message) throws IOException {
+    public synchronized void sendMessage(@NonNull String message) throws IOException {
         outputWriter.write(message + System.lineSeparator());
         outputWriter.flush();
     }
@@ -189,7 +189,7 @@ class LegacyPipe implements Pipe {
         return stderrReceiver.alive && stdoutReceiver.alive;
     }
 
-    public @Nonnull SolverCommunication getSolverCommunication() {
+    public @NonNull SolverCommunication getSolverCommunication() {
         return session;
     }
 }

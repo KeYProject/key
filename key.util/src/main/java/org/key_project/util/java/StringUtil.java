@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.JFileChooser;
 
 
@@ -385,8 +385,8 @@ public final class StringUtil {
      *
      * The given predicate test the characters, if true the character is removed.
      */
-    @Nonnull
-    public static String trim(@Nonnull String text, @Nonnull Predicate<Character> predicate) {
+    @NonNull
+    public static String trim(@NonNull String text, @NonNull Predicate<Character> predicate) {
         int first = 0;
         int last = text.length() - 1;
         char[] value = text.toCharArray();
@@ -405,7 +405,7 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-    @Nonnull
+    @NonNull
     public static String trim(String text, char c) {
         return trim(text, it -> it == c);
     }
@@ -415,7 +415,7 @@ public final class StringUtil {
      *
      * @see #trim(String, Predicate)
      */
-    @Nonnull
+    @NonNull
     public static String trim(String text, String chars) {
         return trim(text, it -> chars.indexOf(it) >= 0);
     }

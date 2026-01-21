@@ -4,7 +4,7 @@ package de.uka.ilkd.key.gui.settings;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

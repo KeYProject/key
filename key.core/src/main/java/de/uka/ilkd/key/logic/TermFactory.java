@@ -3,7 +3,7 @@ package de.uka.ilkd.key.logic;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
@@ -100,15 +100,15 @@ public final class TermFactory {
         return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
     }
 
-    public @Nonnull Term addOriginRef(Term base, OriginRef origref) {
+    public @NonNull Term addOriginRef(Term base, OriginRef origref) {
         return addOriginRef(base, Collections.singleton(origref));
     }
 
-    public @Nonnull Term addOriginRef(Term base, ImmutableArray<OriginRef> origref) {
+    public @NonNull Term addOriginRef(Term base, ImmutableArray<OriginRef> origref) {
         return addOriginRef(base, origref.toList());
     }
 
-    public @Nonnull Term addOriginRef(Term base, Collection<OriginRef> origref) {
+    public @NonNull Term addOriginRef(Term base, Collection<OriginRef> origref) {
         var olist = base.getOriginRef().toList();
         var toadd = origref
             .stream()
@@ -126,7 +126,7 @@ public final class TermFactory {
         return newTerm;
     }
 
-    public @Nonnull Term setOriginRef(Term base, Collection<OriginRef> origref) {
+    public @NonNull Term setOriginRef(Term base, Collection<OriginRef> origref) {
         ImmutableArray<OriginRef> arr = new ImmutableArray<>(origref);
         Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(), base.getLabels(), arr);
 
@@ -137,7 +137,7 @@ public final class TermFactory {
         return newTerm;
     }
 
-    public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
+    public @NonNull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
         var origref = base.getOriginRef().toList();
         origref.replaceAll(o -> {
             if (o.Type == OriginRefType.LOOP_ANONUPDATE || o.Type == OriginRefType.OPERATION_ANONUPDATE) {
@@ -163,7 +163,7 @@ public final class TermFactory {
             base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
     }
 
-    public @Nonnull Term replaceOriginRefTypeRecursive(Term base, OriginRefType told, OriginRefType tnew) {
+    public @NonNull Term replaceOriginRefTypeRecursive(Term base, OriginRefType told, OriginRefType tnew) {
         var origref = base.getOriginRef().toList();
         for (int i = 0; i < origref.size(); i++) {
             if (origref.get(i).Type == told) {
@@ -179,11 +179,11 @@ public final class TermFactory {
                 base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
     }
 
-    public @Nonnull Term addOriginRefRecursive(Term base, OriginRef origref) {
+    public @NonNull Term addOriginRefRecursive(Term base, OriginRef origref) {
         return addOriginRefRecursive(base, Collections.singleton(origref));
     }
 
-    public @Nonnull Term addOriginRefRecursive(Term base, Collection<OriginRef> origref) {
+    public @NonNull Term addOriginRefRecursive(Term base, Collection<OriginRef> origref) {
         var olist = base.getOriginRef().toList();
         var toadd = origref
                 .stream()
@@ -205,12 +205,12 @@ public final class TermFactory {
     }
 
 
-    public @Nonnull Term replaceSubs(@Nonnull Term base, Set<Term> subs) {
+    public @NonNull Term replaceSubs(@NonNull Term base, Set<Term> subs) {
         return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
                 base.javaBlock(), base.getLabels(), base.getOriginRef());
     }
 
-    public @Nonnull Term replaceSubs(@Nonnull Term base, ImmutableArray<Term> subs) {
+    public @NonNull Term replaceSubs(@NonNull Term base, ImmutableArray<Term> subs) {
         return doCreateTerm(base.op(), subs, base.boundVars(),
                 base.javaBlock(), base.getLabels(), base.getOriginRef());
     }
@@ -256,7 +256,7 @@ public final class TermFactory {
      * @param junctor the left-associative operator to combine the terms together
      * @param terms a list of non-null temrs
      */
-    public @Nonnull Term createTerm(@Nonnull Operator junctor, @Nonnull List<Term> terms) {
+    public @NonNull Term createTerm(@NonNull Operator junctor, @NonNull List<Term> terms) {
         if (terms.size() == 1)
             return terms.get(0);
         else if (terms.size() == 2)

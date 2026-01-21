@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

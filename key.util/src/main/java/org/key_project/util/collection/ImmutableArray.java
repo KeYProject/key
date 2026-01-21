@@ -1,6 +1,6 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Array;
 
@@ -50,7 +50,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      * @param list a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")
-    public ImmutableArray(@Nonnull Collection<? extends S> list) {
+    public ImmutableArray(@NonNull Collection<? extends S> list) {
         content = (S[]) list.toArray();
     }
 

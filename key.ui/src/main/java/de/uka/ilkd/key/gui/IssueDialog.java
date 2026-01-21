@@ -18,8 +18,8 @@ import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.*;
@@ -589,19 +589,19 @@ public final class IssueDialog extends JDialog {
     private static class PositionedIssueString extends PositionedString {
 
         /** contains additional information, e.g., a stacktrace */
-        private final @Nonnull String additionalInfo;
+        private final @NonNull String additionalInfo;
 
-        public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-                @Nullable Position pos, @Nonnull String additionalInfo) {
+        public PositionedIssueString(@NonNull String text, @Nullable String fileName,
+                @Nullable Position pos, @NonNull String additionalInfo) {
             super(text, fileName, pos);
             this.additionalInfo = additionalInfo;
         }
 
-        public PositionedIssueString(@Nonnull String text) {
+        public PositionedIssueString(@NonNull String text) {
             this(text, null, null, "");
         }
 
-        public PositionedIssueString(@Nonnull PositionedString o, @Nonnull String additionalInfo) {
+        public PositionedIssueString(@NonNull PositionedString o, @NonNull String additionalInfo) {
             this(o.text, o.fileName, o.pos, additionalInfo);
         }
 

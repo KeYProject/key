@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableList;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 

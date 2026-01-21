@@ -5,7 +5,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import org.key_project.extsourceview.debug.DebugTab;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
@@ -19,7 +19,7 @@ public class SourceHighlightsView extends DebugTab {
 
     private final SourceView sourceView;
 
-    public SourceHighlightsView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public SourceHighlightsView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         sourceView = window.getSourceViewFrame().getSourceView();
@@ -68,7 +68,7 @@ public class SourceHighlightsView extends DebugTab {
             GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Source Higlights";

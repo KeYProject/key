@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -60,7 +60,7 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @Nonnull
+    @NonNull
     List<File> readClassPath() throws ProofInputException;
 
     /**

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 public final class CharListLDT extends LDT {

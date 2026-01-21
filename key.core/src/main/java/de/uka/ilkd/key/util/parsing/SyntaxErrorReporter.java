@@ -7,7 +7,7 @@ import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.logic;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.util.collection.ImmutableArray;
@@ -146,7 +146,7 @@ public interface Term extends SVSubstitute, Sorted {
      */
     public ImmutableArray<TermLabel> getLabels();
 
-    public @Nonnull ImmutableArray<OriginRef> getOriginRef();
+    public @NonNull ImmutableArray<OriginRef> getOriginRef();
 
     public List<OriginRef> getOriginRefRecursive();
 

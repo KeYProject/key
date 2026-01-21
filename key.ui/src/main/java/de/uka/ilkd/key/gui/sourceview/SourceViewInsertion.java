@@ -2,7 +2,7 @@ package de.uka.ilkd.key.gui.sourceview;
 
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;

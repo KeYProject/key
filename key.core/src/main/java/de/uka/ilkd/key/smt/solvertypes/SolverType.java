@@ -17,8 +17,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -198,7 +198,7 @@ public interface SolverType {
      *        solvers this can be null)
      * @return the newly created socket
      */
-    @Nonnull
+    @NonNull
     AbstractSolverSocket getSocket(ModelExtractor query);
 
 }

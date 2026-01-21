@@ -2,7 +2,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class represents the translation of an expression of an arbitrary specification language,
@@ -14,7 +14,7 @@ public final class SLExpression {
     private final boolean isTerm;
 
 
-    public SLExpression(@Nonnull Term term, @Nonnull KeYJavaType type, boolean isTerm) {
+    public SLExpression(@NonNull Term term, @NonNull KeYJavaType type, boolean isTerm) {
         if (term.sort() != type.getSort())
             throw new IllegalArgumentException(
                 String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
@@ -23,7 +23,7 @@ public final class SLExpression {
         this.isTerm = isTerm;
     }
 
-    public SLExpression(@Nonnull Term term, @Nonnull KeYJavaType type) {
+    public SLExpression(@NonNull Term term, @NonNull KeYJavaType type) {
         this(term, type, true);
     }
 
@@ -31,14 +31,14 @@ public final class SLExpression {
     /**
      * USE WITH CARE! Term-SLExpressions should have a type!
      */
-    public SLExpression(@Nonnull Term term) {
+    public SLExpression(@NonNull Term term) {
         this.term = term;
         this.type = null;
         this.isTerm = true;
     }
 
 
-    public SLExpression(@Nonnull KeYJavaType type) {
+    public SLExpression(@NonNull KeYJavaType type) {
         this.term = null;
         this.type = type;
         this.isTerm = false;

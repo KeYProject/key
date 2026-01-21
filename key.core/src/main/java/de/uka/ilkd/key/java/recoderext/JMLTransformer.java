@@ -25,7 +25,7 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -711,7 +711,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         final HashSet<TypeDeclaration> result = new LinkedHashSet<>();
 
-        public void walk(@Nonnull SourceElement s) {
+        public void walk(@NonNull SourceElement s) {
             s.accept(this);
             if (s instanceof NonTerminalProgramElement) {
                 NonTerminalProgramElement pe = (NonTerminalProgramElement) s;

@@ -8,7 +8,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -133,7 +133,7 @@ public class DockingHelper {
             p.getComponent(), p.getPermissions(), a);
     }
 
-    public static @Nonnull CAction translateAction(@Nonnull Action action) {
+    public static @NonNull CAction translateAction(@NonNull Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -142,7 +142,7 @@ public class DockingHelper {
         }
     }
 
-    private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
+    private static @NonNull CAction createCheckBox(@NonNull Action action) {
         CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON)) {
             @Override

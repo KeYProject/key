@@ -10,8 +10,8 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class RunAllProofsAction extends MainWindowAction {
      * content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null, then
      * {@link #DEFAULT_FILE} is used.
      */
-    @Nonnull
+    @NonNull
     private List<File> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
             getClass().getSimpleName());

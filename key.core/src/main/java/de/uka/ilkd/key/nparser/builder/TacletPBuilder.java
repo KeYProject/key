@@ -29,8 +29,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -451,7 +451,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         return ImmutableList.fromList(taclets);
     }
 
-    @Nonnull
+    @NonNull
     private TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction,
             ParserRuleContext ctx) {
         if (find == null) {

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 
 public class SLTranslationException extends ProofInputException implements HasLocation {

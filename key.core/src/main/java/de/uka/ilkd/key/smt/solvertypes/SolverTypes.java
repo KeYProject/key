@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt.solvertypes;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.util.*;
 
 /**
@@ -35,7 +35,7 @@ public final class SolverTypes {
      *
      * @return the available solver types, including legacy solvers
      */
-    @Nonnull
+    @NonNull
     public static Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
@@ -50,7 +50,7 @@ public final class SolverTypes {
      *
      * @return the available legacy solver types
      */
-    @Nonnull
+    @NonNull
     public static Collection<SolverType> getLegacySolvers() {
         if (SOLVERS.isEmpty()) {
             getSolverTypes();

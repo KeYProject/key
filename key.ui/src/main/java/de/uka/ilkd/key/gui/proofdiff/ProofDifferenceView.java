@@ -12,8 +12,8 @@ import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -46,7 +46,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
 
     private JComboBox<Proof> listLeftProof = new JComboBox<>(), listRightProof = new JComboBox<>();
 
-    public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator) {
+    public ProofDifferenceView(@NonNull Node left, @NonNull Node right, KeYMediator mediator) {
         super(NullMultipleCDockableFactory.NULL);
         this.mediator = mediator;
         this.services = mediator.getServices();
@@ -174,7 +174,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         return services;
     }
 
-    @Nonnull
+    @NonNull
     public Node getLeft() {
         return left;
     }
@@ -187,7 +187,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         propertyChangeSupport.firePropertyChange(PROPERTY_LEFT_NODE, oldLeft, left);
     }
 
-    @Nonnull
+    @NonNull
     public Node getRight() {
         return right;
     }

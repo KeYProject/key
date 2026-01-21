@@ -3,7 +3,7 @@ package de.uka.ilkd.key.util.parsing;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class BuildingIssue {
     private final String message;

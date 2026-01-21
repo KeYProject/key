@@ -5,7 +5,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import recoder.parser.ParseException;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.net.MalformedURLException;
 
 /**

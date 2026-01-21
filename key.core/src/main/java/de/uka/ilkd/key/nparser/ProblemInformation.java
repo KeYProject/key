@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.nparser;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class ProblemInformation {
     /**
      * A list of class paths entries.
      */
-    private final @Nonnull List<String> classpath;
+    private final @NonNull List<String> classpath;
 
     /**
      * Value of a "\chooseContract". If "\chooseContract" are mentioned in the file, but without a
@@ -120,7 +120,7 @@ public class ProblemInformation {
         this.javaSource = javaSource;
     }
 
-    @Nonnull
+    @NonNull
     public List<String> getClasspath() {
         return classpath;
     }

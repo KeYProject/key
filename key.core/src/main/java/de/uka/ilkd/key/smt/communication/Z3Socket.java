@@ -3,7 +3,7 @@ package de.uka.ilkd.key.smt.communication;
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 
 public class Z3Socket extends AbstractSolverSocket {
@@ -13,7 +13,7 @@ public class Z3Socket extends AbstractSolverSocket {
     }
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
         if (msg.startsWith("(error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);

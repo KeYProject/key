@@ -26,8 +26,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import org.key_project.util.lookup.Lookup;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -775,7 +775,7 @@ public class Node implements Iterable<Node> {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null)
             userData = new Lookup();
         return userData;

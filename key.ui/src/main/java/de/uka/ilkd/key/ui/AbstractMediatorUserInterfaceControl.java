@@ -36,7 +36,7 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a

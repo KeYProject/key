@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.Objects;
@@ -14,16 +14,16 @@ import java.util.Objects;
  * @author Dominic Scheurer
  */
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
-    private final @Nonnull JmlParser.Merge_point_statementContext mergeProc;
+    private final @NonNull JmlParser.Merge_point_statementContext mergeProc;
 
-    public TextualJMLMergePointDecl(@Nonnull ImmutableList<String> mods,
-            @Nonnull JmlParser.Merge_point_statementContext mergeProc) {
+    public TextualJMLMergePointDecl(@NonNull ImmutableList<String> mods,
+            @NonNull JmlParser.Merge_point_statementContext mergeProc) {
         super(mods);
         this.mergeProc = mergeProc;
         setPosition(mergeProc);
     }
 
-    public @Nonnull JmlParser.Merge_point_statementContext getMergeProc() {
+    public @NonNull JmlParser.Merge_point_statementContext getMergeProc() {
         return mergeProc;
     }
 

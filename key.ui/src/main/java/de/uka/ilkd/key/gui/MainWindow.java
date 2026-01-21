@@ -46,7 +46,7 @@ import de.uka.ilkd.key.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -1315,7 +1315,7 @@ public final class MainWindow extends JFrame {
      *
      * @see RecentFileMenu#addRecentFile(String)
      */
-    public void addRecentFile(@Nonnull String absolutePath) {
+    public void addRecentFile(@NonNull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.nparser.KeyIO;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.util.*;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -169,7 +169,7 @@ public class MergeRuleUtils {
      */
     public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            @Nonnull
+            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {

@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -45,8 +45,8 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    @Nonnull
-    public static <T extends ParserRuleContext> T getParseRuleContext(@Nonnull KeyAst<T> ast) {
+    @NonNull
+    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -76,7 +76,7 @@ public final class ParsingFacade {
      *
      * @param ctxs non-null list
      */
-    public static @Nonnull ChoiceInformation getChoices(@Nonnull List<KeyAst.File> ctxs) {
+    public static @NonNull ChoiceInformation getChoices(@NonNull List<KeyAst.File> ctxs) {
         ChoiceInformation ci = new ChoiceInformation();
         ChoiceFinder finder = new ChoiceFinder(ci);
         ctxs.forEach(it -> it.accept(finder));
@@ -147,8 +147,8 @@ public final class ParsingFacade {
      * @param ctx non-null context
      * @return non-null string
      */
-    public static @Nonnull String getValueDocumentation(
-            @Nonnull KeYParser.String_valueContext ctx) {
+    public static @NonNull String getValueDocumentation(
+            @NonNull KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1).replace("\\\"", "\"")
                 .replace("\\\\", "\\");
     }

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collection;
@@ -260,7 +260,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
     private static @Nullable TestGenerationSettings instance;
 
-    public static @Nonnull TestGenerationSettings getInstance() {
+    public static @NonNull TestGenerationSettings getInstance() {
         if (instance == null) {
             instance = new TestGenerationSettings();
             ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(instance);

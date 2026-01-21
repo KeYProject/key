@@ -7,7 +7,7 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.TestGenMacro;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -35,7 +35,7 @@ public class TestgenExtension
     }
 
     @Override
-    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         init(mainWindow);
         return Arrays.asList(actionCounterExample, actionTestGeneration);
     }
@@ -53,7 +53,7 @@ public class TestgenExtension
     }
 
     @Override
-    public @Nonnull JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("test generation");
         tb.add(actionCounterExample);
         tb.add(actionTestGeneration);

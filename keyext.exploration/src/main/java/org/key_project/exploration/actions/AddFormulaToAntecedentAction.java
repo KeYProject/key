@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import org.key_project.exploration.ProofExplorationService;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import java.awt.event.ActionEvent;
 
 /**
@@ -29,7 +29,7 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
         if (t == null)
             return;
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @Nonnull
+        @NonNull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
