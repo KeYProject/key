@@ -340,21 +340,25 @@ public final class OneStepSimplifier implements BuiltInRule {
             boolean inAntecedent,
             /* out */ List<PosInOccurrence> ifInsts,
             Protocol protocol,
-            Goal goal, RuleApp ruleApp) {
+            Goal goal, RuleApp ruleApp, PosInOccurrence findPos) {
         var services = goal.getOverlayServices();
-        final PosInOccurrence pos =
+        final PosInOccurrence assumesPos =
             map.get(new TermReplacementKey(in));
-        if (pos != null) {
-            ifInsts.add(pos);
+        if (assumesPos != null) {
+            ifInsts.add(assumesPos);
             if (protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos, goal.sequent()));
+                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, assumesPos, findPos,
+                    goal.sequent()));
             }
             JTerm result =
-                pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
-            // TODO: pos.subTerm() == in should be true which is currently not the case (labels are
+                assumesPos.isInAntec() ? services.getTermBuilder().tt()
+                        : services.getTermBuilder().ff();
+            // TODO: assumesPos.subTerm() == in should be true which is currently not the case
+            // (labels are
             // missing)
             ImmutableArray<TermLabel> labels =
-                TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
+                TermLabelManager.instantiateLabels(new TermLabelState(), services, in, assumesPos,
+                    this,
                     ruleApp, goal, null, null, result);
             if (labels != null && !labels.isEmpty()) {
                 result = services.getTermBuilder().label(result, labels);
@@ -368,7 +372,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
                 subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
-                    goal, ruleApp);
+                    goal, ruleApp, findPos.down(i));
                 if (subs[i] != in.sub(i)) {
                     changed = true;
                 }
@@ -399,7 +403,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
         final JTerm formula = (JTerm) cf.formula();
         final JTerm simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
-            protocol, goal, ruleApp);
+            protocol, goal, ruleApp, ruleApp.posInOccurrence());
         if (simplifiedFormula.equals(formula)) {
             return null;
         } else {
@@ -409,9 +413,9 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     private RuleApp makeReplaceKnownTacletApp(JTerm formula,
             boolean inAntecedent,
-            PosInOccurrence pio, Sequent seq) {
+            PosInOccurrence assumesPos, PosInOccurrence findPos, Sequent seq) {
         FindTaclet taclet;
-        if (pio.isInAntec()) {
+        if (assumesPos.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig()
                     .lookupActiveTaclet(new Name("replace_known_left"));
         } else {
@@ -421,20 +425,21 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
+        svi.add(sv, assumesPos.sequentFormula().formula(), lastProof.getServices());
 
-        PosInOccurrence applicatinPIO =
-            new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
-                                                                                      // should be
-                                                                                      // the precise
-                                                                                      // sub term
-                inAntecedent); // It is required to create a new PosInOccurrence because formula and
-                               // pio.constrainedFormula().formula() are only equals module
-                               // renamings and term labels
+        // PosInOccurrence applicatinPIO =
+        // new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
+        // // should be
+        // // the precise
+        // // sub term
+        // inAntecedent); // It is required to create a new PosInOccurrence because formula and
+        // assumesPos.constrainedFormula().formula() are only equals module
+        // renamings and term labels
         ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst =
-            ifInst.append(new AssumesFormulaInstSeq(seq, pio.isInAntec(), pio.sequentFormula()));
-        return PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
+            ifInst.append(new AssumesFormulaInstSeq(seq, assumesPos.isInAntec(),
+                assumesPos.sequentFormula()));
+        return PosTacletApp.createPosTacletApp(taclet, svi, ifInst, findPos,
             lastProof.getServices());
     }
 
