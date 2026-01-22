@@ -50,6 +50,7 @@ import org.key_project.util.collection.Immutables;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 public final class OneStepSimplifier implements BuiltInRule {
@@ -337,7 +338,6 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private JTerm replaceKnownHelper(
             Map<TermReplacementKey, PosInOccurrence> map, JTerm in,
-            boolean inAntecedent,
             /* out */ List<PosInOccurrence> ifInsts,
             Protocol protocol,
             Goal goal, RuleApp ruleApp, PosInOccurrence findPos) {
@@ -347,7 +347,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (assumesPos != null) {
             ifInsts.add(assumesPos);
             if (protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, assumesPos, findPos,
+                protocol.add(makeReplaceKnownTacletApp(assumesPos, findPos,
                     goal.sequent()));
             }
             JTerm result =
@@ -371,7 +371,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             JTerm[] subs = new JTerm[in.arity()];
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
-                subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
+                subs[i] = replaceKnownHelper(map, in.sub(i), ifInsts, protocol,
                     goal, ruleApp, findPos.down(i));
                 if (subs[i] != in.sub(i)) {
                     changed = true;
@@ -402,7 +402,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             return null;
         }
         final JTerm formula = (JTerm) cf.formula();
-        final JTerm simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
+        final JTerm simplifiedFormula = replaceKnownHelper(context, formula, ifInsts,
             protocol, goal, ruleApp, ruleApp.posInOccurrence());
         if (simplifiedFormula.equals(formula)) {
             return null;
@@ -411,9 +411,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(JTerm formula,
-            boolean inAntecedent,
-            PosInOccurrence assumesPos, PosInOccurrence findPos, Sequent seq) {
+    private RuleApp makeReplaceKnownTacletApp(PosInOccurrence assumesPos, PosInOccurrence findPos,
+            Sequent seq) {
         FindTaclet taclet;
         if (assumesPos.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig()
@@ -427,14 +426,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
         svi.add(sv, assumesPos.sequentFormula().formula(), lastProof.getServices());
 
-        // PosInOccurrence applicatinPIO =
-        // new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
-        // // should be
-        // // the precise
-        // // sub term
-        // inAntecedent); // It is required to create a new PosInOccurrence because formula and
-        // assumesPos.constrainedFormula().formula() are only equals module
-        // renamings and term labels
         ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst =
             ifInst.append(new AssumesFormulaInstSeq(seq, assumesPos.isInAntec(),
@@ -777,9 +768,9 @@ public final class OneStepSimplifier implements BuiltInRule {
                 obj = ((TermReplacementKey) obj).term;
             }
             if (obj instanceof JTerm t) {
-                return term.equals(t);// RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); //
-                                      // Ignore naming and
-                                      // term
+                return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); //
+                // Ignore naming and
+                // term
                 // labels in the way a
                 // taclet rule does.
             } else {
