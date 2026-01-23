@@ -378,7 +378,7 @@ public class SpecificationRepository {
         }
     }
 
-    protected void registerContract(Contract contract,
+    protected Contract registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
         LOGGER.trace("Contract registered {}", contract);
         final KeYJavaType targetKJT = targetPair.first;
@@ -389,7 +389,7 @@ public class SpecificationRepository {
             LOGGER.error("Tried to add a contract with a non-unique name: {}", name);
             // throw new IllegalStateException("Tried to add a contract with a non-unique name: " +
             // name);
-            return;
+            return contract;
         }
         assert !name.contains(CONTRACT_COMBINATION_MARKER)
                 : "Tried to add a contract with a name containing the" + " reserved character "
@@ -408,6 +408,7 @@ public class SpecificationRepository {
                 getOperationContracts(targetKJT, (IProgramMethod) targetMethod)
                         .add(operationContract));
         }
+        return contract;
     }
 
     /**

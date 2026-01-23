@@ -41,13 +41,15 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     }
 
     @Override
-    protected void registerContract(Contract contract,
+    protected Contract registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
         LOGGER.trace("Contract registered {}", contract);
         if (!WellDefinednessCheck.isOn(services) && contract instanceof WellDefinednessCheck) {
-            return;
+            return contract;
         }
-        super.registerContract(contract, targetPair);
+        // weigl: important as super.registerContract updates the contract which creates a new
+        // contract instance.
+        contract = super.registerContract(contract, targetPair);
 
         final KeYJavaType targetKJT = targetPair.first;
         final IObserverFunction targetMethod = targetPair.second;
@@ -101,6 +103,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
          * final ImmutableSet<IObserverFunction> newTargets = oldTargets.add(targetMethod);
          * contractTargets.put(targetKJT, newTargets);
          */
+        return contract;
     }
 
 
