@@ -64,7 +64,7 @@ public class ProveTest {
     }
 
     protected void assertUnProvability(String file) throws Exception {
-        // runKey(file, TestProperty.NOTPROVABLE);
+        runKey(file, TestProperty.NOTPROVABLE);
     }
 
     protected void assertLoadability(String file) throws Exception {

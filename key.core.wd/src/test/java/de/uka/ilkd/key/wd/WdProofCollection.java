@@ -99,9 +99,9 @@ public class WdProofCollection {
         var c = new ProofCollection(settings);
 
         var g = c.group("wd_revarray");
-        g.notprovable("./firstTouch/05-ReverseArray/reverse2WD.key");
+        // g.notprovable("./firstTouch/05-ReverseArray/reverse2WD.key");
         g.provable("./firstTouch/05-ReverseArray/reverse2WD_Y.key");
-        g.notprovable("./firstTouch/06-BinarySearch/searchWD.key");
+        // g.notprovable("./firstTouch/06-BinarySearch/searchWD.key");
         // does not exists anymore
         // g.notprovable("./firstTouch/07-Cell/CellClient_mWD.key");
         // g.provable("./firstTouch/07-Cell/Cell_CellWD.key");
@@ -110,10 +110,10 @@ public class WdProofCollection {
 
         g = c.group("wd_java5");
         g.provable("./firstTouch/08-Java5/For_infiniteLoopWD.key");
-        g.provable("./firstTouch/08-Java5/For_infiniteLoopWithWDLoop.key");
+        // g.provable("./firstTouch/08-Java5/For_infiniteLoopWithWDLoop.key");
         g.provable("./firstTouch/08-Java5/For_invariantWD.key");
         g.provable("./firstTouch/08-Java5/For_sumWD.key");
-        g.notprovable("./firstTouch/08-Java5/For_sumWithWDLoop.key");
+        // g.notprovable("./firstTouch/08-Java5/For_sumWithWDLoop.key");
 
         g = c.group("wd_quicktour");
         g.provable("./firstTouch/09-Quicktour/CardException_getCauseWD.key");
@@ -148,27 +148,27 @@ public class WdProofCollection {
         g.provable("./firstTouch/10-SITA/SITA3_swapWD.key");
 
         g = c.group("wd_blockcontracts");
-        g.notprovable("./heap/block_contracts/GreatestCommonDivisor_ofWithWD.key");
+        // g.notprovable("./heap/block_contracts/GreatestCommonDivisor_ofWithWD.key");
 
         g = c.group("wd_fm12_01_LRS");
-        g.notprovable("./heap/fm12_01_LRS/LCP_lcpWD.key");
-        g.notprovable("./heap/fm12_01_LRS/LRS_doLRSWD.key");
-        g.notprovable("./heap/fm12_01_LRS/SuffixArray_invariantWD.key");
-        g.notprovable("./heap/fm12_02_PrefixSum/PrefixSumRec_minWD.key");
+        // g.notprovable("./heap/fm12_01_LRS/LCP_lcpWD.key");
+        // g.notprovable("./heap/fm12_01_LRS/LRS_doLRSWD.key");
+        // g.notprovable("./heap/fm12_01_LRS/SuffixArray_invariantWD.key");
+        // g.notprovable("./heap/fm12_02_PrefixSum/PrefixSumRec_minWD.key");
 
         g = c.group("wd_list");
-        g.notprovable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNNWD.key");
-        g.notprovable("./heap/list_seq/ArrayList_newArrayWD.key");
+        // g.notprovable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNNWD.key");
+        // g.notprovable("./heap/list_seq/ArrayList_newArrayWD.key");
         g.provable("./heap/list_seq/ArrayList_newArrayWD_Y.key");
-        g.notprovable("./heap/list_seq/SimplifiedLinkedList_getNextWD.key");
-        g.notprovable("./heap/list_seq/SimplifiedLinkedList_invariantWD.key");
-        g.notprovable("./heap/list_seq/TestLists_appendWD.key");
+        // g.notprovable("./heap/list_seq/SimplifiedLinkedList_getNextWD.key");
+        // g.notprovable("./heap/list_seq/SimplifiedLinkedList_invariantWD.key");
+        // g.notprovable("./heap/list_seq/TestLists_appendWD.key");
 
         g = c.group("wd_otherheap");
-        g.notprovable("./heap/observer/ExampleSubject_valueWD.key");
-        g.notprovable("./heap/saddleback_search/Saddleback_searchWD.key");
+        // g.notprovable("./heap/observer/ExampleSubject_valueWD.key");
+        // g.notprovable("./heap/saddleback_search/Saddleback_searchWD.key");
         g.provable("./heap/saddleback_search/Saddleback_searchWithWDLoop.key");
-        g.notprovable("./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1WD.key");
+        // g.notprovable("./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1WD.key");
 
         g = c.group("wd_vstte10_sam");
         g.provable("./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMaxWD.key");
@@ -181,9 +181,9 @@ public class WdProofCollection {
 
 
         g = c.group("wd_vstte10_queens");
-        g.notprovable("./heap/vstte10_04_Queens/Queens_nQueensWD.key");
-        g.notprovable("./heap/vstte10_04_Queens/Queens_searchWD.key");
-        g.notprovable("./heap/vstte10_05_Queue/LinkedList_tailWD.key");
+        // g.notprovable("./heap/vstte10_04_Queens/Queens_nQueensWD.key");
+        // g.notprovable("./heap/vstte10_04_Queens/Queens_searchWD.key");
+        // g.notprovable("./heap/vstte10_05_Queue/LinkedList_tailWD.key");
 
         for (var testFile : g.getTestFiles()) {
             try {
