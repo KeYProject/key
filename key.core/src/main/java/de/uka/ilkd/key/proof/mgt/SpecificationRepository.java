@@ -752,8 +752,6 @@ public class SpecificationRepository {
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
-        final IObserverFunction target = inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt)
-                : services.getJavaInfo().getInv();
         invs.put(kjt, getClassInvariants(kjt).add(inv));
 
         // in any case, create axiom with non-static target
