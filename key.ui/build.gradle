@@ -18,8 +18,7 @@ dependencies {
     implementation project(":key.core.rifl")
 
     implementation("com.formdev:flatlaf:3.6.2")
-    // implementation("io.github.piisrational:universe:0.1.0")
-    implementation("piisrational:universe:0.1.0")
+    implementation("io.github.piisrational.universe:universe:0.1.0")
     implementation("io.github.eisop:checker:3.42.0-eisop3")
 
     implementation project(":key.core.proof_references")
