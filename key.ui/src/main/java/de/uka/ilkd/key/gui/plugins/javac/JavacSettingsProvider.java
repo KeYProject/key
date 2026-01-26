@@ -27,7 +27,7 @@ public class JavacSettingsProvider extends SettingsPanel implements SettingsProv
      * Text for the explanaition.
      */
     private static final String INTRO_LABEL =
-        "This allows to run the Java compiler when loading java files with additional processes such as Nulness or Ownership checkers.";
+        "This allows to run the Java compiler when loading java files with additional processes such as Nullness or Ownership checkers.";
 
     /**
      * Information message for the {@link #useProcessors} checkbox.
@@ -64,7 +64,7 @@ public class JavacSettingsProvider extends SettingsPanel implements SettingsProv
             });
         processors = addTextArea("Annotation Processors", "", PROCESSORS_INFO, e -> {
         });
-        paths = addTextArea("Class Paths", "", CLASS_PATHS_INFO, e -> {
+        paths = addTextArea("Processor Class Paths", "", CLASS_PATHS_INFO, e -> {
         });
 
         setHeaderText("Javac Options");
