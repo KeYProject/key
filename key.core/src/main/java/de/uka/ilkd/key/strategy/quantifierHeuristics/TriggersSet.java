@@ -251,7 +251,7 @@ public class TriggersSet {
             final HashSet<JTerm> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final JTerm res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,
-                    boundVars, null);
+                    boundVars, null, oriTerm.getOriginRef());
 
 
                 set.add(res);

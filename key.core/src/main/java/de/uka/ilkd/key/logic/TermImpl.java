@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
 import org.key_project.logic.Visitor;
@@ -81,6 +84,8 @@ class TermImpl implements JTerm {
      */
     private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
 
+    protected final ImmutableArray<OriginRef> originRef;
+
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -96,29 +101,18 @@ class TermImpl implements JTerm {
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
-            String origin) {
+            @NonNull ImmutableArray<OriginRef> originRef) {
         assert op != null;
         assert subs != null;
         this.op = op;
         this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
         this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
-        this.origin = origin;
+        this.originRef = originRef;
     }
 
     TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars) {
-        this(op, subs, boundVars, "");
-    }
-
-    /**
-     * For which feature is this information needed?
-     * What is the difference from {@link de.uka.ilkd.key.logic.label.OriginTermLabel}?
-     */
-    private final String origin;
-
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
+        this(op, subs, boundVars, new ImmutableArray<>());
     }
 
     // -------------------------------------------------------------------------
@@ -412,6 +406,22 @@ class TermImpl implements JTerm {
     @Override
     public TermLabel getLabel(Name termLabelName) {
         return null;
+    }
+
+    @Override
+    public @NonNull ImmutableArray<OriginRef> getOriginRef() {
+        return originRef;
+    }
+
+    @Override
+    public List<OriginRef> getOriginRefRecursive() {
+        ArrayList<OriginRef> r = new ArrayList<>(this.getOriginRef().toList());
+
+        for (JTerm t : subs()) {
+            r.addAll(t.getOriginRefRecursive());
+        }
+
+        return r;
     }
 
     @Override

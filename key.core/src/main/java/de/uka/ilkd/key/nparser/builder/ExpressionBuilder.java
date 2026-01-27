@@ -18,6 +18,8 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -97,9 +99,15 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     public static JTerm updateOrigin(JTerm t, ParserRuleContext ctx, Services services) {
         try {
-            t = services.getTermFactory().createTermWithOrigin(t,
-                ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
-                    + ":" + ctx.start.getCharPositionInLine() + 1);
+            // TODO: WP: does this work? more concrete OriginRefType?
+            var origin = new OriginRef(ctx.start.getTokenSource().getSourceName(),
+                ctx.start.getLine(), ctx.stop.getLine(), ctx.start.getCharPositionInLine(),
+                ctx.stop.getCharPositionInLine(), OriginRefType.UNKNOWN, t);
+            var originArr = new ImmutableArray<>(origin);
+            t = services.getTermFactory().createTermWithOrigin(t, originArr);
+//            t = services.getTermFactory().createTermWithOrigin(t,
+//                ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
+//                    + ":" + ctx.start.getCharPositionInLine() + 1);
         } catch (ClassCastException ignored) {
         }
         return t;
@@ -1023,7 +1031,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm elseT = accept(ctx.elseT);
         ImmutableArray<QuantifiableVariable> exVarsArray = new ImmutableArray<>(exVars);
         JTerm result = getTermFactory().createTerm(IfExThenElse.IF_EX_THEN_ELSE,
-            new JTerm[] { condF, thenT, elseT }, exVarsArray, null);
+            new JTerm[] { condF, thenT, elseT }, exVarsArray, null, null);
         unbindVars(orig);
         return result;
     }
@@ -1157,7 +1165,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         return capsulateTf(ctx,
-            () -> getTermFactory().createTerm(op, new JTerm[] { a1 }, null, null));
+            () -> getTermFactory().createTerm(op, new JTerm[] { a1 }, null, null, null));
     }
 
     @Override
@@ -1535,7 +1543,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // create term
                 JTerm[] finalArgs1 = args;
                 current = capsulateTf(ctx,
-                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null));
+                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null,
+                        null));
             }
         }
         current = handleAttributes(current, ctx.attribute());

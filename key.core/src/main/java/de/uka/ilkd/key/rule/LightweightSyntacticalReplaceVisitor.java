@@ -240,7 +240,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final JTerm newTerm =
-                    tb.tf().createTerm(newOp, neededsubs, boundVars, visited.getLabels());
+                    tb.tf().createTerm(newOp, neededsubs, boundVars, visited.getLabels(),
+                        visited.getOriginRef());
                 pushNew(resolveSubst(newTerm));
             } else {
                 JTerm term = resolveSubst(visited);

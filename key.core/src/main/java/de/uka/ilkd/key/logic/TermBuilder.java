@@ -444,7 +444,7 @@ public class TermBuilder {
     }
 
     public JTerm func(Function f, JTerm[] s, ImmutableArray<QuantifiableVariable> boundVars) {
-        return tf.createTerm(f, s, boundVars, null);
+        return tf.createTerm(f, s, boundVars, null, null);
     }
 
     // public Term prog(Modality modality, Term t) {
@@ -456,12 +456,12 @@ public class TermBuilder {
     // }
 
     public JTerm prog(JModality.JavaModalityKind modKind, JavaBlock jb, JTerm t) {
-        return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, null);
+        return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, null, null);
     }
 
     public JTerm prog(JModality.JavaModalityKind modKind, JavaBlock jb, JTerm t,
             ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, labels);
+        return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, labels, null);
     }
 
     public JTerm box(JavaBlock jb, JTerm t) {
@@ -774,7 +774,7 @@ public class TermBuilder {
         } else if (t2.op() == Junctor.FALSE) {
             return not(t1);
         } else {
-            return tf.createTerm(Junctor.IMP, t1, t2, labels);
+            return tf.createTerm(Junctor.IMP, t1, t2, labels, null);
         }
     }
 
@@ -1078,7 +1078,7 @@ public class TermBuilder {
         } else if (target.equals(tt())) {
             return tt();
         } else {
-            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels);
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels, null);
         }
     }
 
@@ -1422,7 +1422,7 @@ public class TermBuilder {
     public JTerm infiniteUnion(QuantifiableVariable[] qvs, JTerm s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         return tf.createTerm(ldt.getInfiniteUnion(), new JTerm[] { s },
-            new ImmutableArray<>(qvs), null);
+            new ImmutableArray<>(qvs), null, null);
     }
 
     public JTerm infiniteUnion(QuantifiableVariable[] qvs, JTerm guard, JTerm s) {
@@ -1745,7 +1745,7 @@ public class TermBuilder {
 
 
         JTerm result =
-            tf.createTerm(term.op(), newSubs, term.boundVars(), term.getLabels());
+            tf.createTerm(term.op(), newSubs, term.boundVars(), term.getLabels(), term.getOriginRef());
         result = addLabel(result, labels);
         return result;
     }
@@ -1777,7 +1777,7 @@ public class TermBuilder {
             return term;
         } else if (!term.hasLabels()) {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                labels);
+                labels, term.getOriginRef());
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
@@ -1795,7 +1795,7 @@ public class TermBuilder {
             }
 
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                new ImmutableArray<>(newLabelList));
+                new ImmutableArray<>(newLabelList), term.getOriginRef());
         }
     }
 
@@ -1826,7 +1826,7 @@ public class TermBuilder {
             return term;
         } else {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                labels);
+                labels, term.getOriginRef());
         }
     }
 
@@ -1850,7 +1850,7 @@ public class TermBuilder {
     }
 
     public JTerm unlabel(JTerm term) {
-        return tf.createTerm(term.op(), term.subs(), term.boundVars());
+        return tf.createTerm(term.op(), term.subs(), term.boundVars(), null);
     }
 
     public JTerm unlabelRecursive(JTerm term) {
@@ -1858,7 +1858,7 @@ public class TermBuilder {
         for (int i = 0; i < subs.length; i++) {
             subs[i] = unlabelRecursive(term.sub(i));
         }
-        return tf.createTerm(term.op(), subs, term.boundVars(), null);
+        return tf.createTerm(term.op(), subs, term.boundVars(), null, null);
     }
 
     public JTerm dotArr(JTerm ref, JTerm idx) {
@@ -2173,7 +2173,7 @@ public class TermBuilder {
         }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(),
-            term.getLabels());
+            term.getLabels(), term.getOriginRef());
     }
 
     public ImmutableSet<JTerm> unionToSet(JTerm s) {

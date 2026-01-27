@@ -211,7 +211,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
                     tb.tf().createTerm(modality, inst.modality.subs(), null,
-                        inst.modality.getLabels())));
+                        inst.modality.getLabels(), inst.modality.getOriginRef())));
         JTerm lhs = tb.var(inst.assignmentTarget);
 
         JTerm update = tb.elementary(lhs,
@@ -271,7 +271,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
                     tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost.sub(0)), null,
-                        inst.progPost.getLabels())));
+                        inst.progPost.getLabels(), inst.progPost.getOriginRef())));
         JTerm lhs = tb.var((ProgramVariable) inst.actualResult);
         JTerm update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));

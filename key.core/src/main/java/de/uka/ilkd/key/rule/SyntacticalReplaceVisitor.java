@@ -367,7 +367,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
                     new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
-                final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
+                final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels, null);
                 pushNew(resolveSubst(newTerm));
             } else {
                 JTerm t;
@@ -377,7 +377,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                     t = visited;
                 } else {
                     t = tb.tf().createTerm(visitedOp, visited.subs(), visited.boundVars(),
-                        labels);
+                        labels, null);
                 }
                 t = resolveSubst(t);
                 if (t == visited) {
@@ -395,7 +395,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
-            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
+            tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels, tacletTerm.getOriginRef()));
     }
 
     private Operator handleSortDependingSymbol(SortDependingFunction depOp) {

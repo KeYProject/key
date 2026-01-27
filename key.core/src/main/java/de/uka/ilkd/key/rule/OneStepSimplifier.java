@@ -373,7 +373,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
             if (changed) {
                 return services.getTermBuilder().tf().createTerm(in.op(), subs, in.boundVars(),
-                    in.getLabels());
+                    in.getLabels(), in.getOriginRef());
             } else {
                 return in;
             }

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
@@ -17,6 +18,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -109,6 +112,10 @@ public interface JTerm
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
     TermLabel getLabel(Name termLabelName);
+
+    public @NonNull ImmutableArray<OriginRef> getOriginRef();
+
+    public List<OriginRef> getOriginRefRecursive();
 
     /**
      * Checks if the {@link JTerm} or one of its direct or indirect children contains a non-empty

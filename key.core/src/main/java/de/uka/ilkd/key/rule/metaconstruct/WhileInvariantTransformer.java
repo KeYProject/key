@@ -250,7 +250,7 @@ public final class WhileInvariantTransformer {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyModality", null,
             tf.createTerm(loopBodyModality,
-                new ImmutableArray<>(result), null, newTermOriginalLabels));
+                new ImmutableArray<>(result), null, newTermOriginalLabels, null));
     }
 
     /**
@@ -339,7 +339,7 @@ public final class WhileInvariantTransformer {
                 ruleApp, goal, "ReturnCaseModality", null,
                 tf.createTerm(JModality.getModality(modality.kind(), returnJavaBlock),
                     new ImmutableArray<>(post),
-                    null, post.getLabels())));
+                    null, post.getLabels(), null)));
 
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag),
@@ -367,7 +367,7 @@ public final class WhileInvariantTransformer {
                 ruleApp, goal, "BreakCaseModality", null,
                 tf.createTerm(JModality.getModality(modality.kind(), executeJavaBlock),
                     new ImmutableArray<>(post),
-                    null, post.getLabels())));
+                    null, post.getLabels(), null)));
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag),
                     typeConv.getBooleanLDT().getTrueTerm()), executeBreak);
@@ -440,7 +440,7 @@ public final class WhileInvariantTransformer {
             Goal goal, Operator operator, ImmutableArray<JTerm> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyImplication", null,
-            tf.createTerm(operator, subs, null, post.getLabels()));
+            tf.createTerm(operator, subs, null, post.getLabels(), null));
     }
 
     private JTerm throwCase(TermLabelState termLabelState, ProgramVariable excFlag,
@@ -455,7 +455,7 @@ public final class WhileInvariantTransformer {
                 ruleApp, goal, "ThrowCaseModality", null,
                 tf.createTerm(JModality.getModality(modality.kind(), throwJavaBlock),
                     new ImmutableArray<>(post), null,
-                    post.getLabels())));
+                    post.getLabels(), null)));
         return TB.imp(TB.equals(typeConv.convertToLogicElement(excFlag),
             typeConv.getBooleanLDT().getTrueTerm()), throwException);
     }

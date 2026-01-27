@@ -8,7 +8,7 @@
 // import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 // import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 // import de.uka.ilkd.key.ldt.IntegerLDT;
-// import de.uka.ilkd.key.logic.Term;
+// import org.key_project.logic.Term;
 // import de.uka.ilkd.key.logic.TermBuilder;
 // import org.key_project.logic.op.Function;
 // import org.jspecify.annotations.NonNull;

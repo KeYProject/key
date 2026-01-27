@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -57,7 +58,7 @@ public final class TermFactory {
      */
     public JTerm createTerm(@NonNull Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -66,13 +67,13 @@ public final class TermFactory {
             subs = NO_SUBTERMS;
         }
 
-        return doCreateTerm(op, subs, boundVars, labels, "");
+        return doCreateTerm(op, subs, boundVars, labels, originref);
     }
 
     public JTerm createTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+            ImmutableArray<QuantifiableVariable> boundVars, ImmutableArray<OriginRef> originref) {
 
-        return createTerm(op, subs, boundVars, null);
+        return createTerm(op, subs, boundVars, null, originref);
     }
 
     public JTerm createTerm(@NonNull Operator op, JTerm... subs) {
@@ -81,30 +82,30 @@ public final class TermFactory {
 
     public JTerm createTerm(Operator op, JTerm[] subs,
             ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
-        return createTerm(op, createSubtermArray(subs), boundVars, labels);
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
+        return createTerm(op, createSubtermArray(subs), boundVars, labels, originref);
     }
 
-    public JTerm createTerm(Operator op, JTerm[] subs, TermLabel label) {
-        return createTerm(op, subs, null, new ImmutableArray<>(label));
+    public JTerm createTerm(Operator op, JTerm[] subs, TermLabel label, ImmutableArray<OriginRef> originref) {
+        return createTerm(op, subs, null, new ImmutableArray<>(label), originref);
     }
 
-    public JTerm createTerm(Operator op, JTerm[] subs, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, createSubtermArray(subs), null, labels);
+    public JTerm createTerm(Operator op, JTerm[] subs, ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
+        return createTerm(op, createSubtermArray(subs), null, labels, originref);
     }
 
-    public JTerm createTerm(Operator op, JTerm sub, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new ImmutableArray<>(sub), null, labels);
+    public JTerm createTerm(Operator op, JTerm sub, ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
+        return createTerm(op, new ImmutableArray<>(sub), null, labels, originref);
     }
 
     public JTerm createTerm(Operator op, JTerm sub1, JTerm sub2,
-            ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new JTerm[] { sub1, sub2 }, labels);
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
+        return createTerm(op, new JTerm[] { sub1, sub2 }, labels, originref);
     }
 
 
-    public JTerm createTerm(Operator op, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, NO_SUBTERMS, null, labels);
+    public JTerm createTerm(Operator op, ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
+        return createTerm(op, NO_SUBTERMS, null, labels, originref);
     }
 
     // -------------------------------------------------------------------------
@@ -117,12 +118,12 @@ public final class TermFactory {
 
     private JTerm doCreateTerm(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()
-                    ? new TermImpl(op, subs, boundVars, origin)
-                    : new LabeledTermImpl(op, subs, boundVars, labels, origin));
+                    ? new TermImpl(op, subs, boundVars, (originref == null) ? (new ImmutableArray<>()) : originref)
+                    : new LabeledTermImpl(op, subs, boundVars, labels, (originref == null) ? (new ImmutableArray<>()) : originref));
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
@@ -163,7 +164,7 @@ public final class TermFactory {
         throw new IllegalArgumentException("list of terms is empty.");
     }
 
-    public JTerm createTermWithOrigin(JTerm t, String origin) {
-        return doCreateTerm(t.op(), t.subs(), t.boundVars(), t.getLabels(), origin);
+    public JTerm createTermWithOrigin(JTerm t, ImmutableArray<OriginRef> originref) {
+        return doCreateTerm(t.op(), t.subs(), t.boundVars(), t.getLabels(), originref);
     }
 }

@@ -50,7 +50,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
                 labelHint, posOfFind, it, mc, newMaxSort, goal, services, ruleApp);
 
             return services.getTermFactory().createTerm(term.op(), subs, term.boundVars(),
-                term.getLabels());
+                term.getLabels(), term.getOriginRef());
         }
 
         with = (JTerm) syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services,

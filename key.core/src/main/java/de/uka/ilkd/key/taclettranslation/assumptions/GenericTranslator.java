@@ -181,7 +181,7 @@ class GenericTranslator {
             }
         } else {
             term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
-                null);
+                null, term.getOriginRef());
         }
 
         return term;

@@ -6,7 +6,7 @@
 // import de.uka.ilkd.key.java.Services;
 // import de.uka.ilkd.key.ldt.LocSetLDT;
 // import de.uka.ilkd.key.logic.Name;
-// import de.uka.ilkd.key.logic.Term;
+// import org.key_project.logic.Term;
 // import org.key_project.logic.op.Function;
 // import de.uka.ilkd.key.logic.op.Operator;
 // import de.uka.ilkd.key.logic.op.SortDependingFunction;

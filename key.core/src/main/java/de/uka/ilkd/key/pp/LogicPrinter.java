@@ -1697,7 +1697,7 @@ public class LogicPrinter {
                     final JModality m =
                         JModality.getModality((JModality.JavaModalityKind) o, mod.programBlock());
                     final JTerm term = services.getTermFactory().createTerm(m, ta,
-                        phi.boundVars(), null);
+                        phi.boundVars(), null, phi.getOriginRef());
                     notationInfo.getNotation(m).print(term, this);
                     return;
                 }

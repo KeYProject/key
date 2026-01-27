@@ -303,7 +303,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(),
-            new ImmutableArray<>(labels));
+            new ImmutableArray<>(labels), term.getOriginRef());
     }
 
     /**
@@ -445,7 +445,7 @@ public class OriginTermLabel implements TermLabel {
             computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
 
         return services.getTermFactory().createTerm(term.op(), newSubs.terms, term.boundVars(),
-            labels);
+            labels, term.getOriginRef());
     }
 
     @Override

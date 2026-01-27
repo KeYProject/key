@@ -613,7 +613,7 @@ public class TacletGenerator {
 
         final JTerm findTerm =
             TB.tf().createTerm(JModality.getModality(modalitySV, findBlock),
-                new JTerm[] { TB.var(postSV) }, null, null);
+                new JTerm[] { TB.var(postSV) }, null, null, null);
 
         final JavaBlock replaceBlock =
             JavaBlock.createJavaBlock(new ContextStatementBlock(new StatementBlock(), null));
@@ -634,7 +634,7 @@ public class TacletGenerator {
         final JTerm replaceTerm =
             TB.apply(TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
                 TB.tf().createTerm(JModality.getModality(modalitySV, replaceBlock),
-                    new JTerm[] { TB.var(postSV) }, null, null));
+                    new JTerm[] { TB.var(postSV) }, null, null, null));
 
         final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder =
             new RewriteTacletBuilder<>();
@@ -901,7 +901,7 @@ public class TacletGenerator {
             newTerm = t;
         } else {
             newTerm = services.getTermBuilder().tf().createTerm(t.op(), newSubs,
-                new ImmutableArray<>(newBoundVars), null);
+                new ImmutableArray<>(newBoundVars), null, null);
         }
 
         return new TermAndBoundVarPair(newTerm, svs);
@@ -936,7 +936,7 @@ public class TacletGenerator {
 
         // reassemble, return
         final JTerm term =
-            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), null);
+            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), null, null);
         return new Pair<>(term, taclets);
     }
 

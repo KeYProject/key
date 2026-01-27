@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
 import org.key_project.logic.op.Operator;
@@ -51,14 +52,14 @@ public class LabeledTermImpl extends TermImpl {
      */
     public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
-        super(op, subs, boundVars, origin);
+            ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originRef) {
+        super(op, subs, boundVars, originRef);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
     }
 
-    /**
+    /* *
      * creates an instance of a labeled term.
      *
      * @param op the top level operator
@@ -66,14 +67,15 @@ public class LabeledTermImpl extends TermImpl {
      * @param boundVars logic variables bound by the operator
      * @param labels the terms labels (must not be null or empty)
      */
-    public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
+    // TODO: WP: needed?
+    /*public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         super(op, subs, boundVars, "");
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
-    }
+    }*/
 
     /**
      * {@inheritDoc}

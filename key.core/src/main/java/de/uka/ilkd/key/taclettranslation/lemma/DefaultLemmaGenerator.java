@@ -285,7 +285,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-            new ImmutableArray<>(qvars), null);
+            new ImmutableArray<>(qvars), null, null);
     }
 
     /**

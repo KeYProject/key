@@ -580,7 +580,7 @@ public class QueryExpand implements BuiltInRule {
         final JTerm result;
         if (changedSubTerm) {
             result =
-                services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars, null);
+                services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars, null, null);
         } else {
             result = term;
         }

@@ -28,6 +28,6 @@ public class GenericTermReplacer {
                     .toArray(JTerm[]::new);
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
-            newTopLevelTerm.boundVars(), newTopLevelTerm.getLabels());
+            newTopLevelTerm.boundVars(), newTopLevelTerm.getLabels(), newTopLevelTerm.getOriginRef());
     }
 }

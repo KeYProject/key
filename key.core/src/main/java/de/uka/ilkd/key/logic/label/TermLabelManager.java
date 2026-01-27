@@ -1365,7 +1365,7 @@ public class TermLabelManager {
                 if (!newSubsImmutable.equals(newTerm.subs())
                         || !newLabels.equals(newTerm.getLabels())) {
                     newTerm = tf.createTerm(newTerm.op(), newSubsImmutable, newTerm.boundVars(),
-                        newLabels);
+                        newLabels, newTerm.getOriginRef());
                 }
             }
         } while (pio != null);
@@ -1571,7 +1571,7 @@ public class TermLabelManager {
                 if (newLabels != sub.getLabels()) {
                     newSubs[i] =
                         tf.createTerm(sub.op(), sub.subs(), sub.boundVars(),
-                            newLabels);
+                            newLabels, sub.getOriginRef());
                     changed = true;
                 } else {
                     newSubs[i] = sub;
@@ -1579,7 +1579,8 @@ public class TermLabelManager {
             }
             newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
                 newApplicationTerm.boundVars(),
-                newApplicationTerm.getLabels()) : applicationTerm;
+                newApplicationTerm.getLabels(), newApplicationTerm.getOriginRef())
+                : applicationTerm;
         }
         return newApplicationTerm;
     }
@@ -1619,7 +1620,7 @@ public class TermLabelManager {
                 pair.second, refactorings.belowUpdatesRefactorings());
             if (newLabels != pair.second.getLabels()) {
                 JTerm newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
-                    pair.second.boundVars(), newLabels);
+                    pair.second.boundVars(), newLabels, pair.second.getOriginRef());
                 newApplicationTerm =
                     services.getTermBuilder().applyParallel(pair.first, newModality,
                         newApplicationTerm.getLabels());
@@ -1670,7 +1671,7 @@ public class TermLabelManager {
             }
             newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
                 newApplicationTerm.boundVars(),
-                newApplicationTerm.getLabels()) : newApplicationTerm;
+                newApplicationTerm.getLabels(), newApplicationTerm.getOriginRef()) : newApplicationTerm;
         }
         return newApplicationTerm;
     }
@@ -1797,7 +1798,7 @@ public class TermLabelManager {
             performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, term, activeRefactorings);
         return subsChanged || newLabels != term.getLabels() ? services.getTermFactory()
-                .createTerm(term.op(), newSubs, term.boundVars(), newLabels)
+                .createTerm(term.op(), newSubs, term.boundVars(), newLabels, term.getOriginRef())
                 : term;
     }
 
@@ -2121,7 +2122,7 @@ public class TermLabelManager {
                 if (labelsChanged) {
                     JTerm newTerm = services.getTermFactory().createTerm(existingTerm.op(),
                         existingTerm.subs(), existingTerm.boundVars(),
-                        new ImmutableArray<>(mergedLabels));
+                        new ImmutableArray<>(mergedLabels), existingTerm.getOriginRef());
                     SequentChangeInfo sci =
                         currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
                             new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
@@ -2156,10 +2157,11 @@ public class TermLabelManager {
      * @see TermLabel#isProofRelevant()
      */
     public static JTerm removeIrrelevantLabels(JTerm term, TermFactory tf) {
+        // TODO: WP: remove originref instead?
         return tf.createTerm(term.op(),
             new ImmutableArray<>(term.subs().stream().map(t -> removeIrrelevantLabels(t, tf))
                     .collect(Collectors.toList())),
             term.boundVars(), new ImmutableArray<>(term.getLabels().stream()
-                    .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
+                    .filter(TermLabel::isProofRelevant).collect(Collectors.toList())), term.getOriginRef());
     }
 }

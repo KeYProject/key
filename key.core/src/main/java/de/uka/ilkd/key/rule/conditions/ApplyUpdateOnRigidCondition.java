@@ -87,7 +87,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
             }
 
             return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
-                null);
+                null, phi.getOriginRef());
         }
 
         // Here we have to check for name collisions as there are free variables in u
@@ -145,7 +145,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            new ImmutableArray<>(boundVarsInPhi), null);
+            new ImmutableArray<>(boundVarsInPhi), null, phi.getOriginRef());
     }
 
     /**
