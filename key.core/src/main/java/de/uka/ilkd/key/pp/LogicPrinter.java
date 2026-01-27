@@ -782,6 +782,7 @@ public class LogicPrinter {
      * @param t the Term to be printed
      */
     public void printTerm(JTerm t) {
+        layouter.beginC();
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
             layouter.startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
@@ -799,6 +800,7 @@ public class LogicPrinter {
         if (t.hasLabels()) {
             printLabels(t);
         }
+        layouter.end();
     }
 
     /**
