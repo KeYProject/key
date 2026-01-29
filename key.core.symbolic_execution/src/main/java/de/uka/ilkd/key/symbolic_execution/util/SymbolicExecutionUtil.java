@@ -327,7 +327,7 @@ public final class SymbolicExecutionUtil {
         if (subChanged) {
             term =
                 services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
-                    term.boundVars(), term.getLabels());
+                    term.boundVars(), term.getLabels(), term.getOriginRef());
         }
         // Improve readability: a < 1 + b, a < b + 1
         final TermBuilder tb = services.getTermBuilder();
@@ -3146,7 +3146,7 @@ public final class SymbolicExecutionUtil {
                     newSubs.add(skolem);
                     JTerm newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
-                            equality.boundVars(), equality.getLabels());
+                            equality.boundVars(), equality.getLabels(), equality.getOriginRef());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
@@ -3162,7 +3162,7 @@ public final class SymbolicExecutionUtil {
                     newSubs.add(skolem);
                     JTerm newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
-                            equality.boundVars(), equality.getLabels());
+                            equality.boundVars(), equality.getLabels(), equality.getOriginRef());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
@@ -3187,7 +3187,7 @@ public final class SymbolicExecutionUtil {
         if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
             // Do not label skolem equality and skolem terms
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-                term.getLabels());
+                term.getLabels(), term.getOriginRef());
         } else {
             /// Label term which is not a skolem equality and not a skolem term
             List<TermLabel> newLabels = new LinkedList<>();
@@ -3196,7 +3196,7 @@ public final class SymbolicExecutionUtil {
             }
             newLabels.add(label);
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-                new ImmutableArray<>(newLabels));
+                new ImmutableArray<>(newLabels), term.getOriginRef());
         }
     }
 
@@ -3225,7 +3225,7 @@ public final class SymbolicExecutionUtil {
             }
         }
         return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-            new ImmutableArray<>(newLabels));
+            new ImmutableArray<>(newLabels), term.getOriginRef());
     }
 
     /**
@@ -3472,7 +3472,7 @@ public final class SymbolicExecutionUtil {
                         // Create new term in general.
                         return services.getTermFactory().createTerm(term.op(),
                             new ImmutableArray<>(newChildren), term.boundVars(),
-                            term.getLabels());
+                            term.getLabels(), term.getOriginRef());
                     }
                 } else {
                     return term;

@@ -3,6 +3,7 @@ package org.key_project.extsourceview.debug.tabs;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
+import org.jspecify.annotations.NonNull;
 import org.key_project.prover.sequent.Sequent;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.extsourceview.ExtSourceViewExtension;
@@ -34,7 +35,7 @@ public class BackTransformationView extends DebugTab {
 
     private final MainWindow mainWindow;
 
-    public BackTransformationView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public BackTransformationView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         mainWindow = window;
@@ -42,7 +43,7 @@ public class BackTransformationView extends DebugTab {
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         var pnlConf = new JPanel(new GridBagLayout());
@@ -223,7 +224,7 @@ public class BackTransformationView extends DebugTab {
         refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.update(window, mediator));
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Transformer";
@@ -250,8 +251,8 @@ public class BackTransformationView extends DebugTab {
                     "\n\n--------------------------------\n\n%s"+
                     "\n\n--------------------------------\n\n%s",
                     e.getMessage(),
-                    tte.Term.getOriginRef().stream().map(OriginRef::toString).collect(Collectors.joining("\n")),
-                    (new TermTranslator(fileUri, svc, sequent, true, true, false)).translateSafe(tte.Term, InsertionType.ASSERT),
+                    tte.term.getOriginRef().stream().map(OriginRef::toString).collect(Collectors.joining("\n")),
+                    (new TermTranslator(fileUri, svc, sequent, true, true, false)).translateSafe(tte.term, InsertionType.ASSERT),
                     e));
         } else {
             taSource.setText(String.format(

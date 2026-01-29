@@ -70,7 +70,7 @@ public class TruthValuePOExtension implements POExtension {
                 }
                 term = subsChanged
                         ? tf.createTerm(term.op(), new ImmutableArray<>(newSubs),
-                            term.boundVars(), term.getLabels())
+                            term.boundVars(), term.getLabels(), term.getOriginRef())
                         : term;
             }
             ImmutableArray<TermLabel> oldLabels = term.getLabels();
@@ -80,7 +80,7 @@ public class TruthValuePOExtension implements POExtension {
             int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
             newLabels[oldLabels.size()] = new FormulaTermLabel(labelID, labelSubID);
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
-                new ImmutableArray<>(newLabels));
+                new ImmutableArray<>(newLabels), term.getOriginRef());
         } else {
             return null;
         }

@@ -297,7 +297,7 @@ public final class SymbolicExecutionSideProofUtil {
                 }
                 result = services.getTermFactory().createTerm(term.op(),
                     new ImmutableArray<>(newSubs), term.boundVars(),
-                    term.getLabels());
+                    term.getLabels(), term.getOriginRef());
             }
             return result;
         }

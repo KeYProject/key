@@ -1,6 +1,6 @@
 package org.key_project.extsourceview.transformer;
 
-import org.key_project.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  * Transformation failed due to unusable input data
@@ -8,9 +8,9 @@ import org.key_project.logic.Term;
  * For example if the input sequent still contains updates (is not fully simplified)
  */
 public class TermTransformException extends TransformException {
-    public final Term Term;
-    public TermTransformException(Term t, String message) {
+    public final JTerm term;
+    public TermTransformException(JTerm t, String message) {
         super(message);
-        Term = t;
+        term = t;
     }
 }

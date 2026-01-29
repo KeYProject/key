@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.logic.origin.OriginFuncNameMap;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -92,6 +93,8 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     private final TermBuilder termBuilderWithoutCache;
 
+    private final OriginFuncNameMap ofuncNameMap;
+
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
@@ -109,6 +112,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         javainfo = new JavaInfo(
             new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
+        ofuncNameMap = new OriginFuncNameMap();
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
@@ -127,6 +131,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
         nameRecorder = new NameRecorder();
+        ofuncNameMap = new OriginFuncNameMap();
     }
 
     private Services(Services s) {
@@ -145,6 +150,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.originFactory = s.originFactory;
+        this.ofuncNameMap = s.ofuncNameMap;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -359,6 +365,10 @@ public class Services implements TermServices, LogicServices, ProofServices {
      */
     public Proof getProof() {
         return proof;
+    }
+
+    public OriginFuncNameMap getOriginFuncNameMap() {
+        return ofuncNameMap;
     }
 
     public interface ITermProgramVariableCollectorFactory {

@@ -174,7 +174,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             JTerm newTerm = tb.func(newPredicate, varTerm);
             JTerm newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(),
                 new ImmutableArray<>(newTerm), modalityTerm.boundVars(),
-                modalityTerm.getLabels());
+                modalityTerm.getLabels(), modalityTerm.getOriginRef());
             JTerm newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
             sequentToProve = sequentToProve
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)

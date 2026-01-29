@@ -8,6 +8,11 @@ import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -226,7 +231,7 @@ public class SequentBackTransformer {
 
                 TermBuilder tb = svc.getTermBuilder();
 
-                Term joinedAssert = tb.or(resultAssert.stream().map(p -> tb.and(p.stream().map(q->q.Term).collect(Collectors.toList()))).collect(Collectors.toList()));
+                JTerm joinedAssert = tb.or(resultAssert.stream().map(p -> tb.and(p.stream().map(q->q.Term).collect(Collectors.toList()))).collect(Collectors.toList()));
 
                 res.add(new InsertionTerm(InsertionType.ASSERT, joinedAssert, ImmutableList.fromList(pios)));
 
@@ -236,8 +241,8 @@ public class SequentBackTransformer {
         }
     }
 
-    private Pair<Term, List<PosInOccurrence>> applyConstMap(ConstPulloutMap constMap, PosInOccurrence pio) {
-        Term term  = pio.subTerm();
+    private Pair<JTerm, List<PosInOccurrence>> applyConstMap(ConstPulloutMap constMap, PosInOccurrence pio) {
+        JTerm term  = pio.subTerm();
 
         TermFactory tf = svc.getTermFactory();
 
@@ -251,12 +256,12 @@ public class SequentBackTransformer {
         }
     }
 
-    private Pair<Term, List<PosInOccurrence>> applyConstMapRecursive(TermFactory tf, ConstPulloutMap constMap, Term t) {
+    private Pair<JTerm, List<PosInOccurrence>> applyConstMapRecursive(TermFactory tf, ConstPulloutMap constMap, JTerm t) {
         boolean changed = false;
 
         ArrayList<PosInOccurrence> pioList = new ArrayList<>();
 
-        Term t2 = constMap.replace(tf, t);
+        JTerm t2 = constMap.replace(tf, t);
         if (t2 != null) {
             changed = true;
             pioList.add(constMap.getPIO(t));
@@ -285,23 +290,23 @@ public class SequentBackTransformer {
     }
 
     private ConstPulloutMap extractConstMap() {
-        var result = new HashMap<String, Pair<PosInOccurrence, Term>>();
-        var used = new HashSet<Term>();
+        var result = new HashMap<String, Pair<PosInOccurrence, JTerm>>();
+        var used = new HashSet<JTerm>();
 
         if (!reInlineConstPullouts) return new ConstPulloutMap(result, used);
 
         for (SequentFormula sf : sequent.antecedent().asList()) {
             var pio = PosInOccurrence.findInSequent(sequent, sequent.formulaNumberInSequent(true, sf), PosInTerm.getTopLevel());
 
-            Term term = sf.formula();
+            JTerm term = sf.formula();
 
             if (term.op() != Equality.EQUALS) continue;
             if (term.arity() != 2) continue;
 
             if (term.getOriginRef().stream().anyMatch(p -> p.Type != OriginRefType.JAVA_STMT && p.Type != OriginRefType.UNKNOWN)) continue;
 
-            Term sub0 = term.sub(0);
-            Term sub1 = term.sub(1);
+            JTerm sub0 = term.sub(0);
+            JTerm sub1 = term.sub(1);
 
             if (!(sub1.op() instanceof Function)) continue;
             if (sub1.arity() != 0) continue;
@@ -314,20 +319,20 @@ public class SequentBackTransformer {
         for (SequentFormula sf : sequent.succedent().asList()) {
             var pio = PosInOccurrence.findInSequent(sequent, sequent.formulaNumberInSequent(false, sf), PosInTerm.getTopLevel());
 
-            Term touter = sf.formula();
+            JTerm touter = sf.formula();
 
             if (touter.arity() != 1) continue;
             if (touter.op() != Junctor.NOT) continue;
 
-            Term term = touter.sub(0);
+            JTerm term = touter.sub(0);
 
             if (term.op() != Equality.EQUALS) continue;
             if (term.arity() != 2) continue;
 
             if (term.getOriginRef().stream().anyMatch(p -> p.Type != OriginRefType.JAVA_STMT && p.Type != OriginRefType.UNKNOWN)) continue;
 
-            Term sub1 = term.sub(1);
-            Term sub0 = term.sub(0);
+            JTerm sub1 = term.sub(1);
+            JTerm sub0 = term.sub(0);
 
             if (sub1.arity() != 0) continue;
             if (!(sub1.op() instanceof Function)) continue;
@@ -340,7 +345,7 @@ public class SequentBackTransformer {
         return new ConstPulloutMap(result, used);
     }
 
-    private InsertionTerm categorizeTerm(ConstPulloutMap constMap, PosInOccurrence basepio, Term term, List<PosInOccurrence> pios, boolean ante) throws TransformException {
+    private InsertionTerm categorizeTerm(ConstPulloutMap constMap, PosInOccurrence basepio, JTerm term, List<PosInOccurrence> pios, boolean ante) throws TransformException {
 
         if (term.containsJavaBlockRecursive()) {
             throw new TransformException("Cannot transform formula with modalities. - Finish symbolic execution to continue");
@@ -425,7 +430,7 @@ public class SequentBackTransformer {
         throw new TermTransformException(term, "Failed to categorize term '" + term + "'");
     }
 
-    private InsertionTerm createAssume(boolean ante, Term term, List<PosInOccurrence> pios) {
+    private InsertionTerm createAssume(boolean ante, JTerm term, List<PosInOccurrence> pios) {
         if (ante) {
             return new InsertionTerm(InsertionType.ASSUME, term, pios);
         } else {
@@ -434,7 +439,7 @@ public class SequentBackTransformer {
         }
     }
 
-    private InsertionTerm createAssert(boolean ante, Term term, List<PosInOccurrence> pios) {
+    private InsertionTerm createAssert(boolean ante, JTerm term, List<PosInOccurrence> pios) {
         if (ante) {
             // special-case, this should be an [assert] (but is in the antecedent)
             return new InsertionTerm(InsertionType.ASSERT, termNot(term), pios);
@@ -443,7 +448,7 @@ public class SequentBackTransformer {
         }
     }
 
-    private InsertionTerm createAssignable(boolean ante, Term term, List<PosInOccurrence> pios) throws TermTransformException {
+    private InsertionTerm createAssignable(boolean ante, JTerm term, List<PosInOccurrence> pios) throws TermTransformException {
         if (ante) {
             throw new TermTransformException(term, "Cannot transform assignbale term in the antecedent");
         }
@@ -451,8 +456,8 @@ public class SequentBackTransformer {
         return new InsertionTerm(InsertionType.ASSIGNABLE, term, pios);
     }
 
-    private Term termNot(Term term) {
-        Term result = svc.getTermBuilder().not(term);
+    private JTerm termNot(JTerm term) {
+        JTerm result = svc.getTermBuilder().not(term);
 
         var origs = term.getOriginRef().stream().map(OriginRef::WithoutFile).collect(Collectors.toList());
 
@@ -461,7 +466,7 @@ public class SequentBackTransformer {
         return result;
     }
 
-    private boolean isRequires(Term term) {
+    private boolean isRequires(JTerm term) {
         return isType(term,
                 OriginRefType.JML_REQUIRES,
                 OriginRefType.JML_REQUIRES_FREE,
@@ -475,7 +480,7 @@ public class SequentBackTransformer {
                 OriginRefType.IMPLICIT_REQUIRES_PARAM_NON_NULL);
     }
 
-    private boolean isEnsures(Term term) {
+    private boolean isEnsures(JTerm term) {
         return isType(term,
                 OriginRefType.JML_ENSURES,
                 OriginRefType.JML_ENSURES_FREE,
@@ -484,11 +489,11 @@ public class SequentBackTransformer {
                 OriginRefType.IMPLICIT_ENSURES_EXCNULL);
     }
 
-    private boolean isAssignable(Term term) {
+    private boolean isAssignable(JTerm term) {
         return isType(term, OriginRefType.JML_ASSIGNABLE, OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE);
     }
 
-    private boolean isType(Term term, OriginRefType... filter) {
+    private boolean isType(JTerm term, OriginRefType... filter) {
         if (term.containsJavaBlockRecursive())
             return false;
 
@@ -499,7 +504,7 @@ public class SequentBackTransformer {
         return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q) || InsertionTerm.isIrrelevantOriginRefType(p.Type));
     }
 
-    private List<OriginRef> getRelevantOrigins(Term term) {
+    private List<OriginRef> getRelevantOrigins(JTerm term) {
         if (recursiveOriginLookup) {
             return getSubOriginRefs(term, true, false).stream()
                     .filter(p -> p.Type != OriginRefType.UNKNOWN)

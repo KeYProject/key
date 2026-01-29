@@ -121,7 +121,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             JTerm[] newSubs = parent.subs().toArray(new JTerm[parent.arity()]);
             newSubs[pair.first] = root;
             root = services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(),
-                parent.getLabels());
+                parent.getLabels(), parent.getOriginRef());
         }
         return new SequentFormula(root);
     }

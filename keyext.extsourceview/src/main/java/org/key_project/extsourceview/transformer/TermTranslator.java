@@ -1,15 +1,18 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.pp.PrettyPrinter;
+import org.key_project.logic.op.AbstractSortedOperator;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import org.key_project.extsourceview.Utils;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -163,7 +166,7 @@ public class TermTranslator {
         this.manuallyTranslateLoopAssertions = manuallyTranslateLoopAssertions;
     }
 
-    public String translateWithOrigin(Term term) {
+    public String translateWithOrigin(JTerm term) {
         ImmutableArray<OriginRef> or = term.getOriginRef();
 
         if (or.size() == 0) {
@@ -172,19 +175,15 @@ public class TermTranslator {
         return or.get(0).sourceString().orElse("");
     }
 
-    public String translateRaw(Term term, boolean singleLine) {
+    public String translateRaw(JTerm term, boolean singleLine) {
         var ni = new NotationInfo();
 
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), ni, svc);
+        LogicPrinter printer = new LogicPrinter(ni, svc, null);
         ni.refresh(svc, true, false);
 
         term = removeLabelRecursive(svc.getTermFactory(), term);
 
-        try {
-            printer.printTerm(term);
-        } catch (IOException e) {
-            return "[ERROR]";
-        }
+        printer.printTerm(term);
 
         var v = printer.toString();
 
@@ -197,15 +196,15 @@ public class TermTranslator {
         return v;
     }
 
-    private static Term removeLabelRecursive(TermFactory tf, Term term) {
+    private static JTerm removeLabelRecursive(TermFactory tf, JTerm term) {
         // Update children
-        List<Term> newSubs = new LinkedList<>();
-        for (Term oldSub : term.subs()) {
+        List<JTerm> newSubs = new LinkedList<>();
+        for (JTerm oldSub : term.subs()) {
             newSubs.add(removeLabelRecursive(tf, oldSub));
         }
 
-        return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
-            term.javaBlock(), null, term.getOriginRef());
+        return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(), null,
+            term.getOriginRef());
     }
 
     public String translate(InsertionTerm iterm, InsPositionProvider pp) throws TransformException, InternTransformException {
@@ -244,7 +243,7 @@ public class TermTranslator {
         }
     }
 
-    public String translateSafe(Term term, InsertionType itype) {
+    public String translateSafe(JTerm term, InsertionType itype) {
         try {
             return translate(term, new DummyPositionProvider(), null, itype, false);
         } catch (TransformException | InternTransformException e) {
@@ -252,7 +251,7 @@ public class TermTranslator {
         }
     }
 
-    private boolean canTranslateDirectly(Term term, InsPositionProvider pp, Integer termBasePos) throws InternTransformException, TransformException {
+    private boolean canTranslateDirectly(JTerm term, InsPositionProvider pp, Integer termBasePos) throws InternTransformException, TransformException {
         var origin = term.getOriginRef()
                 .stream()
                 .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
@@ -272,7 +271,7 @@ public class TermTranslator {
         return false;
     }
 
-    private String translate(Term term, InsPositionProvider pp, Integer termBasePos, InsertionType itype, boolean root) throws TransformException, InternTransformException {
+    private String translate(JTerm term, InsPositionProvider pp, Integer termBasePos, InsertionType itype, boolean root) throws TransformException, InternTransformException {
         var origin = term.getOriginRef()
                 .stream()
                 .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
@@ -327,7 +326,7 @@ public class TermTranslator {
                     || singleorig.Type == OriginRefType.OPERATION_POST_WELLFORMED
                     || singleorig.Type == OriginRefType.OPERATION_EXC_WELLFORMED)
                     && term.op().name().toString().equals("wellFormed") && term.arity() == 1
-                    && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
+                    && term.sub(0).op().sort(term.sub(0).subs().toArray(new Sort[]{})).toString().equals("Heap")) {
                 return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
             }
 
@@ -447,7 +446,7 @@ public class TermTranslator {
                         bracketTranslate(term.sub(0), term.sub(0).sub(1), pp, termBasePos, itype));
             }
 
-            if (term.op().name().toString().equals("wellFormed") && term.arity() == 1 && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
+            if (term.op().name().toString().equals("wellFormed") && term.arity() == 1 && term.sub(0).op().sort(term.sub(0).subs().toArray(new Sort[]{})).toString().equals("Heap")) {
                 return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
             }
 
@@ -553,9 +552,9 @@ public class TermTranslator {
 
             if (term.op().name().toString().endsWith("::select")) {
 
-                Term selectHeap = term.sub(0);
-                Term selectBase = term.sub(1);
-                Term selectSel = term.sub(2);
+                JTerm selectHeap = term.sub(0);
+                JTerm selectBase = term.sub(1);
+                JTerm selectSel = term.sub(2);
 
 
                 if (selectSel.op() instanceof Function && selectSel.op().name().toString().endsWith("::<created>")) {
@@ -590,11 +589,12 @@ public class TermTranslator {
             //    return translate(term.sub(0)) + ".length";
             //}
 
-            if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
+            // TODO: WP: fix calls to sort(term.subs()...)
+            if (term.op() instanceof Function && term.op().sort(term.subs().toArray(new Sort[]{})).name().toString().equals("Field")) {
                 return term.op().toString();
             }
 
-            if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
+            if (term.op() instanceof Function && term.op().sort(term.subs().toArray(new Sort[]{})).name().toString().equals("Field")) {
                 return term.op().toString();
             }
 
@@ -619,7 +619,7 @@ public class TermTranslator {
         throw new TransformException("Failed to translate term (unsupported op '"+term.op().name()+"')", translateRaw(term, true));
     }
 
-    private String bracketTranslate(Term base, Term child, InsPositionProvider pp, Integer basePos, InsertionType itype) throws TransformException, InternTransformException {
+    private String bracketTranslate(JTerm base, JTerm child, InsPositionProvider pp, Integer basePos, InsertionType itype) throws TransformException, InternTransformException {
         if (needsBrackets(base, child)) {
             return "(" + translate(child, pp, basePos, itype, false) + ")";
         } else {
@@ -627,7 +627,7 @@ public class TermTranslator {
         }
     }
 
-    private boolean needsBrackets(Term base, Term child) {
+    private boolean needsBrackets(JTerm base, JTerm child) {
         // this is by far not exhaustive, but more brackets are not an error
 
         if (child.op() instanceof LocationVariable) return false;
@@ -638,7 +638,7 @@ public class TermTranslator {
         return true;
     }
 
-    private String translateField(Term term) {
+    private String translateField(JTerm term) {
         var opstr = term.op().toString();
         if (opstr.contains("::$")) {
             return /*"this." + */ opstr.substring(opstr.indexOf("::$") + 3);
@@ -647,7 +647,7 @@ public class TermTranslator {
         }
     }
 
-    private String translateAssignable(Term term) throws TransformException, InternTransformException {
+    private String translateAssignable(JTerm term) throws TransformException, InternTransformException {
 
         var fieldLoop = term;
         if (fieldLoop.op() != Quantifier.ALL || fieldLoop.arity() != 1 || fieldLoop.boundVars().size() != 1 || !fieldLoop.boundVars().get(0).sort().name().toString().equals("Field")) {
@@ -665,7 +665,7 @@ public class TermTranslator {
 
         var assignableConditions = Utils.splitFormula(objectLoop.sub(0), Junctor.OR);
 
-        java.util.function.Function<Term, Boolean> isObjEqualsSelf = (Term t) -> {
+        java.util.function.Function<JTerm, Boolean> isObjEqualsSelf = (JTerm t) -> {
             if (t.op() != Equality.EQUALS) return false;
             if (t.arity() != 2) return false;
             var sub1 = t.sub(0);
@@ -677,7 +677,7 @@ public class TermTranslator {
             return true;
         };
 
-        java.util.function.Function<Term, Boolean> isFieldEqualsFunc = (Term t) -> {
+        java.util.function.Function<JTerm, Boolean> isFieldEqualsFunc = (JTerm t) -> {
             if (t.op() != Equality.EQUALS) return false;
             if (t.arity() != 2) return false;
             var sub1 = t.sub(0);
@@ -689,7 +689,7 @@ public class TermTranslator {
             return true;
         };
 
-        java.util.function.Function<Term, Boolean> isObjNotEqualsNull = (Term t) -> {
+        java.util.function.Function<JTerm, Boolean> isObjNotEqualsNull = (JTerm t) -> {
             if (t.op() != Junctor.NOT) return false;
             var sub = t.sub(0);
             if (sub.op() != Equality.EQUALS) return false;
@@ -703,7 +703,7 @@ public class TermTranslator {
             return true;
         };
 
-        java.util.function.Function<Term, Boolean> isObjNotCreated = (Term t) -> {
+        java.util.function.Function<JTerm, Boolean> isObjNotCreated = (JTerm t) -> {
             if (t.op() != Junctor.NOT) return false;
             var sub = t.sub(0);
             if (sub.op() != Equality.EQUALS) return false;
@@ -721,7 +721,7 @@ public class TermTranslator {
             return true;
         };
 
-        java.util.function.Function<Term, Boolean> isFieldEqualsSelf = (Term t) -> {
+        java.util.function.Function<JTerm, Boolean> isFieldEqualsSelf = (JTerm t) -> {
             if (t.op() != Equality.EQUALS) return false;
             if (t.arity() != 2) return false;
             var sub1 = t.sub(0);
@@ -739,7 +739,7 @@ public class TermTranslator {
             return true;
         };
 
-        java.util.function.Function<Term, Boolean> isObjectEqualsVar = (Term t) -> {
+        java.util.function.Function<JTerm, Boolean> isObjectEqualsVar = (JTerm t) -> {
             if (t.op() != Equality.EQUALS) return false;
             if (t.arity() != 2) return false;
             var sub1 = t.sub(0);

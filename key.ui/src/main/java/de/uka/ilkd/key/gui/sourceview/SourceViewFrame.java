@@ -143,4 +143,8 @@ public class SourceViewFrame extends JSplitPane {
             }
         }
     }
+
+    public SourceView getSourceView() {
+        return sourceView;
+    }
 }

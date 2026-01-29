@@ -1,32 +1,18 @@
 package org.key_project.extsourceview;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermImpl;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.origin.OriginRef;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import org.key_project.extsourceview.transformer.HeapReference;
-import org.key_project.extsourceview.transformer.InternTransformException;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.op.Operator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,10 +43,10 @@ public class Utils {
         return r.toString();
     }
 
-    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom, boolean returnNullOnTopLevel) {
+    public static JTerm getParentWithOriginRef(PosInSequent pos, boolean atom, boolean returnNullOnTopLevel) {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
-            Term t = poc.subTerm();
+            JTerm t = (JTerm) poc.subTerm();
             if (t.getOriginRef().stream().anyMatch(p -> !atom || p.isAtom())) {
                 return t;
             }
@@ -71,14 +57,14 @@ public class Utils {
         }
     }
 
-    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf, boolean onlyAtoms) {
+    public static ArrayList<OriginRef> getSubOriginRefs(JTerm term, boolean includeSelf, boolean onlyAtoms) {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {
             r.addAll(term.getOriginRef().stream().filter(p -> !onlyAtoms || p.isAtom()).collect(Collectors.toList()));
         }
 
-        for (Term t : term.subs()) {
+        for (JTerm t : term.subs()) {
             r.addAll(t.getOriginRef().stream().filter(p -> !onlyAtoms || p.isAtom()).collect(Collectors.toList()));
             r.addAll(getSubOriginRefs(t, false, onlyAtoms));
         }
@@ -93,8 +79,8 @@ public class Utils {
         return str.substring(start, end);
     }
 
-    public static List<Term> splitFormula(Term f, Operator j)  {
-        var r = new ArrayList<Term>();
+    public static List<JTerm> splitFormula(JTerm f, Operator j)  {
+        var r = new ArrayList<JTerm>();
 
         if (f.op() == j) {
             r.addAll(splitFormula(f.sub(0), j));
