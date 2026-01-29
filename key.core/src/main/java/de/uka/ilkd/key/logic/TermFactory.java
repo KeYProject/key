@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -106,6 +106,120 @@ public final class TermFactory {
 
     public JTerm createTerm(Operator op, ImmutableArray<TermLabel> labels, ImmutableArray<OriginRef> originref) {
         return createTerm(op, NO_SUBTERMS, null, labels, originref);
+    }
+    public @NonNull JTerm addOriginRef(JTerm base, OriginRef origref) {
+        return addOriginRef(base, Collections.singleton(origref));
+    }
+
+    public @NonNull JTerm addOriginRef(JTerm base, ImmutableArray<OriginRef> origref) {
+        return addOriginRef(base, origref.toList());
+    }
+
+    public @NonNull JTerm addOriginRef(JTerm base, Collection<OriginRef> origref) {
+        var olist = base.getOriginRef().toList();
+        var toadd = origref
+            .stream()
+            .filter(p -> olist.stream().noneMatch(q -> q.equalsModSource(p)))
+            .collect(Collectors.toList());
+        olist.addAll(toadd);
+
+        JTerm newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.getLabels(),
+            new ImmutableArray<>(olist));
+
+        if (newTerm instanceof TermImpl && base instanceof TermImpl) {
+            ((TermImpl) newTerm).setOrigin(base.getOrigin());
+        }
+
+        return newTerm;
+    }
+
+    public @NonNull JTerm setOriginRef(JTerm base, Collection<OriginRef> origref) {
+        ImmutableArray<OriginRef> arr = new ImmutableArray<>(origref);
+        JTerm newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.getLabels(), arr);
+
+        if (newTerm instanceof TermImpl && base instanceof TermImpl) {
+            ((TermImpl) newTerm).setOrigin(base.getOrigin());
+        }
+
+        return newTerm;
+    }
+
+    public @NonNull JTerm setOriginRefTypeRecursive(JTerm base, OriginRefType t, boolean force) {
+        var origref = base.getOriginRef().toList();
+        origref.replaceAll(o -> {
+            if (o.Type == OriginRefType.LOOP_ANONUPDATE || o.Type == OriginRefType.OPERATION_ANONUPDATE) {
+                return o; // leave heap_updates always alone
+            }
+
+            if (o.Type == OriginRefType.JAVA_STMT && !force) {
+                return o;
+            }
+
+            return o.WithType(t);
+        });
+
+        if (origref.isEmpty() && force) {
+            origref.add(new OriginRef(t, base));
+        }
+
+        var subs = base.subs().toList();
+
+        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, false)); //TODO shouldn't this be (term, t, force) ?
+
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+            base.getLabels(), new ImmutableArray<>(origref));
+    }
+
+    public @NonNull JTerm replaceOriginRefTypeRecursive(JTerm base, OriginRefType told, OriginRefType tnew) {
+        var origref = base.getOriginRef().toList();
+        for (int i = 0; i < origref.size(); i++) {
+            if (origref.get(i).Type == told) {
+                origref.set(i, origref.get(i).WithType(tnew));
+            }
+        }
+
+        var subs = base.subs().toList();
+
+        subs.replaceAll(term -> replaceOriginRefTypeRecursive(term, told, tnew));
+
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+            base.getLabels(), new ImmutableArray<>(origref));
+    }
+
+    public @NonNull JTerm addOriginRefRecursive(JTerm base, OriginRef origref) {
+        return addOriginRefRecursive(base, Collections.singleton(origref));
+    }
+
+    public @NonNull JTerm addOriginRefRecursive(JTerm base, Collection<OriginRef> origref) {
+        var olist = base.getOriginRef().toList();
+        var toadd = origref
+            .stream()
+            .filter(p -> olist.stream().noneMatch(q -> q.equalsModSource(p)))
+            .collect(Collectors.toList());
+        olist.addAll(toadd);
+
+        var subs = base.subs().toList();
+        subs.replaceAll(term -> addOriginRefRecursive(term, origref));
+
+        JTerm newTerm = doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+            base.getLabels(), new ImmutableArray<>(origref));
+
+        if (newTerm instanceof TermImpl && base instanceof TermImpl) {
+            ((TermImpl) newTerm).setOrigin(base.getOrigin());
+        }
+
+        return newTerm;
+    }
+
+
+    public @NonNull JTerm replaceSubs(@NonNull JTerm base, Set<JTerm> subs) {
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+            base.getLabels(), base.getOriginRef());
+    }
+
+    public @NonNull JTerm replaceSubs(@NonNull JTerm base, ImmutableArray<JTerm> subs) {
+        return doCreateTerm(base.op(), subs, base.boundVars(),
+            base.getLabels(), base.getOriginRef());
     }
 
     // -------------------------------------------------------------------------

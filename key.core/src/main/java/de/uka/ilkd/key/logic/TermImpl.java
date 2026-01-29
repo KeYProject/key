@@ -408,6 +408,18 @@ class TermImpl implements JTerm {
         return null;
     }
 
+    // TODO: WP: remove?
+    private String origin;
+
+    @Override
+    public @Nullable String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
     @Override
     public @NonNull ImmutableArray<OriginRef> getOriginRef() {
         return originRef;
