@@ -1,12 +1,12 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.PositionInfo;
-import org.key_project.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
+import org.jspecify.annotations.Nullable;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableList;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -35,17 +35,17 @@ public class HeapReference {
     }
 
     public static class HeapUpdate {
-        public final HeapUpdateType Type;
-        public final Term Term1;
-        public final Term Term2;
-        public final Term Term3;
+        public final HeapUpdateType type;
+        public final JTerm term1;
+        public final JTerm term2;
+        public final JTerm term3;
         public final @Nullable OriginRef Origin;
 
-        public HeapUpdate(HeapUpdateType type, Term term1, Term term2, Term term3, @Nullable OriginRef origin) {
-            Type = type;
-            Term1 = term1;
-            Term2 = term2;
-            Term3 = term3;
+        public HeapUpdate(HeapUpdateType type, JTerm term1, JTerm term2, JTerm term3, @Nullable OriginRef origin) {
+            this.type = type;
+            this.term1 = term1;
+            this.term2 = term2;
+            this.term3 = term3;
             Origin = origin;
         }
     }
@@ -64,12 +64,12 @@ public class HeapReference {
 
         int methodStart = 1;
         if (methodPosition != null) {
-            methodStart = methodPosition.getStartPosition().getLine();
+            methodStart = methodPosition.getStartPosition().line();
         }
 
         int ln = -1;
         for (var p : this.updates) {
-            switch (p.Type) {
+            switch (p.type) {
                 case INITIAL:
                     if (p.Origin != null && p.Origin.hasFile()) {
                         ln = Math.max(ln, p.Origin.LineEnd);
@@ -92,7 +92,7 @@ public class HeapReference {
         return Optional.of(ln);
     }
 
-    public static HeapReference.HeapUpdate newStoreUpdate(Term t) {
+    public static HeapReference.HeapUpdate newStoreUpdate(JTerm t) {
         var origin = t.getOriginRef().
             stream().
             filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE || p.Type == OriginRefType.OPERATION_ANONUPDATE).
@@ -101,7 +101,7 @@ public class HeapReference {
         return new HeapUpdate(HeapUpdateType.STORE, t.sub(1), t.sub(2), t.sub(3), origin);
     }
 
-    public static HeapReference.HeapUpdate newAnonUpdate(Term t) {
+    public static HeapReference.HeapUpdate newAnonUpdate(JTerm t) {
         var origin = t.getOriginRef().
                 stream().
                 filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE || p.Type == OriginRefType.OPERATION_ANONUPDATE).
@@ -111,11 +111,11 @@ public class HeapReference {
         return new HeapUpdate(HeapUpdateType.ANON, t.sub(1), t.sub(2), null, origin);
     }
 
-    public static HeapUpdate newIndirect(Term t) {
+    public static HeapUpdate newIndirect(JTerm t) {
         return new HeapUpdate(HeapUpdateType.INDIRECT, t, null, null, null);
     }
 
-    public static HeapUpdate newHeap(Term t) {
+    public static HeapUpdate newHeap(JTerm t) {
         var origin = t.getOriginRef().
                 stream().
                 filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE || p.Type == OriginRefType.OPERATION_ANONUPDATE).

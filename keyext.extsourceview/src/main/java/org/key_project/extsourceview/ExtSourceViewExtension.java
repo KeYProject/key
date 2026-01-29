@@ -9,14 +9,14 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.sourceview.SourceClickedListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.extsourceview.debug.DebugView;
 import org.key_project.extsourceview.transformer.InternTransformException;
 import org.key_project.extsourceview.transformer.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,10 +80,10 @@ public class ExtSourceViewExtension
         });
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
-            @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         if (view == null)
             view = new DebugView(window, mediator);
 

@@ -1,15 +1,12 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.extsourceview.Utils;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 /**
@@ -30,19 +27,19 @@ public class MethodPositioner extends InsPositionProvider {
         var methodPosition = getMethodPositionMap();
 
         if (iterm.Type == InsertionType.ASSUME) {
-            return methodPosition.getStartPosition().getLine() + 1;
+            return methodPosition.getStartPosition().line() + 1;
         }
         if (iterm.Type == InsertionType.ASSUME_ERROR) {
-            return methodPosition.getStartPosition().getLine() + 1;
+            return methodPosition.getStartPosition().line() + 1;
         }
         if (iterm.Type == InsertionType.ASSERT) {
-            return methodPosition.getEndPosition().getLine();
+            return methodPosition.getEndPosition().line();
         }
         if (iterm.Type == InsertionType.ASSIGNABLE) {
-            return methodPosition.getEndPosition().getLine();
+            return methodPosition.getEndPosition().line();
         }
         if (iterm.Type == InsertionType.ASSERT_ERROR) {
-            return methodPosition.getEndPosition().getLine();
+            return methodPosition.getEndPosition().line();
         }
         throw new InternTransformException("unknown InsertionTerm.Type");
 
@@ -57,18 +54,18 @@ public class MethodPositioner extends InsPositionProvider {
     }
 
     @Override
-    public Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype) {
+    public Optional<Integer> getTermHeapPosition(Sequent s, JTerm t, InsertionType itype) {
         return Optional.empty();
     }
 
     @Override
     public Integer getOldPos() throws TransformException {
-        return getMethodPositionMap().getStartPosition().getLine() + 1;
+        return getMethodPositionMap().getStartPosition().line() + 1;
     }
 
     @Override
     public Integer getLoopStartPos() throws TransformException, InternTransformException {
-        return getMethodPositionMap().getStartPosition().getLine() + 1;
+        return getMethodPositionMap().getStartPosition().line() + 1;
     }
 
     @Override

@@ -3,17 +3,19 @@ package org.key_project.extsourceview.utils;
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.macros.*;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.swing.*;
@@ -52,7 +54,8 @@ public class SplitRunner {
 
             @Override
             public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
-                if (info.isCancelled()) return;
+                // TODO: WP: check
+                //if (info.isCancelled()) return;
 
                 if (doSimplify) {
                     SwingUtilities.invokeLater(() -> runSimplification());
@@ -65,7 +68,9 @@ public class SplitRunner {
             public void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos, boolean forced) {}
 
             @Override
-            public void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) { }
+            public void runAutoMode(List<Node> initialGoals, Proof proof,
+                                    ProofSearchInformation<Proof, Goal> info) {
+            }
 
             @Override
             public void runRule(Node goal, RuleApp app) { }
@@ -77,7 +82,7 @@ public class SplitRunner {
     private void runSimplification() {
         var tcm = new UpdateSimplificationMacro();
 
-        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulaByNr(1), PosInTerm.getTopLevel(), false);
 
         final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, topLevel);
         mediator.stopInterface(true);
@@ -93,7 +98,8 @@ public class SplitRunner {
 
             @Override
             public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
-                if (info.isCancelled()) return;
+                // TODO: WP: check
+                //if (info.isCancelled()) return;
 
                 if (doTryClose) {
                     SwingUtilities.invokeLater(() -> runTryClose());
@@ -104,7 +110,9 @@ public class SplitRunner {
             public void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos, boolean forced) {}
 
             @Override
-            public void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) { }
+            public void runAutoMode(List<Node> initialGoals, Proof proof,
+                                    ProofSearchInformation<Proof, Goal> info) {
+            }
 
             @Override
             public void runRule(Node goal, RuleApp app) { }
@@ -116,7 +124,7 @@ public class SplitRunner {
     private void runTryClose() {
         var tcm = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 3000));
 
-        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulaByNr(1), PosInTerm.getTopLevel(), false);
 
         final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, topLevel);
         mediator.stopInterface(true);

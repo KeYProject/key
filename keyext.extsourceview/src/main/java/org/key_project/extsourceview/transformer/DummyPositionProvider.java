@@ -1,11 +1,8 @@
 package org.key_project.extsourceview.transformer;
 
-import org.key_project.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.extsourceview.Utils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 public class DummyPositionProvider extends InsPositionProvider {
@@ -19,7 +16,7 @@ public class DummyPositionProvider extends InsPositionProvider {
     }
 
     @Override
-    public Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype) {
+    public Optional<Integer> getTermHeapPosition(Sequent s, JTerm t, InsertionType itype) {
         return Optional.empty();
     }
 

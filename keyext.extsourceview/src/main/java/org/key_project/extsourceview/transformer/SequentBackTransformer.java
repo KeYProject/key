@@ -7,14 +7,15 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Pair;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -242,7 +243,7 @@ public class SequentBackTransformer {
     }
 
     private Pair<JTerm, List<PosInOccurrence>> applyConstMap(ConstPulloutMap constMap, PosInOccurrence pio) {
-        JTerm term  = pio.subTerm();
+        JTerm term  = (JTerm) pio.subTerm();
 
         TermFactory tf = svc.getTermFactory();
 
@@ -268,7 +269,7 @@ public class SequentBackTransformer {
             t = t2;
         }
 
-        var newsubs = new ArrayList<Term>(t.arity());
+        var newsubs = new ArrayList<JTerm>(t.arity());
         for (int i = 0; i < t.arity(); i++) {
 
             var t3 = applyConstMapRecursive(tf, constMap, t.sub(i));
@@ -298,7 +299,7 @@ public class SequentBackTransformer {
         for (SequentFormula sf : sequent.antecedent().asList()) {
             var pio = PosInOccurrence.findInSequent(sequent, sequent.formulaNumberInSequent(true, sf), PosInTerm.getTopLevel());
 
-            JTerm term = sf.formula();
+            JTerm term = (JTerm) sf.formula();
 
             if (term.op() != Equality.EQUALS) continue;
             if (term.arity() != 2) continue;
@@ -319,7 +320,7 @@ public class SequentBackTransformer {
         for (SequentFormula sf : sequent.succedent().asList()) {
             var pio = PosInOccurrence.findInSequent(sequent, sequent.formulaNumberInSequent(false, sf), PosInTerm.getTopLevel());
 
-            JTerm touter = sf.formula();
+            JTerm touter = (JTerm) sf.formula();
 
             if (touter.arity() != 1) continue;
             if (touter.op() != Junctor.NOT) continue;

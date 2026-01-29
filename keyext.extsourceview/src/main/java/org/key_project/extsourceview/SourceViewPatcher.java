@@ -6,30 +6,25 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.jspecify.annotations.Nullable;
 import org.key_project.extsourceview.transformer.*;
 import org.key_project.extsourceview.utils.SplitRunner;
 import org.key_project.extsourceview.utils.SymbolicExecutionAndSimplificationRunner;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
-import java.time.Instant;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -298,7 +293,7 @@ public class SourceViewPatcher {
 
         List<TacletApp> tacletsAll = Stream.concat(tacletsF.stream(), Stream.concat(tacletsR.stream(), tacletsN.stream())).collect(Collectors.toList());
 
-        var topLevel = new PosInOccurrence(mediator.getSelectedNode().sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+        var topLevel = new PosInOccurrence(mediator.getSelectedNode().sequent().getFormulaByNr(1), PosInTerm.getTopLevel(), false);
 
         final JPopupMenu menu = new JPopupMenu("Menu");
 

@@ -3,9 +3,9 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -13,7 +13,6 @@ import org.key_project.extsourceview.Utils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class HeapPositioner extends InsPositionProvider{
         this.fileUri = fileUri;
     }
 
-    private List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
+    private List<HeapReference> listHeaps(JTerm t, boolean distinct) throws InternTransformException {
         var result = new ArrayList<HeapReference>();
 
         if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
@@ -41,7 +40,7 @@ public class HeapPositioner extends InsPositionProvider{
         }
 
         for (var sub: t.subs()) {
-            result.addAll(ListHeaps(sub, false));
+            result.addAll(listHeaps(sub, false));
         }
 
         if (distinct) {
@@ -57,7 +56,7 @@ public class HeapPositioner extends InsPositionProvider{
         return result;
     }
 
-    private List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
+    private List<HeapReference.HeapUpdate> listHeapUpdates(JTerm t) throws InternTransformException {
 
         if (!t.sort().name().toString().equals("Heap")) {
             throw new InternTransformException("Not a heap");
@@ -84,7 +83,8 @@ public class HeapPositioner extends InsPositionProvider{
         }
     }
 
-    public Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype) {
+    @Override
+    public Optional<Integer> getTermHeapPosition(Sequent s, JTerm t, InsertionType itype) {
         try {
             if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
                 return Optional.of(getPosition(null, t).Line);
@@ -103,10 +103,9 @@ public class HeapPositioner extends InsPositionProvider{
             if (activeStatement != null) {
                 PositionInfo pi = activeStatement.getPositionInfo();
                 if (pi == PositionInfo.UNDEFINED) continue;
-                if (pi.getURI() == PositionInfo.UNKNOWN_URI) continue;
 
-                int line = pi.getStartPosition().getLine() + 1;
-                int indent = getLineIndent(pi.getURI(), line);
+                int line = pi.getStartPosition().line() + 1;
+                int indent = getLineIndent(pi.getURI().orElse(null), line);
 
                 return new InsertionPosition(line, line-1, indent);
             }
@@ -114,7 +113,7 @@ public class HeapPositioner extends InsPositionProvider{
 
         // fallback (?) use method-start directly
 
-        int endLine = getMethodPositionMap().getStartPosition().getLine() + 1;
+        int endLine = getMethodPositionMap().getStartPosition().line() + 1;
         int endIndent = getLineIndent(fileUri, endLine);
 
         return new InsertionPosition(endLine, endLine-1, endIndent);
@@ -125,7 +124,7 @@ public class HeapPositioner extends InsPositionProvider{
         var methodPosition = getMethodPositionMap();
 
         if (iterm.Type == InsertionType.ASSIGNABLE) {
-            var line = methodPosition.getEndPosition().getLine();
+            var line = methodPosition.getEndPosition().line();
             var indent = getLineIndent(fileUri, line);
             return new InsertionPosition(line, line-1, indent);
         }
@@ -133,10 +132,10 @@ public class HeapPositioner extends InsPositionProvider{
         return getPosition(fileUri, iterm.Term);
     }
 
-    public InsertionPosition getPosition(URI fileUri, Term term) throws InternTransformException, TransformException {
+    public InsertionPosition getPosition(URI fileUri, JTerm term) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
-        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
+        var heaps = listHeaps(term, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
 
         if (heaps.size() == 0) {
             return getActiveStatementPosition(fileUri);
@@ -155,7 +154,7 @@ public class HeapPositioner extends InsPositionProvider{
 
     @Override
     public Integer getOldPos() throws TransformException {
-        return getMethodPositionMap().getStartPosition().getLine() + 1;
+        return getMethodPositionMap().getStartPosition().line() + 1;
     }
 
     @Override

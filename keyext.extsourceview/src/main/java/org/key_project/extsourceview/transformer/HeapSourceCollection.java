@@ -1,5 +1,6 @@
 package org.key_project.extsourceview.transformer;
 
+import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.logic.Term;
 import de.uka.ilkd.key.proof.Node;
@@ -40,7 +41,7 @@ public class HeapSourceCollection {
         processed.add(term);
 
         if (term.op().name().toString().endsWith("::select") && term.arity() == 3) {
-            var updates = MovingPositioner.listHeapUpdates(sequent, term.sub(0));
+            var updates = MovingPositioner.listHeapUpdates(sequent, (JTerm) term.sub(0));
             for (var upd : updates) {
                 if (upd.Origin != null && upd.Origin.hasFile()) {
                     if (upd.Origin.LineStart == upd.Origin.LineEnd) {

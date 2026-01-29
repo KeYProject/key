@@ -5,14 +5,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermImpl;
 import org.jspecify.annotations.NonNull;
-import org.key_project.logic.Term;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.*;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -54,7 +56,7 @@ public class OriginRefView extends DebugTab {
     private boolean highlightParents = true;
     private boolean highlightAllChildren = true;
 
-    private Tuple<PosInSequent, Term> shownTerm = null;
+    private Tuple<PosInSequent, JTerm> shownTerm = null;
 
     public OriginRefView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
@@ -62,7 +64,7 @@ public class OriginRefView extends DebugTab {
         // add a listener for hover in the proof tree
         mediator.addSequentInteractionListener(new SequentInteractionListener() {
             @Override
-            public void hover(PosInSequent pos, Term t) {
+            public void hover(PosInSequent pos, JTerm t) {
                 highlightTerm(window, mediator, pos, t);
                 if (!OriginRefView.this.triggerOnClick)
                     showTerm(window, mediator, pos, t);
@@ -76,7 +78,7 @@ public class OriginRefView extends DebugTab {
             }
 
             @Override
-            public void click(PosInSequent pos, Term t) {
+            public void click(PosInSequent pos, JTerm t) {
                 if (OriginRefView.this.triggerOnClick)
                     showTerm(window, mediator, pos, t);
             }
@@ -211,7 +213,7 @@ public class OriginRefView extends DebugTab {
         return "TermOrigin Inspector";
     }
 
-    private void highlightTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void highlightTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, JTerm t) {
         try {
             SourceView sv = window.getSourceViewFrame().getSourceView();
 
@@ -261,7 +263,7 @@ public class OriginRefView extends DebugTab {
 
             PosInOccurrence rootPos = pos.getPosInOccurrence();
             while (true) {
-                final Term rpTerm = rootPos.subTerm();
+                final JTerm rpTerm = (JTerm) rootPos.subTerm();
                 var insertion = SourceViewPatcher.ActiveInsertions.stream().filter(p -> p.getA().Term == rpTerm).findFirst();
                 if (insertion.isPresent()) {
                     var insterm = insertion.get().getB();
@@ -292,7 +294,7 @@ public class OriginRefView extends DebugTab {
 
     }
 
-    private void showTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void showTerm(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, JTerm t) {
         shownTerm = new Tuple<>(pos, t);
 
         var proof = mediator.getSelectedProof();
@@ -374,7 +376,7 @@ public class OriginRefView extends DebugTab {
                 txt.append("----------<PARENT>----------\n");
                 txt.append("\n");
 
-                Term parent = Utils.getParentWithOriginRef(pos, true, false);
+                JTerm parent = Utils.getParentWithOriginRef(pos, true, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm()) {
                     txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent, InsertionType.ASSERT)).append("\n");
                     txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent)).append("\n");
@@ -430,9 +432,12 @@ public class OriginRefView extends DebugTab {
         StringBuilder txt = new StringBuilder();
 
 
-        var tablen1 = heapref.updates.stream().filter(p -> p.Term1 != null).map(p -> translator.translateRaw(p.Term1, true).length()).max(Integer::compareTo).orElse(0);
-        var tablen2 = heapref.updates.stream().filter(p -> p.Term2 != null).map(p -> translator.translateRaw(p.Term2, true).length()).max(Integer::compareTo).orElse(0);
-        var tablen3 = heapref.updates.stream().filter(p -> p.Term3 != null).map(p -> translator.translateRaw(p.Term3, true).length()).max(Integer::compareTo).orElse(0);
+        var tablen1 = heapref.updates.stream().filter(p -> p.term1
+            != null).map(p -> translator.translateRaw(p.term1, true).length()).max(Integer::compareTo).orElse(0);
+        var tablen2 = heapref.updates.stream().filter(p -> p.term2
+            != null).map(p -> translator.translateRaw(p.term2, true).length()).max(Integer::compareTo).orElse(0);
+        var tablen3 = heapref.updates.stream().filter(p -> p.term3
+            != null).map(p -> translator.translateRaw(p.term3, true).length()).max(Integer::compareTo).orElse(0);
 
         for (var upd: heapref.updates) {
 
@@ -442,21 +447,21 @@ public class OriginRefView extends DebugTab {
             }
 
             var str1 = "";
-            if (upd.Term1 != null) {
-                str1 = String.format("%-" + tablen1 + "s", translator.translateRaw(upd.Term1, true));
+            if (upd.term1 != null) {
+                str1 = String.format("%-" + tablen1 + "s", translator.translateRaw(upd.term1, true));
             }
             var str2 = "";
-            if (upd.Term2 != null) {
-                str2 = String.format("%-" + tablen2 + "s", translator.translateRaw(upd.Term2, true));
+            if (upd.term2 != null) {
+                str2 = String.format("%-" + tablen2 + "s", translator.translateRaw(upd.term2, true));
             }
             var str3 = "";
-            if (upd.Term3 != null) {
-                str3 = String.format("%-" + tablen3 + "s", translator.translateRaw(upd.Term3, true));
+            if (upd.term3 != null) {
+                str3 = String.format("%-" + tablen3 + "s", translator.translateRaw(upd.term3, true));
             }
 
             txt.
                     append(indent).
-                    append(String.format("%-6s", upd.Type)).
+                    append(String.format("%-6s", upd.type)).
                     append("  ").
                     append(String.format("%-32s", orstr)).
                     append("  ").
@@ -471,7 +476,7 @@ public class OriginRefView extends DebugTab {
         return txt.toString();
     }
 
-    private String origRefToString(Term t, OriginRef o) {
+    private String origRefToString(JTerm t, OriginRef o) {
 
         var f0 = (o.isAtom() ? "A" : " ");
         var f1 = (o.isBooleanTerm() ? "B" : " ");

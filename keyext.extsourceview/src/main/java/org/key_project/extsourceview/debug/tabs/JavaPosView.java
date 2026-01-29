@@ -1,39 +1,28 @@
 package org.key_project.extsourceview.debug.tabs;
 
-import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Term;
-import de.uka.ilkd.key.logic.TermImpl;
-import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
-import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.*;
+import org.key_project.util.collection.Pair;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
 import java.awt.*;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 
@@ -50,13 +39,13 @@ public class JavaPosView extends DebugTab {
 
     private boolean triggerOnClick = false;
 
-    public JavaPosView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public JavaPosView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         // add a listener for hover in the proof tree
         mediator.addSequentInteractionListener(new SequentInteractionListener() {
             @Override
-            public void hover(PosInSequent pos, Term t) {
+            public void hover(PosInSequent pos, JTerm t) {
                 if (!JavaPosView.this.triggerOnClick) {
                     show(window, mediator, pos, t);
                 }
@@ -70,7 +59,7 @@ public class JavaPosView extends DebugTab {
             }
 
             @Override
-            public void click(PosInSequent pos, Term t) {
+            public void click(PosInSequent pos, JTerm t) {
                 if (JavaPosView.this.triggerOnClick) {
                     show(window, mediator, pos, t);
                 }
@@ -80,7 +69,7 @@ public class JavaPosView extends DebugTab {
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         taSource = new JTextArea();
@@ -105,13 +94,13 @@ public class JavaPosView extends DebugTab {
         this.add(pnlConf, BorderLayout.NORTH);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Java Stmt Pos";
     }
 
-    private void show(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void show(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
         if (t.javaBlock().isEmpty()) {
             taSource.setText("NO JAVA BLOCK");
             return;
@@ -146,22 +135,22 @@ public class JavaPosView extends DebugTab {
         var sb = new StringBuilder();
 
         sb.append("[");
-        sb.append(String.format("%02d", pi.getStartPosition().getLine()));
+        sb.append(String.format("%02d", pi.getStartPosition().line()));
         sb.append(":");
-        sb.append(String.format("%02d", pi.getStartPosition().getColumn()));
+        sb.append(String.format("%02d", pi.getStartPosition().column()));
         sb.append("]");
         sb.append(" - ");
         sb.append("[");
-        sb.append(String.format("%02d", pi.getEndPosition().getLine()));
+        sb.append(String.format("%02d", pi.getEndPosition().line()));
         sb.append(":");
-        sb.append(String.format("%02d", pi.getEndPosition().getColumn()));
+        sb.append(String.format("%02d", pi.getEndPosition().column()));
         sb.append("]");
 
         return sb.toString();
     }
 
     private String fmtSource(PositionInfo pi) {
-        if (pi.getStartPosition().getLine() != pi.getEndPosition().getLine()) {
+        if (pi.getStartPosition().line() != pi.getEndPosition().line()) {
             return "= " + String.format("%-16s", "(multi-line)") + "  ";
         }
 
@@ -180,11 +169,11 @@ public class JavaPosView extends DebugTab {
         try {
             List<String> lines = Files.readAllLines(Path.of(pi.getURI()));
 
-            var LineStart = pi.getStartPosition().getLine();
-            var LineEnd = pi.getEndPosition().getLine();
+            var LineStart = pi.getStartPosition().line();
+            var LineEnd = pi.getEndPosition().line();
 
-            var ColumnStart = pi.getStartPosition().getColumn();
-            var ColumnEnd = pi.getEndPosition().getColumn();
+            var ColumnStart = pi.getStartPosition().column();
+            var ColumnEnd = pi.getEndPosition().column();
 
             StringBuilder r = new StringBuilder();
             for (int i = LineStart; i <= LineEnd; i++) {
@@ -224,7 +213,7 @@ public class JavaPosView extends DebugTab {
         return str;
     }
 
-    private void unshow(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void unshow(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         taSource.setText("");
     }
 

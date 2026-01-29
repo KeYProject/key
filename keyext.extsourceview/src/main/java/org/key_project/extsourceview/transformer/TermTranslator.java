@@ -2,7 +2,6 @@ package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.pp.PrettyPrinter;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -16,7 +15,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import org.key_project.extsourceview.Utils;
 import org.key_project.util.collection.ImmutableArray;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -280,7 +278,7 @@ public class TermTranslator {
                 .collect(Collectors.toList());
 
         if (termBasePos != null) {
-            var posOfTerm = pp.GetTermHeapPosition(sequent, term, itype);
+            var posOfTerm = pp.getTermHeapPosition(sequent, term, itype);
 
             if (posOfTerm.isPresent()) {
                 var posOfTermVal = posOfTerm.get();

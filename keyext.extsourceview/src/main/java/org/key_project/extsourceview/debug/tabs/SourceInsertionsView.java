@@ -4,9 +4,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import org.jspecify.annotations.NonNull;
 import org.key_project.extsourceview.debug.DebugTab;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ public class SourceInsertionsView extends DebugTab {
 
     private final SourceView sourceView;
 
-    public SourceInsertionsView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public SourceInsertionsView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         sourceView = window.getSourceViewFrame().getSourceView();
@@ -115,7 +115,7 @@ public class SourceInsertionsView extends DebugTab {
         }
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Source Insertions";

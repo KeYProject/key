@@ -2,8 +2,8 @@ package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -128,7 +128,7 @@ public abstract class InsPositionProvider {
 
     public abstract InsertionPosition getPosition(Sequent s, InsertionTerm term) throws TransformException, InternTransformException;
 
-    public abstract Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype);
+    public abstract Optional<Integer> getTermHeapPosition(Sequent s, JTerm t, InsertionType itype);
 
     public abstract Integer getOldPos() throws TransformException;
 

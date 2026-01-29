@@ -2,30 +2,17 @@ package org.key_project.extsourceview.debug.tabs;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import org.key_project.logic.Term;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.util.Pair;
-import org.key_project.extsourceview.Utils;
+import org.jspecify.annotations.NonNull;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.HeapSourceCollection;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
-import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 
 /**
  * Class for the [Java Stmts Position] Tab in the debug panel
@@ -36,13 +23,13 @@ public class HeapSourceView extends DebugTab {
 
     private JTextArea taSource;
 
-    public HeapSourceView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public HeapSourceView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         initGUI(window, mediator);
     }
 
-    private void initGUI(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void initGUI(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         setLayout(new BorderLayout());
 
         taSource = new JTextArea();
@@ -60,13 +47,13 @@ public class HeapSourceView extends DebugTab {
         this.add(btn, BorderLayout.NORTH);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "Heap Sources";
     }
 
-    private void calculateSources(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    private void calculateSources(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
 
         taSource.setText("");
 

@@ -3,9 +3,9 @@ package org.key_project.extsourceview.debug;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import org.jspecify.annotations.NonNull;
 import org.key_project.extsourceview.debug.tabs.*;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 /**
@@ -24,7 +24,7 @@ public class DebugView extends JTabbedPane implements TabPanel {
 
     private JTabbedPane pnlMain;
 
-    public DebugView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public DebugView(@NonNull MainWindow window, @NonNull KeYMediator mediator) {
         super();
 
         tabs = new DebugTab[]
@@ -38,13 +38,13 @@ public class DebugView extends JTabbedPane implements TabPanel {
         };
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getTitle() {
         return "ExtSourceView {{DEBUG}}";
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public JComponent getComponent() {
         if (pnlMain == null) {

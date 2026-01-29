@@ -10,7 +10,6 @@ import org.key_project.extsourceview.ExtSourceViewExtension;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.*;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
