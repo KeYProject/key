@@ -172,17 +172,10 @@ public final class HeapLDT extends LDT {
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         var name = symbol.name().toString();
-        // check for normal attribute
-        int endOfClassName = name.indexOf("::$");
+
+        int endOfClassName = name.indexOf("::#");
 
         int startAttributeName = endOfClassName + 3;
-
-
-        if (endOfClassName < 0) {
-            // not a normal attribute, maybe an implicit attribute like <created>?
-            endOfClassName = name.indexOf("::<");
-            startAttributeName = endOfClassName + 2;
-        }
 
         if (endOfClassName < 0) {
             return null;
@@ -199,15 +192,11 @@ public final class HeapLDT extends LDT {
      */
     public static String getPrettyFieldName(Named fieldSymbol) {
         String name = fieldSymbol.name().toString();
-        int index = name.indexOf("::");
+        int index = name.indexOf("::#");
         if (index == -1) {
             return name;
         } else {
-            String result = name.substring(index + 2);
-            if (result.charAt(0) == '$') {
-                result = result.substring(1);
-            }
-            return result;
+            return name.substring(index + 3);
         }
     }
 
@@ -216,7 +205,7 @@ public final class HeapLDT extends LDT {
      * Extracts the name of the enclosing class from the name of a constant symbol representing a
      * field.
      */
-    public static String getClassName(Function fieldSymbol) {
+    public static @Nullable String getClassName(Function fieldSymbol) {
         String name = fieldSymbol.name().toString();
         int index = name.indexOf("::");
         if (index == -1) {

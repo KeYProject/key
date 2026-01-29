@@ -247,7 +247,6 @@ public class VMTacletMatcher implements TacletMatcher {
             @NonNull LogicServices services) {
         var result = (MatchConditions) cond;
         if (result != null) {
-
             final var svIterator = result.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {
