@@ -52,6 +52,11 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
     }
 
     private void attachDefaultConstructor(ClassOrInterfaceDeclaration cd) {
+        // attach Java original
+        if (!cd.isInterface() && cd.getConstructors().isEmpty()) {
+            cd.addConstructor(Modifier.Keyword.PUBLIC);
+        }
+        // attach normalform
         var body = new BlockStmt();
         body.addStatement(new MethodCallExpr(new SuperExpr(),
             PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
