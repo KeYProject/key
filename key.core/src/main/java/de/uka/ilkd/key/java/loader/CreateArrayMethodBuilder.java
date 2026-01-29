@@ -59,9 +59,9 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
-    public static final String IMPLICIT_ARRAY_CREATE = "<createArray>";
+    public static final String IMPLICIT_ARRAY_CREATE = "$createArray";
 
-    public static final String IMPLICIT_ARRAY_CREATION_HELPER = "<createArrayHelper>";
+    public static final String IMPLICIT_ARRAY_CREATION_HELPER = "$createArrayHelper";
 
     // as these methods are thought to be only preliminary(we cache some
     // information here)
