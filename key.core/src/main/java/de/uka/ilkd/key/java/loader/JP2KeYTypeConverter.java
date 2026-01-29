@@ -225,12 +225,14 @@ public class JP2KeYTypeConverter {
             getSortsNamespace().add(arraySort);
         }
 
-        storeInCache(type, result);
-
         // delayed creation of virtual array declarations to avoid cycles
-        var arrayKJT = Objects.requireNonNull(jp2KeY.resolvedTypeToKeY(type));
+        var arrayKJT = jp2KeY.resolvedTypeToKeY(type);
+        if (arrayKJT == null) {
+            arrayKJT = result;
+        }
         var arrayType = createArrayType(getKeYJavaType(componentType), arrayKJT);
         result.setJavaType(arrayType);
+        storeInCache(type, result);
     }
 
     public KeYJavaType getSerializableType() {

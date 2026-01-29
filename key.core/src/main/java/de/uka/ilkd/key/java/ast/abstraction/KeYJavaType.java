@@ -115,7 +115,7 @@ public class KeYJavaType implements Type {
             return false;
         }
         try {
-            return Objects.equals(javaType, ((KeYJavaType) o).javaType)
+            return (Objects.equals(javaType, ((KeYJavaType) o).javaType))
                     && Objects.equals(sort, ((KeYJavaType) o).sort);
         } catch (Exception e) {
             return false;
