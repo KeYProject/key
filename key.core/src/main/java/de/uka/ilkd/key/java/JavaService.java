@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ast.JPContext;
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
@@ -682,7 +683,7 @@ public class JavaService {
                 spec = (VariableDeclarator) Objects.requireNonNull(mapping.nodeFromKeY(keySpec));
             } else {
                 keySpec = new FieldSpecification(var);
-                spec = new VariableDeclarator(name2typeReference(javaType.getFullName()),
+                spec = new VariableDeclarator(keyType2JPType(javaType),
                     var.name().toString());
                 mapping.put(spec, keySpec);
             }
@@ -717,17 +718,22 @@ public class JavaService {
     }
 
     /**
-     * given a name as string, construct a recoder type reference from it.
+     * given a key type, construct a java parser type reference from it.
      *
-     * @param typeName non-null type name as string
+     * @param type non-null type
      * @return a freshly created type reference to the given type.
      */
-    private com.github.javaparser.ast.type.Type name2typeReference(String typeName) {
+    private com.github.javaparser.ast.type.Type keyType2JPType(Type type) {
         try {
-            var p = PrimitiveType.Primitive.valueOf(typeName.toUpperCase());
+            var p = PrimitiveType.Primitive.valueOf(type.getFullName().toUpperCase());
             return new PrimitiveType(p);
         } catch (IllegalArgumentException e) {
-            return new ClassOrInterfaceType(null, typeName);
+            var name = type.getFullName();
+            if (type instanceof ArrayType ad) {
+                return new com.github.javaparser.ast.type.ArrayType(
+                    keyType2JPType(ad.getBaseType().getKeYJavaType().getJavaType()));
+            }
+            return new ClassOrInterfaceType(null, name);
         }
     }
 
@@ -747,7 +753,7 @@ public class JavaService {
         Node original;
         BlockStmt block;
         if (input.contains("..") || input.contains("...")) {
-            // TODO weigl further eloborate the situation, how to work with contexts provided?
+            // TODO weigl further elaborate the situation, how to work with contexts provided?
             var b = unwrapParseResult("memory:/", programFactory.parseContextBlock(input));
             original = b;
             block = new BlockStmt(b.getStatements());
