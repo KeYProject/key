@@ -728,12 +728,19 @@ public class JavaService {
             var p = PrimitiveType.Primitive.valueOf(type.getFullName().toUpperCase());
             return new PrimitiveType(p);
         } catch (IllegalArgumentException e) {
-            var name = type.getFullName();
             if (type instanceof ArrayType ad) {
                 return new com.github.javaparser.ast.type.ArrayType(
                     keyType2JPType(ad.getBaseType().getKeYJavaType().getJavaType()));
             }
-            return new ClassOrInterfaceType(null, name);
+            var name = type.getFullName();
+            ClassOrInterfaceType scope = null;
+            while (name.contains(".")) {
+                int firstDotIdx = name.indexOf(".");
+                String pkg = name.substring(0, firstDotIdx);
+                name = name.substring(firstDotIdx + 1);
+                scope = new ClassOrInterfaceType(scope, pkg);
+            }
+            return new ClassOrInterfaceType(scope, name);
         }
     }
 

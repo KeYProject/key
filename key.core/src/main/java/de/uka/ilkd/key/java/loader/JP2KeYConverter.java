@@ -1658,7 +1658,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         MethodReference methodReference = accept(n.getExpr());
         TypeReference bodySource = requireTypeReference(n.getSource());
         IProgramVariable resultVar =
-            n.getName().map(it -> (IProgramVariable) lookupSchemaVariable(it)).orElse(null);
+            n.getName().map(it -> {
+                // Get a PV where possible, then try SV
+                var pv = services.getNamespaces().programVariables()
+                        .lookup(new org.key_project.logic.Name(it.getIdentifier()));
+                if (pv != null)
+                    return pv;
+                return (IProgramVariable) lookupSchemaVariable(it);
+            }).orElse(null);
         return new MethodBodyStatement(pi, c, resultVar, bodySource, methodReference);
     }
 
