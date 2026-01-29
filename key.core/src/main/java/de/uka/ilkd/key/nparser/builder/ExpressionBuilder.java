@@ -685,7 +685,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
-        Operator result = (JOperatorSV) schemaVariables().lookup(new Name(attributeName));
+        Operator result = schemaVariables().lookup(new Name(attributeName));
         // if (result == null) {
 
         final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;

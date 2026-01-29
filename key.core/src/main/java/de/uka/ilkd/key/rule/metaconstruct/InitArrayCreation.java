@@ -44,7 +44,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;
-    private final static String createArrayName = "<createArray>";
+    private final static String createArrayName = "$createArray";
 
     public InitArrayCreation(SchemaVariable newObjectSV, ProgramElement newExpr) {
         super("init-array-creation", newExpr);

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.Function;
@@ -151,7 +152,10 @@ class FieldPrinter {
      * angle brackets, e.g. o.<created>
      */
     protected boolean isBuiltinObjectProperty(JTerm fieldTerm) {
-        return fieldTerm.op().name().toString().contains("::<")
+        final String implicitFieldMarker = JavaDLFieldNames.SEPARATOR +
+                JavaDLFieldNames.FIELD_PREFIX +
+                JavaDLFieldNames.IMPLICIT_NAME_PREFIX;
+        return fieldTerm.op().name().toString().contains(implicitFieldMarker)
                 && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 

@@ -43,6 +43,7 @@ public class InstanceAllocationMethodBuilder extends JavaTransformer {
         if (td.isRecordDeclaration() || td.isClassOrInterfaceDeclaration()) {
             MethodDeclaration md = td.addMethod(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE,
                 Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+            md.setBody(null);
             md.setType(new ClassOrInterfaceType(null, td.getName(), null));
         }
     }
