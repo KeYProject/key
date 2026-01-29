@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -43,7 +42,7 @@ public class InstanceAllocationMethodBuilder extends JavaTransformer {
     public void apply(TypeDeclaration<?> td) {
         if (td.isRecordDeclaration() || td.isClassOrInterfaceDeclaration()) {
             MethodDeclaration md = td.addMethod(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE,
-                    Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+                Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
             md.setType(new ClassOrInterfaceType(null, td.getName(), null));
         }
     }

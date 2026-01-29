@@ -538,9 +538,9 @@ public class KeYProgModelInfo {
     /// Returns all {@link KeYJavaType},
     /// ```
     /// for all loaded type declarations td
-    ///                 if  td <: ct and implements method with name
-    ///                    add to the returning list
-    ///                 endif
+    /// if td <: ct and implements method with name
+    /// add to the returning list
+    /// endif
     /// endfor
     /// ```
     public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
@@ -609,8 +609,7 @@ public class KeYProgModelInfo {
         // alpha sorting to make order deterministic
         var classesArray = classes.toArray(new ResolvedTypeDeclaration[0]);
         java.util.Arrays.sort(classesArray,
-            (o1, o2) ->
-                    o2.getQualifiedName().compareTo(o1.getQualifiedName()));
+            (o1, o2) -> o2.getQualifiedName().compareTo(o1.getQualifiedName()));
 
         for (var c : classesArray) {
             result = recFindImplementations(c, name, signature, result);

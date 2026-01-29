@@ -98,9 +98,9 @@ public class KeYJavaType implements Type {
     }
 
     public String getName() {
-        if(javaType!=null) {
+        if (javaType != null) {
             return javaType.getName();
-        }else{
+        } else {
             assert sort != null;
             return sort.name().toString();
         }

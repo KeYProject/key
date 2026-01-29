@@ -138,7 +138,7 @@ public final class HeapLDT extends LDT {
 
     private String getFieldSymbolName(LocationVariable fieldPV) {
         if (fieldPV.isImplicit()) {
-            return fieldPV.getProgramElementName().toString().replace("::","::#");
+            return fieldPV.getProgramElementName().toString().replace("::", "::#");
         } else {
             // FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
@@ -416,7 +416,9 @@ public final class HeapLDT extends LDT {
         if (result == null) {
             int index = name.toString().indexOf("::");
             if (index <= 0) {
-                throw new IllegalArgumentException("Given field %s (resolved to %s) does not contain DOUBLECOLON ::".formatted(fieldPV, name));
+                throw new IllegalArgumentException(
+                    "Given field %s (resolved to %s) does not contain DOUBLECOLON ::"
+                            .formatted(fieldPV, name));
             }
             final Name kind = new Name(name.toString().substring(index + 2));
 
