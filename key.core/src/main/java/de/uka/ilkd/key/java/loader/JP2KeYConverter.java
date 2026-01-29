@@ -649,8 +649,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             boolean isFinal = false;
 
             boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
+            // TODO(AW): This PV should probably only be created if the corresponding declaration
+            // has not yet been parsed and then this PV has to be used for the decl later on
             ProgramVariable variable =
-                new LocationVariable(new ProgramElementName(n.getNameAsString()), kjt,
+                new LocationVariable(
+                    new ProgramElementName(n.getNameAsString(), containerClass.getClassName()), kjt,
                     declaringType,
                     isStatic, false, false, isFinal);
 
