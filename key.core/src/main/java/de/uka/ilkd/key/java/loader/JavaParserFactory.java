@@ -232,8 +232,11 @@ public class JavaParserFactory {
                 if (!name.startsWith(packageName)) {
                     continue;
                 }
+                // If we are looking in a compilation unit w/o a package name, we need to take the
+                // whole name
+                int packageNameStart = packageName.isEmpty() ? 0 : packageName.length() + 1;
                 String localName =
-                    name.substring(Math.min(name.length(), packageName.length() + 1));
+                    name.substring(Math.min(name.length(), packageNameStart));
                 var astTypeDeclaration = Navigator.findType(unit, localName);
                 if (astTypeDeclaration.isPresent()) {
                     return SymbolReference
