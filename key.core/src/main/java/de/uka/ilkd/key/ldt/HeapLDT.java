@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -138,14 +139,16 @@ public final class HeapLDT extends LDT {
 
     private String getFieldSymbolName(LocationVariable fieldPV) {
         if (fieldPV.isImplicit()) {
-            return fieldPV.getProgramElementName().toString().replace("::", "::#");
+            return fieldPV.getProgramElementName().toString().replace(JavaDLFieldNames.SEPARATOR,
+                JavaDLFieldNames.FIELD_INFIX);
         } else {
             // FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
-            int index = fieldPV.toString().indexOf("::");
+            int index = fieldPV.toString().indexOf(JavaDLFieldNames.SEPARATOR);
             if (index <= 0)
                 return fieldPVName;
-            return fieldPVName.substring(0, index) + "::#" + fieldPVName.substring(index + 2);
+            return fieldPVName.substring(0, index) + JavaDLFieldNames.FIELD_INFIX
+                    + fieldPVName.substring(index + 2);
         }
     }
 
@@ -173,7 +176,7 @@ public final class HeapLDT extends LDT {
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         var name = symbol.name().toString();
 
-        int endOfClassName = name.indexOf("::#");
+        int endOfClassName = name.indexOf(JavaDLFieldNames.FIELD_INFIX);
 
         int startAttributeName = endOfClassName + 3;
 
@@ -192,7 +195,7 @@ public final class HeapLDT extends LDT {
      */
     public static String getPrettyFieldName(Named fieldSymbol) {
         String name = fieldSymbol.name().toString();
-        int index = name.indexOf("::#");
+        int index = name.indexOf(JavaDLFieldNames.FIELD_INFIX);
         if (index == -1) {
             return name;
         } else {
@@ -207,7 +210,7 @@ public final class HeapLDT extends LDT {
      */
     public static @Nullable String getClassName(Function fieldSymbol) {
         String name = fieldSymbol.name().toString();
-        int index = name.indexOf("::");
+        int index = name.indexOf(JavaDLFieldNames.SEPARATOR);
         if (index == -1) {
             return null;
         } else {
@@ -403,7 +406,7 @@ public final class HeapLDT extends LDT {
         final Name name = new Name(getFieldSymbolName(fieldPV));
         Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
-            int index = name.toString().indexOf("::");
+            int index = name.toString().indexOf(JavaDLFieldNames.SEPARATOR);
             if (index <= 0) {
                 throw new IllegalArgumentException(
                     "Given field %s (resolved to %s) does not contain DOUBLECOLON ::"

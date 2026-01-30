@@ -57,7 +57,8 @@ class FieldPrinter {
              *
              * Example syntax: object.(package.class::field)
              */
-            return "(" + fieldTerm.op().toString().replace("::$", "::") + ")";
+            return "(" + fieldTerm.op().toString().replace(JavaDLFieldNames.FIELD_INFIX,
+                JavaDLFieldNames.SEPARATOR) + ")";
         }
     }
 
@@ -84,9 +85,9 @@ class FieldPrinter {
          * not find a better solution to this yet. But it seems to be standard, as it is done
          * similary in method HeapLDT.getPrettyFieldName(). (Kai Wallisch 09/2014)
          */
-        String[] originTypeAndName = fieldTerm.toString().split("::\\$");
+        String[] originTypeAndName = fieldTerm.toString().split(JavaDLFieldNames.FIELD_INFIX);
         assert originTypeAndName.length == 2;
-        String[] pvTypeAndName = pv.toString().split("::");
+        String[] pvTypeAndName = pv.toString().split(JavaDLFieldNames.SEPARATOR);
         assert pvTypeAndName.length == 2;
 
         return (pvTypeAndName[0].equals(originTypeAndName[0])
@@ -111,8 +112,8 @@ class FieldPrinter {
     protected static @NonNull ProgramVariable getJavaFieldConstant(JTerm fieldTerm, HeapLDT heapLDT,
             Services services) {
         String name = fieldTerm.op().name().toString();
-        if (name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
-            String pvName = name.replace("::$", "::");
+        if (name.contains(JavaDLFieldNames.FIELD_INFIX) && isFieldConstant(fieldTerm, heapLDT)) {
+            String pvName = name.replace(JavaDLFieldNames.FIELD_INFIX, JavaDLFieldNames.SEPARATOR);
             ProgramVariable result = services.getJavaInfo().getAttribute(pvName);
             if (result == null) {
                 throw new NoSuchElementException("No field constant: " + fieldTerm);
@@ -137,7 +138,7 @@ class FieldPrinter {
             getJavaFieldConstant(fieldTerm, heapLDT, services);
             return true;
         } catch (RuntimeException e) {
-            // If there exists a constant of the form x::$y and there is no type
+            // If there exists a constant of the form x::#y and there is no type
             // x, this exception is thrown.
             return false;
         }
@@ -149,7 +150,7 @@ class FieldPrinter {
 
     /*
      * Determine whether the field constant is a generic object property. Those are surrounded by
-     * angle brackets, e.g. o.<created>
+     * angle brackets, e.g. o.$created
      */
     protected boolean isBuiltinObjectProperty(JTerm fieldTerm) {
         final String implicitFieldMarker = JavaDLFieldNames.SEPARATOR +

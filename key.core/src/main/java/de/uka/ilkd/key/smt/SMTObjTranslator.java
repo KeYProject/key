@@ -1475,7 +1475,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 }
                 function = getCastFunction(source, target);
             }
-        } else if (name.endsWith("::<inv>")) {
+        } else if (name.endsWith("::<inv>")) { // TODO: should this be $inv?
             if (functions.containsKey(CLASS_INVARIANT)) {
                 function = functions.get(CLASS_INVARIANT);
             } else {

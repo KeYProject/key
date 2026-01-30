@@ -59,7 +59,8 @@ public class FieldConstantHandler implements SMTHandler {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         return op.arity() == 0 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function && ((Function) op).isUnique()
-                && (JavaDLFieldNames.isField(op.name()) || op.name().toString().contains("::<"))
+                && (JavaDLFieldNames.isField(op.name())
+                        || op.name().toString().contains(JavaDLFieldNames.IMPLICIT_FIELD_INFIX))
                 || op == heapLDT.getArr();
     }
 

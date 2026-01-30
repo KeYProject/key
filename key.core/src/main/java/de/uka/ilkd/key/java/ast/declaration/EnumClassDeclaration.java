@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -63,7 +64,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      *
      */
     private IProgramVariable findAttr(String fieldName) {
-        String completeName = getFullName() + "::" + fieldName;
+        String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
