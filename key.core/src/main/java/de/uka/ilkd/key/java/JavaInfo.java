@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -857,15 +858,15 @@ public final class JavaInfo {
      * @throws IllegalArgumentException if the given name is not fully qualified
      */
     public ProgramVariable getAttribute(String fullyQualifiedName) {
-        final int idx = fullyQualifiedName.indexOf("::");
+        final JavaDLFieldNames.ParsedFieldName parsedName =
+            JavaDLFieldNames.split(fullyQualifiedName);
 
-        if (idx == -1) {
+        if (parsedName.scope() == null) {
             throw new IllegalArgumentException(
                 fullyQualifiedName + " is not a fully qualified attribute name");
         }
 
-        return getAttribute(fullyQualifiedName.substring(idx + 2),
-            fullyQualifiedName.substring(0, idx));
+        return getAttribute(parsedName.nameWithoutFieldPrefix(), parsedName.scope());
     }
 
 

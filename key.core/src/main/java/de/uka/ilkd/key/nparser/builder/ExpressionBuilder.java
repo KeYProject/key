@@ -1402,7 +1402,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         sfxargs, classRef, false);
                 } else {
                     Operator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
-                        classRef + "::" + memberName);
+                        classRef + JavaDLFieldNames.SEPARATOR + memberName);
                     current = createAttributeTerm(current, op, ctxSuffix);
                 }
 

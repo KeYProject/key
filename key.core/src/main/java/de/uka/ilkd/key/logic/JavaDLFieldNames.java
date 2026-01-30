@@ -12,8 +12,8 @@ public class JavaDLFieldNames {
     public static final char FIELD_PREFIX = '#';
     public static final char IMPLICIT_NAME_PREFIX = '$';
     public static final String SEPARATOR = "::";
-    private static final String FIELD_INFIX = SEPARATOR + FIELD_PREFIX;
-    private static final String IMPLICIT_FIELD_INFIX =
+    public static final String FIELD_INFIX = SEPARATOR + FIELD_PREFIX;
+    public static final String IMPLICIT_FIELD_INFIX =
         SEPARATOR + FIELD_PREFIX + IMPLICIT_NAME_PREFIX;
 
     private JavaDLFieldNames() {}
