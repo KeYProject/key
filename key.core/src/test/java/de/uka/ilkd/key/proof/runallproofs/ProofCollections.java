@@ -405,6 +405,7 @@ public class ProofCollections {
         g.provable("standard_key/unicode_test.key");
         g.provable("heap/strictlyModular/mayExpand.key");
         g.notprovable("heap/strictlyModular/modularOnly.key");
+        g.notprovable("standard_key/GhostSetInLoop/set_ghost.key");
 
 
         g = c.group("SmansEtAl");

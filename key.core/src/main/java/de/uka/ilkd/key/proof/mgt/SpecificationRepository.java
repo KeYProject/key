@@ -1917,7 +1917,7 @@ public final class SpecificationRepository {
          * @param index the index of the term in {@code terms()}
          * @return a term updated with {@code self} and the {@code vars()}.
          */
-        public JTerm getTerm(Services services, JTerm self, int index) {
+        public JTerm getTerm(Services services, @Nullable JTerm self, int index) {
             var term = term(index);
 
             final TermFactory termFactory = services.getTermFactory();
