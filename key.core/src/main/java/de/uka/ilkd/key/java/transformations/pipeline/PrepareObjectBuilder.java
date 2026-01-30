@@ -83,14 +83,17 @@ public class PrepareObjectBuilder extends JavaTransformer {
                     SimpleName fieldId = variable.getName();
                     if (!fieldId.getIdentifier().startsWith("" + JavaDLFieldNames.FIELD_PREFIX
                         + JavaDLFieldNames.IMPLICIT_NAME_PREFIX)) {
-                        final var defaultValue =
-                            services.getDefaultValue(field.resolve().getType());
-                        if (defaultValue == null) {
-                            throw new RuntimeException(
-                                "Default value for " + field.resolve().getType() + " is null");
-                        } else {
-                            result.add(assign((attribute(new ThisExpr(), fieldId.getIdentifier())),
-                                defaultValue));
+                        for (final VariableDeclarator fieldDecl : field.getVariables()) {
+                            final var defaultValue =
+                                services.getDefaultValue(fieldDecl.getType());
+                            if (defaultValue == null) {
+                                throw new RuntimeException(
+                                    "Default value for " + field.resolve().getType() + " is null");
+                            } else {
+                                result.add(
+                                    assign((attribute(new ThisExpr(), fieldId.getIdentifier())),
+                                        defaultValue));
+                            }
                         }
                     }
                 }
