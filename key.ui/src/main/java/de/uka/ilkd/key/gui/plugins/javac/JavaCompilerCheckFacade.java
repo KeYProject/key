@@ -94,17 +94,23 @@ public class JavaCompilerCheckFacade {
         if (settings.getUseProcessors()) {
 
             String newlineClassPath = settings.getClassPaths();
-            if (!newlineClassPath.isEmpty()) {
-                List<Path> processorClassPath =
-                    Arrays.asList(newlineClassPath.split(System.lineSeparator()))
-                            .stream().map(p -> Paths.get(p)).toList();
+            List<Path> processorClassPath =
+                Arrays.asList(newlineClassPath.split(System.lineSeparator()))
+                        .stream()
+                        .filter(s -> !s.isBlank())
+                        .map(Paths::get)
+                        .toList();
 
+            if (!processorClassPath.isEmpty()) {
                 classPath = new ArrayList<>(classPath);
                 classPath.addAll(processorClassPath);
             }
 
-            List<String> processors = Arrays.asList(settings.getProcessors()
-                    .split(System.lineSeparator()));
+            List<String> processors =
+                Arrays.asList(settings.getProcessors().split(System.lineSeparator()))
+                        .stream()
+                        .filter(s -> !s.isBlank())
+                        .toList();
 
             if (!processors.isEmpty()) {
                 options.add("-processor");
@@ -156,7 +162,9 @@ public class JavaCompilerCheckFacade {
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
                     new Location(
-                        fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
+                        it.getSource() == null
+                                ? null
+                                : fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
                         it.getPosition() != Diagnostic.NOPOS
                                 ? Position.newOneBased((int) it.getLineNumber(),
                                     (int) it.getColumnNumber())
