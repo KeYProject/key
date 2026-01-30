@@ -19,6 +19,8 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
+
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
@@ -79,7 +81,8 @@ public class PrepareObjectBuilder extends JavaTransformer {
             if (!field.isStatic()) {
                 for (VariableDeclarator variable : field.getVariables()) {
                     SimpleName fieldId = variable.getName();
-                    if (!fieldId.getIdentifier().startsWith("<")) {
+                    if (!fieldId.getIdentifier().startsWith("" + JavaDLFieldNames.FIELD_PREFIX
+                        + JavaDLFieldNames.IMPLICIT_NAME_PREFIX)) {
                         final var defaultValue =
                             services.getDefaultValue(field.resolve().getType());
                         if (defaultValue == null) {
@@ -102,7 +105,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
      */
     protected BlockStmt createPrepareBody(TypeDeclaration<?> type) {
         var body = new NodeList<Statement>();
-        if (type.resolve().isJavaLangObject()) {
+        if (!type.resolve().isJavaLangObject()) {
             // we can access the implementation
             body.add(
                 new ExpressionStmt(new MethodCallExpr(new SuperExpr(), IMPLICIT_OBJECT_PREPARE)));

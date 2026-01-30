@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -354,7 +355,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean isImplicit() {
-        return getName().startsWith("<");
+        return getName().startsWith(JavaDLFieldNames.IMPLICIT_NAME_PREFIX + "");
     }
 
     /*

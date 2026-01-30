@@ -60,11 +60,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         var body = new BlockStmt();
         body.addStatement(new MethodCallExpr(new SuperExpr(),
             PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
-        var initializers = services.getInitializers(cd);
-        int i = 0;
-        for (Statement initializer : initializers) {
-            body.addStatement(i++, initializer.clone());
-        }
+        addInitializers(cd, body, 0);
         MethodDeclaration def =
             cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
                 Modifier.Keyword.PUBLIC);
@@ -152,6 +148,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                 body.addStatement(0,
                     new MethodCallExpr(new SuperExpr(),
                         PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
+                addInitializers(cd, body, enclosingClass.isPresent() ? 1 : 0);
             } else {
                 // the first statement has to be a this or super constructor call
                 // this(...) => this.$init(...)
@@ -209,6 +206,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                         PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
                         args);
                     body.replace(first, new ExpressionStmt(expr));
+                    addInitializers(cd, body, enclosingClass.isPresent() ? 1 : 0);
                 }
             }
 
@@ -220,13 +218,24 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                         AssignExpr.Operator.ASSIGN);
                     body.addStatement(1, assign);
                 }
-
-                /*
-                 * for (i = 0; i < initializers.size(); i++) {
-                 * body.addStatement(i + j + 1, initializers.get(i).clone());
-                 * }
-                 */
             }
+        }
+    }
+
+    /**
+     * adds the object initializers to the constructor body of the given class
+     *
+     * @param cd the class where the constructor is declared
+     * @param body the body of the constructor to which to append the initializers
+     * @param offset in case of an inner class the first statement is the initialisation
+     *        of the outer this reference not an initializer
+     */
+    private void addInitializers(@NonNull ClassOrInterfaceDeclaration cd,
+            BlockStmt body, int offset) {
+        var initializers = services.getInitializers(cd);
+        int i = offset + 1; // + 1 as initialisation happens after super(..) call
+        for (Statement initializer : initializers) {
+            body.addStatement(i++, initializer.clone());
         }
     }
 

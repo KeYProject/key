@@ -644,13 +644,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var declaringType =
                 typeConverter.getKeYJavaType(containerClass.getQualifiedName());
 
+            boolean isStatic = target.asField().isStatic();
             // TODO
-            boolean isStatic = false;
             boolean isFinal = false;
 
             boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
-            // TODO(AW): This PV should probably only be created if the corresponding declaration
-            // has not yet been parsed and then this PV has to be used for the decl later on
+            // TODO(AW): This PV should probably only be created if the corresponding declarad
+            // hence the following line should be used but how to provide the full variable
+            // declaration
+            // variable = getProgramVariableForFieldSpecification();
             ProgramVariable variable =
                 new LocationVariable(
                     new ProgramElementName(n.getNameAsString(), containerClass.getClassName()), kjt,

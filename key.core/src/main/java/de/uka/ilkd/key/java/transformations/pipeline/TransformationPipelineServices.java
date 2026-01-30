@@ -233,43 +233,32 @@ public class TransformationPipelineServices {
      */
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
         NodeList<Statement> result = new NodeList<>();
-        NodeList<MethodDeclaration> mdl = new NodeList<>();
-
-        var initializers =
-            cd.getMembers().stream()
-                    .filter(BodyDeclaration::isInitializerDeclaration)
-                    .map(it -> (InitializerDeclaration) it)
-                    .filter(it -> !it.isStatic())
-                    .toList();
-
-
-        for (InitializerDeclaration initializer : initializers) {
-            String name = PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
-            var initializerMethod = cd.addMethod(name, Modifier.Keyword.PRIVATE);
-            initializerMethod.setBody(initializer.getBody().clone());
-            mdl.add(initializerMethod);
-            result.add(new ExpressionStmt(new MethodCallExpr(name)));
-        }
-
-        var memberFields =
-            cd.getMembers().stream()
-                    .filter(BodyDeclaration::isFieldDeclaration)
-                    .map(it -> (FieldDeclaration) it)
-                    .filter(it -> !it.isStatic())
-                    .toList();
-
-        for (FieldDeclaration field : memberFields) {
-            for (VariableDeclarator variable : field.getVariables()) {
-                if (variable.getInitializer().isPresent()) {
-                    Expression fieldInit = variable.getInitializer().get();
-                    final var access = new FieldAccessExpr(
-                        new ThisExpr(), new NodeList<>(), variable.getName());
-                    var fieldCopy =
-                        new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
-                    result.add(new ExpressionStmt(fieldCopy));
+        int objectInitializerCount = 0;
+        for (BodyDeclaration member : cd.getMembers().toArray(new BodyDeclaration[0])) {
+            if (member instanceof InitializerDeclaration init &&
+                    !init.isStatic()) {
+                String name =
+                    PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + objectInitializerCount;
+                var initializerMethod = cd.addMethod(name, Modifier.Keyword.PRIVATE);
+                initializerMethod.setBody(init.getBody().clone());
+                initializerMethod.setParentNode(cd);
+                result.add(new ExpressionStmt(new MethodCallExpr(name)));
+                objectInitializerCount += 1;
+            } else if (member instanceof FieldDeclaration field &&
+                    !field.isStatic()) {
+                for (VariableDeclarator variable : field.getVariables()) {
+                    if (variable.getInitializer().isPresent()) {
+                        Expression fieldInit = variable.getInitializer().get();
+                        final var access = new FieldAccessExpr(
+                            new ThisExpr(), new NodeList<>(), variable.getName());
+                        var fieldCopy =
+                            new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
+                        result.add(new ExpressionStmt(fieldCopy));
+                    }
                 }
             }
         }
+
         return result;
     }
 
