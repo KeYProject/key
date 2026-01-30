@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Position;
@@ -330,7 +331,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(ClassOrInterfaceDeclaration n, Void arg) {
         final var ref = new ReferenceTypeImpl(n.resolve());
         var kjt = createOrCachedKeyJavaType(ref);
-        mapping.registerType(ref, kjt);
 
         var pi = createPositionInfo(n);
         var c = createComments(n);
@@ -359,6 +359,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 false);
         }
         kjt.setJavaType(td);
+        mapping.registerType(ref, kjt);
         return addToMapping(n, td);
     }
 
@@ -641,23 +642,39 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             }
 
             var containerClass = target.asField().declaringType();
-            var declaringType =
-                typeConverter.getKeYJavaType(containerClass.getQualifiedName());
-
-            boolean isStatic = target.asField().isStatic();
-            // TODO
-            boolean isFinal = false;
 
             boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
-            // TODO(AW): This PV should probably only be created if the corresponding declared
-            // hence the following line should be used but how to provide the full variable
-            // declaration
-            // variable = getProgramVariableForFieldSpecification();
-            ProgramVariable variable =
-                new LocationVariable(
-                    new ProgramElementName(n.getNameAsString(), containerClass.getClassName()), kjt,
-                    declaringType,
-                    isStatic, false, false, isFinal);
+
+            if (target.asField().toAst().isEmpty()) {
+                throw new ConvertException("Field " + target.asField().getName() +
+                    " cannot be converted into an AST node. Note: Bytecode parsing" +
+                    "is not supported.");
+            }
+
+            Node fieldNode = target.asField().toAst().get();
+
+            if (!(fieldNode instanceof FieldDeclaration fldDecl)) {
+                throw new ConvertException(
+                    "Unexpected node type: " + fieldNode.getClass() + "of node " + fieldNode);
+            }
+
+            List<VariableDeclarator> variableCandidates = fldDecl.getVariables().stream()
+                    .filter(v -> v.getName().asString().equals(n.getNameAsString()))
+                    .collect(Collectors.toList());
+
+            if (variableCandidates.size() != 1) {
+                throw new ConvertException("Name of field not unique: " + n.getNameAsString());
+            }
+
+            final VariableDeclarator varDecl = variableCandidates.getFirst();
+
+            var isModel = fldDecl.hasModifier(Modifier.Keyword.MODEL);
+            var isGhost = fldDecl.hasModifier(Modifier.Keyword.GHOST);
+
+            final FullVariableDeclarator decl = new FullVariableDeclarator(varDecl,
+                fldDecl.isFinal(), fldDecl.isStatic(),
+                isModel, isGhost);
+            final ProgramVariable variable = getProgramVariableForFieldSpecification(decl);
 
             if (notFullyQualifiedName) { // regular field access
                 ReferencePrefix prefix = accept(n.getScope());
@@ -926,7 +943,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return keyDecl.getProgramVariable();
         }
         if (other.getVariables().size() == 1) {
-            return other.getVariables().get(0).getProgramVariable();
+            IProgramVariable var = other.getVariables().get(0).getProgramVariable();
+            if (other instanceof de.uka.ilkd.key.java.ast.declaration.FieldDeclaration) {
+                if (var instanceof ProgramVariable pv) {
+                    return new FieldReference(pv, new ThisReference());
+                } else if (var instanceof SchemaVariable sv) {
+                    return new SchematicFieldReference(sv, new ThisReference());
+                }
+            } else {
+                return var;
+            }
         }
         return reportUnsupportedElement(target.toAst().get());
     }
