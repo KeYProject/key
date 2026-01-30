@@ -649,7 +649,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             boolean isFinal = false;
 
             boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
-            // TODO(AW): This PV should probably only be created if the corresponding declarad
+            // TODO(AW): This PV should probably only be created if the corresponding declared
             // hence the following line should be used but how to provide the full variable
             // declaration
             // variable = getProgramVariableForFieldSpecification();
