@@ -199,7 +199,7 @@ public final class HeapLDT extends LDT {
         if (index == -1) {
             return name;
         } else {
-            return name.substring(index + 3);
+            return name.substring(index + JavaDLFieldNames.FIELD_INFIX.length());
         }
     }
 
