@@ -291,10 +291,12 @@ public interface LoopSpecification extends SpecificationElement {
      * @param heapContext all corresponding heaps.
      * @param usePrettyPrinting whether the text should be pretty-printed.
      * @param useUnicodeSymbols whether Unicode symbols should be used.
+     * @param hidePackagePrefix
      * @return a String containing the plain text representation of this invariant.
      */
     String getPlainText(Services services, Iterable<LocationVariable> heapContext,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols);
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix);
 
     String getUniqueName();
 

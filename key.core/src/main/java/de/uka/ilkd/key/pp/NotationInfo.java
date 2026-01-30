@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -147,7 +146,14 @@ public final class NotationInfo {
         this.notationTable = createDefaultNotation();
     }
 
-
+    public NotationInfo(boolean prettySyntax, boolean unicodeEnabled, boolean hidePackagePrefix) {
+        this.notationTable = createDefaultNotation();
+        this.prettySyntax = prettySyntax;
+        this.unicodeEnabled = unicodeEnabled;
+        this.hidePackagePrefix = hidePackagePrefix;
+        // TODO: Do we need this in addition?
+        // this.finalImmutable = finalImmutable;
+    }
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -406,12 +412,15 @@ public final class NotationInfo {
     // -------------------------------------------------------------------------
 
     public void refresh(Services services) {
-        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED);
+        refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED,
+            DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
-    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         this.unicodeEnabled = useUnicodeSymbols;
         this.prettySyntax = usePrettyPrinting;
+        this.hidePackagePrefix = hidePackagePrefix;
         if (usePrettyPrinting && services != null) {
             if (useUnicodeSymbols) {
                 this.notationTable = createUnicodeNotation(services);
@@ -421,8 +430,6 @@ public final class NotationInfo {
         } else {
             this.notationTable = createDefaultNotation();
         }
-        ProofIndependentSettings pis = ProofIndependentSettings.DEFAULT_INSTANCE;
-        hidePackagePrefix = pis.getViewSettings().isHidePackagePrefix();
 
         if (services != null && services.getProof() != null) {
             ProofSettings settings = services.getProof().getSettings();

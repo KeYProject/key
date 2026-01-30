@@ -46,7 +46,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     @Override
     protected String lazyComputeName() {
         return getLoopInvariant().getPlainText(getServices(), getAppliedRuleApp().getHeapContext(),
-            getSettings().usePrettyPrinting(), getSettings().useUnicode()).trim();
+            getSettings().usePrettyPrinting(), getSettings().useUnicode(), false).trim();
     }
 
     /**

@@ -658,7 +658,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             hasMby(), originalMby, originalModifiables, hasRealModifiable, globalDefs, originalPres,
             originalFreePres, originalPosts, originalFreePosts, originalAxioms, getModalityKind(),
             transactionApplicableContract(), includeHtmlMarkup, services,
-            NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED,
+            NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
     public static String getText(FunctionalOperationContract contract,
@@ -666,7 +667,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             JTerm excTerm,
             LocationVariable baseHeap, JTerm baseHeapTerm, List<LocationVariable> heapContext,
             Map<LocationVariable, JTerm> atPres, boolean includeHtmlMarkup, Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         Operator originalSelfVar = contractSelf != null ? contractSelf.op() : null;
         Operator originalResultVar = resultTerm != null ? resultTerm.op() : null;
         final TermBuilder tb = services.getTermBuilder();
@@ -747,14 +749,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             hasRealModifiable, globalDefs, originalPres, originalFreePres, originalPosts,
             originalFreePosts, originalAxioms, contract.getModalityKind(),
             contract.transactionApplicableContract(), includeHtmlMarkup, services,
-            usePrettyPrinting, useUnicodeSymbols);
+            usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
     }
 
 
     private static String getSignatureText(IProgramMethod pm, Operator originalResultVar,
             Operator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
             LocationVariable originalExcVar, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
+            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         final StringBuilder sig = new StringBuilder();
         if (originalResultVar != null) {
             sig.append(originalResultVar);
@@ -774,7 +776,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof JTerm) {
                 sig.append(LogicPrinter.quickPrintTerm((JTerm) subst, services, usePrettyPrinting,
-                    useUnicodeSymbols)).append(", ");
+                    useUnicodeSymbols, hidePackagePrefix)).append(", ");
             } else {
                 sig.append(subst).append(", ");
             }
@@ -793,13 +795,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     private static String printClauseText(final String text, boolean includeHtmlMarkup,
-            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols, String clause,
-            LocationVariable h, final JTerm clauseTerm) {
+            Services services, String clause, LocationVariable h,
+            final JTerm clauseTerm, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
 
         String printClause =
-            LogicPrinter.quickPrintTerm(clauseTerm, services, usePrettyPrinting, useUnicodeSymbols);
+            LogicPrinter.quickPrintTerm(clauseTerm, services, usePrettyPrinting, useUnicodeSymbols,
+                hidePackagePrefix);
         clause = clause + (includeHtmlMarkup ? "<br><b>" : "\n") + text
                 + (h == baseHeap ? "" : "[" + h + "]") + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printClause, false)
@@ -809,7 +813,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     private static String getClauseText(final String text,
             Map<LocationVariable, JTerm> originalClause, boolean includeHtmlMarkup,
-            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         String clause = "";
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -818,21 +823,23 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             JTerm clauseTerm = originalClause.get(h);
             if (clauseTerm != null && !clauseTerm.equals(tb.tt())) {
                 clauseTerm = includeHtmlMarkup ? tb.unlabelRecursive(clauseTerm) : clauseTerm;
-                clause = printClauseText(text, includeHtmlMarkup, services, usePrettyPrinting,
-                    useUnicodeSymbols, clause, h, clauseTerm);
+                clause = printClauseText(text, includeHtmlMarkup, services, clause, h, clauseTerm,
+                    usePrettyPrinting,
+                    useUnicodeSymbols, hidePackagePrefix);
             }
         }
         return clause;
     }
 
     private static String getGlobalUpdatesText(JTerm globalDefs, boolean includeHtmlMarkup,
-            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         String globalUpdates = "";
         final TermBuilder tb = services.getTermBuilder();
         if (globalDefs != null) {
             globalDefs = includeHtmlMarkup ? tb.unlabelRecursive(globalDefs) : globalDefs;
             final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services,
-                usePrettyPrinting, useUnicodeSymbols);
+                usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
@@ -843,7 +850,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     private static String getModifiableText(Map<LocationVariable, JTerm> originalModifiables,
             Map<LocationVariable, Boolean> hasRealModifiable, boolean includeHtmlMarkup,
-            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         String modifiables = "";
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
@@ -851,8 +859,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final JTerm modifiableTerm = originalModifiables.get(h);
             if (modifiableTerm != null) {
                 modifiables =
-                    printClauseText("modifiable", includeHtmlMarkup, services, usePrettyPrinting,
-                        useUnicodeSymbols, modifiables, h, modifiableTerm);
+                    printClauseText("modifiable", includeHtmlMarkup, services, modifiables, h,
+                        modifiableTerm, usePrettyPrinting,
+                        useUnicodeSymbols, hidePackagePrefix);
                 if (!hasRealModifiable.get(h)) {
                     modifiables =
                         modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
@@ -865,12 +874,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     private static String getPostText(Map<LocationVariable, JTerm> originalPosts,
             Map<LocationVariable, JTerm> originalAxioms, boolean includeHtmlMarkup,
-            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         String posts = getClauseText("post", originalPosts, includeHtmlMarkup, services,
-            usePrettyPrinting, useUnicodeSymbols);
+            usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         if (originalAxioms != null) {
             posts = posts + getClauseText("axiom", originalAxioms, includeHtmlMarkup, services,
-                usePrettyPrinting, useUnicodeSymbols);
+                usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         }
         return posts;
     }
@@ -887,33 +897,34 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, JTerm> originalAxioms, JModality.JavaModalityKind modalityKind,
             boolean transaction,
             boolean includeHtmlMarkup, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
+            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         final String sig = getSignatureText(pm, originalResultVar, originalSelfVar,
-            originalParamVars, originalExcVar, services, usePrettyPrinting, useUnicodeSymbols);
+            originalParamVars, originalExcVar, services, usePrettyPrinting, useUnicodeSymbols,
+            hidePackagePrefix);
 
         final String mby = hasMby
                 ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting,
-                    useUnicodeSymbols)
+                    useUnicodeSymbols, hidePackagePrefix)
                 : null;
 
         final String modifiables =
             getModifiableText(originalModifiables, hasRealModifiable, includeHtmlMarkup,
-                services, usePrettyPrinting, useUnicodeSymbols);
+                services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
 
         final String globalUpdates = getGlobalUpdatesText(globalDefs, includeHtmlMarkup, services,
-            usePrettyPrinting, useUnicodeSymbols);
+            usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
 
         final String pres = getClauseText("pre", originalPres, includeHtmlMarkup, services,
-            usePrettyPrinting, useUnicodeSymbols);
+            usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
 
         final String freePres = getClauseText("free pre", originalFreePres, includeHtmlMarkup,
-            services, usePrettyPrinting, useUnicodeSymbols);
+            services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
 
         final String freePosts = getClauseText("free post", originalFreePosts, includeHtmlMarkup,
-            services, usePrettyPrinting, useUnicodeSymbols);
+            services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
 
         final String posts = getPostText(originalPosts, originalAxioms, includeHtmlMarkup, services,
-            usePrettyPrinting, useUnicodeSymbols);
+            usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
 
         final String clauses = globalUpdates + pres + freePres + posts + freePosts + modifiables;
         if (includeHtmlMarkup) {

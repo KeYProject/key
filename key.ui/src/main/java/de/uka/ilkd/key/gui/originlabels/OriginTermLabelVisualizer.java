@@ -699,7 +699,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             final NotationInfo ni = new NotationInfo();
             if (services != null) {
                 ni.refresh(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-                    NotationInfo.DEFAULT_UNICODE_ENABLED);
+                    NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
             }
 
             setLogicPrinter(new TermViewLogicPrinter(pos, ni, services));

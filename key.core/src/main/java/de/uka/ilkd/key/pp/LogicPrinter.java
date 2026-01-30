@@ -133,10 +133,11 @@ public class LogicPrinter {
     }
 
     public static SequentViewLogicPrinter quickPrinter(Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         }
 
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
@@ -154,7 +155,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(JTerm t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
     /**
@@ -164,11 +165,12 @@ public class LogicPrinter {
      * @param services services.
      * @param usePrettyPrinting whether to use pretty-printing.
      * @param useUnicodeSymbols whether to use unicode symbols.
+     * @param hidePackagePrefix
      * @return the printed term.
      */
     public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
-        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
+        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         p.printTerm(t);
         return p.result();
     }
@@ -182,7 +184,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
         p.printSemisequent(s);
         return p.result();
     }
@@ -196,7 +198,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSequent(Sequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
         p.printSequent(s);
         return p.result();
     }
@@ -616,7 +618,7 @@ public class LogicPrinter {
     private void printSourceElement(SourceElement element) {
         new PrettyPrinter(layouter, instantiations, services,
             notationInfo.isPrettySyntax(),
-            notationInfo.isUnicodeEnabled()).print(element);
+            notationInfo.isUnicodeEnabled(), notationInfo.isHidePackagePrefix()).print(element);
     }
 
     /**

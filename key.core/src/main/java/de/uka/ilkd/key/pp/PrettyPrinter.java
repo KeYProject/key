@@ -71,21 +71,23 @@ public class PrettyPrinter implements Visitor {
 
     private final SVInstantiations instantiations;
     private final @Nullable Services services;
-    private boolean usePrettyPrinting;
-    private boolean useUnicodeSymbols;
+    private final boolean usePrettyPrinting;
+    private final boolean useUnicodeSymbols;
+    private final boolean hidePackagePrefix;
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(PosTableLayouter out) {
-        this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
+        this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true, true);
     }
 
     public PrettyPrinter(PosTableLayouter o, SVInstantiations svi, @Nullable Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         this.layouter = o;
         this.instantiations = svi;
         this.services = services;
         this.usePrettyPrinting = usePrettyPrinting;
         this.useUnicodeSymbols = useUnicodeSymbols;
+        this.hidePackagePrefix = hidePackagePrefix;
     }
 
     /**
@@ -1991,7 +1993,8 @@ public class PrettyPrinter implements Visitor {
     }
 
     public String printInLogicPrinter(JTerm t) {
-        var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+        var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols,
+            hidePackagePrefix);
         lp.printTerm(t);
         return lp.result();
     }
