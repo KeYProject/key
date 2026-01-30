@@ -354,7 +354,7 @@ public class StatementBlock extends JavaStatement
     @Override
     public String toString() {
         var out = "{" + System.lineSeparator();
-        
+
         for (var statement : body) {
             out += "    " + statement.toString() + System.lineSeparator();
         }

@@ -633,7 +633,8 @@ public class Recoder2KeYConverter {
 
         // annotations are collected separatly as they are not tracked
         var annots = newArr.getAnnotations();
-        for (int i = annots.size() - 1; i >= 0; i--) children.add(convert(annots.get(i)));
+        for (int i = annots.size() - 1; i >= 0; i--)
+            children.add(convert(annots.get(i)));
 
         // now we have to extract the array initializer
         // is stored separately and must not appear in the children list
@@ -1777,7 +1778,8 @@ public class Recoder2KeYConverter {
         if (rp == null) {
             return new New(arguments, maybeAnonClass, null, immutableAnnots);
         } else {
-            return new New(arguments, maybeAnonClass, (ReferencePrefix) callConvert(rp), immutableAnnots);
+            return new New(arguments, maybeAnonClass, (ReferencePrefix) callConvert(rp),
+                immutableAnnots);
         }
     }
 

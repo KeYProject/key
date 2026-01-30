@@ -7,14 +7,14 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
-import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Type operator.
@@ -46,7 +46,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         super(children);
         typeReference = children.get(TypeReference.class);
         annotations = new ImmutableArray<>(
-                children.collect(AnnotationUseSpecification.class));
+            children.collect(AnnotationUseSpecification.class));
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         super(children);
         typeReference = children.get(TypeReference.class);
         annotations = new ImmutableArray<>(
-                children.collect(AnnotationUseSpecification.class));
+            children.collect(AnnotationUseSpecification.class));
     }
 
     protected TypeOperator(Expression unaryChild, TypeReference typeref) {

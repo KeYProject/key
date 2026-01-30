@@ -17,6 +17,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
 import recoder.java.*;
@@ -32,9 +34,6 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SchemaJavaProgramFactory extends JavaProgramFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchemaJavaProgramFactory.class);

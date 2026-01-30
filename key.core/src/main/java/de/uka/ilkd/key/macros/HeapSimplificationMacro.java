@@ -38,7 +38,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
 
     // note that rules in the 'concrete' rule set are usually not included here
     private static final Set<String> ADMITTED_RULES_SET = asSet("selectOfStore",
-     "selectOfCreate", "selectOfAnon", "selectOfMemset",
+        "selectOfCreate", "selectOfAnon", "selectOfMemset",
 
         "selectCreatedOfStore", "selectCreatedOfCreate", "selectCreatedOfAnon",
         "selectCreatedOfMemset",
@@ -64,29 +64,31 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "wellFormedMemsetObjectEQ", "wellFormedMemsetLocSetEQ", "wellFormedMemsetPrimitiveEQ",
 
         // universe rules
-        "createdRepfpElement", 
-        
+        "createdRepfpElement",
+
         "dismissSelectOfDominatedObject", "dismissSelectOfDominatingObject",
         "dismissSelectOfDominatedAnon", "dismissSelectOfDominatedCreatedAnon",
-        
+
         "dismissSelectOfSelfRepfpComplementAnon", "dismissSelectOfSelfCreatedRepfpComplementAnon",
-        "dismissSelectOfDominatingRepfpComplementAnon", 
+        "dismissSelectOfDominatingRepfpComplementAnon",
         "dismissSelectOfDominatingCreatedRepfpComplementAnon",
-        
-        "dismissSelectOfDominatedObjectEQ", "dismissSelectOfDominatingObjectEQ", 
+
+        "dismissSelectOfDominatedObjectEQ", "dismissSelectOfDominatingObjectEQ",
         "dismissSelectOfDominatedAnonEQ", "dismissSelectOfDominatedCreatedAnonEQ",
-        
-        "dismissSelectOfSelfRepfpComplementAnonEQ", "dismissSelectOfSelfCreatedRepfpComplementAnonEQ",
-        "dismissSelectOfDominatingRepfpComplementAnonEQ", 
+
+        "dismissSelectOfSelfRepfpComplementAnonEQ",
+        "dismissSelectOfSelfCreatedRepfpComplementAnonEQ",
+        "dismissSelectOfDominatingRepfpComplementAnonEQ",
         "dismissSelectOfDominatingCreatedRepfpComplementAnonEQ",
-        
+
         "simplifySelectOfDominatedAnon", "simplifySelectOfDominatedCreatedAnon",
         "simplifySelectOfSelfRepfpComplementAnon", "simplifySelectOfSelfCreatedRepfpComplementAnon",
-        "simplifySelectOfDominatingRepfpComplementAnon", 
+        "simplifySelectOfDominatingRepfpComplementAnon",
         "simplifySelectOfDominatingCreatedRepfpComplementAnon",
-        
+
         "simplifySelectOfDominatedAnonEQ", "simplifySelectOfDominatedCreatedAnonEQ",
-        "simplifySelectOfSelfRepfpComplementAnonEQ", "simplifySelectOfSelfCreatedRepfpComplementAnonEQ",
+        "simplifySelectOfSelfRepfpComplementAnonEQ",
+        "simplifySelectOfSelfCreatedRepfpComplementAnonEQ",
         "simplifySelectOfDominatingRepfpComplementAnonEQ",
         "simplifySelectOfDominatingCreatedRepfpComplementAnonEQ",
 

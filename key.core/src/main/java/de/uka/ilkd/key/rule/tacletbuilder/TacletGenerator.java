@@ -245,10 +245,11 @@ public class TacletGenerator {
         final Pair<JTerm, ImmutableSet<Taclet>> limited = limitTerm(schemaRhs, toLimit, services);
         final JTerm limitedRhs = limited.first;
         result = result.union(limited.second);
-        final TermAndBoundVarPair schemaRepresentsLimited = 
+        final TermAndBoundVarPair schemaRepresentsLimited =
             new TermAndBoundVarPair(
-                    OpReplacer.replace(schemaRepresents.term.sub(1), limitedRhs, schemaRepresents.term, services.getTermFactory()), 
-                    schemaRepresents.boundVars);
+                OpReplacer.replace(schemaRepresents.term.sub(1), limitedRhs, schemaRepresents.term,
+                    services.getTermFactory()),
+                schemaRepresents.boundVars);
 
         // create if sequent
         final boolean finalClass = kjt.getJavaType() instanceof ClassDeclaration

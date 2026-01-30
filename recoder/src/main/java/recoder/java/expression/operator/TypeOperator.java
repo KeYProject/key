@@ -6,11 +6,10 @@ package recoder.java.expression.operator;
 
 import recoder.java.Expression;
 import recoder.java.ProgramElement;
+import recoder.java.declaration.AnnotationUseSpecification;
 import recoder.java.expression.Operator;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
-import recoder.java.declaration.AnnotationUseSpecification;
-
 import recoder.list.generic.ASTList;
 
 /**

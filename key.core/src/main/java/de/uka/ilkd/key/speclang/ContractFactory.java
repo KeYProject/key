@@ -339,8 +339,8 @@ public class ContractFactory {
             services);
     }
 
-    private void addUniverseConds(IProgramMethod pm, 
-            Map<LocationVariable, JTerm> freePres, Map<LocationVariable, JTerm> freePosts, 
+    private void addUniverseConds(IProgramMethod pm,
+            Map<LocationVariable, JTerm> freePres, Map<LocationVariable, JTerm> freePosts,
             LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar) {
 
@@ -356,22 +356,24 @@ public class ContractFactory {
         for (var param : pm.getMethodDeclaration().getParameters()) {
             var modifiers = param.getModifiers();
             for (var modifier : modifiers) {
-                if (!(modifier instanceof AnnotationUseSpecification)) continue;
-                var specifier = (AnnotationUseSpecification)modifier;
+                if (!(modifier instanceof AnnotationUseSpecification))
+                    continue;
+                var specifier = (AnnotationUseSpecification) modifier;
                 var name = specifier.getTypeReferenceAt(0).getName();
                 if (name.equals("Rep")) {
                     change = true;
-                    pres = tb.and(pres, 
-                            tb.imp(
-                                tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())), 
-                                tb.equals(tb.var(selfVar), tb.func(owner, tb.var(paramVars.get(i))))));
+                    pres = tb.and(pres,
+                        tb.imp(
+                            tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())),
+                            tb.equals(tb.var(selfVar), tb.func(owner, tb.var(paramVars.get(i))))));
                     break;
                 } else if (name.equals("Peer")) {
                     change = true;
-                    pres = tb.and(pres, 
-                            tb.imp(
-                                tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())), 
-                                tb.equals(tb.func(owner, tb.var(selfVar)), tb.func(owner, tb.var(paramVars.get(i))))));
+                    pres = tb.and(pres,
+                        tb.imp(
+                            tb.not(tb.equals(tb.var(paramVars.get(i)), tb.NULL())),
+                            tb.equals(tb.func(owner, tb.var(selfVar)),
+                                tb.func(owner, tb.var(paramVars.get(i))))));
                     break;
                 } else if (name.equals("Dom")) {
                     change = true;
@@ -387,22 +389,24 @@ public class ContractFactory {
             i++;
         }
 
-        if (change) freePres.put(heap, pres);
+        if (change)
+            freePres.put(heap, pres);
         change = false;
 
         var posts = freePosts.get(heap);
         if (resultVar != null) {
             var modifiers = pm.getMethodDeclaration().getModifiers();
             for (var modifier : modifiers) {
-                if (!(modifier instanceof AnnotationUseSpecification)) continue;
-                var specifier = (AnnotationUseSpecification)modifier;
+                if (!(modifier instanceof AnnotationUseSpecification))
+                    continue;
+                var specifier = (AnnotationUseSpecification) modifier;
                 var name = specifier.getTypeReferenceAt(0).getName();
                 if (name.equals("Rep")) {
                     change = true;
-                    posts = tb.and(posts, 
-                            tb.imp(
-                                tb.not(tb.equals(tb.var(resultVar), tb.NULL())), 
-                                tb.equals(tb.var(selfVar), tb.func(owner, tb.var(resultVar)))));
+                    posts = tb.and(posts,
+                        tb.imp(
+                            tb.not(tb.equals(tb.var(resultVar), tb.NULL())),
+                            tb.equals(tb.var(selfVar), tb.func(owner, tb.var(resultVar)))));
                     break;
                 } else if (name.equals("Dom")) {
                     pres = tb.and(pres, tb.imp(
@@ -410,10 +414,11 @@ public class ContractFactory {
                         tb.func(dominates, tb.var(resultVar), tb.var(selfVar))));
                 } else if (name.equals("Peer")) {
                     change = true;
-                    posts = tb.and(posts, 
-                            tb.imp(
-                                tb.not(tb.equals(tb.var(resultVar), tb.NULL())), 
-                                tb.equals(tb.func(owner, tb.var(selfVar)), tb.func(owner, tb.var(resultVar)))));
+                    posts = tb.and(posts,
+                        tb.imp(
+                            tb.not(tb.equals(tb.var(resultVar), tb.NULL())),
+                            tb.equals(tb.func(owner, tb.var(selfVar)),
+                                tb.func(owner, tb.var(resultVar)))));
                     break;
                 } else if (name.equals("Payload")) {
                     change = true;
@@ -422,7 +427,8 @@ public class ContractFactory {
             }
         }
 
-        if (change) freePosts.put(heap, posts);
+        if (change)
+            freePosts.put(heap, posts);
     }
 
     /**
@@ -493,7 +499,8 @@ public class ContractFactory {
             Map<LocationVariable, Boolean> hasFreeModifiable,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         // add the conditions for the universe types to the pre- and post-conditions
-        addUniverseConds(pm, freePres, freePosts, progVars.selfVar, progVars.paramVars, progVars.resultVar);
+        addUniverseConds(pm, freePres, freePosts, progVars.selfVar, progVars.paramVars,
+            progVars.resultVar);
 
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
             pm.getContainerType(), modalityKind, pres, freePres, mby, posts, freePosts, axioms,

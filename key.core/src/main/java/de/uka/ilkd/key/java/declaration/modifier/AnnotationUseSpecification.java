@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import org.key_project.logic.SyntaxElement;
-
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
-
-import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.rule.MatchConditions;
+
+import org.key_project.logic.SyntaxElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +61,8 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
 
-        if (matchCond != null && !tr.getName().equals(((AnnotationUseSpecification)pe).tr.getName())) {
+        if (matchCond != null
+                && !tr.getName().equals(((AnnotationUseSpecification) pe).tr.getName())) {
             return null;
         }
 
