@@ -151,21 +151,18 @@ public class JavaDLTheory extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm[] subs, Services services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub, TermServices services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
