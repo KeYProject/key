@@ -151,7 +151,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
     private CatchClause createCatchClause(String caughtType, String caughtParam, ThrowStmt t) {
         NodeList<Statement> catcher = new NodeList<>();
         var resetInitInProgress =
-            assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkTrue());
+            assignToPassive(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS, mkFalse());
         var markErroneous = assignToPassive(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, mkTrue());
 
         Parameter param = new Parameter(
