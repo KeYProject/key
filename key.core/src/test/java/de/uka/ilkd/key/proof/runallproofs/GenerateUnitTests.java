@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
@@ -41,8 +40,10 @@ public class GenerateUnitTests {
     private static Path outputFolder;
 
     public static void main(String[] args) throws IOException {
-        var collections = new ProofCollection[] { ProofCollections.automaticJavaDL(),
-            ProofCollections.automaticInfFlow() };
+        var collections = Map.of(
+            "fun", ProofCollections.automaticJavaDL(),
+            "infflow", ProofCollections.automaticInfFlow());
+
         if (args.length != 1) {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
@@ -53,9 +54,9 @@ public class GenerateUnitTests {
 
         Files.createDirectories(outputFolder);
 
-        for (var col : collections) {
-            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
-                createUnitClass(unit);
+        for (var col : collections.entrySet()) {
+            for (RunAllProofsTestUnit unit : col.getValue().createRunAllProofsTestUnits()) {
+                createUnitClass(col.getKey(), unit);
             }
         }
     }
@@ -99,14 +100,15 @@ public class GenerateUnitTests {
      * Generates the test classes for the given proof collection, and writes the
      * java files.
      *
+     * @param prefix
      * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(RunAllProofsTestUnit unit)
+    private static void createUnitClass(String prefix, RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
-        String className = '_' + name // avoids name clashes, i.e., group "switch"
+        String className = '_' + prefix + "_" + name // avoids name clashes, i.e., group "switch"
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
                 .replaceAll("[^a-zA-Z0-9]+", "_");
