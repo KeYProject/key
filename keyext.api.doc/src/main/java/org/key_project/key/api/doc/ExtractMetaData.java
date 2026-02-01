@@ -32,12 +32,8 @@ import org.keyproject.key.api.remoteclient.ClientApi;
  * @author Alexander Weigl
  * @version 1 (14.10.23)
  */
-@NullMarked
-@CommandLine.Command(name = "gendoc",
-    mixinStandardHelpOptions = true,
-    version = "gendoc 1.0",
-    description = "Generates the documentation for key.api")
-public class ExtractMetaData implements Callable<Integer> {
+
+public class ExtractMetaData implements Runnable {
     private final List<Metamodel.Endpoint> endpoints = new LinkedList<>();
     private final Map<Class<?>, Metamodel.Type> types = new HashMap<>();
     private final Map<String, HelpText> segDocumentation = new TreeMap<>();
@@ -48,18 +44,7 @@ public class ExtractMetaData implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws IOException {
-        if (source != null) {
-            ParserConfiguration config = new ParserConfiguration();
-            config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21);
-            config.setAttributeComments(true);
-            config.setLexicalPreservationEnabled(false);
-            config.setStoreTokens(false);
-            config.setIgnoreAnnotationsWhenAttributingComments(true);
-            config.setDoNotAssignCommentsPrecedingEmptyLines(true);
-            sourceRoot = new SourceRoot(source, config);
-        }
-
+    public void run() {
         for (Method method : KeyApi.class.getMethods()) {
             addServerEndpoint(method);
         }
@@ -284,7 +269,7 @@ public class ExtractMetaData implements Callable<Integer> {
 
     private void addClientEndpoint(Method method) {
         var jsonSegment = method.getDeclaringClass().getAnnotation(JsonSegment.class);
-        var segment = jsonSegment.value();
+        var segment = jsonSegment == null ? "" : jsonSegment.value();
 
         var req = method.getAnnotation(JsonRequest.class);
         var resp = method.getAnnotation(JsonNotification.class);
@@ -428,5 +413,9 @@ public class ExtractMetaData implements Callable<Integer> {
         }
 
         return null;
+    }
+
+    public Metamodel.KeyApi getApi() {
+        return keyApi;
     }
 }
