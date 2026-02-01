@@ -171,9 +171,18 @@ public class JavaParserFactory {
 
         @Override
         public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
-            if (delegate == null)
+            if (delegate == null) {
                 rebuild();
+            }
             return delegate.tryToSolveType(name);
+        }
+
+        @Override
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(String qualifiedModuleName, String simpleTypeName) {
+            if(delegate == null) {
+                rebuild();
+            }
+            return delegate.tryToSolveTypeInModule(qualifiedModuleName, simpleTypeName);
         }
     }
 
@@ -212,6 +221,11 @@ public class JavaParserFactory {
             SymbolReference<ResolvedReferenceTypeDeclaration> result = tryToSolveTypeUncached(name);
             foundTypes.put(name, result);
             return result;
+        }
+
+        @Override
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(String qualifiedModuleName, String simpleTypeName) {
+            return tryToSolveType(simpleTypeName);
         }
 
         private SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeUncached(
@@ -272,6 +286,11 @@ public class JavaParserFactory {
                 }
             }
             return SymbolReference.unsolved();
+        }
+
+        @Override
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(String qualifiedModuleName, String simpleTypeName) {
+            return tryToSolveType(simpleTypeName);
         }
     }
 }

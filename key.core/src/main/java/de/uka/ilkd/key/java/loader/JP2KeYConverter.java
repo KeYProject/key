@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
@@ -1919,10 +1920,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(JavadocComment n, Void arg) {
+    public Object visit(TraditionalJavadocComment n, Void arg) {
         return reportUnsupportedElement(n);
     }
-
 
     @Override
     public Object visit(MarkerAnnotationExpr n, Void arg) {
