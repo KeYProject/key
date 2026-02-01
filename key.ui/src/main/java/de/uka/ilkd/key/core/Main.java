@@ -464,25 +464,27 @@ public final class Main implements Callable<Integer> {
     }
 
     public static void ensureExamplesAvailable() {
-        File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
-                : new File(getExamplesDir());
-        if (!examplesDir.exists()) {
+        Path examplesDir =
+            getExamplesDir() == null ? ExampleChooser.lookForExamples() : getExamplesDir();
+        if (!Files.exists(examplesDir)) {
             examplesDir = setupExamples();
         }
-        setExamplesDir(examplesDir.getAbsolutePath());
+        if (examplesDir == null) {
+            setExamplesDir(examplesDir.toAbsolutePath());
+        }
     }
 
-    private static File setupExamples() {
+    private static @Nullable Path setupExamples() {
         try {
             URL examplesURL = Main.class.getResource("/examples.zip");
             if (examplesURL == null) {
                 throw new IOException("Missing examples.zip in resources");
             }
 
-            File tempDir = createTempDirectory();
+            Path tempDir = Files.createTempDirectory("key-examples");
 
             if (tempDir != null) {
-                IOUtil.extractZip(examplesURL.openStream(), tempDir.toPath());
+                IOUtil.extractZip(examplesURL.openStream(), tempDir);
             }
             return tempDir;
         } catch (IOException e) {
@@ -552,9 +554,9 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static String EXAMPLE_DIR = null;
+    private static Path EXAMPLE_DIR = null;
 
-    public static @Nullable String getExamplesDir() {
+    public static @Nullable Path getExamplesDir() {
         return EXAMPLE_DIR;
     }
 
@@ -565,7 +567,7 @@ public final class Main implements Callable<Integer> {
      *
      * @param newExamplesDir The new examples directory to use.
      */
-    public static void setExamplesDir(String newExamplesDir) {
+    public static void setExamplesDir(Path newExamplesDir) {
         EXAMPLE_DIR = newExamplesDir;
     }
 }
