@@ -419,7 +419,7 @@ public class Configuration {
      * @param writer a writer
      * @param comment a comment
      */
-    public void save(Writer writer, String comment) {
+    public void save(Writer writer, @Nullable String comment) {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
     }
 
@@ -504,7 +504,11 @@ public class Configuration {
             return this;
         }
 
-        public ConfigurationWriter printComment(String comment) {
+        public ConfigurationWriter printComment(@Nullable String comment) {
+            if (comment == null) {
+                return this;
+            }
+
             if (comment.contains("\n")) {
                 out.format("/* %s */\n", comment);
             } else {

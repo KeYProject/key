@@ -5,6 +5,7 @@ package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.StringWriter;
 import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
@@ -56,6 +57,16 @@ public interface Settings {
      *        internal state.
      */
     void writeSettings(@NonNull Configuration props);
+
+
+    /// Returns the JSON representation of this settings in a string.
+    default String writeSettingsToString() {
+        var config = new Configuration();
+        var out = new StringWriter();
+        writeSettings(config);
+        config.save(out, null);
+        return out.toString();
+    }
 
 
     /**
