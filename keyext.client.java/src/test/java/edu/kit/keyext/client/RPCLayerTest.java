@@ -8,8 +8,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import edu.kit.iti.formal.keyextclientjava.JsonRPC;
-import edu.kit.iti.formal.keyextclientjava.RPCLayer;
 import edu.kit.iti.formal.keyextclientjava.rpc.JsonRPC;
 import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
 import org.junit.jupiter.api.Assertions;

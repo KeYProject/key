@@ -1,12 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.key.api.doc;/*
-                                     * This file is part of KeY - https://key-project.org
-                                     * KeY is licensed under the GNU General Public License Version
-                                     * 2
-                                     * SPDX-License-Identifier: GPL-2.0-only
-                                     */
+package org.key_project.key.api.doc;
 
 import java.util.List;
 import java.util.Map;
@@ -15,10 +10,11 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.keyproject.key.api.data.DataExamples;
 
-/**
- * @author Alexander Weigl
- * @version 1 (29.10.23)
- */
+/// Metamodel of the API. This class contains classes which represents the functionality and
+/// interfaces of the API.
+///
+/// @author Alexander Weigl
+/// @version 1 (29.10.23)
 @NullMarked
 public class Metamodel {
 
@@ -51,9 +47,10 @@ public class Metamodel {
         HelpText documentation();
 
         default String kind() {
-            return getClass().getSimpleName();
+            return getClass().getName();
         }
 
+        /// a list of its arguments
         List<Argument> args();
 
         ///
@@ -76,6 +73,10 @@ public class Metamodel {
         }
     }
 
+    /// A [Argument] of an endpoint
+    ///
+    /// @param name the argument name
+    /// @param type the argument type
     public record Argument(String name, String type) {
     }
 
@@ -115,10 +116,8 @@ public class Metamodel {
         }
     }
 
-    public sealed
-
-
-    interface Type {
+    /// A data type
+    public sealed interface Type {
         default String kind() {
             return getClass().getName();
         }
@@ -127,8 +126,10 @@ public class Metamodel {
         @Nullable
         HelpText documentation();
 
+        /// name of the data type
         String name();
 
+        ///
         String identifier();
     }
 

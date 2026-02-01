@@ -37,6 +37,7 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.prover.engine.ProverTaskListener;
@@ -49,7 +50,6 @@ import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.keyproject.key.api.data.*;
-import org.keyproject.key.api.data.ExampleDesc;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
