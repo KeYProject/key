@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -19,7 +20,7 @@ public class TacletAppIntermediate extends AppIntermediate {
 
     private String tacletName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
-    private LinkedList<String> insts = null;
+    private List<String> insts = null;
     private ImmutableList<String> ifSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
     private ImmutableList<Name> newNames = null;
@@ -40,8 +41,8 @@ public class TacletAppIntermediate extends AppIntermediate {
      *        New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
-            LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
-            ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
+                                 List<String> insts, ImmutableList<String> ifSeqFormulaList,
+                                 ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;
@@ -60,7 +61,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         return posInfo;
     }
 
-    public LinkedList<String> getInsts() {
+    public List<String> getInsts() {
         return insts;
     }
 

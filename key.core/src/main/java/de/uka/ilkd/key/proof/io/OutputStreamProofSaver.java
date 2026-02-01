@@ -781,7 +781,7 @@ public class OutputStreamProofSaver {
      * @return the "interesting" instantiations (serialized)
      */
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
-        Collection<String> s = new ArrayList<>();
+        var s = new ArrayList<String>();
 
         for (final var pair : inst.interesting()) {
             final SchemaVariable var = pair.key();
@@ -798,7 +798,7 @@ public class OutputStreamProofSaver {
                 var.name() + "=" + printAnything(value, proof.getServices(), false);
             s.add(singleInstantiation);
         }
-
+        Collections.sort(s); // Sorting makes the output format (more) reproducible.
         return s;
     }
 
@@ -890,22 +890,30 @@ public class OutputStreamProofSaver {
 
     public static String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
-        if (val instanceof ProgramElement) {
-            return printProgramElement((ProgramElement) val);
-        } else if (val instanceof JTerm) {
-            return printTerm((JTerm) val, services, shortAttrNotation);
-        } else if (val instanceof Sequent) {
-            return printSequent((Sequent) val, services);
-        } else if (val instanceof Name) {
-            return val.toString();
-        } else if (val instanceof InstantiationEntry<?> entry) {
-            return printAnything(entry.getInstantiation(), services);
-        } else if (val == null) {
-            return null;
-        } else {
-            LOGGER.warn("Don't know how to prettyprint {}", val.getClass());
-            // try to String by chance
-            return val.toString();
+        switch (val) {
+            case ProgramElement programElement -> {
+                return printProgramElement(programElement);
+            }
+            case JTerm jTerm -> {
+                return printTerm(jTerm, services, shortAttrNotation);
+            }
+            case Sequent sequentFormulas -> {
+                return printSequent(sequentFormulas, services);
+            }
+            case Name name -> {
+                return val.toString();
+            }
+            case InstantiationEntry<?> entry -> {
+                return printAnything(entry.getInstantiation(), services);
+            }
+            case null -> {
+                return null;
+            }
+            default -> {
+                LOGGER.warn("Don't know how to prettyprint {}", val.getClass());
+                // try to String by chance
+                return val.toString();
+            }
         }
     }
 

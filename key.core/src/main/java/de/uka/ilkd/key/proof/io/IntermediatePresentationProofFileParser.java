@@ -128,7 +128,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             {
                 TacletInformation tacletInfo = (TacletInformation) ruleInfo;
                 if (tacletInfo.loadedInsts == null) {
-                    tacletInfo.loadedInsts = new LinkedList<>();
+                    tacletInfo.loadedInsts = new ArrayList<>(4);
                 }
                 tacletInfo.loadedInsts.add(str);
             }
@@ -373,7 +373,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
-        protected LinkedList<String> loadedInsts = null;
+        protected List<String> loadedInsts = null;
         protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.nil();
         protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.nil();
 
