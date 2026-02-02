@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJPMapping;
@@ -58,7 +57,7 @@ import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.key.sv.*;
@@ -487,6 +486,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         ImmutableArray<TypeReference> exc = map(n.getThrownExceptions());
         Throws thr = exc.isEmpty() ? null : new Throws(null, null, exc);
+        final var body = n.body();
         var cd = new de.uka.ilkd.key.java.ast.declaration.ConstructorDeclaration(pi, c,
             map(n.getModifiers()),
             null,
@@ -494,7 +494,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             createProgramElementName(n.getName()),
             map(n.getParameters()),
             thr,
-            accept(n.getBody()), isInInterface);
+            body !=null?accept(body):new StatementBlock(), isInInterface);
 
         var clazz = getContainingClass(n);
         try {
@@ -524,14 +524,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new Continue(pi, c, name);
     }
 
+    private Label nameToLabel(@Nullable Name name) {
+        if (name == null) {
+            return null;
+        }
+
+        var str = name.asString();
+        if (str.startsWith("#")) {
+            return (Label) lookupSchemaVariable(str, name);
+        }
+        return new ProgramElementName(str);
+    }
+
     private Label nameToLabel(Optional<Name> label) {
-        return label.map(name -> {
-            var str = name.asString();
-            if (str.startsWith("#")) {
-                return (Label) lookupSchemaVariable(str, name);
-            }
-            return new ProgramElementName(str);
-        }).orElse(null);
+        return nameToLabel(label.orElse(null));
     }
 
     @Nullable

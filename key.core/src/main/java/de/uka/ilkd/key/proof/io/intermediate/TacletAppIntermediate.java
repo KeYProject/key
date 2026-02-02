@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.logic.Name;
@@ -41,8 +40,8 @@ public class TacletAppIntermediate extends AppIntermediate {
      *        New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
-                                 List<String> insts, ImmutableList<String> ifSeqFormulaList,
-                                 ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
+            List<String> insts, ImmutableList<String> ifSeqFormulaList,
+            ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;

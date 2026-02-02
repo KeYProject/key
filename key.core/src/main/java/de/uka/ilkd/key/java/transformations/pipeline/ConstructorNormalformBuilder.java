@@ -121,7 +121,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         parameters.addAll(TransformationPipelineServices.cloneList(cons.getParameters()));
 
         // transfer constructor body
-        BlockStmt origBody = cons.getBody();
+        BlockStmt origBody = cons.body();
         if (origBody != null) {
             for (Statement statement : origBody.getStatements()) {
                 body.addStatement(statement.clone());

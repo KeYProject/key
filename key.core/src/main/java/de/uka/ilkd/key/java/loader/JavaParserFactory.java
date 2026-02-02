@@ -129,13 +129,11 @@ public class JavaParserFactory {
      * make the type solving
      * aware of changes to this instance without changing the behavior of JP, we introduce one
      * indirection with this class.
-     * This class behaves like a {@link TypeSolver} because everything is delegated to an intenral
-     * {@link CombinedTypeSolver},
-     * which is rebuild on changes on the outer instance.
+     * This class behaves like a {@link TypeSolver} because everything is delegated to an internal
+     * {@link CombinedTypeSolver}, which is rebuild on changes on the outer instance.
      * <p>
      * Use {@link #rebuild()} to trigger a rebuild of the type solver on changing relevant setting
-     * in the outer
-     * instance.
+     * in the outer instance.
      *
      * @author Alexander Weigl
      */
@@ -178,8 +176,9 @@ public class JavaParserFactory {
         }
 
         @Override
-        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(String qualifiedModuleName, String simpleTypeName) {
-            if(delegate == null) {
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(
+                String qualifiedModuleName, String simpleTypeName) {
+            if (delegate == null) {
                 rebuild();
             }
             return delegate.tryToSolveTypeInModule(qualifiedModuleName, simpleTypeName);
@@ -224,7 +223,8 @@ public class JavaParserFactory {
         }
 
         @Override
-        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(String qualifiedModuleName, String simpleTypeName) {
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(
+                String qualifiedModuleName, String simpleTypeName) {
             return tryToSolveType(simpleTypeName);
         }
 
@@ -289,7 +289,8 @@ public class JavaParserFactory {
         }
 
         @Override
-        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(String qualifiedModuleName, String simpleTypeName) {
+        public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeInModule(
+                String qualifiedModuleName, String simpleTypeName) {
             return tryToSolveType(simpleTypeName);
         }
     }
