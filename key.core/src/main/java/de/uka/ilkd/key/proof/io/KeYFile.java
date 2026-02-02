@@ -219,7 +219,9 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                includes = ctx.getIncludes(file.file().getParent().toUri().toURL());
+                // weigl: fix #3721, absolute path is required to solve relative filenames.
+                Path absPath = file.file().toAbsolutePath().getParent();
+                includes = ctx.getIncludes(absPath.toUri().toURL());
             } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
             } catch (Exception e) {
@@ -240,7 +242,7 @@ public class KeYFile implements EnvInput {
         Path bootClassPathFile = Paths.get(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
-            var parentDirectory = file.file().getParent();
+            Path parentDirectory = file.file().getParent();
             bootClassPathFile = parentDirectory.resolve(bootClassPath);
         }
 
@@ -259,7 +261,7 @@ public class KeYFile implements EnvInput {
     @Override
     public @NonNull List<Path> readClassPath() {
         ProblemInformation pi = getProblemInformation();
-        var parentDirectory = file.file().getParent();
+        Path parentDirectory = file.file().getParent();
         List<Path> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
             if (cp == null) {
@@ -280,10 +282,10 @@ public class KeYFile implements EnvInput {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
-            var absFile = Paths.get(javaPath);
+            Path absFile = Paths.get(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
-                var parent = file.file().getParent();
+                Path parent = file.file().getParent();
                 absFile = parent.resolve(javaPath);
             }
             if (!Files.exists(absFile)) {
