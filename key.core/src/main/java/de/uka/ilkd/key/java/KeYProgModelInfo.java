@@ -456,18 +456,22 @@ public class KeYProgModelInfo {
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
      */
     private List<ResolvedReferenceTypeDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
-        var rt = getJavaParserType(ct);
+        final ResolvedType rt = getJavaParserType(ct);
         // TODO javaparser get all known java types in classpath
         // best approximation is to use the recoder2key mapping
 
-        var types = rec2key().elemsRec().stream()
-                .filter(it -> it instanceof ResolvedReferenceTypeDeclaration)
+        List<Node> types = rec2key().elemsRec().stream()
+                .filter(it -> it instanceof com.github.javaparser.ast.body.TypeDeclaration)
                 .toList();
 
         List<ResolvedReferenceTypeDeclaration> res = new ArrayList<>(1024);
         for (var decl : types) {
-            ResolvedReferenceTypeDeclaration resolved = (ResolvedReferenceTypeDeclaration) decl;
-            if (resolved.isAssignableBy(rt)) // TODO weigl correct direction?
+            ResolvedReferenceTypeDeclaration resolved =
+                ((com.github.javaparser.ast.body.TypeDeclaration) decl).resolve();
+            if (resolved.canBeAssignedTo(rt.asReferenceType().getTypeDeclaration().get())) // TODO
+                                                                                           // weigl
+                                                                                           // correct
+                                                                                           // direction?
             {
                 res.add(resolved);
             }
@@ -613,8 +617,8 @@ public class KeYProgModelInfo {
 
         for (var c : classesArray) {
             if (!c.equals(ct)) {
-            result = recFindImplementations(c, name, signature, result);
-        }
+                result = recFindImplementations(c, name, signature, result);
+            }
         }
         return result;
     }
