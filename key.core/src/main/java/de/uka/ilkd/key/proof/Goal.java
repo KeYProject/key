@@ -43,7 +43,6 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -88,7 +87,7 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * the strategy object that determines automated application of rules
      */
-    private @Nullable Strategy<@NonNull Goal> goalStrategy = null;
+    private @Nullable Strategy<Goal> goalStrategy = null;
     /**
      * This is the object which keeps book about all applicable rules.
      */
@@ -163,20 +162,22 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * @return the strategy that determines automated rule applications for this goal
      */
-    public Strategy<@NonNull Goal> getGoalStrategy() {
+    public Strategy<Goal> getGoalStrategy() {
         if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
         }
         return goalStrategy;
     }
 
-    public void setGoalStrategy(Strategy<@NonNull Goal> p_goalStrategy) {
+    public void setGoalStrategy(Strategy<Goal> p_goalStrategy) {
         goalStrategy = p_goalStrategy;
-        ruleAppManager.clearCache();
+        if (ruleAppManager != null) {
+            ruleAppManager.clearCache();
+        }
     }
 
     @Override
-    public RuleApplicationManager<Goal> getRuleAppManager() {
+    public @Nullable RuleApplicationManager<Goal> getRuleAppManager() {
         return ruleAppManager;
     }
 
@@ -325,7 +326,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return the Sequent to be proved
      */
     @Override
-    public @NonNull Sequent sequent() {
+    public Sequent sequent() {
         return node().sequent();
     }
 
@@ -541,7 +542,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @param n number of goals to create
      * @return the list of new created goals.
      */
-    public @NonNull ImmutableList<@NonNull Goal> split(int n) {
+    public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
@@ -581,7 +582,7 @@ public final class Goal implements ProofGoal<Goal> {
     /// non-null goal transformer to each proof.
     ///
     /// @return the list of new created goals, manipulated by funcs
-    public @NonNull ImmutableList<Goal> split(List<@Nullable Consumer<Goal>> funcs) {
+    public ImmutableList<Goal> splitAndTransform(List<@Nullable Consumer<Goal>> funcs) {
         final var nonNullFuncs = funcs.stream().filter(Objects::nonNull).toList();
         var n = nonNullFuncs.size();
         var goals = split(n);
@@ -626,7 +627,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return new goal(s)
      */
     @Override
-    public ImmutableList<Goal> apply(@NonNull final RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);

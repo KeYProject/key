@@ -179,20 +179,9 @@ public class OutputStreamProofSaver {
                 po.prepareSave(strategyProperties, proof);
             }
 
-            // FIXME weigl
-            // strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-            // StrategyProperties.INF_FLOW_CHECK_FALSE);
             strategySettings.setActiveStrategyProperties(strategyProperties);
             ps.println(writeSettings(proof.getSettings()));
 
-            /*
-             * FIXME weigl
-             * if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
-             * || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-             * strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-             * StrategyProperties.INF_FLOW_CHECK_FALSE);
-             * strategySettings.setActiveStrategyProperties(strategyProperties);
-             */
 
             // declarations of symbols, sorts
             // FIXME this should rather be an AST rewrite, than a bunch of regex.
