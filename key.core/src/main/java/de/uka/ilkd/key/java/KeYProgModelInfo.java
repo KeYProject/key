@@ -612,7 +612,9 @@ public class KeYProgModelInfo {
             (o1, o2) -> o2.getQualifiedName().compareTo(o1.getQualifiedName()));
 
         for (var c : classesArray) {
+            if (!c.equals(ct)) {
             result = recFindImplementations(c, name, signature, result);
+        }
         }
         return result;
     }
