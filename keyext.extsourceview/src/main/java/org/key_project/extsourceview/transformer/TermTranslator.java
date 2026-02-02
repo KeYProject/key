@@ -2,6 +2,7 @@ package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -176,7 +177,7 @@ public class TermTranslator {
     public String translateRaw(JTerm term, boolean singleLine) {
         var ni = new NotationInfo();
 
-        LogicPrinter printer = new LogicPrinter(ni, svc, null);
+        LogicPrinter printer = new LogicPrinter(ni, svc, PosTableLayouter.pure());
         ni.refresh(svc, true, false);
 
         term = removeLabelRecursive(svc.getTermFactory(), term);
@@ -323,9 +324,15 @@ public class TermTranslator {
                     || singleorig.Type == OriginRefType.OPERATION_PRE_WELLFORMED
                     || singleorig.Type == OriginRefType.OPERATION_POST_WELLFORMED
                     || singleorig.Type == OriginRefType.OPERATION_EXC_WELLFORMED)
-                    && term.op().name().toString().equals("wellFormed") && term.arity() == 1
-                    && term.sub(0).op().sort(term.sub(0).subs().toArray(new Sort[]{})).toString().equals("Heap")) {
-                return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
+                    && term.op().name().toString().equals("wellFormed") && term.arity() == 1) {
+                Sort[] sorts = new Sort[term.sub(0).subs().size()];
+                for (int i = 0; i < sorts.length; i++) {
+                    sorts[i] = term.sub(0).subs().get(i).sort();
+                }
+                if (term.sub(0).op().sort(sorts).toString().equals("Heap")) {
+                    return "\\wellFormed(" + term.sub(0).op().toString()
+                        + ")"; // TODO not valid JML
+                }
             }
 
             if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED
@@ -444,8 +451,15 @@ public class TermTranslator {
                         bracketTranslate(term.sub(0), term.sub(0).sub(1), pp, termBasePos, itype));
             }
 
-            if (term.op().name().toString().equals("wellFormed") && term.arity() == 1 && term.sub(0).op().sort(term.sub(0).subs().toArray(new Sort[]{})).toString().equals("Heap")) {
-                return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
+            if (term.op().name().toString().equals("wellFormed")) {
+                Sort[] sorts = new Sort[term.sub(0).subs().size()];
+                for (int i = 0; i < sorts.length; i++) {
+                    sorts[i] = term.sub(0).subs().get(i).sort();
+                }
+                if (term.arity() == 1 && term.sub(0).op().sort(sorts).toString().equals("Heap")) {
+                    return "\\wellFormed(" + term.sub(0).op().toString()
+                        + ")"; // TODO not valid JML
+                }
             }
 
             if (term.op().name().toString().endsWith("::exactInstance") && term.arity() == 1) {
@@ -588,11 +602,16 @@ public class TermTranslator {
             //}
 
             // TODO: WP: fix calls to sort(term.subs()...)
-            if (term.op() instanceof Function && term.op().sort(term.subs().toArray(new Sort[]{})).name().toString().equals("Field")) {
+            Sort[] sorts = new Sort[term.subs().size()];
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = term.subs().get(i).sort();
+            }
+
+            if (term.op() instanceof Function && term.op().sort(sorts).name().toString().equals("Field")) {
                 return term.op().toString();
             }
 
-            if (term.op() instanceof Function && term.op().sort(term.subs().toArray(new Sort[]{})).name().toString().equals("Field")) {
+            if (term.op() instanceof Function && term.op().sort(sorts).name().toString().equals("Field")) {
                 return term.op().toString();
             }
 

@@ -160,7 +160,7 @@ public class JavaPosView extends DebugTab {
         if (pi == PositionInfo.UNDEFINED) {
             return "";
         }
-//        if (pi.getURI() == PositionInfo.UNKNOWN_URI) {
+//        if (pi.getURI() == null) {
 //            return "";
 //        }
 
@@ -203,9 +203,9 @@ public class JavaPosView extends DebugTab {
     }
 
     private String fmtURI(URI u) {
-//        if (u == PositionInfo.UNKNOWN_URI) {
-//            return "UNKNOWN";
-//        }
+        if (u == null) {
+            return "UNKNOWN";
+        }
 
         String str = u.toString();
         if (str.startsWith("file:/") && str.endsWith(".java")) {
