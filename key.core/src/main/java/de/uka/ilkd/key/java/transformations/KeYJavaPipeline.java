@@ -62,8 +62,8 @@ public class KeYJavaPipeline {
     }
 
     public void apply(Collection<CompilationUnit> compilationUnits) {
-        for (JavaTransformer step : steps) {
-            for (CompilationUnit compilationUnit : compilationUnits) {
+        for (CompilationUnit compilationUnit : compilationUnits) {
+            for (JavaTransformer step : steps) {
                 long start = System.currentTimeMillis();
                 step.apply(compilationUnit);
                 long stop = System.currentTimeMillis();

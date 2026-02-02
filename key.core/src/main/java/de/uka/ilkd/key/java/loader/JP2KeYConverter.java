@@ -494,7 +494,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             createProgramElementName(n.getName()),
             map(n.getParameters()),
             thr,
-            body !=null?accept(body):new StatementBlock(), isInInterface);
+            body != null ? accept(body) : new StatementBlock(), isInInterface);
 
         var clazz = getContainingClass(n);
         try {

@@ -633,7 +633,9 @@ public final class JMLTransformer extends JavaTransformer {
 
                 // iterate over all pre-existing constructors
                 for (var constructor : td.getConstructors()) {
-                    transformMethodLevelCommentsHelper(constructor.body(), resource);
+                    if (constructor.getBody().isPresent()) {
+                        transformMethodLevelCommentsHelper(constructor.body(), resource);
+                    }
                 }
 
                 // iterate over all pre-existing methods
