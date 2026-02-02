@@ -136,11 +136,13 @@ public class CharLiteral extends AbstractIntegerLiteral {
      *      https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
      */
     protected static char parseFromString(final String sourceStr) {
-        if (sourceStr.charAt(0) != '\'' || sourceStr.charAt(sourceStr.length() - 1) != '\'') {
-            throw new NumberFormatException("Invalid char delimiters: " + sourceStr);
+        String valStr = sourceStr;
+        if (sourceStr.charAt(0) == '\'' && sourceStr.charAt(sourceStr.length() - 1) == '\'') {
+            valStr = sourceStr.length() == 1 ? sourceStr
+                    : sourceStr.substring(1, sourceStr.length() - 1);
+        } else if (sourceStr.isEmpty()) {
+            throw new NumberFormatException("Empty character does not exist");
         }
-
-        String valStr = sourceStr.substring(1, sourceStr.length() - 1);
 
         /*
          * There are three possible cases:

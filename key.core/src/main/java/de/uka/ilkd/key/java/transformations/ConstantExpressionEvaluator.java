@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.transformations;
 
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyEscapeExpression;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
@@ -61,6 +62,9 @@ public class ConstantExpressionEvaluator {
         }
         if (value instanceof Byte) {
             return new IntegerLiteralExpr(value.toString());
+        }
+        if (value instanceof Character) {
+            return new CharLiteralExpr(value.toString());
         }
         throw new EvaluationException("Can not express the given value as a literal", null);
     }
@@ -217,7 +221,13 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(FieldAccessExpr n, Void arg) {
-            return super.visit(n, arg);
+            final FieldDeclaration fd =
+                (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
+            if (fd.isFinal() && fd.isStatic()) {
+                return visit(fd, arg);
+            } else {
+                return null;
+            }
         }
 
         @Override
