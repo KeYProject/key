@@ -86,6 +86,35 @@ public class JP2KeYTypeConverter {
         this.jp2KeY = jp2KeY;
         this.typeSolver = typeSolver;
         this.services = services;
+
+        // below avoids double registrations
+        // TODO: ask Alexander whether we should cache these types in mapping to avoid this search
+        initializeCaches(jp2KeY);
+    }
+
+    private void initializeCaches(KeYJPMapping jp2KeY) {
+        byte found = 0;
+        for (var kjt : jp2KeY.keYTypes()) {
+            final String fullyQualifiedName = kjt.getFullName();
+            switch (fullyQualifiedName) {
+                case "java.lang.Object":
+                    this.__objectType = kjt;
+                    found += 1;
+                    break;
+                case "java.lang.Cloneable":
+                    this.__cloneableType = kjt;
+                    found += 1;
+                    break;
+                case "java.lang.Serializable":
+                    this.__serializableType = kjt;
+                    found += 1;
+                    break;
+                default:;
+            }
+            if (found == 3) {
+                break;
+            }
+        }
     }
 
     public TypeConverter getTypeConverter() {
