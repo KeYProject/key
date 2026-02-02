@@ -20,7 +20,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.gui.sourceview.SourceView.Highlight;
+import de.uka.ilkd.key.gui.sourceview.SourceViewHighlight;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
@@ -68,7 +68,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private final Set<Highlight> originHighlights = new HashSet<>();
+    private final Set<SourceViewHighlight> originHighlights = new HashSet<>();
 
     /** The sequent view associated with this listener. */
     private final SequentView sequentView;
@@ -107,8 +107,17 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             sequentView.highlight(me.getPoint());
         }
 
+        PosInSequent pos = sequentView.getPosInSequent(me.getPoint());
+
         if (sequentView.isInUserSelectionHighlight(null)) {
-            highlightOriginInSourceView(sequentView.getPosInSequent(me.getPoint()));
+            highlightOriginInSourceView(pos);
+        }
+
+        if (pos != null && pos.getPosInOccurrence() != null) {
+            JTerm term = (JTerm) pos.getPosInOccurrence().subTerm();
+            sequentView.getMainWindow().getMediator().fireTermHover(pos, term);
+        } else {
+            sequentView.getMainWindow().getMediator().fireTermLeaveHover();
         }
     }
 
@@ -121,6 +130,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         if (sequentView.isInUserSelectionHighlight(null)) {
             highlightOriginInSourceView(null);
         }
+
+        sequentView.getMainWindow().getMediator().fireTermLeaveHover();
     }
 
     @Override
@@ -129,16 +140,22 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             return;
         }
 
+        Point point = e.getPoint();
+        PosInSequent pis = sequentView.getPosInSequent(point);
+
         if (SwingUtilities.isMiddleMouseButton(e)
                 || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
-            Point point = e.getPoint();
-            PosInSequent pis = sequentView.getPosInSequent(point);
 
             if (pis == null || pis.isSequent() || sequentView.isInUserSelectionHighlight(point)) {
                 sequentView.removeUserSelectionHighlight();
             } else {
                 sequentView.setUserSelectionHighlight(point);
             }
+        }
+
+        if (pis != null && pis.getPosInOccurrence() != null) {
+            JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
+            sequentView.getMainWindow().getMediator().fireTermClicked(pis, term);
         }
     }
 
@@ -163,6 +180,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         }
 
         SourceView sourceView = SourceView.getSourceView(sequentView.getMainWindow());
+
+        sourceView.removeHighlightsForJMLStatements();
 
         originHighlights.forEach(sourceView::removeHighlight);
         originHighlights.clear();

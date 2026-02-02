@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import org.jspecify.annotations.NonNull;
-import org.key_project.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
@@ -100,7 +99,7 @@ public class JavaPosView extends DebugTab {
         return "Java Stmt Pos";
     }
 
-    private void show(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, Term t) {
+    private void show(@NonNull MainWindow window, @NonNull KeYMediator mediator, PosInSequent pos, JTerm t) {
         if (t.javaBlock().isEmpty()) {
             taSource.setText("NO JAVA BLOCK");
             return;
@@ -118,7 +117,7 @@ public class JavaPosView extends DebugTab {
                     append(" ").
                     append(fmtSource(pi)).
                     append(" ").
-                    append(fmtURI(pi.getURI())).
+                    append(fmtURI(pi.getURI().orElse(null))).
                     append("\n");
 
         }
@@ -158,16 +157,19 @@ public class JavaPosView extends DebugTab {
     }
 
     private String getSourceString(PositionInfo pi) {
-        if (pi.getURI() == PositionInfo.UNKNOWN_URI) {
+        if (pi == PositionInfo.UNDEFINED) {
             return "";
         }
+//        if (pi.getURI() == PositionInfo.UNKNOWN_URI) {
+//            return "";
+//        }
 
         if (sourceStringCache.containsKey(pi)) {
             return sourceStringCache.get(pi);
         }
 
         try {
-            List<String> lines = Files.readAllLines(Path.of(pi.getURI()));
+            List<String> lines = Files.readAllLines(Path.of(pi.getURI().orElse(null)));
 
             var LineStart = pi.getStartPosition().line();
             var LineEnd = pi.getEndPosition().line();
@@ -201,9 +203,9 @@ public class JavaPosView extends DebugTab {
     }
 
     private String fmtURI(URI u) {
-        if (u == PositionInfo.UNKNOWN_URI) {
-            return "UNKNOWN";
-        }
+//        if (u == PositionInfo.UNKNOWN_URI) {
+//            return "UNKNOWN";
+//        }
 
         String str = u.toString();
         if (str.startsWith("file:/") && str.endsWith(".java")) {

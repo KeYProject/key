@@ -5,8 +5,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermImpl;
 import org.jspecify.annotations.NonNull;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -172,7 +172,7 @@ public class OriginRefView extends DebugTab {
             OriginRefView.this.highlightEnabled = cbSec.isSelected();
         }
         {
-            var cbSec = new JCheckBox("Highlight Only Atoms", true);
+            var cbSec = new JCheckBox("SourceViewHighlight Only Atoms", true);
             pnlConf.add(cbSec, gbc(3, 1));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected();
@@ -188,7 +188,7 @@ public class OriginRefView extends DebugTab {
             OriginRefView.this.highlightParents = cbSec.isSelected();
         }
         {
-            var cbSec = new JCheckBox("Highlight union of all children", true);
+            var cbSec = new JCheckBox("SourceViewHighlight union of all children", true);
             pnlConf.add(cbSec, gbc(3, 3));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightAllChildren = cbSec.isSelected();
@@ -266,7 +266,7 @@ public class OriginRefView extends DebugTab {
                 final JTerm rpTerm = (JTerm) rootPos.subTerm();
                 var insertion = SourceViewPatcher.ActiveInsertions.stream().filter(p -> p.getA().Term == rpTerm).findFirst();
                 if (insertion.isPresent()) {
-                    var insterm = insertion.get().getB();
+                    SourceViewInsertion insterm = insertion.get().getB();
                     insterm.setBackgroundOverride(COL_HIGHLIGHT_INS);
                     sv.repaintInsertion(insterm);
                     break;
@@ -322,26 +322,26 @@ public class OriginRefView extends DebugTab {
                 txt.append("----------<SELF>----------\n");
                 txt.append("\n");
 
-                if (t instanceof TermImpl) {
-                    TermImpl term = (TermImpl) t;
+                //if (t instanceof TermImpl) {
+                //    TermImpl term = (TermImpl) t;
 
                     {
-                        for (var o: term.getOriginRef()) {
-                            txt.append(origRefToString(term, o));
+                        for (var o: t.getOriginRef()) {
+                            txt.append(origRefToString(t, o));
                             txt.append("\n");
                         }
                     }
-                }
+                //}
                 txt.append("\n");
             }
 
             if (showSectionSource) {
                 txt.append("----------<SOURCE>----------\n");
                 txt.append("\n");
-                if (t instanceof TermImpl) {
-                    TermImpl term = (TermImpl) t;
+                //if (t instanceof TermImpl) {
+                //    TermImpl term = (TermImpl) t;
 
-                    for (var o: term.getOriginRef().stream().filter(OriginRef::hasFile).collect(Collectors.toList())) {
+                    for (var o: t.getOriginRef().stream().filter(OriginRef::hasFile).collect(Collectors.toList())) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
                             var str = Utils.getLines(o.File, i, i);
                             txt.append(str.stripTrailing()).append("\n");
@@ -352,22 +352,22 @@ public class OriginRefView extends DebugTab {
                             txt.append("\n");
                         }
                     }
-                }
+                //}
             }
 
             if (showSectionChildren) {
                 txt.append("----------<CHILDREN>----------\n");
                 txt.append("\n");
 
-                if (t instanceof TermImpl) {
-                    TermImpl term = (TermImpl) t;
+                //if (t instanceof TermImpl) {
+                //    TermImpl term = (TermImpl) t;
 
-                    for (OriginRef o : Utils.getSubOriginRefs(term, false, false)) {
-                        txt.append(origRefToString(term, o));
+                    for (OriginRef o : Utils.getSubOriginRefs(t, false, false)) {
+                        txt.append(origRefToString(t, o));
                         txt.append("\n");
                     }
 
-                }
+                //}
 
                 txt.append("\n");
             }

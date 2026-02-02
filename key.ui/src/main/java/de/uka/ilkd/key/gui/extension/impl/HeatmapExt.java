@@ -169,10 +169,10 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
         addSeparator("Disable heatmaps");
         addRadio(HeatmapMode.DEFAULT);
-        addSeparator("Highlight sequent formulae");
+        addSeparator("SourceViewHighlight sequent formulae");
         addRadio(HeatmapMode.SF_AGE);
         addRadio(HeatmapMode.SF_NEWEST);
-        addSeparator("Highlight terms");
+        addSeparator("SourceViewHighlight terms");
         addRadio(HeatmapMode.TERMS_AGE);
         addRadio(HeatmapMode.TERMS_NEWEST);
 

@@ -547,4 +547,10 @@ public class JavaDocument extends DefaultStyledDocument {
         mode = Mode.NORMAL;
         state = CommentState.NO;
     }
+
+    public void insertExtraString(int offs, String str, AttributeSet a)
+        throws BadLocationException {
+        // insert the unformatted string as a placeholder
+        super.insertString(offs, str, a);
+    }
 }

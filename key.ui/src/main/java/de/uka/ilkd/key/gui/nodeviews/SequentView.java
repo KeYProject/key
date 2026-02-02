@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -148,6 +149,10 @@ public abstract class SequentView extends JEditorPane {
     private @Nullable Object userSelectionHighlight = null;
     private @Nullable Range userSelectionHighlightRange = null;
     private @Nullable PosInSequent userSelectionHighlightPis = null;
+
+    private List<Object> sourceSelectionHighlight = null;
+    private List<Range> sourceSelectionHighlightRange = null;
+    private List<PosInSequent> sourceSelectionHighlightPis = null;
 
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -318,7 +323,7 @@ public abstract class SequentView extends JEditorPane {
         try {
             highlight = getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
-            LOGGER.debug("Highlight range out of scope.", e);
+            LOGGER.debug("SourceViewHighlight range out of scope.", e);
         }
         return highlight;
     }
@@ -1040,6 +1045,40 @@ public abstract class SequentView extends JEditorPane {
      */
     public boolean isMainSequentView() {
         return true;
+    }
+
+    public void setSourceSelectionHighlight(List<PosInSequent> pisl, Color c) {
+        removeSourceSelectionHighlight();
+
+        try {
+            InitialPositionTable posTable = printer.layouter().getInitialPositionTable();
+
+            sourceSelectionHighlightPis = new ArrayList<>();
+            sourceSelectionHighlightRange = new ArrayList<>();
+            sourceSelectionHighlight = new ArrayList<>();
+
+            for (var pis : pisl) {
+                sourceSelectionHighlightPis.add(pis);
+                var r = posTable.rangeForPath(posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+                sourceSelectionHighlight.add(getHighlighter().addHighlight(
+                    r.start() + 1, // same +1 as in ::getHighlightedText
+                    r.end() + 1,
+                    new DefaultHighlightPainter(c)));
+            }
+
+        } catch (BadLocationException e) {
+            LOGGER.debug("Error while setting permanent highlight", e);
+        }
+    }
+
+    public void removeSourceSelectionHighlight() {
+        if (sourceSelectionHighlight != null) {
+            for (Object h: sourceSelectionHighlight) getHighlighter().removeHighlight(h);
+        }
+
+        sourceSelectionHighlight = null;
+        sourceSelectionHighlightPis = null;
+        sourceSelectionHighlightRange = null;
     }
 
     /**

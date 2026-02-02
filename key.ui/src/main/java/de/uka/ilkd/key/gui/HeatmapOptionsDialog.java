@@ -260,9 +260,9 @@ public class HeatmapOptionsDialog extends JDialog {
             p.setLayout(new BorderLayout());
             JLabel dis = new JLabel("Disable heatmaps");
             dis.setAlignmentX(.5f);
-            JLabel sf = new JLabel("Highlight sequent formulae");
+            JLabel sf = new JLabel("SourceViewHighlight sequent formulae");
             sf.setAlignmentX(.5f);
-            JLabel terms = new JLabel("Highlight terms");
+            JLabel terms = new JLabel("SourceViewHighlight terms");
             terms.setAlignmentX(.5f);
             if (i == 0) {
                 radioBoxes.add(dis);

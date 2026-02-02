@@ -3,6 +3,7 @@ package org.key_project.extsourceview.utils;
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -141,8 +142,8 @@ public class SymbolicExecutionAndSimplificationRunner {
     }
 
     public boolean canApply() {
-        var containsJava1 = node.sequent().succedent().asList().stream().anyMatch(p -> p.formula().containsJavaBlockRecursive());
-        var containsJava2 = node.sequent().antecedent().asList().stream().anyMatch(p -> p.formula().containsJavaBlockRecursive());
+        var containsJava1 = node.sequent().succedent().asList().stream().anyMatch(p -> ((JTerm)p.formula()).containsJavaBlockRecursive());
+        var containsJava2 = node.sequent().antecedent().asList().stream().anyMatch(p -> ((JTerm)p.formula()).containsJavaBlockRecursive());
 
         var topLevel = new PosInOccurrence(node.sequent().getFormulaByNr(1), PosInTerm.getTopLevel(), false);
 

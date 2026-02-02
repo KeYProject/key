@@ -36,7 +36,7 @@ public class SequentViewSearchBar extends SearchBar {
         ColorSettings.define("[sequentSearchBar]highlight_2", "", new Color(0, 140, 255, 100));
 
     public enum SearchMode {
-        HIGHLIGHT("Highlight", IconFactory.SEARCH_HIGHLIGHT.get(16)),
+        HIGHLIGHT("SourceViewHighlight", IconFactory.SEARCH_HIGHLIGHT.get(16)),
         HIDE("Hide", IconFactory.SEARCH_HIDE.get(16)),
         REGROUP("Regroup", IconFactory.SEARCH_REGROUP.get(16));
 

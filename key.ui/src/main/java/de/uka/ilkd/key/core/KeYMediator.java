@@ -15,13 +15,16 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -292,6 +295,10 @@ public class KeYMediator {
         keySelectionModel.addKeYSelectionListenerChecked(listener);
     }
 
+    public void addSequentInteractionListener(SequentInteractionListener listener) {
+        listenerList.add(SequentInteractionListener.class, listener);
+    }
+
     /**
      * removes a listener from the KeYSelectionModel
      *
@@ -407,6 +414,27 @@ public class KeYMediator {
             if (listeners[i] == GUIListener.class) {
                 ((GUIListener) listeners[i + 1]).shutDown(e);
             }
+        }
+    }
+
+    public synchronized void fireTermHover(PosInSequent pos, JTerm term) {
+        for (SequentInteractionListener listener : listenerList
+            .getListeners(SequentInteractionListener.class)) {
+            listener.hover(pos, term);
+        }
+    }
+
+    public synchronized void fireTermLeaveHover() {
+        for (SequentInteractionListener listener : listenerList
+            .getListeners(SequentInteractionListener.class)) {
+            listener.leaveHover();
+        }
+    }
+
+    public synchronized void fireTermClicked(PosInSequent pos, JTerm term) {
+        for (SequentInteractionListener listener : listenerList
+            .getListeners(SequentInteractionListener.class)) {
+            listener.click(pos, term);
         }
     }
 
