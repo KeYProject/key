@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
@@ -234,7 +235,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ImmutableList<LocationVariable> paramVars, Services services) {
         JTerm frameTerm = null;
         for (LocationVariable heap : modifiableHeaps) {
-            final JTerm ft;
+            JTerm ft;
             if (!getContract().hasModifiable(heap)) {
                 if (!getContract().hasFreeModifiable(heap)) {
                     ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
@@ -252,6 +253,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                         getContract().getFreeModifiable(heap, selfVar, paramVars, services)));
                 }
             }
+            ft = tb.tf().setOriginRefTypeRecursive(ft, OriginRefType.JML_ASSIGNABLE, true);
 
             if (frameTerm == null) {
                 frameTerm = ft;

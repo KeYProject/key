@@ -255,7 +255,11 @@ public class OriginRef {
     private static boolean calculateIsBooleanTerm(Term t) {
         if (t == null) return false;
 
-        return t.op().sort(t.subs().toArray(new Sort[0])) == JavaDLTheory.FORMULA; //TODO is this right?
+        Sort[] sorts = new Sort[t.subs().size()];
+        for (int i = 0; i < sorts.length; i++) {
+            sorts[i] = t.subs().get(i).sort();
+        }
+        return t.op().sort(sorts) == JavaDLTheory.FORMULA;
     }
 
     private static boolean hasAtomChildren(Term t) {

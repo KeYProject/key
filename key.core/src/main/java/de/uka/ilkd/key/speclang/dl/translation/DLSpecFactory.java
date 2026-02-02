@@ -17,6 +17,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.equality.OriginRefProperty;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
@@ -78,7 +79,8 @@ public final class DLSpecFactory {
             if (!(eu.lhs() instanceof ProgramVariable)) {
                 throw new ProofInputException(
                     "Program variable expected, " + "but found: " + eu.lhs());
-            } else if (!update.sub(0).equals(services.getTermBuilder().getBaseHeap())) {
+            } else if (!update.sub(0).equalsModProperty(services.getTermBuilder().getBaseHeap(),
+                OriginRefProperty.ORIGIN_REF_PROPERTY)) {
                 throw new ProofInputException("heap expected, " + "but found: " + update.sub(0));
             } else {
                 return (LocationVariable) eu.lhs();

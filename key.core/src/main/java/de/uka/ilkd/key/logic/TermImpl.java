@@ -310,6 +310,11 @@ class TermImpl implements JTerm {
 
         final TermImpl t = (TermImpl) o;
 
+        if ((originRef == null) != (t.originRef == null))
+            return false;
+        if (originRef != null && !originRef.equals(t.originRef))
+            return false;
+
         return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
                 && boundVars.equals(t.boundVars)
                 // TODO (DD): below is no longer necessary
@@ -335,6 +340,8 @@ class TermImpl implements JTerm {
         hashcode = hashcode * 17 + subs().hashCode();
         hashcode = hashcode * 17 + boundVars().hashCode();
         hashcode = hashcode * 17 + javaBlock().hashCode();
+
+        hashcode = hashcode * 7 + ((originRef != null) ? originRef.hashCode() : 0);
 
         if (hashcode == -1) {
             hashcode = 0;

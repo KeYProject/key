@@ -5,15 +5,24 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenamingTable;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -25,8 +34,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -97,7 +108,19 @@ public abstract class TacletExecutor
                 (SVInstantiations) mc.getInstantiations(), goal,
                 taclet, tacletApp);
         term.execPostOrder(srVisitor);
-        return srVisitor.getTerm();
+        JTerm res = srVisitor.getTerm();
+
+        // TODO: WP: might be too early ...
+        if (applicationPosInOccurrence != null) {
+            // if applicationPosInOccurence == null then the source term does not exist in the sequent (eg [CUT])
+
+            JTerm apioTerm = (JTerm) applicationPosInOccurrence.subTerm();
+
+            res = updateOriginRefs(apioTerm, res, services, goal, tacletApp);
+
+        }
+
+        return res;
     }
 
     protected Term applyContextUpdate(
@@ -257,5 +280,106 @@ public abstract class TacletExecutor
         goal.node().setRenamings(renamings);
     }
 
+    protected JTerm updateOriginRefs(JTerm findTerm, JTerm replTerm, LogicServices svc, Goal goal, RuleApp ruleApp) {
+        TermFactory tf = ((Services)svc).getTermFactory();
 
+        // remove UNKNOWN|no-src origins ( can come from invariant instanciations )
+        if (replTerm.getOriginRef().stream().anyMatch(p -> p.Type == OriginRefType.UNKNOWN && !p.hasFile())) {
+            List<OriginRef> cleaned = replTerm.getOriginRef().stream().filter(p -> p.Type != OriginRefType.UNKNOWN || p.hasFile()).collect(
+                Collectors.toList());
+            replTerm = tf.setOriginRef(replTerm, cleaned);
+        }
+
+        if (replTerm.getOriginRef().isEmpty()) {
+            // do not add a new origin if the term already has one
+            // this means that we haven't created a new term but extracted a sub-term from the find clause
+            // (e.g. andLeft{} )
+            // in this case we do _not_ wand to add the find origin to the origin-list
+            replTerm = tf.addOriginRef(replTerm, findTerm.getOriginRef());
+        }
+
+        if (ruleApp instanceof TacletApp) {
+            var ifinst = ((TacletApp)ruleApp).assumesFormulaInstantiations();
+            if (ifinst != null) {
+                var assumeTerms = ifinst.stream().map(p -> p.getSequentFormula().formula()).collect(Collectors.toList());
+                for (Term at: assumeTerms) {
+                    replTerm = tf.addOriginRef(replTerm, ((JTerm)at).getOriginRef());
+                }
+            }
+        }
+
+        SourceElement procStmt = getProcessedStatement(goal, findTerm, replTerm);
+        if (procStmt != null) {
+            // We land here if:
+            // - The taclet matched a diamond-op replTerm java code
+            // - And replaced it replTerm an update-application
+            // - and we found a node with an activeStatement replTerm a valid PositionInfo
+            // --> TODO check this logic
+
+            OriginRef origref = OriginRef.fromStatement(procStmt);
+
+            replTerm = patchCreatedUpdateApplicationOrigin(tf, replTerm, origref);
+        }
+
+        return replTerm;
+    }
+
+    private JTerm patchCreatedUpdateApplicationOrigin(TermFactory tf, JTerm t, OriginRef origref) {
+        JTerm s1 = t.sub(0);
+        JTerm s2 = t.sub(1);
+
+        if (s2.op() != UpdateApplication.UPDATE_APPLICATION) {
+            s1 = tf.addOriginRefRecursive(s1, origref);
+            return tf.createTerm(t.op(), new ImmutableArray<>(s1, s2), t.boundVars(), t.getLabels(), t.getOriginRef());
+        } else {
+            s2 = patchCreatedUpdateApplicationOrigin(tf, s2, origref);
+            return tf.createTerm(t.op(), new ImmutableArray<>(s1, s2), t.boundVars(), t.getLabels(), t.getOriginRef());
+        }
+    }
+
+    private JTerm getCreatedUpdateApplicationOrigin(JTerm t) {
+        if (t.op() != UpdateApplication.UPDATE_APPLICATION) {
+            return null;
+        }
+
+        JTerm s1 = t.sub(0);
+        JTerm s2 = t.sub(1);
+
+        if (s2.op() != UpdateApplication.UPDATE_APPLICATION) {
+            return s1;
+        } else {
+            return getCreatedUpdateApplicationOrigin(s2);
+        }
+    }
+
+    private SourceElement getProcessedStatement(Goal goal, JTerm findTerm, JTerm replTerm) {
+
+        while (findTerm.op() instanceof UpdateApplication) {
+            findTerm = findTerm.sub(1);
+        }
+
+        if (findTerm.javaBlock() == null) return null;
+        // TODO: WP: Correct? What was the effect of that?
+        if (findTerm.op() instanceof JModality mod && mod.kind() != JModality.JavaModalityKind.DIA) return null;
+
+        JTerm newUpdate = getCreatedUpdateApplicationOrigin(replTerm);
+        if (newUpdate == null) return null;
+
+        if (replTerm.op() != UpdateApplication.UPDATE_APPLICATION) return null;
+        if (!newUpdate.getOriginRefRecursive().isEmpty()) return null;
+
+        Node node = goal.node();
+        SourceElement activeStatement = null;
+        while ((activeStatement == null || activeStatement.getPositionInfo() == PositionInfo.UNDEFINED /*|| activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI*/) && node != null) {
+            activeStatement = node.getNodeInfo().getActiveStatement();
+            node = node.parent();
+        }
+
+        if (activeStatement == null) return null;
+
+        if (activeStatement.getPositionInfo() == PositionInfo.UNDEFINED) return null;
+        //if (activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI) return null;
+
+        return activeStatement;
+    }
 }

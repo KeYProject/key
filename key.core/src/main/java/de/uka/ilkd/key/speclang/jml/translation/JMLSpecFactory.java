@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -485,9 +486,9 @@ public class JMLSpecFactory {
             ContractClauses clauses, Behavior originalBehavior) {
         boolean empty = axioms.isEmpty() // either the list is empty
                 || (axioms.size() == 1 // or the first element is an empty method_decl
-                        && axioms.head().first instanceof JmlParser.Method_declarationContext
+                        && axioms.head().ctx instanceof JmlParser.Method_declarationContext
                         && ((JmlParser.Method_declarationContext) axioms
-                                .head().first).method_body == null);
+                                .head().ctx).method_body == null);
         if (empty) {
             clauses.axioms.put(heap, null);
         } else {
@@ -611,9 +612,9 @@ public class JMLSpecFactory {
             Context context, ProgramVariableCollection progVars, ContractClauses clauses) {
         for (TextualJMLSpecCase.Abbreviation abbrv : textualSpecCase.getAbbreviations()) {
             final KeYJavaType abbrKJT =
-                services.getJavaInfo().getKeYJavaType(abbrv.typeName().first.getText());
+                services.getJavaInfo().getKeYJavaType(abbrv.typeName().ctx.getText());
             final ProgramElementName abbrVarName =
-                new ProgramElementName(abbrv.abbrevName().first.getText());
+                new ProgramElementName(abbrv.abbrevName().ctx.getText());
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
@@ -701,7 +702,7 @@ public class JMLSpecFactory {
                     throw new SLTranslationException(
                         "\"assignable \\strictly_nothing\" cannot be joined with other "
                             + "\"assignable\" clauses (even if they declare the same).",
-                        Location.fromToken(expr.first.start));
+                        Location.fromToken(expr.ctx.start));
                 }
                 return tb.empty();
             }
@@ -927,6 +928,7 @@ public class JMLSpecFactory {
                         (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
                         new Origin(SpecType.ENSURES));
+                    excNull = tb.tf().setOriginRefTypeRecursive(excNull, OriginRefType.IMPLICIT_ENSURES_EXCNULL, true);
                     JTerm post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))
                             : tb.imp(excNull, tb.convertToFormula(clauses.ensures.get(heap))));
@@ -1170,7 +1172,7 @@ public class JMLSpecFactory {
             if (p.first.equals(kjt) && p.second.equals(rep.first)) {
                 throw new SLTranslationException(
                     "JML represents clauses must occur uniquely per type and target.",
-                    Location.fromToken(originalRep.first.start));
+                    Location.fromToken(originalRep.ctx.start));
             }
         }
         modelFields.add(new Pair<>(kjt, rep.first));
@@ -1193,7 +1195,7 @@ public class JMLSpecFactory {
 
         // check whether there already is a represents clause
         if (!modelFields.add(new Pair<>(kjt, rep.first))) {
-            Token start = clause.first.start;
+            Token start = clause.ctx.start;
             throw new SLWarningException(
                 "JML represents clauses must occur uniquely per " + "type and target."
                     + "\nAll but one are ignored.",
@@ -1870,7 +1872,8 @@ public class JMLSpecFactory {
 
         final String invariantFor = "\\invariant_for(this)";
         final LabeledParserRuleContext ctxFor = new LabeledParserRuleContext(
-            JmlFacade.parseExpr(invariantFor), ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+                    JmlFacade.parseExpr(invariantFor), OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT,
+            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
 
         specCase.addClause(ENSURES, ctxFor);
         specCase.addClause(ENSURES, ini.getOriginalSpec());
@@ -1897,8 +1900,8 @@ public class JMLSpecFactory {
                     JMLSpecExtractor.createNonNullPositionedString(
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
-                        Location.fromToken(originalSpec.first.start),
-                        services);
+                        Location.fromToken(originalSpec.ctx.start),
+                        services, null);
                 res = res.append(nonNullPositionedString);
             }
         }

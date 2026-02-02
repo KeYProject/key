@@ -184,7 +184,7 @@ public class TermTranslator {
 
         printer.printTerm(term);
 
-        var v = printer.toString();
+        var v = printer.result();
 
         if (singleLine) {
             v = v.replaceAll("\\r", "").replaceAll("\\n", " ").replaceAll("[ ]{2,}", " ");
@@ -601,7 +601,6 @@ public class TermTranslator {
             //    return translate(term.sub(0)) + ".length";
             //}
 
-            // TODO: WP: fix calls to sort(term.subs()...)
             Sort[] sorts = new Sort[term.subs().size()];
             for (int i = 0; i < sorts.length; i++) {
                 sorts[i] = term.subs().get(i).sort();

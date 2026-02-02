@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.settings.Configuration;
@@ -613,21 +614,33 @@ public abstract class AbstractOperationPO extends AbstractPO {
             ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services services) {
         // "self != null"
-        final JTerm selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
+        JTerm selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
+        selfNotNull = services.getTermFactory().setOriginRefTypeRecursive(selfNotNull,
+            OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL, true);
 
         // "self.<created> = TRUE"
-        final JTerm selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
+        JTerm selfCreated = generateSelfCreated(heaps, getProgramMethod(), selfVar, services);
+        selfCreated = services.getTermFactory().setOriginRefTypeRecursive(selfCreated,
+            OriginRefType.IMPLICIT_REQUIRES_SELFCREATED, true);
 
         // "MyClass::exactInstance(self) = TRUE"
-        final JTerm selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
+        JTerm selfExactType = generateSelfExactType(getProgramMethod(), selfVar, selfKJT);
+        selfExactType = services.getTermFactory().setOriginRefTypeRecursive(selfExactType,
+            OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE, true);
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         JTerm paramsOK = generateParamsOK(paramVars);
+        paramsOK = services.getTermFactory().setOriginRefTypeRecursive(paramsOK,
+            OriginRefType.IMPLICIT_REQUIRES_PARAMSOK, true);
 
         // initial value of measured_by clause
-        final JTerm mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
+        JTerm mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
+        mbyAtPreDef = services.getTermFactory().setOriginRefTypeRecursive(mbyAtPreDef,
+            OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL, true);
+
+        // wellFormed(heap)
         JTerm wellFormed = null;
         for (LocationVariable heap : heaps) {
             final JTerm wf = tb.wellFormed(tb.var(heap));
@@ -637,6 +650,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 wellFormed = tb.and(wellFormed, wf);
             }
         }
+        wellFormed = (wellFormed == null) ? null
+            : services.getTermFactory().setOriginRefTypeRecursive(wellFormed,
+            OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP, true);
 
         JTerm result = tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull, selfCreated,
             selfExactType, paramsOK, mbyAtPreDef);

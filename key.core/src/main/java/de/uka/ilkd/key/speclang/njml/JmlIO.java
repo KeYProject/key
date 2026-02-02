@@ -119,7 +119,7 @@ public class JmlIO {
      */
     public @NonNull Pair<IObserverFunction, JTerm> translateRepresents(
             @NonNull LabeledParserRuleContext clause) {
-        Pair<IObserverFunction, JTerm> p = translateRepresents(clause.first);
+        Pair<IObserverFunction, JTerm> p = translateRepresents(clause.ctx);
         return new Pair<>(p.first, p.second);
     }
 
@@ -145,7 +145,7 @@ public class JmlIO {
     @SuppressWarnings("unchecked")
     public Pair<Label, JTerm> translateLabeledClause(LabeledParserRuleContext parserRuleContext,
             OriginTermLabel.SpecType type) {
-        Pair<Label, JTerm> t = (Pair<Label, JTerm>) interpret(parserRuleContext.first);
+        Pair<Label, JTerm> t = (Pair<Label, JTerm>) interpret(parserRuleContext.ctx);
         return new Pair<>(t.first, attachTermLabel(t.second, type));
     }
 
@@ -204,9 +204,9 @@ public class JmlIO {
      * attached.
      */
     public JTerm translateTerm(LabeledParserRuleContext expr) {
-        JTerm term = translateTerm(expr.first);
-        if (expr.second != null) {
-            return services.getTermBuilder().addLabel(term, expr.second);
+        JTerm term = translateTerm(expr.ctx);
+        if (expr.label != null) {
+            return services.getTermBuilder().addLabel(term, expr.label);
         } else {
             return term;
         }
@@ -217,10 +217,10 @@ public class JmlIO {
      * labels {@code type} and in labeled parse tree.
      */
     public JTerm translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
-        JTerm term = translateTerm(expr.first);
+        JTerm term = translateTerm(expr.ctx);
         OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
-        if (expr.second != null) {
-            return services.getTermBuilder().addLabel(term, expr.second);
+        if (expr.label != null) {
+            return services.getTermBuilder().addLabel(term, expr.label);
         } else {
             return services.getTermBuilder().addLabel(term, origin);
         }
@@ -246,9 +246,9 @@ public class JmlIO {
      * @see #translateTerm(LabeledParserRuleContext)
      */
     public JTerm translateTermAsFormula(final LabeledParserRuleContext condition) {
-        JTerm term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
-        if (condition.second != null) {
-            return services.getTermBuilder().addLabel(term, condition.second);
+        JTerm term = services.getTermBuilder().convertToFormula(translateTerm(condition.ctx));
+        if (condition.label != null) {
+            return services.getTermBuilder().addLabel(term, condition.label);
         }
         return term;
     }
@@ -282,7 +282,7 @@ public class JmlIO {
      * label.
      */
     public InfFlowSpec translateInfFlow(LabeledParserRuleContext expr) {
-        return translateInfFlow(expr.first);
+        return translateInfFlow(expr.ctx);
     }
 
     /**
@@ -308,7 +308,7 @@ public class JmlIO {
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
     public TranslatedDependencyContract translateDependencyContract(LabeledParserRuleContext ctx) {
-        return translateDependencyContract(ctx.first);
+        return translateDependencyContract(ctx.ctx);
     }
     // endregion
 

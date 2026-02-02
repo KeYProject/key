@@ -31,7 +31,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return inv.first.getText();
+        return inv.ctx.getText();
     }
 
 

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.nparser.KeyAst;
 
 import org.key_project.util.collection.ImmutableSLList;
@@ -15,11 +16,17 @@ import org.antlr.v4.runtime.RuleContext;
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final KeyAst.Expression context;
     private final Kind kind;
+    private final OriginRefType originRef;
 
-    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause, OriginRefType originRef) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
+        this.originRef = originRef;
+    }
+
+    public OriginRefType getOriginRef() {
+        return originRef;
     }
 
     public KeyAst.Expression getContext() {

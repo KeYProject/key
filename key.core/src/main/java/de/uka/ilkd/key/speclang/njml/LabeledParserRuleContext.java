@@ -8,6 +8,7 @@ import java.net.URI;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -18,31 +19,53 @@ import org.jspecify.annotations.Nullable;
  */
 public class LabeledParserRuleContext {
 
-    public final @Nullable ParserRuleContext first;
-    public final @Nullable TermLabel second;
+    public final @Nullable ParserRuleContext ctx;
+    public final @Nullable TermLabel label;
+    public final @Nullable OriginRefType refType;
 
-    public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) {
+
+    public LabeledParserRuleContext(ParserRuleContext ctx, OriginRefType refType, TermLabel label) {
+        if (ctx == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
+        this.ctx = ctx;
+        this.label = label;
+        this.refType = refType;
+    }
+
+    public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType,
+                                    OriginRefType refType) {
+        if (ctx == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
+        this.ctx = ctx;
+        this.label = constructTermLabel(ctx, specType);
+        this.refType = refType;
+    }
+
+    public LabeledParserRuleContext(ParserRuleContext ctx, TermLabel label) {
+        if (ctx == null) {
             throw new IllegalArgumentException("ParserRuleContext is null");
         }
-        this.first = first;
-        this.second = second;
+        this.ctx = ctx;
+        this.label = label;
+        this.refType = null;
     }
 
 
-    public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) {
+    public LabeledParserRuleContext(ParserRuleContext ctx) {
+        if (ctx == null) {
             throw new IllegalArgumentException("ParserRuleContext is null");
         }
-        this.first = first;
-        second = null;
+        this.ctx = ctx;
+        label = null;
+        refType = null;
     }
 
     public static LabeledParserRuleContext createLabeledParserRuleContext(ParserRuleContext ctx,
-            OriginTermLabel.SpecType specType, boolean attachOriginLabel) {
+            OriginTermLabel.SpecType specType, OriginRefType refType, boolean attachOriginLabel) {
+
         return attachOriginLabel
-                ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType))
-                : new LabeledParserRuleContext(ctx);
+            ? new LabeledParserRuleContext(ctx, refType, constructTermLabel(ctx, specType))
+            : new LabeledParserRuleContext(ctx, refType, null);
     }
 
     private LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {

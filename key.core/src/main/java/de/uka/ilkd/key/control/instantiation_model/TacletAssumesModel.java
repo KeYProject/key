@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -128,6 +129,9 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
             term = services.getTermBuilder().addLabelToAllSubs(term,
                 new NodeOrigin(SpecType.USER_INTERACTION,
                     app.rule().displayName(), goal.node().serialNr()));
+
+            term = services.getTermFactory().setOriginRefTypeRecursive(term,
+                OriginRefType.USER_INTERACTION, true);
 
             return new AssumesFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {

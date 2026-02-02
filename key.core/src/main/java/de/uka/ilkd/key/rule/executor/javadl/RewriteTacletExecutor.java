@@ -60,7 +60,7 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             with = services.getTermBuilder().cast(maxSort, with);
         }
 
-        return with;
+        return updateOriginRefs(term, with, services, goal, ruleApp);
     }
 
 

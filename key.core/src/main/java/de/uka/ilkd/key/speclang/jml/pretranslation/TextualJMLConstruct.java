@@ -92,7 +92,7 @@ public abstract class TextualJMLConstruct {
     }
 
     protected void setPosition(LabeledParserRuleContext ps) {
-        setPosition(ps.first);
+        setPosition(ps.ctx);
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class TextualJMLConstruct {
     @Deprecated
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
             @NonNull LabeledParserRuleContext ps) {
-        String t = ps.first.getText();
+        String t = ps.ctx.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
             l = l.append(ps);

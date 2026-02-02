@@ -39,6 +39,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -235,6 +237,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
             final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
+            services.getOriginFuncNameMap().put(pv, anonFuncName);
             final JTerm elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;
@@ -249,7 +252,7 @@ public final class WhileInvariantRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, JTerm modifiable,
-            LoopSpecification inv, Services services) {
+            LoopSpecification inv, Services services, LoopInvariantBuiltInRuleApp app) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
@@ -265,12 +268,21 @@ public final class WhileInvariantRule implements BuiltInRule {
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops
-        final JTerm anonUpdate;
+        JTerm anonUpdate;
         if (tb.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, modifiable, anonHeapTerm);
         }
+
+        anonUpdate = tb.tf().addOriginRefRecursive(anonUpdate, new OriginRef(
+            app.getLoopStatement().getPositionInfo().getURI().toString(),
+            app.getLoopStatement().getStartPosition().line(),
+            app.getLoopStatement().getStartPosition().line(),
+            app.getLoopStatement().getStartPosition().column(),
+            app.getLoopStatement().getStartPosition().column(),
+            OriginRefType.LOOP_ANONUPDATE,
+            anonUpdate));
 
         return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
     }
@@ -543,8 +555,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private SequentFormula initFormula(TermLabelState termLabelState,
-            Instantiation inst,
+    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
             final JTerm invTerm, JTerm reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
         JTerm sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
@@ -605,10 +616,17 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
-            RuleApp ruleApp, Instantiation inst, final JTerm invTerm,
+            RuleApp ruleApp, Instantiation inst, JTerm invTerm,
             JTerm reachableState,
             Goal initGoal) {
+        final TermBuilder tb = services.getTermBuilder();
+
         initGoal.setBranchLabel("Invariant Initially Valid");
+
+        invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, true);
+        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED, true);
+
+
         initGoal.changeFormula(
             initFormula(termLabelState, inst, invTerm, reachableState, services, initGoal),
             ruleApp.posInOccurrence());
@@ -620,11 +638,21 @@ public final class WhileInvariantRule implements BuiltInRule {
     private void prepareBodyPreservesBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, final Sequent applicationSequent,
             Instantiation inst,
-            final JTerm invTerm, JTerm wellFormedAnon, JTerm frameCondition, final JTerm variantPO,
-            Goal bodyGoal, final JavaBlock guardJb, final JTerm guardTrueTerm,
-            final JTerm[] uBeforeLoopDefAnonVariant, final JTerm uAnonInv) {
+            JTerm invTerm, JTerm wellFormedAnon, JTerm frameCondition, JTerm variantPO,
+            Goal bodyGoal, final JavaBlock guardJb, JTerm guardTrueTerm,
+            final JTerm[] uBeforeLoopDefAnonVariant, JTerm uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
+
+        wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED, true);
+        uAnonInv = tb.tf().setOriginRefTypeRecursive(uAnonInv, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE, true);
+
+        frameCondition = tb.tf().setOriginRefTypeRecursive(frameCondition, OriginRefType.LOOP_BODYPRESERVEDINV_ASSIGNABLE, true);
+        variantPO = tb.tf().setOriginRefTypeRecursive(variantPO, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, true);
+        guardTrueTerm = tb.tf().setOriginRefTypeRecursive(guardTrueTerm, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD, true);
+
+        invTerm = tb.tf().setOriginRefTypeRecursive(invTerm, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER, true);
+
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
 
         bodyGoal.addFormula(new SequentFormula(uAnonInv), true, false);
@@ -641,12 +669,18 @@ public final class WhileInvariantRule implements BuiltInRule {
     private void prepareUseCaseBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, Instantiation inst, JTerm wellFormedAnon,
             Goal useGoal,
-            final JavaBlock guardJb, final JTerm guardFalseTerm, final JTerm[] uAnon,
-            final JTerm uAnonInv) {
+            final JavaBlock guardJb, JTerm guardFalseTerm, final JTerm[] uAnon,
+            JTerm uAnonInv) {
+        final TermBuilder tb = services.getTermBuilder();
+
         useGoal.setBranchLabel("Use Case");
+
+        guardFalseTerm = tb.tf().setOriginRefTypeRecursive(guardFalseTerm, OriginRefType.LOOP_USECASE_GUARD, true);
+        uAnonInv = tb.tf().setOriginRefTypeRecursive(uAnonInv, OriginRefType.LOOP_USECASE_INVARIANT, true);
+        wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.LOOP_USECASE_WELLFORMED, true);
+
         useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        final TermBuilder tb = services.getTermBuilder();
 
         JTerm guardFalseRestPsi = useCaseFormula(termLabelState, services, ruleApp, inst, useGoal,
             guardJb, guardFalseTerm);
@@ -824,7 +858,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon =
-                createAnonUpdate(heap, modifiables.get(heap), inst.inv, services);
+                createAnonUpdate(heap, modifiables.get(heap), inst.inv, services, loopRuleApp);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if (anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;
