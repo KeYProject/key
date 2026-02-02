@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -350,7 +351,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public boolean implicit() {
-        return getProgramElementName().toString().charAt(0) == '<';
+        return getProgramElementName().toString()
+                .charAt(0) == JavaDLFieldNames.IMPLICIT_NAME_PREFIX;
     }
 
     public MethodName getMethodName() {
