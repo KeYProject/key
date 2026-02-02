@@ -268,7 +268,7 @@ public class Configuration {
 
     /**
      * Returns a list of strings for the given name.
-     *
+     * <p>
      * In contrast to the other methods, this method does not throw an exception if the entry does
      * not
      * exist in the configuration. Instead, it returns an empty list.
@@ -286,6 +286,19 @@ public class Configuration {
             throw new ClassCastException();
         }
         return (List<String>) result;
+    }
+
+    /**
+     * Returns a list of integer values given by the name.
+     */
+    @Nullable
+    public List<Long> getIntList(String name) {
+        var seq = get(name, List.class);
+        if (seq == null)
+            return null;
+        if (!seq.stream().allMatch(it -> it instanceof Long))
+            throw new ClassCastException();
+        return seq;
     }
 
     /**
@@ -332,7 +345,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the meta data corresponding to the given entry.
+     * Returns the meta-data corresponding to the given entry.
      */
     @Nullable
     public ConfigurationMeta getMeta(String name) {
@@ -451,14 +464,19 @@ public class Configuration {
     }
 
     // TODO Add documentation for this.
+
     /**
      * POJO for metadata of configuration entries.
      */
     public static class ConfigurationMeta {
-        /** Position of declaration within a file */
+        /**
+         * Position of declaration within a file
+         */
         private Position position;
 
-        /** documentation given in the file */
+        /**
+         * documentation given in the file
+         */
         private String documentation;
 
         public Position getPosition() {
@@ -533,6 +551,8 @@ public class Configuration {
                 printValue(value.toString());
             } else if (value == null) {
                 printValue("null");
+            } else if (value instanceof int[] array) {
+                printSeq(array);
             } else {
                 throw new IllegalArgumentException("Unexpected object: " + value);
             }
@@ -563,6 +583,19 @@ public class Configuration {
 
         private ConfigurationWriter print(String s) {
             out.print(s);
+            return this;
+        }
+
+        private ConfigurationWriter printSeq(int[] values) {
+            out.format("[");
+            for (var i = 0; i < values.length; i++) {
+                int o = values[i];
+                printValue(o);
+                if (i + 1 < values.length) {
+                    print(", ");
+                }
+            }
+            out.format("]");
             return this;
         }
 

@@ -34,7 +34,9 @@ import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -392,6 +394,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
             }
+
+            if (getMediator().getSelectedProof() == proof) {
+                saver.setPathToLastSelectedNode(getMediator().getSelectedNode().getPosInProof());
+            }
+
             String errorMsg;
             try {
                 getMediator().stopInterface(true);
@@ -503,8 +510,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
-        super.loadingFinished(loader, poContainer, proofList, result);
+            ProofAggregate proofList, ReplayResult result, Configuration settings)
+            throws ProblemLoaderException {
+
+        super.loadingFinished(loader, poContainer, proofList, result, settings);
         if (proofList != null) {
             if (result != null) {
                 if ("".equals(result.getStatus())) {
@@ -523,12 +532,23 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
         }
         getMediator().resetNrGoalsClosedByHeuristics();
-        if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
+        if (poContainer != null
+                && poContainer.getProofOblInput() instanceof KeYUserProblemFile file) {
+            // TODO weigl not triggered
+            var addInfo = settings.getSection(ProofSettings.KEY_ADDITIONAL_DATA);
+            if (addInfo != null) {
+                var lastSelectedNodePath =
+                    settings.getIntList(OutputStreamProofSaver.KEY_LAST_SELECTED_NODE);
+                if (lastSelectedNodePath != null && proofList != null) {
+                    var proof = proofList.getFirstProof();
+                    var selectedNode = proof.root().traversePath(
+                        lastSelectedNodePath.stream().map(Long::intValue).iterator());
+                    getMediator().getSelectionModel().setSelectedNode(selectedNode);
+                }
+            }
+            file.close();
         }
     }
-
-
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment} with

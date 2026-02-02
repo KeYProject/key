@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -124,5 +121,116 @@ public class KeYCollections {
             }
         }
         return res.toString();
+    }
+
+    /**
+     * Creates a run-length encoding from the given positive integer array. The return array has the
+     * following form:
+     * every positive entry stands for its own. Every negative integer describes the repetition
+     * of the following positive integer.
+     * <p>
+     * For example {@code [1, -5, 2, 1]} stands for {@code [1,2,2,2,2,2,1]}.
+     *
+     * @param array an integer array where
+     */
+    public static int[] runLengthEncoding(int[] array) {
+        int len = array.length;
+        int[] target = new int[2 * len];
+        int used = 0;
+        for (int i = 0; i < len; i++) {
+            // Count occurrences of current character
+            int count = 1;
+            int symbol = array[i];
+            while (i < len - 1 && symbol == array[i + 1]) {
+                count++;
+                i++;
+            }
+            if (count != 1) {
+                target[used++] = -count;
+            }
+            target[used++] = symbol;
+        }
+
+        return Arrays.copyOf(target, used);
+    }
+
+
+    public static int[] runLengthEncoding(Collection<Integer> array) {
+        var iter = array.iterator();
+        class PushbackIterator implements Iterator<Integer> {
+            private int pushedBack = -1;
+
+            @Override
+            public boolean hasNext() {
+                return pushedBack >= 0 || iter.hasNext();
+            }
+
+            @Override
+            public Integer next() {
+                if (pushedBack >= 0) {
+                    var v = pushedBack;
+                    pushedBack = -1;
+                    return v;
+                }
+                return iter.next();
+            }
+
+            public void pushBack(int last) {
+                pushedBack = last;
+            }
+        }
+        var piter = new PushbackIterator();
+        int len = array.size();
+        int[] target = new int[2 * len];
+        int used = 0;
+
+        while (piter.hasNext()) {
+            // Count occurrences of current character
+            int count = 1;
+            int symbol = piter.next();
+            int last = symbol;
+            while (iter.hasNext() && (symbol == (last = piter.next()))) {
+                count++;
+            }
+            if (last != symbol) {
+                piter.pushBack(last);
+            }
+            if (count != 1) {
+                target[used++] = -count;
+            }
+            target[used++] = symbol;
+        }
+        return Arrays.copyOf(target, used);
+    }
+
+
+    /**
+     * Creates a lazy decoding for the given run-length encoding.
+     */
+    public static Iterator<Integer> runLengthDecoding(int[] rleArray) {
+        return new Iterator<>() {
+            int pos = 0;
+            int count = 0;
+            int value = -1;
+
+            @Override
+            public boolean hasNext() {
+                return count > 0 || pos < rleArray.length;
+            }
+
+            @Override
+            public Integer next() {
+                if (count == 0) {
+                    value = rleArray[pos++];
+                    if (value < 0) {
+                        count = (-value) - 1;
+                        value = rleArray[pos++];
+                    }
+                } else {
+                    count--;
+                }
+                return value;
+            }
+        };
     }
 }

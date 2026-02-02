@@ -3,15 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -50,10 +42,14 @@ public class Node implements Iterable<Node> {
 
     private static final String NODES = "nodes";
 
-    /** the proof the node belongs to */
+    /**
+     * the proof the node belongs to
+     */
     private final Proof proof;
 
-    /** The parent node. **/
+    /**
+     * The parent node.
+     **/
     private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
@@ -82,7 +78,9 @@ public class Node implements Iterable<Node> {
 
     private boolean closed = false;
 
-    /** contains non-logical content, used for user feedback */
+    /**
+     * contains non-logical content, used for user feedback
+     */
     private NodeInfo nodeInfo;
 
     /**
@@ -161,7 +159,9 @@ public class Node implements Iterable<Node> {
         this.seq = seq;
     }
 
-    /** returns the sequent of this node */
+    /**
+     * returns the sequent of this node
+     */
     public Sequent sequent() {
         return seq;
     }
@@ -175,7 +175,9 @@ public class Node implements Iterable<Node> {
         return nodeInfo;
     }
 
-    /** returns the proof the Node belongs to */
+    /**
+     * returns the proof the Node belongs to
+     */
     public Proof proof() {
         return proof;
     }
@@ -225,7 +227,9 @@ public class Node implements Iterable<Node> {
         return appliedRuleApp;
     }
 
-    /** Returns the set of NoPosTacletApps at this node */
+    /**
+     * Returns the set of NoPosTacletApps at this node
+     */
     public Iterable<NoPosTacletApp> getLocalIntroducedRules() {
         return localIntroducedRules;
     }
@@ -249,7 +253,7 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of freshly created function symbols known to this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
      * @return a non-null immutable list of function symbols.
@@ -471,13 +475,14 @@ public class Node implements Iterable<Node> {
         return new SubtreeIterator(this);
     }
 
-    /** @return number of children */
+    /**
+     * @return number of children
+     */
     public int childrenCount() {
         return children.size();
     }
 
     /**
-     *
      * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
@@ -667,7 +672,9 @@ public class Node implements Iterable<Node> {
         return true;
     }
 
-    /** marks a node as closed */
+    /**
+     * marks a node as closed
+     */
     Node close() {
         closed = true;
         Node tmp = parent;
@@ -684,7 +691,7 @@ public class Node implements Iterable<Node> {
     /**
      * Opens a previously closed node and all its closed parents.
      * <p>
-     *
+     * <p>
      * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
      * and its associated partners have been closed and the merge node is then pruned away, the
      * partners have to be reopened again. Otherwise, we have a soundness issue.
@@ -699,7 +706,9 @@ public class Node implements Iterable<Node> {
         clearNameCache();
     }
 
-    /** @return true iff this inner node is closeable */
+    /**
+     * @return true iff this inner node is closeable
+     */
     private boolean isCloseable() {
         assert childrenCount() > 0;
         for (Node child : children) {
@@ -837,5 +846,38 @@ public class Node implements Iterable<Node> {
 
     void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    /**
+     * Calculates an array is the path from root node to this node. Each entry defines the child to
+     * be selected.
+     *
+     * @see #traversePath(Iterator)
+     */
+    public int[] getPosInProof() {
+        // collect the path from the current to node to the root of the proof.
+        // each entry is the children position
+        var path = new LinkedList<Integer>();
+        var current = this;
+        while (current.parent != null) {
+            path.add(0, current.parent.getChildNr(current));
+            current = current.parent;
+        }
+        return path.stream().mapToInt(it -> it).toArray();
+    }
+
+
+    /**
+     * Traverses a given iterator (child selection).
+     *
+     * @param traverse non-null
+     */
+    public Node traversePath(Iterator<Integer> traverse) {
+        var current = this;
+        while (traverse.hasNext()) {
+            int child = traverse.next();
+            current = current.child(child);
+        }
+        return current;
     }
 }
