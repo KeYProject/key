@@ -5,6 +5,8 @@ package de.uka.ilkd.key.java.ast.reference;
 
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -53,4 +55,20 @@ public class TypeRef extends TypeReferenceImp {
         return kjt;
     }
 
+    /**
+     * the KeYJavaType must eb part of the equality comparison to
+     * ensure that the correct modalities are returned when looking up in the
+     * cache.
+     *
+     * @param obj the Object to compare with
+     * @return true if and only if both type references refer to the same type
+     */
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj instanceof TypeRef tr) {
+            return Objects.equals(kjt, tr.kjt) && super.equals(obj);
+        }
+        return false;
+    }
 }

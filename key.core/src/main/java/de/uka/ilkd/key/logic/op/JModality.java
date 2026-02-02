@@ -30,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 public class JModality extends Modality implements Operator {
     /**
      * keeps track of created modalities
+     * TODO: needs to be moved to services cache to avoid problems when reloading a proof or
      */
     private static final WeakValueLinkedHashMap<Pair<JavaModalityKind, JavaProgramElement>, JModality> modalities =
         new WeakValueLinkedHashMap<>();
@@ -45,6 +46,7 @@ public class JModality extends Modality implements Operator {
      */
     public static synchronized JModality getModality(JavaModalityKind kind, JavaBlock jb) {
         var pair = new Pair<>(kind, jb.program());
+
         JModality mod = modalities.get(pair);
         if (mod == null) {
             mod = new JModality(jb, kind);
