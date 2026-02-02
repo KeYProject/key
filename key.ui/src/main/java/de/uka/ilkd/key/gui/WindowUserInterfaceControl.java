@@ -53,6 +53,7 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +95,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         };
     }
 
+
+    public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
+        mainWindow.addRecentFile(file.toAbsolutePath().toString());
+        ProblemLoader problemLoader = getProblemLoader(file, null, null, null, getMediator());
+        configure.accept(problemLoader);
+        problemLoader.runAsynchronously();
+    }
+
     /**
      * loads the problem or proof from the given file
      *
@@ -101,12 +110,18 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param classPath the class path entries to use.
      * @param bootClassPath the boot class path to use.
      */
-    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
-            List<Path> includes) {
+    public void loadProblem(Path file, @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes) {
         mainWindow.addRecentFile(file.toAbsolutePath().toString());
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
+    }
+
+    public void loadProblem(Path file, Profile profile) {
+        loadProblem(file, (pl) -> {
+            pl.setProfileOfNewProofs(profile);
+        });
     }
 
     @Override
@@ -612,4 +627,5 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
         dialog.setVisible(true);
     }
+
 }

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.rule.RuleKey;
 
 import org.key_project.logic.LogicServices;
@@ -51,9 +50,6 @@ public class RuleJustificationInfo {
     }
 
     public void removeJustificationFor(Rule rule) {
-        if (InfFlowContractAppTaclet.hasType(rule)) {
-            InfFlowContractAppTaclet.unregister(rule.name());
-        }
         rule2Justification.remove(new RuleKey(rule));
     }
 

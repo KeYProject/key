@@ -19,6 +19,9 @@ dependencies {
 
     implementation("com.formdev:flatlaf:3.7")
 
+    implementation project(":key.core.infflow")
+    implementation project(":key.core.wd")
+
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
