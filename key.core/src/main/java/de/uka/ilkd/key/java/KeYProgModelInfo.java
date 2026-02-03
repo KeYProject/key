@@ -380,7 +380,8 @@ public class KeYProgModelInfo {
 
         var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
         List<ResolvedType> jpSignature =
-                StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType).toList();
+            StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType)
+                    .toList();
         var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
 
         if (!method.isSolved()) {
