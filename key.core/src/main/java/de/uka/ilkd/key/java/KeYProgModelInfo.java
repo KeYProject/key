@@ -366,11 +366,31 @@ public class KeYProgModelInfo {
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
      */
-    public IProgramMethod getProgramMethod(
+    public @Nullable IProgramMethod getProgramMethod(
             @NonNull KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature, KeYJavaType context) {
-        // TODO javaparser implement resolution with context
-        return getProgramMethod(ct, name, signature);
+        if (context.getJavaType() instanceof ArrayType) {
+            return getImplicitMethod(ct, name);
+        }
+
+        var type = getJavaParserType(context);
+        if (!type.isReferenceType()) {
+            return null;
+        }
+
+        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+        List<ResolvedType> jpSignature =
+                StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType).toList();
+        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+
+        if (!method.isSolved()) {
+            return null;
+        }
+
+        return method.getDeclaration()
+                .map(d -> (IProgramMethod) Objects
+                        .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+                .orElse(null);
     }
 
     private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
