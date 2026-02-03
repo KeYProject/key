@@ -35,13 +35,13 @@ class JavaCompilerCheckFacadeTest {
 
     @Test 
     void compileUniverseCorrect() throws ExecutionException, InterruptedException { 
-        Path src = Paths.get("src/test/recources/plugins/javac/Correct.java");
+        Path src = Paths.get("src/test/resources/plugins/javac/Correct.java");
         assertEquals(checkFile(src, Arrays.asList("universe.UniverseChecker")).size(), 0);
     }
 
     @Test
     void compileUniverseIncorrect() throws ExecutionException, InterruptedException, IOException {
-        Path src = Paths.get("src/test/recources/plugins/javac/Incorrect.java");
+        Path src = Paths.get("src/test/resources/plugins/javac/Incorrect.java");
         assertEquals(checkFile(src, Collections.emptyList()).size(), 0);
         assertEquals(checkFile(src, Arrays.asList("universe.UniverseChecker")).size(), 1);
     }
