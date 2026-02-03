@@ -116,27 +116,27 @@ public final class DLSpecFactory {
 
     private IProgramMethod extractProgramMethod(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.pm;
+        return inst.pm();
     }
 
 
     private JModality.JavaModalityKind extractModalityKind(
             UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.modality.kind();
+        return inst.modality().kind();
     }
 
 
     private LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        if (inst.actualSelf == null) {
-            assert inst.pm.isStatic();
+        if (inst.actualSelf() == null) {
+            assert inst.pm().isStatic();
             return null;
-        } else if (inst.actualSelf.op() instanceof LocationVariable lv) {
+        } else if (inst.actualSelf().op() instanceof LocationVariable lv) {
             return lv;
         } else {
             throw new ProofInputException(
-                "Program variable expected, " + "but found: " + inst.actualSelf);
+                "Program variable expected, " + "but found: " + inst.actualSelf());
         }
     }
 
@@ -144,7 +144,7 @@ public final class DLSpecFactory {
     private ImmutableList<LocationVariable> extractParamVars(
             UseOperationContractRule.Instantiation inst) throws ProofInputException {
         ImmutableList<LocationVariable> result = ImmutableSLList.nil();
-        for (JTerm param : inst.actualParams) {
+        for (JTerm param : inst.actualParams()) {
             if (param.op() instanceof LocationVariable lv) {
                 result = result.append(lv);
             } else {
@@ -158,13 +158,13 @@ public final class DLSpecFactory {
 
     private LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        if (inst.actualResult == null) {
+        if (inst.actualResult() == null) {
             return null;
-        } else if (inst.actualResult instanceof LocationVariable lv) {
+        } else if (inst.actualResult() instanceof LocationVariable lv) {
             return lv;
         } else {
             throw new ProofInputException(
-                "Program variable expected, " + "but found: " + inst.actualResult);
+                "Program variable expected, " + "but found: " + inst.actualResult());
         }
     }
 

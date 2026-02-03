@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
@@ -60,7 +61,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * The time when the {@link Proof} instance was created.
      */
-    final long creationTime = System.currentTimeMillis();
+    private final long creationTime = System.currentTimeMillis();
 
     /**
      * name of the proof
@@ -123,7 +124,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public List<String> userLog;
+    public @Nullable List<String> userLog;
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
@@ -1366,5 +1367,15 @@ public class Proof implements ProofObject<Goal>, Named {
                 callbackBranch.run();
             }
         }
+    }
+
+    /// Persist symbols (sorts, functions, ...) to the given `ps`.
+    /// There should be no need to write of [#header()].
+    public void printSymbols(PrintWriter ps) {
+    }
+
+    /// The time when the {@link Proof} instance was created.
+    public long getCreationTime() {
+        return creationTime;
     }
 }

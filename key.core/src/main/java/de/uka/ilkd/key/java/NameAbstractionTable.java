@@ -27,10 +27,8 @@ public class NameAbstractionTable {
     /**
      * adds the given two elements to the table
      *
-     * @param pe1
-     *        SourceElement to be added
-     * @param pe2
-     *        SourceElement to be added
+     * @param pe1 SourceElement to be added
+     * @param pe2 SourceElement to be added
      */
     public void add(SourceElement pe1, SourceElement pe2) {
         if (declarations0 == null) {
@@ -45,11 +43,9 @@ public class NameAbstractionTable {
     /**
      * tests if the given elements have been assigned to the same abstract name.
      *
-     * @param pe0
-     *        SourceElement
-     * @param pe1
-     *        SourceElement
-     * @returns true if the pe1 and pe2 have been assigned to the same name
+     * @param pe0 SourceElement
+     * @param pe1 SourceElement
+     * @return true if the pe1 and pe2 have been assigned to the same name
      */
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
         if (declarations0 != null) {

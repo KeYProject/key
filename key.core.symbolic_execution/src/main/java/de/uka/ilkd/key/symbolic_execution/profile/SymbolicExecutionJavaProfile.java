@@ -224,7 +224,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public String ident() {
         return NAME;
     }
 

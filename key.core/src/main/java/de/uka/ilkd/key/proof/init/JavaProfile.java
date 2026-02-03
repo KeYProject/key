@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserFactory;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.label.OriginTermLabelPolicy;
@@ -32,8 +33,30 @@ import org.key_project.util.collection.ImmutableSet;
  *
  */
 public class JavaProfile extends AbstractProfile {
-    public static final String NAME = "Java Profile";
+    public static final String PROFILE_ID = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
+
+    /**
+     * the name of the profile
+     *
+     * @return the name
+     */
+    @Override
+    public String ident() {
+        return permissions ? NAME_WITH_PERMISSIONS : PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
+        return permissions ? NAME_WITH_PERMISSIONS : (PROFILE_ID + " (Default)");
+    }
+
+    @Override
+    public String description() {
+        return permissions
+                ? "Java programs with support for permissions"
+                : "The default for Java programs";
+    }
 
     /**
      * <p>
@@ -182,22 +205,13 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     public RuleJustification getJustification(Rule r) {
-        return r == UseOperationContractRule.INSTANCE || r == UseDependencyContractRule.INSTANCE
-                || r == BlockContractExternalRule.INSTANCE || r == LoopContractExternalRule.INSTANCE
-                        ? new ComplexRuleJustificationBySpec()
-                        : super.getJustification(r);
+        if (r instanceof ComplexJustificationable) {
+            return new ComplexRuleJustificationBySpec();
+        } else {
+            return super.getJustification(r);
+        }
     }
 
-
-    /**
-     * the name of the profile
-     *
-     * @return the name
-     */
-    @Override
-    public String name() {
-        return permissions ? NAME_WITH_PERMISSIONS : NAME;
-    }
 
     /**
      * the default strategy factory to be used

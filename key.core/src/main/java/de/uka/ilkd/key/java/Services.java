@@ -123,9 +123,8 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.caches = caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-        this.specRepos = new SpecificationRepository(this);
+        this.specRepos = profile.createSpecificationRepository(this);
         this.cee = new ConstantExpressionEvaluator();
-
         typeconverter = new TypeConverter(this);
         if (javaService == null) {
             this.javaService = null;
@@ -446,8 +445,8 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * sets the factory for origin term labels
      *
-     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
-     *        should not be created
+     * @param originFactory the {@link OriginTermLabelFactory} to use, if null is passed, origin
+     *        labels should not be created
      */
     public void setOriginFactory(OriginTermLabelFactory originFactory) {
         this.originFactory = originFactory;

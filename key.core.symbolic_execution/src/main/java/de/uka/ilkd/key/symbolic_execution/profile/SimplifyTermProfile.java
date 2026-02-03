@@ -90,7 +90,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public String ident() {
         return NAME;
     }
 

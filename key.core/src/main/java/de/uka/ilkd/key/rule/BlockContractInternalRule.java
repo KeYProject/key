@@ -6,23 +6,19 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
@@ -30,7 +26,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -51,11 +46,10 @@ import org.jspecify.annotations.NonNull;
  * </ol>
  * </p>
  *
- * @see BlockContractInternalBuiltInRuleApp
- *
  * @author wacker, lanzinger
+ * @see BlockContractInternalBuiltInRuleApp
  */
-public final class BlockContractInternalRule extends AbstractBlockContractRule {
+public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      * The only instance of this class.
@@ -77,22 +71,17 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private BlockContractInternalRule() {}
+    protected BlockContractInternalRule() {
+    }
 
     /**
      *
-     * @param contract
-     *        the contract being applied.
-     * @param self
-     *        the self term.
-     * @param heaps
-     *        the heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
-     * @param services
-     *        services.
+     * @param contract the contract being applied.
+     * @param self the self term.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final BlockContract contract, final JTerm self,
@@ -113,12 +102,9 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
     private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
@@ -137,18 +123,12 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param contextUpdate
-     *        the context update.
-     * @param heaps
-     *        the heaps.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param variables
-     *        the variables.
-     * @param modifiableClauses
-     *        the modified clauses.
-     * @param services
-     *        services.
+     * @param contextUpdate the context update.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param variables the variables.
+     * @param modifiableClauses the modified clauses.
+     * @param services services.
      * @return the updates.
      */
     private static JTerm[] createUpdates(final JTerm contextUpdate,
@@ -165,48 +145,26 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
      *
-     * @param goal
-     *        the current goal.
-     * @param contract
-     *        the contract being applied.
-     * @param heaps
-     *        the heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param contextUpdate
-     *        the context update.
-     * @param remembranceUpdate
-     *        the remembrance update.
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param configurator
-     *        a configurator.
-     * @param services
-     *        services.
+     * @param goal the current goal.
+     * @param contract the contract being applied.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param contextUpdate the context update.
+     * @param remembranceUpdate the remembrance update.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param configurator a configurator.
+     * @param services services.
      * @return a list containing the new goals.
      */
-    private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
+    protected ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
             final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final JTerm contextUpdate,
             final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
-        final ImmutableList<Goal> result;
-        final LocationVariable heap = heaps.get(0);
-        if (WellDefinednessCheck.isOn()) {
-            result = goal.split(4);
-            final JTerm localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
-            final JTerm wdUpdate =
-                services.getTermBuilder().parallel(contextUpdate, remembranceUpdate);
-            configurator.setUpWdGoal(result.tail().tail().tail().head(), contract, wdUpdate,
-                localAnonUpdate, heap, anonymisationHeaps.get(heap), localInVariables);
-        } else {
-            result = goal.split(3);
-        }
-        return result;
+        return goal.split(3);
     }
 
     @Override
@@ -235,17 +193,16 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp createApp(final PosInOccurrence occurrence,
-            TermServices services) {
-        return new BlockContractInternalBuiltInRuleApp(this, occurrence);
+    public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
+            final PosInOccurrence occurrence, TermServices services) {
+        return new BlockContractInternalBuiltInRuleApp<>(this, occurrence);
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
-            final RuleApp ruleApp) throws RuleAbortException {
-        assert ruleApp instanceof BlockContractInternalBuiltInRuleApp;
-        BlockContractInternalBuiltInRuleApp application =
-            (BlockContractInternalBuiltInRuleApp) ruleApp;
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
+            throws RuleAbortException {
+        assert ruleApp instanceof BlockContractInternalBuiltInRuleApp<?>;
+        var application = (BlockContractInternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
@@ -295,8 +252,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(assumptions, freePostcondition));
 
-        final boolean isInfFlow = InfFlowCheckInfo.isInfFlow(goal);
-        setUpValidityGoal(result, isInfFlow, contract, application, instantiation, heaps,
+        setUpValidityGoal(result, contract, application, instantiation, heaps,
             anonymisationHeaps, localInVariables, localOutVariables, variables,
             ArrayUtil.add(preconditions, freePrecondition), assumptions, frameCondition, updates,
             configurator, conditionsAndClausesBuilder, services);
@@ -329,43 +285,25 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     /**
      * Sets up the validity goal as the first goal in the list.
      *
-     * @param result
-     *        the new goals.
-     * @param isInfFlow
-     *        whether or not this is an information flow proof.
-     * @param contract
-     *        the block contract being applied.
-     * @param application
-     *        the rule application.
-     * @param instantiation
-     *        the instantiation.
-     * @param heaps
-     *        the heaps.
-     * @param anonymisationHeaps
-     *        the anonymization heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param variables
-     *        the variables.
-     * @param preconditions
-     *        the preconditions.
-     * @param assumptions
-     *        the postconditions.
-     * @param frameCondition
-     *        the framing condition.
-     * @param updates
-     *        the updates.
-     * @param configurator
-     *        a Configurator.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder
-     * @param services
-     *        services.
+     * @param result the new goals.
+     * @param contract the block contract being applied.
+     * @param application the rule application.
+     * @param instantiation the instantiation.
+     * @param heaps the heaps.
+     * @param anonymisationHeaps the anonymization heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param variables the variables.
+     * @param preconditions the preconditions.
+     * @param assumptions the postconditions.
+     * @param frameCondition the framing condition.
+     * @param updates the updates.
+     * @param configurator a Configurator.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
+     * @param services services.
      */
-    private void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
-            final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
+    protected void setUpValidityGoal(final ImmutableList<Goal> result,
+            final BlockContract contract, final BlockContractInternalBuiltInRuleApp<?> application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final ImmutableSet<LocationVariable> localInVariables,
@@ -378,30 +316,8 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         Goal validityGoal = result.tail().tail().head();
         final ProgramVariable exceptionParameter =
             createLocalVariable("e", variables.exception.getKeYJavaType(), services);
-        if (!isInfFlow) {
-            configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
-                preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
-                conditionsAndClausesBuilder.terms);
-        } else {
-            validityGoal.setBranchLabel("Information Flow Validity");
-
-            // clear goal
-            validityGoal.node().setSequent(JavaDLSequentKit.getInstance().getEmptySequent());
-            validityGoal.clearAndDetachRuleAppIndex();
-            final TermBuilder tb = services.getTermBuilder();
-
-            if (contract.hasModifiableClause(heaps.get(0)) && contract.hasInfFlowSpecs()) {
-                // set up information flow validity goal
-                InfFlowValidityData infFlowValidityData = setUpInfFlowValidityGoal(validityGoal,
-                    contract, anonymisationHeaps, services, variables, exceptionParameter, heaps,
-                    localInVariables, localOutVariables, application, instantiation);
-                // do additional inf flow preparations on the usage goal
-                setUpInfFlowPartOfUsageGoal(result.head(), infFlowValidityData, updates[0],
-                    updates[1], updates[2], tb);
-            } else {
-                // nothing to prove -> set up trivial goal
-                validityGoal.addFormula(new SequentFormula(tb.tt()), false, true);
-            }
-        }
+        configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
+            preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
+            conditionsAndClausesBuilder.terms);
     }
 }

@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
@@ -94,51 +93,14 @@ public abstract class AbstractPO implements IPersistablePO {
         return axioms;
     }
 
-    /**
-     * Generate well-definedness taclets to resolve formulas as WD(pv.{@literal <inv>}) or
-     * WD(pv.m(...)).
-     *
-     * @param proofConfig the proof configuration
-     */
-    void generateWdTaclets(InitConfig proofConfig) {
-        if (!WellDefinednessCheck.isOn()) {
-            return;
-        }
-        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
-        ImmutableSet<String> names = DefaultImmutableSet.nil();
-        for (WellDefinednessCheck ch : specRepos.getAllWdChecks()) {
-            if (ch instanceof MethodWellDefinedness mwd) {
-                // WD(callee.m(...))
-                RewriteTaclet mwdTaclet = mwd.createOperationTaclet(proofConfig.getServices());
-                String tName = mwdTaclet.name().toString();
-                final String prefix;
-                if (tName.startsWith(WellDefinednessCheck.OP_TACLET)) {
-                    prefix = WellDefinednessCheck.OP_TACLET;
-                } else if (tName.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
-                    prefix = WellDefinednessCheck.OP_EXC_TACLET;
-                } else {
-                    prefix = "";
-                }
-                tName = tName.replace(prefix, "");
-                if (names.contains(tName)) {
-                    for (RewriteTaclet t : res) {
-                        if (t.find().toString().equals(mwdTaclet.find().toString())) {
-                            res = res.remove(t);
-                            names = names.remove(tName);
-                            mwdTaclet = mwd.combineTaclets(t, mwdTaclet, proofConfig.getServices());
-                        }
-                    }
-                }
-                res = res.add(mwdTaclet);
-                names = names.add(tName);
-            }
-        }
-        // WD(a.<inv>)
-        res = res.union(ClassWellDefinedness.createInvTaclet(proofConfig.getServices()));
-        for (RewriteTaclet t : res) {
-            register(t, proofConfig);
-        }
+    /// Queries the registered (dynamic) taclet generators.
+    /// The taclet generator receives the `initConfig` to add further taclets to the proof.
+    /// @see TacletPOGenerator
+    protected void generateDynamicTaclets(InitConfig initConfig) {
+        var generators = ServiceLoader.load(TacletPOGenerator.class);
+        generators.forEach(it -> it.generate(this, initConfig, specRepos));
     }
+
 
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
         return specRepos.getClassAxioms(selfKJT);
@@ -149,7 +111,7 @@ public abstract class AbstractPO implements IPersistablePO {
         registerClassAxiomTaclets(selfKJT, proofConfig);
     }
 
-    private void register(Taclet t, InitConfig proofConfig) {
+    public void register(Taclet t, InitConfig proofConfig) {
         assert t != null;
         taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
         proofConfig.registerRule(t, AxiomJustification.INSTANCE);

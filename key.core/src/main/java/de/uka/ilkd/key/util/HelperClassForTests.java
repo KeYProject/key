@@ -28,6 +28,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
@@ -48,8 +49,8 @@ public class HelperClassForTests {
         // library (HACK)
         @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.nil());
+            final var ruleSource = RuleSourceFactory.fromDefaultLocation(ldtFile);
+            return new RuleCollection(ImmutableList.of(ruleSource), ImmutableSLList.nil());
         }
     };
 

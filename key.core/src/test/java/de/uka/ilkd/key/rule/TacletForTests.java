@@ -29,6 +29,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
@@ -64,7 +65,8 @@ public class TacletForTests {
         // library (HACK)
         @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
+            return new RuleCollection(
+                ImmutableList.of(RuleSourceFactory.fromDefaultLocation(ldtFile)),
                 ImmutableSLList.nil());
         }
     };

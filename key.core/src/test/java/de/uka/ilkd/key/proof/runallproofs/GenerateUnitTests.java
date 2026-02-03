@@ -7,13 +7,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
@@ -34,38 +32,31 @@ import org.slf4j.LoggerFactory;
  */
 public class GenerateUnitTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTests.class);
-    /**
-     * Output folder. Set on command line.
-     */
-    private static Path outputFolder;
 
     public static void main(String[] args) throws IOException {
-        var collections = Map.of(
-            "fun", ProofCollections.automaticJavaDL(),
-            "infflow", ProofCollections.automaticInfFlow());
-
+        var collections = List.of(ProofCollections.automaticJavaDL());
         if (args.length != 1) {
             System.err.println("Usage: <main> <output-folder>");
             System.exit(1);
         }
+        var outputFolder = Paths.get(args[0]);
+        run(outputFolder, collections);
+    }
 
-        outputFolder = Paths.get(args[0]);
+    public static void run(Path outputFolder, List<ProofCollection> collections)
+            throws IOException {
         LOGGER.info("Output folder {}", outputFolder);
 
+        outputFolder = outputFolder.toAbsolutePath();
         Files.createDirectories(outputFolder);
 
-        for (var col : collections.entrySet()) {
-            for (RunAllProofsTestUnit unit : col.getValue().createRunAllProofsTestUnits()) {
-                createUnitClass(col.getKey(), unit);
+        for (var col : collections) {
+            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
+                createUnitClass(outputFolder, unit);
             }
         }
     }
 
-    // "import de.uka.ilkd.key.util.NamedRunner;\n" +
-    // "import de.uka.ilkd.key.util.TestName;\n" +
-    // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
-    // +
-    // "@RunWith(NamedRunner.class)\n" +
     private static final String TEMPLATE_CONTENT =
         """
                 /* This file is part of KeY - https://key-project.org
@@ -100,15 +91,14 @@ public class GenerateUnitTests {
      * Generates the test classes for the given proof collection, and writes the
      * java files.
      *
-     * @param prefix
      * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(String prefix, RunAllProofsTestUnit unit)
+    private static void createUnitClass(Path outputFolder, RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();
-        String className = '_' + prefix + "_" + name // avoids name clashes, i.e., group "switch"
+        String className = '_' + name // avoids name clashes, i.e., group "switch"
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
                 .replaceAll("[^a-zA-Z0-9]+", "_");

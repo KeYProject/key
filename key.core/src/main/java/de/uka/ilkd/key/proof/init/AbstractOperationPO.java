@@ -458,7 +458,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
 
         // for JML annotation statements
-        generateWdTaclets(proofConfig);
+        generateDynamicTaclets(proofConfig);
     }
 
     /**

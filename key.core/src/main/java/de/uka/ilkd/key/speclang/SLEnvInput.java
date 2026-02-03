@@ -336,7 +336,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractMethodSpecs(constructor, staticInvPresent);
                 specRepos.addSpecs(DefaultImmutableSet.fromCollection(constructorSpecs));
             }
-            specRepos.addRepresentsTermToWdChecksForModelFields(kjt);
+            specRepos.processJavaType(kjt);
         }
 
         // add initially clauses to constructor contracts

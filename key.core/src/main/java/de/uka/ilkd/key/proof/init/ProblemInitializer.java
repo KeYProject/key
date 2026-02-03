@@ -207,12 +207,18 @@ public final class ProblemInitializer {
      * get a vector of Strings containing all .java file names in the cfile directory. Helper for
      * readJava().
      */
-    private List<Path> getClasses(Path folder) throws ProofInputException {
-        try (var files = Files.walk(folder)) {
-            return files.filter(f -> !f.toFile().isDirectory() && f.toString().endsWith(".java"))
-                    .toList();
-        } catch (IOException e) {
-            throw new ProofInputException("Failed to list classes folder", e);
+    private Collection<Path> getClasses(Path javaRoot) throws ProofInputException {
+        if (Files.isDirectory(javaRoot)) {
+            try (var walker = Files.walk(javaRoot)) {
+                return walker.filter(it -> !it.toFile().isDirectory()
+                        && it.getFileName().toString().endsWith(".java")).toList();
+            } catch (IOException e) {
+                throw new ProofInputException(
+                    "Reading java model path " + javaRoot + " resulted into an error.", e);
+            }
+        } else {
+            throw new ProofInputException(
+                "Java model path " + javaRoot + " not found or is not a directory.");
         }
     }
 
@@ -252,7 +258,7 @@ public final class ProblemInitializer {
         if (javaPath != null) {
             reportStatus("Reading Java source");
             LOGGER.debug("Reading Java source");
-            List<Path> classes = getClasses(javaPath);
+            Collection<Path> classes = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 Path file = envInput.getJavaFile();
                 if (classes.contains(file)) {
@@ -422,15 +428,20 @@ public final class ProblemInitializer {
         var config = new InitConfig(services);
         activateInitConfigJava(config, envInput);
 
-        RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-        if (tacletBase != null) {
-            KeYFile tacletBaseFile = new KeYFile("taclet base",
-                profile.getStandardRules().getTacletBase(), progMon, profile);
-            readEnvInput(tacletBaseFile, config);
+        // the first time, read in standard rules
+        ImmutableList<RuleSource> tacletBases = profile.getStandardRules().getTacletBase();
+        if (tacletBases != null) {
+            for (var tacletBase : tacletBases) {
+                KeYFile tacletBaseFile = new KeYFile(
+                    "taclet base (%s)".formatted(tacletBase.file().getFileName()),
+                    tacletBase, progMon, profile);
+                readEnvInput(tacletBaseFile, config);
+            }
         }
 
         // remove traces of the generic sorts within the base configuration
         cleanupNamespaces(config);
+        profile.prepareInitConfig(BASE_INPUT_CONFIG);
         BASE_INPUT_CONFIG = config;
         return BASE_INPUT_CONFIG.copy();
     }
