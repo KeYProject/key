@@ -8,7 +8,7 @@ package de.uka.ilkd.key.smt.lang;
 /**
  *
  *
- * @authors Aboubakr Achraf El Ghazi and Fikri Kabakcha
+ * @author Aboubakr Achraf El Ghazi, Fikri Kabakcha
  *
  */
 public class SMTSort {

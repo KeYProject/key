@@ -39,9 +39,7 @@ public class LemmataAutoModeOptions {
         description = "store proofs to this folder")
     public @Nullable File pathOfResult = null;
 
-    /**
-     * The time out for each proof. If <code>timeout<0</code> no time out is used.
-     */
+    /// The time-out for each proof. If `timeout<0` no time out is used.
     @CommandLine.Option(names = "--jr-timeout", paramLabel = "INT",
         description = "the timeout for proof of a taclet in ms",
         defaultValue = LemmataAutoModeOptions.DEFAULT_TIMEOUT + "")
