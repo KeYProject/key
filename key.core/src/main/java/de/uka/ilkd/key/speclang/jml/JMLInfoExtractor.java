@@ -328,6 +328,10 @@ public final class JMLInfoExtractor {
         MethodDeclaration decl = pm.getMethodDeclaration();
 
         ImmutableList<Comment> comments = ImmutableSLList.nil();
+
+        // nullable JML modifier might have been added to method name
+        comments = comments.prepend(decl.getProgramElementName().getComments());
+
         for (Modifier modifier : decl.getModifiers()) {
             comments = comments.prepend(modifier.getComments());
         }
