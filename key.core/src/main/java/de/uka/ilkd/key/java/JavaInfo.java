@@ -209,7 +209,7 @@ public final class JavaInfo {
             } else {
                 var name = getFullName(type);
                 var old = name2KJTCache.put(name, type);
-                assert old == null;
+                assert old == null : "Already had KeYJavaType for name '" + name + "'";
             }
         }
     }
