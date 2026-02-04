@@ -422,12 +422,10 @@ public class KeYProgModelInfo {
                         args.add(new BooleanLiteralExpr(false));
                         break;
                     case "byte":
-                        args.add(new CastExpr(new PrimitiveType(PrimitiveType.Primitive.BYTE),
-                            new IntegerLiteralExpr(0)));
+                        args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
                         break;
                     case "short":
-                        args.add(new CastExpr(new PrimitiveType(PrimitiveType.Primitive.SHORT),
-                            new IntegerLiteralExpr(0)));
+                        args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
                         break;
                     case "int":
                         args.add(new IntegerLiteralExpr(0));
@@ -442,8 +440,7 @@ public class KeYProgModelInfo {
                         args.add(new DoubleLiteralExpr(0));
                         break;
                     case "float":
-                        args.add(new CastExpr(new PrimitiveType(PrimitiveType.Primitive.FLOAT),
-                            new DoubleLiteralExpr(0)));
+                        args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
                         break;
                 }
             }
@@ -456,7 +453,7 @@ public class KeYProgModelInfo {
         if (classContext.getParentNode().isEmpty()) {
             var cu = new CompilationUnit();
             // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
-            var solver = (JavaSymbolSolver) getJavaParserType(ct).asReferenceType()
+            var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
                     .getTypeDeclaration().get().toAst().get().getSymbolResolver();
             solver.inject(cu);
             mapping.getJavaServices().getProgramFactory().getTypeSolver();
