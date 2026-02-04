@@ -177,7 +177,12 @@ public class KeYProgModelInfo {
     }
 
     private boolean isSubtype(ResolvedType subType, ResolvedType superType) {
-        return superType.isAssignableBy(subType); // TODO weigl check if it is the right method and
+        // reference and array type is checked to avoid the method returning
+        // true for "int" and "Integer" as s.th. like "Integer i = 0";
+        // is compilable
+        return (subType.isReferenceType() || subType.isArray())
+                && (superType.isReferenceType() || subType.isArray()) &&
+                superType.isAssignableBy(subType); // TODO weigl check if it is the right method and
         // order.
     }
 
@@ -373,7 +378,7 @@ public class KeYProgModelInfo {
             return getImplicitMethod(ct, name);
         }
 
-        var type = getJavaParserType(context);
+        var type = getJavaParserType(ct);
         if (!type.isReferenceType()) {
             return null;
         }
