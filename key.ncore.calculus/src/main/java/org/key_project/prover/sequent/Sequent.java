@@ -100,7 +100,7 @@ public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement
     /// @return a string representation of the sequent
     @Override
     public String toString() {
-        return antecedent().toString() + "==>" + succedent().toString();
+        return antecedent() + "==>" + succedent();
     }
 
     /// Creates an iterator to traverse all [SequentFormula] objects in this sequent.
@@ -154,12 +154,10 @@ public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement
     /// @param inAntecedent `true` to add the formula to the antecedent, `false` for the
     /// succedent
     /// @param first `true` to add the formula at the beginning, `false` to add it at the
-    /// end of the
-    /// selected semisequent
+    /// end of the selected semisequent
     /// @return a [SequentChangeInfo] containing the modified sequent and details of the change
     /// like which formulas have been added or removed (removal is possible as the
-    /// implementation guarantees
-    /// redundance freeness)
+    /// implementation guarantee redundancy freeness)
     public SequentChangeInfo addFormula(SequentFormula sequentFormula, boolean inAntecedent,
             boolean first) {
         final Semisequent seq = inAntecedent ? antecedent : succedent;
@@ -273,7 +271,7 @@ public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement
 
     /// Creates a new [Semisequent] composed of the list of formulas proved as argument
     ///
-    /// @param formulas the {@ImmutableList} of [SequentFormula]s used to create the
+    /// @param formulas the [ImmutableList] of [SequentFormula]s used to create the
     /// semisequent
     /// @return the [Semisequent] consisting of the provided formulas
     abstract protected Semisequent createSemisequent(final ImmutableList<SequentFormula> formulas);

@@ -9,33 +9,36 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this class represents an application of a built-in rule application
  */
-public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
+@NullMarked
+public class DefaultBuiltInRuleApp<T extends BuiltInRule> extends AbstractBuiltInRuleApp<T> {
 
-    public DefaultBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
+    public DefaultBuiltInRuleApp(T builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
 
-    public DefaultBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
+    public DefaultBuiltInRuleApp(T builtInRule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts) {
         super(builtInRule, pio, ifInsts);
     }
 
     @Override
-    public DefaultBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new DefaultBuiltInRuleApp(builtInRule, newPos, ifInsts);
+    public DefaultBuiltInRuleApp<T> replacePos(PosInOccurrence newPos) {
+        return new DefaultBuiltInRuleApp<>(builtInRule, newPos, ifInsts);
     }
 
     @Override
-    public DefaultBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public DefaultBuiltInRuleApp<T> tryToInstantiate(Goal goal) {
         return this;
     }
 
     @Override
-    public DefaultBuiltInRuleApp setAssumesInsts(
+    public DefaultBuiltInRuleApp<T> setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

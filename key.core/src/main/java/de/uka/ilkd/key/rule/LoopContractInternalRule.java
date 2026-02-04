@@ -49,7 +49,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author lanzinger
  */
-public final class LoopContractInternalRule extends AbstractLoopContractRule {
+public class LoopContractInternalRule extends AbstractLoopContractRule {
 
     /**
      * The only instance of this class.
@@ -71,7 +71,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private LoopContractInternalRule() {
+    protected LoopContractInternalRule() {
     }
 
     /**

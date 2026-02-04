@@ -7,6 +7,10 @@ package de.uka.ilkd.key.util.properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+
+/// WEIGL: These classes are redundant with {@link PropertyEntry}
+/// {@link PropertyEntry} is also prepared for {@link Configuration} which provides
+/// a type safe access.
 public interface Properties {
 
     final class Property<T> {
