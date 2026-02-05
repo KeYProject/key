@@ -26,7 +26,6 @@ import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
@@ -40,7 +39,6 @@ import com.github.javaparser.resolution.logic.MethodResolutionLogic;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
 import org.jspecify.annotations.NonNull;
@@ -409,59 +407,59 @@ public class KeYProgModelInfo {
     public @Nullable IProgramMethod getProgramMethod(
             @NonNull KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature, KeYJavaType context) {
-
-        NodeList<Expression> args = new NodeList<>();
-        for (var argType : signature) {
-            Type javaType = getType(getJavaParserType(argType));
-            if (!javaType.isPrimitiveType()) {
-                args.add(new CastExpr(javaType, new NullLiteralExpr()));
-            } else {
-                PrimitiveType pt = (PrimitiveType) javaType;
-                switch (pt.type().asString()) {
-                    case "boolean":
-                        args.add(new BooleanLiteralExpr(false));
-                        break;
-                    case "byte":
-                        args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
-                        break;
-                    case "short":
-                        args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
-                        break;
-                    case "int":
-                        args.add(new IntegerLiteralExpr(0));
-                        break;
-                    case "long":
-                        args.add(new LongLiteralExpr(0));
-                        break;
-                    case "char":
-                        args.add(new CharLiteralExpr('a'));
-                        break;
-                    case "double":
-                        args.add(new DoubleLiteralExpr(0));
-                        break;
-                    case "float":
-                        args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
-                        break;
-                }
-            }
-        }
-
-        // TODO: Type arguments
-        var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
-        MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
-        var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
-        if (classContext.getParentNode().isEmpty()) {
-            var cu = new CompilationUnit();
-            // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
-            var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
-                    .getTypeDeclaration().get().toAst().get().getSymbolResolver();
-            solver.inject(cu);
-            mapping.getJavaServices().getProgramFactory().getTypeSolver();
-            classContext.setParentNode(cu);
-        }
-        mce.setParentNode(classContext);
-
-        return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
+        return getProgramMethod(ct, name, signature);
+        // NodeList<Expression> args = new NodeList<>();
+        // for (var argType : signature) {
+        // Type javaType = getType(getJavaParserType(argType));
+        // if (!javaType.isPrimitiveType()) {
+        // args.add(new CastExpr(javaType, new NullLiteralExpr()));
+        // } else {
+        // PrimitiveType pt = (PrimitiveType) javaType;
+        // switch (pt.type().asString()) {
+        // case "boolean":
+        // args.add(new BooleanLiteralExpr(false));
+        // break;
+        // case "byte":
+        // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+        // break;
+        // case "short":
+        // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+        // break;
+        // case "int":
+        // args.add(new IntegerLiteralExpr(0));
+        // break;
+        // case "long":
+        // args.add(new LongLiteralExpr(0));
+        // break;
+        // case "char":
+        // args.add(new CharLiteralExpr('a'));
+        // break;
+        // case "double":
+        // args.add(new DoubleLiteralExpr(0));
+        // break;
+        // case "float":
+        // args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
+        // break;
+        // }
+        // }
+        // }
+        //
+        // // TODO: Type arguments
+        // var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
+        // MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
+        // var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
+        // if (classContext.getParentNode().isEmpty()) {
+        // var cu = new CompilationUnit();
+        // // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
+        // var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
+        // .getTypeDeclaration().get().toAst().get().getSymbolResolver();
+        // solver.inject(cu);
+        // mapping.getJavaServices().getProgramFactory().getTypeSolver();
+        // classContext.setParentNode(cu);
+        // }
+        // mce.setParentNode(classContext);
+        //
+        // return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
 
         // if (context.getJavaType() instanceof ArrayType) {
         // return getImplicitMethod(ct, name);
