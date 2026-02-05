@@ -118,10 +118,10 @@ public class GenerateUnitTests {
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
 
-        vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
+        vars.put("keySettings", settings.getGlobalKeYSettings().replace("\n", "\\\\n"));
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\n"));
+                    .replace("\n", "\\\\n"));
 
         StringBuilder methods = new StringBuilder();
         Set<String> usedMethodNames = new TreeSet<>();
