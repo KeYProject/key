@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
@@ -230,18 +231,26 @@ public class OutputStreamProofSaver {
         }
     }
 
-    /**
-     * Searches in the header for absolute paths to Java files and tries to replace them by paths
-     * relative to the proof file to be saved.
-     *
-     * TODO weigl: if someone finds time, this function is a string manipulation mess.
-     * You should rather parse the header using the {@link de.uka.ilkd.key.nparser.ParsingFacade}
-     * and
-     * use the {@link de.uka.ilkd.key.nparser.builder.ProblemFinder} to extract the field.
-     *
-     * Better would be to get rid of the header, and using an AST.
-     */
-    private String makePathsRelative(String header) {
+    /// Searches in the header for absolute paths to Java files and tries to replace them by paths
+    /// relative to the proof file to be saved.
+    /// If the given `header` is null, an empty string is returned. This is the case for proofs,
+    /// that are non-KeY-file not crated by KeY-files.
+    ///
+    /// @param header a string created a proper KeY-file content.
+    ///
+    ///
+    /// TODO weigl: If someone finds time, this function is a string manipulation mess.
+    /// You should rather parse the header using the [de.uka.ilkd.key.nparser.ParsingFacade]
+    /// and use the [de.uka.ilkd.key.nparser.builder.ProblemFinder] to extract the field.
+    /// Better would be to get rid of the header, and using an AST.
+    ///
+    ///
+    /// @see KeYUserProblemFile#getProblemHeader()
+    /// @see de.uka.ilkd.key.proof.init.InitConfig#getProblemHeader()
+    private String makePathsRelative(@Nullable String header) {
+        if (header == null) {
+            return "";
+        }
         final String[] search =
             { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
