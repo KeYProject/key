@@ -378,9 +378,7 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Creates declarations necessary to save/load proof in textual form (helper for createProof()).
      */
-    private void createProofHeader(
-            JavaModel model, Services services) {
-
+    private void createProofHeader(JavaModel model, Services services) {
         if (header != null) {
             return;
         }
@@ -418,8 +416,7 @@ public abstract class AbstractPO implements IPersistablePO {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
-        final JavaModel javaModel = proofConfig.getServices().getJavaModel();
-        createProofHeader(javaModel, proofConfig.getServices());
+        header = proofConfig.getProblemHeader();
 
         final Proof proof = createProofObject(proofName, header, poTerm, proofConfig);
 

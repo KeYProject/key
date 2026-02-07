@@ -34,6 +34,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -79,10 +80,12 @@ public class InitConfig {
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
 
+    // weigl this field is never set
     private String originalKeYFileName;
 
     private ProofSettings settings;
 
+    private @Nullable String header;
 
 
     // -------------------------------------------------------------------------
@@ -437,6 +440,7 @@ public class InitConfig {
             (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
+        ic.header = header;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         return ic;
@@ -465,5 +469,13 @@ public class InitConfig {
                     .stream().filter(it -> choice.category().equals(it.category()))
                     .collect(ImmutableSet.collector())
                     .add(choice));
+    }
+
+    public @Nullable String getProblemHeader() {
+        return header;
+    }
+
+    public void setHeader(@Nullable String header) {
+        this.header = header;
     }
 }

@@ -254,6 +254,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }
     }
 
+
+    ///
+    public @Nullable String getProblemHeader() {
+        return getParseContext().getProblemHeader();
+    }
+
     /**
      * Returns the default {@link Profile} which was defined by a constructor.
      *
