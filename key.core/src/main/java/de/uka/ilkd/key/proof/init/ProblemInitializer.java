@@ -459,6 +459,11 @@ public final class ProblemInitializer {
             if (Debug.ENABLE_DEBUG) {
                 print(ic);
             }
+
+            if (envInput instanceof KeYUserProblemFile uf) {
+                ic.setHeader(uf.getProblemHeader());
+            }
+
             return ic;
         }
     }
