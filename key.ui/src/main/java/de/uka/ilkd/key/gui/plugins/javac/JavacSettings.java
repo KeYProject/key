@@ -5,12 +5,14 @@ package de.uka.ilkd.key.gui.plugins.javac;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
+import java.io.Serializable;
+
 /**
  * Settings for the javac extention.
  *
  * @author Daniel Grévent
  */
-public class JavacSettings extends AbstractPropertiesSettings {
+public class JavacSettings extends AbstractPropertiesSettings implements Serializable {
 
     /**
      * The name of the category in the settings.
