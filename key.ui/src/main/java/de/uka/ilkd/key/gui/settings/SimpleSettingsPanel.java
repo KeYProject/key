@@ -15,7 +15,8 @@ import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.gui.fonticons.IconProvider;
 
 import org.key_project.util.java.StringUtil;
 
@@ -43,6 +44,9 @@ public class SimpleSettingsPanel extends JPanel {
     private static final ColorSettings.ColorProperty COLOR_ERROR =
         ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
+    public static final String SAVED_BACKGROUND_COLOR = "saved_background_color";
+    private static final IconProvider HELP_ICON =
+        new IconFontProvider(FontAwesomeSolid.QUESTION_CIRCLE, Color.black, Color.white);
 
     protected final Box pNorth = new Box(BoxLayout.Y_AXIS);
     protected final JPanel pCenter = new JPanel();
@@ -53,7 +57,7 @@ public class SimpleSettingsPanel extends JPanel {
         setLayout(new BorderLayout());
 
         pNorth.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        pNorth.setBackground(Color.WHITE);
+        // pNorth.setBackground(Color.WHITE);
         pNorth.setOpaque(true);
 
         lblHead.setFont(lblHead.getFont().deriveFont(16f).deriveFont(Font.BOLD));
@@ -76,14 +80,14 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     protected void demarkComponentAsErrornous(JComponent component) {
-        Object col = component.getClientProperty("saved_background_color");
+        Object col = component.getClientProperty(SAVED_BACKGROUND_COLOR);
         if (col instanceof Color) {
             component.setBackground((Color) col);
         }
     }
 
     protected void markComponentAsErrornous(JComponent component, String error) {
-        component.putClientProperty("saved_background_color", component.getBackground());
+        component.putClientProperty(SAVED_BACKGROUND_COLOR, component.getBackground());
         component.setBackground(COLOR_ERROR.get());
         component.setToolTipText(error);
     }
@@ -170,7 +174,7 @@ public class SimpleSettingsPanel extends JPanel {
                 return editor.getTextField().getBackground();
             }
         };
-        spinner.setBackground(Color.WHITE); // without this, the background would be gray ...
+        // spinner.setBackground(Color.WHITE); // without this, the background would be gray ...
         spinner.addChangeListener(new ValidatorSpinnerAdapter<>(spinner, validator));
         return spinner;
     }
@@ -184,8 +188,7 @@ public class SimpleSettingsPanel extends JPanel {
                 + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
         }
 
-        JLabel infoButton =
-            new JLabel(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        JLabel infoButton = new JLabel(HELP_ICON.get(16f));
         infoButton.setToolTipText(s);
         return infoButton;
     }
@@ -205,8 +208,7 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     public static JButton createHelpButton(Runnable callback) {
-        var infoButton =
-            new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        var infoButton = new JButton(HELP_ICON.get(16f));
         infoButton.setToolTipText("Open online help...");
         infoButton.addActionListener(e -> callback.run());
         return infoButton;

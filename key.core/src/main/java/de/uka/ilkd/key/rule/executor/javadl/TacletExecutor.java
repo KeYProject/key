@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -53,13 +55,13 @@ public abstract class TacletExecutor
 
     @Override
     protected Term not(Term t, Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().not((de.uka.ilkd.key.logic.Term) t);
+        return goal.getOverlayServices().getTermBuilder().not((JTerm) t);
     }
 
     @Override
     protected Term and(Term t1, Term t2, Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().and((de.uka.ilkd.key.logic.Term) t1,
-            (de.uka.ilkd.key.logic.Term) t2);
+        return goal.getOverlayServices().getTermBuilder().and((JTerm) t1,
+            (JTerm) t2);
     }
 
     /**
@@ -84,7 +86,7 @@ public abstract class TacletExecutor
     @Override
     protected Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.instantiation.MatchConditions mc,
+            MatchResultInfo mc,
             @NonNull Goal goal,
             @NonNull TacletApp tacletApp,
             LogicServices services,
@@ -108,7 +110,7 @@ public abstract class TacletExecutor
         }
         return goal.getOverlayServices().getTermBuilder()
                 .applyUpdatePairsSequential(svInst.getUpdateContext(),
-                    (de.uka.ilkd.key.logic.Term) formula);
+                    (JTerm) formula);
     }
 
     /**
@@ -131,7 +133,7 @@ public abstract class TacletExecutor
     protected ImmutableList<SequentFormula> instantiateSemisequent(
             Semisequent semi,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond, Goal goal,
+            MatchResultInfo matchCond, Goal goal,
             TacletApp tacletApp, LogicServices services,
             Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
                                            // labelHint) {
@@ -161,7 +163,7 @@ public abstract class TacletExecutor
     protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
             @NonNull Goal goal,
             LogicServices services,
-            org.key_project.prover.rules.instantiation.MatchConditions p_matchCond) {
+            MatchResultInfo p_matchCond) {
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
@@ -209,7 +211,7 @@ public abstract class TacletExecutor
             Goal goal,
             PosInOccurrence posOfFind,
             LogicServices p_services,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond) {
+            MatchResultInfo matchCond) {
         final Services services = (Services) p_services;
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {

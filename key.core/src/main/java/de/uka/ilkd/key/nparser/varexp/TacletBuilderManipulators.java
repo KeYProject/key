@@ -10,8 +10,8 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.conditions.*;
@@ -270,7 +270,7 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("static", StaticReferenceCondition.class, SV);
     public static final TacletBuilderCommand DIFFERENT_FIELDS =
         new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
-    public static final AbstractConditionBuilder HAS_ANNOTATION = 
+    public static final AbstractConditionBuilder HAS_ANNOTATION =
         new ConstructorBasedBuilder("hasAnnotation", HasAnnotationCondition.class, SV, S);
     public static final AbstractConditionBuilder SAME_OBSERVER =
         new ConstructorBasedBuilder("sameObserver", SameObserverCondition.class, PV, PV);
@@ -312,7 +312,7 @@ public class TacletBuilderManipulators {
         @Override
         public VariableCondition build(Object[] arguments, List<String> parameters,
                 boolean negated) {
-            var v = (OperatorSV) arguments[0];
+            var v = (JOperatorSV) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
                 throw new IllegalArgumentException("Generic sort is expected. Got: " + s);
@@ -338,7 +338,8 @@ public class TacletBuilderManipulators {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                return new StoreTermInCondition((SchemaVariable) arguments[0], (Term) arguments[1]);
+                return new StoreTermInCondition((SchemaVariable) arguments[0],
+                    (JTerm) arguments[1]);
             }
         };
 
@@ -383,7 +384,7 @@ public class TacletBuilderManipulators {
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
             STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
             META_DISJOINT,
-            IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP, 
+            IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP,
             HAS_ANNOTATION);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);

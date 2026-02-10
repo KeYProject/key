@@ -6,13 +6,15 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
-
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.JavaDeclaration;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
 public class MatchProgramInstruction implements MatchInstruction {
 
@@ -23,15 +25,12 @@ public class MatchProgramInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
             LogicServices services) {
         final MatchConditions result = pe.match(
-            new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1,
+            new SourceData(((JavaBlock) actualElement).program(), -1,
                 (Services) services),
-            matchConditions);
-        if (result != null) {
-            termPosition.gotoNext();
-        }
+            (MatchConditions) matchConditions);
         return result;
     }
 
@@ -40,10 +39,11 @@ public class MatchProgramInstruction implements MatchInstruction {
         var add = "";
 
         if (pe instanceof StatementBlock) {
-            var body = ((StatementBlock)pe).getBody();
+            var body = ((StatementBlock) pe).getBody();
             var first = body.get(0);
 
-            add += " " + first.toString() + " " + first.getClass() + " " + ((JavaDeclaration)first).getModifiers();
+            add += " " + first.toString() + " " + first.getClass() + " "
+                + ((JavaDeclaration) first).getModifiers();
         }
 
         return "MatchProgramInstruction(pe: " + pe.toString() + ", " + pe.getClass() + ")" + add;

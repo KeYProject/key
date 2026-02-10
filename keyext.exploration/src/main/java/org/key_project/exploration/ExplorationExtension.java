@@ -100,12 +100,12 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         ExplorationExtension extension = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 // ignored
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 Proof oldProof = leftPanel.getProof();
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {

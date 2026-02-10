@@ -18,6 +18,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -59,13 +60,13 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     /**
      * The optional custom stop condition used in the current proof.
      */
-    private StopCondition stopCondition;
+    private StopCondition<Goal> stopCondition;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         if (selectedList.size() >= 2) {
             Goal goal = null;
             // Reinitialize preferred set if required: Only with the goals where the stop condition
@@ -155,11 +156,11 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public void removeGoal(Goal p_goal) {
+    public void removeGoal(Goal goal) {
         // Update available goals in super class
-        super.removeGoal(p_goal);
+        super.removeGoal(goal);
         // Remove no longer relevant goal from preferred set
-        goalsToPrefer.remove(p_goal);
+        goalsToPrefer.remove(goal);
     }
 
     /**

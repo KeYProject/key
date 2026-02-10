@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -39,10 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author mulbrich
  * @since 2017-03
  */
-
 public class TestLocalSymbols {
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "localSymbols/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("localSymbols/");
 
 
     static class LocalMacro extends AbstractPropositionalExpansionMacro {
@@ -87,7 +87,7 @@ public class TestLocalSymbols {
     @Test
     public void testSkolemization() throws Exception {
 
-        Term target = TacletForTests
+        JTerm target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                     + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
@@ -125,8 +125,8 @@ public class TestLocalSymbols {
     // there was a bug.
     @Test
     public void testDoubleInstantiation() throws Exception {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, "doubleSkolem.key");
-        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
+        Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve("doubleSkolem.key");
+        Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
 
         KeYEnvironment<?> env = KeYEnvironment.load(
             JavaProfile.getDefaultInstance(), proofFile, null, null,
@@ -176,13 +176,12 @@ public class TestLocalSymbols {
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, proofFileName);
-        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
+        Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve(proofFileName);
+        Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
 
         try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+            return KeYEnvironment.load(JavaProfile.getDefaultInstance(),
                 proofFile, null, null, null, true);
-            return environment;
         } catch (ProblemLoaderException e) {
             Assertions.fail("Proof could not be loaded.");
             return null;

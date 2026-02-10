@@ -11,10 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -29,9 +28,12 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionVariable}.
@@ -65,7 +67,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO,
             IProgramVariable programVariable,
-            Term additionalCondition) {
+            JTerm additionalCondition) {
         this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
     }
 
@@ -80,7 +82,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
             PosInOccurrence modalityPIO, ExecutionValue parentValue,
-            IProgramVariable programVariable, Term additionalCondition) {
+            IProgramVariable programVariable, JTerm additionalCondition) {
         super(parentNode.getSettings(), proofNode, programVariable, parentValue, null,
             additionalCondition, modalityPIO);
         assert programVariable != null;
@@ -100,8 +102,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
-            ExecutionValue lengthValue, Term additionalCondition) {
+            PosInOccurrence modalityPIO, ExecutionValue parentValue, JTerm arrayIndex,
+            ExecutionValue lengthValue, JTerm additionalCondition) {
         super(parentNode.getSettings(), proofNode, null, parentValue, arrayIndex,
             additionalCondition, modalityPIO);
         assert modalityPIO != null;
@@ -138,8 +140,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             final TermBuilder tb = services.getTermBuilder();
             // Start site proof to extract the value of the result variable.
             SiteProofVariableValueInput sequentToProve;
-            Term siteProofSelectTerm = null;
-            Term siteProofCondition;
+            JTerm siteProofSelectTerm = null;
+            JTerm siteProofCondition;
             if (getAdditionalCondition() != null) {
                 siteProofCondition = getAdditionalCondition();
             } else {
@@ -162,10 +164,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services,
                     getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
             }
-            ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
-                sideProofEnv, sequentToProve.getSequentToProve(), StrategyProperties.METHOD_NONE,
-                StrategyProperties.LOOP_NONE, StrategyProperties.QUERY_OFF,
-                StrategyProperties.SPLITTING_DELAYED);
+            ApplyStrategyInfo<@NonNull Proof, Goal> info =
+                SymbolicExecutionSideProofUtil.startSideProof(getProof(),
+                    sideProofEnv, sequentToProve.getSequentToProve(),
+                    StrategyProperties.METHOD_NONE,
+                    StrategyProperties.LOOP_NONE, StrategyProperties.QUERY_OFF,
+                    StrategyProperties.SPLITTING_DELAYED);
             try {
                 return instantiateValuesFromSideProof(initConfig, services, tb, info,
                     sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition);
@@ -195,24 +199,24 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
             Services services, TermBuilder tb, ApplyStrategyInfo<Proof, Goal> info,
             Operator resultOperator,
-            Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
+            JTerm siteProofSelectTerm, JTerm siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());
         // Group values of the branches
-        Map<Term, List<Goal>> valueMap = new LinkedHashMap<>();
+        Map<JTerm, List<Goal>> valueMap = new LinkedHashMap<>();
         List<Goal> unknownValues = new LinkedList<>();
         groupGoalsByValue(info.getProof().openGoals(), resultOperator, siteProofSelectTerm,
             siteProofCondition, valueMap, unknownValues, services);
         // Instantiate child values
-        for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
-            Term value = valueEntry.getKey();
+        for (Entry<JTerm, List<Goal>> valueEntry : valueMap.entrySet()) {
+            JTerm value = valueEntry.getKey();
             if (isValidValue(value)) {
                 // Format return vale
                 String valueString = formatTerm(value, services);
                 // Determine type
                 String typeString = value.sort().toString();
                 // Compute value condition
-                Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
+                JTerm condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
                 String conditionString = null;
                 if (condition != null) {
                     conditionString = formatTerm(condition, services);
@@ -225,7 +229,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
         // Instantiate unknown child values
         if (!unknownValues.isEmpty()) {
             // Compute value condition
-            Term condition = computeValueCondition(tb, unknownValues, initConfig);
+            JTerm condition = computeValueCondition(tb, unknownValues, initConfig);
             String conditionString = null;
             if (condition != null) {
                 conditionString = formatTerm(condition, services);
@@ -239,12 +243,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     }
 
     /**
-     * Checks if the given {@link Term} represents a valid value.
+     * Checks if the given {@link JTerm} represents a valid value.
      *
      * @param value The value to check.
      * @return {@code true} valid value, {@code false} invalid value to be ignored.
      */
-    protected boolean isValidValue(Term value) {
+    protected boolean isValidValue(JTerm value) {
         return true;
     }
 
@@ -252,15 +256,15 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * Groups all {@link Goal}s which provides the same value.
      *
      * @param goals All available {@link Goal}s to group.
-     * @param operator The {@link Operator} of the {@link Term} which provides the value.
+     * @param operator The {@link Operator} of the {@link JTerm} which provides the value.
      * @param services The {@link Services} to use.
      */
     protected void groupGoalsByValue(ImmutableList<Goal> goals, Operator operator,
-            Term siteProofSelectTerm, Term siteProofCondition, Map<Term, List<Goal>> valueMap,
+            JTerm siteProofSelectTerm, JTerm siteProofCondition, Map<JTerm, List<Goal>> valueMap,
             List<Goal> unknownValues, Services services) throws ProofInputException {
         for (Goal goal : goals) {
             // Extract value
-            Term value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
+            JTerm value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
             assert value != null;
             value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, services);
             // Compute unknown flag if required
@@ -298,17 +302,17 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @return The combined path condition.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals,
+    protected JTerm computeValueCondition(TermBuilder tb, List<Goal> valueGoals,
             InitConfig initConfig) throws ProofInputException {
         if (!valueGoals.isEmpty()) {
-            List<Term> pathConditions = new LinkedList<>();
+            List<JTerm> pathConditions = new LinkedList<>();
             Proof proof = null;
             for (Goal valueGoal : valueGoals) {
                 pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(),
                     getSettings().simplifyConditions(), false));
                 proof = valueGoal.node().proof();
             }
-            Term comboundPathCondition = tb.or(pathConditions);
+            JTerm comboundPathCondition = tb.or(pathConditions);
             if (getSettings().simplifyConditions()) {
                 comboundPathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
@@ -325,7 +329,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * {@inheritDoc}
      */
     @Override
-    public Term createSelectTerm() {
+    public JTerm createSelectTerm() {
         return SymbolicExecutionUtil.createSelectTerm(this);
     }
 

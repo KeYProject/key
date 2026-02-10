@@ -9,7 +9,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -24,7 +24,7 @@ public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
 
-    private final Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
+    private final Map<ProofObligationVars, Map<JTerm, JTerm>> infFlowToSymbExecVarsMaps;
 
 
     public IFProofObligationVars(ProofObligationVars symbExecVars, Services services) {
@@ -63,10 +63,10 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<Term, Term> map) {
-        final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
-        for (final Term symbTerm : seVars.termList) {
-            final Term ifTerm;
+    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<JTerm, JTerm> map) {
+        final Iterator<JTerm> ifVarsIt = ifVars.termList.iterator();
+        for (final JTerm symbTerm : seVars.termList) {
+            final JTerm ifTerm;
             if (ifVarsIt.hasNext()) {
                 ifTerm = ifVarsIt.next();
             } else {
@@ -79,7 +79,7 @@ public class IFProofObligationVars {
     }
 
 
-    public Map<Term, Term> getMapFor(ProofObligationVars vars) {
+    public Map<JTerm, JTerm> getMapFor(ProofObligationVars vars) {
         return infFlowToSymbExecVarsMaps.get(vars);
     }
 

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -30,6 +30,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -65,7 +66,7 @@ public class ProofStarter {
                     : "ProofObligation for " + ProofSaver.printAnything(seq, null);
         }
 
-        public UserProvidedInput(Term formula, ProofEnvironment env) {
+        public UserProvidedInput(JTerm formula, ProofEnvironment env) {
             this(
                 JavaDLSequentKit.createSuccSequent(
                     ImmutableSLList.<SequentFormula>nil().prepend(new SequentFormula(formula))),
@@ -122,7 +123,7 @@ public class ProofStarter {
 
     private @Nullable AutoSaver autoSaver;
 
-    private @Nullable Strategy strategy;
+    private @Nullable Strategy<@NonNull Goal> strategy;
 
     /**
      * creates an instance of the ProofStarter
@@ -151,7 +152,7 @@ public class ProofStarter {
      *
      * @throws ProofInputException if the proof obligation generation fails
      */
-    public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
+    public void init(JTerm formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
         proof.setEnv(env);
@@ -196,7 +197,7 @@ public class ProofStarter {
         this.maxSteps = maxSteps;
     }
 
-    public void setStrategy(Strategy strategy) {
+    public void setStrategy(Strategy<@NonNull Goal> strategy) {
         this.strategy = strategy;
     }
 

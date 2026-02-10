@@ -103,21 +103,21 @@ public class SequentViewSearchBar extends SearchBar {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 // search always does a repaint, therefore don't force update in setFilter
                 switch ((SearchMode) Objects.requireNonNull(searchModeBox.getSelectedItem())) {
-                case HIDE -> {
-                    sequentView.setFilter(new HideSequentPrintFilter(
-                        sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
-                    search();
-                }
-                case REGROUP -> {
-                    sequentView.setFilter(new RegroupSequentPrintFilter(
-                        sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
-                    search();
-                }
-                case HIGHLIGHT -> {
-                    sequentView.setFilter(new IdentitySequentPrintFilter(), false);
-                    search();
-                }
-                default -> sequentView.setFilter(new IdentitySequentPrintFilter(), true);
+                    case HIDE -> {
+                        sequentView.setFilter(new HideSequentPrintFilter(
+                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                        search();
+                    }
+                    case REGROUP -> {
+                        sequentView.setFilter(new RegroupSequentPrintFilter(
+                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                        search();
+                    }
+                    case HIGHLIGHT -> {
+                        sequentView.setFilter(new IdentitySequentPrintFilter(), false);
+                        search();
+                    }
+                    default -> sequentView.setFilter(new IdentitySequentPrintFilter(), true);
                 }
             }
         });

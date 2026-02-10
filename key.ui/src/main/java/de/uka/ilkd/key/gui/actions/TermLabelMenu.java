@@ -15,8 +15,10 @@ import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.Sequent;
@@ -61,7 +63,7 @@ public class TermLabelMenu extends JMenu {
              * Change font style for TermLabelCheckBox instances when the selected node changes.
              */
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 Set<Name> labelNames =
                     getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
@@ -84,7 +86,7 @@ public class TermLabelMenu extends JMenu {
             public Set<Name> getOccuringTermLabels(Sequent seq) {
                 final Set<Name> result = new HashSet<>();
                 for (final SequentFormula sf : seq) {
-                    result.addAll(getLabelsForTermRecursively((Term) sf.formula()));
+                    result.addAll(getLabelsForTermRecursively((JTerm) sf.formula()));
                 }
                 return result;
             }
@@ -92,7 +94,7 @@ public class TermLabelMenu extends JMenu {
             /*
              * Returns names of TermLabels, that occur in term or one of its subterms.
              */
-            private static Set<Name> getLabelsForTermRecursively(Term term) {
+            private static Set<Name> getLabelsForTermRecursively(JTerm term) {
                 Set<Name> result = new HashSet<>();
 
                 if (term.hasLabels()) {
@@ -101,7 +103,7 @@ public class TermLabelMenu extends JMenu {
                     }
                 }
 
-                for (final Term subTerm : term.subs()) {
+                for (final JTerm subTerm : term.subs()) {
                     result.addAll(getLabelsForTermRecursively(subTerm));
                 }
 
@@ -112,7 +114,7 @@ public class TermLabelMenu extends JMenu {
              * This function only has effect if the Profile gets changed.
              */
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 rebuildMenu();
             }
         });

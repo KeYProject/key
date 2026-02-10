@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -27,12 +27,12 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 
 public final class DependencyContractFeature extends BinaryFeature {
 
-    private void removePreviouslyUsedSteps(Term focus, Goal goal,
+    private void removePreviouslyUsedSteps(JTerm focus, Goal goal,
             List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
-            Term term = (Term) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
-                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, focus)) {
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(app.posInOccurrence().subTerm(),
+                        focus)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
                 for (PosInOccurrence ifInst : bapp.assumesInsts()) {
                     steps.remove(ifInst);
@@ -46,7 +46,7 @@ public final class DependencyContractFeature extends BinaryFeature {
             PosInOccurrence pos,
             Goal p_goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-        final Term focus = (Term) pos.subTerm();
+        final JTerm focus = (JTerm) pos.subTerm();
 
         // determine possible steps
         final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;

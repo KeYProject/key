@@ -14,6 +14,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -63,14 +64,15 @@ public class TestGenerationAction extends MainWindowAction implements PropertyCh
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
                 setEnabled(haveZ3CE && proof != null);
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                selectedNodeChanged(e);
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                final Proof proof = getMediator().getSelectedProof();
+                setEnabled(haveZ3CE && proof != null);
             }
         };
         getMediator().addKeYSelectionListener(selListener);
@@ -89,7 +91,7 @@ public class TestGenerationAction extends MainWindowAction implements PropertyCh
                 getMediator().addKeYSelectionListener(selListener);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent<>(getMediator().getSelectionModel()));
     }
 
     /**

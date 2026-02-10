@@ -60,7 +60,7 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
     @Override
     protected void tryLoadFile(Path file) throws Exception {
         ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-        AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
+        AbstractProblemLoader pl = new SingleThreadProblemLoader(file, null, null,
             null, AbstractProfile.getDefaultProfile(), false,
             control, false, new Properties());
         pl.setLoadSingleJavaFile(true);

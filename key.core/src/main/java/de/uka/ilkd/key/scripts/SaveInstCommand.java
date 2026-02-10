@@ -5,8 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -25,22 +24,16 @@ import org.key_project.prover.rules.RuleApp;
  *
  * @author Dominic Steinhoefel
  */
-public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
+public class SaveInstCommand extends AbstractCommand {
     public SaveInstCommand() {
         super(null);
     }
 
     @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
-            EngineState stateMap) throws ScriptException, InterruptedException {
-
-        AbbrevMap abbrMap = stateMap.getAbbreviations();
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        AbbrevMap abbrMap = state().getAbbreviations();
+        for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
             final var value = entry.getValue();
             if ("#1".equals(key)) {
@@ -61,14 +54,14 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
             }
 
             try {
-                var parentNode = stateMap.getFirstOpenAutomaticGoal().node().parent();
+                var parentNode = state().getFirstOpenAutomaticGoal().node().parent();
                 if (parentNode != null) {
                     final RuleApp ruleApp = parentNode.getAppliedRuleApp();
                     if (ruleApp instanceof TacletApp tacletApp) {
                         final Object inst = tacletApp.matchConditions().getInstantiations()
                                 .lookupValue(new Name(value.toString()));
-                        if (inst != null && ((Term) inst).op() instanceof Function) {
-                            abbrMap.put((Term) inst, key, true);
+                        if (inst != null && ((JTerm) inst).op() instanceof Function) {
+                            abbrMap.put((JTerm) inst, key, true);
                         } else {
                             throw new ScriptException(String.format(
                                 "Tried to remember instantiation of schema variable %s "

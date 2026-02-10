@@ -186,21 +186,21 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         IsabelleResult result = solver.getFinalResult();
 
         switch (result.getType()) {
-        case INTERRUPTED:
-            interrupted(x, y);
-            break;
-        case SUCCESS:
-            successfullyStopped(solver, x, y);
-            break;
-        case ERROR:
-            encounteredError(x, y);
-            break;
-        case TIMEOUT:
-            timedOut(x, y);
-            break;
-        default:
-            unknownStopped(x, y);
-            break;
+            case INTERRUPTED:
+                interrupted(x, y);
+                break;
+            case SUCCESS:
+                successfullyStopped(solver, x, y);
+                break;
+            case ERROR:
+                encounteredError(x, y);
+                break;
+            case TIMEOUT:
+                timedOut(x, y);
+                break;
+            default:
+                unknownStopped(x, y);
+                break;
         }
     }
 
@@ -357,11 +357,11 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private void refreshProgressOfSolver(IsabelleSolver solver) {
         IsabelleSolver.SolverState state = solver.getState();
         switch (state) {
-        case Preparing -> preparing(solver);
-        case Parsing -> parsing(solver);
-        case Running -> running(solver);
-        case Stopped -> stopped(solver);
-        case Waiting -> waiting(solver);
+            case Preparing -> preparing(solver);
+            case Parsing -> parsing(solver);
+            case Running -> running(solver);
+            case Stopped -> stopped(solver);
+            case Waiting -> waiting(solver);
         }
     }
 

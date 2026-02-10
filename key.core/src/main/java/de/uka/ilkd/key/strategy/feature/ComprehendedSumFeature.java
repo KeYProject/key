@@ -36,7 +36,7 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer<Goal> var,
             TermGenerator<Goal> generator,
             Feature body) {
-        return new ComprehendedSumFeature(var, generator, body);
+        return new ComprehendedSumFeature<>(var, generator, body);
     }
 
     private ComprehendedSumFeature(TermBuffer<Goal> var, TermGenerator<Goal> generator,

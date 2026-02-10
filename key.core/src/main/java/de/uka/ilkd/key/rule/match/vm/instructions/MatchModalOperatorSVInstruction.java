@@ -3,41 +3,36 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
+import java.util.Set;
+
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
-public class MatchModalOperatorSVInstruction implements MatchInstruction {
+public final class MatchModalOperatorSVInstruction implements MatchInstruction {
 
-    private ModalOperatorSV op;
+    private final Set<JModality.JavaModalityKind> modalityKinds;
+    private final ModalOperatorSV modalitySV;
 
-    public MatchModalOperatorSVInstruction(ModalOperatorSV op) {
-        this.op = op;
+    public MatchModalOperatorSVInstruction(ModalOperatorSV mod) {
+        this.modalitySV = mod;
+        this.modalityKinds = modalitySV.getModalities().toSet();
     }
 
-    public MatchConditions match(Term t, MatchConditions mc, LogicServices services) {
-        if (t.op() instanceof Modality mod
-                && op.getModalities().contains(mod.kind())) {
-            return mc.setInstantiations(
-                mc.getInstantiations().add(op, mod.<Modality.JavaModalityKind>kind(), services));
+    @Override
+    public MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo mc, LogicServices services) {
+        if (actualElement instanceof JModality.JavaModalityKind kind
+                && modalityKinds.contains(kind)) {
+            final SVInstantiations instantiations = (SVInstantiations) mc.getInstantiations();
+            return mc.setInstantiations(instantiations.add(modalitySV, kind, services));
         } else {
             return null;
         }
-    }
-
-    @Override
-    public MatchConditions match(TermNavigator termPosition,
-            MatchConditions mc,
-            LogicServices services) {
-        return match(termPosition.getCurrentSubterm(), mc, services);
-    }
-
-    @Override
-    public String toString() {
-        return "MatchModalOperatorSVInstruction";
     }
 }

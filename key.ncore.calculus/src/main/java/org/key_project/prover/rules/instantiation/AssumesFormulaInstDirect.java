@@ -4,47 +4,38 @@
 package org.key_project.prover.rules.instantiation;
 
 
-import org.key_project.logic.LogicServices;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.Nullable;
 
-/**
- * Instantiation of an assumes-formula that has to be proven by an explicit assumes-goal
- * <p>
- * This is used if an assumes sequent cannot be matched against an existing formula in the
- * proof goal. The instantiation is usually provided by the user or the proof search strategy.
- * </p>
- * <p>
- * Application of a taclet whose instantiations contain a direct instantiation leads to a proof
- * split
- * where on one branch the formula used as instantiation has to be proven valid.
- * </p>
- *
- * @see AssumesFormulaInstantiation, AssumesFormulaInstSeq
- */
+
+/// Instantiation of an assumes-formula that has to be proven by an explicit assumes-goal
+///
+/// This is used if an assumes sequent cannot be matched against an existing formula in the
+/// proof goal. The instantiation is usually provided by the user or the proof search strategy.
+///
+///
+/// Application of a taclet whose instantiations contain a direct instantiation leads to a proof
+/// split
+/// where on one branch the formula used as instantiation has to be proven valid.
+///
+///
+/// @see AssumesFormulaInstantiation, AssumesFormulaInstSeq
 public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
 
-    /**
-     * Simply the formula
-     */
+    /// Simply the formula
     private final SequentFormula cf;
 
     public AssumesFormulaInstDirect(SequentFormula p_cf) {
         cf = p_cf;
     }
 
-    /**
-     * @return the cf this is pointing to
-     */
+    /// @return the cf this is pointing to
     public SequentFormula getSequentFormula() {
         return cf;
     }
 
-    public String toString() {
-        return toString(null);
-    }
-
-    public boolean equals(Object p_obj) {
+    public boolean equals(@Nullable Object p_obj) {
         if (!(p_obj instanceof AssumesFormulaInstDirect)) {
             return false;
         }
@@ -57,7 +48,7 @@ public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
         return result;
     }
 
-    public String toString(LogicServices services) {
+    public String toString() {
         return cf.toString();
     }
 }

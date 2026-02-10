@@ -348,8 +348,9 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public String toString() {
         var declspecs = getDeclarationSpecifiers();
 
-        return declspecs == null ? "" : declspecs.toString() 
-            + " " + getTypeReference().toString() 
-            + " " + varSpecs.toString() + ";";
+        return declspecs == null ? ""
+                : declspecs.toString()
+                    + " " + getTypeReference().toString()
+                    + " " + varSpecs.toString() + ";";
     }
 }

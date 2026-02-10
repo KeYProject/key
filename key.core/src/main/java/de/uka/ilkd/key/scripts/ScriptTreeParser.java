@@ -30,23 +30,23 @@ public class ScriptTreeParser {
             }
 
             switch (command.args().get(ScriptLineParser.COMMAND_KEY)) {
-            case "branches" -> branchStack.push(last);
-            case "next" -> last = branchStack.peek();
-            case "end" -> {
-                last = null;
-                branchStack.pop();
-            }
-            default -> {
-                ScriptNode node = new ScriptNode(last, command.args(), from, to);
-                if (root == null) {
-                    root = node;
-                } else if (last == null) {
-                    throw new ScriptException("unexpected last");
-                } else {
-                    last.addNode(node);
+                case "branches" -> branchStack.push(last);
+                case "next" -> last = branchStack.peek();
+                case "end" -> {
+                    last = null;
+                    branchStack.pop();
                 }
-                last = node;
-            }
+                default -> {
+                    ScriptNode node = new ScriptNode(last, command.args(), from, to);
+                    if (root == null) {
+                        root = node;
+                    } else if (last == null) {
+                        throw new ScriptException("unexpected last");
+                    } else {
+                        last.addNode(node);
+                    }
+                    last = node;
+                }
             }
         }
 

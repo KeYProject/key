@@ -81,7 +81,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
 
     /** The chosen distinguishing formula */
-    private Term chosenDistForm = null;
+    private JTerm chosenDistForm = null;
 
     private JEditorPane txtPartner1 = null;
     private JEditorPane txtPartner2 = null;
@@ -353,7 +353,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return The chosen distinguishing formula. If null, an automatic generation of the
      *         distinguishing formula should be performed.
      */
-    public Term getChosenDistinguishingFormula() {
+    public JTerm getChosenDistinguishingFormula() {
         return isSuitableDistFormula() ? chosenDistForm : null;
     }
 
@@ -429,14 +429,14 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param formulaToProve Formula to prove.
      * @return True iff formulaToProve can be proven within the given sequent.
      */
-    private static boolean checkProvability(Sequent seq, Term formulaToProve, Services services) {
+    private static boolean checkProvability(Sequent seq, JTerm formulaToProve, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Sequent toProve = JavaDLSequentKit.createSequent(seq.antecedent().asList(),
             ImmutableSLList.singleton(new SequentFormula(formulaToProve)));
 
         for (SequentFormula succedentFormula : seq.succedent()) {
-            final Term formula = (Term) succedentFormula.formula();
+            final JTerm formula = (JTerm) succedentFormula.formula();
             if (!formula.containsJavaBlockRecursive()) {
                 toProve =
                     toProve.addFormula(new SequentFormula(tb.not(formula)), true, true).sequent();
@@ -513,7 +513,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     private void setHighlightedSequentForArea(Goal goal,
             PosInOccurrence pio, JEditorPane area) {
 
-        String subterm = LogicPrinter.quickPrintTerm((Term) pio.subTerm(), services);
+        String subterm = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), services);
 
         // Render subterm to highlight as a regular expression.
         // Note: Four backslashs in replacement expression will result in

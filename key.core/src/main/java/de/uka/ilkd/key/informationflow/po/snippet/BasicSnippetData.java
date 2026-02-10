@@ -12,11 +12,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -84,18 +84,18 @@ class BasicSnippetData {
         /**
          * Returns the contracted block.
          */
-        TARGET_BLOCK(StatementBlock.class), PRECONDITION(Term.class),
+        TARGET_BLOCK(StatementBlock.class), PRECONDITION(JTerm.class),
         /**
          * Returns the free precondition.
          */
-        FREE_PRECONDITION(Term.class), POSTCONDITION(Term.class),
-        LOOP_INVARIANT(LoopSpecification.class), LOOP_INVARIANT_TERM(Term.class),
-        MODIFIABLE(Term.class), DEPENDENS(Term.class), MEASURED_BY(Term.class),
-        MODALITY(Modality.JavaModalityKind.class), INF_FLOW_SPECS(ImmutableList.class),
+        FREE_PRECONDITION(JTerm.class), POSTCONDITION(JTerm.class),
+        LOOP_INVARIANT(LoopSpecification.class), LOOP_INVARIANT_TERM(JTerm.class),
+        MODIFIABLE(JTerm.class), DEPENDENS(JTerm.class), MEASURED_BY(JTerm.class),
+        MODALITY(JModality.JavaModalityKind.class), INF_FLOW_SPECS(ImmutableList.class),
         /**
          * Self term of the transformed block contract
          */
-        BLOCK_SELF(Term.class),
+        BLOCK_SELF(JTerm.class),
         /**
          * Variables originally used during parsing.
          */
@@ -129,12 +129,12 @@ class BasicSnippetData {
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModalityKind());
 
-        final Term heap = tb.getBaseHeap();
+        final JTerm heap = tb.getBaseHeap();
         origVars = new StateVars(contract.getSelf(), contract.getParams(), contract.getResult(),
             contract.getExc(), heap);
     }
 
-    BasicSnippetData(LoopSpecification invariant, ExecutionContext context, Term guardTerm,
+    BasicSnippetData(LoopSpecification invariant, ExecutionContext context, JTerm guardTerm,
             Services services) {
         this.hasMby = false;
         this.services = services;
@@ -146,7 +146,7 @@ class BasicSnippetData {
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIABLE, invariant.getModifiable());
-        contractContents.put(Key.MODALITY, Modality.JavaModalityKind.BOX);
+        contractContents.put(Key.MODALITY, JModality.JavaModalityKind.BOX);
         contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
         // add guard term to information flow specs (necessary for soundness)
@@ -154,24 +154,24 @@ class BasicSnippetData {
         ImmutableList<InfFlowSpec> infFlowSpecs = invariant.getInfFlowSpecs(services);
         ImmutableList<InfFlowSpec> modifiedSpecs = ImmutableSLList.nil();
         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-            ImmutableList<Term> modifiedPreExps = infFlowSpec.preExpressions.append(guardTerm);
-            ImmutableList<Term> modifiedPostExps = infFlowSpec.postExpressions.append(guardTerm);
+            ImmutableList<JTerm> modifiedPreExps = infFlowSpec.preExpressions.append(guardTerm);
+            ImmutableList<JTerm> modifiedPostExps = infFlowSpec.postExpressions.append(guardTerm);
             InfFlowSpec modifiedSpec =
                 new InfFlowSpec(modifiedPreExps, modifiedPostExps, infFlowSpec.newObjects);
             modifiedSpecs = modifiedSpecs.append(modifiedSpec);
         }
         contractContents.put(Key.INF_FLOW_SPECS, modifiedSpecs);
 
-        final Term heap = tb.getBaseHeap();
+        final JTerm heap = tb.getBaseHeap();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(invariant.getLoop(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(invariant.getLoop(), services);
-        final ImmutableList<Term> localInTerms = toTermList(localInVariables);
-        final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
-        final ImmutableList<Term> localInsWithoutOutDuplicates =
+        final ImmutableList<JTerm> localInTerms = toTermList(localInVariables);
+        final ImmutableList<JTerm> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<JTerm> localInsWithoutOutDuplicates =
             MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
-        final ImmutableList<Term> localVarsTerms =
+        final ImmutableList<JTerm> localVarsTerms =
             localInsWithoutOutDuplicates.append(localOutTerms);
 
         origVars = new StateVars(invariant.getInternalSelfTerm(), guardTerm, localVarsTerms, heap);
@@ -193,7 +193,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModalityKind());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
 
-        final Term heap = tb.getBaseHeap();
+        final JTerm heap = tb.getBaseHeap();
         origVars = new StateVars(contract.getSelf(), contract.getParams(), contract.getResult(),
             contract.getExc(), heap);
     }
@@ -218,25 +218,25 @@ class BasicSnippetData {
         contractContents.put(Key.LABELS, labels.toArray(new Label[0]));
         contractContents.put(Key.EXECUTION_CONTEXT, context);
 
-        final Term heap = tb.getBaseHeap();
+        final JTerm heap = tb.getBaseHeap();
         BlockContract.Terms vars = contract.getVariablesAsTerms(services);
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(contract.getBlock(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(contract.getBlock(), services);
-        final ImmutableList<Term> localInTerms = toTermList(localInVariables);
-        final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
-        final ImmutableList<Term> localInsWithoutOutDuplicates =
+        final ImmutableList<JTerm> localInTerms = toTermList(localInVariables);
+        final ImmutableList<JTerm> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<JTerm> localInsWithoutOutDuplicates =
             MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
-        final ImmutableList<Term> localVarsTerms =
+        final ImmutableList<JTerm> localVarsTerms =
             localInsWithoutOutDuplicates.append(localOutTerms);
 
         origVars = new StateVars(vars.self, localVarsTerms, vars.result, vars.exception, heap);
     }
 
 
-    private ImmutableList<Term> toTermList(ImmutableSet<LocationVariable> vars) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
+    private ImmutableList<JTerm> toTermList(ImmutableSet<LocationVariable> vars) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }

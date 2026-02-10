@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -424,7 +425,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer replayer = SlicingProofReplayer
                     .constructSlicer(control, currentProof, results, mediator.getUI());
-            File proofFile;
+            Path proofFile;
             // first slice attempt: leave aggressive de-duplicate on
             if (results.didDeduplicateRuleApps
                     && SlicingSettingsProvider.getSlicingSettings()
@@ -529,7 +530,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         currentProof = e.getSource().getSelectedProof();
         resetLabels();
         resetGraphLabels();
@@ -588,8 +589,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         } else {
             dotExport.setEnabled(true);
             dotExport.setToolTipText(null);
-            showGraphRendering.setEnabled(true);
-            showGraphRendering.setToolTipText(null);
+            if (GraphvizDotExecutor.isDotInstalled()) {
+                showGraphRendering.setEnabled(true);
+                showGraphRendering.setToolTipText(null);
+            }
             boolean algoSelectionSane = doDependencyAnalysis.isSelected()
                     || doDeduplicateRuleApps.isSelected();
             runAnalysis.setEnabled(algoSelectionSane);

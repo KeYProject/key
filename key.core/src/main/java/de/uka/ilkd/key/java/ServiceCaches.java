@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -88,7 +88,7 @@ public class ServiceCaches implements SessionCaches {
      *
      * keys: Term values: TermInfo
      */
-    private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<>(1000);
+    private final LRUCache<JTerm, TermInfo> betaCandidates = new LRUCache<>(1000);
 
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
@@ -117,7 +117,7 @@ public class ServiceCaches implements SessionCaches {
     /**
      * Cache used by the TermFactory to avoid unnecessary creation of terms
      */
-    private final Map<Term, Term> termCache = new LRUCache<>(20000);
+    private final Map<JTerm, JTerm> termCache = new LRUCache<>(20000);
 
     /**
      * Cache used by TypeComparisonCondition
@@ -128,14 +128,14 @@ public class ServiceCaches implements SessionCaches {
     /**
      * Cache used by HandleArith for caching formatted terms
      */
-    private final LRUCache<Term, Term> formattedTermCache = new LRUCache<>(5000);
+    private final LRUCache<JTerm, JTerm> formattedTermCache = new LRUCache<>(5000);
 
     /**
      * Caches used bu HandleArith to cache proof results
      */
-    private final LRUCache<Term, Term> provedByArithFstCache = new LRUCache<>(5000);
+    private final LRUCache<JTerm, JTerm> provedByArithFstCache = new LRUCache<>(5000);
 
-    private final LRUCache<Pair<Term, Term>, Term> provedByArithSndCache =
+    private final LRUCache<Pair<JTerm, JTerm>, JTerm> provedByArithSndCache =
         new LRUCache<>(5000);
 
     /** Cache used by the exhaustive macro */
@@ -154,7 +154,8 @@ public class ServiceCaches implements SessionCaches {
         new AppliedRuleAppsNameCache();
 
     /** Cache used by EqualityConstraint to speed up meta variable search */
-    private final LRUCache<Term, ImmutableSet<Metavariable>> mvCache = new LRUCache<>(2000);
+    private final LRUCache<org.key_project.logic.Term, ImmutableSet<Metavariable>> mvCache =
+        new LRUCache<>(2000);
 
 
     /**
@@ -166,7 +167,7 @@ public class ServiceCaches implements SessionCaches {
         return termTacletAppIndexCache;
     }
 
-    public final LRUCache<Term, TermInfo> getBetaCandidates() {
+    public final LRUCache<JTerm, TermInfo> getBetaCandidates() {
         return betaCandidates;
     }
 
@@ -194,7 +195,7 @@ public class ServiceCaches implements SessionCaches {
         return graphCache;
     }
 
-    public final Map<Term, Term> getTermFactoryCache() {
+    public final Map<JTerm, JTerm> getTermFactoryCache() {
         return termCache;
     }
 
@@ -202,15 +203,15 @@ public class ServiceCaches implements SessionCaches {
         return disjointnessCache;
     }
 
-    public final LRUCache<Term, Term> getFormattedTermCache() {
+    public final LRUCache<JTerm, JTerm> getFormattedTermCache() {
         return formattedTermCache;
     }
 
-    public final LRUCache<Term, Term> getProvedByArithFstCache() {
+    public final LRUCache<JTerm, JTerm> getProvedByArithFstCache() {
         return provedByArithFstCache;
     }
 
-    public final LRUCache<Pair<Term, Term>, Term> getProvedByArithSndCache() {
+    public final LRUCache<Pair<JTerm, JTerm>, JTerm> getProvedByArithSndCache() {
         return provedByArithSndCache;
     }
 
@@ -230,7 +231,7 @@ public class ServiceCaches implements SessionCaches {
         return appliedRuleAppsNameCache;
     }
 
-    public LRUCache<Term, ImmutableSet<Metavariable>> getMVCache() {
+    public LRUCache<org.key_project.logic.Term, ImmutableSet<Metavariable>> getMVCache() {
         return mvCache;
     }
 

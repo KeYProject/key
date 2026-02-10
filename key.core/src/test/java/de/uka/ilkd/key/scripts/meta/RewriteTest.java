@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,13 +30,13 @@ public class RewriteTest {
     @Test
     public void testTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        Path script = HelperClassForTests.TESTCASE_DIRECTORY.toPath()
+        Path script = HelperClassForTests.TESTCASE_DIRECTORY
                 .resolve("scriptCommands/rewrite.script");
-        File keyFile =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
+        Path keyFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("scriptCommands/transitive.key");
 
         assumeTrue(Files.exists(script), "Required script file not found: " + script);
-        assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
+        assumeTrue(Files.exists(keyFile), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         assertNotNull(env);
@@ -60,13 +59,13 @@ public class RewriteTest {
     @Test
     public void testLessTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        Path script = HelperClassForTests.TESTCASE_DIRECTORY.toPath()
+        Path script = HelperClassForTests.TESTCASE_DIRECTORY
                 .resolve("scriptCommands/lesstrans.script");
-        File keyFile =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
+        Path keyFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("scriptCommands/less_trans.key");
 
         assumeTrue(Files.exists(script), "Required script file not found: " + script);
-        assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
+        assumeTrue(Files.exists(keyFile), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         Proof proof = env.getLoadedProof();

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -37,7 +37,7 @@ public interface POExtension {
      * @return The modified post condition or the original post condition if no modifications were
      *         performed.
      */
-    Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+    JTerm modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
             Services services, ProgramVariable selfTerm,
-            Term postTerm);
+            JTerm postTerm);
 }

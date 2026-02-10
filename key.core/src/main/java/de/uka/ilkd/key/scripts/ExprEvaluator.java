@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
+import java.net.URI;
+
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.*;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
 import org.key_project.prover.sequent.Sequent;
@@ -34,6 +37,12 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
 
     ExprEvaluator(EngineState engineState) {
         this.state = engineState;
+    }
+
+    @Override
+    public Object visitProofScriptCodeBlock(ProofScriptCodeBlockContext ctx) {
+        URI uri = KeyAst.ProofScript.getUri(ctx.start);
+        return KeyAst.ProofScript.asAst(uri, ctx);
     }
 
     @Override

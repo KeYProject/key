@@ -6,14 +6,19 @@ package de.uka.ilkd.key.nparser;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.scripts.ScriptBlock;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -48,7 +53,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         this.ctx = ctx;
     }
 
-    public <T> T accept(ParseTreeVisitor<T> visitor) {
+    /// Apply the given `visitor` to the underlying ANTLR4 parse tree.
+    public <R> R accept(ParseTreeVisitor<R> visitor) {
         return ctx.accept(visitor);
     }
 
@@ -57,22 +63,27 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
     }
 
+    /// Returns the start location of the first character of the first token of the underlying parse
+    /// tree.
     public Location getStartLocation() {
         return Location.fromToken(ctx.start);
     }
 
+    /// Get the text of the parse tree as a cut out of the original input stream.
+    /// Hence, Spaces and comments should be preserved.
     public String getText() {
         var interval = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
         return ctx.start.getInputStream().getText(interval);
     }
 
+    /// An AST representing a complete KeY file.
     public static class File extends KeyAst<KeYParser.FileContext> {
         File(KeYParser.FileContext ctx) {
             super(ctx);
         }
 
-        @Nullable
-        public ProofSettings findProofSettings() {
+        /// Returns proof settings (aka `\settings`) if found in the parse tree.
+        public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
 
             if (ctx.preferences() != null && ctx.preferences().s != null) {
@@ -100,7 +111,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
                 KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
 
-                KeYParser.ProofScriptContext ps;
                 if (pctx.STRING_LITERAL() != null) {
                     var ctx = pctx.STRING_LITERAL().getSymbol();
                     String text = pctx.STRING_LITERAL().getText();
@@ -117,25 +127,34 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return null;
         }
 
+        /// Returns the includes (possible empty but not null) computed from the underlying parse
+        /// tree.
         public Includes getIncludes(URL base) {
             IncludeFinder finder = new IncludeFinder(base);
             accept(finder);
             return finder.getIncludes();
         }
 
+        /// Returns the information on choices from the underlying parse tree.
         public ChoiceInformation getChoices() {
             ChoiceFinder finder = new ChoiceFinder();
             accept(finder);
             return finder.getChoiceInformation();
         }
 
+        /// Returns information on `\problem`, `\proofObligation` or `\chooseContract` using the
+        /// underlying
+        /// parse tree.
         public ProblemInformation getProblemInformation() {
             FindProblemInformation fpi = new FindProblemInformation();
             ctx.accept(fpi);
             return fpi.getProblemInformation();
         }
 
-        public Token findProof() {
+        /// Returns the token `\proof` in the underlying parse tree.`
+        /// This token also marks the end of the parse tree (EOF) but not the end of the file.
+        /// Positional information of the token is used to set up the proof replayer.
+        public @Nullable Token findProof() {
             KeYParser.ProofContext a = ctx.proof();
             if (a != null) {
                 return a.PROOF().getSymbol();
@@ -177,7 +196,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             final var cfg = new ConfigurationBuilder();
             List<Object> res = cfg.visitCfile(ctx);
             if (!res.isEmpty())
-                return (Configuration) res.get(0);
+                return (Configuration) res.getFirst();
             else
                 throw new RuntimeException("Error in configuration. Source: "
                     + ctx.start.getTokenSource().getSourceName());
@@ -234,8 +253,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public URI getUrl() {
-            final var sourceName = ctx.start.getTokenSource().getSourceName();
+        public URI getUri() {
+            return getUri(ctx.start);
+        }
+
+        public static URI getUri(Token token) {
+            final var sourceName = token.getTokenSource().getSourceName();
             try {
                 if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
                         || sourceName.startsWith("jar:"))
@@ -243,6 +266,57 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             } catch (URISyntaxException ignored) {
             }
             return new java.io.File(sourceName).toURI();
+        }
+
+        /// Translates this parse tree into an AST usable for the proof script engine.
+        /// The current representation of a proof script is a list of commands. Each command
+        /// can hold a list of sub-commands.
+        ///
+        /// @return a non-null list of the parsed commands.
+        public List<ScriptCommandAst> asAst() {
+            var fileUri = getUri();
+            return asAst(fileUri, ctx.proofScriptCommand());
+        }
+
+        private static List<ScriptCommandAst> asAst(URI file,
+                List<KeYParser.ProofScriptCommandContext> cmds) {
+            return cmds.stream().map(it -> asAst(file, it)).toList();
+        }
+
+        public static @NonNull ScriptBlock asAst(URI file,
+                KeYParser.ProofScriptCodeBlockContext ctx) {
+            var loc = new Location(file, Position.fromToken(ctx.start));
+            final var proofScriptCommandContexts = ctx.proofScript().proofScriptCommand();
+            final List<ScriptCommandAst> list =
+                proofScriptCommandContexts.stream()
+                        .map(it -> asAst(file, it))
+                        .toList();
+            return new ScriptBlock(list, loc);
+        }
+
+        private static @NonNull ScriptCommandAst asAst(URI file,
+                KeYParser.ProofScriptCommandContext it) {
+            var loc = new Location(file, Position.fromToken(it.start));
+            var nargs = new HashMap<String, Object>();
+            var pargs = new ArrayList<>();
+
+            if (it.proofScriptParameters() != null) {
+                for (var param : it.proofScriptParameters().proofScriptParameter()) {
+                    var expr = param.expr;
+                    Object value = expr;
+                    if (expr.proofScriptCodeBlock() != null) {
+                        value = asAst(file, expr.proofScriptCodeBlock());
+                    }
+
+                    if (param.pname != null) {
+                        nargs.put(param.pname.getText(), value);
+                    } else {
+                        pargs.add(value);
+                    }
+                }
+            }
+
+            return new ScriptCommandAst(it.cmd.getText(), nargs, pargs, loc);
         }
     }
 }

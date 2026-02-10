@@ -501,4 +501,57 @@ public final class StringUtil {
     public static String move(@NonNull String text, int line, int charPositionInLine) {
         return repeat("\n", line) + repeat(" ", charPositionInLine) + text;
     }
+
+    /// Returns the string until the first match of the given regex.
+    public static String takeUntil(String content, String regex) {
+        var array = content.split(regex, 1);
+        return array[0];
+    }
+
+    /// Returns the string after the first match of the given regex.
+    public static String takeAfter(String content, String regex) {
+        var array = content.split(regex, 1);
+        return array[0];
+    }
+
+
+    /**
+     * Replaces {@literal <},{@literal >},{@literal &} and new lines with their HTML masks.
+     *
+     * @param sb The StringBuffer with forbidden HTML characters
+     * @return A new StringBuffer with the masked characters.
+     */
+    public static StringBuilder ascii2html(String sb) {
+        StringBuilder nsb = new StringBuilder();
+        String asb = removeEmptyLines(sb);
+        int sbl = asb.length();
+        for (int i = 0; i < sbl; i++) {
+            switch (asb.charAt(i)) {
+                case '<':
+                    nsb.append("&lt;");
+                    break;
+                case '>':
+                    nsb.append("&gt;");
+                    break;
+                case '&':
+                    nsb.append("&amp;");
+                    break;
+                case '\n':
+                    nsb.append("<br>");
+                    break;
+                default:
+                    nsb.append(asb.charAt(i));
+            }
+        }
+        return nsb;
+    }
+
+    public static String removeEmptyLines(String string) {
+        // This regular expression matches against lines that only have spaces
+        // (' ' or '\t') in them and against trailing new line characters and
+        // replaces them with "".
+        // This fixes bug #1435, MU
+        return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
+    }
+
 }

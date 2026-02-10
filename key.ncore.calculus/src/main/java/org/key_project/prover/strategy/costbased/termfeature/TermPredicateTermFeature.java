@@ -9,10 +9,8 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * A termfeature that can be used to check whether a term has a specific property
- * {@link #create(Predicate<Term>)}.
- */
+/// A termfeature that can be used to check whether a term has a specific property
+/// [<>][#create(PredicateTerm)].
 public class TermPredicateTermFeature extends BinaryTermFeature {
 
     public static BinaryTermFeature create(Predicate<Term> predicate) {

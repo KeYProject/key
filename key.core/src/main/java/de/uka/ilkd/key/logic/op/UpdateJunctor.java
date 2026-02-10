@@ -15,7 +15,7 @@ import org.key_project.logic.sort.Sort;
  * another update. There are currently two such operators: the empty update "skip" and the parallel
  * update connector "|".
  */
-public final class UpdateJunctor extends AbstractSortedOperator {
+public final class UpdateJunctor extends JAbstractSortedOperator {
 
     public static final UpdateJunctor SKIP = new UpdateJunctor(new Name("skip"), 0);
 

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -37,14 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase {
     /**
-     * Tests {@link SymbolicExecutionUtil#improveReadability(Term, Services)}
+     * Tests {@link SymbolicExecutionUtil#improveReadability(JTerm, Services)}
      */
     @Test
     public void test1ImproveReadability() throws ProblemLoaderException {
-        File location = new File(testCaseDirectory,
+        Path location = testCaseDirectory.resolve(
             "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
-                .getAbsoluteFile();
-        assertTrue(location.exists(), "Could not find required resource: " + location);
+                .toAbsolutePath();
+        assertTrue(Files.exists(location), "Could not find required resource: " + location);
 
         KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
         Services services = environment.getServices();
@@ -52,33 +53,33 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
         Sort intSort = integerLDT.targetSort();
         final TermBuilder TB = services.getTermBuilder();
         // Create test terms
-        Term a = TB.var(new LogicVariable(new Name("a"), intSort));
-        Term b = TB.var(new LogicVariable(new Name("b"), intSort));
-        Term aleqb = TB.leq(a, b);
-        Term altb = TB.lt(a, b);
-        Term agtb = TB.gt(a, b);
-        Term ageqb = TB.geq(a, b);
-        Term notAleqb = TB.not(aleqb);
-        Term notAltb = TB.not(altb);
-        Term notAgtb = TB.not(agtb);
-        Term notAgeqb = TB.not(ageqb);
-        Term onePlusB = TB.add(TB.one(), b);
-        Term bPlusOne = TB.add(b, TB.one());
-        Term altOnePlusB = TB.lt(a, onePlusB);
-        Term altBPlusOne = TB.lt(a, bPlusOne);
-        Term ageqOnePlusB = TB.geq(a, onePlusB);
-        Term ageqBPlusOne = TB.geq(a, bPlusOne);
-        Term minusOne = services.getTypeConverter().getIntegerLDT()
+        JTerm a = TB.var(new LogicVariable(new Name("a"), intSort));
+        JTerm b = TB.var(new LogicVariable(new Name("b"), intSort));
+        JTerm aleqb = TB.leq(a, b);
+        JTerm altb = TB.lt(a, b);
+        JTerm agtb = TB.gt(a, b);
+        JTerm ageqb = TB.geq(a, b);
+        JTerm notAleqb = TB.not(aleqb);
+        JTerm notAltb = TB.not(altb);
+        JTerm notAgtb = TB.not(agtb);
+        JTerm notAgeqb = TB.not(ageqb);
+        JTerm onePlusB = TB.add(TB.one(), b);
+        JTerm bPlusOne = TB.add(b, TB.one());
+        JTerm altOnePlusB = TB.lt(a, onePlusB);
+        JTerm altBPlusOne = TB.lt(a, bPlusOne);
+        JTerm ageqOnePlusB = TB.geq(a, onePlusB);
+        JTerm ageqBPlusOne = TB.geq(a, bPlusOne);
+        JTerm minusOne = services.getTypeConverter().getIntegerLDT()
                 .translateLiteral(new IntLiteral(-1), services);
-        Term minusOnePlusB = TB.add(minusOne, b);
-        Term bPlusMinusOne = TB.add(b, minusOne);
-        Term bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());
-        Term aleqMinusOnePlusB = TB.leq(a, minusOnePlusB);
-        Term aleqBPlusMinusOne = TB.leq(a, bPlusMinusOne);
-        Term aleqBMinusOne = TB.leq(a, bMinusOne);
-        Term agtMinusOnePlusB = TB.gt(a, minusOnePlusB);
-        Term agtBPlusMinusOne = TB.gt(a, bPlusMinusOne);
-        Term agtBMinusOne = TB.gt(a, bMinusOne);
+        JTerm minusOnePlusB = TB.add(minusOne, b);
+        JTerm bPlusMinusOne = TB.add(b, minusOne);
+        JTerm bMinusOne = TB.func(integerLDT.getSub(), b, TB.one());
+        JTerm aleqMinusOnePlusB = TB.leq(a, minusOnePlusB);
+        JTerm aleqBPlusMinusOne = TB.leq(a, bPlusMinusOne);
+        JTerm aleqBMinusOne = TB.leq(a, bMinusOne);
+        JTerm agtMinusOnePlusB = TB.gt(a, minusOnePlusB);
+        JTerm agtBPlusMinusOne = TB.gt(a, bPlusMinusOne);
+        JTerm agtBMinusOne = TB.gt(a, bMinusOne);
         // Test null
         Assertions.assertNull(SymbolicExecutionUtil.improveReadability(null, services));
         assertTerm(notAleqb, SymbolicExecutionUtil.improveReadability(notAleqb, null));
@@ -108,8 +109,8 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             SymbolicExecutionUtil.improveReadability(TB.not(aleqBPlusMinusOne), services));
         assertTerm(altb, SymbolicExecutionUtil.improveReadability(TB.not(agtBMinusOne), services));
         // Test complex term
-        Term complex = TB.and(altOnePlusB, TB.or(ageqBPlusOne, agtMinusOnePlusB));
-        Term expectedComplex = TB.and(aleqb, TB.or(agtb, ageqb));
+        JTerm complex = TB.and(altOnePlusB, TB.or(ageqBPlusOne, agtMinusOnePlusB));
+        JTerm expectedComplex = TB.and(aleqb, TB.or(agtb, ageqb));
         assertTerm(expectedComplex, SymbolicExecutionUtil.improveReadability(complex, services));
         environment.dispose();
     }

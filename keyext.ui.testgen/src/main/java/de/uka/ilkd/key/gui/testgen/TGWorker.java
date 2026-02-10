@@ -17,8 +17,8 @@ import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
-import de.uka.ilkd.key.smt.testgen.StopRequest;
+import de.uka.ilkd.key.testgen.smt.testgen.AbstractTestGenerator;
+import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
 
 import org.key_project.prover.sequent.Sequent;
 
@@ -46,7 +46,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     }
 
     @Override
-    public Void doInBackground() {
+    public Void doInBackground() throws InterruptedException {
         testGenerator.generateTestCases(this, tgInfoDialog.getLogger());
         return null;
     }
@@ -121,9 +121,6 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     public void dispose() {
         if (showInMainWindow) {
             List<Proof> proofs = getProofs();
-            if (proofs == null) {
-                return;
-            }
             for (final Proof p : proofs) {
                 if (MainWindow.getInstance().getProofList().containsProof(p)) {
                     p.dispose();

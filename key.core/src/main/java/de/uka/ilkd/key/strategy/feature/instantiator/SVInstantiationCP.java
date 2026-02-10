@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
@@ -112,7 +113,7 @@ public class SVInstantiationCP implements Feature {
             final Term instTerm = value.toTerm(app, pos, goal, mState);
 
             final RuleApp newApp =
-                tapp.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) instTerm,
+                tapp.addCheckedInstantiation(sv, (JTerm) instTerm,
                     goal.proof().getServices(), true);
 
             final CPBranch branch = new CPBranch() {

@@ -15,9 +15,8 @@ import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -96,7 +95,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @param rp a ReferencePrefix as access path for the constructor
      * @param annotations the annotations on the constructor call
      */
-    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp, ImmutableArray<AnnotationUseSpecification> annotations) {
+    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp,
+            ImmutableArray<AnnotationUseSpecification> annotations) {
         super(arguments, type, annotations);
         anonymousClass = null;
         accessPath = rp;

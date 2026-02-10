@@ -12,7 +12,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -40,6 +40,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -123,30 +124,31 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String methProp =
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
         switch (methProp) {
-        case StrategyProperties.METHOD_CONTRACT -> methodSpecF = methodSpecFeature(longConst(-20));
-        case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
-            methodSpecFeature(inftyConst());
-        default -> {
-            methodSpecF = null;
-            assert false;
-        }
+            case StrategyProperties.METHOD_CONTRACT ->
+                methodSpecF = methodSpecFeature(longConst(-20));
+            case StrategyProperties.METHOD_EXPAND, StrategyProperties.METHOD_NONE -> methodSpecF =
+                methodSpecFeature(inftyConst());
+            default -> {
+                methodSpecF = null;
+                assert false;
+            }
         }
 
         final String queryProp =
             strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         switch (queryProp) {
-        case StrategyProperties.QUERY_ON -> queryF =
-            querySpecFeature(new QueryExpandCost(200, 1, 1, false));
-        case StrategyProperties.QUERY_RESTRICTED ->
-            // All tests in the example directory pass with this strategy.
-            // Hence, the old query_on strategy is obsolete.
-            queryF = querySpecFeature(new QueryExpandCost(500, 0, 1, true));
-        case StrategyProperties.QUERY_OFF -> queryF = querySpecFeature(inftyConst());
-        default -> {
-            queryF = null;
-            assert false;
-        }
+            case StrategyProperties.QUERY_ON -> queryF =
+                querySpecFeature(new QueryExpandCost(200, 1, 1, false));
+            case StrategyProperties.QUERY_RESTRICTED ->
+                // All tests in the example directory pass with this strategy.
+                // Hence, the old query_on strategy is obsolete.
+                queryF = querySpecFeature(new QueryExpandCost(500, 0, 1, true));
+            case StrategyProperties.QUERY_OFF -> queryF = querySpecFeature(inftyConst());
+            default -> {
+                queryF = null;
+                assert false;
+            }
         }
 
         final Feature depSpecF;
@@ -387,39 +389,43 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
 
         switch (methProp) {
-        case StrategyProperties.METHOD_CONTRACT ->
-            /*
-             * If method treatment by contracts is chosen, this does not mean that method expansion
-             * is disabled. The original cost was 200 and is now increased to 2000 in order to
-             * repress method expansion stronger when method treatment by contracts is chosen.
-             */
-            bindRuleSet(d, "method_expand", longConst(2000));
-        case StrategyProperties.METHOD_EXPAND -> bindRuleSet(d, "method_expand", longConst(100));
-        case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
-        default -> throw new RuntimeException("Unexpected strategy property " + methProp);
+            case StrategyProperties.METHOD_CONTRACT ->
+                /*
+                 * If method treatment by contracts is chosen, this does not mean that method
+                 * expansion
+                 * is disabled. The original cost was 200 and is now increased to 2000 in order to
+                 * repress method expansion stronger when method treatment by contracts is chosen.
+                 */
+                bindRuleSet(d, "method_expand", longConst(2000));
+            case StrategyProperties.METHOD_EXPAND ->
+                bindRuleSet(d, "method_expand", longConst(100));
+            case StrategyProperties.METHOD_NONE -> bindRuleSet(d, "method_expand", inftyConst());
+            default -> throw new RuntimeException("Unexpected strategy property " + methProp);
         }
 
         final String mpsProp = strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
 
         switch (mpsProp) {
-        case StrategyProperties.MPS_MERGE ->
-            /*
-             * For this case, we use a special feature, since deleting merge points should only be
-             * done after a merge rule application.
-             */
-            bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
-        case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
-        case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
-        default -> throw new RuntimeException("Unexpected strategy property " + methProp);
+            case StrategyProperties.MPS_MERGE ->
+                /*
+                 * For this case, we use a special feature, since deleting merge points should only
+                 * be
+                 * done after a merge rule application.
+                 */
+                bindRuleSet(d, "merge_point", DeleteMergePointRuleFeature.INSTANCE);
+            case StrategyProperties.MPS_SKIP -> bindRuleSet(d, "merge_point", longConst(-5000));
+            case StrategyProperties.MPS_NONE -> bindRuleSet(d, "merge_point", inftyConst());
+            default -> throw new RuntimeException("Unexpected strategy property " + methProp);
         }
 
 
         final String queryAxProp =
             strategyProperties.getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
         switch (queryAxProp) {
-        case StrategyProperties.QUERYAXIOM_ON -> bindRuleSet(d, "query_axiom", longConst(-3000));
-        case StrategyProperties.QUERYAXIOM_OFF -> bindRuleSet(d, "query_axiom", inftyConst());
-        default -> throw new RuntimeException("Unexpected strategy property " + queryAxProp);
+            case StrategyProperties.QUERYAXIOM_ON ->
+                bindRuleSet(d, "query_axiom", longConst(-3000));
+            case StrategyProperties.QUERYAXIOM_OFF -> bindRuleSet(d, "query_axiom", inftyConst());
+            default -> throw new RuntimeException("Unexpected strategy property " + queryAxProp);
         }
 
         if (classAxiomApplicationEnabled()) {
@@ -1443,32 +1449,32 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Term tOne = getServices().getTermBuilder().zTerm("1");
         final TermBuffer one = new TermBuffer() {
             @Override
-            public void setContent(org.key_project.logic.Term term, MutableState mState) {}
+            public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public Term getContent(MutableState mState) {
+            public @NonNull Term getContent(MutableState mState) {
                 return tOne;
             }
 
             @Override
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
             }
         };
 
-        final Term tTwo = getServices().getTermBuilder().zTerm("2");
+        final JTerm tTwo = getServices().getTermBuilder().zTerm("2");
         final TermBuffer two = new TermBuffer() {
             @Override
-            public void setContent(org.key_project.logic.Term term, MutableState mState) {}
+            public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public Term getContent(MutableState mState) {
+            public @NonNull Term getContent(MutableState mState) {
                 return tTwo;
             }
 
             @Override
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;
             }

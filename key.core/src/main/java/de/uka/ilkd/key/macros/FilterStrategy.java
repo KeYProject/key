@@ -16,11 +16,11 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class FilterStrategy implements Strategy<Goal> {
+public abstract class FilterStrategy implements Strategy<@NonNull Goal> {
 
-    private final Strategy delegate;
+    private final Strategy<@NonNull Goal> delegate;
 
-    protected FilterStrategy(Strategy delegate) {
+    protected FilterStrategy(Strategy<@NonNull Goal> delegate) {
         this.delegate = delegate;
     }
 
@@ -31,9 +31,9 @@ public abstract class FilterStrategy implements Strategy<Goal> {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pio,
-            Goal goal, MutableState mState) {
+            G goal, MutableState mState) {
         if (!isApprovedApp(app, pio, (de.uka.ilkd.key.proof.Goal) goal)) {
             return TopRuleAppCost.INSTANCE;
         }

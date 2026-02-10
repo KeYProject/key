@@ -65,11 +65,11 @@ public class ViewSelector extends JDialog {
         maxLinesPanel.setLayout(new BoxLayout(maxLinesPanel, BoxLayout.X_AXIS));
         maxTooltipLinesInputField = new NumberInputField(maxLinesInt, 4);
         maxTooltipLinesInputField.setMaximumSize(new Dimension(40, 30));
-        maxLinesPanel.add(new JLabel("<html><font color=\"#000000\">"
+        maxLinesPanel.add(new JLabel("<html>"
             + "Maximum size (line count) of the tooltips of applicable rules"
             + "<br> with schema variable instantiations displayed. "
             + "In case of longer <br>tooltips the instantiation will be "
-            + "suppressed. </font></html>"));
+            + "suppressed.</html>"));
         maxLinesPanel.add(maxTooltipLinesInputField);
 
         JPanel showUninstantiatedTacletPanel = new JPanel();

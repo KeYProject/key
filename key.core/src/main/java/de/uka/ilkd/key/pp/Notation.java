@@ -10,11 +10,13 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
@@ -50,14 +52,14 @@ public abstract class Notation {
      * Print a term to a {@link LogicPrinter}. Concrete subclasses override this to call one of the
      * <code>printXYZTerm</code> of {@link LogicPrinter}, which do the layout.
      */
-    public abstract void print(Term t, LogicPrinter sp);
+    public abstract void print(JTerm t, LogicPrinter sp);
 
     /**
      * Print a term without beginning a new block. See
-     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea behind this. The standard
-     * implementation just delegates to {@link #print(Term,LogicPrinter)}
+     * {@link LogicPrinter#printTermContinuingBlock(JTerm)}for the idea behind this. The standard
+     * implementation just delegates to {@link #print(JTerm,LogicPrinter)}
      */
-    public void printContinuingBlock(Term t, LogicPrinter sp) {
+    public void printContinuingBlock(JTerm t, LogicPrinter sp) {
         print(t, sp);
     }
 
@@ -74,7 +76,7 @@ public abstract class Notation {
             this.name = name;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printConstant(t, name);
         }
     }
@@ -92,7 +94,7 @@ public abstract class Notation {
             this.ass = ass;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printPrefixTerm(name, t, t.sub(0), ass);
         }
 
@@ -112,15 +114,15 @@ public abstract class Notation {
             this.assRight = assRight;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printInfixTerm(t.sub(0), assLeft, name, t, t.sub(1), assRight);
         }
 
         /**
          * Print a term without beginning a new block. This calls the
-         * {@link LogicPrinter#printTermContinuingBlock(Term)} method.
+         * {@link LogicPrinter#printTermContinuingBlock(JTerm)} method.
          */
-        public void printContinuingBlock(Term t, LogicPrinter sp) {
+        public void printContinuingBlock(JTerm t, LogicPrinter sp) {
             sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t, t.sub(1), assRight);
         }
 
@@ -138,7 +140,7 @@ public abstract class Notation {
             right = endLabel;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printLabels(t, left, right);
         }
     }
@@ -156,7 +158,7 @@ public abstract class Notation {
             this.ass = ass;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
         }
 
@@ -178,8 +180,8 @@ public abstract class Notation {
             this.ass = ass;
         }
 
-        public void print(Term t, LogicPrinter sp) {
-            assert t.op() instanceof Modality;
+        public void print(JTerm t, LogicPrinter sp) {
+            assert t.op() instanceof JModality;
             assert t.javaBlock() != null;
             sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
         }
@@ -197,7 +199,7 @@ public abstract class Notation {
             this.ass = ass;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printModalityTerm("\\modality{" + t.op().name() + "}", t.javaBlock(),
                 "\\endmodality", t, ass);
         }
@@ -213,7 +215,7 @@ public abstract class Notation {
             super(115);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             assert t.op() == UpdateApplication.UPDATE_APPLICATION;
             final Operator targetOp = UpdateApplication.getTarget(t).op();
             final int assTarget =
@@ -233,7 +235,7 @@ public abstract class Notation {
             super(150);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printElementaryUpdate(":=", t, 0);
         }
     }
@@ -248,7 +250,7 @@ public abstract class Notation {
             super(100);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
 
             sp.printParallelUpdate("||", t, 10);
@@ -264,7 +266,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             QuantifiableVariable v = instQV(t, sp, 1);
             final int assTarget =
                 (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60)
@@ -272,15 +274,15 @@ public abstract class Notation {
             sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1), assTarget);
         }
 
-        private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
+        private QuantifiableVariable instQV(JTerm t, LogicPrinter sp, int subTerm) {
             QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
             if (v instanceof SchemaVariable) {
                 Object object = (sp.getInstantiations().getInstantiation((SchemaVariable) v));
                 if (object != null) {
-                    Debug.assertTrue(object instanceof Term);
-                    Debug.assertTrue(((Term) object).op() instanceof QuantifiableVariable);
-                    v = (QuantifiableVariable) (((Term) object).op());
+                    Debug.assertTrue(object instanceof JTerm);
+                    Debug.assertTrue(((JTerm) object).op() instanceof QuantifiableVariable);
+                    v = (QuantifiableVariable) (((JTerm) object).op());
                 }
             }
             return v;
@@ -297,7 +299,7 @@ public abstract class Notation {
             super(130);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printFunctionTerm(t);
         }
     }
@@ -319,7 +321,7 @@ public abstract class Notation {
             this.ass = ass;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printCast(pre, post, t, ass);
         }
     }
@@ -339,11 +341,11 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printObserver(t, null);
         }
 
-        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) {
+        public void printWithHeap(JTerm t, LogicPrinter sp, JTerm heapTerm) {
             sp.printObserver(t, heapTerm);
         }
     }
@@ -357,12 +359,12 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printSelect(t, null);
         }
 
         @Override
-        public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) {
+        public void printWithHeap(JTerm t, LogicPrinter sp, JTerm heapTerm) {
             sp.printSelect(t, heapTerm);
         }
     }
@@ -376,7 +378,7 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printFinal(t);
         }
     }
@@ -389,11 +391,11 @@ public abstract class Notation {
             super(140);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printHeapConstructor(t, true);
         }
 
-        public void printEmbeddedHeap(Term t, LogicPrinter sp) {
+        public void printEmbeddedHeap(JTerm t, LogicPrinter sp) {
             sp.printHeapConstructor(t, false);
         }
     }
@@ -403,11 +405,11 @@ public abstract class Notation {
      */
     public static final class StoreNotation extends HeapConstructorNotation {
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printStore(t, true);
         }
 
-        public void printEmbeddedHeap(Term t, LogicPrinter sp) {
+        public void printEmbeddedHeap(JTerm t, LogicPrinter sp) {
             sp.printStore(t, false);
         }
     }
@@ -425,7 +427,7 @@ public abstract class Notation {
             this.postfix = postfix;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printPostfix(t, postfix);
         }
     }
@@ -440,7 +442,7 @@ public abstract class Notation {
             super(130);
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printSingleton(t);
         }
     }
@@ -460,7 +462,7 @@ public abstract class Notation {
             this.symbol = symbol;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printElementOf(t, symbol);
         }
     }
@@ -477,7 +479,7 @@ public abstract class Notation {
             keyword = keyw;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printIfThenElseTerm(t, keyword);
         }
     }
@@ -497,7 +499,7 @@ public abstract class Notation {
         }
 
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             if (t.op() instanceof ProgramVariable) {
                 sp.printConstant(t.op().name().toString().replaceAll("::", "."));
             } else if (t.op() instanceof LogicVariable) {
@@ -524,42 +526,42 @@ public abstract class Notation {
 
             String svType;
             String specificSort = "";
-            if (v instanceof OperatorSV) {
+            if (v instanceof JOperatorSV) {
                 switch (v) {
-                case ProgramSV psv -> {
-                    svType = "\\program";
-                    specificSort = psv.sort().declarationString();
-                }
-                case TermSV tsv -> {
-                    svType = "\\term";
-                    specificSort = tsv.sort().name().toString();
-                }
-                case FormulaSV fsv -> {
-                    svType = "\\formula";
-                    specificSort = fsv.sort().name().toString();
-                }
-                case VariableSV varSV -> {
-                    svType = "\\variables";
-                    specificSort = varSV.sort().name().toString();
-                }
-                case UpdateSV ignored -> svType = "\\update";
-                case SkolemTermSV skolemTermSV -> {
-                    if (skolemTermSV.sort() == JavaDLTheory.FORMULA) {
-                        svType = "\\skolemFormula";
-                    } else {
-                        svType = "\\skolemTerm";
-                        specificSort = skolemTermSV.sort().name().toString();
+                    case ProgramSV psv -> {
+                        svType = "\\program";
+                        specificSort = psv.sort().declarationString();
                     }
-                }
-                case TermLabelSV ignored -> svType = "\\termlabel";
-                default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                    case TermSV tsv -> {
+                        svType = "\\term";
+                        specificSort = tsv.sort().name().toString();
+                    }
+                    case FormulaSV fsv -> {
+                        svType = "\\formula";
+                        specificSort = fsv.sort().name().toString();
+                    }
+                    case VariableSV varSV -> {
+                        svType = "\\variables";
+                        specificSort = varSV.sort().name().toString();
+                    }
+                    case UpdateSV ignored -> svType = "\\update";
+                    case SkolemTermSV skolemTermSV -> {
+                        if (skolemTermSV.sort() == JavaDLTheory.FORMULA) {
+                            svType = "\\skolemFormula";
+                        } else {
+                            svType = "\\skolemTerm";
+                            specificSort = skolemTermSV.sort().name().toString();
+                        }
+                    }
+                    case TermLabelSV ignored -> svType = "\\termlabel";
+                    default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
                 }
                 sp.layouter().print("\\schemaVar ").print(svType + " ").print(specificSort)
                         .print(" ").print(v.name().toString());
             } else if (v instanceof ModalOperatorSV modalOperatorSV) {
                 sp.layouter().beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
                 boolean first = true;
-                for (Modality.JavaModalityKind modality : modalOperatorSV.getModalities()) {
+                for (JModality.JavaModalityKind modality : modalOperatorSV.getModalities()) {
                     if (!first) {
                         sp.layouter().print(",").brk();
                     } else {
@@ -575,7 +577,7 @@ public abstract class Notation {
         }
 
         @SuppressWarnings("unchecked")
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             // logger.debug("SSV: " + t+ " [" + t.op() + "]");
             Debug.assertTrue(t.op() instanceof SchemaVariable);
             Object o = sp.getInstantiations().getInstantiation((SchemaVariable) (t.op()));
@@ -596,8 +598,8 @@ public abstract class Notation {
                         sp.layouter().print("{");
                         while (it.hasNext()) {
                             final Object next = it.next();
-                            if (next instanceof Term) {
-                                sp.printTerm((Term) o);
+                            if (next instanceof JTerm) {
+                                sp.printTerm((JTerm) o);
                             } else {
                                 sp.printConstant(o.toString());
                             }
@@ -607,8 +609,8 @@ public abstract class Notation {
                         }
                         sp.layouter().print("}");
                     } else {
-                        Debug.assertTrue(o instanceof Term);
-                        sp.printTerm((Term) o);
+                        Debug.assertTrue(o instanceof JTerm);
+                        sp.printTerm((JTerm) o);
                     }
                 }
             }
@@ -625,8 +627,8 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printNumberTerm(Term numberTerm) {
-            Term t = numberTerm;
+        public static String printNumberTerm(JTerm numberTerm) {
+            JTerm t = numberTerm;
 
             // skip number symbol /as this method may be called
             // e.g. by char literal we do not fail if the first is
@@ -659,7 +661,7 @@ public abstract class Notation {
             return number.toString();
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             final String number = printNumberTerm(t);
             if (number != null) {
                 sp.printConstant(number);
@@ -680,7 +682,7 @@ public abstract class Notation {
             super(1000);
         }
 
-        private static String printCharTerm(Term t) {
+        private static String printCharTerm(JTerm t) {
 
             char charVal = 0;
             int intVal = 0;
@@ -706,7 +708,7 @@ public abstract class Notation {
             return ("'" + charVal) + "'";
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             final String charString = printCharTerm(t);
             if (charString != null) {
                 sp.printConstant(charString);
@@ -727,7 +729,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printFloatTerm(Term floatTerm) {
+        public static String printFloatTerm(JTerm floatTerm) {
 
             if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
                 return null;
@@ -750,7 +752,7 @@ public abstract class Notation {
             }
         }
 
-        private static int extractValue(Term t) {
+        private static int extractValue(JTerm t) {
             if (t.op().name().toString().equals("#")) {
                 return 0;
             } else {
@@ -759,7 +761,7 @@ public abstract class Notation {
             }
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             final String number = printFloatTerm(t);
             if (number != null) {
                 sp.printConstant(number);
@@ -777,7 +779,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printDoubleTerm(Term doubleTerm) {
+        public static String printDoubleTerm(JTerm doubleTerm) {
 
             if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
                 return null;
@@ -800,7 +802,7 @@ public abstract class Notation {
             }
         }
 
-        private static long extractValue(Term t) {
+        private static long extractValue(JTerm t) {
             if (t.op().name().toString().equals("#")) {
                 return 0L;
             } else {
@@ -809,7 +811,7 @@ public abstract class Notation {
             }
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             final String number = printDoubleTerm(t);
             if (number != null) {
                 sp.printConstant(number);
@@ -833,7 +835,7 @@ public abstract class Notation {
             this.rDelimiter = rDelimiter;
         }
 
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printSeqSingleton(t, lDelimiter, rDelimiter);
         }
     }
@@ -853,9 +855,9 @@ public abstract class Notation {
         }
 
 
-        private String printStringTerm(Term t) {
+        private String printStringTerm(JTerm t) {
             StringBuilder result = new StringBuilder("\"");
-            Term term = t;
+            JTerm term = t;
             while (term.op().arity() == 2) {
                 result.append(CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1));
                 term = term.sub(1);
@@ -865,7 +867,7 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             if (isCharLiteralSequence(t)) {
                 final String sLit;
                 try {
@@ -881,7 +883,7 @@ public abstract class Notation {
         }
 
 
-        private boolean isCharLiteralSequence(Term t) {
+        private boolean isCharLiteralSequence(JTerm t) {
             if (t.op() == seqConcat && isCharLiteralSequenceHelp(t.sub(0))) {
                 return isCharLiteralSequenceHelp(t.sub(1)) || isCharLiteralSequence(t.sub(1));
             }
@@ -889,7 +891,7 @@ public abstract class Notation {
         }
 
 
-        private boolean isCharLiteralSequenceHelp(Term t) {
+        private boolean isCharLiteralSequenceHelp(JTerm t) {
             return (t.op() == seqSingleton && t.sub(0).op() == charLiteral);
         }
 
@@ -905,7 +907,7 @@ public abstract class Notation {
         }
 
         @Override
-        public void print(Term t, LogicPrinter sp) {
+        public void print(JTerm t, LogicPrinter sp) {
             sp.printSeqGet(t);
         }
 
