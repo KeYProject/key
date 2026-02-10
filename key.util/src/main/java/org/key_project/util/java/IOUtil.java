@@ -350,6 +350,7 @@ public final class IOUtil {
     }
 
 
+
     /**
      * A line information returned from {@link IOUtil#computeLineInformation(File)} and
      * {@link IOUtil#computeLineInformation(InputStream)}.
@@ -822,5 +823,15 @@ public final class IOUtil {
     public static String safePath(Path path) {
         var s = path.toString();
         return s.replace('\\', '/');
+    }
+
+
+    /// Returns a string, representing the given path to `source` relatively to `basePath`.
+    /// @param source a path
+    /// @param basePath a directory
+    /// @return a string that is printable (escaped) for KeY files
+    public static String safePathRelativeTo(Path source, Path basePath) {
+        var abs = source.toAbsolutePath();
+        return safePath(basePath.relativize(abs));
     }
 }

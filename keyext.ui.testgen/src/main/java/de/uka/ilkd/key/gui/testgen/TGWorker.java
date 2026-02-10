@@ -140,7 +140,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
             Sequent newSequent) throws ProofInputException {
         if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();
-            final Proof proof = new Proof(newName, newSequent, "", initConfig.createTacletIndex(),
+            final Proof proof = new Proof(newName, newSequent, null, initConfig.createTacletIndex(),
                 initConfig.createBuiltInRuleIndex(), initConfig.deepCopy());
             proof.setEnv(oldProof.getEnv());
             proof.setNamespaces(oldProof.getNamespaces());

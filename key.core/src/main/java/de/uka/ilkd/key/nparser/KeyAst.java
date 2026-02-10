@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -170,20 +171,9 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * declarations of sorts, program variables, schema variables, predicates, and more.
          * See the grammar (KeYParser.g4) for more possible elements.
          */
-        public String getProblemHeader() {
+        public KeyAst.@Nullable Declarations getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();
-            if (decls != null && decls.getChildCount() > 0) {
-                final Token start = decls.start;
-                final Token stop = decls.stop;
-                if (start != null && stop != null) {
-                    int a = start.getStartIndex();
-                    int b = stop.getStopIndex();
-                    Interval interval = new Interval(a, b);
-                    CharStream input = ctx.start.getInputStream();
-                    return input.getText(interval);
-                }
-            }
-            return "";
+            return new KeyAst.Declarations(decls);
         }
     }
 
@@ -317,6 +307,138 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             }
 
             return new ScriptCommandAst(it.cmd.getText(), nargs, pargs, loc);
+        }
+    }
+
+    /// Represents the user declarations in a KeY file.
+    ///
+    /// @author weigl
+    public static class Declarations extends KeyAst<KeYParser.DeclsContext> {
+        protected Declarations(KeYParser.DeclsContext ctx) {
+            super(ctx);
+        }
+
+        public java.io.@Nullable File getJavaSourceLocation() {
+            try {
+                KeYParser.String_valueContext value =
+                    ctx.javaSource(0).oneJavaSource().string_value(0);
+                String v = ParsingFacade.getValueDocumentation(value);
+                return new java.io.File(v);
+            } catch (NullPointerException | IndexOutOfBoundsException e) {
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// Prints the definitions, independent of paths, to the given {@link PrintWriter}.
+        public void printDefinitions(PrintWriter out) {
+            ctx.accept(new KeYParserBaseVisitor<@Nullable Object>() {
+                @Override
+                public @Nullable Object visitOne_include(KeYParser.One_includeContext ctx) {
+                    if (ctx.absfile != null) {
+                        out.printf("\\include %s;", ctx.absfile.getText());
+                    }
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitOption_decls(KeYParser.Option_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitSort_decls(KeYParser.Sort_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitSchema_var_decls(
+                        KeYParser.Schema_var_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitPred_decls(KeYParser.Pred_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitFunc_decls(KeYParser.Func_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitTransform_decls(KeYParser.Transform_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitDatatype_decls(KeYParser.Datatype_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+
+                @Override
+                public @Nullable Object visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+
+                @Override
+                public @Nullable Object visitContracts(KeYParser.ContractsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitInvariants(KeYParser.InvariantsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                @Override
+                public @Nullable Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
+                    printAsIs(ctx);
+                    return null;
+                }
+
+                private void printAsIs(ParserRuleContext ctx) {
+                    if (ctx != null) {
+                        final Token start = ctx.start;
+                        final Token stop = ctx.stop;
+                        if (start != null && stop != null) {
+                            int a = start.getStartIndex();
+                            int b = stop.getStopIndex();
+                            Interval interval = new Interval(a, b);
+                            CharStream input = ctx.start.getInputStream();
+                            out.println(input.getText(interval));
+                        }
+                    }
+                }
+            });
+
+
         }
     }
 }

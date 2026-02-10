@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -50,7 +51,7 @@ public class ProofStarter {
      */
     public static class UserProvidedInput implements ProofOblInput {
 
-        private static final String EMPTY_PROOF_HEADER = "";
+        private static final KeyAst.@Nullable Declarations EMPTY_PROOF_HEADER = null;
         private final ProofEnvironment env;
         private final Sequent seq;
         private final String proofName;

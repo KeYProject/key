@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo.INF_FLOW_CHECK_TRUE;
@@ -45,7 +47,8 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
     }
 
     @Override
-    public InfFlowProof createProofObject(String proofName, String proofHeader, JTerm poTerm,
+    public InfFlowProof createProofObject(String proofName,
+            KeyAst.@Nullable Declarations proofHeader, JTerm poTerm,
             InitConfig proofConfig) {
         final InfFlowProof proof = new InfFlowProof(proofName, poTerm, proofHeader, proofConfig);
 
