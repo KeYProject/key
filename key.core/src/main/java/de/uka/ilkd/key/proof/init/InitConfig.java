@@ -8,6 +8,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -85,7 +86,7 @@ public class InitConfig {
 
     private ProofSettings settings;
 
-    private @Nullable String header;
+    private KeyAst.@Nullable Declarations header;
 
 
     // -------------------------------------------------------------------------
@@ -471,11 +472,11 @@ public class InitConfig {
                     .add(choice));
     }
 
-    public @Nullable String getProblemHeader() {
+    public KeyAst.@Nullable Declarations getProblemHeader() {
         return header;
     }
 
-    public void setHeader(@Nullable String header) {
+    public void setHeader(KeyAst.@Nullable Declarations header) {
         this.header = header;
     }
 }

@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
@@ -19,6 +20,8 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The proof object used by Information Flow Proofs.
@@ -39,12 +42,14 @@ public class InfFlowProof extends Proof {
      */
     private SideProofStatistics sideProofStatistics = null;
 
-    public InfFlowProof(String name, Sequent sequent, String header, TacletIndex rules,
+    public InfFlowProof(String name, Sequent sequent, KeyAst.@Nullable Declarations header,
+            TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
         super(name, sequent, header, rules, builtInRules, initConfig);
     }
 
-    public InfFlowProof(String name, JTerm problem, String header, InitConfig initConfig) {
+    public InfFlowProof(String name, JTerm problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig) {
         super(name, problem, header, initConfig);
     }
 
