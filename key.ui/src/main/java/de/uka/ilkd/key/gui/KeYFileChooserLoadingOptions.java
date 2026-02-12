@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.ServiceLoader;
+import java.util.*;
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
@@ -39,6 +39,11 @@ public class KeYFileChooserLoadingOptions extends JPanel {
                  Mark this checkbox to only load the selected Java file.
                 """);
 
+    private final Map<Profile, KeYGuiExtension.OptionPanel> additionalOptionPanels =
+            KeYGuiExtensionFacade.createAdditionalOptionPanels();
+
+
+    private KeYGuiExtension.@Nullable OptionPanel currentOptionPanel = null;
 
     public KeYFileChooserLoadingOptions(KeYFileChooser chooser) {
         setLayout(new MigLayout(new LC().fillX().wrapAfter(3).maxWidth("400"),
@@ -78,10 +83,18 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     }
 
     private void updateProfileInfo(@Nullable ProfileWrapper selectedItem) {
+        if(currentOptionPanel!=null){currentOptionPanel.deinstall(this);}
+
         if (selectedItem == null) {
             lblProfileInfo.setText("");
         } else {
             lblProfileInfo.setText(selectedItem.profile.description());
+
+
+            if (additionalOptionPanels.containsKey(selectedItem.profile)) {
+                currentOptionPanel = additionalOptionPanels.get(selectedItem.profile);
+                currentOptionPanel.install(this);
+            }
         }
     }
 
@@ -92,6 +105,13 @@ public class KeYFileChooserLoadingOptions extends JPanel {
                 .findFirst();
         return items.map(it -> it.get().getDefaultProfile())
                 .orElse(null);
+    }
+
+    public @Nullable Object getAdditionalProfileOptions() {
+        if(currentOptionPanel==null){
+            return null;
+        }
+        return currentOptionPanel.getResult();
     }
 
     public @Nullable String getSelectedProfileName() {

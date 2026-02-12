@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -401,6 +402,19 @@ public final class KeYGuiExtensionFacade {
     public static Stream<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()
                 .flatMap(it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
+    }
+
+    /**
+     * TODO
+     * @return
+     */
+    public static Map<Profile, KeYGuiExtension.OptionPanel> createAdditionalOptionPanels() {
+        List<KeYGuiExtension.LoadOptionPanel> items =  getExtensionInstances(KeYGuiExtension.LoadOptionPanel.class);
+        HashMap<Profile, KeYGuiExtension.OptionPanel> map = HashMap.newHashMap(4);
+        for (KeYGuiExtension.LoadOptionPanel item : items) {
+            map.put(item.getProfile(), item.get());
+        }
+        return map;
     }
 
     /**

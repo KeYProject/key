@@ -10,6 +10,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.KeYFileChooserLoadingOptions;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -29,7 +30,7 @@ public class OpenFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser fc = new KeYFileChooser(lastSelectedPath);
         fc.setDialogTitle("Select file to load proof or problem");
-        var options = fc.addLoadingOptions();
+        KeYFileChooserLoadingOptions options = fc.addLoadingOptions();
         fc.addBookmarkPanel();
         fc.prepare();
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
@@ -64,9 +65,11 @@ public class OpenFileAction extends MainWindowAction {
             }
 
             var selectedProfile = options.getSelectedProfile();
+            var additionalProfileOptions = options.getAdditionalProfileOptions();
             mainWindow.loadProblem(file, pl -> {
                 if (selectedProfile != null) {
                     pl.setProfileOfNewProofs(selectedProfile);
+                    pl.setAdditionalProfileOptions(additionalProfileOptions);
                 }
                 pl.setLoadSingleJavaFile(options.isOnlyLoadSingleJavaFile());
             });

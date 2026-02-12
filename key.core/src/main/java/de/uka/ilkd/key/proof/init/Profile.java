@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.prover.engine.GoalChooserFactory;
 import org.key_project.prover.proof.ProofGoal;
@@ -181,7 +182,7 @@ public interface Profile {
     /// established.
     ///
     /// @see ProblemInitializer
-    default void prepareInitConfig(InitConfig baseConfig) {
+    default void prepareInitConfig(InitConfig baseConfig, @Nullable Object additionalProfileOptions) {
 
     }
 }
