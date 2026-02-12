@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -68,26 +69,34 @@ public final class ProblemInitializer {
      */
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+    private @Nullable Object additionalProfileOptions;
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
     public ProblemInitializer(ProgressMonitor mon, Services services,
-            ProblemInitializerListener listener) {
+                              ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
     }
 
     public ProblemInitializer(Profile profile) {
-        if (profile == null) {
-            throw new IllegalArgumentException("Given profile is null");
-        }
+        this(null, new Services(Objects.requireNonNull(profile, "Given profile is null")), null);
+    }
 
-        this.progMon = null;
-        this.listener = null;
-        this.services = new Services(Objects.requireNonNull(profile));
+    public ProblemInitializer(Profile profile, @Nullable Object additionalProfileOptions) {
+        this(profile);
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    public @Nullable Object getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
+    public void setAdditionalProfileOptions(@Nullable Object additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
     }
 
     private void progressStarted(Object sender) {
@@ -127,7 +136,7 @@ public final class ProblemInitializer {
     /**
      * displays the status report in the status line and the maximum used by a progress bar
      *
-     * @param status the String to be displayed in the status line
+     * @param status      the String to be displayed in the status line
      * @param progressMax an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
@@ -166,7 +175,7 @@ public final class ProblemInitializer {
         for (String name : in.getLDTIncludes()) {
 
             keyFile[i] =
-                new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+                    new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
             i++;
             setProgress(i);
         }
@@ -196,7 +205,7 @@ public final class ProblemInitializer {
         int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
-                new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
+                    new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -212,11 +221,11 @@ public final class ProblemInitializer {
                 return walker.filter(it -> it.getFileName().toString().endsWith(".java")).toList();
             } catch (IOException e) {
                 throw new ProofInputException(
-                    "Reading java model path " + javaRoot + " resulted into an error.", e);
+                        "Reading java model path " + javaRoot + " resulted into an error.", e);
             }
         } else {
             throw new ProofInputException(
-                "Java model path " + javaRoot + " not found or is not a directory.");
+                    "Java model path " + javaRoot + " not found or is not a directory.");
         }
     }
 
@@ -247,8 +256,8 @@ public final class ProblemInitializer {
         // this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
             KeYFile keyFile =
-                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
-                    envInput.getProfile(), fileRepo);
+                    new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                            envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -286,7 +295,7 @@ public final class ProblemInitializer {
         }
         var initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
-            JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
+                JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
     }
 
     /**
@@ -333,7 +342,7 @@ public final class ProblemInitializer {
     }
 
     private void populateNamespaces(Term term, NamespaceSet namespaces,
-            Goal rootGoal) {
+                                    Goal rootGoal) {
         for (int i = 0; i < term.arity(); i++) {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
@@ -353,7 +362,7 @@ public final class ProblemInitializer {
             final ProgramElement pe = mod.programBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =
-                MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
+                    MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
                 if (namespaces.programVariables().lookup(pv.name()) == null) {
                     rootGoal.addProgramVariable(pv);
@@ -378,7 +387,7 @@ public final class ProblemInitializer {
     private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
-            false);
+                false);
         return initConfig;
     }
 
@@ -393,12 +402,12 @@ public final class ProblemInitializer {
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
             proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(),
-                AxiomJustification.INSTANCE);
+                    AxiomJustification.INSTANCE);
             setProgress(3 + i * proofs.length);
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                profile.getStandardRules().standardBuiltInRules();
+                    profile.getStandardRules().standardBuiltInRules();
             int j = 0;
             final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
@@ -442,15 +451,15 @@ public final class ProblemInitializer {
                 if (tacletBases != null) {
                     for (var tacletBase : tacletBases) {
                         KeYFile tacletBaseFile = new KeYFile(
-                            "taclet base (%s)".formatted(tacletBase.file().getFileName()),
-                            tacletBase, progMon, profile);
+                                "taclet base (%s)".formatted(tacletBase.file().getFileName()),
+                                tacletBase, progMon, profile, null);
                         readEnvInput(tacletBaseFile, currentBaseConfig);
                     }
                 }
                 // remove traces of the generic sorts within the base configuration
                 cleanupNamespaces(currentBaseConfig);
 
-                profile.prepareInitConfig(currentBaseConfig);
+                profile.prepareInitConfig(currentBaseConfig, additionalProfileOptions);
 
                 baseConfig = currentBaseConfig;
             }
@@ -473,7 +482,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
             LOGGER.warn("Failed write proof", e);
@@ -490,7 +499,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");
@@ -501,7 +510,7 @@ public final class ProblemInitializer {
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
-                    taclet.displayName());
+                        taclet.displayName());
                 out.println(taclet);
                 out.format("-----------------------------------------------------%n");
             }
@@ -516,10 +525,10 @@ public final class ProblemInitializer {
 
     private void configureTermLabelSupport(InitConfig initConfig) {
         initConfig.getServices().setOriginFactory(
-            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                    .getUseOriginLabels()
-                            ? new OriginTermLabelFactory()
-                            : null);
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                        .getUseOriginLabels()
+                        ? new OriginTermLabelFactory()
+                        : null);
     }
 
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
@@ -543,9 +552,8 @@ public final class ProblemInitializer {
                 if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
                     for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
                         final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                        if (pv instanceof LocationVariable) {
-                            heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                initConfig.getServices());
+                        if (pv instanceof LocationVariable lv) {
+                            heapLDT.getFieldSymbolForPV(lv, initConfig.getServices());
                         }
                     }
                 }
@@ -573,8 +581,7 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
-            throws ProofInputException {
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po) throws ProofInputException {
         progressStarted(this);
         try {
             // determine environment
