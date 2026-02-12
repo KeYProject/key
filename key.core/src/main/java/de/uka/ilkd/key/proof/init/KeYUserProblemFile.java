@@ -96,8 +96,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         initConfig.setSettings(settings);
 
         ChoiceInformation ci = getParseContext().getChoices();
-        settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
-        initConfig.setActivatedChoices(settings.getChoiceSettings().getDefaultChoicesAsSet());
+        initConfig.computeDefaults(ci);
 
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 

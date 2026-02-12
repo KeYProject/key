@@ -179,10 +179,11 @@ public class KeYFile implements EnvInput {
 
     protected ProofSettings getPreferences() {
         if (initConfig.getSettings() == null) {
-            return readPreferences();
-        } else {
-            return initConfig.getSettings();
+            var settings = readPreferences();
+            initConfig.setSettings(settings);
+            return settings;
         }
+        return initConfig.getSettings();
     }
 
     public ProofSettings readPreferences() {

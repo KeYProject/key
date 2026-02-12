@@ -31,8 +31,8 @@ public class ChoiceSettings extends AbstractSettings {
      * maps categories to a set of Strings(representing the choices which are options for this
      * category).
      */
-    private Map<String, Set<String>> category2Choices = new LinkedHashMap<>();
-    private Map<String, String> category2Default;
+    private Map<String, Set<String>> category2Choices = new TreeMap<>();
+    private Map<String, String> category2Default = new TreeMap<>();
 
 
     public ChoiceSettings() {
@@ -84,9 +84,14 @@ public class ChoiceSettings extends AbstractSettings {
         return DefaultImmutableSet.fromImmutableList(choices);
     }
 
-    private void setChoiceCategories(HashMap<String, Set<String>> c2C) {
+
+    public Map<String, Set<String>> getCategory2Choices() {
+        return category2Choices;
+    }
+
+    public void setChoiceCategories(Map<String, Set<String>> c2C) {
         var old = category2Choices;
-        this.category2Choices = new HashMap<>(c2C);
+        this.category2Choices = new TreeMap<>(c2C);
         firePropertyChange(PROP_CHOICE_CATEGORIES, old, category2Choices);
     }
 

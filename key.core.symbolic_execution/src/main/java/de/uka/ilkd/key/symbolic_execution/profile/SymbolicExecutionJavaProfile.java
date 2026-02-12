@@ -325,4 +325,9 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
             return false;
         }
     }
+
+    @Override
+    public String displayName() {
+        return NAME;
+    }
 }
