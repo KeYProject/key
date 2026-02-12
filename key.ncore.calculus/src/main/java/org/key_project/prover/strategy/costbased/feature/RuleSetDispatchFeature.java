@@ -18,7 +18,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -29,9 +31,9 @@ import org.jspecify.annotations.NonNull;
  */
 public class RuleSetDispatchFeature implements Feature {
 
-    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
+    private final Map<@NonNull RuleSet, @NonNull Feature> rulesetToFeature = new LinkedHashMap<>();
 
-    public Set<RuleSet> ruleSets() {
+    public Set<@KeyFor("this.rulesetToFeature") RuleSet> ruleSets() {
         return rulesetToFeature.keySet();
     }
 
@@ -94,7 +96,7 @@ public class RuleSetDispatchFeature implements Feature {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature get(RuleSet ruleSet) {
+    public @Nullable Feature get(@NonNull RuleSet ruleSet) {
         return rulesetToFeature.get(ruleSet);
     }
 
@@ -105,7 +107,7 @@ public class RuleSetDispatchFeature implements Feature {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature remove(RuleSet ruleSet) {
+    public @Nullable Feature remove(@NonNull RuleSet ruleSet) {
         return rulesetToFeature.remove(ruleSet);
     }
 }
