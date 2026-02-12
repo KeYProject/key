@@ -440,10 +440,10 @@ public abstract class TacletApp implements ITacletApp {
      *
      * @return ImmutableSet<SchemaVariable> with SchemaVariables that have not been instantiated yet
      */
+    @Override
     public @NonNull ImmutableSet<SchemaVariable> uninstantiatedVars() {
         return calculateNonInstantiatedSV();
     }
-
 
     /**
      * returns true if the given {@link SchemaVariable} must be explicitly instantiated it does not
@@ -957,6 +957,7 @@ public abstract class TacletApp implements ITacletApp {
     /**
      * @return true iff the if-instantiation list is not null or no if sequent is needed
      */
+    @Override
     public boolean assumesInstantionsComplete() {
         return assumesFormulaInstantiations != null || taclet().assumesSequent().isEmpty();
     }

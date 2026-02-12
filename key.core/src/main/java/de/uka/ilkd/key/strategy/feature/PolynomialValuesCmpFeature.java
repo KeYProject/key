@@ -103,8 +103,9 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
-        return compare(getPolynomial(left, leftCoeff, app, pos, goal, mState),
-            getPolynomial(right, rightCoeff, app, pos, goal, mState));
+        final TacletApp tacletApp = (TacletApp) app;
+        return compare(getPolynomial(left, leftCoeff, tacletApp, pos, goal, mState),
+            getPolynomial(right, rightCoeff, tacletApp, pos, goal, mState));
     }
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
