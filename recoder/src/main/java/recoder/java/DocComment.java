@@ -7,9 +7,8 @@ package recoder.java;
 /**
  * Contains tags with
  *
- * @-prefix and corresponding entries.
+ * {@code -prefix} and corresponding entries.
  */
-
 public class DocComment extends Comment {
 
     /**

@@ -64,7 +64,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             return null;
         }
 
-        final MergeRuleBuiltInRuleApp result = new MergeRuleBuiltInRuleApp(app.rule(), pio);
+        final MergeRuleBuiltInRuleApp result =
+            new MergeRuleBuiltInRuleApp((MergeRule) app.rule(), pio);
         result.setMergePartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
         result.setDistinguishingFormula(chosenDistForm);

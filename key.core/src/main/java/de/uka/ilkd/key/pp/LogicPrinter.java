@@ -169,7 +169,9 @@ public class LogicPrinter {
     public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
         var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+        p.layouter().beginC();
         p.printTerm(t);
+        p.layouter().end();
         return p.result();
     }
 
@@ -780,6 +782,7 @@ public class LogicPrinter {
      * @param t the Term to be printed
      */
     public void printTerm(JTerm t) {
+        layouter.beginC();
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
             layouter.startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
@@ -797,6 +800,7 @@ public class LogicPrinter {
         if (t.hasLabels()) {
             printLabels(t);
         }
+        layouter.end();
     }
 
     /**
@@ -989,7 +993,7 @@ public class LogicPrinter {
 
         Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapConstructorNotation heapNotation) {
-            heapNotation.printEmbeddedHeap(t, this);
+            heapNotation.print(t, this);
             return true;
         } else {
             printTerm(t);
@@ -1001,7 +1005,7 @@ public class LogicPrinter {
         layouter.print(className);
     }
 
-    public void printHeapConstructor(JTerm t, boolean closingBrace) {
+    public void printHeapConstructor(JTerm t) {
         assert t.boundVars().isEmpty();
 
         final HeapLDT heapLDT = getHeapLDT();
@@ -1045,10 +1049,9 @@ public class LogicPrinter {
 
             layouter.print(")]").end();
 
-            if (closingBrace) {
+            if (!hasEmbedded) {
                 layouter.end();
             }
-
         } else {
             printFunctionTerm(t);
         }
@@ -1753,7 +1756,7 @@ public class LogicPrinter {
     protected void maybeParens(JTerm t, int ass) {
         if (t.op() instanceof SchemaVariable && instantiations != null
                 && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof JTerm) {
-            t = (JTerm) instantiations.getInstantiation((SchemaVariable) t.op());
+            t = instantiations.getInstantiation((SchemaVariable) t.op());
         }
 
         if (notationInfo.getNotation(t.op()).getPriority() < ass) {

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.fonticons.IconProvider;
 
 import org.key_project.util.java.StringUtil;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,14 +184,19 @@ public class SimpleSettingsPanel extends JPanel {
         if (s == null || s.isEmpty()) {
             s = "";
         } else {
-            String brokenLines = StringUtil.wrapLines(s);
-            s = "<html>"
-                + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+            s = createHtmlText(s);
         }
 
         JLabel infoButton = new JLabel(HELP_ICON.get(16f));
         infoButton.setToolTipText(s);
         return infoButton;
+    }
+
+    public static @NonNull String createHtmlText(String s) {
+        String brokenLines = StringUtil.wrapLines(s);
+        s = "<html>"
+            + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+        return s;
     }
 
     public static JLabel createHelpTextLabel(String s) {
