@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
@@ -27,23 +27,25 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 import org.jspecify.annotations.NonNull;
 
 /**
- * {@link Strategy} to use for symbolic execution.
+ * {@link JavaStrategy} to use for symbolic execution.
  */
 public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
-     * The {@link Name} of the symbolic execution {@link Strategy}.
+     * The {@link Name} of the symbolic execution {@link JavaStrategy}.
      */
     public static final Name name = new Name("Symbolic Execution Strategy");
 

@@ -11,7 +11,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -22,9 +21,11 @@ import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -38,7 +39,7 @@ import org.jspecify.annotations.NonNull;
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
-public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
     public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
@@ -571,7 +572,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return rule instanceof QueryExpand || rule instanceof UseDependencyContractRule;
     }
 }

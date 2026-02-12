@@ -432,7 +432,7 @@ public class TacletAppIndex {
             + tacletIndex;
     }
 
-    // helper because IList<NoPosTacletApp> is no IList<TacletApp>
+    // helper because IList<NoPosTacletApp> is no IList<ITacletApp>
     private static ImmutableList<TacletApp> prepend(ImmutableList<TacletApp> l1,
             ImmutableList<NoPosTacletApp> l2) {
         for (NoPosTacletApp aL2 : l2) {

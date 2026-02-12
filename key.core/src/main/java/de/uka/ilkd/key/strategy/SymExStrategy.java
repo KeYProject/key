@@ -17,13 +17,16 @@ import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.FindDepthFeature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
@@ -32,7 +35,7 @@ import org.jspecify.annotations.NonNull;
 /// Strategy for symbolic execution rules.
 ///
 /// Do not create directly. Use [SymExStrategyFactory] instead.
-public class SymExStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class SymExStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("SymExStrategy");
 
     private final FormulaTermFeatures ff;
@@ -267,7 +270,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return rule instanceof WhileInvariantRule || rule instanceof LoopScopeInvariantRule
                 || rule instanceof BlockContractInternalRule
                 || rule instanceof BlockContractExternalRule

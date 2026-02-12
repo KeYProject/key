@@ -29,7 +29,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -348,7 +348,7 @@ public final class KeYFacade {
                     .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
                 StrategyProperties.OSS_ON);
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             // passing null is ok since ProblemLoader is only used for error reporting as origin
@@ -384,7 +384,7 @@ public final class KeYFacade {
             StrategyProperties newProps = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             result = new ReplayResult(status, errors, lastTouchedNode);

@@ -12,17 +12,19 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -32,7 +34,7 @@ import org.jspecify.annotations.NonNull;
 /// Strategy for string related rules.
 ///
 /// Do not create directly; use [StringStrategyFactory] instead.
-public class StringStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class StringStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("String Strategy");
 
     /// The features defining the three phases: cost computation, approval,
@@ -205,7 +207,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return false;
     }
 }

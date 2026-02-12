@@ -1,15 +1,14 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.rule.TacletApp;
-
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -17,8 +16,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -42,12 +39,12 @@ public class RuleSetDispatchFeature implements Feature {
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal,
             MutableState mState) {
-        if (!(app instanceof TacletApp)) {
+        if (!(app instanceof ITacletApp tapp)) {
             return NumberRuleAppCost.getZeroCost();
         }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
-        ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ((TacletApp) app).taclet().getRuleSets();
+        ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = tapp.taclet().getRuleSets();
         /*
          * do not use iterator here, as this method is called a lot when proving such that avoiding
          * object creation helps to reduce the load put on the garbage collector

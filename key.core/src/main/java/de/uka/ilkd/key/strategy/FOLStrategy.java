@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
@@ -28,9 +27,11 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -48,7 +49,7 @@ import org.jspecify.annotations.NonNull;
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
 /// For that reason, instantiation can be found [JFOLStrategy].
-public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("FOL Strategy");
 
     protected final StrategyProperties strategyProperties;
@@ -621,7 +622,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return rule instanceof OneStepSimplifier;
     }
 }

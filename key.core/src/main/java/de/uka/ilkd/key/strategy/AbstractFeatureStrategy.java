@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
@@ -25,6 +24,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
@@ -36,7 +36,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
-        implements Strategy<Goal> {
+        implements JavaStrategy {
 
     private final Proof proof;
 
@@ -117,7 +117,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal,
-            RuleAppCostCollector collector) {
+            org.key_project.prover.strategy.RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();
         final BackTrackingManager btManager = mState.getBacktrackingManager();
         btManager.setup(app);

@@ -46,8 +46,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.ModularJavaDLStrategyFactory;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -2562,7 +2562,7 @@ public final class SymbolicExecutionUtil {
             boolean improveReadability) throws ProofInputException {
         if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
-                "Only TacletApp is allowed in branch computation but rule \""
+                "Only ITacletApp is allowed in branch computation but rule \""
                     + parent.getAppliedRuleApp() + "\" was found.");
         }
         Services services = node.proof().getServices();
@@ -4312,7 +4312,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Initializes the {@link Proof} of the given {@link SymbolicExecutionTreeBuilder} so that the
-     * correct {@link Strategy} is used.
+     * correct {@link JavaStrategy} is used.
      *
      * @param builder The {@link SymbolicExecutionTreeBuilder} to initialize.
      */

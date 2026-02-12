@@ -8,7 +8,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistr
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
@@ -194,7 +194,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
-            final PosInOccurrence occurrence, TermServices services) {
+            final PosInOccurrence occurrence, LogicServices services) {
         return new BlockContractInternalBuiltInRuleApp<>(this, occurrence);
     }
 

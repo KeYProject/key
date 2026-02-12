@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
@@ -102,7 +103,7 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence occurrence, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence occurrence, LogicServices services) {
         return new JmlAssertBuiltInRuleApp(this, occurrence);
     }
 

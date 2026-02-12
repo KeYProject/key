@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
@@ -23,14 +22,17 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.FocusInAntecFeature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -45,7 +47,7 @@ import org.jspecify.annotations.NonNull;
 /// and Gröbner basis.
 ///
 /// Do not create directly, instead use [IntegerStrategyFactory].
-public class IntegerStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class IntegerStrategy extends AbstractFeatureStrategy implements ComponentStrategy<Goal> {
 
     public static final Name NAME = new Name("Integer Strategy");
 
@@ -1034,7 +1036,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return false;
     }
 }

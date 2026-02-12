@@ -47,7 +47,7 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
      * Compute whether the result of the feature is zero (<code>true</code>) or infinity
      * (<code>false</code>)
      *
-     * @param app the TacletApp
+     * @param app the ITacletApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
      * @param mState the MutableState used to store modifiable information

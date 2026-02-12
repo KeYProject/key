@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
@@ -26,6 +26,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -37,7 +38,8 @@ import org.jspecify.annotations.NonNull;
  * more modality on the sequent.
  * <p>
  *
- * This is done by implementing a delegation {@link Strategy} which assigns to any rule application
+ * This is done by implementing a delegation {@link JavaStrategy} which assigns to any rule
+ * application
  * infinite costs if there is no modality on the sequent.
  *
  * @author Mattias Ulbrich

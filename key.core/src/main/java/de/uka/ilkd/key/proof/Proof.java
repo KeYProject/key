@@ -30,7 +30,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -39,6 +38,7 @@ import org.key_project.logic.Named;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;

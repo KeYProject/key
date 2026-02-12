@@ -5,35 +5,37 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.*;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.strategy.ComponentStrategy.StrategyAspect;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.strategy.ComponentStrategy;
+import org.key_project.prover.strategy.ComponentStrategy.StrategyAspect;
 
 /// A cache for the strategies responsible for a given [Rule] and [RuleSet].
 public class ResponsibleStrategyCache {
     // map rulesets to the strategies that participate in their cost computations, instantiation or
     // approval decisions
-    private final Map<RuleSet, List<ComponentStrategy>> costResponsibilityMap =
-        new LinkedHashMap<RuleSet, List<ComponentStrategy>>();
-    private final Map<RuleSet, List<ComponentStrategy>> instantiationResponsibilityMap =
-        new LinkedHashMap<RuleSet, List<ComponentStrategy>>();
-    private final Map<RuleSet, List<ComponentStrategy>> approvalResponsibilityMap =
-        new LinkedHashMap<RuleSet, List<ComponentStrategy>>();
+    private final Map<RuleSet, List<ComponentStrategy<Goal>>> costResponsibilityMap =
+        new LinkedHashMap<RuleSet, List<ComponentStrategy<Goal>>>();
+    private final Map<RuleSet, List<ComponentStrategy<Goal>>> instantiationResponsibilityMap =
+        new LinkedHashMap<RuleSet, List<ComponentStrategy<Goal>>>();
+    private final Map<RuleSet, List<ComponentStrategy<Goal>>> approvalResponsibilityMap =
+        new LinkedHashMap<RuleSet, List<ComponentStrategy<Goal>>>();
     // map rules to the strategies that participate in their cost computations, instantiation or
     // approval decisions
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> costRuleToStrategyMap =
-        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy>>();
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> instantiationRuleToStrategyMap =
-        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy>>();
-    private final Map<Rule, LinkedHashSet<ComponentStrategy>> approvalRuleToStrategyMap =
-        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy>>();
-    private final Map<Name, ComponentStrategy> nameToStrategyMap =
-        new HashMap<Name, ComponentStrategy>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> costRuleToStrategyMap =
+        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy<Goal>>>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> instantiationRuleToStrategyMap =
+        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy<Goal>>>();
+    private final Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> approvalRuleToStrategyMap =
+        new LinkedHashMap<Rule, LinkedHashSet<ComponentStrategy<Goal>>>();
+    private final Map<Name, ComponentStrategy<Goal>> nameToStrategyMap =
+        new HashMap<Name, ComponentStrategy<Goal>>();
 
-    public ResponsibleStrategyCache(List<ComponentStrategy> strategies) {
+    public ResponsibleStrategyCache(List<ComponentStrategy<Goal>> strategies) {
         initialize(StrategyAspect.Cost, strategies);
         initialize(StrategyAspect.Instantiation, strategies);
         initialize(StrategyAspect.Approval, strategies);
@@ -45,9 +47,9 @@ public class ResponsibleStrategyCache {
      * @param aspect the StrategyAspect for which the cache is created
      * @param strategies list of all component strategies
      */
-    private void initialize(StrategyAspect aspect, List<ComponentStrategy> strategies) {
+    private void initialize(StrategyAspect aspect, List<ComponentStrategy<Goal>> strategies) {
         var map = getResponsibilityMap(aspect);
-        for (ComponentStrategy strategy : strategies) {
+        for (ComponentStrategy<Goal> strategy : strategies) {
             nameToStrategyMap.put(strategy.name(), strategy);
             var res = strategy.getResponsibilities(aspect);
             for (var rs : res) {
@@ -57,7 +59,7 @@ public class ResponsibleStrategyCache {
     }
 
     /// Returns the map for the given aspect
-    private Map<Rule, LinkedHashSet<ComponentStrategy>> getRuleToStrategyMap(
+    private Map<Rule, LinkedHashSet<ComponentStrategy<Goal>>> getRuleToStrategyMap(
             StrategyAspect aspect) {
         return switch (aspect) {
             case Cost -> costRuleToStrategyMap;
@@ -67,7 +69,8 @@ public class ResponsibleStrategyCache {
     }
 
     /// Returns the map for the given aspect
-    private Map<RuleSet, List<ComponentStrategy>> getResponsibilityMap(StrategyAspect aspect) {
+    private Map<RuleSet, List<ComponentStrategy<Goal>>> getResponsibilityMap(
+            StrategyAspect aspect) {
         return switch (aspect) {
             case Cost -> costResponsibilityMap;
             case Instantiation -> instantiationResponsibilityMap;
@@ -76,10 +79,10 @@ public class ResponsibleStrategyCache {
     }
 
     /// Returns the strategies responsible for the given [Rule] under the given [StrategyAspect].
-    public LinkedHashSet<ComponentStrategy> getResponsibleStrategies(Rule rule,
-            List<ComponentStrategy> strategies, StrategyAspect aspect) {
+    public LinkedHashSet<ComponentStrategy<Goal>> getResponsibleStrategies(Rule rule,
+            List<ComponentStrategy<Goal>> strategies, StrategyAspect aspect) {
         var ruleToStrategyMap = getRuleToStrategyMap(aspect);
-        LinkedHashSet<ComponentStrategy> strats = ruleToStrategyMap.get(rule);
+        LinkedHashSet<ComponentStrategy<Goal>> strats = ruleToStrategyMap.get(rule);
         if (strats == null) {
             strats = new LinkedHashSet<>();
             if (rule instanceof BuiltInRule bir) {
@@ -90,11 +93,11 @@ public class ResponsibleStrategyCache {
                 }
             } else {
                 var ruleSets = rule.ruleSets();
-                Map<RuleSet, List<ComponentStrategy>> responsibilityMap =
+                Map<RuleSet, List<ComponentStrategy<Goal>>> responsibilityMap =
                     getResponsibilityMap(aspect);
                 while (ruleSets.hasNext()) {
                     var rs = ruleSets.next();
-                    List<ComponentStrategy> s = responsibilityMap.get(rs);
+                    List<ComponentStrategy<Goal>> s = responsibilityMap.get(rs);
                     if (s != null)
                         strats.addAll(s);
                 }

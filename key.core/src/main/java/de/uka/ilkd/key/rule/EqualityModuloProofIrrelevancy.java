@@ -457,13 +457,13 @@ public class EqualityModuloProofIrrelevancy {
     }
 
 
-    // TacletApp
+    // ITacletApp
 
     /**
      * test for equality modulo proof irrelevancy for the given arguments
      *
-     * @param _this the first TacletApp
-     * @param that the second TacletApp
+     * @param _this the first ITacletApp
+     * @param that the second ITacletApp
      * @return true if both arguments are equal modulo proof irrelevancy
      */
     public static boolean equalsModProofIrrelevancy(TacletApp _this, TacletApp that) {
