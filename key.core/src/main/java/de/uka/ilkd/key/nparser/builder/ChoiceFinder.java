@@ -56,8 +56,9 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         }
 
         seq().put(category, new HashSet<>(options));
-        choiceInformation.setDefaultOption(category, options.get(0));
-        options.forEach(it -> choices().add(new Choice(it, category)));
+        var choices = options.stream().map(it -> new Choice(it, category)).toList();
+        choices.forEach(it -> choices().add(it));
+        choiceInformation.setDefaultOption(category, choices.getFirst());
         return null;
     }
 
