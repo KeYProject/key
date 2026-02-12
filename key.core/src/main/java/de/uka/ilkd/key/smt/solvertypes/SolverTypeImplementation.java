@@ -206,7 +206,7 @@ public final class SolverTypeImplementation implements SolverType {
             String defaultCommand, String versionParameter, String minimumSupportedVersion,
             long defaultTimeout, String[] delimiters, Class<?> translatorClass,
             String[] handlerNames, String[] handlerOptions, Class<?> solverSocketClass,
-            String preamble) {
+            @Nullable String preamble) {
         this.name = name;
         this.info = info;
         this.defaultParams = defaultParams;
