@@ -101,6 +101,7 @@ one_sort_decl
 
 parametric_sort_decl
 :
+    DOC_COMMENT?
     simple_ident_dots
     formal_sort_param_decls
 ;

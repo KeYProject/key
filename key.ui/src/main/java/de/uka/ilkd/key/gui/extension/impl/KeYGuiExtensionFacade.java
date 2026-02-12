@@ -17,9 +17,12 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.LoadOptionPanel;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.OptionPanel;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -401,6 +404,19 @@ public final class KeYGuiExtensionFacade {
     public static Stream<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()
                 .flatMap(it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
+    }
+
+    /**
+     * Helper methods that finds matches {@link Profile} and {@link OptionPanel} together.
+     * This information are provided by {@link LoadOptionPanel} interface.
+     */
+    public static Map<Profile, OptionPanel> createAdditionalOptionPanels() {
+        List<LoadOptionPanel> items = getExtensionInstances(LoadOptionPanel.class);
+        HashMap<Profile, OptionPanel> map = HashMap.newHashMap(4);
+        for (LoadOptionPanel item : items) {
+            map.put(item.getProfile(), item.get());
+        }
+        return map;
     }
 
     /**

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -51,8 +53,8 @@ public class FinalHeapResolution {
      * @return true if final fields are treated as immutable
      */
     public static boolean isFinalEnabled(@NonNull ProofSettings settings) {
-        return settings.getChoiceSettings().getDefaultChoices().get(SETTING)
-                .equals(IMMUTABLE_OPTION);
+        return Objects.equals(settings.getChoiceSettings().getDefaultChoices().get(SETTING),
+            IMMUTABLE_OPTION);
     }
 
     /**

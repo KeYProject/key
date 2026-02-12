@@ -532,7 +532,7 @@ public class Configuration {
             } else if (value instanceof Enum<?>) {
                 printValue(value.toString());
             } else if (value == null) {
-                printValue("null");
+                out.write("null");
             } else {
                 throw new IllegalArgumentException("Unexpected object: " + value);
             }
@@ -540,7 +540,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printMap(Map<?, ?> value) {
-            out.format("{ ");
+            out.format("{");
             indent += 4;
             newline().printIndent();
             for (Iterator<? extends Map.Entry<?, ?>> iterator =
@@ -567,7 +567,7 @@ public class Configuration {
         }
 
         private ConfigurationWriter printSeq(Collection<?> value) {
-            out.format("[ ");
+            out.print("[");
             indent += 4;
             newline();
             printIndent();
@@ -586,13 +586,13 @@ public class Configuration {
             }
             indent -= 4;
             newline().printIndent();
-            out.format("]");
+            out.print("]");
             return this;
         }
 
         private ConfigurationWriter printKey(String key) {
             printValue(key);
-            out.format(" : ");
+            out.print(" : ");
             return this;
         }
     }

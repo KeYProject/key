@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.sort;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericParameter;
 
+import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -19,21 +20,18 @@ import org.jspecify.annotations.NonNull;
 ///
 /// Get instantiated versions using [ParametricSortInstance#get(ParametricSortDecl, ImmutableList,
 /// Services)].
-public class ParametricSortDecl implements Named {
+public class ParametricSortDecl implements Named, HasDocumentation {
     private final Name name;
     private final boolean isAbstract;
-    private final String documentation;
-
     private final ImmutableList<GenericParameter> parameters;
     private final ImmutableSet<Sort> extendedSorts;
     private final String origin;
 
     public ParametricSortDecl(Name name, boolean isAbstract, ImmutableSet<Sort> ext,
-            ImmutableList<GenericParameter> sortParams, String documentation, String origin) {
+            ImmutableList<GenericParameter> sortParams, String origin) {
         this.name = name;
         this.isAbstract = isAbstract;
         this.extendedSorts = ext.isEmpty() ? ImmutableSet.singleton(JavaDLTheory.ANY) : ext;
-        this.documentation = documentation;
         this.parameters = sortParams;
         this.origin = origin;
         assert Immutables.isDuplicateFree(parameters)
@@ -57,8 +55,9 @@ public class ParametricSortDecl implements Named {
         return extendedSorts;
     }
 
-    public String getDocumentation() {
-        return documentation;
+    @Override
+    public String getDocumentationKey() {
+        return "psort/" + name();
     }
 
     public String getOrigin() {

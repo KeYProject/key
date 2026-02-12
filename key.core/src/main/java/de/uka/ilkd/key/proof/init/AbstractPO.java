@@ -292,7 +292,6 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
-        var choices = Collections.unmodifiableSet(proofConfig.getActivatedChoices().toSet());
         for (ClassAxiom axiom : axioms) {
             final Vertex node = getVertexFor(axiom.getKJT().getSort(), axiom.getTarget(), axiom);
             if (node.index == -1) {
@@ -305,9 +304,9 @@ public abstract class AbstractPO implements IPersistablePO {
                 proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: " + axiom.getName();
                 // only include if choices are appropriate
-                if (axiomTaclet.getChoices().eval(choices)) {
-                    register(axiomTaclet, proofConfig);
-                }
+                // weigl: register always! choices are evaluated as late as possible.
+                // This would technically allow to change Taclet options after loading.
+                register(axiomTaclet, proofConfig);
             }
         }
 

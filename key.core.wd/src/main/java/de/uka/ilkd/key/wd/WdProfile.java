@@ -20,6 +20,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (7/27/25)
@@ -97,9 +99,19 @@ public class WdProfile extends JavaProfile {
         return wdStandardRules;
     }
 
+    /// {@inheritDoc}
+    ///
+    /// @param additionalProfileOptions a string representing the choice of `wdOperator`
     @Override
-    public void prepareInitConfig(InitConfig baseConfig) {
+    public void prepareInitConfig(InitConfig baseConfig,
+            @Nullable Object additionalProfileOptions) {
         var wdChoice = baseConfig.choiceNS().lookup(new Name("wdChecks:on"));
         baseConfig.activateChoice(wdChoice);
+
+        if (additionalProfileOptions != null) {
+            var wdOperator =
+                baseConfig.choiceNS().lookup(new Name(additionalProfileOptions.toString()));
+            baseConfig.activateChoice(wdOperator);
+        }
     }
 }

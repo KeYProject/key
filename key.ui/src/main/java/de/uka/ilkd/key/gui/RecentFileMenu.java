@@ -102,6 +102,7 @@ public class RecentFileMenu {
     private void insertFirstEntry(RecentFileEntry entry) {
         menu.insert(entry.getMenuItem(), 0);
         mostRecentFile = entry;
+        recentFiles.addFirst(entry);
     }
 
     /**
@@ -207,9 +208,11 @@ public class RecentFileMenu {
             var c = Configuration.load(filename);
             c.getStringList("recentFiles").forEach(this::addRecentFileNoSave);
         } catch (FileNotFoundException ex) {
-            LOGGER.debug("Could not read RecentFileList. Did not find file {}", filename);
+            LOGGER.info("Could not read RecentFileList. Did not find file {}", filename);
         } catch (IOException ioe) {
-            LOGGER.debug("Could not read RecentFileList. Some IO Error occured ", ioe);
+            LOGGER.error("Could not read RecentFileList. Some IO Error occured ", ioe);
+        } catch (Exception ioe) {
+            LOGGER.error("Could not read RecentFileList.", ioe);
         }
     }
 
