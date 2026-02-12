@@ -15,6 +15,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -56,7 +57,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private final InnerNodeViewListener listener;
 
-    private JTextArea tacletInfo = new JTextArea();
+    private JTextPane tacletInfo = new JTextPane();
 
     private Node node;
     private final RuleApp ruleApp;
@@ -244,9 +245,13 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     private void updateTacletInfo() {
-        tacletInfo.setText(
+        final var tacletDescription =
             TacletDescriber.getTacletDescription(getMainWindow().getMediator(), ruleApp,
-                getLineWidth()));
+                getLineWidth());
+        tacletInfo.setText(tacletDescription);
+        LexerHighlighter lh = new LexerHighlighter.KeYLexerHighlighter();
+        lh.highlightPaneAll(tacletInfo, tacletDescription.indexOf('\n'), -1);
+
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));
@@ -260,7 +265,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         tacletInfo.setVisible(visible);
     }
 
-    public JTextArea getTacletInfo() {
+    public JTextPane getTacletInfo() {
         return tacletInfo;
     }
 

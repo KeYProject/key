@@ -104,7 +104,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         mainWindow.addRecentFile(file.toAbsolutePath().toString(),
             problemLoader.getProfileOfNewProofs(),
             problemLoader.isLoadSingleJavaFile(),
-            problemLoader.getAdditionalProfileOptions());
+            null);
         problemLoader.runAsynchronously();
     }
 
