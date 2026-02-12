@@ -5,6 +5,7 @@ package de.uka.ilkd.key.wd;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -15,10 +16,14 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -97,9 +102,34 @@ public class WdProfile extends JavaProfile {
         return wdStandardRules;
     }
 
+    /// {@inheritDoc}
+    ///
+    /// @param additionalProfileOptions a string representing the choice of `wdOperator`
     @Override
-    public void prepareInitConfig(InitConfig baseConfig) {
+    public void prepareInitConfig(InitConfig baseConfig,
+            @Nullable Configuration additionalProfileOptions) {
         var wdChoice = baseConfig.choiceNS().lookup(new Name("wdChecks:on"));
         baseConfig.activateChoice(wdChoice);
+
+        if (additionalProfileOptions != null) {
+            final var selectedWdOperator = additionalProfileOptions.getString("wdOperator");
+            if (selectedWdOperator == null) {
+                return;
+            }
+
+            var wdOperator = baseConfig.choiceNS().lookup(selectedWdOperator);
+            if (wdOperator == null) {
+                var choices = baseConfig.choiceNS().allElements()
+                        .stream()
+                        .filter(it -> it.category().equals("wdOperator"))
+                        .map(Choice::toString)
+                        .collect(Collectors.joining(", "));
+
+                throw new IllegalStateException("Could not find choice for %s. \n Choices known %s."
+                        .formatted(additionalProfileOptions, choices));
+            } else {
+                baseConfig.activateChoice(wdOperator);
+            }
+        }
     }
 }
