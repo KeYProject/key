@@ -508,4 +508,21 @@ public class InitConfig {
     public boolean isChoiceCategorySet(String category) {
         return activatedChoices.containsKey(category);
     }
+
+    public List<NoPosTacletApp> filterTaclets(ImmutableSet<NoPosTacletApp> taclets) {
+        var choices = Collections.unmodifiableSet(getActivatedChoices().toSet());
+        return taclets.stream().filter(app -> {
+            var t = app.rule();
+            TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
+            if (t.getChoices().eval(choices)) {
+                if (b != null && b.getGoal2Choices() != null) {
+                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
+                }
+                if (t != null) {
+                    return true;
+                }
+            }
+            return false;
+        }).toList();
+    }
 }

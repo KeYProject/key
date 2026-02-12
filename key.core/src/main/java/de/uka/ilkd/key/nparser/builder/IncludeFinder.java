@@ -57,9 +57,10 @@ public class IncludeFinder extends AbstractBuilder<Void> {
         filename = filename.replace('/', File.separatorChar); // Not required for Windows, but
         // whatsoever
         filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
-        var path = base.resolve(filename).normalize();
+        var path = base.resolve(filename).normalize().toAbsolutePath();
 
         var url = path.toUri().toURL();
+        // url = URI.create(path.toString()).toURL();
         source = RuleSourceFactory.initRuleFile(url);
         if (ldt) {
             includes.putLDT(filename, source);

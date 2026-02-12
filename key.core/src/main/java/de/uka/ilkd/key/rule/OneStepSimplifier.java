@@ -3,12 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -794,5 +789,29 @@ public final class OneStepSimplifier implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
+    }
+
+
+    @Override
+    public String getDocumentation() {
+        return """
+                The One Step Simplifier (OSS) aggregates the application of simplification rules into a single rule. This is done to make the calculus more efficient.
+
+                You can activate/deactivate the simplifier by toggling the menu entry Options->One Step Simplifier. An active OSS makes the proof faster, a deactivated more transparent.
+
+                In particular, the OSS performs normalisation and simplification on updated terms:
+                  * Updates on terms without modality are resolved.
+                  * Updates without effects are dropped.
+                  * Sequential updates are merged into one parallel update.
+
+                Technical Information:
+                The OSS aggregates the rules from the following heuristics (-> Taclet Base):
+                  concrete,
+                  update_elim,
+                  update_apply_on_update,
+                  update_apply,
+                  update_join,
+                  elimQuantifier
+                  """;
     }
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
@@ -262,23 +263,16 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
     }
 
     @Override
-    public @NonNull Set<NoPosTacletApp> allNoPosTacletApps() {
-        Set<NoPosTacletApp> result = new LinkedHashSet<>();
-        for (ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) {
-            tacletApps.forEach(result::add);
-        }
+    public Set<NoPosTacletApp> allNoPosTacletApps() {
+        return new HashSet<>(allNoPosTacletAppsStream().collect(Collectors.toUnmodifiableSet()));
+    }
 
-        for (ImmutableList<NoPosTacletApp> tacletApps : antecList.values()) {
-            tacletApps.forEach(result::add);
-        }
-
-        for (ImmutableList<NoPosTacletApp> tacletApps : succList.values()) {
-            tacletApps.forEach(result::add);
-        }
-
-        noFindList.forEach(result::add);
-
-        return result;
+    public Stream<NoPosTacletApp> allNoPosTacletAppsStream() {
+        Stream<NoPosTacletApp> s1 = rwList.values().stream().flatMap(ImmutableList::stream);
+        Stream<NoPosTacletApp> s2 = antecList.values().stream().flatMap(ImmutableList::stream);
+        Stream<NoPosTacletApp> s3 = succList.values().stream().flatMap(ImmutableList::stream);
+        Stream<NoPosTacletApp> s4 = noFindList.stream();
+        return Stream.concat(Stream.concat(Stream.concat(s1, s2), s3), s4);
     }
 
     /**
@@ -507,12 +501,10 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      */
     @Override
     public NoPosTacletApp lookup(Name name) {
-        for (NoPosTacletApp tacletApp : allNoPosTacletApps()) {
-            if (tacletApp.taclet().name().equals(name)) {
-                return tacletApp;
-            }
-        }
-        return null;
+        return allNoPosTacletAppsStream()
+                .filter(tacletApp -> tacletApp.taclet().name().equals(name))
+                .findAny()
+                .orElse(null);
     }
 
 

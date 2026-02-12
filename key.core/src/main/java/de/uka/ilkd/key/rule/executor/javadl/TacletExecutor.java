@@ -183,8 +183,8 @@ public abstract class TacletExecutor
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
-            tacletToAdd = tacletToAdd
-                    .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
+            String name = tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId();
+            tacletToAdd = tacletToAdd.setName(name);
 
 
             // the new Taclet may contain variables with a known
