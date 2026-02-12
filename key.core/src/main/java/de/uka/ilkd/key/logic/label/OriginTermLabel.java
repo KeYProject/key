@@ -59,12 +59,12 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Display name for {@link OriginTermLabel}s.
      */
-    public final static Name NAME = new Name("origin");
+    public static final Name NAME = new Name("origin");
 
     /**
      * @see #getTLChildCount()
      */
-    public final static int CHILD_COUNT = 2;
+    public static final int CHILD_COUNT = 2;
     public static final Sort[] EMPTY_SORTS = new Sort[0];
 
 
@@ -559,9 +559,13 @@ public class OriginTermLabel implements TermLabel {
      *
      */
     private static class SubTermOriginData {
-        /** All collected sub-terms */
+        /**
+         * All collected sub-terms
+         */
         public final JTerm[] terms;
-        /** All collected origins */
+        /**
+         * All collected origins
+         */
         public final Set<Origin> origins;
 
         /**
@@ -773,6 +777,18 @@ public class OriginTermLabel implements TermLabel {
             }
             return line == other.line;
         }
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                This label saves a term's origin in the JML specification as well as the origins of all of its subterms and former subterms.
+
+                For example, if the file "Example.java" contains the clause "requires R" at line 20, then every JavaDL term that is generated from R will have the origin
+                "requires @ Example.java @ line 20".
+
+                Origin labels are not printed in the sequent view. To see a term's origin, you can mouse over it while holding the ALT button. If you want more detailed information, left click on the term and then on "Show Origin".
+                """;
     }
 
     /**

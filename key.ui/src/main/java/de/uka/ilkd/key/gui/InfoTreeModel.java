@@ -6,16 +6,20 @@ package de.uka.ilkd.key.gui;
 import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 
+import de.uka.ilkd.key.logic.MetaSpace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.XMLResources;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
@@ -31,13 +35,12 @@ public class InfoTreeModel extends DefaultTreeModel {
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
 
-    public InfoTreeModel(Goal goal, XMLResources xmlResources, MainWindow mainWindow) {
+    public InfoTreeModel(Goal goal, MetaSpace meta, MainWindow mainWindow) {
         super(new InfoTreeNode());
-        insertAsLast(new RulesNode(xmlResources.getRuleExplanations(), goal), (InfoTreeNode) root);
-        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.getTermLabelExplanations()),
+        insertAsLast(new RulesNode(meta, goal), (InfoTreeNode) root);
+        insertAsLast(new TermLabelsNode(goal.proof(), meta),
             (InfoTreeNode) root);
-        insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()),
-            (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(meta, goal.getLocalNamespaces()), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -56,31 +59,25 @@ public class InfoTreeModel extends DefaultTreeModel {
         private static final String DEFAULT_FUNCTIONS_LABEL =
             "Display descriptions for documented interpreted function and predicate symbols.";
 
-        FunctionsNode(Properties functionExplanations) {
+        FunctionsNode(MetaSpace functionExplanations, NamespaceSet nss) {
             super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
             Map<String, InfoTreeNode> categoryMap = new HashMap<>();
 
-            List<String> sortedKeys =
-                new ArrayList<>(functionExplanations.stringPropertyNames());
-            java.util.Collections.sort(sortedKeys);
+            var sortedKeys = new ArrayList<>(nss.functions().allElements());
+            sortedKeys.sort(Comparator.comparing(it -> it.name().toString()));
 
-            for (String key : sortedKeys) {
-                String[] parts = key.split("/", 2);
-                if (parts.length == 1) {
-                    // no "/"
-                    insertAsLast(new InfoTreeNode(key, functionExplanations), this);
-                } else {
-                    String category = parts[0];
-                    InfoTreeNode categoryNode = categoryMap.get(category);
-                    if (categoryNode == null) {
-                        categoryNode = new InfoTreeNode(category, COLLECTION);
-                        categoryMap.put(category, categoryNode);
-                        insertAsLast(categoryNode, this);
-                    }
-                    String description = functionExplanations.getProperty(key);
-                    insertAsLast(new InfoTreeNode(parts[1], description), categoryNode);
+            for (Function function : sortedKeys) {
+                var key = function.name().toString();
+                var category = function.sort().name().toString();
+                var doc = functionExplanations.findDocumentation(function);
+                InfoTreeNode categoryNode = categoryMap.get(category);
+                if (categoryNode == null) {
+                    categoryNode = new InfoTreeNode(category, COLLECTION);
+                    categoryMap.put(category, categoryNode);
+                    insertAsLast(categoryNode, this);
                 }
+                insertAsLast(new InfoTreeNode(key, doc), categoryNode);
             }
         }
     }
@@ -92,12 +89,19 @@ public class InfoTreeModel extends DefaultTreeModel {
          */
         private static final long serialVersionUID = 7447092361863294242L;
 
-        TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
+        TermLabelsNode(Proof proof, MetaSpace meta) {
             super("Term Labels", "Show descriptions for currently available term labels.");
 
-            List<Name> labelNames = mainWindow.getSortedTermLabelNames();
+            var mgr = TermLabelManager.getTermLabelManager(proof.getServices());
+            var factories = mgr.getFactories();
+
+            var labelNames = new ArrayList<>(factories.keySet());
+            labelNames.sort(Comparator.comparing(Name::toString));
+
             for (Name name : labelNames) {
-                insertAsLast(new InfoTreeNode(name.toString(), termLabelExplanations), this);
+                var item =
+                    new InfoTreeNode(name.toString(), factories.get(name).getDocumentation());
+                insertAsLast(item, this);
             }
         }
     }
@@ -109,20 +113,20 @@ public class InfoTreeModel extends DefaultTreeModel {
          */
         private static final long serialVersionUID = 7622830441420768861L;
 
-        RulesNode(Properties ruleExplanations, Goal goal) {
+        RulesNode(MetaSpace meta, Goal goal) {
             super("Rules", "Browse descriptions for currently available rules.");
 
-            InfoTreeNode builtInRoot = new InfoTreeNode("Built-In", ruleExplanations);
+            InfoTreeNode builtInRoot = new InfoTreeNode("Built-In", "");
             insertAsLast(builtInRoot, this);
-            InfoTreeNode axiomTacletRoot = new InfoTreeNode(TACLET_BASE, ruleExplanations);
+            InfoTreeNode axiomTacletRoot = new InfoTreeNode(TACLET_BASE, "");
             insertAsLast(axiomTacletRoot, this);
-            InfoTreeNode proveableTacletsRoot = new InfoTreeNode(LEMMAS, ruleExplanations);
+            InfoTreeNode proveableTacletsRoot = new InfoTreeNode(LEMMAS, "");
             insertAsLast(proveableTacletsRoot, this);
 
             if (goal != null && goal.proof() != null && goal.proof().mgt() != null) {
                 for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex()
                         .builtInRuleIndex().rules()) {
-                    insertAsLast(new InfoTreeNode(br, ruleExplanations), builtInRoot);
+                    insertAsLast(new InfoTreeNode(br, meta), builtInRoot);
                 }
                 Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
                 OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(goal.proof());
@@ -136,11 +140,10 @@ public class InfoTreeModel extends DefaultTreeModel {
                         continue; // do not break system because of this
                     }
                     if (just.isAxiomJustification()) {
-                        insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot,
-                            ruleExplanations);
+                        insertAndGroup(new InfoTreeNode(app.taclet(), meta), axiomTacletRoot, "");
                     } else {
-                        insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot,
-                            ruleExplanations);
+                        insertAndGroup(new InfoTreeNode(app.taclet(), meta), proveableTacletsRoot,
+                            "");
                     }
                 }
             }
@@ -166,7 +169,7 @@ public class InfoTreeModel extends DefaultTreeModel {
          * groups subsequent insertions with the same name under a new node
          */
         private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent,
-                Properties ruleExplanations) {
+                String ruleExplanations) {
             InfoTreeNode insNode = ins;
             if (parent.getChildCount() > 0) {
                 InfoTreeNode lastNode =

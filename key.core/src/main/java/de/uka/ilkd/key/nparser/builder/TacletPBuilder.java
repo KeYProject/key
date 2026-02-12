@@ -172,9 +172,11 @@ public class TacletPBuilder extends ExpressionBuilder {
             b.setName(new Name(name));
             b.setChoices(choices);
             b.setAnnotations(tacletAnnotations);
-            b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
-            registerTaclet(ctx, r);
+            String doc = processDocumentation(ctx.doc);
+            String origin = BuilderHelpers.getPosition(ctx);
+
+            registerTaclet(ctx, r, doc, origin);
             currentTBuilder.pop();
             return r;
         }
@@ -187,9 +189,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             ifSeq = accept(ctx.ifSeq);
         }
 
-        @Nullable
         Object find = accept(ctx.find);
-        Sequent seq = find instanceof Sequent ? (Sequent) find : null;
+        Sequent seq = (find instanceof Sequent s) ? s : null;
 
         var applicationRestriction = ApplicationRestriction.NONE;
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
@@ -218,10 +219,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         accept(ctx.modifiers());
         b.setChoices(choices);
         b.setAnnotations(tacletAnnotations);
-        b.setOrigin(BuilderHelpers.getPosition(ctx));
+        String origin = BuilderHelpers.getPosition(ctx);
         try {
             Taclet r = peekTBuilder().getTaclet();
-            registerTaclet(ctx, r);
+            String doc = processDocumentation(ctx.doc);
+            registerTaclet(ctx, r, doc, origin);
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
             return r;
@@ -238,8 +240,11 @@ public class TacletPBuilder extends ExpressionBuilder {
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
     }
 
-    private void registerTaclet(ParserRuleContext ctx, Taclet taclet) {
+    private void registerTaclet(ParserRuleContext ctx, Taclet taclet,
+            @Nullable String documentation, @Nullable String origin) {
         taclet2Builder.put(taclet, peekTBuilder());
+        docsSpace().setDocumentation(taclet, documentation);
+        docsSpace().setOrigin(taclet, origin);
         LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
     }
@@ -457,7 +462,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var cases = ctx.datatype_constructor().stream()
                 .map(it -> createQuantifiedFormula(it, qvar, tb.var(phi), sort))
-                .collect(Collectors.toList());
+                .toList();
 
         for (var c : cases) {
             if (c.vars == null)
@@ -582,10 +587,6 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         if (ctx.DISPLAYNAME() != null && !ctx.DISPLAYNAME().isEmpty()) {// last entry
             b.setDisplayName(Objects.requireNonNull(accept(ctx.dname)));
-        }
-
-        if (ctx.HELPTEXT() != null) { // last entry
-            b.setHelpText(accept(ctx.htext));
         }
 
         mapOf(ctx.triggers());
@@ -801,7 +802,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 
-        @Nullable
         Object rwObj = accept(ctx.replacewith());
         if (ctx.add() != null) {
             addSeq = accept(ctx.add());
@@ -850,29 +850,32 @@ public class TacletPBuilder extends ExpressionBuilder {
     private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
             ApplicationRestriction applicationRestriction,
             ParserRuleContext ctx) {
-        if (find == null) {
-            return new NoFindTacletBuilder();
-        } else if (find instanceof JTerm) {
-            return new RewriteTacletBuilder<>().setFind((JTerm) find)
-                    .setApplicationRestriction(applicationRestriction);
-        } else if (find instanceof Sequent findSeq) {
-            if (findSeq.isEmpty()) {
+        switch (find) {
+            case null -> {
                 return new NoFindTacletBuilder();
-            } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
-                AntecTacletBuilder b = new AntecTacletBuilder();
-                b.setFind(findSeq);
-                b.setApplicationRestriction(applicationRestriction);
-                return b;
-            } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
-                SuccTacletBuilder b = new SuccTacletBuilder();
-                b.setFind(findSeq);
-                b.setApplicationRestriction(applicationRestriction);
-                return b;
-            } else {
-                semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);
             }
-        } else {
-            semanticError(ctx, "Unknown find class type: %s", find.getClass().getName());
+            case JTerm jTerm -> {
+                return new RewriteTacletBuilder<>().setFind(jTerm)
+                        .setApplicationRestriction(applicationRestriction);
+            }
+            case Sequent findSeq -> {
+                if (findSeq.isEmpty()) {
+                    return new NoFindTacletBuilder();
+                } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
+                    AntecTacletBuilder b = new AntecTacletBuilder();
+                    b.setFind(findSeq);
+                    b.setApplicationRestriction(applicationRestriction);
+                    return b;
+                } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
+                    SuccTacletBuilder b = new SuccTacletBuilder();
+                    b.setFind(findSeq);
+                    b.setApplicationRestriction(applicationRestriction);
+                    return b;
+                } else {
+                    semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);
+                }
+            }
+            default -> semanticError(ctx, "Unknown find class type: %s", find.getClass().getName());
         }
 
         throw new IllegalArgumentException(

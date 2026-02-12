@@ -5,6 +5,7 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -23,7 +24,6 @@ import org.key_project.util.collection.ImmutableSet;
 import org.checkerframework.checker.calledmethods.qual.RequiresCalledMethods;
 import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static org.key_project.util.Strings.formatAsList;
@@ -44,7 +44,7 @@ public abstract class Taclet implements Rule {
     protected final @Nullable SyntaxElement find;
 
     /// The restriction(s) for applying this update. [ApplicationRestriction].
-    protected final @NonNull ApplicationRestriction applicationRestriction;
+    protected final ApplicationRestriction applicationRestriction;
 
     /// the <tt>assumes</tt> sequent of the taclet
     protected final Sequent assumesSequent;
@@ -75,7 +75,7 @@ public abstract class Taclet implements Rule {
     /// list
     /// of all variables that may appear free in the instantiation of the schemavariable (a bit more
     /// complicated for rewrite taclets, see paper of M:Giese)
-    protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
+    protected final ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
 
     /// cache; contains set of all bound variables
     protected @Nullable ImmutableSet<QuantifiableVariable> boundVariables = null;
@@ -101,10 +101,10 @@ public abstract class Taclet implements Rule {
     // but all at once for a given term.
 
     /// The taclet matcher
-    protected @NonNull TacletMatcher matcher;
+    protected TacletMatcher matcher;
 
     /// The taclet executor
-    protected @NonNull TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
+    protected TacletExecutor<? extends ProofGoal<?>, ? extends RuleApp> executor;
 
     /// creates a Taclet (originally known as Schematic Theory Specific Rules)
     ///
@@ -121,7 +121,7 @@ public abstract class Taclet implements Rule {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
@@ -167,7 +167,7 @@ public abstract class Taclet implements Rule {
     }
 
     @RequiresCalledMethods(value = "this", methods = "createAndInitializeMatcher")
-    public final TacletMatcher getMatcher() {
+    public final @Nullable TacletMatcher getMatcher() {
         return matcher;
     }
 
@@ -227,13 +227,13 @@ public abstract class Taclet implements Rule {
 
     /// @return the name of the Taclet
     @Override
-    public @NonNull Name name() {
+    public Name name() {
         return name;
     }
 
     /// @return the display name of the taclet, or, if not specified -- the canonical name
     @Override
-    public @NonNull String displayName() {
+    public String displayName() {
         return displayName;
     }
 
@@ -243,7 +243,7 @@ public abstract class Taclet implements Rule {
     }
 
     /// @return the application restrictions of the Taclet.
-    public ApplicationRestriction applicationRestriction() {
+    public @Nullable ApplicationRestriction applicationRestriction() {
         return applicationRestriction;
     }
 
@@ -266,7 +266,7 @@ public abstract class Taclet implements Rule {
         return goalTemplates;
     }
 
-    public ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap() {
+    public ImmutableMap<SchemaVariable, TacletPrefix> prefixMap() {
         return prefixMap;
     }
 
@@ -440,8 +440,8 @@ public abstract class Taclet implements Rule {
     }
 
     @SuppressWarnings("unchecked")
-    public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
-        return (TacletExecutor<@NonNull G, ?>) executor;
+    public <G extends @NonNull ProofGoal<G>> TacletExecutor<@NonNull G, ?> getExecutor() {
+        return (TacletExecutor<G, ?>) executor;
     }
 
     public abstract Taclet setName(String name);
