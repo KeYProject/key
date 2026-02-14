@@ -91,6 +91,7 @@ public final class ProblemInitializer {
         this.additionalProfileOptions = additionalProfileOptions;
     }
 
+    /// An arbitrary object which is passed to the provided profile, during construction of the `initConfig`.
     public @Nullable Object getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
