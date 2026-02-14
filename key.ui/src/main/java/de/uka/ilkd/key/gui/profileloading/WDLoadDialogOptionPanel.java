@@ -9,6 +9,8 @@ import net.miginfocom.layout.CC;
 import javax.swing.*;
 import java.awt.*;
 
+/// Additional UI components for the selection of the WD semantics.
+/// @author weigl
 @KeYGuiExtension.Info(experimental = false)
 public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension.LoadOptionPanel {
     @Override
@@ -49,12 +51,12 @@ public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension
 
 
         private static final String DESCRIPTION_Y_WD_SEMANTIC = """
-                        Complete and along the lines of classical logic, where the
-                        order of terms/formulas is irrelevant. This operator is not as
-                        strict as the L-operator, based on strong Kleene logic. To be
-                        used with care, since formulas may blow up exponentially.
-                        Cf. "Well Defined B" by Patrick Behm, Lilian Burdy, and
-                        Jean-Marc Meynadier
+                Complete and along the lines of classical logic, where the
+                order of terms/formulas is irrelevant. This operator is not as
+                strict as the L-operator, based on strong Kleene logic. To be
+                used with care, since formulas may blow up exponentially.
+                Cf. "Well Defined B" by Patrick Behm, Lilian Burdy, and
+                Jean-Marc Meynadier
                 """;
 
         public WDLoadDialogOptionPanelImpl() {
@@ -87,6 +89,7 @@ public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension
         public void deinstall(KeYFileChooserLoadingOptions panel) {
             panel.remove(lblHeader);
             panel.remove(sepHeader);
+            panel.remove(lblSemantics);
             panel.remove(rdbWDL);
             panel.remove(rdbWDD);
             panel.remove(rdbWDY);

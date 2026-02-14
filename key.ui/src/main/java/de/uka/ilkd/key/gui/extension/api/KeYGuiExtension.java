@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import org.jspecify.annotations.NonNull;
 
@@ -272,18 +273,35 @@ public interface KeYGuiExtension {
         }
     }
 
+    /// A {@link LoadOptionPanel} provides additional UI components in the file selection dialog
+    /// dependent on the selected profile.
     ///
-    public interface LoadOptionPanel extends Supplier<OptionPanel> {
+    /// Implementing this interface requires to provide an {@link OptionPanel}, and associated {@link Profile}.
+    ///
+    /// @author weigl
+    interface LoadOptionPanel extends Supplier<OptionPanel> {
         Profile getProfile();
     }
 
-    /// A panel for additional options of profiles.
+    /// A provider of UI components for additional options w.r.t. specific profiles.
+    /// **Lifecycle:** For each {@link Profile} an {@link OptionPanel} is constructed, when the {@link KeYFileChooser}
+    /// is instantiated. *On selected of a profile*, the current {@link OptionPanel} is `deinstall`ed, and the
+    /// {@link OptionPanel} for the selected profile is `install`ed.
+    ///
     /// @author weigl
+    /// @see KeYFileChooserLoadingOptions
     interface OptionPanel {
+        /// Installs the UI components in the given {@link KeYFileChooserLoadingOptions} instance. UI components
+        /// can be reused, to keep the temporary state.
+        /// {@link KeYFileChooserLoadingOptions} uses the {@link net.miginfocom.swing.MigLayout} to manage the layout.
         void install(KeYFileChooserLoadingOptions panel);
 
+        /// Removes all *installed* UI components from the panel.
         void deinstall(KeYFileChooserLoadingOptions panel);
 
+        /// Returning an arbitrary object, representing the selected option in the UI components. 
+        /// The object needs to compatible with the assigned profile in {@link LoadOptionPanel}.
+        /// @see Profile#prepareInitConfig(InitConfig, Object)
         Object getResult();
     }
 }

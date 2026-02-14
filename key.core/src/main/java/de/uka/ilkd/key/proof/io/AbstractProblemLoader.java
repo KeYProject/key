@@ -836,6 +836,8 @@ public abstract class AbstractProblemLoader {
         this.additionalProfileOptions = additionalProfileOptions;
     }
 
+    /// An arbitrary object representing additional options for the given profile.
+    /// @see ProblemInitializer
     public Object getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }

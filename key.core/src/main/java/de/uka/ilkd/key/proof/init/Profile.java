@@ -181,6 +181,8 @@ public interface Profile {
     /// Taclet base has been loaded, but before Java sources are loaded or the environment is
     /// established.
     ///
+    /// @param baseConfig a initial configuration which can be modified, e.g., forcing Taclet options.
+    /// @param additionalProfileOptions a nullable object representing selected options in the UI or command line.
     /// @see ProblemInitializer
     default void prepareInitConfig(InitConfig baseConfig, @Nullable Object additionalProfileOptions) {
 

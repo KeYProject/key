@@ -98,8 +98,8 @@ public class WdProfile extends JavaProfile {
         return wdStandardRules;
     }
 
+    /// {@inheritDoc}
     ///
-    /// @param baseConfig
     /// @param additionalProfileOptions a string representing the choice of `wdOperator`
     @Override
     public void prepareInitConfig(InitConfig baseConfig, @Nullable Object additionalProfileOptions) {
