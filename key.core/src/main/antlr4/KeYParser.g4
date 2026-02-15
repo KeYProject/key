@@ -90,11 +90,11 @@ one_sort_decl
 :
   doc=DOC_COMMENT?
   (
-     GENERIC  sortIds=simple_ident_dots_comma_list
+     GENERIC  sortIds=simple_ident_dots_comma_list_with_docs
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
-    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)?  SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list_with_docs (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? sortIds=simple_ident_dots_comma_list_with_docs (EXTENDS sortExt=extends_sorts)?  SEMI
   )
 ;
 
@@ -107,6 +107,13 @@ simple_ident_dots_comma_list
 :
   simple_ident_dots (COMMA simple_ident_dots)*
 ;
+
+simple_ident_dots_comma_list_with_docs
+:
+    simple_ident_dots_with_docs (COMMA simple_ident_dots_with_docs)*
+;
+
+simple_ident_dots_with_docs: DOC_COMMENT? simple_ident_dots;
 
 
 extends_sorts
@@ -132,7 +139,7 @@ prog_var_decls
     LBRACE
     (
         kjt = keyjavatype
-        var_names = simple_ident_comma_list
+        var_names = simple_ident_comma_list_with_docs
         SEMI
     )*
     RBRACE
@@ -154,6 +161,10 @@ simple_ident_comma_list
     id = simple_ident (COMMA id = simple_ident )*
 ;
 
+simple_ident_comma_list_with_docs
+:
+    id+=simple_ident_with_doc (COMMA id+=simple_ident_with_doc)*
+;
 
 schema_var_decls :
     SCHEMAVARIABLES LBRACE
@@ -250,6 +261,7 @@ datatype_decl:
 ;
 
 datatype_constructor:
+  doc=DOC_COMMENT?
   name=simple_ident
   (
     LPAREN
@@ -321,7 +333,12 @@ where_to_bind:
 
 ruleset_decls
 :
-  HEURISTICSDECL LBRACE  (doc+=DOC_COMMENT? id+=simple_ident SEMI)* RBRACE
+  HEURISTICSDECL LBRACE  (id+=simple_ident_with_doc SEMI)* RBRACE
+;
+
+simple_ident_with_doc
+:
+    doc=DOC_COMMENT? id=simple_ident
 ;
 
 sortId

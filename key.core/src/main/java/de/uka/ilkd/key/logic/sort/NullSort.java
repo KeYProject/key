@@ -35,7 +35,7 @@ public final class NullSort extends SortImpl {
 
 
     public NullSort(Sort objectSort) {
-        super(NAME, null, false, "", "");
+        super(NAME, null, false, "");
         assert objectSort != null;
         this.objectSort = objectSort;
     }

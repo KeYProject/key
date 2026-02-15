@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -83,7 +84,7 @@ public abstract class TacletLoader {
         ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
         ImmutableList<Taclet> newTaclets = ImmutableSLList.nil();
-        HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
+        Map<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
             if (taclet.equals(tacletToProve)) {

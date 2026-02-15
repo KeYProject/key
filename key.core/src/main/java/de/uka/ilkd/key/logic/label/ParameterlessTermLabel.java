@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -56,12 +57,22 @@ public final class ParameterlessTermLabel implements TermLabel {
      */
     public static final Name SHORTCUT_EVALUATION_LABEL_NAME = new Name("SC");
 
+    public static final String SHORTCUT_EVALUATION_LABEL_DOC =
+                    """
+                    The term label SC is used to indicate that a logical operator has originally been "shortcut" operator.
+                    
+                    For instance, both conjunction operators in JML (i.e., &amp;&amp; and &amp;) are translated to the same function in JavaDL. To differentiate between the two, the translation of &amp;&amp; adds the label SC.
+                    
+                    This is relevant for welldefinedness checks.
+                    """;
+
     /**
      * Label attached to a term with the logical operator '{@literal ||}' or '{@literal &&}' to
      * distinguish from '{@literal |}' or '{@literal &}' respectively.
      */
     public static final TermLabel SHORTCUT_EVALUATION_LABEL =
-        new ParameterlessTermLabel(SHORTCUT_EVALUATION_LABEL_NAME);
+            new ParameterlessTermLabel(SHORTCUT_EVALUATION_LABEL_NAME,
+                    SHORTCUT_EVALUATION_LABEL_DOC);
 
     /**
      * Name of {@link #UNDEFINED_VALUE_LABEL}.
@@ -115,6 +126,8 @@ public final class ParameterlessTermLabel implements TermLabel {
      */
     private final Name name;
 
+    private final @Nullable String documentation;
+
     /**
      * Instantiates a new simple term label.
      *
@@ -122,8 +135,13 @@ public final class ParameterlessTermLabel implements TermLabel {
      *        <code>null</code>.
      */
     public ParameterlessTermLabel(Name name) {
+        this(name, null);
+    }
+
+    public ParameterlessTermLabel(Name name, @Nullable String doc) {
         assert name != null;
         this.name = name;
+        this.documentation = doc;
     }
 
     @Override
@@ -180,5 +198,10 @@ public final class ParameterlessTermLabel implements TermLabel {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return documentation;
     }
 }

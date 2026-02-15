@@ -5,18 +5,10 @@ package org.key_project.logic.sort;
 
 import org.key_project.logic.Name;
 
-import org.jspecify.annotations.Nullable;
-
-
 /// Abstract base class for implementations of the Sort interface.
 public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
-
-    /// Documentation for this sort given by the associated documentation comment.
-    /// //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
-    private @Nullable String documentation;
-
     protected AbstractSort(Name name, boolean isAbstract) {
         this.name = name;
         this.isAbstract = isAbstract;
@@ -39,14 +31,5 @@ public abstract class AbstractSort implements Sort {
 
     public String declarationString() {
         return name.toString();
-    }
-
-    public void setDocumentation(@Nullable String documentation) {
-        this.documentation = documentation;
-    }
-
-    @Override
-    public @Nullable String getDocumentation() {
-        return documentation;
     }
 }

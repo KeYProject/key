@@ -347,10 +347,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                         && !declaringType.getFullName().equals("java.lang.Object")
                         && !pm.isImplicit()) {
                     specRepos.addContract(specExtractor.createDefaultContract(pm,
-                        initConfig.getActivatedChoices().exists(
-                            choice -> choice.category().equals("soundDefaultContracts")
-                                    && choice.name().toString()
-                                            .equals("soundDefaultContracts:on"))));
+                            initConfig.isChoiceActive("soundDefaultContracts:on")));
                 }
 
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);

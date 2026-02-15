@@ -817,9 +817,7 @@ public final class SymbolicExecutionSideProofUtil {
                 ? new ProofSettings(sourceInitConfig.getSettings())
                 : null;
         initConfig.setSettings(clonedSettings);
-        initConfig.setTaclet2Builder(
-            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder()
-                    .clone());
+        initConfig.setTaclet2Builder(new HashMap<>(sourceInitConfig.getTaclet2Builder()));
         initConfig.setTaclets(sourceInitConfig.getTaclets());
         // Create new ProofEnvironment and initialize it with values from initial one.
         ProofEnvironment env = new ProofEnvironment(initConfig);
