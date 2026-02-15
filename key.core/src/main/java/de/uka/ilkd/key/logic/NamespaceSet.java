@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic;
 
 
-import java.util.Objects;
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
@@ -24,6 +23,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+
 @NullMarked
 public class NamespaceSet {
 
@@ -37,7 +37,7 @@ public class NamespaceSet {
     private Namespace<ParametricSortDecl> parametricSortNS = new Namespace<>();
     private Namespace<ParametricFunctionDecl> parametricFuncNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
-    private DocSpace documentation = new DocSpace();
+    private final DocSpace documentation = new DocSpace();
 
     public NamespaceSet() {
     }
@@ -75,7 +75,7 @@ public class NamespaceSet {
         this.choiceNS = choiceNS;
         this.parametricSortNS = parametricSortNS;
         this.parametricFuncNS = parametricFuncNS;
-        this.documentation = Objects.requireNonNull(documentation);
+        this.documentation.add(documentation);
     }
 
 
@@ -302,7 +302,7 @@ public class NamespaceSet {
         return new NamespaceSet(varNS.simplify(), funcNS.simplify(), sortNS.simplify(),
             sortAliases.simplify(),
             ruleSetNS.simplify(), parametricSortNS.simplify(), parametricFuncNS.simplify(),
-            choiceNS.simplify(), progVarNS.simplify(), documentation);
+            choiceNS.simplify(), progVarNS.simplify());
     }
 
     public NamespaceSet getCompression() {

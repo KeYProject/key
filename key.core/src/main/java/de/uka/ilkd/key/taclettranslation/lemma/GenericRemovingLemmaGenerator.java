@@ -70,7 +70,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
             }
 
             ImmutableSet<Sort> extSorts = replaceSorts(sort.extendsSorts(), services);
-            ProxySort result = new ProxySort(sort.name(), extSorts, "", "");
+            ProxySort result = new ProxySort(sort.name(), extSorts, "");
             sortMap.put(sort, result);
             return result;
 
