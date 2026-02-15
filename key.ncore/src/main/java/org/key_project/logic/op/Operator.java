@@ -3,13 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
-import org.key_project.logic.Named;
-import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.Term;
-import org.key_project.logic.TermCreationException;
+import org.key_project.logic.*;
 import org.key_project.logic.sort.Sort;
 
-public interface Operator extends Named, SyntaxElement {
+public interface Operator extends Named, HasDocumentation, SyntaxElement {
     /// the arity of this operator
     int arity();
 
@@ -41,4 +38,9 @@ public interface Operator extends Named, SyntaxElement {
     ///
     /// @throws TermCreationException if a construction error was recognised
     <T extends Term> void validTopLevelException(T term) throws TermCreationException;
+
+    @Override
+    default String getDocumentationKey() {
+        return "operator/" + name();
+    }
 }

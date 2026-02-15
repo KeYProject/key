@@ -59,12 +59,12 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Display name for {@link OriginTermLabel}s.
      */
-    public final static Name NAME = new Name("origin");
+    public static final Name NAME = new Name("origin");
 
     /**
      * @see #getTLChildCount()
      */
-    public final static int CHILD_COUNT = 2;
+    public static final int CHILD_COUNT = 2;
     public static final Sort[] EMPTY_SORTS = new Sort[0];
 
 
@@ -143,7 +143,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param origin the term's origin.
+     * @param origin         the term's origin.
      * @param subtermOrigins the origins of the term's (former) subterms.
      */
     OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
@@ -195,7 +195,7 @@ public class OriginTermLabel implements TermLabel {
      * various problems during proof search.
      * </p>
      *
-     * @param term a term
+     * @param term     a term
      * @param services services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to the specified term.
      */
@@ -214,10 +214,10 @@ public class OriginTermLabel implements TermLabel {
      * various problems during proof search.
      * </p>
      *
-     * @param op the specified operator.
+     * @param op       the specified operator.
      * @param services services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to a term with the specified
-     *         operator.
+     * operator.
      */
     public static boolean canAddLabel(Operator op, Services services) {
         // TODO: Instead of not adding origin labels to certain terms, we should investigate why
@@ -248,7 +248,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Removes all {@link OriginTermLabel} from the specified sequent.
      *
-     * @param seq the sequent to transform.
+     * @param seq      the sequent to transform.
      * @param services services.
      * @return the resulting sequent change info.
      */
@@ -260,11 +260,11 @@ public class OriginTermLabel implements TermLabel {
         for (int i = 1; i <= seq.size(); ++i) {
             SequentFormula oldFormula = seq.getFormulaByNr(i);
             SequentFormula newFormula = new SequentFormula(
-                removeOriginLabels((JTerm) oldFormula.formula(), services));
+                    removeOriginLabels((JTerm) oldFormula.formula(), services));
             SequentChangeInfo change =
-                seq.changeFormula(newFormula,
-                    PosInOccurrence.findInSequent(seq, i,
-                        PosInTerm.getTopLevel()));
+                    seq.changeFormula(newFormula,
+                            PosInOccurrence.findInSequent(seq, i,
+                                    PosInTerm.getTopLevel()));
 
             if (changes == null) {
                 changes = change;
@@ -279,7 +279,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Removes all {@link OriginTermLabel} from the specified term and its sub-terms.
      *
-     * @param term the term to transform.
+     * @param term     the term to transform.
      * @param services services.
      * @return the transformed term.
      */
@@ -303,7 +303,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(),
-            new ImmutableArray<>(labels));
+                new ImmutableArray<>(labels));
     }
 
     /**
@@ -431,7 +431,7 @@ public class OriginTermLabel implements TermLabel {
      * This method transforms a term in such a way that every {@link OriginTermLabel} contains all
      * the correct {@link #getSubtermOrigins()}.
      *
-     * @param term the term to transform.
+     * @param term     the term to transform.
      * @param services services.
      * @return the transformed term.
      */
@@ -442,10 +442,10 @@ public class OriginTermLabel implements TermLabel {
 
         SubTermOriginData newSubs = getSubTermOriginData(term.subs(), services);
         final ImmutableArray<TermLabel> labels =
-            computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
+                computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
 
         return services.getTermFactory().createTerm(term.op(), newSubs.terms, term.boundVars(),
-            labels);
+                labels);
     }
 
     @Override
@@ -506,7 +506,7 @@ public class OriginTermLabel implements TermLabel {
 
 
     private static ImmutableArray<TermLabel> computeOriginLabelsFromSubTermOrigins(final JTerm term,
-            final Set<Origin> origins) {
+                                                                                   final Set<Origin> origins) {
         List<TermLabel> labels = term.getLabels().toList();
         final OriginTermLabel oldLabel = (OriginTermLabel) term.getLabel(NAME);
 
@@ -518,7 +518,7 @@ public class OriginTermLabel implements TermLabel {
             }
         } else if (!origins.isEmpty()) {
             final OriginTermLabel newLabel =
-                new OriginTermLabel(computeCommonOrigin(origins), origins);
+                    new OriginTermLabel(computeCommonOrigin(origins), origins);
 
             labels.add(newLabel);
         }
@@ -526,14 +526,14 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
-     * @param subs the sub-terms to be searched
+     * @param subs     the sub-terms to be searched
      * @param services a services object used for getting type information and creating the new
-     *        sub-term
+     *                 sub-term
      * @return origin information about the searched sub-terms stored in a {@link SubTermOriginData}
-     *         object.
+     * object.
      */
     private static SubTermOriginData getSubTermOriginData(final ImmutableArray<JTerm> subs,
-            final Services services) {
+                                                          final Services services) {
         JTerm[] newSubs = new JTerm[subs.size()];
         Set<Origin> origins = new LinkedHashSet<>();
 
@@ -559,15 +559,19 @@ public class OriginTermLabel implements TermLabel {
      *
      */
     private static class SubTermOriginData {
-        /** All collected sub-terms */
+        /**
+         * All collected sub-terms
+         */
         public final JTerm[] terms;
-        /** All collected origins */
+        /**
+         * All collected origins
+         */
         public final Set<Origin> origins;
 
         /**
          * This method constructs an object of type {@link SubTermOriginData}.
          *
-         * @param subterms the collected sub-terms
+         * @param subterms       the collected sub-terms
          * @param subtermOrigins the origin information collected from these sub-terms
          */
         public SubTermOriginData(JTerm[] subterms, Set<Origin> subtermOrigins) {
@@ -643,7 +647,7 @@ public class OriginTermLabel implements TermLabel {
          *
          * @param specType the spec type the term originates from.
          * @param ruleName the name of the rule applied at the node the term originates from.
-         * @param nodeNr the {@link Node#serialNr()} of the node the term originates from.
+         * @param nodeNr   the {@link Node#serialNr()} of the node the term originates from.
          */
         public NodeOrigin(SpecType specType, String ruleName, int nodeNr) {
             super(specType);
@@ -713,7 +717,7 @@ public class OriginTermLabel implements TermLabel {
          *
          * @param specType the spec type the term originates from.
          * @param fileName the file the term originates from.
-         * @param line the line in the file.
+         * @param line     the line in the file.
          */
         public FileOrigin(SpecType specType, @Nullable URI fileName, int line) {
             super(specType);
@@ -773,6 +777,18 @@ public class OriginTermLabel implements TermLabel {
             }
             return line == other.line;
         }
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                This label saves a term's origin in the JML specification as well as the origins of all of its subterms and former subterms.
+                
+                For example, if the file "Example.java" contains the clause "requires R" at line 20, then every JavaDL term that is generated from R will have the origin 
+                "requires @ Example.java @ line 20".
+                
+                Origin labels are not printed in the sequent view. To see a term's origin, you can mouse over it while holding the ALT button. If you want more detailed information, left click on the term and then on "Show Origin".
+                """;
     }
 
     /**

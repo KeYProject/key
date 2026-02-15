@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -679,5 +680,16 @@ public class QueryExpand implements BuiltInRule {
     @Override
     public boolean isApplicableOnSubTerms() {
         return true;
+    }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                The QueryExpand rule allows to apply contracts or to symbolically execute a query
+                expression in the logic. It replaces the query expression by a new constant and
+                constructs a box formula in the antecedent 'defining' the constant as the result of
+                a method call. The method call is encoded directly as a method call in the box modality.
+                The query is invoked in a context equal to the container type of the query method.
+                """;
     }
 }

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
+import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -151,7 +152,7 @@ import org.key_project.prover.sequent.SequentFormula;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named, /* TODO: Remove */ TerminalSyntaxElement {
+public interface TermLabel extends Named, HasDocumentation, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.
@@ -182,5 +183,10 @@ public interface TermLabel extends Named, /* TODO: Remove */ TerminalSyntaxEleme
      */
     default boolean isProofRelevant() {
         return true;
+    }
+
+    @Override
+    default String getDocumentationKey() {
+        return "termlabel/" + name();
     }
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.sort;
 
+import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.HasOrigin;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
@@ -10,7 +11,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 
-public interface Sort extends Named, HasOrigin {
+public interface Sort extends Named, HasOrigin, HasDocumentation {
     /// @return the direct supersorts of this sort. Not supported by `NullSort`.
     ImmutableSet<Sort> extendsSorts();
 
@@ -27,7 +28,8 @@ public interface Sort extends Named, HasOrigin {
 
     String declarationString();
 
-    /// Returns a human explainable text describing this sort. This field is typical set by the
-    /// parser, who captures the documentation comments.
-    default @Nullable String getDocumentation() { return null; }
+    @Override
+    default String getDocumentationKey(){
+        return "sort/" + name();
+    }
 }

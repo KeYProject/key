@@ -161,6 +161,7 @@ public final class ExceptionTools {
 
         return token == null ? null
                 : new Location(
+                        // FIXME weigl: This does not work on Windows. Illegal characters.
                     Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
                             .normalize().toUri(),
                     Position.fromToken(token));

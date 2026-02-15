@@ -956,4 +956,20 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             return finalPreTerm;
         }
     }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                When symbolic execution reaches a method call, the according method can be approximated by its specified contract (more precisely, one or more of its contracts).
+                
+                This rule gives rise to three or four subgoals:
+                1. Pre: It must be established that the pre-condition of the method holds prior to the method call.
+                
+                2. Post: The method terminates normally, the post-condition of the method can be assumed and symbolic execution continues.
+                
+                3. Exceptional Post: The method terminates abruptly with an exception, the exceptional post-condition is assumed, and symbolic execution continues with this exception thrown.
+                
+                4. Null reference: The receiver of the call can be null. This case is considered on this branch. If KeY can figure out automatically that this cannot be the case, this branch is suppressed.
+                """;
+    }
 }
