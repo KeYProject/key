@@ -10,9 +10,12 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.scripts.meta.Documentation;
+import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// The *let* command lets you introduce entries to the abbreviation table.
 /// ```
@@ -32,42 +35,58 @@ import org.jspecify.annotations.NullMarked;
 /// * Apr,2025 (weigl): remove {@code force} in favor of {@code letf}.
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 @NullMarked
-public class LetCommand implements ProofScriptCommand {
+public class LetCommand extends AbstractCommand {
+
+    @Documentation(category = "Fundamental", value = """
+        The let command lets you introduce entries to the abbreviation table.
+        
+            let @abbrev1=term1 ... @abbrev2=term2;
+
+        or
+        
+            letf @abbrev1=term1 ... @abbrev2=term2;
+   
+        One or more key-value pairs are supported where key starts is @ followed by an identifier and
+        value is a term.
+        If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
+
+
+    public static class Parameters {
+        @Documentation("Key-value pairs where key is the name of the abbreviation (starting with @) and value is a term.")
+        @OptionalVarargs(as = JTerm.class)
+        public Map<String, JTerm> namedArgs = Map.of();
+    }
+
+    public LetCommand() {
+        super(Parameters.class);
+    }
+
     @Override
     public List<ProofScriptArgument> getArguments() {
         return List.of();
     }
 
+    public void execute(ScriptCommandAst ast) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(new Parameters(), ast);
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
-            EngineState stateMap) throws ScriptException, InterruptedException {
+        AbbrevMap abbrMap = state().getAbbreviations();
 
-        AbbrevMap abbrMap = stateMap.getAbbreviations();
+        boolean force = "letf".equals(ast.commandName());
 
-        boolean force = "letf".equals(args.commandName());
-
-        for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
+        for (Map.Entry<String, JTerm> entry : args.namedArgs.entrySet()) {
             String key = entry.getKey();
-            if (key.startsWith("#") || key.equals("force")) {
-                continue;
-            }
 
-            if (!key.startsWith("@")) {
-                throw new ScriptException("Unexpected parameter to let, only @var allowed: " + key);
+            if (key.startsWith("@")) {
+                // get rid of @
+                key = key.substring(1);
             }
-
-            // get rid of @
-            key = key.substring(1);
 
             if (abbrMap.containsAbbreviation(key) && !force) {
                 throw new ScriptException(key + " is already fixed in this script");
             }
+
             try {
-                final var termCtx = (KeYParser.ProofScriptExpressionContext) entry.getValue();
-                final var value = termCtx.accept(stateMap.getEvaluator());
-                final var term = stateMap.getValueInjector().convert(value, JTerm.class);
-                abbrMap.put(term, key, true);
+                abbrMap.put(entry.getValue(), key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }
@@ -78,11 +97,6 @@ public class LetCommand implements ProofScriptCommand {
     @Override
     public String getName() {
         return "let";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return "";
     }
 
     @Override

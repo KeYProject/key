@@ -59,11 +59,23 @@ class BoyerMoore {
             if(mc == 0) {
                 mc = 1;
                 mx = a[k];
+                /*@ assert count(a, k+1, a[k]) <= count(a, k, a[k]) + 1 \by {
+                  @  oss;
+                  @  expand on: "self.count(a, k_0 + 1, a[k_0])";
+                  @  auto classAxioms:false;
+                  @ }*/
             } else if(mx == a[k]) {
                 mc++;
             } else {
                 mc--;
             }
+            /*@ assert (\forall int x; x != mx; 2 * count(a, k+1, x) <= k+1 - mc) \by {
+              @  oss;
+              @  obtain int x \from_goal;
+              @  expand on: "self.count(a, k_0 + 1, x)";
+              @  instantiate var:"x" with: x;
+              @  auto classAxioms:false;
+              @ }*/
         }
 
         if(mc == 0) return IntOpt.NONE;

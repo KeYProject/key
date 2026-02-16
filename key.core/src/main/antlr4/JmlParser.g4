@@ -9,8 +9,10 @@ options { tokenVocab=JmlLexer; }
 @members {
   private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter(getClass());
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+  private boolean isNextToken(String tokenText) {
+    return _input.LA(1) != Token.EOF && tokenText.equals(_input.LT(1).getText());
+  }
 }
-
 
 classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
@@ -202,11 +204,34 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT (label=IDENT COLON)? expression | UNREACHABLE) (assertionProof SEMI_TOPLEVEL? | SEMI_TOPLEVEL);
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
+
+// --- proof scripts in JML
+assertionProof: BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) ;
+proofCmd:
+    // TODO allow more than one var in obtain
+  { isNextToken("obtain") }? obtain=IDENT typespec var=IDENT
+       ( obtKind=EQUAL_SINGLE expression SEMI
+       | obtKind=SUCH_THAT expression proofCmdSuffix
+       | obtKind=FROM_GOAL SEMI
+       )
+  | cmd=IDENT ( proofArg )* proofCmdSuffix
+  ;
+
+proofCmdSuffix:
+  SEMI | BY ( proofCmd | LBRACE (proofCmd+ | proofCmdCase+) RBRACE )
+  ;
+
+proofCmdCase:
+    CASE ( label=STRING_LITERAL )? COLON ( proofCmd )*
+  | DEFAULT COLON ( proofCmd )*
+  ;
+proofArg: (argLabel=IDENT COLON)? expression;
+// ---
 
 mergeparamsspec:
     MERGE_PARAMS

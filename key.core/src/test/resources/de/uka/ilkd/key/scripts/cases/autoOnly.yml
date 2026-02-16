@@ -1,0 +1,7 @@
+key: |
+  \predicates { a; b; c;}
+  \problem { a & b & 1=0 ->  a | c }
+script: |
+  auto only:alpha;
+goals:
+  - a, b, 1 = 0 ==> a, c

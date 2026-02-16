@@ -4,7 +4,9 @@
 package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
+@Documentation(category = "Control", value = "Does exactly nothing.")
 public class SkipCommand extends NoArgumentCommand {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
@@ -15,10 +17,5 @@ public class SkipCommand extends NoArgumentCommand {
     @Override
     public String getName() {
         return "skip";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return "Does exactly nothing. Really nothing.";
     }
 }

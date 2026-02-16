@@ -1510,7 +1510,7 @@ public class JMLSpecFactory {
      * @param pm the enclosing method
      */
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
-        final var pv = createProgramVariablesForStatement(jmlAssert, pm);
+        final ProgramVariableCollection pv = createProgramVariablesForStatement(jmlAssert, pm);
         var io = new JmlIO(services).context(Context.inMethod(pm, tb))
                 .selfVar(pv.selfVar)
                 .parameters(pv.paramVars)
@@ -1518,10 +1518,12 @@ public class JMLSpecFactory {
                 .exceptionVariable(pv.excVar)
                 .atPres(pv.atPres)
                 .atBefore(pv.atBefores);
-        JTerm expr = io.translateTerm(jmlAssert.getCondition());
+        ImmutableList<LocationVariable> varsInProof = jmlAssert.collectVariablesInProof(io);
+        io.parameters(pv.paramVars.prepend(varsInProof));
+        ImmutableList<JTerm> terms = jmlAssert.collectTerms().map(io::translateTerm);
         services.getSpecificationRepository().addStatementSpec(
             jmlAssert,
-            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(expr)));
+            new SpecificationRepository.JmlStatementSpec(pv, terms));
     }
 
     public @Nullable String checkSetStatementAssignee(JTerm assignee) {

@@ -1,0 +1,7 @@
+key: |  
+  \programVariables { int a; }
+  \problem { ==> ((1 + 1) + 5) + 0 = 7 & ((0 + 2) + 5) + 0 = 7 }
+script: |
+  rule add_zero_right on:(?find(1+1));
+goals:
+  - ==> 1 + 1 + 5 = 7 & 0 + 2 + 5 + 0 = 7

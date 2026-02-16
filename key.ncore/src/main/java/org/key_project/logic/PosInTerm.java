@@ -82,6 +82,13 @@ public class PosInTerm {
                 : new PosInTerm(positions, (char) positions.length, true);
     }
 
+    public PosInTerm prepend(char index) {
+        var newPositions = new char[size + 1];
+        System.arraycopy(positions, 0, newPositions, 1, size);
+        newPositions[0] = index;
+        return new PosInTerm(newPositions, (char) (size + 1), false);
+    }
+
     /// returns the instance representing the top level position
     ///
     /// @return the top level position
@@ -128,6 +135,25 @@ public class PosInTerm {
             return this;
         }
         return new PosInTerm(positions, (char) n, true);
+    }
+
+
+    /// returns the position of the suffix of length <code>n</code>
+    /// @param n the length of the suffix
+    /// @return the suffix of this position of length <code>n</code>
+    /// @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this
+    /// position
+    public PosInTerm lastN(int n) {
+        if (n > size) {
+            throw new IndexOutOfBoundsException("Position is shorter than " + n);
+        } else if (n == 0) {
+            return getTopLevel();
+        } else if (n == size) {
+            return this;
+        }
+        final char[] newPositions = new char[n];
+        System.arraycopy(positions, size - n, newPositions, 0, n);
+        return new PosInTerm(newPositions, (char) n, false);
     }
 
     /// returns the position for the <code>i</code>-th subterm of the subterm described by this
@@ -237,7 +263,7 @@ public class PosInTerm {
     ///
     /// @param it the iterator
     /// @return the String with the list of integers
-    public String integerList(IntIterator it) {
+    public static String integerList(IntIterator it) {
         final StringBuilder list = new StringBuilder("[");
         while (it.hasNext()) {
             list.append(it.next());

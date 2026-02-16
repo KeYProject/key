@@ -700,6 +700,40 @@ public final class IOUtil {
         }
     }
 
+    public static URL makeMemoryURL(String data) {
+        try {
+            return new URL("memory", "", 0, String.format("/%x", System.identityHashCode(data)),
+                new MemoryDataHandler(data));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final class MemoryDataHandler extends URLStreamHandler {
+        private final String data;
+
+        public MemoryDataHandler(String data) {
+            this.data = data;
+        }
+
+        @Override
+        protected URLConnection openConnection(URL u) throws IOException {
+            // perhaps check the hash code too?
+            if (!u.getProtocol().equals("memory")) {
+                throw new IOException("Unsupported protocol");
+            }
+            return new URLConnection(u) {
+                @Override
+                public void connect() {}
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new ByteArrayInputStream(data.getBytes());
+                }
+            };
+        }
+    }
+
     /**
      * Returns the current directory.
      *

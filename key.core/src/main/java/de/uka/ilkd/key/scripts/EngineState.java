@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,13 +54,14 @@ public class EngineState {
 
     private final AbbrevMap abbrevMap = new AbbrevMap();
     private final ValueInjector valueInjector = createDefaultValueInjector();
-    private final ExprEvaluator exprEvaluator = new ExprEvaluator(this);
 
     private @Nullable Consumer<ProofScriptEngine.Message> observer;
     private Path baseFileName = Paths.get(".");
 
     private @Nullable Goal goal;
     private @Nullable Node lastSetGoalNode;
+
+    private final HashMap<String, Object> userData = new HashMap<>();
 
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
@@ -78,61 +80,31 @@ public class EngineState {
         this.engine = engine;
     }
 
+    /// add converters for types used in proof scripts,
+    /// add support for parse trees
     private ValueInjector createDefaultValueInjector() {
-        var v = ValueInjector.createDefault();
+        ValueInjector v = ValueInjector.createDefault();
+
+        // from string to ...
         v.addConverter(JTerm.class, String.class, (str) -> this.toTerm(str, null));
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
 
-        addContextTranslator(v, String.class);
-        addContextTranslator(v, JTerm.class);
-        addContextTranslator(v, Integer.class);
-        addContextTranslator(v, Byte.class);
-        addContextTranslator(v, Long.class);
-        addContextTranslator(v, Boolean.class);
-        addContextTranslator(v, Character.class);
-        addContextTranslator(v, Sequent.class);
-        addContextTranslator(v, Integer.TYPE);
-        addContextTranslator(v, Byte.TYPE);
-        addContextTranslator(v, Long.TYPE);
-        addContextTranslator(v, Boolean.TYPE);
-        addContextTranslator(v, Character.TYPE);
-        addContextTranslator(v, JTerm.class);
-        addContextTranslator(v, Sequent.class);
-        addContextTranslator(v, Semisequent.class);
-        addContextTranslator(v, ScriptBlock.class);
+        // to terms with holes
+        v.addConverter(TermWithHoles.class, String.class,
+                str -> TermWithHoles.fromString(this, str));
+
+        // to sequents with holes
+        v.addConverter(SequentWithHoles.class, String.class,
+                str -> SequentWithHoles.fromString(this, str));
+
+        // from KeY parse tree to everything
+        ExprEvaluator exprEvaluator = new ExprEvaluator(this);
+        exprEvaluator.addConvertersToValueInjector(v);
         return v;
     }
 
-    private <T> void addContextTranslator(ValueInjector v, Class<T> aClass) {
-        Converter<T, ProofScriptExpressionContext> converter =
-            (ProofScriptExpressionContext a) -> convertToString(v, aClass, a);
-        v.addConverter(aClass, ProofScriptExpressionContext.class, converter);
-    }
-
     @SuppressWarnings("unchecked")
-    private <R, T> R convertToString(ValueInjector inj, Class<R> aClass,
-            ProofScriptExpressionContext ctx)
-            throws Exception {
-        try {
-            if (aClass == String.class && ctx.string_literal() != null) {
-                return inj.getConverter(aClass, String.class)
-                        .convert(StringUtil.trim(ctx.string_literal().getText(), '"'));
-            }
-            if (aClass == String.class) {
-                return inj.getConverter(aClass, String.class).convert(ctx.getText());
-            }
-
-            T value = (T) ctx.accept(exprEvaluator);
-            Class<T> tClass = (Class<T>) value.getClass();
-            if (aClass.isAssignableFrom(value.getClass())) {
-                return aClass.cast(value);
-            }
-            return inj.getConverter(aClass, tClass).convert(value);
-        } catch (ConversionException | NoSpecifiedConverterException e) {
-            return inj.getConverter(aClass, String.class).convert(ctx.getText());
-        }
-    }
 
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
@@ -143,7 +115,7 @@ public class EngineState {
         return null;
     }
 
-    public void setGoal(Goal g) {
+    public void setGoal(@Nullable Goal g) {
         goal = g;
         lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
     }
@@ -359,7 +331,11 @@ public class EngineState {
         }
     }
 
-    public ExprEvaluator getEvaluator() {
-        return exprEvaluator;
+    public void putUserData(String key, @Nullable Object val) {
+        userData.put(key, val);
+    }
+
+    public @Nullable Object getUserData(String key) {
+        return userData.get(key);
     }
 }

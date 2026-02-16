@@ -1,0 +1,8 @@
+key: |  
+  \functions { int x; int x1; }
+  \predicates { x2; }
+  \programVariables { int x3; }
+  \problem { ==> \forall int x; x=x, \forall int x; (x > 0 | x < x1) }
+script: |
+  witness (\forall int x; (x > 0 | x < x1)) as="x1";
+exception: "Name already used as function or predicate: x1"

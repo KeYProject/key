@@ -34,16 +34,6 @@ public class AssumeCommand extends AbstractCommand {
         return "assume";
     }
 
-    @Override
-    public String getDocumentation() {
-        return """
-                The assume command is an unsound taclet rule and takes one argument:
-
-                The command adds the formula passed as argument to the antecedent
-                a formula #2 to which the command is applied""";
-    }
-
-
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var parameter = state().getValueInjector()
                 .inject(new FormulaParameter(), arguments);
@@ -57,6 +47,10 @@ public class AssumeCommand extends AbstractCommand {
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @Documentation(category = "Control", value = """
+            The assume command is an **unsound** taclet rule and adds a formula to the antecedent of the current goal
+            Can be used for debug and proof exploration purposes.
+            """)
     public static class FormulaParameter {
         @Argument
         @Documentation("The formula to be assumed.")
