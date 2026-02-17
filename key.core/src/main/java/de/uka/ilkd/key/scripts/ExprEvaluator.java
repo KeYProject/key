@@ -94,10 +94,10 @@ class ExprEvaluator {
             } else if (ctx.proofScriptCodeBlock() != null) {
                 throw new ConversionException("A block cannot be used as a term");
             } else {
-                return (JTerm) evaluateExpression((ParserRuleContext) ctx.getChild(0));
+                return (JTerm) evaluateExpression((ParserRuleContext) ctx.getChild(ParserRuleContext.class, 0));
             }
         } catch (Exception e) {
-            throw new ConversionException("Cannot convert expression to term: " + ANTLRUtil.reconstructOriginal(ctx));
+            throw new ConversionException("Cannot convert expression to term: " + ANTLRUtil.reconstructOriginal(ctx), e);
         }
     }
 
