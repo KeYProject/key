@@ -1,7 +1,17 @@
+plugins {
+    id 'java-test-fixtures'
+}
+
 description = "Utility library of the key-project"
 
 dependencies {
     implementation("org.jspecify:jspecify:1.0.0")
+
+    testFixturesApi(platform("org.junit:junit-bom:5.14.2"))
+    testFixturesApi("org.junit.jupiter:junit-jupiter-api")
+    testFixturesApi("org.junit.jupiter:junit-jupiter-params")
+    testFixturesApi("org.assertj:assertj-core:3.27.7")
+    testFixturesApi("ch.qos.logback:logback-classic:1.5.27")
 }
 
 checkerFramework {
