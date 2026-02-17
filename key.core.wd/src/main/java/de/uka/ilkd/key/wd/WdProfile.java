@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.Name;
@@ -104,7 +105,7 @@ public class WdProfile extends JavaProfile {
     /// @param additionalProfileOptions a string representing the choice of `wdOperator`
     @Override
     public void prepareInitConfig(InitConfig baseConfig,
-            @Nullable Object additionalProfileOptions) {
+            @Nullable Configuration additionalProfileOptions) {
         var wdChoice = baseConfig.choiceNS().lookup(new Name("wdChecks:on"));
         baseConfig.activateChoice(wdChoice);
 

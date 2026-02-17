@@ -64,7 +64,11 @@ public abstract class AbstractProblemLoader {
      * @see EnvInput#isIgnoreOtherJavaFiles()
      */
     private boolean loadSingleJavaFile = false;
-    private Object additionalProfileOptions;
+
+    /**
+     *
+     */
+    private @Nullable Configuration additionalProfileOptions;
 
     /**
      * The file or folder to load.
@@ -832,13 +836,13 @@ public abstract class AbstractProblemLoader {
         this.ignoreWarnings = ignoreWarnings;
     }
 
-    public void setAdditionalProfileOptions(Object additionalProfileOptions) {
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
         this.additionalProfileOptions = additionalProfileOptions;
     }
 
     /// An arbitrary object representing additional options for the given profile.
     /// @see ProblemInitializer
-    public Object getAdditionalProfileOptions() {
+    public Configuration getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
 

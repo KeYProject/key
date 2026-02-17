@@ -56,11 +56,9 @@ import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
-import de.uka.ilkd.key.settings.FeatureSettings;
-import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
@@ -81,6 +79,7 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1389,8 +1388,11 @@ public final class MainWindow extends JFrame {
      *
      * @see RecentFileMenu#addRecentFile(String)
      */
-    public void addRecentFile(@NonNull String absolutePath) {
-        recentFileMenu.addRecentFile(absolutePath);
+    public void addRecentFile(@NonNull String absolutePath,
+            @Nullable Profile profile,
+            boolean singleJava,
+            @Nullable Configuration additionalOption) {
+        recentFileMenu.addRecentFile(absolutePath, profile, singleJava, additionalOption);
     }
 
     public void openExamples() {

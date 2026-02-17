@@ -22,7 +22,9 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.Configuration;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -305,7 +307,9 @@ public interface KeYGuiExtension {
 
         /// Returning an arbitrary object, representing the selected option in the UI components.
         /// The object needs to compatible with the assigned profile in {@link LoadOptionPanel}.
+        ///
         /// @see Profile#prepareInitConfig(InitConfig, Object)
-        Object getResult();
+        @Nullable
+        Configuration getResult();
     }
 }

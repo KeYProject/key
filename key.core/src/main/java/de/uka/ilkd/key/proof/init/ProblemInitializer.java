@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -69,7 +70,7 @@ public final class ProblemInitializer {
      */
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
-    private @Nullable Object additionalProfileOptions;
+    private @Nullable Configuration additionalProfileOptions;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -86,18 +87,18 @@ public final class ProblemInitializer {
         this(null, new Services(Objects.requireNonNull(profile, "Given profile is null")), null);
     }
 
-    public ProblemInitializer(Profile profile, @Nullable Object additionalProfileOptions) {
+    public ProblemInitializer(Profile profile, @Nullable Configuration additionalProfileOptions) {
         this(profile);
         this.additionalProfileOptions = additionalProfileOptions;
     }
 
     /// An arbitrary object which is passed to the provided profile, during construction of the
     /// `initConfig`.
-    public @Nullable Object getAdditionalProfileOptions() {
+    public @Nullable Configuration getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
 
-    public void setAdditionalProfileOptions(@Nullable Object additionalProfileOptions) {
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
         this.additionalProfileOptions = additionalProfileOptions;
     }
 
