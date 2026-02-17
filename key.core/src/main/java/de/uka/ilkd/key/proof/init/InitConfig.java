@@ -77,7 +77,7 @@ public class InitConfig {
     private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private Map<Name, Taclet> activatedTacletCache = null;
+    private @Nullable Map<Name, Taclet> activatedTacletCache = null;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
@@ -125,7 +125,7 @@ public class InitConfig {
     public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
-            final Choice c = choiceNS().lookup(new Name(entry.getKey()));
+            final Choice c = choiceNS().lookup(new Name(entry.getValue()));
             if (c != null && !category2DefaultChoice.containsKey(c.category())) {
                 changed = true;
                 category2DefaultChoice.put(c.category(), c);
