@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.logic;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 import org.key_project.logic.Choice;
@@ -27,7 +29,7 @@ public class NamespaceSet {
     private Namespace<RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<Sort> sortNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
-    private final DocSpace documentation = new DocSpace();
+    private DocSpace documentation = new DocSpace();
 
     public NamespaceSet() {
     }
@@ -52,7 +54,7 @@ public class NamespaceSet {
         this.sortNS = sortNS;
         this.ruleSetNS = ruleSetNS;
         this.choiceNS = choiceNS;
-        this.documentation.add(documentation);
+        this.documentation = Objects.requireNonNull(documentation);
     }
 
     public NamespaceSet copy() {
@@ -72,7 +74,8 @@ public class NamespaceSet {
         return new NamespaceSet(new Namespace<>(variables()),
             new Namespace<>(functions()), new Namespace<>(sorts()),
             new Namespace<>(ruleSets()), new Namespace<>(choices()),
-            new Namespace<>(programVariables()));
+            new Namespace<>(programVariables()),
+            new DocSpace(documentation));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -223,12 +226,12 @@ public class NamespaceSet {
     // create a namespace
     public NamespaceSet simplify() {
         return new NamespaceSet(varNS.simplify(), funcNS.simplify(), sortNS.simplify(),
-            ruleSetNS.simplify(), choiceNS.simplify(), progVarNS.simplify());
+            ruleSetNS.simplify(), choiceNS.simplify(), progVarNS.simplify(), documentation);
     }
 
     public NamespaceSet getCompression() {
         return new NamespaceSet(varNS.compress(), funcNS.compress(), sortNS.compress(),
-            ruleSetNS.compress(), choiceNS.compress(), progVarNS.compress());
+            ruleSetNS.compress(), choiceNS.compress(), progVarNS.compress(), documentation);
     }
 
     public void flushToParent() {
