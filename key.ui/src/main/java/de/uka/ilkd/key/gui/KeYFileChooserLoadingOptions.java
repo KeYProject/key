@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.ServiceLoader;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.Configuration;
@@ -19,6 +20,7 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NonNull;
 
 public class KeYFileChooserLoadingOptions extends JPanel {
     private final JLabel lblProfile = new JLabel("Profile:");
@@ -54,16 +56,23 @@ public class KeYFileChooserLoadingOptions extends JPanel {
         lblProfileInfo.setWrapStyleWord(true);
         lblProfileInfo.setLineWrap(true);
 
-        var items = ServiceLoader.load(DefaultProfileResolver.class)
-                .stream().map(it -> it.get().getDefaultProfile())
-                .map(ProfileWrapper::new)
-                .toArray(ProfileWrapper[]::new);
+        var profiles =
+            new ArrayList<>(ServiceLoader.load(DefaultProfileResolver.class)
+                    .stream().map(it -> it.get().getDefaultProfile())
+                    .map(ProfileWrapper::new)
+                    .toList());
+
+        final var legacyMode = new ProfileWrapper("Respect profile given in file", "",
+            "Usable on KeY file which defines \\profile inside the file. " +
+                "If no KeY file is loaded, falls back to legacy behavior",
+            null);
+
+        profiles.addFirst(legacyMode);
+
+        var items = profiles.toArray(ProfileWrapper[]::new);
+
         cboProfile.setModel(new DefaultComboBoxModel<>(items));
-        cboProfile.setSelectedItem(
-            Arrays.stream(items)
-                    .filter(it -> it.profile.equals(AbstractProfile.getDefaultProfile()))
-                    .findFirst()
-                    .orElse(null));
+        cboProfile.setSelectedItem(legacyMode);
 
         cboProfile.addItemListener(evt -> updateProfileInfo());
         updateProfileInfo();
@@ -91,9 +100,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
         if (selectedItem == null) {
             lblProfileInfo.setText("");
         } else {
-            lblProfileInfo.setText(selectedItem.profile.description());
-
-
+            lblProfileInfo.setText(selectedItem.description());
             if (additionalOptionPanels.containsKey(selectedItem.profile)) {
                 currentOptionPanel = additionalOptionPanels.get(selectedItem.profile);
                 currentOptionPanel.install(this);
@@ -102,12 +109,11 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     }
 
     public @Nullable Profile getSelectedProfile() {
-        var selected = getSelectedProfileName();
-        var items = ServiceLoader.load(DefaultProfileResolver.class)
-                .stream().filter(it -> Objects.equals(selected, it.get().getProfileName()))
-                .findFirst();
-        return items.map(it -> it.get().getDefaultProfile())
-                .orElse(null);
+        var selected = (ProfileWrapper) cboProfile.getSelectedItem();
+        if (selected == null) {
+            return null;
+        }
+        return selected.profile();
     }
 
     public @Nullable Configuration getAdditionalProfileOptions() {
@@ -118,17 +124,25 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     }
 
     public @Nullable String getSelectedProfileName() {
-        return ((ProfileWrapper) cboProfile.getSelectedItem()).profile().ident();
+        final var selectedItem = (ProfileWrapper) cboProfile.getSelectedItem();
+        if (selectedItem == null)
+            return null;
+        return selectedItem.ident();
     }
 
     public boolean isOnlyLoadSingleJavaFile() {
         return lblSingleJava.isSelected();
     }
 
-    record ProfileWrapper(Profile profile) {
+    record ProfileWrapper(String name, String ident, String description,
+            @Nullable Profile profile) {
+        ProfileWrapper(Profile profile) {
+            this(profile.displayName(), profile.ident(), profile.description(), profile);
+        }
+
         @Override
-        public String toString() {
-            return profile.displayName();
+        public @NonNull String toString() {
+            return name;
         }
     }
 }
