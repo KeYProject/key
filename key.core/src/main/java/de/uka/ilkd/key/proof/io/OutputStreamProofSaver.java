@@ -82,6 +82,7 @@ public class OutputStreamProofSaver {
     protected final boolean saveProofSteps;
     /// Whether steps by the [OneStepSimplifier] should be expanded.
     protected final boolean expandOneStepSimplifier;
+    private int skipTopLevelStepAfterOSS = 0;
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -348,9 +349,20 @@ public class OutputStreamProofSaver {
      */
     private void printSingleTacletApp(TacletApp appliedRuleApp, Node node, String prefix,
             Appendable output, boolean isOSSStep) throws IOException {
+        /*
+         * An OSS rule application may contain rule applications on top-level formulas that get
+         * deleted when expanding the OSS steps. In that case, the rule after the OSS must also be
+         * deleted, as the formula to be removed was never added in the first place.
+         */
+        String tacletName = appliedRuleApp.taclet().name().toString();
+        if (expandOneStepSimplifier && skipTopLevelStepAfterOSS > 0
+                && (tacletName.equals("false_right") || tacletName.equals("true_left"))) {
+            skipTopLevelStepAfterOSS = 0;
+            return;
+        }
         output.append(prefix);
         output.append("(rule \"");
-        output.append(appliedRuleApp.rule().name().toString());
+        output.append(tacletName);
         output.append("\"");
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
@@ -633,6 +645,29 @@ public class OutputStreamProofSaver {
                     .replaceFormula(seqFNum, app.posInOccurrence().sequentFormula()).sequent();
             n.setSequent(seq);
             if (app instanceof TacletApp ta) {
+                /*
+                 * If we apply replace_know_* on a top-level and the assumes formula is on the same
+                 * side of the sequent
+                 * as the "to-be-replaced"-formula, then it just disappears (we can't have the same
+                 * formula on the same semi sequent).
+                 * Hence, don't print the rule app.
+                 */
+                if (ta.posInOccurrence().isTopLevel() && ta.posInOccurrence().isInAntec()
+                        && ta.taclet().name().toString().equals("replace_known_left")
+                        && ta.assumesFormulaInstantiations()
+                                .head() instanceof AssumesFormulaInstSeq afis
+                        && afis.inAntecedent()) {
+                    skipTopLevelStepAfterOSS = seqFNum;
+                    return;
+                }
+                if (ta.posInOccurrence().isTopLevel() && !ta.posInOccurrence().isInAntec()
+                        && ta.taclet().name().toString().equals("replace_known_right")
+                        && ta.assumesFormulaInstantiations()
+                                .head() instanceof AssumesFormulaInstSeq afis
+                        && !afis.inAntecedent()) {
+                    skipTopLevelStepAfterOSS = seqFNum;
+                    return;
+                }
                 printSingleTacletApp(ta, n, prefix, output, true);
             } else if (app instanceof IBuiltInRuleApp ba) {
                 // This case does not currently happen, but just in case any built-ins get added to
