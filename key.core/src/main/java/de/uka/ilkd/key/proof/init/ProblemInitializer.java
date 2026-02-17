@@ -39,7 +39,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -50,6 +49,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.PathList;
@@ -76,7 +76,7 @@ public final class ProblemInitializer {
     // -------------------------------------------------------------------------
 
     public ProblemInitializer(ProgressMonitor mon, Services services,
-                              ProblemInitializerListener listener) {
+            ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
@@ -91,7 +91,8 @@ public final class ProblemInitializer {
         this.additionalProfileOptions = additionalProfileOptions;
     }
 
-    /// An arbitrary object which is passed to the provided profile, during construction of the `initConfig`.
+    /// An arbitrary object which is passed to the provided profile, during construction of the
+    /// `initConfig`.
     public @Nullable Object getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
@@ -137,7 +138,7 @@ public final class ProblemInitializer {
     /**
      * displays the status report in the status line and the maximum used by a progress bar
      *
-     * @param status      the String to be displayed in the status line
+     * @param status the String to be displayed in the status line
      * @param progressMax an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
@@ -176,7 +177,7 @@ public final class ProblemInitializer {
         for (String name : in.getLDTIncludes()) {
 
             keyFile[i] =
-                    new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+                new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
             i++;
             setProgress(i);
         }
@@ -206,7 +207,7 @@ public final class ProblemInitializer {
         int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
-                    new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
+                new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -222,11 +223,11 @@ public final class ProblemInitializer {
                 return walker.filter(it -> it.getFileName().toString().endsWith(".java")).toList();
             } catch (IOException e) {
                 throw new ProofInputException(
-                        "Reading java model path " + javaRoot + " resulted into an error.", e);
+                    "Reading java model path " + javaRoot + " resulted into an error.", e);
             }
         } else {
             throw new ProofInputException(
-                    "Java model path " + javaRoot + " not found or is not a directory.");
+                "Java model path " + javaRoot + " not found or is not a directory.");
         }
     }
 
@@ -257,8 +258,8 @@ public final class ProblemInitializer {
         // this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
             KeYFile keyFile =
-                    new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
-                            envInput.getProfile(), fileRepo);
+                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -296,7 +297,7 @@ public final class ProblemInitializer {
         }
         var initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
-                JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
+            JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
     }
 
     /**
@@ -343,7 +344,7 @@ public final class ProblemInitializer {
     }
 
     private void populateNamespaces(Term term, NamespaceSet namespaces,
-                                    Goal rootGoal) {
+            Goal rootGoal) {
         for (int i = 0; i < term.arity(); i++) {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
@@ -363,7 +364,7 @@ public final class ProblemInitializer {
             final ProgramElement pe = mod.programBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =
-                    MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
+                MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
                 if (namespaces.programVariables().lookup(pv.name()) == null) {
                     rootGoal.addProgramVariable(pv);
@@ -388,7 +389,7 @@ public final class ProblemInitializer {
     private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
-                false);
+            false);
         return initConfig;
     }
 
@@ -403,12 +404,12 @@ public final class ProblemInitializer {
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
             proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(),
-                    AxiomJustification.INSTANCE);
+                AxiomJustification.INSTANCE);
             setProgress(3 + i * proofs.length);
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                    profile.getStandardRules().standardBuiltInRules();
+                profile.getStandardRules().standardBuiltInRules();
             int j = 0;
             final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
@@ -452,8 +453,8 @@ public final class ProblemInitializer {
                 if (tacletBases != null) {
                     for (var tacletBase : tacletBases) {
                         KeYFile tacletBaseFile = new KeYFile(
-                                "taclet base (%s)".formatted(tacletBase.file().getFileName()),
-                                tacletBase, progMon, profile, null);
+                            "taclet base (%s)".formatted(tacletBase.file().getFileName()),
+                            tacletBase, progMon, profile, null);
                         readEnvInput(tacletBaseFile, currentBaseConfig);
                     }
                 }
@@ -483,7 +484,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
             LOGGER.warn("Failed write proof", e);
@@ -500,7 +501,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");
@@ -511,7 +512,7 @@ public final class ProblemInitializer {
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
-                        taclet.displayName());
+                    taclet.displayName());
                 out.println(taclet);
                 out.format("-----------------------------------------------------%n");
             }
@@ -526,10 +527,10 @@ public final class ProblemInitializer {
 
     private void configureTermLabelSupport(InitConfig initConfig) {
         initConfig.getServices().setOriginFactory(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                        .getUseOriginLabels()
-                        ? new OriginTermLabelFactory()
-                        : null);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()
+                            ? new OriginTermLabelFactory()
+                            : null);
     }
 
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
@@ -582,7 +583,8 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po) throws ProofInputException {
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
+            throws ProofInputException {
         progressStarted(this);
         try {
             // determine environment

@@ -9,7 +9,6 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
 
 public interface Sort extends Named, HasOrigin, HasDocumentation {
     /// @return the direct supersorts of this sort. Not supported by `NullSort`.
@@ -29,7 +28,7 @@ public interface Sort extends Named, HasOrigin, HasDocumentation {
     String declarationString();
 
     @Override
-    default String getDocumentationKey(){
+    default String getDocumentationKey() {
         return "sort/" + name();
     }
 }

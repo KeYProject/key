@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
-
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.key_project.logic.HasDocumentation;
 
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.key_project.logic.HasDocumentation;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class DocSpace {
@@ -24,14 +28,16 @@ public class DocSpace {
 
     public @Nullable String find(String key) {
         var value = documentation.get(key);
-        if (value != null) return value;
-        if (parent != null) return parent.find(key);
+        if (value != null)
+            return value;
+        if (parent != null)
+            return parent.find(key);
         return null;
     }
 
     public @Nullable String find(HasDocumentation entity) {
         var doc = entity.getDocumentation();
-        if(doc != null) {
+        if (doc != null) {
             return doc;
         }
         return find(entity.getDocumentationKey());

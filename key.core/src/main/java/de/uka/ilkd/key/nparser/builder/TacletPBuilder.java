@@ -237,7 +237,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
     }
 
-    private void registerTaclet(ParserRuleContext ctx, Taclet taclet, @Nullable String documentation) {
+    private void registerTaclet(ParserRuleContext ctx, Taclet taclet,
+            @Nullable String documentation) {
         taclet2Builder.put(taclet, peekTBuilder());
         docsSpace().describe(taclet, documentation);
         LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),

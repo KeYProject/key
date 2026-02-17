@@ -9,6 +9,7 @@ import org.key_project.logic.Name;
 public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
+
     protected AbstractSort(Name name, boolean isAbstract) {
         this.name = name;
         this.isAbstract = isAbstract;

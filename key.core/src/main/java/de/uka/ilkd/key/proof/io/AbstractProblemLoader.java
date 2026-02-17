@@ -162,7 +162,7 @@ public abstract class AbstractProblemLoader {
 
     static {
         mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
-                "there may be only one declaration per line");
+            "there may be only one declaration per line");
 
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
@@ -172,34 +172,34 @@ public abstract class AbstractProblemLoader {
     /**
      * Constructor.
      *
-     * @param file                                                  The file or folder to load.
-     * @param classPath                                             The optional class path entries to use.
-     * @param bootClassPath                                         An optional boot class path.
-     * @param includes                                              Optional includes to consider.
-     * @param profileOfNewProofs                                    The {@link Profile} to use for new {@link Proof}s.
-     * @param forceNewProfileOfNewProofs                            {@code} true {@link #profileOfNewProofs} will be used as
-     *                                                              {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
-     *                                                              will be used for new proofs.
-     * @param control                                               The {@link ProblemLoaderControl} to use.
+     * @param file The file or folder to load.
+     * @param classPath The optional class path entries to use.
+     * @param bootClassPath An optional boot class path.
+     * @param includes Optional includes to consider.
+     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as
+     *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
+     *        will be used for new proofs.
+     * @param control The {@link ProblemLoaderControl} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call
-     *                                                              {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no {@link Proof} is
-     *                                                              defined by the loaded proof or {@code false} otherwise which still allows to work with
-     *                                                              the loaded {@link InitConfig}.
+     *        {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no {@link Proof} is
+     *        defined by the loaded proof or {@code false} otherwise which still allows to work with
+     *        the loaded {@link InitConfig}.
      */
     protected AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
-                                    List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
-                                    ProblemLoaderControl control,
-                                    boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                                    Properties poPropertiesToForce) {
+            List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+            ProblemLoaderControl control,
+            boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+            Properties poPropertiesToForce) {
         this.file = file;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
         setProfileOfNewProofs(
-                profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile());
+            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile());
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
-                askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
         this.includes = includes;
     }
@@ -284,8 +284,8 @@ public abstract class AbstractProblemLoader {
      * Executes the loading process and tries to instantiate a proof and to re-apply rules on it if
      * possible.
      *
-     * @throws ProofInputException    Occurred Exception.
-     * @throws IOException            Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
     public final void load() throws Exception {
@@ -297,9 +297,9 @@ public abstract class AbstractProblemLoader {
      * possible.
      *
      * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
-     *                            replayed
-     * @throws ProofInputException    Occurred Exception.
-     * @throws IOException            Occurred Exception.
+     *        replayed
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
     public final void load(Consumer<Proof> callbackProofLoaded) throws Exception {
@@ -327,7 +327,7 @@ public abstract class AbstractProblemLoader {
      * Loads and initialized the proof environment.
      *
      * @throws ProofInputException Occurred Exception.
-     * @throws IOException         Occurred Exception.
+     * @throws IOException Occurred Exception.
      * @see AbstractProblemLoader#load()
      */
     protected void loadEnvironment() throws ProofInputException, IOException {
@@ -337,14 +337,14 @@ public abstract class AbstractProblemLoader {
         LOGGER.info("Loading environment from {}", file);
         envInput = createEnvInput(fileRepo);
         LOGGER.debug("Environment load took {}",
-                PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
+            PerfScope.formatTime(System.nanoTime() - timeBeforeEnv));
         problemInitializer = createProblemInitializer(fileRepo);
         var beforeInitConfig = System.nanoTime();
         LOGGER.info("Creating init config");
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
         LOGGER.debug("Init config took {}",
-                PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
+            PerfScope.formatTime(System.nanoTime() - beforeInitConfig));
         if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
@@ -353,7 +353,7 @@ public abstract class AbstractProblemLoader {
     /**
      * Asks the user to select a proof obligation and loads it.
      *
-     * @param control    the ui controller.
+     * @param control the ui controller.
      * @param initConfig the proof configuration.
      * @see AbstractProblemLoader#load()
      */
@@ -364,13 +364,13 @@ public abstract class AbstractProblemLoader {
     /**
      * Loads a proof from the proof list.
      *
-     * @param poContainer         the container created by {@link #createProofObligationContainer()}.
-     * @param proofList           the proof list containing the proof to load.
+     * @param poContainer the container created by {@link #createProofObligationContainer()}.
+     * @param proofList the proof list containing the proof to load.
      * @param callbackProofLoaded optional callback, called before the proof is replayed
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-                                     Consumer<Proof> callbackProofLoaded) {
+            Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -390,7 +390,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return a FileRepo that can be used for proof bundle saving
      * @throws IOException if for some reason the FileRepo can not be created (e.g. temporary
-     *                     directory can not be created).
+     *         directory can not be created).
      */
     protected FileRepo createFileRepo() throws IOException {
         // create a FileRepo depending on the settings
@@ -423,10 +423,10 @@ public abstract class AbstractProblemLoader {
             SLEnvInput ret;
             if (file.getParent() == null) {
                 ret = new SLEnvInput(Paths.get("."), classPath, bootClassPath, profileOfNewProofs,
-                        includes);
+                    includes);
             } else {
                 ret = new SLEnvInput(file.getParent().toAbsolutePath(), classPath,
-                        bootClassPath, profileOfNewProofs, includes);
+                    bootClassPath, profileOfNewProofs, includes);
             }
             ret.setJavaFile(file.toAbsolutePath());
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
@@ -491,12 +491,12 @@ public abstract class AbstractProblemLoader {
             Path unzippedProof = tmpDir.resolve(proofFilename);
 
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof,
-                    fileRepo, control, profileOfNewProofs, false);
+                fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
-                    filename.endsWith(".proof.gz"));
+                filename.endsWith(".proof.gz"));
         } else if (Files.isDirectory(file)) {
             // directory containing java sources, probably enriched
             // by specifications
@@ -504,12 +504,12 @@ public abstract class AbstractProblemLoader {
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension '"
-                        + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
-                        + filename + ". Allowed extensions are: .key, .proof, .java or "
-                        + "complete directories.");
+                    + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
+                    + filename + ". Allowed extensions are: .key, .proof, .java or "
+                    + "complete directories.");
             } else {
                 throw new FileNotFoundException(
-                        "File or directory\n\t " + filename + "\n not found.");
+                    "File or directory\n\t " + filename + "\n not found.");
             }
         }
     }
@@ -582,17 +582,17 @@ public abstract class AbstractProblemLoader {
         String poClass = proofObligation.getString(IPersistablePO.PROPERTY_CLASS);
         if (poClass == null || poClass.isEmpty()) {
             throw new IOException("Proof obligation class property \""
-                    + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+                + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
         }
         ServiceLoader<ProofObligationLoader> loader =
-                ServiceLoader.load(ProofObligationLoader.class);
+            ServiceLoader.load(ProofObligationLoader.class);
         for (ProofObligationLoader poloader : loader) {
             if (poloader.handles(poClass)) {
                 return poloader.loadFrom(initConfig, proofObligation);
             }
         }
         throw new IllegalArgumentException(
-                "There is no builder that can build the PO for the id " + poClass);
+            "There is no builder that can build the PO for the id " + poClass);
     }
 
     private LoadedPOContainer loadByChosenContract(String chooseContract) {
@@ -632,7 +632,7 @@ public abstract class AbstractProblemLoader {
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
 
         ProofAggregate proofList =
-                problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+            problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
             // register proof
@@ -683,7 +683,7 @@ public abstract class AbstractProblemLoader {
             assert envInput instanceof KeYUserProblemFile;
 
             IntermediatePresentationProofFileParser parser =
-                    new IntermediatePresentationProofFileParser(proof);
+                new IntermediatePresentationProofFileParser(proof);
             problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
             parserResult = parser.getResult();
 
@@ -694,14 +694,14 @@ public abstract class AbstractProblemLoader {
             // able to load proofs that used it even if the user has currently
             // turned OSS off.
             StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             replayer = new IntermediateProofReplayer(this, proof, parserResult);
             replayResult =
-                    replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
+                replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
 
             lastTouchedNode = replayResult.getLastSelectedGoal() != null
                     ? replayResult.getLastSelectedGoal().node()
@@ -722,13 +722,13 @@ public abstract class AbstractProblemLoader {
             }
             status += (status.isEmpty() ? "Proof replayed successfully." : "\n\n")
                     + (replayResult != null ? replayResult.getStatus()
-                    : "Error while loading proof.");
+                            : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
 
             StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
@@ -790,7 +790,7 @@ public abstract class AbstractProblemLoader {
      * elements and specifications.
      *
      * @return The instantiated {@link InitConfig} which provides access to the loaded source
-     * elements and specifications.
+     *         elements and specifications.
      */
     public InitConfig getInitConfig() {
         return initConfig;
@@ -801,7 +801,7 @@ public abstract class AbstractProblemLoader {
      * process.
      *
      * @return The instantiate proof or {@code null} if no proof was instantiated during loading
-     * process.
+     *         process.
      */
     public Proof getProof() {
         return proof;

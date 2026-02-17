@@ -26,7 +26,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * The names of all term labels that should never be printed.
      */
-    private static final Name[] ALWAYS_HIDDEN = {OriginTermLabel.NAME};
+    private static final Name[] ALWAYS_HIDDEN = { OriginTermLabel.NAME };
 
     /**
      * A switch to choose whether labels are to be shown or not.
@@ -43,7 +43,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * All available {@link TermLabelVisibilityManagerListener}s.
      */
     private final List<TermLabelVisibilityManagerListener> listeners =
-            new LinkedList<>();
+        new LinkedList<>();
 
     /**
      * Constructs a new TermLabelVisibilityManager.
@@ -90,7 +90,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * Sets the state of the term label with the passed name to hidden or not.
      *
      * @param labelName The name of a term label
-     * @param hidden    The boolean value whether the term label should be hidden or not
+     * @param hidden The boolean value whether the term label should be hidden or not
      */
     public void setHidden(Name labelName, boolean hidden) {
         if (hidden) {
@@ -200,7 +200,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
         List<Name> labelNames = manager.getSupportedTermLabelNames().toList();
 
         labelNames.sort(
-                (t, t1) -> String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString()));
+            (t, t1) -> String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString()));
 
         return labelNames;
     }

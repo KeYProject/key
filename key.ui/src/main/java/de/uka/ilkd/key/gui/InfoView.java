@@ -3,6 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -11,6 +24,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
 import de.uka.ilkd.key.logic.DocSpace;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -27,7 +41,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.ThreadUtilities;
+
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -36,18 +50,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class for info contents displayed in {@link MainWindow}.
@@ -56,33 +59,39 @@ import java.util.stream.Stream;
  */
 public class InfoView extends JSplitPane implements TabPanel {
     public static final Icon INFO_ICON =
-            IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
+        IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
+
 
     private final JTree infoTree = new JTree();
-    private final JTextArea contentPane = createInfoArea();
+    private final JTextPane contentPane = createInfoArea();
     private final ProofDisposedListener proofDisposedListener;
     private final InfoNodeFactory nodeFactory = new InfoNodeFactory();
 
+    private LexerHighlighter lexerHighlighter = new LexerHighlighter.KeYLexerHighlighter();
+
+
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
         public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-            ThreadUtilities.invokeOnEventQueue(() -> {
+            SwingUtilities.invokeLater(() -> {
                 if (mediator.getSelectedGoal() != null) {
                     updateModel(mediator.getSelectedGoal());
-                }
-                if (mediator.getSelectedProof() != null) {
-                    updateModel(mediator.getSelectedProof().openGoals().head());
+                } else if (mediator.getSelectedProof() != null) {
+                    try {
+                        updateModel(mediator.getSelectedProof().openGoals().head());
+                    } catch (NoSuchElementException ex) {
+                        // nothing possible to do
+                    }
                 }
             });
         }
     };
 
-    private Node lastShownGoalNode;
+    private @Nullable Node lastShownGoalNode;
     private KeYMediator mediator;
 
-    public InfoView(MainWindow window, KeYMediator mediator) {
+    public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
 
-        setMainWindow(window);
         setMediator(mediator);
 
         // initial placement of the divider
@@ -96,7 +105,8 @@ public class InfoView extends JSplitPane implements TabPanel {
 
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        root.add(nodeFactory.create("No proof loaded", "In this pane, the available logical rules will be displayed and/or explained."));
+        root.add(nodeFactory.create("No proof loaded",
+            "In this pane, the available logical rules will be displayed and/or explained."));
         infoTree.setModel(new DefaultTreeModel(root));
         infoTree.setShowsRootHandles(true);
         infoTree.setRootVisible(false);
@@ -150,14 +160,16 @@ public class InfoView extends JSplitPane implements TabPanel {
 
             private void checkPopup(MouseEvent e) {
                 /*
-                if (e.isPopupTrigger()) {
-                    Rule selected = ((InfoTreeNode) infoTree.getLastSelectedPathComponent()).getRule();
-                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                            DefaultContextMenuKind.TACLET_INFO, selected, mediator);
-                    if (menu.getComponentCount() > 0) {
-                        menu.show(InfoView.this, e.getX(), e.getY());
-                    }
-                }*/
+                 * if (e.isPopupTrigger()) {
+                 * Rule selected = ((InfoTreeNode)
+                 * infoTree.getLastSelectedPathComponent()).getRule();
+                 * JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                 * DefaultContextMenuKind.TACLET_INFO, selected, mediator);
+                 * if (menu.getComponentCount() > 0) {
+                 * menu.show(InfoView.this, e.getX(), e.getY());
+                 * }
+                 * }
+                 */
             }
         });
 
@@ -165,6 +177,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             InfoTreeNode node = (InfoTreeNode) infoTree.getLastSelectedPathComponent();
             if (node != null) {
                 contentPane.setText(node.getDescription());
+                lexerHighlighter.highlightPaneMarkdown(contentPane);
             } else {
                 contentPane.setText("");
             }
@@ -174,9 +187,16 @@ public class InfoView extends JSplitPane implements TabPanel {
         setRightComponent(new JScrollPane(contentPane));
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
-                KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
+            KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
     }
 
+    @Override
+    public void updateUI() {
+        // create new lexer highlighter for updating dark/light color
+        lexerHighlighter = new LexerHighlighter.KeYLexerHighlighter();
+
+        super.updateUI();
+    }
 
     public void setMediator(KeYMediator m) {
         if (mediator != null) {
@@ -186,8 +206,6 @@ public class InfoView extends JSplitPane implements TabPanel {
         mediator = m;
     }
 
-    public void setMainWindow(MainWindow w) {
-    }
 
     @Override
     public String getTitle() {
@@ -204,7 +222,7 @@ public class InfoView extends JSplitPane implements TabPanel {
         return this;
     }
 
-    private void updateModel(Goal g) {
+    private void updateModel(@Nullable Goal g) {
         if (g == null || lastShownGoalNode != g.node()) {
             if (lastShownGoalNode != null) {
                 lastShownGoalNode.proof().removeProofDisposedListener(proofDisposedListener);
@@ -221,11 +239,9 @@ public class InfoView extends JSplitPane implements TabPanel {
         }
     }
 
-    private JTextArea createInfoArea() {
-        JTextArea description = new JTextArea("", 15, 30);
+    private JTextPane createInfoArea() {
+        var description = new JTextPane();
         description.setEditable(false);
-        description.setLineWrap(true);
-        description.setWrapStyleWord(true);
         description.setBorder(BorderFactory.createTitledBorder(""));
         description.setCaretPosition(0);
         return description;
@@ -237,15 +253,15 @@ public class InfoView extends JSplitPane implements TabPanel {
         private static final String TACLET_BASE = "Taclet Base";
 
         private static final String COLLECTION =
-                "This node stands for a category of symbols; expand it to browse the symbols "
-                        + "in the category.";
+            "This node stands for a category of symbols; expand it to browse the symbols "
+                + "in the category.";
         private static final String DEFAULT_FUNCTIONS_LABEL =
-                "Display descriptions for documented interpreted function and predicate symbols.";
+            "Display descriptions for documented interpreted function and predicate symbols.";
 
 
         private DefaultMutableTreeNode createInfoTreeRoot(Goal g) {
-            InfoTreeNode root = new InfoTreeNode(
-                    "This is the root node of InfoTreeModel. It should not be visible.", null);
+            InfoTreeNode root = create(
+                "This is the root node of InfoTreeModel. It should not be visible.", "");
 
             DocSpace docs = g.proof().getServices().getNamespaces().docs();
 
@@ -259,7 +275,8 @@ public class InfoView extends JSplitPane implements TabPanel {
         private InfoTreeNode createNodeRules(DocSpace docs, Goal g) {
             var tlRoot = create("Rules", "Browse descriptions for currently available rules.");
 
-            List<NoPosTacletApp> set = new ArrayList<>(g.ruleAppIndex().tacletIndex().allNoPosTacletApps());
+            List<NoPosTacletApp> set =
+                new ArrayList<>(g.ruleAppIndex().tacletIndex().allNoPosTacletApps());
             OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(g.proof());
             if (simplifier != null && !simplifier.isShutdown()) {
                 set.addAll(simplifier.getCapturedTaclets());
@@ -268,10 +285,10 @@ public class InfoView extends JSplitPane implements TabPanel {
 
             tlRoot.add(createNodeBuiltInRules(docs, g));
             tlRoot.add(createNodeAxiom(docs,
-                    set.stream().filter(it -> {
-                        RuleJustification just = g.proof().mgt().getJustification(it);
-                        return just != null && just.isAxiomJustification();
-                    })));
+                set.stream().filter(it -> {
+                    RuleJustification just = g.proof().mgt().getJustification(it);
+                    return just != null && just.isAxiomJustification();
+                })));
 
             tlRoot.add(createNodeLemmas(docs, set.stream().filter(it -> {
                 RuleJustification just = g.proof().mgt().getJustification(it);
@@ -283,9 +300,11 @@ public class InfoView extends JSplitPane implements TabPanel {
 
         private MutableTreeNode createNodeBuiltInRules(DocSpace docs, Goal g) {
             InfoTreeNode builtInRoot = create("Built-In",
-                    "Some logical rules are implemented in Java code. This is because their semantics " +
-                            "cannot easily be expressed in KeY's Taclet language.");
-            ImmutableList<BuiltInRule> rules = g.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules();
+                "Some logical rules are implemented in Java code. This is because their semantics "
+                    +
+                    "cannot easily be expressed in KeY's Taclet language.");
+            ImmutableList<BuiltInRule> rules =
+                g.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules();
             for (BuiltInRule br : rules) {
                 builtInRoot.add(create(br, docs));
             }
@@ -295,26 +314,42 @@ public class InfoView extends JSplitPane implements TabPanel {
         private MutableTreeNode createNodeAxiom(DocSpace docs, Stream<NoPosTacletApp> seq) {
             InfoTreeNode axiomTacletRoot = create(TACLET_BASE, """
                     Most logical rules are implemented as Taclets.
-                    
+
                     Taclets are schematic logical rules formulated in the Taclet Language.\s
                     The language is defined and explained in the KeY book.
                     """);
-            seq.forEach(it -> axiomTacletRoot.add(create(it.rule(), docs)));
+            Map<String, List<NoPosTacletApp>> ruleAppIndex = new TreeMap<>();
+            seq.forEach(it -> ruleAppIndex.computeIfAbsent(it.displayName(), k -> new ArrayList<>())
+                    .add(it));
+
+            ruleAppIndex.forEach((key, value) -> {
+                if (value.size() > 1) {
+                    InfoTreeNode group = create("%s (%d)".formatted(key, value.size()), "");
+                    axiomTacletRoot.add(group);
+                    value.forEach(it -> group.add(create(it.rule(), docs)));
+                } else {
+                    value.forEach(it -> axiomTacletRoot.add(create(it.rule(), docs)));
+                }
+            });
+            var count = ruleAppIndex.values().stream().mapToInt(List::size).sum();
+            axiomTacletRoot.setUserObject("%s (%d)".formatted(TACLET_BASE, count));
             return axiomTacletRoot;
         }
 
         private MutableTreeNode createNodeLemmas(DocSpace docs, Stream<NoPosTacletApp> seq) {
-            InfoTreeNode proveableTacletsRoot = create(LEMMAS, """
-                    Taclets which have been introduced using File->Load User-Defined Taclets are filed here.
-                    
-                    Loading User Defined Taclets opens side branches on which the soundness of the lemma taclets must be established.
-                    """);
+            InfoTreeNode proveableTacletsRoot = create(LEMMAS,
+                """
+                        Taclets which have been introduced using File->Load User-Defined Taclets are filed here.
+
+                        Loading User Defined Taclets opens side branches on which the soundness of the lemma taclets must be established.
+                        """);
             seq.forEach(it -> proveableTacletsRoot.add(create(it.rule(), docs)));
             return proveableTacletsRoot;
         }
 
         private MutableTreeNode createNodeTermLabels(DocSpace docs, Proof proof) {
-            var tlRoot = create("Term Labels", "Show descriptions for currently available term labels.");
+            var tlRoot =
+                create("Term Labels", "Show descriptions for currently available term labels.");
             var mgr = TermLabelManager.getTermLabelManager(proof.getServices());
             var factories = mgr.getFactories();
 
@@ -322,9 +357,8 @@ public class InfoView extends JSplitPane implements TabPanel {
             labelNames.sort(Comparator.comparing(Name::toString));
 
             for (Name name : labelNames) {
-                tlRoot.add(new InfoTreeNode(name.toString(), () ->
-                        factories.get(name).getDocumentation()
-                ));
+                tlRoot.add(new InfoTreeNode(name.toString(),
+                    () -> factories.get(name).getDocumentation()));
             }
             return tlRoot;
         }
@@ -341,11 +375,14 @@ public class InfoView extends JSplitPane implements TabPanel {
             seq.sort(Comparator.comparing(it -> it.name().toString()));
 
             var byReturn = new TreeMap<Sort, List<InfoTreeNode>>(
-                    Comparator.comparing(it -> it.name().toString())
-            );
+                Comparator.comparing(it -> it.name().toString()));
 
             for (var fn : seq) {
-                var fnName = fn.name().toString();
+                var fnName = "%s(%s) : %s".formatted(
+                    fn.name(),
+                    fn.argSorts().stream().map(it -> it.name().toString())
+                            .collect(Collectors.joining(", ")),
+                    fn.sort().name());
                 var fnSort = fn.sort();
 
                 // flat list:
@@ -367,33 +404,32 @@ public class InfoView extends JSplitPane implements TabPanel {
         }
 
         private InfoTreeNode createNodeTacletOptions(DocSpace docs, InitConfig initConfig) {
-            InfoTreeNode localRoot = create("Active Taclet Options", "Shows the activated Taclet options");
+            InfoTreeNode localRoot =
+                create("Active Taclet Options", "Shows the activated Taclet options");
             for (Choice activatedChoice : initConfig.getActivatedChoices()) {
                 localRoot.add(
-                        create(activatedChoice.name().toString(),
-                                docs.find(activatedChoice)));
+                    create(activatedChoice.name().toString(),
+                        docs.find(activatedChoice)));
             }
             return localRoot;
         }
 
 
         public InfoTreeNode create(Taclet taclet, DocSpace docs) {
-            var node = new InfoTreeNode(taclet.displayName(), null);
             LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
             lp.printTaclet(taclet);
-            return new InfoTreeNode(taclet.displayName(),
-                    () -> Stream.of(docs.find(taclet), lp.result(),
-                                    "Defined at:" + taclet.getOrigin() + "under options:" + taclet.getChoices())
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.joining("\n\n")));
+            return create(taclet.name().toString(),
+                () -> Stream.of(docs.find(taclet), "```key\n" + lp.result() + "\n```",
+                    "Defined at:" + taclet.getOrigin() + "under options:" + taclet.getChoices())
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.joining("\n\n")));
         }
 
         public InfoTreeNode create(BuiltInRule br, DocSpace docs) {
             var description = "Defined at: " + br.getOrigin();
-            return create(br.displayName(), () ->
-                    Stream.of(docs.find(br), description)
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.joining("\n\n")));
+            return create(br.displayName(), () -> Stream.of(docs.find(br), description)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining("\n\n")));
         }
 
         public InfoTreeNode create(String title, String description) {

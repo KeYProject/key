@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic;
 
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import org.jspecify.annotations.NullMarked;
+
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -14,6 +14,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+
+import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class NamespaceSet {
@@ -31,19 +33,19 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-                        Namespace<Function> funcNS,
-                        Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS,
-                        Namespace<Choice> choiceNS,
-                        Namespace<IProgramVariable> programVarNS) {
+            Namespace<Function> funcNS,
+            Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS,
+            Namespace<Choice> choiceNS,
+            Namespace<IProgramVariable> programVarNS) {
         this(varNS, funcNS, sortNS, ruleSetNS, choiceNS, programVarNS, new DocSpace());
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-                        Namespace<Function> funcNS,
-                        Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS,
-                        Namespace<Choice> choiceNS,
-                        Namespace<IProgramVariable> programVarNS,
-                        DocSpace documentation) {
+            Namespace<Function> funcNS,
+            Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS,
+            Namespace<Choice> choiceNS,
+            Namespace<IProgramVariable> programVarNS,
+            DocSpace documentation) {
         this.varNS = varNS;
         this.progVarNS = programVarNS;
         this.funcNS = funcNS;
@@ -57,7 +59,7 @@ public class NamespaceSet {
         return new NamespaceSet(variables().copy(), functions().copy(),
             sorts().copy(),
             ruleSets().copy(), choices().copy(), programVariables().copy(),
-                documentation.copy());
+            documentation.copy());
     }
 
     public NamespaceSet shallowCopy() {
