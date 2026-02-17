@@ -14,7 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
-import org.key_project.isabelletranslation.automation.IsabelleRuleApp;
+import org.key_project.isabelletranslation.automation.IsabelleRule;
 import org.key_project.isabelletranslation.automation.IsabelleSolver;
 
 public class IsabelleProofApplyUserAction extends UserAction {
@@ -55,7 +55,7 @@ public class IsabelleProofApplyUserAction extends UserAction {
 
             goalsClosed.add(goal);
 
-            IBuiltInRuleApp app = IsabelleRuleApp.RULE.createApp(solver.name(),
+            IBuiltInRuleApp app = IsabelleRule.INSTANCE.createApp(solver.name(),
                 solver.getFinalResult().getSuccessfulTactic());
             app.tryToInstantiate(goal);
             goal.apply(app);

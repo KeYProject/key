@@ -57,14 +57,13 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
      * Inherited through ConstructorReference. However, this kind of ConstructorReference cannot
      * appear as a statement. Always returns <code>null</code>
      *
-     * @returns <code>null</code>
+     * @return <code>null</code>
      */
     public StatementContainer getStatementContainer() {
         return null;
     }
 
     /**
-     * @throws UnsupportedOperationException
      * @see #getStatementContainer()
      */
     public void setStatementContainer(@SuppressWarnings("unused") StatementContainer c) {

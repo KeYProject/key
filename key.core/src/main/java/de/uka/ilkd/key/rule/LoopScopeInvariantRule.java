@@ -6,13 +6,7 @@ package de.uka.ilkd.key.rule;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
@@ -28,7 +22,6 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
@@ -118,7 +111,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * <strong>NOTE:</strong> The {@link LoopScopeInvariantRule} currently doesn't support Java Card
      * transactions and information flow proof obligations.
      * </p>
-     *
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -131,20 +124,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             splitUpdates((JTerm) pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((JModality) progPost.op()).<JModality.JavaModalityKind>kind();
 
-        return !InfFlowCheckInfo.isInfFlow(goal) && !WellDefinednessCheck.isOn() // TODO: Remove
-                                                                                 // when wd goal is
-                                                                                 // integrated,
-                                                                                 // otherwise loop
-                                                                                 // invariant rule
-                                                                                 // would be unsound
-                                                                                 // w.r.t.
-                                                                                 // well-definedness
-                && !(kind.transaction());
+        return !kind.transaction();
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal,
-            RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
@@ -173,13 +157,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         return goals;
     }
 
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
 
-    /**
-     * Singleton constructor.
-     */
     private LoopScopeInvariantRule() {
     }
 

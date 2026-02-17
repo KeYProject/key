@@ -281,7 +281,7 @@ public class IntermediateProofReplayer {
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<PartnerNode> partnerNodesInfo =
-                                joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
+                                joinPartnerNodes.get(joinAppInterm.getId());
 
                             if (partnerNodesInfo == null
                                     || partnerNodesInfo.size() < joinAppInterm.getNrPartners()) {
@@ -366,9 +366,7 @@ public class IntermediateProofReplayer {
 
                                 addChildren(children, intermChildren);
                             } catch (SkipSMTRuleException e) {
-                                // silently continue; status will be reported
-                                // via
-                                // polling
+                                // silently continue; status will be reported via polling
                             } catch (BuiltInConstructionException | AssertionError
                                     | RuntimeException e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
@@ -486,6 +484,10 @@ public class IntermediateProofReplayer {
                 } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
                     throw new TacletAppConstructionException("The taclet " + taclet.name()
                         + " can not be applied to a formula/term in antecedent.");
+                } else if (!pos.isTopLevel()
+                        && (taclet instanceof AntecTaclet || taclet instanceof SuccTaclet)) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " must be applied at the top level; got " + pos);
                 }
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
@@ -598,7 +600,9 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (SMTRuleApp.RULE.name().toString().equals(ruleName)) {
+        final SMTRule smtRule = SMTRule.INSTANCE; // proof.getServices().getProfile().findInstanceFor(SMTRule.class);
+
+        if (smtRule.name().toString().equals(ruleName)) {
             if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
@@ -645,14 +649,14 @@ public class IntermediateProofReplayer {
                 ImmutableList<PosInOccurrence> unsatCore =
                     SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
-                    return SMTRuleApp.RULE.createApp(name, unsatCore);
+                    return smtRule.createApp(name, unsatCore);
                 } else {
-                    return SMTRuleApp.RULE.createApp(name);
+                    return smtRule.createApp(name);
                 }
             }
         }
 
-        IBuiltInRuleApp ourApp = null;
+        IBuiltInRuleApp ourApp;
         PosInOccurrence pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -665,19 +669,16 @@ public class IntermediateProofReplayer {
         }
 
         if (currContract != null) {
-            AbstractContractRuleApp contractApp = null;
+            AbstractContractRuleApp<?> contractApp;
 
-            BuiltInRule useContractRule;
             if (currContract instanceof OperationContract) {
-                useContractRule = UseOperationContractRule.INSTANCE;
-                contractApp = (((UseOperationContractRule) useContractRule).createApp(pos))
-                        .setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseOperationContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
             } else {
-                useContractRule = UseDependencyContractRule.INSTANCE;
-                contractApp = (((UseDependencyContractRule) useContractRule).createApp(pos))
-                        .setContract(currContract);
+                var rule = proof.getServices().getProfile().getUseDependencyContractRule();
+                contractApp = rule.createApp(pos).setContract(currContract);
                 // restore "step" if needed
-                var depContractApp = ((UseDependencyContractApp) contractApp);
+                var depContractApp = ((UseDependencyContractApp<?>) contractApp);
                 if (depContractApp.step() == null) {
                     contractApp = depContractApp.setStep(builtinIfInsts.head());
                 }
@@ -689,10 +690,8 @@ public class IntermediateProofReplayer {
                 ourApp = contractApp;
             }
 
-            currContract = null;
             if (builtinIfInsts != null) {
                 ourApp = ourApp.setAssumesInsts(builtinIfInsts);
-                builtinIfInsts = null;
             }
             return ourApp;
         }

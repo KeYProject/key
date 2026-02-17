@@ -438,14 +438,20 @@ public final class ProblemInitializer {
             Profile profile = services.getProfile();
             if (currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
                 currentBaseConfig = new InitConfig(services);
-                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-                if (tacletBase != null) {
-                    KeYFile tacletBaseFile = new KeYFile("taclet base",
-                        profile.getStandardRules().getTacletBase(), progMon, profile);
-                    readEnvInput(tacletBaseFile, currentBaseConfig);
+                ImmutableList<RuleSource> tacletBases = profile.getStandardRules().getTacletBase();
+                if (tacletBases != null) {
+                    for (var tacletBase : tacletBases) {
+                        KeYFile tacletBaseFile = new KeYFile(
+                            "taclet base (%s)".formatted(tacletBase.file().getFileName()),
+                            tacletBase, progMon, profile);
+                        readEnvInput(tacletBaseFile, currentBaseConfig);
+                    }
                 }
                 // remove traces of the generic sorts within the base configuration
                 cleanupNamespaces(currentBaseConfig);
+
+                profile.prepareInitConfig(currentBaseConfig);
+
                 baseConfig = currentBaseConfig;
             }
 

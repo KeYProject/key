@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -179,7 +180,9 @@ public class JMLSpecFactory {
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData);
+                if (symbData != null) {
+                    symbDatas = symbDatas.add(symbData);
+                }
             } else if (clauses.diverges.equals(tb.tt())) {
                 InformationFlowContract symbData = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
@@ -187,7 +190,9 @@ public class JMLSpecFactory {
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData);
+                if (symbData != null) {
+                    symbDatas = symbDatas.add(symbData);
+                }
             } else {
                 InformationFlowContract symbData1 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
@@ -196,13 +201,19 @@ public class JMLSpecFactory {
                     clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
+                if (symbData1 != null) {
+                    symbDatas = symbDatas.add(symbData1);
+                }
+
                 InformationFlowContract symbData2 = cf.createInformationFlowContract(
                     pm.getContainerType(), pm, pm.getContainerType(),
                     JModality.JavaModalityKind.BOX,
                     clauses.requires.get(heap), clauses.requiresFree.get(heap), clauses.measuredBy,
                     clauses.assignables.get(heap), !clauses.hasAssignable.get(heap), progVars,
                     clauses.accessibles.get(heap), clauses.infFlowSpecs, false);
-                symbDatas = symbDatas.add(symbData1).add(symbData2);
+                if (symbData2 != null) {
+                    symbDatas = symbDatas.add(symbData2);
+                }
             }
         }
         return symbDatas;
@@ -1015,10 +1026,13 @@ public class JMLSpecFactory {
             result = result.add(contract);
         } else {
             // create two contracts for each diamond and box modality
+            Map<LocationVariable, JTerm> boxPres = new LinkedHashMap<>(pres);
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (clauses.requires.get(heap) != null) {
+                    var div = tb.convertToFormula(clauses.diverges);
                     pres.put(heap,
-                        tb.andSC(pres.get(heap), tb.not(tb.convertToFormula(clauses.diverges))));
+                        tb.andSC(pres.get(heap), tb.not(div)));
+                    boxPres.put(heap, tb.andSC(boxPres.get(heap), div));
                     break;
                 }
             }
@@ -1027,7 +1041,7 @@ public class JMLSpecFactory {
                 clauses.assignables, clauses.assignablesFree, clauses.accessibles,
                 clauses.hasAssignable, clauses.hasFreeAssignable, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
-            FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
+            FunctionalOperationContract contract2 = cf.func(name, pm, false, boxPres,
                 clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
                 clauses.assignables, clauses.assignablesFree, clauses.accessibles,
                 clauses.hasAssignable, clauses.hasFreeAssignable, progVars);

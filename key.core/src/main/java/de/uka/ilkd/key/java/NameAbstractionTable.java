@@ -43,7 +43,7 @@ public class NameAbstractionTable {
      *
      * @param pe0 SourceElement
      * @param pe1 SourceElement
-     * @returns true if the pe1 and pe2 have been assigned to the same name
+     * @return true if the pe1 and pe2 have been assigned to the same name
      */
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
         if (declarations0 != null) {
