@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
@@ -187,7 +188,7 @@ public interface Profile {
     /// command line.
     /// @see ProblemInitializer
     default void prepareInitConfig(InitConfig baseConfig,
-            @Nullable Object additionalProfileOptions) {
+            @Nullable Configuration additionalProfileOptions) {
 
     }
 }

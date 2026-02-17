@@ -3,25 +3,32 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.event.ActionListener;
-import java.io.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the necessary menu items to a menu
@@ -40,6 +47,8 @@ public class RecentFileMenu {
      */
     private static final int MAX_RECENT_FILES = 8;
 
+    private final KeYMediator mediator;
+
     /**
      * this is the maximal number of recent files.
      */
@@ -51,18 +60,9 @@ public class RecentFileMenu {
     private final JMenu menu;
 
     /**
-     * the actionListener to be notified of mouse-clicks or other actionevents on the menu items
-     */
-    private final ActionListener lissy;
-
-    /**
-     * recent files, unique by path
-     */
-    private final Map<String, RecentFileEntry> pathToRecentFile = new LinkedHashMap<>();
-    /**
      * Mapping from menu item to entry
      */
-    private final HashMap<JMenuItem, RecentFileEntry> menuItemToRecentFile;
+    private final List<RecentFileEntry> recentFiles = new ArrayList<>();
 
     private RecentFileEntry mostRecentFile;
 
@@ -72,96 +72,75 @@ public class RecentFileMenu {
      * @param mediator Key mediator
      */
     public RecentFileMenu(final KeYMediator mediator) {
+        this.mediator = mediator;
         this.menu = new JMenu("Recent Files");
-        this.lissy = e -> {
-            String absPath = getAbsolutePath((JMenuItem) e.getSource());
-            Path file = Paths.get(absPath);
-
-            // special case proof bundles -> allow to select the proof to load
-            if (ProofSelectionDialog.isProofBundle(file)) {
-                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
-                if (proofPath == null) {
-                    // canceled by user!
-                } else {
-                    mediator.getUI().loadProofFromBundle(file, proofPath);
-                }
-            } else {
-                mediator.getUI().loadProblem(file);
-            }
-        };
         this.maxNumberOfEntries = MAX_RECENT_FILES;
 
-        this.menuItemToRecentFile = new LinkedHashMap<>();
-
-        menu.setEnabled(menu.getItemCount() != 0);
+        // menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
 
         loadFrom(PathConfig.getRecentFileStorage());
     }
 
     private void insertFirstEntry(RecentFileEntry entry) {
-        menu.insert(entry.getMenuItem(), 0);
+        menu.insert(entry.createMenuItem(), 0);
         mostRecentFile = entry;
     }
 
     /**
      * add path to the menu
      */
-    private void addNewToModelAndView(final String path) {
+    private void addNewToModelAndView(final String path,
+            @Nullable Profile profile,
+            boolean singleJava, @Nullable Configuration additionalOption) {
         // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path)) {
+        if (QUICK_SAVE_PATH.endsWith(path)) {
             return;
         }
 
         if (new File(path).exists()) {
-            final RecentFileEntry entry = new RecentFileEntry(path);
-            pathToRecentFile.put(entry.getAbsolutePath(), entry);
+            var entry = new RecentFileEntry(path, profile != null ? profile.displayName() : null,
+                singleJava, additionalOption);
 
             // Recalculate unique names
-            final String[] paths = pathToRecentFile.keySet().toArray(String[]::new);
+            final String[] paths =
+                recentFiles.stream().map(RecentFileEntry::getAbsolutePath).toArray(String[]::new);
             final ShortUniqueFileNames.Name[] names = ShortUniqueFileNames.makeUniqueNames(paths);
+
             // Set the names
             for (ShortUniqueFileNames.Name name : names) {
-                pathToRecentFile.get(name.getPath()).setName(name.getName());
+                // TODO pathToRecentFile.get(name.getPath()).setName(name.getName());
             }
-
-            // Insert the menu item
-            final JMenuItem item = entry.getMenuItem();
-            menuItemToRecentFile.put(item, entry);
-            item.addActionListener(lissy);
 
             insertFirstEntry(entry);
         }
     }
 
-    /**
-     *
-     */
-    private String getAbsolutePath(JMenuItem item) {
-        return menuItemToRecentFile.get(item).getAbsolutePath();
-    }
-
-    private void addRecentFileNoSave(final String path) {
+    private void addRecentFileNoSave(final String path,
+            @Nullable Profile profile,
+            boolean singleJava,
+            @Nullable Configuration additionalOption) {
         LOGGER.trace("Adding file: {}", path);
-        final RecentFileEntry existingEntry = pathToRecentFile.get(path);
+
+        Optional<RecentFileEntry> existingEntry = recentFiles.stream()
+                .filter(it -> path.equals(it.getAbsolutePath())).findFirst();
 
         // Add the path to the recentFileList:
         // check whether this path is already there
-        if (existingEntry != null) {
-            menu.remove(existingEntry.getMenuItem());
-            insertFirstEntry(existingEntry);
+        if (existingEntry.isPresent()) {
+            var entry = existingEntry.get();
+            recentFiles.remove(entry);
+            menu.remove(entry.createMenuItem());
+            insertFirstEntry(entry);
             return;
         }
 
         // if appropriate, remove the last entry.
         if (menu.getItemCount() == maxNumberOfEntries) {
-            final JMenuItem item = menu.getItem(menu.getItemCount() - 1);
-            final RecentFileEntry entry = menuItemToRecentFile.get(item);
-            menuItemToRecentFile.remove(entry.getMenuItem());
-            pathToRecentFile.remove(entry.getAbsolutePath());
-            menu.remove(entry.getMenuItem());
+            var lastEntry = recentFiles.removeLast();
+            menu.remove(lastEntry.createMenuItem());
         }
-        addNewToModelAndView(path);
+        addNewToModelAndView(path, profile, singleJava, additionalOption);
         menu.setEnabled(menu.getItemCount() != 0);
     }
 
@@ -172,9 +151,12 @@ public class RecentFileMenu {
      * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
      *
      * @param path the path of the file.
+     * @param singleJava
      */
-    public void addRecentFile(final String path) {
-        addRecentFileNoSave(path);
+    public void addRecentFile(final String path,
+            @Nullable Profile profile, boolean singleJava,
+            @Nullable Configuration additionalOption) {
+        addRecentFileNoSave(path, profile, singleJava, additionalOption);
         save();
     }
 
@@ -204,8 +186,17 @@ public class RecentFileMenu {
      */
     public final void loadFrom(Path filename) {
         try {
-            var c = Configuration.load(filename);
-            c.getStringList("recentFiles").forEach(this::addRecentFileNoSave);
+            var file = ParsingFacade.parseConfigurationFile(filename);
+            List<Configuration> recent = file.asConfigurationList();
+            this.recentFiles.clear();
+            for (var c : recent) {
+                final var e = new RecentFileEntry(c);
+                if (mostRecentFile != null) {
+                    mostRecentFile = e;
+                }
+                recentFiles.add(e);
+                menu.add(e.createMenuItem());
+            }
         } catch (FileNotFoundException ex) {
             LOGGER.debug("Could not read RecentFileList. Did not find file {}", filename);
         } catch (IOException ioe) {
@@ -226,14 +217,11 @@ public class RecentFileMenu {
      * exists) and then re-written so no information will be lost.
      */
     public void store(Path filename) {
-        Configuration c = new Configuration();
-        var seq = menuItemToRecentFile.values().stream()
-                .map(RecentFileEntry::getAbsolutePath)
-                .collect(Collectors.toList());
-        c.set("recentFiles", seq);
-
+        List<Configuration> config =
+            recentFiles.stream().map(RecentFileEntry::asConfiguration).toList();
         try (var fin = Files.newBufferedWriter(filename)) {
-            c.save(fin, "");
+            var writer = new Configuration.ConfigurationWriter(fin);
+            writer.printValue(config);
         } catch (IOException ex) {
             LOGGER.info("Could not write recent files list ", ex);
         }
@@ -243,37 +231,80 @@ public class RecentFileMenu {
         store(PathConfig.getRecentFileStorage());
     }
 
-    private static class RecentFileEntry {
-        /**
-         * full path
-         */
-        private final String absolutePath;
-        /**
-         * the associated menu item
-         */
-        private final JMenuItem menuItem;
+    public class RecentFileEntry {
+        public static final String KEY_PATH = "path";
+        public static final String KEY_PROFILE = "profile";
+        public static final String KEY_OPTIONS = "options";
+        private static final String KEY_LOAD_SINGLE_JAVA = "singleJava";
 
-        public RecentFileEntry(String absolutePath) {
-            this.menuItem = new JMenuItem();
-            this.menuItem.setToolTipText(absolutePath);
-            this.absolutePath = absolutePath;
+        private @Nullable JMenuItem menuItem;
+
+        private final String path;
+        private final @Nullable String profile;
+        private final boolean singleJava;
+        private final @Nullable Configuration additionalOption;
+
+        public RecentFileEntry(String path, @Nullable String profile, boolean singleJava,
+                @Nullable Configuration additionalOption) {
+            this.additionalOption = additionalOption;
+            this.path = path;
+            this.profile = profile;
+            this.singleJava = singleJava;
+        }
+
+        public RecentFileEntry(Configuration options) {
+            this(Objects.requireNonNull(options.getString(KEY_PATH)),
+                options.getString(KEY_PROFILE),
+                options.getBool(KEY_LOAD_SINGLE_JAVA, false),
+                options.getTable(KEY_OPTIONS));
+        }
+
+        public Configuration asConfiguration() {
+            Configuration config = new Configuration();
+            config.set(KEY_PATH, path);
+            config.set(KEY_PROFILE, profile);
+            config.set(KEY_LOAD_SINGLE_JAVA, singleJava);
+            config.set(KEY_OPTIONS, additionalOption);
+            return config;
         }
 
         public String getAbsolutePath() {
-            return absolutePath;
+            return path;
         }
 
-        public void setName(String name) {
-            this.menuItem.setText(name);
-        }
-
-        public JMenuItem getMenuItem() {
+        public JMenuItem createMenuItem() {
+            if (menuItem == null) {
+                menuItem = new JMenuItem(new RecentFileAction(this));
+            }
             return menuItem;
+        }
+    }
+
+    private class RecentFileAction extends KeyAction {
+        private final RecentFileEntry recentFileEntry;
+
+        public RecentFileAction(RecentFileEntry recentFileEntry) {
+            this.recentFileEntry = recentFileEntry;
+            setName(recentFileEntry.getAbsolutePath());
+            setTooltip(recentFileEntry.getAbsolutePath());
         }
 
         @Override
-        public String toString() {
-            return absolutePath;
+        public void actionPerformed(ActionEvent actionEvent) {
+            String absPath = recentFileEntry.getAbsolutePath();
+            Path file = Paths.get(absPath);
+
+            // special case proof bundles -> allow to select the proof to load
+            if (ProofSelectionDialog.isProofBundle(file)) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
+                if (proofPath == null) {
+                    // canceled by user!
+                } else {
+                    mediator.getUI().loadProofFromBundle(file, proofPath);
+                }
+            } else {
+                mediator.getUI().loadProblem(file);
+            }
         }
     }
 }

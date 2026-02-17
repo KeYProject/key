@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.Configuration;
 
 import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
@@ -109,7 +110,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
                 .orElse(null);
     }
 
-    public @Nullable Object getAdditionalProfileOptions() {
+    public @Nullable Configuration getAdditionalProfileOptions() {
         if (currentOptionPanel == null) {
             return null;
         }

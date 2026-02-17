@@ -9,11 +9,14 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.KeYFileChooserLoadingOptions;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.wd.WdProfile;
 
 import net.miginfocom.layout.CC;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /// Additional UI components for the selection of the WD semantics.
+///
 /// @author weigl
 @KeYGuiExtension.Info(experimental = false)
 public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension.LoadOptionPanel {
@@ -100,15 +103,16 @@ public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension
         }
 
         @Override
-        public Object getResult() {
+        public @Nullable Configuration getResult() {
+            Configuration configuration = new Configuration();
+            configuration.set("wdOperator", "wdOperator:L");
             if (rdbWDD.isSelected()) {
-                return "wdOperator:D";
+                configuration.set("wdOperator", "wdOperator:D");
             }
             if (rdbWDY.isSelected()) {
-                return "wdOperator:Y";
+                configuration.set("wdOperator", "wdOperator:Y");
             }
-            // default
-            return "wdOperator:L";
+            return configuration;
         }
     }
 }
