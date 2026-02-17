@@ -26,6 +26,11 @@ public class DocSpace {
         this.parent = parent;
     }
 
+    public DocSpace(@Nullable DocSpace parent, Map<String, String> documentation) {
+        this(documentation);
+        this.parent = parent;
+    }
+
     public @Nullable String find(String key) {
         var value = documentation.get(key);
         if (value != null)
@@ -59,6 +64,6 @@ public class DocSpace {
     }
 
     public DocSpace copy() {
-        return new DocSpace(documentation);
+        return new DocSpace(parent, documentation);
     }
 }
