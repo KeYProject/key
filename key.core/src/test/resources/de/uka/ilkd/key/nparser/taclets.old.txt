@@ -17991,21 +17991,22 @@ tryCatchThrow {
     #slist1
   }
 ... }}| (post))
-\replacewith(#allmodal ((modal operator))|{{ ..
-  if (#se == null) {
-    try {
-      throw new java.lang.NullPointerException();
-    } catch (#t #v0) {
-      #slist1
-    }
-  } else if (#se instanceof #t) {
+\add []==>[equals(#se,null)] \replacewith(#allmodal ((modal operator))|{{ ..
+  if (#se instanceof #t) {
     #t #v0;
     #v0 = (#t) #se;
     #slist1
   } else {
     throw #se;
   }
-... }}| (post)) 
+... }}| (post)) ;
+\add [equals(#se,null)]==>[] \replacewith(#allmodal ((modal operator))|{{ ..
+  try {
+    throw new java.lang.NullPointerException();
+  } catch (#t #v0) {
+    #slist1
+  }
+... }}| (post))
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
