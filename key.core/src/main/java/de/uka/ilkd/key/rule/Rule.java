@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.rule;
 
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.HasOrigin;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**

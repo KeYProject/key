@@ -233,13 +233,13 @@ public final class KeYGuiExtensionFacade {
      * If the underlying object is a proof, this will also include the usual actions.
      * </p>
      *
-     * @param kind             what kind of object the context menu is built on
+     * @param kind what kind of object the context menu is built on
      * @param underlyingObject the object the context menu is built on
-     * @param mediator         the KeY mediator
+     * @param mediator the KeY mediator
      * @return populated context menu
      */
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
-                                               KeYMediator mediator) {
+            KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
         if (underlyingObject instanceof Proof proof) {
             for (Component comp : MainWindow.getInstance().createProofMenu(proof)
@@ -253,13 +253,13 @@ public final class KeYGuiExtensionFacade {
     }
 
     public static void addContextMenuItems(ContextMenuKind kind, JPopupMenu menu,
-                                           Object underlyingObject, KeYMediator mediator) {
+            Object underlyingObject, KeYMediator mediator) {
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
     }
 
     public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
-                                                   KeYMediator mediator) {
+            KeYMediator mediator) {
         if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
             throw new IllegalArgumentException();
         }
@@ -270,7 +270,7 @@ public final class KeYGuiExtensionFacade {
     }
 
     public static JMenu createTermMenu(ContextMenuKind kind, Object underlyingObject,
-                                       KeYMediator mediator) {
+            KeYMediator mediator) {
         JMenu menu = new JMenu("Extensions");
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
@@ -285,7 +285,7 @@ public final class KeYGuiExtensionFacade {
 
     /**
      * @param clazz the interface class
-     * @param <T>   the interface of the service
+     * @param <T> the interface of the service
      * @return a list of all found and enabled service implementations
      */
     @SuppressWarnings("unchecked")
@@ -348,7 +348,7 @@ public final class KeYGuiExtensionFacade {
     }
 
     public static Stream<Action> getKeyboardShortcuts(KeYMediator mediator, String componentId,
-                                                      JComponent component) {
+            JComponent component) {
         return getKeyboardShortcutsExtensions().stream()
                 .flatMap(it -> it.getShortcuts(mediator, componentId, component).stream())
                 .sorted(new ActionPriorityComparator());
@@ -360,7 +360,7 @@ public final class KeYGuiExtensionFacade {
      * @param componentId
      */
     public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component,
-                                                String componentId) {
+            String componentId) {
         Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
         provider.forEach(it -> {
             int condition = it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null
@@ -390,7 +390,7 @@ public final class KeYGuiExtensionFacade {
     /**
      *
      * @param window the main window.
-     * @param pos    the position the user selected.
+     * @param pos the position the user selected.
      * @return every term info string from every loaded extension.
      */
     public static List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {

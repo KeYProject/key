@@ -282,11 +282,11 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return """
                                 Like methods, statement blocks can be annotated with contracts. The application of the Block Contract rules then gives rise to subgoals which roughly correspond to those of the Use Operation Contract rule (see there).
                 Three properties have to be shown:
-                
+
                 1. Validity of block contract
-                
+
                 2. Precondition of contract holds
-                
+
                 3. Postcondition holds after block terminates
                 """;
     }

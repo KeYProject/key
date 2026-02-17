@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.label;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.TermServices;
+
 import org.jspecify.annotations.Nullable;
 
 /**

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;

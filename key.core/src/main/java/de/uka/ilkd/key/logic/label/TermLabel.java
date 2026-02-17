@@ -152,7 +152,8 @@ import org.key_project.prover.sequent.SequentFormula;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named, HasDocumentation, /* TODO: Remove */ TerminalSyntaxElement {
+public interface TermLabel
+        extends Named, HasDocumentation, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.

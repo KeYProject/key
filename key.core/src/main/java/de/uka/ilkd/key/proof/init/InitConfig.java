@@ -20,7 +20,6 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -34,6 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -54,7 +54,8 @@ public class InitConfig {
 
     /**
      * Map of categories to their default choice. The choices are overridden in activateChoice
-     * by settings given in the {@link KeYUserProblemFile} or {@link Profile#prepareInitConfig(InitConfig, Object)}.
+     * by settings given in the {@link KeYUserProblemFile} or
+     * {@link Profile#prepareInitConfig(InitConfig, Object)}.
      */
     private final Map<String, Choice> category2DefaultChoice;
 
@@ -88,7 +89,8 @@ public class InitConfig {
     public InitConfig(Services services) {
         this.services = services;
 
-        var currentDefaultChoices = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+        var currentDefaultChoices =
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
         var defaults = new TreeMap<String, Choice>();
 
@@ -124,7 +126,7 @@ public class InitConfig {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
             final Choice c = choiceNS().lookup(new Name(entry.getKey()));
-            if(c != null && !category2DefaultChoice.containsKey(c.category())) {
+            if (c != null && !category2DefaultChoice.containsKey(c.category())) {
                 changed = true;
                 category2DefaultChoice.put(c.category(), c);
             }
@@ -132,9 +134,9 @@ public class InitConfig {
 
         if (changed) {
             // FIXME weigl: I do not understand why the default choices are back progragated!
-            //              For me this is a design flaw.
+            // For me this is a design flaw.
             // weigl(2026): This is the way, how the settings are getting updated by the current
-            //              known choices. This is not good!
+            // known choices. This is not good!
             Map<String, String> clone = new HashMap<>();
             for (Map.Entry<String, Choice> entry : category2DefaultChoice.entrySet()) {
                 clone.put(entry.getKey(), entry.getValue().name().toString());
@@ -454,6 +456,7 @@ public class InitConfig {
             return true;
         }
 
-        return !activatedChoices.containsKey(c.category()) && category2DefaultChoice.containsValue(c);
+        return !activatedChoices.containsKey(c.category())
+                && category2DefaultChoice.containsValue(c);
     }
 }

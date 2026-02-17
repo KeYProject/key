@@ -40,7 +40,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
                 """);
 
     private final Map<Profile, KeYGuiExtension.OptionPanel> additionalOptionPanels =
-            KeYGuiExtensionFacade.createAdditionalOptionPanels();
+        KeYGuiExtensionFacade.createAdditionalOptionPanels();
 
 
     private KeYGuiExtension.@Nullable OptionPanel currentOptionPanel = null;
@@ -83,7 +83,9 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     }
 
     private void updateProfileInfo(@Nullable ProfileWrapper selectedItem) {
-        if(currentOptionPanel!=null){currentOptionPanel.deinstall(this);}
+        if (currentOptionPanel != null) {
+            currentOptionPanel.deinstall(this);
+        }
 
         if (selectedItem == null) {
             lblProfileInfo.setText("");
@@ -108,7 +110,7 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     }
 
     public @Nullable Object getAdditionalProfileOptions() {
-        if(currentOptionPanel==null){
+        if (currentOptionPanel == null) {
             return null;
         }
         return currentOptionPanel.getResult();

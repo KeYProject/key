@@ -46,7 +46,7 @@ public class SortImpl extends AbstractSort {
 
 
     public SortImpl(Name name) {
-        this(name, DefaultImmutableSet.nil(),  "");
+        this(name, DefaultImmutableSet.nil(), "");
     }
 
     @Override

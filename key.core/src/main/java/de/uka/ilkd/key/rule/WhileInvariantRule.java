@@ -706,11 +706,11 @@ public class WhileInvariantRule implements BuiltInRule {
                 Loops can be handled by expanding or by using a loop invariant.
                 An invariant can be created manually or supplied by the JML specification.
                 Use of this rule creates three subgoals, two of which are new proof obligations:
-                
+
                 1. It must be shown that the loop invariant is initially valid.
-                
+
                 2. The loop body needs to preserve the invariant.
-                
+
                 In the third subgoal, the loop invariant can be used.
                 """;
     }

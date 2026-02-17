@@ -15,9 +15,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.ParsingFacade;
 
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.key_project.logic.Choice;
 import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.Name;
@@ -58,8 +56,8 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
-                ctx.datatype_decls(),
-                ctx.prog_var_decls(), ctx.schema_var_decls());
+            ctx.datatype_decls(),
+            ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
 
@@ -92,7 +90,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                     // commented out as pv do not have unique name (at the moment)
                     // throw new AmbigiousDeclException(varName, getSourceName(), getLine(),
                     // getColumn())
-                    if (!(name instanceof ProgramVariable pv) || !(pv.getKeYJavaType().equals(kjt))) {
+                    if (!(name instanceof ProgramVariable pv)
+                            || !(pv.getKeYJavaType().equals(kjt))) {
                         programVariables().add(new LocationVariable(pvName, kjt));
                     }
                 } else {
@@ -166,7 +165,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                 Sort s = null;
                 if (isGenericSort) {
                     try {
-                        var gs = new GenericSort(sortName, ext, oneOf, BuilderHelpers.getPosition(idCtx));
+                        var gs = new GenericSort(sortName, ext, oneOf,
+                            BuilderHelpers.getPosition(idCtx));
                         s = gs;
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
@@ -178,14 +178,16 @@ public class DeclarationBuilder extends DefaultBuilder {
                         var ps = new ProxySort(sortName, ext, BuilderHelpers.getPosition(idCtx));
                         s = ps;
                     } else {
-                        var si = new SortImpl(sortName, ext, isAbstractSort, BuilderHelpers.getPosition(idCtx));
+                        var si = new SortImpl(sortName, ext, isAbstractSort,
+                            BuilderHelpers.getPosition(idCtx));
                         s = si;
                     }
                 }
                 assert s != null;
                 String doc = processDocumentation(idCtx.DOC_COMMENT());
                 docsSpace().describe(s,
-                        Stream.of(doc, sectionDoc).filter(Objects::nonNull).collect(Collectors.joining("\n")));
+                    Stream.of(doc, sectionDoc).filter(Objects::nonNull)
+                            .collect(Collectors.joining("\n")));
                 sorts().add(s);
                 createdSorts.add(s);
             } else {
@@ -193,8 +195,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                 // local namespaces for generic sorts
                 // addWarning(ctx, "Sort declaration is ignored, due to collision.");
                 LOGGER.debug("Sort declaration of {} in {} is ignored due to collision (already "
-                                + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
-                        existingSort.getOrigin());
+                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
+                    existingSort.getOrigin());
             }
         }
         return createdSorts;
