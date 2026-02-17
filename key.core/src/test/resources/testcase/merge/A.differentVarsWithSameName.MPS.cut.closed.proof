@@ -88,7 +88,7 @@
 \proof {
 (keyLog "0" (keyUser "ulbrich" ) (keyVersion "ec5929d9d07ad15825a3df906130ec25331835c0"))
 
-(autoModeTime "879")
+(autoModeTime "2175")
 
 (branch "dummy ID"
  (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,o,f"))
@@ -138,7 +138,7 @@
       (rule "times_zero_1" (formula "11") (term "1,0,0,0,0,1,0"))
       (rule "add_zero_right" (formula "11") (term "0,0,0,0,1,0"))
       (rule "blockEmpty" (formula "11") (term "1"))
-       (builtin "MergeRule" (formula "11") (mergeProc "MergeByIfThenElse") (nrMergePartners "1") (mergeId "197"))
+       (builtin "MergeRule" (formula "11") (mergeProc "MergeByIfThenElse") (nrMergePartners "1") (mergeId "199"))
       (rule "deleteMergePoint" (formula "7") (term "1"))
       (rule "notLeft" (formula "1"))
       (rule "inEqSimp_sepPosMonomial1" (formula "7") (term "0,1,0,0,0,0"))
@@ -267,11 +267,12 @@
       (rule "methodCallParamThrow" (formula "12") (term "1"))
       (rule "tryCatchThrow" (formula "12") (term "1"))
       (branch "Null reference in throw"
-         (rule "typeEqDerived" (formula "10") (term "0,0") (ifseqformula "1"))
-         (rule "typeEqDerived" (formula "10") (term "0,1") (ifseqformula "1"))
-         (rule "close" (formula "11") (ifseqformula "1"))
+          (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "11")))
+         (rule "closeFalse" (formula "1"))
       )
       (branch "Normal execution"
+          (builtin "One Step Simplification" (formula "12") (ifInst ""  (formula "10")))
+         (rule "false_right" (formula "12"))
          (rule "ifElseSplit" (formula "12"))
          (branch "if exc_0 instanceof java.lang.Throwable true"
              (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "11")))
@@ -343,7 +344,7 @@
       (rule "replace_known_right" (formula "12") (term "0,0,1,0") (ifseqformula "9"))
        (builtin "One Step Simplification" (formula "12"))
       (rule "blockEmpty" (formula "12") (term "1"))
-       (builtin "CloseAfterMerge" (formula "12") (newnames "exc_0_0,exc_0_1,P") (mergeNode "197"))
+       (builtin "CloseAfterMerge" (formula "12") (newnames "exc_0_0,exc_0_1,P") (mergeNode "199"))
       (branch "Merged node is weakening"
           (builtin "One Step Simplification" (formula "1"))
          (rule "impRight" (formula "1"))
@@ -365,7 +366,7 @@
           (builtin "One Step Simplification" (formula "9") (ifInst ""  (formula "12")) (ifInst ""  (formula "1")) (ifInst ""  (formula "2")) (ifInst ""  (formula "3")) (ifInst ""  (formula "4")) (ifInst ""  (formula "11")) (ifInst ""  (formula "11")) (ifInst ""  (formula "10")) (ifInst ""  (formula "5")) (ifInst ""  (formula "6")) (ifInst ""  (formula "7")) (ifInst ""  (formula "8")) (ifInst ""  (formula "11")) (ifInst ""  (formula "13")))
          (rule "closeFalse" (formula "9"))
       )
-      (branch "Merged with node 197"
+      (branch "Merged with node 199"
       )
    )
    (branch "Exceptional Post (g)"
@@ -399,11 +400,12 @@
       (rule "methodCallParamThrow" (formula "12") (term "1"))
       (rule "tryCatchThrow" (formula "12") (term "1"))
       (branch "Null reference in throw"
-         (rule "typeEqDerived" (formula "9") (term "0,0") (ifseqformula "1"))
-         (rule "typeEqDerived" (formula "9") (term "0,1") (ifseqformula "1"))
-         (rule "close" (formula "10") (ifseqformula "1"))
+          (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "10")))
+         (rule "closeFalse" (formula "1"))
       )
       (branch "Normal execution"
+          (builtin "One Step Simplification" (formula "12") (ifInst ""  (formula "9")))
+         (rule "false_right" (formula "12"))
          (rule "ifElseSplit" (formula "12"))
          (branch "if exc_0 instanceof java.lang.Throwable true"
              (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "10")))
