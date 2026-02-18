@@ -634,13 +634,13 @@ public class OutputStreamProofSaver {
     private void printExpandedOneStepSimplifierRuleApp(OneStepSimplifierRuleApp ossa, Node node,
             String prefix, Appendable output) throws IOException {
         OneStepSimplifier.Protocol protocol = ossa.getProtocol();
+        int seqFNum = node.sequent().formulaNumberInSequent(ossa.posInOccurrence());
         for (int i = 0; i < protocol.size(); i++) {
             var app = protocol.get(i);
             Node n = new Node(node.proof());
             if (i == 0) {
                 n.setNameRecorder(node.getNameRecorder());
             }
-            int seqFNum = node.sequent().formulaNumberInSequent(ossa.posInOccurrence());
             Sequent seq = node.sequent()
                     .replaceFormula(seqFNum, app.posInOccurrence().sequentFormula()).sequent();
             n.setSequent(seq);
