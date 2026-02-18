@@ -76,9 +76,9 @@
  } 
 
 
-\javaSource "src";\proofObligation 
-// 
-{ 
+\javaSource "src";
+
+\proofObligation {
     "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
     "contract" : "Perm[Perm::foo()].JML normal_behavior operation contract.0",
     "name" : "Perm[Perm::foo()].JML normal_behavior operation contract.0"

@@ -76,9 +76,9 @@
  } 
 
 
-\javaSource "src";\proofObligation 
-// 
-{ 
+\javaSource "src";
+
+\proofObligation {
     "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
     "contract" : "ReverseArray[ReverseArray::reverse()].JML normal_behavior operation contract.0",
     "name" : "ReverseArray[ReverseArray::reverse()].JML normal_behavior operation contract.0"
