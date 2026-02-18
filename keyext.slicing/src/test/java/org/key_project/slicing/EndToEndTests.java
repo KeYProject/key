@@ -85,7 +85,7 @@ class EndToEndTests {
                     .resolve("key.ui")
                     .resolve("examples").resolve("firstTouch").resolve("05-ReverseArray")
                     .resolve("reverseArray.proof"),
-            6537, 4236, true, true, true);
+            5138, 4127, true, true, true);
         var iteration2 =
             sliceProofFullFilename(iteration1.second, 4236, 4229, true, true, true);
         var iteration3 =
