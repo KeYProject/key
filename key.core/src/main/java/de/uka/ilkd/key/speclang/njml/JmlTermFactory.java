@@ -838,8 +838,9 @@ public final class JmlTermFactory {
         return new SLExpression(tb.index(), t);
     }
 
-    public SLExpression values(KeYJavaType t) {
-        return new SLExpression(tb.values(), t);
+    public SLExpression values() {
+        return new SLExpression(tb.values(), services.getJavaInfo()
+                .getKeYJavaType(services.getTypeConverter().getSeqLDT().targetSort()));
     }
 
     /**
