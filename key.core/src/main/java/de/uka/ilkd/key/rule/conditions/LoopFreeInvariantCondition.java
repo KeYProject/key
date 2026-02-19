@@ -71,7 +71,6 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        // TODO: Handle exception?!
         final JModality.JavaModalityKind modalityKind = svInst.getInstantiation(modalitySV);
 
         JTerm freeInvInst = tb.tt();
@@ -86,8 +85,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
                 maybeFreeInvInst.map(inv -> tb.and(currentFreeInvInst, inv)).orElse(freeInvInst);
         }
 
-        return matchCond.setInstantiations( //
-            svInst.add(invSV, freeInvInst, services));
+        return matchCond.setInstantiations(svInst.add(invSV, freeInvInst, services));
     }
 
     @Override

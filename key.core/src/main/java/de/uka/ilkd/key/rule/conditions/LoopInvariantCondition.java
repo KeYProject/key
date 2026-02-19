@@ -71,7 +71,6 @@ public class LoopInvariantCondition implements VariableCondition {
         final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        // TODO: handle exception
         final JModality.JavaModalityKind modalityKind = svInst.getInstantiation(modalitySV);
 
         JTerm invInst = tb.tt();
