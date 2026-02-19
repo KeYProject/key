@@ -650,6 +650,11 @@ public final class Goal implements ProofGoal<Goal> {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
             return null;
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println(ruleApp.rule().displayName());
+            removeLastAppliedRuleApp();
+            node().setAppliedRuleApp(null);
+            return null;
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
