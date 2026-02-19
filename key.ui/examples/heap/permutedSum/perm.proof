@@ -1,53 +1,87 @@
 \profile "Java Profile";
 
-\settings {
-"#Proof-Settings-Config-File
-#Thu Jan 12 15:37:29 CET 2023
-[Labels]UseOriginLabels=true
-[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
-[SMTSettings]invariantForall=false
-[Strategy]ActiveStrategy=JavaCardDLStrategy
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
-[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:on , bigint-bigint\\:on , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:showSatisfiability , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:allow , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
-[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
-[SMTSettings]UseBuiltUniqueness=false
-[SMTSettings]explicitTypeHierarchy=false
-[SMTSettings]instantiateHierarchyAssumptions=true
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
-[SMTSettings]SelectedTaclets=
-[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
-[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
-[Strategy]MaximumNumberOfAutomaticApplications=10000
-[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
-[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_DELAYED
-[SMTSettings]useConstantsForBigOrSmallIntegers=true
-[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
-[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
-[Strategy]Timeout=-1
-[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
-[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
-[SMTSettings]useUninterpretedMultiplication=true
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
-[SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
-[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
-[SMTSettings]integersMinimum=-2147483645
-[StrategyProperty]VBT_PHASE=VBT_SYM_EX
-[SMTSettings]integersMaximum=2147483645
-"
-}
+\settings // Proof-Settings-Config-File
+{ 
+    "Choice" : { 
+        "JavaCard" : "JavaCard:on",
+        "Strings" : "Strings:on",
+        "assertions" : "assertions:on",
+        "bigint" : "bigint:on",
+        "finalFields" : "finalFields:immutable",
+        "floatRules" : "floatRules:strictfpOnly",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "integerSimplificationRules" : "integerSimplificationRules:full",
+        "javaLoopTreatment" : "javaLoopTreatment:efficient",
+        "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
+        "methodExpansion" : "methodExpansion:modularOnly",
+        "modelFields" : "modelFields:showSatisfiability",
+        "moreSeqRules" : "moreSeqRules:on",
+        "permissions" : "permissions:off",
+        "programRules" : "programRules:Java",
+        "reach" : "reach:on",
+        "runtimeExceptions" : "runtimeExceptions:allow",
+        "sequences" : "sequences:on",
+        "soundDefaultContracts" : "soundDefaultContracts:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
+     },
+    "Labels" : { 
+        "UseOriginLabels" : true
+     },
+    "NewSMT" : { 
+        
+     },
+    "SMTSettings" : { 
+        "SelectedTaclets" : [ 
+            
+         ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+     },
+    "Strategy" : { 
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : { 
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+         }
+     }
+ } 
+
 
 \javaSource "src";
 
 \proofObligation {
-	"contract": "Perm[Perm::foo()].JML normal_behavior operation contract.0",
-	"name": "Perm[Perm::foo()].JML normal_behavior operation contract.0",
-	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+    "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+    "contract" : "Perm[Perm::foo()].JML normal_behavior operation contract.0",
+    "name" : "Perm[Perm::foo()].JML normal_behavior operation contract.0"
  }
 
 \proof {
@@ -57,8 +91,9 @@
 (keyLog "3" (keyUser "Julian" ) (keyVersion "008f011f15"))
 (keyLog "4" (keyUser "Julian" ) (keyVersion "008f011f15"))
 (keyLog "5" (keyUser "Julian" ) (keyVersion "44c2a312eb"))
+(keyLog "6" (keyUser "bubel" ) (keyVersion "cacb625f9caeb9baf0b0ea63b8484f8c5b766f85"))
 
-(autoModeTime "162456")
+(autoModeTime "162496")
 
 (branch "dummy ID"
  (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,o,f"))
@@ -78,12 +113,14 @@
 (rule "variableDeclaration" (formula "8") (term "1") (newnames "s"))
 (rule "assignment" (formula "8") (term "1"))
  (builtin "One Step Simplification" (formula "8"))
-(rule "loopScopeInvDia" (formula "8") (term "1") (newnames "s_0,o,f") (inst "anon_heap_LOOP=anon_heap_LOOP_0") (inst "anon_savedHeap_LOOP=anon_savedHeap_LOOP_0") (inst "anon_permissions_LOOP=anon_permissions_LOOP_0") (inst "#heapBefore_LOOP=h") (inst "#savedHeapBefore_LOOP=h_1") (inst "#permissionsBefore_LOOP=h_2") (inst "#variant=x") (inst "#x=x_1"))
+(rule "loopScopeInvDia" (formula "8") (term "1") (newnames "s_0,o,f") (inst "#x=x_1") (inst "#variant=x") (inst "#permissionsBefore_LOOP=h_2") (inst "#savedHeapBefore_LOOP=h_1") (inst "#heapBefore_LOOP=h") (inst "anon_permissions_LOOP=anon_permissions_LOOP_0") (inst "anon_savedHeap_LOOP=anon_savedHeap_LOOP_0") (inst "anon_heap_LOOP=anon_heap_LOOP_0"))
 (branch "Invariant Initially Valid"
    (rule "andRight" (formula "8"))
    (branch "Case 1"
        (builtin "One Step Simplification" (formula "8"))
-      (rule "eqSymm" (formula "8"))
+      (rule "eqSymm" (formula "8") (term "0"))
+      (rule "replace_known_left" (formula "8") (term "1") (ifseqformula "6"))
+       (builtin "One Step Simplification" (formula "8"))
       (rule "castedGetAny" (formula "8") (term "0,2,0"))
       (rule "applyEq" (formula "8") (term "1,0") (ifseqformula "5"))
       (rule "bsum_lower_equals_upper" (formula "8") (term "0"))
@@ -91,19 +128,19 @@
       (rule "closeTrue" (formula "8"))
    )
    (branch "Case 2"
-       (builtin "One Step Simplification" (formula "8") (ifInst ""  (formula "6")))
+       (builtin "One Step Simplification" (formula "8"))
       (rule "closeTrue" (formula "8"))
    )
 )
 (branch "Invariant Preserved and Used"
     (builtin "One Step Simplification" (formula "9"))
-     (rule "variableDeclaration" (formula "9") (term "1") (newnames "h") (userinteraction))
-     (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_1") (userinteraction))
-     (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_2") (userinteraction))
-     (rule "variableDeclaration" (formula "9") (term "1") (newnames "x") (userinteraction))
-     (rule "variableDeclaration" (formula "9") (term "1") (newnames "s_before") (userinteraction))
-     (rule "emptyModality" (formula "9") (term "1") (userinteraction))
-   (builtin "One Step Simplification" (formula "9") (userinteraction))
+   (rule "variableDeclaration" (formula "9") (term "1") (newnames "h") (userinteraction))
+   (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_1") (userinteraction))
+   (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_2") (userinteraction))
+   (rule "variableDeclaration" (formula "9") (term "1") (newnames "x") (userinteraction))
+   (rule "variableDeclaration" (formula "9") (term "1") (newnames "s_before") (userinteraction))
+   (rule "emptyModality" (formula "9") (term "1") (userinteraction))
+    (builtin "One Step Simplification" (formula "9"))
    (rule "impRight" (formula "9"))
    (rule "andLeft" (formula "1"))
    (rule "eqSymm" (formula "11") (term "0,0,0,1,1,0,1"))
@@ -142,7 +179,7 @@
    (rule "hideAuxiliaryEq" (formula "1"))
    (rule "ifElseUnfold" (formula "11") (term "1") (inst "#boolv=x_2"))
    (rule "variableDeclaration" (formula "11") (term "1") (newnames "x_2"))
-    (builtin "Use Operation Contract" (formula "11") (newnames "heapBefore_hasNext,result_hasNext,exc_0") (contract "Perm[Perm::hasNext()].JML normal_behavior operation contract.0"))
+    (builtin "Use Operation Contract" (formula "11") (newnames "heapBefore_hasNext,result_hasNext,exc_0") (contract "Perm[Perm::hasNext()].JML normal_behavior operation contract.0") (modality "diamond"))
    (branch "Post (hasNext)"
        (builtin "One Step Simplification" (formula "10"))
       (rule "replaceKnownSelect_taclet1_0" (formula "10") (term "0,0,1,0,1"))
@@ -165,7 +202,7 @@
          (rule "variableDeclarationAssign" (formula "14") (term "1"))
          (rule "variableDeclaration" (formula "14") (term "1") (newnames "x_3"))
          (rule "remove_parentheses_right" (formula "14") (term "1"))
-         (rule "compound_addition_2" (formula "14") (term "1") (inst "#v0=x_4") (inst "#v1=x_5"))
+         (rule "compound_addition_2" (formula "14") (term "1") (inst "#v1=x_5") (inst "#v0=x_4"))
          (rule "variableDeclarationAssign" (formula "14") (term "1"))
          (rule "variableDeclaration" (formula "14") (term "1") (newnames "x_4"))
          (rule "assignment" (formula "14") (term "1"))
@@ -173,7 +210,7 @@
          (rule "variableDeclarationAssign" (formula "14") (term "1"))
          (rule "variableDeclaration" (formula "14") (term "1") (newnames "x_5"))
          (rule "remove_parentheses_right" (formula "14") (term "1"))
-          (builtin "Use Operation Contract" (formula "14") (newnames "heapBefore_next,result_next,exc_1,heapAfter_next,anon_heap_next") (contract "Perm[Perm::next()].JML normal_behavior operation contract.0"))
+          (builtin "Use Operation Contract" (formula "14") (newnames "heapBefore_next,result_next,exc_1,heapAfter_next,anon_heap_next") (contract "Perm[Perm::next()].JML normal_behavior operation contract.0") (modality "diamond"))
          (branch "Post (next)"
              (builtin "One Step Simplification" (formula "14"))
              (builtin "One Step Simplification" (formula "16"))
@@ -369,12 +406,12 @@
             (rule "polySimp_mulLiterals" (formula "16") (term "1,1"))
             (rule "polySimp_elimOne" (formula "16") (term "1,1"))
             (rule "polySimp_mulComm0" (formula "16") (term "0,1"))
-            (rule "newSym_eq" (formula "16") (inst "l=l_0") (inst "newSymDef=add(mul(result_next, Z(0(#))),
+            (rule "newSym_eq" (formula "16") (inst "newSymDef=add(mul(result_next, Z(0(#))),
     mul(int::seqGet(Seq::select(heap, self, Perm::$c),
                     int::select(anon_heap_LOOP_0<<anonHeapFunction>>,
                                 self,
                                 Perm::$pIdx)),
-        Z(0(#))))"))
+        Z(0(#))))") (inst "l=l_0"))
             (rule "times_zero_1" (formula "16") (term "1,1,1"))
             (rule "times_zero_1" (formula "16") (term "0,1,1"))
             (rule "add_literals" (formula "16") (term "1,1"))
@@ -417,7 +454,7 @@
             (rule "polySimp_mulLiterals" (formula "16") (term "0"))
             (rule "polySimp_elimOne" (formula "16") (term "0"))
             (rule "commute_or" (formula "21") (term "0"))
-            (rule "Class_invariant_axiom_for_Perm" (formula "19") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (inst "sk=sk_0") (ifseqformula "7"))
+            (rule "Class_invariant_axiom_for_Perm" (formula "19") (inst "sk=sk_0") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "7"))
             (branch "Use Axiom"
                 (builtin "One Step Simplification" (formula "19"))
                (rule "replaceKnownSelect_taclet0001_8" (formula "19") (term "0,0,1"))
@@ -709,7 +746,7 @@
                (rule "polySimp_mulLiterals" (formula "25") (term "1,0,1,1,0"))
                (rule "polySimp_mulComm0" (formula "25") (term "0,0,1,1,0"))
                (rule "nnf_imp2or" (formula "23") (term "0"))
-               (rule "Class_invariant_axiom_for_Perm" (formula "3") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (inst "sk=sk_1") (ifseqformula "7"))
+               (rule "Class_invariant_axiom_for_Perm" (formula "3") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "7"))
                (branch "Use Axiom"
                    (builtin "One Step Simplification" (formula "3"))
                   (rule "replaceKnownSelect_taclet1_4" (formula "3") (term "0,0,1"))
@@ -978,7 +1015,7 @@
                      (rule "applyEq" (formula "3") (term "0") (ifseqformula "2") (userinteraction))
                      (rule "applyEqReverse" (formula "16") (term "1") (ifseqformula "3") (userinteraction))
                      (rule "equal_bsum_perm1" (formula "16") (userinteraction))
-                     (rule "Class_invariant_axiom_for_Perm" (formula "11") (inst "sk=sk_0") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "8") (userinteraction))
+                     (rule "Class_invariant_axiom_for_Perm" (formula "11") (inst "sk=sk_0") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "8") (userinteraction))
                      (branch "Use Axiom"
                         (rule "true_left" (formula "1"))
                         (rule "andLeft" (formula "10"))
@@ -991,7 +1028,7 @@
                         (rule "andLeft" (formula "10"))
                         (rule "andLeft" (formula "10"))
                         (rule "seqPermSym" (formula "24") (userinteraction))
-                        (rule "seqPermDef" (formula "24") (inst "s=s_1") (inst "iv=iv") (userinteraction))
+                        (rule "seqPermDef" (formula "24") (inst "iv=iv") (inst "s=s_1") (userinteraction))
                         (rule "andRight" (formula "24"))
                         (branch "Case 1"
                             (builtin "One Step Simplification" (formula "18"))
@@ -1249,7 +1286,7 @@
                            (rule "add_zero_right" (formula "16") (term "0,0,0,0,0"))
                            (rule "inEqSimp_sepPosMonomial0" (formula "16") (term "0,0,0"))
                            (rule "mul_literals" (formula "16") (term "1,0,0,0"))
-                           (rule "Class_invariant_axiom_for_Perm" (formula "4") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "8"))
+                           (rule "Class_invariant_axiom_for_Perm" (formula "4") (inst "sk=sk_1") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "8"))
                            (branch "Use Axiom"
                                (builtin "One Step Simplification" (formula "4"))
                               (rule "replaceKnownSelect_taclet1_4" (formula "4") (term "0,0,1"))
@@ -1783,7 +1820,7 @@
                                  (rule "nnf_imp2or" (formula "1") (term "0,0,1,0"))
                                  (rule "nnf_notOr" (formula "1") (term "0,1,0"))
                                   (builtin "One Step Simplification" (formula "1"))
-                                 (rule "Class_invariant_axiom_for_Perm" (formula "5") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "9"))
+                                 (rule "Class_invariant_axiom_for_Perm" (formula "5") (inst "sk=sk_1") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "9"))
                                  (branch "Use Axiom"
                                      (builtin "One Step Simplification" (formula "5"))
                                     (rule "replaceKnownSelect_taclet1_4" (formula "5") (term "0,0,1"))
@@ -3596,7 +3633,7 @@
                                                    (rule "castDel" (formula "8") (term "0"))
                                                     (builtin "One Step Simplification" (formula "8"))
                                                    (rule "true_left" (formula "8"))
-                                                   (rule "Class_invariant_axiom_for_Perm" (formula "15") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "19"))
+                                                   (rule "Class_invariant_axiom_for_Perm" (formula "15") (inst "sk=sk_1") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "19"))
                                                    (branch "Use Axiom"
                                                        (builtin "One Step Simplification" (formula "15"))
                                                       (rule "replaceKnownSelect_taclet1_4" (formula "15") (term "0,0,1"))
@@ -4335,7 +4372,7 @@
                                                    (rule "nnf_imp2or" (formula "1") (term "0,0,1,0"))
                                                    (rule "nnf_notOr" (formula "1") (term "0,1,0"))
                                                     (builtin "One Step Simplification" (formula "1"))
-                                                   (rule "Class_invariant_axiom_for_Perm" (formula "12") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "16"))
+                                                   (rule "Class_invariant_axiom_for_Perm" (formula "12") (inst "sk=sk_1") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "16"))
                                                    (branch "Use Axiom"
                                                        (builtin "One Step Simplification" (formula "12"))
                                                       (rule "replaceKnownSelect_taclet1_4" (formula "12") (term "0,0,1"))
@@ -5871,7 +5908,7 @@
                                              (rule "nnf_imp2or" (formula "1") (term "0,0,1,0"))
                                              (rule "nnf_notOr" (formula "1") (term "0,1,0"))
                                               (builtin "One Step Simplification" (formula "1"))
-                                             (rule "Class_invariant_axiom_for_Perm" (formula "13") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "17"))
+                                             (rule "Class_invariant_axiom_for_Perm" (formula "13") (inst "sk=sk_1") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "17"))
                                              (branch "Use Axiom"
                                                  (builtin "One Step Simplification" (formula "13"))
                                                 (rule "replaceKnownSelect_taclet1_4" (formula "13") (term "0,0,1"))
@@ -6034,7 +6071,7 @@
                      (rule "inEqSimp_sepPosMonomial1" (formula "1"))
                      (rule "polySimp_mulLiterals" (formula "1") (term "1"))
                      (rule "polySimp_elimOne" (formula "1") (term "1"))
-                     (rule "Class_invariant_axiom_for_Perm" (formula "10") (inst "sk=sk_0") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "7"))
+                     (rule "Class_invariant_axiom_for_Perm" (formula "10") (inst "sk=sk_0") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "7"))
                      (branch "Use Axiom"
                          (builtin "One Step Simplification" (formula "10"))
                         (rule "andLeft" (formula "10"))
@@ -6263,7 +6300,7 @@
                         (rule "inEqSimp_sepPosMonomial1" (formula "15") (term "1,0,0"))
                         (rule "polySimp_mulLiterals" (formula "15") (term "1,1,0,0"))
                         (rule "polySimp_elimOne" (formula "15") (term "1,1,0,0"))
-                        (rule "Class_invariant_axiom_for_Perm" (formula "3") (inst "sk=sk_1") (inst "i_3=i_3") (inst "i_2=i_2") (inst "i_1=i_1") (inst "i_0=i_0") (inst "i=i") (ifseqformula "7"))
+                        (rule "Class_invariant_axiom_for_Perm" (formula "3") (inst "sk=sk_1") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (ifseqformula "7"))
                         (branch "Use Axiom"
                             (builtin "One Step Simplification" (formula "3"))
                            (rule "replaceKnownSelect_taclet1_4" (formula "3") (term "0,0,1"))
@@ -6685,14 +6722,14 @@
                            (rule "polySimp_invertEq" (formula "28"))
                            (rule "polySimp_mulLiterals" (formula "28") (term "0"))
                            (rule "mul_literals" (formula "28") (term "1"))
-                           (rule "elimGcdEq" (formula "28") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
+                           (rule "elimGcdEq" (formula "28") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
              length(int[]::select(heap, self, Perm::$a)),
              div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
                      int::seqGet(Seq::select(heap,
                                              self,
                                              Perm::$c),
                                  i)),
-                 Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))))") (inst "elimGcdRightDiv=Z(0(#))"))
+                 Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))))") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                             (builtin "One Step Simplification" (formula "28"))
                            (rule "mul_literals" (formula "28") (term "0,1,0,1,0"))
                            (rule "times_zero_1" (formula "28") (term "1,0,0,0"))
@@ -6728,14 +6765,14 @@
                            (rule "inEqSimp_commuteLeq" (formula "29") (term "0"))
                            (rule "replace_known_left" (formula "29") (term "0") (ifseqformula "13"))
                             (builtin "One Step Simplification" (formula "29"))
-                           (rule "elimGcdEq" (formula "29") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
+                           (rule "elimGcdEq" (formula "29") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
              length(int[]::select(heap, self, Perm::$a)),
              div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
                      int::seqGet(Seq::select(heap,
                                              self,
                                              Perm::$c),
                                  i)),
-                 Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))))") (inst "elimGcdRightDiv=Z(0(#))"))
+                 Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))))") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                             (builtin "One Step Simplification" (formula "29") (ifInst ""  (formula "28")))
                            (rule "add_zero_left" (formula "29") (term "0,0,0"))
                            (rule "times_zero_1" (formula "29") (term "1,0,1,0"))
@@ -6768,10 +6805,10 @@
                            (rule "inEqSimp_sepNegMonomial0" (formula "2"))
                            (rule "polySimp_mulLiterals" (formula "2") (term "0"))
                            (rule "polySimp_elimOne" (formula "2") (term "0"))
-                           (rule "elimGcdEq" (formula "31") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
+                           (rule "elimGcdEq" (formula "31") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
         int::seqGet(Seq::select(heap, self, Perm::$c),
                     i_1)),
-    Z(6(9(2(7(6(9(4(9(2(4(#))))))))))))") (inst "elimGcdRightDiv=Z(0(#))"))
+    Z(6(9(2(7(6(9(4(9(2(4(#))))))))))))") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                             (builtin "One Step Simplification" (formula "31"))
                            (rule "times_zero_1" (formula "31") (term "1,0,1,0"))
                            (rule "times_zero_1" (formula "31") (term "1,0,0,1"))
@@ -6993,7 +7030,7 @@
                               (rule "add_literals" (formula "40") (term "0,0"))
                               (rule "inEqSimp_sepPosMonomial1" (formula "40"))
                               (rule "mul_literals" (formula "40") (term "1"))
-                              (rule "elimGcdGeq_antec" (formula "40") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcdRightDiv=Z(0(#))"))
+                              (rule "elimGcdGeq_antec" (formula "40") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                               (rule "polySimp_mulLiterals" (formula "40") (term "1,0,1,0"))
                               (rule "mul_literals" (formula "40") (term "0,1,0,0,0,0,1,0"))
                               (rule "leq_literals" (formula "40") (term "0,0"))
@@ -7028,7 +7065,7 @@
                               (rule "add_literals" (formula "2") (term "0,0"))
                               (rule "inEqSimp_sepNegMonomial1" (formula "2"))
                               (rule "polySimp_mulLiterals" (formula "2") (term "0"))
-                              (rule "elimGcdLeq_antec" (formula "2") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=quotient_2") (inst "elimGcdRightDiv=Z(0(#))"))
+                              (rule "elimGcdLeq_antec" (formula "2") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=quotient_2") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                               (rule "polySimp_mulLiterals" (formula "2") (term "1,0,1,0"))
                               (rule "polySimp_mulLiterals" (formula "2") (term "1,0,0,0,0,1,0"))
                               (rule "neg_literal" (formula "2") (term "0,0,0,0,0,1,0"))
@@ -7073,7 +7110,7 @@
                               (rule "inEqSimp_contradInEq1" (formula "38") (term "0") (ifseqformula "15"))
                               (rule "qeq_literals" (formula "38") (term "0,0"))
                                (builtin "One Step Simplification" (formula "38"))
-                              (rule "newSym_eq" (formula "38") (inst "newSymDef=add(add(quotient_2,
+                              (rule "newSym_eq" (formula "38") (inst "l=l_0") (inst "newSymDef=add(add(quotient_2,
         mul(int::seqGet(Seq::select(heap,
                                     self,
                                     Perm::$c),
@@ -7101,7 +7138,7 @@
                                                            Perm::$perm),
                                                j_0))))
             \\else ((int)(seqGetOutside)),
-        Z(0(#))))") (inst "l=l_0"))
+        Z(0(#))))"))
                               (rule "times_zero_1" (formula "38") (term "1,0,1,1"))
                               (rule "times_zero_1" (formula "38") (term "1,1,1"))
                               (rule "add_zero_right" (formula "38") (term "0,1,1"))
@@ -7174,7 +7211,7 @@
                               (rule "add_literals" (formula "45") (term "0,0"))
                               (rule "inEqSimp_sepPosMonomial1" (formula "45"))
                               (rule "mul_literals" (formula "45") (term "1"))
-                              (rule "elimGcdGeq_antec" (formula "45") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=quotient_2") (inst "elimGcdRightDiv=Z(0(#))"))
+                              (rule "elimGcdGeq_antec" (formula "45") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=quotient_2") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                               (rule "mul_literals" (formula "45") (term "0,1,0,0,0,0,1,0"))
                               (rule "polySimp_mulLiterals" (formula "45") (term "1,0,1,0"))
                               (rule "leq_literals" (formula "45") (term "0,0"))
@@ -7223,7 +7260,7 @@
                               (rule "inEqSimp_contradInEq1" (formula "36") (term "0") (ifseqformula "17"))
                               (rule "qeq_literals" (formula "36") (term "0,0"))
                                (builtin "One Step Simplification" (formula "36"))
-                              (rule "newSym_eq" (formula "36") (inst "newSymDef=add(add(quotient_0,
+                              (rule "newSym_eq" (formula "36") (inst "l=l_1") (inst "newSymDef=add(add(quotient_0,
         mul(int::seqGet(Seq::select(heap,
                                     self,
                                     Perm::$c),
@@ -7251,7 +7288,7 @@
                                                            Perm::$perm),
                                                i_0))))
             \\else ((int)(seqGetOutside)),
-        Z(0(#))))") (inst "l=l_1"))
+        Z(0(#))))"))
                               (rule "times_zero_1" (formula "36") (term "1,1,1"))
                               (rule "times_zero_1" (formula "36") (term "1,0,1,1"))
                               (rule "polySimp_addLiterals" (formula "36") (term "1,1"))
@@ -7326,7 +7363,7 @@
                               (rule "add_literals" (formula "8") (term "0,0"))
                               (rule "inEqSimp_sepNegMonomial1" (formula "8"))
                               (rule "polySimp_mulLiterals" (formula "8") (term "0"))
-                              (rule "elimGcdLeq_antec" (formula "8") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcdRightDiv=Z(0(#))"))
+                              (rule "elimGcdLeq_antec" (formula "8") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                               (rule "mul_literals" (formula "8") (term "0,1,0,0,0,0,1,0"))
                               (rule "polySimp_mulLiterals" (formula "8") (term "1,0,1,0"))
                               (rule "neg_literal" (formula "8") (term "0,0,0,0,0,1,0"))
@@ -7379,7 +7416,7 @@
                               (rule "add_literals" (formula "3") (term "0,0"))
                               (rule "inEqSimp_sepNegMonomial1" (formula "3"))
                               (rule "polySimp_mulLiterals" (formula "3") (term "0"))
-                              (rule "elimGcdLeq_antec" (formula "3") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=quotient_1") (inst "elimGcdRightDiv=Z(0(#))"))
+                              (rule "elimGcdLeq_antec" (formula "3") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=quotient_1") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                               (rule "polySimp_mulLiterals" (formula "3") (term "1,0,1,0"))
                               (rule "neg_literal" (formula "3") (term "0,0,0,0,0,1,0"))
                               (rule "polySimp_mulLiterals" (formula "3") (term "1,0,0,0,0,1,0"))
@@ -7418,7 +7455,7 @@
                               (rule "add_literals" (formula "20") (term "0,0,0"))
                               (rule "leq_literals" (formula "20") (term "0,0"))
                                (builtin "One Step Simplification" (formula "20"))
-                              (rule "newSym_eq" (formula "20") (inst "newSymDef=add(mul(int::seqGet(Seq::select(heap, self, Perm::$c),
+                              (rule "newSym_eq" (formula "20") (inst "l=l_2") (inst "newSymDef=add(mul(int::seqGet(Seq::select(heap, self, Perm::$c),
                     j_0),
         Z(0(#))),
     mul(int::seqGet(Seq::select(heap, self, Perm::$b),
@@ -7426,7 +7463,7 @@
                                             self,
                                             Perm::$perm),
                                 j_0)),
-        Z(0(#))))") (inst "l=l_2"))
+        Z(0(#))))"))
                               (rule "times_zero_1" (formula "20") (term "1,1,1"))
                               (rule "times_zero_1" (formula "20") (term "0,1,1"))
                               (rule "add_literals" (formula "20") (term "1,1"))
@@ -7500,7 +7537,7 @@
                               (rule "add_literals" (formula "21") (term "0,0,0"))
                               (rule "leq_literals" (formula "21") (term "0,0"))
                                (builtin "One Step Simplification" (formula "21"))
-                              (rule "newSym_eq" (formula "21") (inst "newSymDef=add(mul(int::seqGet(Seq::select(heap, self, Perm::$c),
+                              (rule "newSym_eq" (formula "21") (inst "l=l_3") (inst "newSymDef=add(mul(int::seqGet(Seq::select(heap, self, Perm::$c),
                     i_0),
         Z(0(#))),
     mul(int::seqGet(Seq::select(heap, self, Perm::$b),
@@ -7508,7 +7545,7 @@
                                             self,
                                             Perm::$perm),
                                 i_0)),
-        Z(0(#))))") (inst "l=l_3"))
+        Z(0(#))))"))
                               (rule "times_zero_1" (formula "21") (term "1,1,1"))
                               (rule "times_zero_1" (formula "21") (term "0,1,1"))
                               (rule "add_literals" (formula "21") (term "1,1"))
@@ -7565,7 +7602,7 @@
                               (rule "inEqSimp_contradInEq1" (formula "22") (term "0") (ifseqformula "13"))
                               (rule "qeq_literals" (formula "22") (term "0,0"))
                                (builtin "One Step Simplification" (formula "22"))
-                              (rule "newSym_eq" (formula "22") (inst "newSymDef=add(add(quotient_1,
+                              (rule "newSym_eq" (formula "22") (inst "l=l_4") (inst "newSymDef=add(add(quotient_1,
         mul(int::seqGet(Seq::select(heap,
                                     self,
                                     Perm::$c),
@@ -7576,7 +7613,7 @@
                                             self,
                                             Perm::$perm),
                                 i_1)),
-        Z(0(#))))") (inst "l=l_4"))
+        Z(0(#))))"))
                               (rule "times_zero_1" (formula "22") (term "1,0,1,1"))
                               (rule "times_zero_1" (formula "22") (term "1,1,1"))
                               (rule "add_zero_right" (formula "22") (term "0,1,1"))

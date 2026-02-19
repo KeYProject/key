@@ -56,7 +56,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
+        final LoopStatement loop = svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
@@ -71,9 +71,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        // TODO: Handle exception?!
-        final JModality.JavaModalityKind modalityKind =
-            (JModality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind = svInst.getInstantiation(modalitySV);
 
         JTerm freeInvInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
@@ -87,8 +85,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
                 maybeFreeInvInst.map(inv -> tb.and(currentFreeInvInst, inv)).orElse(freeInvInst);
         }
 
-        return matchCond.setInstantiations( //
-            svInst.add(invSV, freeInvInst, services));
+        return matchCond.setInstantiations(svInst.add(invSV, freeInvInst, services));
     }
 
     @Override
