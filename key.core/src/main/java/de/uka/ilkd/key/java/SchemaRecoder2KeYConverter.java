@@ -312,9 +312,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             SchemaVariable typesv = ((TypeSVWrapper) lvd.getTypeReference()).getSV();
 
             List<recoder.java.declaration.Modifier> mods = lvd.getModifiers();
-            Modifier[] modifiers = new Modifier[mods == null ? 0 : mods.size()];
-            for (int i = 0; i < modifiers.length; i++) {
+            List<recoder.java.declaration.AnnotationUseSpecification> annots = lvd.getAnnotations();
+            var modCount = mods == null ? 0 : mods.size();
+            var annotCount = annots == null ? 0 : annots.size();
+            Modifier[] modifiers = new Modifier[modCount + annotCount];
+
+            for (int i = 0; i < modCount; i++) {
                 modifiers[i] = (Modifier) callConvert(mods.get(i));
+            }
+            for (int i = 0; i < annotCount; i++) {
+                modifiers[i + modCount] = (Modifier) callConvert(annots.get(i));
             }
 
             return new LocalVariableDeclaration(modifiers, (ProgramSV) typesv, varspecs);

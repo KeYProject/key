@@ -350,4 +350,17 @@ public class StatementBlock extends JavaStatement
     public void accept(SourceVisitor v) {
         v.visitStatementBlock(this);
     }
+
+    @Override
+    public String toString() {
+        var out = "{" + System.lineSeparator();
+
+        for (var statement : body) {
+            out += "    " + statement.toString() + System.lineSeparator();
+        }
+
+        out += "}" + System.lineSeparator();
+
+        return out;
+    }
 }

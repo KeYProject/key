@@ -438,4 +438,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     public void accept(SourceVisitor v) {
         v.visitVariableSpecification(this);
     }
+
+    @Override
+    public String toString() {
+        return getFullName();
+    }
 }

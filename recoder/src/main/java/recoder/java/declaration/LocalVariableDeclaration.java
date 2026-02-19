@@ -343,4 +343,14 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public void accept(SourceVisitor v) {
         v.visitLocalVariableDeclaration(this);
     }
+
+    @Override
+    public String toString() {
+        var declspecs = getDeclarationSpecifiers();
+
+        return declspecs == null ? ""
+                : declspecs.toString()
+                    + " " + getTypeReference().toString()
+                    + " " + varSpecs.toString() + ";";
+    }
 }
