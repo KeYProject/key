@@ -172,7 +172,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             b.setAnnotations(tacletAnnotations);
             b.setOrigin(BuilderHelpers.getPosition(ctx));
             Taclet r = b.getTaclet();
-            registerTaclet(ctx, r);
+            String doc = processDocumentation(ctx.doc);
+            registerTaclet(ctx, r, doc);
             currentTBuilder.pop();
             return r;
         }
@@ -185,9 +186,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             ifSeq = accept(ctx.ifSeq);
         }
 
-        @Nullable
         Object find = accept(ctx.find);
-        Sequent seq = find instanceof Sequent ? (Sequent) find : null;
+        Sequent seq = (find instanceof Sequent s) ? s : null;
 
         var applicationRestriction = ApplicationRestriction.NONE;
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
@@ -219,7 +219,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setOrigin(BuilderHelpers.getPosition(ctx));
         try {
             Taclet r = peekTBuilder().getTaclet();
-            registerTaclet(ctx, r);
+            String doc = processDocumentation(ctx.doc);
+            registerTaclet(ctx, r, doc);
             setSchemaVariables(schemaVariables().parent());
             currentTBuilder.pop();
             return r;
@@ -236,8 +237,10 @@ public class TacletPBuilder extends ExpressionBuilder {
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
     }
 
-    private void registerTaclet(ParserRuleContext ctx, Taclet taclet) {
+    private void registerTaclet(ParserRuleContext ctx, Taclet taclet,
+            @Nullable String documentation) {
         taclet2Builder.put(taclet, peekTBuilder());
+        docsSpace().describe(taclet, documentation);
         LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
     }
@@ -742,7 +745,6 @@ public class TacletPBuilder extends ExpressionBuilder {
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 
-        @Nullable
         Object rwObj = accept(ctx.replacewith());
         if (ctx.add() != null) {
             addSeq = accept(ctx.add());

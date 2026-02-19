@@ -176,7 +176,7 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
-        return get(name, Boolean.class);
+        return Boolean.TRUE.equals(get(name, Boolean.class));
     }
 
     /**
@@ -350,7 +350,7 @@ public class Configuration {
     /**
      * @see #getTable(String)
      */
-    public Configuration getSection(String name) {
+    public @Nullable Configuration getSection(String name) {
         return getTable(name);
     }
 
@@ -365,39 +365,39 @@ public class Configuration {
         return getSection(name);
     }
 
-    public Object set(String name, Object obj) {
+    public @Nullable Object set(String name, @Nullable Object obj) {
         return data.put(name, obj);
     }
 
-    public Object set(String name, Boolean obj) {
+    public @Nullable Object set(String name, @Nullable Boolean obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, String obj) {
+    public @Nullable Object set(String name, @Nullable String obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, Long obj) {
+    public @Nullable Object set(String name, @Nullable Long obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, int obj) {
+    public @Nullable Object set(String name, int obj) {
         return set(name, (long) obj);
     }
 
-    public Object set(String name, Double obj) {
+    public @Nullable Object set(String name, @Nullable Double obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, Configuration obj) {
+    public @Nullable Object set(String name, @Nullable Configuration obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, List<?> obj) {
+    public @Nullable Object set(String name, @Nullable List<?> obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, String[] seq) {
+    public @Nullable Object set(String name, @Nullable String[] seq) {
         return set(name, (Object) Arrays.asList(seq));
     }
 

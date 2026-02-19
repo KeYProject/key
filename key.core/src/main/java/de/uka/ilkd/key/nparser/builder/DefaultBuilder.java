@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +35,8 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
@@ -256,6 +260,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().choices();
     }
 
+    protected DocSpace docsSpace() {
+        return namespaces().docs();
+    }
+
+
     @Override
     public String visitString_value(KeYParser.String_valueContext ctx) {
         return ctx.getText().substring(1, ctx.getText().length() - 1);
@@ -408,4 +417,28 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
         return ctx.getText();
     }
+
+
+    protected String processDocumentation(TerminalNode terminalNode) {
+        if (terminalNode != null)
+            return processDocumentation(terminalNode.getSymbol());
+        return null;
+    }
+
+    protected String processDocumentation(List<Token> maindoc) {
+        return maindoc.stream().map(this::processDocumentation).collect(Collectors.joining("\n\n"));
+    }
+
+    protected String processDocumentation(Token doc) {
+        if (doc == null) {
+            return null;
+        }
+
+        var text = doc.getText();
+        int prefix = doc.getCharPositionInLine() + 2;
+        Pattern REMOVE_INDENT = Pattern.compile("^[ ]{1," + prefix + "}", Pattern.MULTILINE);
+        text = text.strip().substring(3, text.length() - 2);
+        return REMOVE_INDENT.matcher(text).replaceAll("").trim();
+    }
+
 }

@@ -153,14 +153,21 @@ public class JavacExtension
             lblStatus.setText("Javac runs");
             lblStatus.setIcon(ICON_WAIT.get(16));
 
-            CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
+
             try {
-                task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
-                    lblStatus.setText("Javac finished");
-                    data.issues = it;
-                    updateLabel(data);
-                })).get();
+                try {
+                    CompletableFuture<List<PositionedIssueString>> task =
+                        JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath,
+                            javaPath);
+
+                    task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
+                        lblStatus.setText("Javac finished");
+                        data.issues = it;
+                        updateLabel(data);
+                    })).get();
+                } catch (IllegalArgumentException iae) {
+                    LOGGER.error("Javac check failed {}", iae.getMessage());
+                }
             } catch (InterruptedException | ExecutionException ex) {
                 throw new RuntimeException(ex);
             }

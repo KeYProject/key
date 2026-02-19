@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -16,9 +15,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.ParsingFacade;
 
 import org.key_project.logic.Choice;
+import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -64,27 +63,26 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        // boolean freeAdt = ctx.FREE() != null;
         var name = ctx.name.getText();
-        var doc = ctx.DOC_COMMENT() != null
-                ? ctx.DOC_COMMENT().getText()
-                : null;
+        var doc = processDocumentation(ctx.doc);
         var origin = BuilderHelpers.getPosition(ctx);
-        var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
+        var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, origin);
         sorts().addSafely(s);
+        docsSpace().describe(s, doc);
         return null;
     }
 
     @Override
     public Object visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
-        for (int i = 0; i < ctx.simple_ident_comma_list().size(); i++) {
-            List<String> varNames = accept(ctx.simple_ident_comma_list(i));
+        for (int i = 0; i < ctx.simple_ident_comma_list_with_docs().size(); i++) {
+            var c = ctx.simple_ident_comma_list_with_docs(i);
+            List<String> varNames = c.simple_ident_with_doc()
+                    .stream().map(it -> (String) accept(it.simple_ident())).toList();
             KeYJavaType kjt = accept(ctx.keyjavatype(i));
             assert varNames != null;
             for (String varName : varNames) {
                 if (varName.equals("null")) {
-                    semanticError(ctx.simple_ident_comma_list(i),
-                        "Function '" + varName + "' is already defined!");
+                    semanticError(c, "Function '" + varName + "' is already defined!");
                 }
                 ProgramElementName pvName = new ProgramElementName(varName);
                 Named name = lookup(pvName);
@@ -92,8 +90,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                     // commented out as pv do not have unique name (at the moment)
                     // throw new AmbigiousDeclException(varName, getSourceName(), getLine(),
                     // getColumn())
-                    if (!(name instanceof ProgramVariable)
-                            || !((ProgramVariable) name).getKeYJavaType().equals(kjt)) {
+                    if (!(name instanceof ProgramVariable pv)
+                            || !(pv.getKeYJavaType().equals(kjt))) {
                         programVariables().add(new LocationVariable(pvName, kjt));
                     }
                 } else {
@@ -108,21 +106,30 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
+        String catDoc = processDocumentation(ctx.maindoc);
+        docsSpace().describe(new HasDocumentation.OptionCategory(cat), catDoc);
+
         for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
             String name = cat + ":" + catctx.getText();
+
             Choice c = choices().lookup(new Name(name));
             if (c == null) {
                 c = new Choice(catctx.getText(), cat);
                 choices().add(c);
+
+                var doc = processDocumentation(optdecl.DOC_COMMENT);
+                docsSpace().describe(c, doc);
             }
             category2Default.putIfAbsent(cat, name);
         }
+
         category2Default.computeIfAbsent(cat, it -> {
-            choices().add(new Choice("On", cat));
-            choices().add(new Choice("Off", cat));
+            choices().add(new Choice(cat + ":On", cat));
+            choices().add(new Choice(cat + ":Off", cat));
             return cat + ":On";
         });
+
         return null;
     }
 
@@ -142,9 +149,9 @@ public class DeclarationBuilder extends DefaultBuilder {
         boolean isProxySort = ctx.PROXY() != null;
         boolean isAbstractSort = ctx.ABSTRACT() != null;
         List<Sort> createdSorts = new LinkedList<>();
-        var documentation = ParsingFacade.getValueDocumentation(ctx.DOC_COMMENT());
-        for (var idCtx : ctx.sortIds.simple_ident_dots()) {
-            String sortId = accept(idCtx);
+        var sectionDoc = processDocumentation(ctx.DOC_COMMENT());
+        for (var idCtx : ctx.sortIds.simple_ident_dots_with_docs()) {
+            String sortId = accept(idCtx.simple_ident_dots());
             Name sortName = new Name(sortId);
 
             ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
@@ -158,7 +165,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 Sort s = null;
                 if (isGenericSort) {
                     try {
-                        var gs = new GenericSort(sortName, ext, oneOf, documentation,
+                        var gs = new GenericSort(sortName, ext, oneOf,
                             BuilderHelpers.getPosition(idCtx));
                         s = gs;
                     } catch (GenericSupersortException e) {
@@ -168,16 +175,19 @@ public class DeclarationBuilder extends DefaultBuilder {
                     s = JavaDLTheory.ANY;
                 } else {
                     if (isProxySort) {
-                        var ps = new ProxySort(sortName, ext, documentation,
-                            BuilderHelpers.getPosition(idCtx));
+                        var ps = new ProxySort(sortName, ext, BuilderHelpers.getPosition(idCtx));
                         s = ps;
                     } else {
                         var si = new SortImpl(sortName, ext, isAbstractSort,
-                            documentation, BuilderHelpers.getPosition(idCtx));
+                            BuilderHelpers.getPosition(idCtx));
                         s = si;
                     }
                 }
                 assert s != null;
+                String doc = processDocumentation(idCtx.DOC_COMMENT());
+                docsSpace().describe(s,
+                    Stream.of(doc, sectionDoc).filter(Objects::nonNull)
+                            .collect(Collectors.joining("\n")));
                 sorts().add(s);
                 createdSorts.add(s);
             } else {
@@ -210,10 +220,13 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
-        for (String id : this.<String>mapOf(ctx.simple_ident())) {
+        for (KeYParser.Simple_ident_with_docContext iddoc : ctx.simple_ident_with_doc()) {
+            String id = accept(iddoc.simple_ident());
+            String doc = processDocumentation(iddoc.DOC_COMMENT());
             RuleSet h = new RuleSet(new Name(id));
             if (ruleSets().lookup(new Name(id)) == null) {
                 ruleSets().add(h);
+                docsSpace().describe(h, doc);
             }
         }
         return null;
@@ -224,6 +237,5 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitOptions_choice(KeYParser.Options_choiceContext ctx) {
         return null;
     }
-
 
 }

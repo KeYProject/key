@@ -9,12 +9,11 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 public class ProxySort extends SortImpl {
-
-    public ProxySort(Name name, ImmutableSet<Sort> ext, String documentation, String origin) {
-        super(name, ext, false, documentation, origin);
+    public ProxySort(Name name, ImmutableSet<Sort> ext, String origin) {
+        super(name, ext, false, origin);
     }
 
     public ProxySort(Name name) {
-        this(name, DefaultImmutableSet.nil(), "", "");
+        this(name, DefaultImmutableSet.nil(), "");
     }
 }

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -49,6 +50,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.PathList;
@@ -68,6 +70,7 @@ public final class ProblemInitializer {
      */
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+    private @Nullable Configuration additionalProfileOptions;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -81,13 +84,22 @@ public final class ProblemInitializer {
     }
 
     public ProblemInitializer(Profile profile) {
-        if (profile == null) {
-            throw new IllegalArgumentException("Given profile is null");
-        }
+        this(null, new Services(Objects.requireNonNull(profile, "Given profile is null")), null);
+    }
 
-        this.progMon = null;
-        this.listener = null;
-        this.services = new Services(Objects.requireNonNull(profile));
+    public ProblemInitializer(Profile profile, @Nullable Configuration additionalProfileOptions) {
+        this(profile);
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    /// An arbitrary object which is passed to the provided profile, during construction of the
+    /// `initConfig`.
+    public @Nullable Configuration getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
     }
 
     private void progressStarted(Object sender) {
@@ -443,14 +455,14 @@ public final class ProblemInitializer {
                     for (var tacletBase : tacletBases) {
                         KeYFile tacletBaseFile = new KeYFile(
                             "taclet base (%s)".formatted(tacletBase.file().getFileName()),
-                            tacletBase, progMon, profile);
+                            tacletBase, progMon, profile, null);
                         readEnvInput(tacletBaseFile, currentBaseConfig);
                     }
                 }
                 // remove traces of the generic sorts within the base configuration
                 cleanupNamespaces(currentBaseConfig);
 
-                profile.prepareInitConfig(currentBaseConfig);
+                profile.prepareInitConfig(currentBaseConfig, additionalProfileOptions);
 
                 baseConfig = currentBaseConfig;
             }
@@ -543,9 +555,8 @@ public final class ProblemInitializer {
                 if (type instanceof ClassDeclaration || type instanceof InterfaceDeclaration) {
                     for (Field f : javaInfo.getAllFields((TypeDeclaration) type)) {
                         final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-                        if (pv instanceof LocationVariable) {
-                            heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                initConfig.getServices());
+                        if (pv instanceof LocationVariable lv) {
+                            heapLDT.getFieldSymbolForPV(lv, initConfig.getServices());
                         }
                     }
                 }

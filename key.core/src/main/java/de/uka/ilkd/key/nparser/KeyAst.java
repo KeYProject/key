@@ -201,6 +201,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 throw new RuntimeException("Error in configuration. Source: "
                     + ctx.start.getTokenSource().getSourceName());
         }
+
+        public List<Configuration> asConfigurationList() {
+            final var cfg = new ConfigurationBuilder();
+            List<Object> res = cfg.visitCfile(ctx);
+            if (!res.isEmpty())
+                return (List<Configuration>) res.getFirst();
+            else
+                throw new RuntimeException("Error in configuration. Source: "
+                    + ctx.start.getTokenSource().getSourceName());
+        }
     }
 
     public static class SetStatementContext extends KeyAst<JmlParser.Set_statementContext> {

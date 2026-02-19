@@ -605,4 +605,15 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     public boolean isApplicableOnSubTerms() {
         return true;
     }
+
+    @Override
+    public @Nullable String getDocumentation() {
+        return """
+                                Methods and model fields may be annotated with an accessible clause. This defines a dependency contract describing the heap locations its value may depend on.
+
+                If the heap changes in locations the symbol does not depend on, its value remains unchanged. This rules adds an according implication for a heap-dependent symbol to the sequent's antecedent.
+
+                In automatic strategy, this rule is applied lazily (only once all other means of advancing the proof have been exhausted) to avoid endless loops.</entry>
+                """;
+    }
 }
