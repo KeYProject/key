@@ -5,14 +5,18 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -138,6 +142,11 @@ public class ProveTest {
                     LOGGER.info("({}) Finished proof: {}", caseId,
                         (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile.toFile());
+
+                    var path = Paths.get("proofs",
+                        loadedProof.getProofFile().getFileName() + ".proof.xml");
+                    saveProofXml(loadedProof, path);
+
                     if (success) {
                         reload(proofFile, loadedProof);
                     }
@@ -160,6 +169,27 @@ public class ProveTest {
         if (!success) {
             fail(message);
         }
+    }
+
+    public static void saveProofXml(Proof loadedProof, Path path) throws IOException {
+        Files.createDirectories(path.getParent());
+        try (var out = new PrintWriter(new GZIPOutputStream(Files.newOutputStream(path)))) {
+            toXml(out, loadedProof.root());
+        }
+    }
+
+    private static void toXml(PrintWriter out, Node node) {
+        out.format("\n<node label=\"%s\" taclet=\"%s\">", node.getNodeInfo().getBranchLabel(),
+                node.getAppliedRuleApp().rule().name());
+        out.format("\n<raw><![CDATA[%s]]>\n</raw>", node.sequent());
+        out.format("\n<lpr><![CDATA[%s]]>\n</lpr>",
+            LogicPrinter.quickPrintSequent(node.sequent(), node.proof().getServices()));
+        out.format("\n<children>\n");
+        for (Node child : node.children()) {
+            toXml(out, child);
+        }
+        out.format("</children>\n");
+        out.format("</node>\n");
     }
 
     /**
