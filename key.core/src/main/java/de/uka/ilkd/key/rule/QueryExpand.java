@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -669,7 +670,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

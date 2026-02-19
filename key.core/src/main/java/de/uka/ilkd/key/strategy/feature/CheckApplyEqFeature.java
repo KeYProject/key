@@ -15,6 +15,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
  * rule application must not be one side of an equation that is the instantiation of the first
@@ -27,7 +29,8 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     private CheckApplyEqFeature() {}
 
     @Override
-    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@MonotonicNonNull TacletApp p_app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Need to know the position of " + "the application of the taclet";
 
         AssumesFormulaInstantiation ifInst = p_app.assumesFormulaInstantiations().head();

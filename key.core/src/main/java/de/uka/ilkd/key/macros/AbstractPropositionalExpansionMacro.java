@@ -61,7 +61,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+    protected org.key_project.prover.strategy.Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
             allowOSS());
@@ -85,15 +85,15 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * This strategy accepts all rule apps for which the rule name is in the admitted set and
      * rejects everything else.
      */
-    private static class PropExpansionStrategy implements Strategy<Goal> {
-
+    private static class PropExpansionStrategy implements JavaStrategy {
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
-        private final Strategy<@NonNull Goal> delegate;
+        private final org.key_project.prover.strategy.Strategy<@NonNull Goal> delegate;
         private final boolean allowOSS;
 
-        public PropExpansionStrategy(Strategy<@NonNull Goal> delegate,
+        public PropExpansionStrategy(
+                org.key_project.prover.strategy.Strategy<@NonNull Goal> delegate,
                 Set<String> admittedRuleNames,
                 boolean allowOSS) {
             this.delegate = delegate;
@@ -135,13 +135,12 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
+                org.key_project.prover.strategy.RuleAppCostCollector collector) {
         }
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
             return false;
         }
-
     }
 }

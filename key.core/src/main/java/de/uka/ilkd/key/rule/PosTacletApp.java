@@ -93,7 +93,7 @@ public class PosTacletApp extends TacletApp {
      * __OPTIMIZE__ If this method is needed more than once caching the result should be considered.
      *
      * @return the set of the logicvariables that are bound for the indicated application position
-     *         of the TacletApp.
+     *         of the ITacletApp.
      */
     private static Set<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
             PosInOccurrence pos) {
@@ -148,11 +148,11 @@ public class PosTacletApp extends TacletApp {
 
 
     /**
-     * adds a new instantiation to this TacletApp
+     * adds a new instantiation to this ITacletApp
      *
      * @param sv the SchemaVariable to be instantiated
      * @param term the Term the SchemaVariable is instantiated with
-     * @return the new TacletApp
+     * @return the new ITacletApp
      */
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, SyntaxElement term, boolean interesting,
@@ -170,7 +170,7 @@ public class PosTacletApp extends TacletApp {
 
     /**
      * creates a new Taclet application containing all the instantiations given by the
-     * SVInstantiations and the ones of this TacletApp
+     * SVInstantiations and the ones of this ITacletApp
      *
      * @param svi the SVInstantiations whose entries are the needed instantiations
      * @return the new Taclet application

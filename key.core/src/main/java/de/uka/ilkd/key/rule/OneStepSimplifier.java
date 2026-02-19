@@ -12,7 +12,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -81,10 +81,11 @@ public final class OneStepSimplifier implements BuiltInRule {
      * "evaluate_instanceof"; in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets = ImmutableSLList.<String>nil()
-            .append("concrete").append("update_elim").append("update_apply_on_update")
+            .append("concrete").append("concrete_java").append("update_elim")
+            .append("update_apply_on_update")
             .append("update_apply").append("update_join").append("elimQuantifier");
 
-    private static final boolean[] bottomUp = { false, false, true, true, true, false };
+    private static final boolean[] bottomUp = { false, false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
 
@@ -267,7 +268,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 protocol.add(app);
             }
             return result;
-            // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
+            // TODO Idea: return new Pair<ITacletApp, SequentFormula>(null, null);
         }
         return null;
     }
@@ -688,7 +689,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         return result;
     }
 
-
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
@@ -724,7 +724,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new OneStepSimplifierRuleApp(this, pos);
     }
 

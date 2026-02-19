@@ -22,10 +22,12 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
+
+import org.key_project.prover.strategy.Strategy;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -45,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * As future work this class should not show a fixed content defined by {@link #DEFINITION}. Instead
  * it should update the UI controls based on the currently active proof and its {@link Profile}
- * since different {@link Profile}s support different {@link Strategy}s with different
+ * since different {@link Profile}s support different {@link JavaStrategy}s with different
  * {@link StrategyProperties}. For more information have a look at:
  * {@code http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1359}
  * </p>

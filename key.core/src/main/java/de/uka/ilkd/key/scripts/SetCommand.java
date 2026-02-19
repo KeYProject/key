@@ -14,9 +14,11 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.prover.strategy.Strategy;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -41,7 +43,7 @@ public class SetCommand extends AbstractCommand {
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
                 args.oneStepSimplification ? StrategyProperties.OSS_ON
                         : StrategyProperties.OSS_OFF);
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
         }
         if (args.proofSteps != null) {

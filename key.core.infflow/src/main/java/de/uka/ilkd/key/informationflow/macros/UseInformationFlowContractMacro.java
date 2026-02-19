@@ -14,13 +14,13 @@ import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleAppCostCollector;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -166,7 +166,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name starts with a string in the
      * admitted set and rejects everything else.
      */
-    protected class PropExpansionStrategy implements Strategy<Goal> {
+    protected class PropExpansionStrategy implements JavaStrategy {
 
         private final Name NAME =
             new Name(UseInformationFlowContractMacro.PropExpansionStrategy.class.getSimpleName());

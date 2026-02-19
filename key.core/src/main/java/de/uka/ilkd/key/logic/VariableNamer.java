@@ -432,7 +432,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
-        // determine posOfDeclaration from TacletApp
+        // determine posOfDeclaration from ITacletApp
         ContextStatementBlockInstantiation cie = app.instantiations().getContextInstantiation();
         PosInProgram posOfDeclaration = (cie == null ? null : cie.prefix());
 

@@ -14,6 +14,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -28,15 +30,18 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
     private DiffFindAndReplacewithFeature() {}
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@MonotonicNonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 
-        for (TacletGoalTemplate template : app.rule().goalTemplates()) {
-            final JTerm replaceWith = ((RewriteTacletGoalTemplate) template).replaceWith();
-            if (replaceWith.equalsModProperty(pos.subTerm(),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                return false;
+        for (TacletGoalTemplate template : app.taclet().goalTemplates()) {
+            if (template instanceof RewriteTacletGoalTemplate rwTGT) {
+                final JTerm replaceWith = rwTGT.replaceWith();
+                if (replaceWith.equalsModProperty(pos.subTerm(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    return false;
+                }
             }
         }
         return true;

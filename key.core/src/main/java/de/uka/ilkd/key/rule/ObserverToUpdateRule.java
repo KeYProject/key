@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -108,7 +108,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

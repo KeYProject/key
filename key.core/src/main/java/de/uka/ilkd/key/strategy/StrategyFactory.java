@@ -24,11 +24,13 @@ public interface StrategyFactory extends Named {
      * @param strategyProperties the StrategyProperties to customize the strategy
      * @return the newly created strategy
      */
-    Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties);
+    org.key_project.prover.strategy.Strategy<@NonNull Goal> create(Proof proof,
+            StrategyProperties strategyProperties);
 
     /**
      * Returns the {@link StrategySettingsDefinition} which describes how an user interface has to
-     * look like to edit {@link StrategySettings} supported by created {@link Strategy} instances.
+     * look like to edit {@link StrategySettings} supported by created {@link JavaStrategy}
+     * instances.
      *
      * @return The {@link StrategySettingsDefinition} which describes the user interface.
      */
