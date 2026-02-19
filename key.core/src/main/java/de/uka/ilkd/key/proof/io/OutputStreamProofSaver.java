@@ -55,6 +55,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class OutputStreamProofSaver {
     protected final boolean saveProofSteps;
     /// Whether steps by the [OneStepSimplifier] should be expanded.
     protected final boolean expandOneStepSimplifier;
-    private int skipTopLevelStepAfterOSS = 0;
+    private ImmutableList<Integer> skipTopLevelStepAfterOSS = ImmutableSLList.nil();
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -355,16 +356,19 @@ public class OutputStreamProofSaver {
          * deleted, as the formula to be removed was never added in the first place.
          */
         String tacletName = appliedRuleApp.taclet().name().toString();
-        if (expandOneStepSimplifier && skipTopLevelStepAfterOSS > 0
-                && (tacletName.equals("false_right") || tacletName.equals("true_left"))) {
-            skipTopLevelStepAfterOSS = 0;
+        if (expandOneStepSimplifier && !skipTopLevelStepAfterOSS.isEmpty()
+                && (tacletName.equals("false_right") || tacletName.equals("true_left"))
+                && node.sequent().formulaNumberInSequent(
+                    appliedRuleApp.posInOccurrence()) == skipTopLevelStepAfterOSS.head()) {
+            skipTopLevelStepAfterOSS = skipTopLevelStepAfterOSS.tail();
             return;
         }
         output.append(prefix);
         output.append("(rule \"");
         output.append(tacletName);
         output.append("\"");
-        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
+        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence(),
+            skipTopLevelStepAfterOSS.size()));
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
         final ImmutableList<AssumesFormulaInstantiation> l =
@@ -562,7 +566,8 @@ public class OutputStreamProofSaver {
         output.append("(builtin \"");
         output.append(appliedRuleApp.rule().name().toString());
         output.append("\"");
-        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
+        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence(),
+            skipTopLevelStepAfterOSS.size()));
 
         output.append(newNames2Proof(node));
         output.append(builtinRuleAssumesInsts(node, appliedRuleApp.assumesInsts()));
@@ -657,7 +662,7 @@ public class OutputStreamProofSaver {
                         && ta.assumesFormulaInstantiations()
                                 .head() instanceof AssumesFormulaInstSeq afis
                         && afis.inAntecedent()) {
-                    skipTopLevelStepAfterOSS = seqFNum;
+                    skipTopLevelStepAfterOSS = skipTopLevelStepAfterOSS.prepend(seqFNum);
                     return;
                 }
                 if (ta.posInOccurrence().isTopLevel() && !ta.posInOccurrence().isInAntec()
@@ -665,7 +670,7 @@ public class OutputStreamProofSaver {
                         && ta.assumesFormulaInstantiations()
                                 .head() instanceof AssumesFormulaInstSeq afis
                         && !afis.inAntecedent()) {
-                    skipTopLevelStepAfterOSS = seqFNum;
+                    skipTopLevelStepAfterOSS = skipTopLevelStepAfterOSS.prepend(seqFNum);
                     return;
                 }
                 printSingleTacletApp(ta, n, prefix, output, true);
@@ -770,12 +775,13 @@ public class OutputStreamProofSaver {
     }
 
     public static String posInOccurrence2Proof(Sequent seq,
-            PosInOccurrence pos) {
+            PosInOccurrence pos, int skips) {
         if (pos == null) {
             return "";
         }
+        int inSequent = seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula()) - skips;
         return " (formula \""
-            + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+            + inSequent
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
@@ -860,7 +866,8 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final PosInOccurrence posOfAssumesInstatiation : assumesInstantiations) {
             s.append(" (ifInst \"\" ");
-            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation));
+            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation,
+                skipTopLevelStepAfterOSS.size()));
             s.append(")");
         }
         return s.toString();

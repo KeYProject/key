@@ -236,7 +236,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
                     Sequent seq =
                         sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
-                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
+                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc, 0);
 
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
                     extensionStr.setEmptyValue("");
