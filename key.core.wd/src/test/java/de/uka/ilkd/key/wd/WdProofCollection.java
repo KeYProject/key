@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
-import static de.uka.ilkd.key.proof.runallproofs.ProofCollections.loadFromFile;
+import static de.uka.ilkd.key.proof.runallproofs.GenerateUnitTestsUtil.loadFromFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WdProofCollection {
@@ -147,10 +147,10 @@ public class WdProofCollection {
         g.provable("./firstTouch/10-SITA/SITA3_rearrangeWithWDLoop.key");
         g.provable("./firstTouch/10-SITA/SITA3_swapWD.key");
 
-        g = c.group("wd_blockcontracts");
+        // g = c.group("wd_blockcontracts");
         // g.notprovable("./heap/block_contracts/GreatestCommonDivisor_ofWithWD.key");
 
-        g = c.group("wd_fm12_01_LRS");
+        // g = c.group("wd_fm12_01_LRS");
         // g.notprovable("./heap/fm12_01_LRS/LCP_lcpWD.key");
         // g.notprovable("./heap/fm12_01_LRS/LRS_doLRSWD.key");
         // g.notprovable("./heap/fm12_01_LRS/SuffixArray_invariantWD.key");

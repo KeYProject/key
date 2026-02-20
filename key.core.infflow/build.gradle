@@ -2,7 +2,8 @@
 
 dependencies {
     api(project(":key.core"))
-    testImplementation(project(":key.core").sourceSets.test.output)
+
+    testImplementation(testFixtures(project(":key.core")))
 }
 
 
