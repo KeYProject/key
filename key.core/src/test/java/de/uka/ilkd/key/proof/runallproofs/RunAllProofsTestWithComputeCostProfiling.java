@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof.runallproofs.performance;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.performance.ProfilingDirectories;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 
 import org.key_project.prover.rules.RuleApp;

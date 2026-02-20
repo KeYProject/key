@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testfixtures;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -16,17 +19,20 @@ import org.slf4j.LoggerFactory;
  * @version 1 (2/17/26)
  */
 public class TestLogMgr implements AfterTestExecutionCallback, BeforeTestExecutionCallback {
-    private static ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
-            .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+    private static ch.qos.logback.classic.Logger root =
+        (ch.qos.logback.classic.Logger) LoggerFactory
+                .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 
     private static final ConsoleAppender<ILoggingEvent> consoleAppender;
 
-    private static final StringListAppender<ILoggingEvent> listAppender = new StringListAppender<>();
+    private static final StringListAppender<ILoggingEvent> listAppender =
+        new StringListAppender<>();
 
     static {
         consoleAppender = (ConsoleAppender<ILoggingEvent>) root.getAppender("STDOUT");
         listAppender.setContext(consoleAppender.getContext());
-        listAppender.setLayout(((LayoutWrappingEncoder<ILoggingEvent>) consoleAppender.getEncoder()).getLayout());
+        listAppender.setLayout(
+            ((LayoutWrappingEncoder<ILoggingEvent>) consoleAppender.getEncoder()).getLayout());
         listAppender.start();
     }
 

@@ -9,7 +9,9 @@ import java.util.*;
 
 /**
  * This class allows to write test-results into XML like JUnit.
- * https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
+ * <a href=
+ * "https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports">JUNIT
+ * Format</a>
  *
  * @author Alexander Weigl
  * @version 1 (8/5/20)
@@ -91,7 +93,7 @@ public class JunitXmlWriter implements AutoCloseable {
                 time));
     }
 
-    enum TestCaseState {
+    public enum TestCaseState {
         FAILED,
         ERROR,
         SUCCESS,

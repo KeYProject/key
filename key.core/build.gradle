@@ -1,5 +1,7 @@
 plugins {
     id 'org.javacc.javacc' version '4.0.3'
+
+    id 'java-test-fixtures'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
@@ -19,6 +21,10 @@ dependencies {
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
+
+    // test fixtures
+
+    testFixturesApi(testFixtures(project(":key.util")))
 }
 
 // The target directory for JavaCC (parser generation)
