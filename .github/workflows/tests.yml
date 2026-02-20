@@ -28,7 +28,8 @@ jobs:
         modules: [
           keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
-          key.util, key.core.example, keyext.caching, keyext.proofmanagement]
+          key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
+          keyext.proofmanagement]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
