@@ -82,7 +82,6 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     public void check(Services javaServ, KeYJavaType containingClass) throws ConvertException {
-
         if (functionSymbol == null) {
             throw new ConvertException("null function symbol");
         }
@@ -106,7 +105,9 @@ public class DLEmbeddedExpression extends Operator {
         String qualifier =
             name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
         name = name.substring(name.lastIndexOf('.') + 1);
-        TypeRef tr = new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
+        ProgramElementName peName = qualifier.isEmpty() ? new ProgramElementName(name)
+                : new ProgramElementName(name, qualifier);
+        TypeRef tr = new TypeRef(peName, 0, null, containingClass);
         ExecutionContext ec = new ExecutionContext(tr, null, null);
 
         for (int i = 0; i < actual; i++) {
@@ -114,7 +115,6 @@ public class DLEmbeddedExpression extends Operator {
             KeYJavaType kjtExpected = getKeYJavaType(javaServ, argSort);
 
             Expression child = children.get(i);
-
 
             KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
 
