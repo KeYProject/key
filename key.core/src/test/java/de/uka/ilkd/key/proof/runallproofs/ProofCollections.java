@@ -11,10 +11,6 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
-import org.key_project.util.java.IOUtil;
-
-import org.junit.jupiter.api.Assertions;
-
 /**
  * This class configuress the "runAllProofs" test runs.
  *
@@ -108,7 +104,7 @@ public class ProofCollections {
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
         // settings.setRunOnlyOn("performance, performancePOConstruction");
 
-        settings.setKeySettings(loadFromFile("automaticJAVADL.properties"));
+        settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 
         var c = new ProofCollection(settings);
 
@@ -1008,12 +1004,4 @@ public class ProofCollections {
         }
         return c;
     }
-
-
-    public static String loadFromFile(String name) throws IOException {
-        var stream = ProofCollections.class.getResourceAsStream(name);
-        Assertions.assertNotNull(stream, "Failed to find " + name);
-        return IOUtil.readFrom(stream);
-    }
-
 }
