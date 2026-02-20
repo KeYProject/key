@@ -55,7 +55,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -83,7 +82,6 @@ public class OutputStreamProofSaver {
     protected final boolean saveProofSteps;
     /// Whether steps by the [OneStepSimplifier] should be expanded.
     protected final boolean expandOneStepSimplifier;
-    private ImmutableList<Integer> skipTopLevelStepAfterOSS = ImmutableSLList.nil();
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -356,19 +354,11 @@ public class OutputStreamProofSaver {
          * deleted, as the formula to be removed was never added in the first place.
          */
         String tacletName = appliedRuleApp.taclet().name().toString();
-        if (expandOneStepSimplifier && !skipTopLevelStepAfterOSS.isEmpty()
-                && (tacletName.equals("false_right") || tacletName.equals("true_left"))
-                && node.sequent().formulaNumberInSequent(
-                    appliedRuleApp.posInOccurrence()) == skipTopLevelStepAfterOSS.head()) {
-            skipTopLevelStepAfterOSS = skipTopLevelStepAfterOSS.tail();
-            return;
-        }
         output.append(prefix);
         output.append("(rule \"");
         output.append(tacletName);
         output.append("\"");
-        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence(),
-            skipTopLevelStepAfterOSS.size()));
+        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
         final ImmutableList<AssumesFormulaInstantiation> l =
@@ -566,8 +556,7 @@ public class OutputStreamProofSaver {
         output.append("(builtin \"");
         output.append(appliedRuleApp.rule().name().toString());
         output.append("\"");
-        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence(),
-            skipTopLevelStepAfterOSS.size()));
+        output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
         output.append(builtinRuleAssumesInsts(node, appliedRuleApp.assumesInsts()));
@@ -650,29 +639,6 @@ public class OutputStreamProofSaver {
                     .replaceFormula(seqFNum, app.posInOccurrence().sequentFormula()).sequent();
             n.setSequent(seq);
             if (app instanceof TacletApp ta) {
-                /*
-                 * If we apply replace_know_* on a top-level and the assumes formula is on the same
-                 * side of the sequent
-                 * as the "to-be-replaced"-formula, then it just disappears (we can't have the same
-                 * formula on the same semi sequent).
-                 * Hence, don't print the rule app.
-                 */
-                if (ta.posInOccurrence().isTopLevel() && ta.posInOccurrence().isInAntec()
-                        && ta.taclet().name().toString().equals("replace_known_left")
-                        && ta.assumesFormulaInstantiations()
-                                .head() instanceof AssumesFormulaInstSeq afis
-                        && afis.inAntecedent()) {
-                    skipTopLevelStepAfterOSS = skipTopLevelStepAfterOSS.prepend(seqFNum);
-                    return;
-                }
-                if (ta.posInOccurrence().isTopLevel() && !ta.posInOccurrence().isInAntec()
-                        && ta.taclet().name().toString().equals("replace_known_right")
-                        && ta.assumesFormulaInstantiations()
-                                .head() instanceof AssumesFormulaInstSeq afis
-                        && !afis.inAntecedent()) {
-                    skipTopLevelStepAfterOSS = skipTopLevelStepAfterOSS.prepend(seqFNum);
-                    return;
-                }
                 printSingleTacletApp(ta, n, prefix, output, true);
             } else if (app instanceof IBuiltInRuleApp ba) {
                 // This case does not currently happen, but just in case any built-ins get added to
@@ -775,11 +741,11 @@ public class OutputStreamProofSaver {
     }
 
     public static String posInOccurrence2Proof(Sequent seq,
-            PosInOccurrence pos, int skips) {
+            PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
-        int inSequent = seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula()) - skips;
+        int inSequent = seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula());
         return " (formula \""
             + inSequent
             + "\")" + posInTerm2Proof(pos.posInTerm());
@@ -866,8 +832,7 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final PosInOccurrence posOfAssumesInstatiation : assumesInstantiations) {
             s.append(" (ifInst \"\" ");
-            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation,
-                skipTopLevelStepAfterOSS.size()));
+            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation));
             s.append(")");
         }
         return s.toString();

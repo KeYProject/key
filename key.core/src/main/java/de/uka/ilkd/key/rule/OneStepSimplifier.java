@@ -465,6 +465,15 @@ public final class OneStepSimplifier implements BuiltInRule {
         return null;
     }
 
+    /// @return true iff the formula `sf` is already on the semi sequent `semi` (module renaming).
+    /// Models the behavior of normal rule applications on the sequent.
+    private boolean isRedundant(SequentFormula sf, Semisequent semi) {
+        for (var s : semi) {
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(s.formula(), sf.formula()))
+                return true;
+        }
+        return false;
+    }
 
     /**
      * Freshly computes the overall simplification result for the passed constrained formula.
@@ -493,6 +502,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         final List<PosInOccurrence> ifInsts =
             new ArrayList<>(seq.size());
 
+        var semi = ossPIO.isInAntec() ? goal.sequent().antecedent() : goal.sequent().succedent();
+
         // simplify as long as possible
         ImmutableList<SequentFormula> list = ImmutableSLList.nil();
         SequentFormula simplifiedCf = cf;
@@ -502,6 +513,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             if (simplifiedCf != null && !list.contains(simplifiedCf)) {
                 list = list.prepend(simplifiedCf);
             } else {
+                break;
+            }
+            if (isRedundant(simplifiedCf, semi)) {
+                // Formula will be removed, we are done
                 break;
             }
         }
@@ -593,8 +608,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         // applicable to the formula?
         return applicableTo(goal.proof().getServices(), pio.sequentFormula(),
-            pio.isInAntec(), goal,
-            null);
+            pio.isInAntec(), goal, null);
     }
 
     @Override
@@ -648,7 +662,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         goal.setBranchLabel(
             inst.getNumAppliedRules() + (inst.getNumAppliedRules() > 1 ? " rules" : " rule"));
         ((IBuiltInRuleApp) ruleApp).setAssumesInsts(inst.getIfInsts());
-
 
         return result;
     }
