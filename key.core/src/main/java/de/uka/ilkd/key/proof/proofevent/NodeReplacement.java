@@ -31,9 +31,12 @@ public class NodeReplacement {
     ImmutableList<NodeChange> changes = null;
 
     /**
-     * @param p_node the node this object reports about
-     * @param p_parent the parent node
-     * @param p_changes the complete list of changes made to the original node, with the most recent
+     * @param p_node
+     *        the node this object reports about
+     * @param p_parent
+     *        the parent node
+     * @param p_changes
+     *        the complete list of changes made to the original node, with the most recent
      *        change being the first element of the list
      */
     public NodeReplacement(Node p_node, Node p_parent,

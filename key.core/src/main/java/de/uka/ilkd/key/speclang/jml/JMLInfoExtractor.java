@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
@@ -123,7 +123,8 @@ public final class JMLInfoExtractor {
     /**
      * Parses a modifiers of a method
      *
-     * @param methodDeclaration the method declaration
+     * @param methodDeclaration
+     *        the method declaration
      * @return modifiers
      */
     public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
@@ -247,7 +248,8 @@ public final class JMLInfoExtractor {
     /**
      * Parses modifiers of a type
      *
-     * @param td the type declaration
+     * @param td
+     *        the type declaration
      * @return modifiers
      */
     public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
@@ -301,8 +303,8 @@ public final class JMLInfoExtractor {
      * explicitly). Warning: weird things may happen if the parameter doesn't belong to the method.
      */
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
-        assert pm.getMethodDeclaration().getParameters().contains(pd)
-                : "parameter " + pd + " does not belong to method declaration " + pm;
+        assert pm.getMethodDeclaration().getParameters().contains(pd) : "parameter " + pd
+            + " does not belong to method declaration " + pm;
         ImmutableList<Comment> comments = ImmutableSLList.nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
@@ -326,6 +328,10 @@ public final class JMLInfoExtractor {
         MethodDeclaration decl = pm.getMethodDeclaration();
 
         ImmutableList<Comment> comments = ImmutableSLList.nil();
+
+        // nullable JML modifier might have been added to method name
+        comments = comments.prepend(decl.getProgramElementName().getComments());
+
         for (Modifier modifier : decl.getModifiers()) {
             comments = comments.prepend(modifier.getComments());
         }

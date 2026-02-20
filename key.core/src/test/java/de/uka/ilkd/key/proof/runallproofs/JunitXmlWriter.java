@@ -5,7 +5,8 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class allows to write test-results into XML like JUnit.
@@ -98,7 +99,8 @@ public class JunitXmlWriter implements AutoCloseable {
         SKIPPED
     }
 
-    private record TestCase(TestCaseState state, String name, String classname, String error,
+    private record TestCase(
+            TestCaseState state, String name, String classname, String error,
             String failure,
             String sout, String serr, double time) {
 

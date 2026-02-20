@@ -20,8 +20,10 @@ public class ClosableTabComponent extends JPanel {
     /**
      * Creates a new {@code ClosableTabComponent}.
      *
-     * @param title the component's title.
-     * @param closeAction the action to execute when the component is closed.
+     * @param title
+     *        the component's title.
+     * @param closeAction
+     *        the action to execute when the component is closed.
      */
     public ClosableTabComponent(String title, Action closeAction) {
         setOpaque(false);

@@ -56,7 +56,8 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     /**
      * Construct a new graphviz executor given the provided input graph.
      *
-     * @param dot graph to render (in DOT format)
+     * @param dot
+     *        graph to render (in DOT format)
      */
     public GraphvizDotExecutor(String dot) {
         this.dot = dot;

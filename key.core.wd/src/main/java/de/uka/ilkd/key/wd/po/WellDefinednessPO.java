@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -61,8 +61,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * Constructor
      *
-     * @param initConfig The initial Configuration
-     * @param check The Well-Definedness Check
+     * @param initConfig
+     *        The initial Configuration
+     * @param check
+     *        The Well-Definedness Check
      */
     public WellDefinednessPO(InitConfig initConfig, WellDefinednessCheck check) {
         super(initConfig, check.getName());
@@ -140,7 +142,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * This should only be executed once per proof.
      *
-     * @param check the underlying well-definedness check
+     * @param check
+     *        the underlying well-definedness check
      * @param services
      * @return new variables to be used in the actual check
      */
@@ -188,7 +191,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     /**
      * Registers the new variables
      *
-     * @param vars variables to be used in the check
+     * @param vars
+     *        variables to be used in the check
      */
     private void register(Variables vars, Services proofServices) {
         register((Function) vars.anonHeap.op(), proofServices);

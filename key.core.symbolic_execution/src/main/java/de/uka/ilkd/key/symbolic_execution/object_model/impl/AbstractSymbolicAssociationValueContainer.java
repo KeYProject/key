@@ -36,7 +36,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * Constructor.
      *
-     * @param settings The {@link IModelSettings} to use.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     protected AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
         super(settings);
@@ -53,7 +54,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * Adds a new {@link ISymbolicAssociation}.
      *
-     * @param association The new {@link ISymbolicAssociation} to add.
+     * @param association
+     *        The new {@link ISymbolicAssociation} to add.
      */
     public void addAssociation(ISymbolicAssociation association) {
         associations = associations.append(association);
@@ -83,7 +85,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * Adds a new {@link ISymbolicValue}.
      *
-     * @param value The new {@link ISymbolicValue} to add.
+     * @param value
+     *        The new {@link ISymbolicValue} to add.
      */
     public void addValue(ISymbolicValue value) {
         values = values.append(value);

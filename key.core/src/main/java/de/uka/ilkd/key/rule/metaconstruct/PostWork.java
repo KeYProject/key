@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
- * creates an assignment instantiationOf(#newObjectsV).<initialized> = true
+ * creates an assignment instantiationOf(#newObjectsV).$initialized = true
  */
 public class PostWork extends ProgramTransformer {
 
@@ -34,7 +34,8 @@ public class PostWork extends ProgramTransformer {
     /**
      * Used to create this Java statement programmatically. Do not use in taclet meta constructs!
      *
-     * @param pv The {@link ProgramVariable}
+     * @param pv
+     *        The {@link ProgramVariable}
      */
     public PostWork(ProgramVariable pv) {
         super(POST_WORK, pv);
@@ -53,7 +54,7 @@ public class PostWork extends ProgramTransformer {
             (ProgramVariable) (schema ? svInst.getInstantiation((SchemaVariable) body()) : body());
 
         final ProgramVariable initialized = services.getJavaInfo().getAttribute(
-            ImplicitFieldAdder.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
+            PipelineConstants.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
         return new ProgramElement[] { KeYJavaASTFactory.assign(
             KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
     }

@@ -8,7 +8,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -59,9 +59,11 @@ public class ProblemFinder extends ExpressionBuilder {
      * {@link #getChooseContract()} or the
      * proof obligation information via {@link #getProofObligation()}.
      *
-     * @param ctx the parse tree
+     * @param ctx
+     *        the parse tree
      * @return a term if {@code \problem} entry exists.
-     * @throws BuildingException if the
+     * @throws BuildingException
+     *         if the
      */
     @Override
     public @Nullable JTerm visitProblem(KeYParser.ProblemContext ctx) {

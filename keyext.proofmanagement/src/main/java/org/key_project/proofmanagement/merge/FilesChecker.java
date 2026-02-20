@@ -109,10 +109,13 @@ public class FilesChecker {
     /**
      * Reads the file with the given path and computes the SHA256 checksum of it.
      *
-     * @param path path of the file
+     * @param path
+     *        path of the file
      * @return md5 checksum of the file
-     * @throws NoSuchAlgorithmException if the MD5 checksum is not available for some reason
-     * @throws IOException if the file with the given path does not exist or can not be read
+     * @throws NoSuchAlgorithmException
+     *         if the MD5 checksum is not available for some reason
+     * @throws IOException
+     *         if the file with the given path does not exist or can not be read
      */
     public static byte[] createSHA256Checksum(Path path)
             throws NoSuchAlgorithmException, IOException {

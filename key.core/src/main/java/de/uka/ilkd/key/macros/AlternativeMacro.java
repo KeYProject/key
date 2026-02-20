@@ -65,7 +65,8 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      * <p>
      * This launches the first applicable macro of {@link #getProofMacros()}.
      *
-     * @throws InterruptedException if the macro is interrupted.
+     * @throws InterruptedException
+     *         if the macro is interrupted.
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,

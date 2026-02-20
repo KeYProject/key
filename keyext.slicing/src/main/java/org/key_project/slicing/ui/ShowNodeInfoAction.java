@@ -46,9 +46,12 @@ public class ShowNodeInfoAction extends MainWindowAction {
      * Construct a new debug dialog. Call {@link #showDialog(Window)} afterwards to make it visible
      * to the user.
      *
-     * @param mw main window
-     * @param tracker dependency tracker
-     * @param node node to show info on
+     * @param mw
+     *        main window
+     * @param tracker
+     *        dependency tracker
+     * @param node
+     *        node to show info on
      */
     public ShowNodeInfoAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
@@ -65,7 +68,8 @@ public class ShowNodeInfoAction extends MainWindowAction {
     /**
      * Show a dialog with dependency graph information on the {@link #node}.
      *
-     * @param parentWindow the parent window to center this dialog on
+     * @param parentWindow
+     *        the parent window to center this dialog on
      */
     private void showDialog(Window parentWindow) {
         List<GraphNode> graphNodes = new ArrayList<>();

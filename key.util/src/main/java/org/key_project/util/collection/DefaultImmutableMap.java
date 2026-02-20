@@ -62,8 +62,10 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
      * entry has
      * to be removed {@code null} is not allowed for key or value.
      *
-     * @param key a S to be used as key
-     * @param value a T to be stored as value
+     * @param key
+     *        a S to be used as key
+     * @param value
+     *        a T to be stored as value
      * @return a ImmutableMap including the {@code <key, value>}-pair and all other pairs of the
      *         current map
      *         with keys different from the given key
@@ -236,7 +238,6 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         if (!(o instanceof ImmutableMap)) {
             return false;
         }
-
         if (o == this) {
             return true;
         }
@@ -246,6 +247,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         if (o1.size() != size()) {
             return false;
         }
+
 
         for (ImmutableMapEntry<S, T> e : this) {
             if (!e.value().equals(o1.get(e.key()))) {

@@ -103,7 +103,7 @@
       (rule "variableDeclaration" (formula "4") (term "1") (newnames "n_1"))
       (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "4") (term "1") (inst "#v0=n_2"))
       (rule "variableDeclaration" (formula "4") (term "1") (newnames "n_2"))
-      (rule "methodBodyExpand" (formula "4") (term "1") (newnames "heapBefore_<createObject>,savedHeapBefore_<createObject>"))
+      (rule "methodBodyExpand" (formula "4") (term "1") (newnames "heapBefore_$createObject,savedHeapBefore_$createObject"))
       (builtin "One Step Simplification" (formula "4"))
       (rule "variableDeclaration" (formula "4") (term "1") (newnames "__NEW__"))
       (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "4") (term "1") (inst "#v0=n_3"))
@@ -123,19 +123,19 @@
       (rule "assignment_write_attribute_this" (formula "7") (term "1"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallWithinClass" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<prepareEnter>,savedHeapBefore_<prepareEnter>"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$prepareEnter,savedHeapBefore_$prepareEnter"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<prepare>,savedHeapBefore_<prepare>"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$prepare,savedHeapBefore_$prepare"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<prepare>_0,savedHeapBefore_<prepare>_0"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$prepare_0,savedHeapBefore_$prepare_0"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<prepare>_1,savedHeapBefore_<prepare>_1"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$prepare_1,savedHeapBefore_$prepare_1"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<prepare>_2,savedHeapBefore_<prepare>_2"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$prepare_2,savedHeapBefore_$prepare_2"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallEmpty" (formula "7") (term "1"))
       (rule "blockEmpty" (formula "7") (term "1"))
@@ -156,19 +156,19 @@
       (rule "blockEmpty" (formula "7") (term "1"))
       (rule "assignment" (formula "7") (term "1"))
       (builtin "One Step Simplification" (formula "7"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<init>,savedHeapBefore_<init>"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$init,savedHeapBefore_$init"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<init>_0,savedHeapBefore_<init>_0"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$init_0,savedHeapBefore_$init_0"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<init>_1,savedHeapBefore_<init>_1"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$init_1,savedHeapBefore_$init_1"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<init>_2,savedHeapBefore_<init>_2"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$init_2,savedHeapBefore_$init_2"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallSuper" (formula "7") (term "1"))
-      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_<init>_3,savedHeapBefore_<init>_3"))
+      (rule "methodBodyExpand" (formula "7") (term "1") (newnames "heapBefore_$init_3,savedHeapBefore_$init_3"))
       (builtin "One Step Simplification" (formula "7"))
       (rule "methodCallEmpty" (formula "7") (term "1"))
       (rule "blockEmpty" (formula "7") (term "1"))
@@ -255,7 +255,7 @@
                   (rule "commute_and" (formula "2") (term "0,0"))
                   (rule "commute_and" (formula "1") (term "0,0"))
                   (rule "ifthenelse_split" (formula "1") (term "0"))
-                  (branch "f_2 = java.lang.Object::<created> & o_2 = n_3 TRUE"
+                  (branch "f_2 = java.lang.Object::#$created & o_2 = n_3 TRUE"
                      (rule "andLeft" (formula "1"))
                      (rule "applyEqReverse" (formula "4") (term "2,0") (ifseqformula "3"))
                      (rule "hideAuxiliaryEq" (formula "3"))
@@ -287,7 +287,7 @@
                      (rule "eqSymm" (formula "10"))
                      (rule "close" (formula "10") (ifseqformula "1"))
                   )
-                  (branch "f_2 = java.lang.Object::<created> & o_2 = n_3 FALSE"
+                  (branch "f_2 = java.lang.Object::#$created & o_2 = n_3 FALSE"
                      (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
                      (rule "hideAuxiliaryEq" (formula "1"))
                      (rule "ifthenelse_split" (formula "1") (term "0"))
@@ -361,7 +361,7 @@
                            (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
                            (rule "hideAuxiliaryEq" (formula "1"))
                            (rule "ifthenelse_split" (formula "1") (term "0"))
-                           (branch "f_2 = java.lang.Object::<initialized> & o_2 = n_3 TRUE"
+                           (branch "f_2 = java.lang.Object::#$initialized & o_2 = n_3 TRUE"
                               (rule "andLeft" (formula "1"))
                               (rule "applyEqReverse" (formula "14") (term "1") (ifseqformula "3"))
                               (rule "hideAuxiliaryEq" (formula "3"))
@@ -391,7 +391,7 @@
                               (rule "eqSymm" (formula "3"))
                               (rule "close" (formula "9") (ifseqformula "3"))
                            )
-                           (branch "f_2 = java.lang.Object::<initialized> & o_2 = n_3 FALSE"
+                           (branch "f_2 = java.lang.Object::#$initialized & o_2 = n_3 FALSE"
                               (rule "close" (formula "13") (ifseqformula "1"))
                            )
                         )
@@ -488,7 +488,7 @@
                (rule "replace_known_right" (formula "8") (term "0,0") (ifseqformula "7"))
                (builtin "One Step Simplification" (formula "8"))
                (rule "cut_direct" (formula "6") (term "0"))
-               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::<created>) = TRUE TRUE"
+               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::#$created) = TRUE TRUE"
                   (builtin "One Step Simplification" (formula "7"))
                   (rule "true_left" (formula "7"))
                   (rule "cut_direct" (formula "8") (term "0"))
@@ -508,7 +508,7 @@
                      (rule "closeTypeSwitched" (formula "8") (ifseqformula "4"))
                   )
                )
-               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::<created>) = TRUE FALSE"
+               (branch "CUT: boolean::select(heap, exc_0, java.lang.Object::#$created) = TRUE FALSE"
                   (builtin "One Step Simplification" (formula "6"))
                   (rule "cut_direct" (formula "9") (term "0"))
                   (branch "CUT: java.lang.RuntimeException::instance(exc_0) = TRUE TRUE"

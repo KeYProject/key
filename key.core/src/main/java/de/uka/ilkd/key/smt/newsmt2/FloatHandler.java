@@ -4,14 +4,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DoubleLDT;
@@ -210,7 +203,8 @@ public class FloatHandler implements SMTHandler {
     /**
      * Translate a float literal of sort "float" in FP notation to an SMTLIB fp literal
      *
-     * @param term an application of FP
+     * @param term
+     *        an application of FP
      * @return A string containing the translated literal
      */
     public static SExpr floatLiteralToSMT(Term term, Services services) {
@@ -228,7 +222,8 @@ public class FloatHandler implements SMTHandler {
     /**
      * Translate a double literal of sort "double" in DFP notation to an SMTLIB fp literal
      *
-     * @param term an application of DFP
+     * @param term
+     *        an application of DFP
      * @return An sexpr containing the translated literal
      */
     public static SExpr doubleLiteralToSMT(Term term, Services services) {

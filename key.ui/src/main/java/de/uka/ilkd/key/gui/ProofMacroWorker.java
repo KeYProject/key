@@ -73,10 +73,14 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     /**
      * Instantiates a new proof macro worker.
      *
-     * @param node the {@link Node} to start macro at.
-     * @param macro the macro, not null
-     * @param mediator the mediator, not null
-     * @param posInOcc the position, possibly null
+     * @param node
+     *        the {@link Node} to start macro at.
+     * @param macro
+     *        the macro, not null
+     * @param mediator
+     *        the mediator, not null
+     * @param posInOcc
+     *        the position, possibly null
      */
     public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator,
             PosInOccurrence posInOcc) {

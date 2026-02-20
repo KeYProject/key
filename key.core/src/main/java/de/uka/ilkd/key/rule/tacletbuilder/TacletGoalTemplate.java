@@ -24,9 +24,12 @@ public class TacletGoalTemplate
     /**
      * creates new Goaldescription
      *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with a application
+     * @param addedSeq
+     *        new Sequent to be added
+     * @param addedRules
+     *        IList<Taclet> contains the new allowed rules at this branch
+     * @param addedProgVars
+     *        a SetOf<SchemaVariable> which will be instantiated with a application
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
@@ -44,8 +47,10 @@ public class TacletGoalTemplate
      *                                             SetAsListOf.<SchemaVariable>nil())
      *                                             </code>
      *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
+     * @param addedSeq
+     *        new Sequent to be added
+     * @param addedRules
+     *        IList<Taclet> contains the new allowed rules at this branch
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());

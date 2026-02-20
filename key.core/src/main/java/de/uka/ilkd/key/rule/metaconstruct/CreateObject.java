@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.transformations.pipeline.CreateObjectBuilder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -23,7 +23,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class CreateObject extends ProgramTransformer {
 
     /**
-     * @param newExpr The {@link ProgramElement}
+     * @param newExpr
+     *        The {@link ProgramElement}
      */
     public CreateObject(ProgramElement newExpr) {
         super("create-object", newExpr);

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
@@ -562,6 +563,10 @@ public final class IssueDialog extends JDialog {
         MainWindow.getInstance().getMediator().startInterface(true);
 
         Set<PositionedIssueString> msg = Collections.singleton(extractMessage(exception));
+        if (exception instanceof BuildingExceptions) {
+            ((BuildingExceptions) exception).getErrors().forEach(
+                it -> LOGGER.info("Error", it));
+        }
         IssueDialog dlg = new IssueDialog(parent, "Parser Error", msg, true, exception);
         dlg.setVisible(true);
         dlg.dispose();

@@ -177,8 +177,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * Construct a new panel for this extension.
      *
-     * @param mediator the KeY mediator
-     * @param extension instance of the extension
+     * @param mediator
+     *        the KeY mediator
+     * @param extension
+     *        instance of the extension
      */
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
@@ -552,8 +554,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * Notify the panel that a rule has been applied on the currently opened proof.
      *
-     * @param proof proof
-     * @param tracker dependency tracker of that proof
+     * @param proof
+     *        proof
+     * @param tracker
+     *        dependency tracker of that proof
      */
     public void ruleAppliedOnProof(Proof proof, DependencyTracker tracker) {
         currentProof = proof;
@@ -628,7 +632,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * Notify the panel that a proof has been disposed.
      *
-     * @param proof disposed proof
+     * @param proof
+     *        disposed proof
      */
     public void proofDisposed(Proof proof) {
         if (proof == currentProof) {

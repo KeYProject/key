@@ -68,6 +68,7 @@ public class GenerateUnitTests {
                 import org.junit.jupiter.api.*;
                 import static org.junit.jupiter.api.Assertions.*;
 
+                @org.junit.jupiter.api.Timeout(60)
                 public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
                   public static final String STATISTIC_FILE = "$statisticsFile";
 
@@ -117,20 +118,10 @@ public class GenerateUnitTests {
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
 
-        vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
+        vars.put("keySettings", settings.getGlobalKeYSettings().replace("\n", "\\\\n"));
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\n"));
-
-        vars.put("timeout", "");
-
-        if (false) {// disabled
-            int globalTimeout = 0;
-            if (globalTimeout > 0) {
-                vars.put("timeout",
-                    "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
-            }
-        }
+                    .replace("\n", "\\\\n"));
 
         StringBuilder methods = new StringBuilder();
         Set<String> usedMethodNames = new TreeSet<>();

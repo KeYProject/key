@@ -25,8 +25,7 @@ public class TestGenericRemovingLemmaGenerator {
     @Test
     public void testRemovingGenericSorts() {
         TacletForTests.parse();
-        NoPosTacletApp app = TacletForTests.getRules().lookup(new Name("TestRemovingGenericSorts"));
-        Assertions.assertNotNull(app);
+        NoPosTacletApp app = TacletForTests.lookupTaclet("TestRemovingGenericSorts");
 
         GenericRemovingLemmaGenerator g = new GenericRemovingLemmaGenerator();
         TacletFormula result = g.translate(app.taclet(), TacletForTests.services());

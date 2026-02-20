@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -112,7 +112,7 @@ public class Main {
         // List all specifications of all types in the source location (not classPaths and
         // bootClassPath)
         final List<Contract> proofContracts = new LinkedList<>();
-        Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = env.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =

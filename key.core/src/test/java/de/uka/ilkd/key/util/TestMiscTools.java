@@ -7,27 +7,20 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 
 import org.key_project.util.java.IOUtil;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 import static de.uka.ilkd.key.util.MiscTools.containsWholeWord;
 import static de.uka.ilkd.key.util.MiscTools.isJMLComment;
@@ -108,85 +101,11 @@ public class TestMiscTools {
     }
 
     /**
-     * This is a test for the method {@link MiscTools#extractURI(DataLocation)}. It tests URI
-     * extraction all four known kinds of DataLocations:
-     * <ul>
-     * <li>URLDataLocations</li>
-     * <li>ArchiveDataLocations</li>
-     * <li>SpecDataLocations</li>
-     * <li>DataFileLocations</li>
-     * </ul>
-     * Note: This test creates two temporary files.
-     */
-    @Test
-    public void testExtractURI() throws Exception {
-        // test for URLDataLocation
-        Path tmp = Files.createTempFile("test with whitespace", ".txt");
-        URI tmpURI = tmp.toUri();
-        DataLocation urlDataLoc = new URLDataLocation(tmpURI.toURL());
-        assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc).orElseThrow());
-
-        // additional test for URLDataLocation with whitespace in filename
-        Path tmpSpace = Files.createTempFile("test with whitespace", ".txt");
-        URI tmpSpaceURI = tmpSpace.toUri();
-        DataLocation urlDataLoc2 = new URLDataLocation(tmpSpaceURI.toURL());
-        assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2).orElseThrow());
-
-        // test for ArchiveDataLocation
-        byte[] b = "test content".getBytes(StandardCharsets.UTF_8);
-        Path zipP = Files.createTempFile("test with whitespace!", ".zip");
-
-        try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
-                ZipOutputStream zos = new ZipOutputStream(fos)) {
-            zos.putNextEntry(new ZipEntry("entry.txt"));
-            zos.putNextEntry(new ZipEntry("entry with whitespace.txt"));
-            zos.putNextEntry(new ZipEntry("entry with !bang!.txt"));
-            zos.write(b);
-        }
-
-        try (ZipFile zf = new ZipFile(zipP.toFile())) {
-            DataLocation entry0 = new ArchiveDataLocation(zf, "entry.txt");
-            DataLocation entry1 = new ArchiveDataLocation(zf, "entry with whitespace.txt");
-            DataLocation entry2 = new ArchiveDataLocation(zf, "entry with !bang!.txt");
-
-            URI tmpZipURI = zipP.toUri();
-            assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
-                MiscTools.extractURI(entry0).orElseThrow().toString());
-            assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
-                MiscTools.extractURI(entry1).orElseThrow().toString());
-            URI read = MiscTools.extractURI(entry2).orElseThrow();
-
-            // we can not simply use read.toURL().openStream(), because that uses caches and thus
-            // keeps the file open (at least on Windows)
-            URLConnection juc = read.toURL().openConnection();
-            juc.setUseCaches(false);
-            try (InputStream is = juc.getInputStream()) {
-                assertNotNull(is);
-                // try if the file can be read correctly
-                assertEquals(new String(b, StandardCharsets.UTF_8), IOUtil.readFrom(is));
-            }
-            assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20!bang!.txt", read.toString());
-        }
-
-        // test for SpecDataLocation
-        DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
-        assertEquals(Optional.empty(), MiscTools.extractURI(specDataLoc));
-
-        // test for DataFileLocation
-        DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
-        assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc).orElseThrow());
-
-        // clean up temporary files
-        Files.deleteIfExists(tmp);
-        Files.deleteIfExists(tmpSpace);
-        Files.deleteIfExists(zipP);
-    }
-
-    /**
      * This is a test for the method {@link MiscTools#parseURL(String)}. It tests for some strings
      * if they can be converted to URLs correctly. Note: This test creates a temporary zip file.
      *
-     * @throws Exception if a string can not be converted successfully
+     * @throws Exception
+     *         if a string can not be converted successfully
      */
     @Test
     public void testTryParseURL() throws Exception {

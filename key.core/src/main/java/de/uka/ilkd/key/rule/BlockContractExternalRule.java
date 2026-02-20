@@ -81,16 +81,20 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
      */
     private Instantiation lastInstantiation;
 
-    private BlockContractExternalRule() {
-    }
+    private BlockContractExternalRule() {}
 
     /**
      *
-     * @param contract the contract being applied.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @param services services.
+     * @param contract
+     *        the contract being applied.
+     * @param heaps
+     *        the heaps.
+     * @param localInVariables
+     *        all free program variables in the block.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
+     * @param services
+     *        services.
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final Instantiation instantiation,
@@ -111,9 +115,12 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
 
     /**
      *
-     * @param localOutVariables all free program variables modified by the block.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param localOutVariables
+     *        all free program variables modified by the block.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
      * @return the postconditions.
      */
     private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
@@ -132,11 +139,16 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
 
     /**
      *
-     * @param contextUpdate the context update.
-     * @param heaps the heaps.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param variables the variables.
-     * @param services services.
+     * @param contextUpdate
+     *        the context update.
+     * @param heaps
+     *        the heaps.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param variables
+     *        the variables.
+     * @param services
+     *        services.
      * @return the updates.
      */
     private static JTerm[] createUpdates(final JTerm contextUpdate,

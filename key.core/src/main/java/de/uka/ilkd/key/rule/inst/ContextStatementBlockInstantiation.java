@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
 
 /**
@@ -28,10 +28,14 @@ public class ContextStatementBlockInstantiation {
     /**
      * creates a ContextStatementBlockInstantiation of a context term
      *
-     * @param prefixEnd the PosInProgram describing the first statement after the end of the prefix
-     * @param suffixStart the PosInProgram describing the statement just before the suffix begins
-     * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param prefixEnd
+     *        the PosInProgram describing the first statement after the end of the prefix
+     * @param suffixStart
+     *        the PosInProgram describing the statement just before the suffix begins
+     * @param activeStatementContext
+     *        the ExecutionContext of the first active statement
+     * @param pe
+     *        the ProgramElement the context positions are related to
      */
     public ContextStatementBlockInstantiation(PosInProgram prefixEnd, PosInProgram suffixStart,
             ExecutionContext activeStatementContext, ProgramElement pe) {

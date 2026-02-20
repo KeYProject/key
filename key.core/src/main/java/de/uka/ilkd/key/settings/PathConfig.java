@@ -55,8 +55,7 @@ public final class PathConfig {
      */
     private static Path logDirectory;
 
-    private PathConfig() {
-    }
+    private PathConfig() {}
 
     /*
      * Initializes the instance variables with the default settings.
@@ -77,7 +76,8 @@ public final class PathConfig {
     /**
      * Sets the path to the directory that contains KeY configuration files.
      *
-     * @param keyConfigDir The new directory to use.
+     * @param keyConfigDir
+     *        The new directory to use.
      */
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = Paths.get(keyConfigDir);

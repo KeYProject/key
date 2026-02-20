@@ -22,17 +22,22 @@ import org.jspecify.annotations.Nullable;
 public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp<JmlAssertRule> {
 
     /**
-     * @param rule the rule being applied
-     * @param occurrence the position at which the rule is applied
+     * @param rule
+     *        the rule being applied
+     * @param occurrence
+     *        the position at which the rule is applied
      */
     public JmlAssertBuiltInRuleApp(JmlAssertRule rule, PosInOccurrence occurrence) {
         this(rule, occurrence, null);
     }
 
     /**
-     * @param rule the rule being applied
-     * @param pio the position at which the rule is applied
-     * @param ifInsts information flow related information
+     * @param rule
+     *        the rule being applied
+     * @param pio
+     *        the position at which the rule is applied
+     * @param ifInsts
+     *        information flow related information
      */
     public JmlAssertBuiltInRuleApp(JmlAssertRule rule, PosInOccurrence pio,
             @Nullable ImmutableList<PosInOccurrence> ifInsts) {

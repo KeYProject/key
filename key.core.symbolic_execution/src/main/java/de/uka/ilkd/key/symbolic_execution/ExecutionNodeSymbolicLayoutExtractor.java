@@ -21,7 +21,8 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
     /**
      * Constructor.
      *
-     * @param executionNode The {@link IExecutionNode} to extract memory layouts from.
+     * @param executionNode
+     *        The {@link IExecutionNode} to extract memory layouts from.
      */
     public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode<?> executionNode) {
         super(executionNode.getProofNode(), executionNode.getModalityPIO(),

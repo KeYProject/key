@@ -63,7 +63,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     /**
      * Translation of a string to a list of strings by using {@link #SET_DELIMITER}.
      *
-     * @param str a nonnull, emptible string
+     * @param str
+     *        a nonnull, emptible string
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
@@ -74,7 +75,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     }
 
     /**
-     * @param seq a string list
+     * @param seq
+     *        a string list
      * @return the strings concatenated with {@link #SET_DELIMITER}
      */
     private static @NonNull String stringListToString(@NonNull List<String> seq) {
@@ -173,8 +175,10 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     /**
      * Creates a string list property.
      *
-     * @param key the key value of this property inside {@link Properties} instance
-     * @param defValue a default value
+     * @param key
+     *        the key value of this property inside {@link Properties} instance
+     * @param defValue
+     *        a default value
      * @return returns a {@link PropertyEntry}
      */
     protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,

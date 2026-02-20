@@ -50,8 +50,7 @@ public final class ProofReferenceUtil {
     /**
      * Forbid instances.
      */
-    private ProofReferenceUtil() {
-    }
+    private ProofReferenceUtil() {}
 
     /**
      * <p>
@@ -63,7 +62,8 @@ public final class ProofReferenceUtil {
      * Otherwise it is possible that the result is wrong.
      * </p>
      *
-     * @param proof The {@link Proof} to compute its references.
+     * @param proof
+     *        The {@link Proof} to compute its references.
      * @return The found {@link IProofReference}s.
      */
     public static LinkedHashSet<IProofReference<?>> computeProofReferences(Proof proof) {
@@ -80,8 +80,10 @@ public final class ProofReferenceUtil {
      * Otherwise it is possible that the result is wrong.
      * </p>
      *
-     * @param proof The {@link Proof} to compute its references.
-     * @param analysts The {@link IProofReferencesAnalyst} to use.
+     * @param proof
+     *        The {@link Proof} to compute its references.
+     * @param analysts
+     *        The {@link IProofReferencesAnalyst} to use.
      * @return The found {@link IProofReference}s.
      */
     public static LinkedHashSet<IProofReference<?>> computeProofReferences(Proof proof,
@@ -122,8 +124,10 @@ public final class ProofReferenceUtil {
         /**
          * Constructor.
          *
-         * @param services The {@link Services} to use.
-         * @param analysts The {@link IProofReferencesAnalyst}s to use.
+         * @param services
+         *        The {@link Services} to use.
+         * @param analysts
+         *        The {@link IProofReferencesAnalyst}s to use.
          */
         public ReferenceAnalaystProofVisitor(Services services,
                 ImmutableList<IProofReferencesAnalyst> analysts) {
@@ -152,8 +156,10 @@ public final class ProofReferenceUtil {
     /**
      * Computes the {@link IProofReference} of the given {@link Node}.
      *
-     * @param node The {@link Node} to compute its {@link IProofReference}s.
-     * @param services The {@link Services} to use.
+     * @param node
+     *        The {@link Node} to compute its {@link IProofReference}s.
+     * @param services
+     *        The {@link Services} to use.
      * @return The found {@link IProofReference}s.
      */
     public static LinkedHashSet<IProofReference<?>> computeProofReferences(Node node,
@@ -164,9 +170,12 @@ public final class ProofReferenceUtil {
     /**
      * Computes the {@link IProofReference} of the given {@link Node}.
      *
-     * @param node The {@link Node} to compute its {@link IProofReference}s.
-     * @param services The {@link Services} to use.
-     * @param analysts The {@link IProofReferencesAnalyst} to use.
+     * @param node
+     *        The {@link Node} to compute its {@link IProofReference}s.
+     * @param services
+     *        The {@link Services} to use.
+     * @param analysts
+     *        The {@link IProofReferencesAnalyst} to use.
      * @return The found {@link IProofReference}s.
      */
     public static LinkedHashSet<IProofReference<?>> computeProofReferences(Node node,
@@ -187,8 +196,10 @@ public final class ProofReferenceUtil {
     /**
      * Merges the {@link IProofReference}s to add into the target.
      *
-     * @param target The target to add to.
-     * @param toAdd The {@link IProofReference}s to add.
+     * @param target
+     *        The target to add to.
+     * @param toAdd
+     *        The {@link IProofReference}s to add.
      */
     public static void merge(LinkedHashSet<IProofReference<?>> target,
             LinkedHashSet<IProofReference<?>> toAdd) {
@@ -200,8 +211,10 @@ public final class ProofReferenceUtil {
     /**
      * Merges the {@link IProofReference} into the target:
      *
-     * @param target The target to add to.
-     * @param reference The {@link IProofReference} to add.
+     * @param target
+     *        The target to add to.
+     * @param reference
+     *        The {@link IProofReference} to add.
      */
     public static void merge(LinkedHashSet<IProofReference<?>> target,
             final IProofReference<?> reference) {

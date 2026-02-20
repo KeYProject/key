@@ -56,11 +56,16 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param arrayIndex The array index.
-     * @param target The target {@link ISymbolicObject}.
-     * @param condition The optional condition under which this association is valid.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param arrayIndex
+     *        The array index.
+     * @param target
+     *        The target {@link ISymbolicObject}.
+     * @param condition
+     *        The optional condition under which this association is valid.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, JTerm arrayIndex, ISymbolicObject target,
             JTerm condition, IModelSettings settings) {
@@ -79,13 +84,20 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param arrayIndex The array index.
-     * @param arrayStartIndex The array start index or {@code null} if not used.
-     * @param arrayEndIndex The array end index or {@code null} if not used.
-     * @param target The target {@link ISymbolicObject}.
-     * @param condition The optional condition under which this association is valid.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param arrayIndex
+     *        The array index.
+     * @param arrayStartIndex
+     *        The array start index or {@code null} if not used.
+     * @param arrayEndIndex
+     *        The array end index or {@code null} if not used.
+     * @param target
+     *        The target {@link ISymbolicObject}.
+     * @param condition
+     *        The optional condition under which this association is valid.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
             JTerm arrayEndIndex, ISymbolicObject target, JTerm condition, IModelSettings settings) {
@@ -104,11 +116,16 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     /**
      * Constructor.
      *
-     * @param services The {@link Services} to use.
-     * @param programVariable The {@link IProgramVariable}.
-     * @param target The target {@link ISymbolicObject}.
-     * @param condition The optional condition under which this association is valid.
-     * @param settings The {@link IModelSettings} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param programVariable
+     *        The {@link IProgramVariable}.
+     * @param target
+     *        The target {@link ISymbolicObject}.
+     * @param condition
+     *        The optional condition under which this association is valid.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, IProgramVariable programVariable,
             ISymbolicObject target, JTerm condition, IModelSettings settings) {

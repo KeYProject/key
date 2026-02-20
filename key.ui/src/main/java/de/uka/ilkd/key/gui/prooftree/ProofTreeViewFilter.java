@@ -55,7 +55,8 @@ public abstract class ProofTreeViewFilter {
 
     /**
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return {@code true} iff the subtree starting at {@code node} is hidden by an active global
      *         filter.
      */
@@ -71,7 +72,8 @@ public abstract class ProofTreeViewFilter {
 
     /**
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return {@code false} iff the subtree starting at {@code node} is hidden by this filter.
      */
     public abstract boolean showSubtree(Node node);
@@ -91,7 +93,8 @@ public abstract class ProofTreeViewFilter {
     /**
      * Should only be called through GUIProofTreeNode#setFilter().
      *
-     * @param active whether the filter should be activated or deactivated.
+     * @param active
+     *        whether the filter should be activated or deactivated.
      */
     abstract void setActive(boolean active);
 
@@ -115,16 +118,20 @@ public abstract class ProofTreeViewFilter {
          * Decides whether a child should be counted while iterating all children. A child should
          * not be counted if it is hidden by one of the active filters.
          *
-         * @param child a node.
-         * @param parent the node's parent.
-         * @param pos the node's index in the parent's children array (see
+         * @param child
+         *        a node.
+         * @param parent
+         *        the node's parent.
+         * @param pos
+         *        the node's index in the parent's children array (see
          *        {@link TreeNode#getChildAt(int)}.
          */
         protected abstract boolean countChild(GUIProofTreeNode child, TreeNode parent, int pos);
 
         /**
          *
-         * @param parent a node.
+         * @param parent
+         *        a node.
          * @return the number of child nodes, not counting the ones hidden by the active filters.
          * @see #countChild(TreeNode, TreeNode, int)
          */
@@ -142,8 +149,10 @@ public abstract class ProofTreeViewFilter {
 
         /**
          *
-         * @param parent a node.
-         * @param index an index.
+         * @param parent
+         *        a node.
+         * @param index
+         *        an index.
          * @return the node's {@code index}th child, not counting the ones hidden by the active
          *         filters.
          * @see #countChild(TreeNode, TreeNode, int)
@@ -165,8 +174,10 @@ public abstract class ProofTreeViewFilter {
 
         /**
          *
-         * @param parent a parent node.
-         * @param child a child node.
+         * @param parent
+         *        a parent node.
+         * @param child
+         *        a child node.
          * @return the child's index after applying all active filters to the children, or
          *         {@code -1} if {@code child} is not a child of {@code parent}.
          */
@@ -189,9 +200,12 @@ public abstract class ProofTreeViewFilter {
          * Decides whether a child should be counted while iterating all children. A child should
          * not be counted if it is hidden by one of the active filters.
          *
-         * @param child a node.
-         * @param parent the node's parent.
-         * @param pos the node's index in the parent's children array (see
+         * @param child
+         *        a node.
+         * @param parent
+         *        the node's parent.
+         * @param pos
+         *        the node's index in the parent's children array (see
          *        {@link TreeNode#getChildAt(int)}.
          */
         protected boolean countChild(TreeNode child, TreeNode parent, int pos) {

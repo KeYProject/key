@@ -147,8 +147,10 @@ public class TestExecutionNodePreorderIterator {
      * Creates a new {@link KeYlessStatement} which represents the given {@link Node} in KeY's proof
      * tree.
      *
-     * @param parent The parent {@link AbstractKeYlessExecutionNode}.
-     * @param proofNode The {@link Node} in KeY's proof tree to represent.
+     * @param parent
+     *        The parent {@link AbstractKeYlessExecutionNode}.
+     * @param proofNode
+     *        The {@link Node} in KeY's proof tree to represent.
      * @return The created {@link KeYlessStatement}.
      */
     protected KeYlessStatement createStatement(AbstractKeYlessExecutionNode<?> parent,
@@ -179,9 +181,12 @@ public class TestExecutionNodePreorderIterator {
      * Makes sure that a {@link ExecutionNodePreorderIterator} which iterates over the given
      * {@link IExecutionNode} returns nodes in preorder iteration over the expected trees.
      *
-     * @param element The {@link IExecutionNode} to iterate over.
-     * @param expectedRoots The expected values.
-     * @throws ProofInputException Occurred Exception.
+     * @param element
+     *        The {@link IExecutionNode} to iterate over.
+     * @param expectedRoots
+     *        The expected values.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected void assertRoot(IExecutionNode<?> element, ExpectedNode[] expectedRoots)
             throws ProofInputException {
@@ -194,10 +199,14 @@ public class TestExecutionNodePreorderIterator {
      * Makes sure that the nodes returned by the given {@link ExecutionNodePreorderIterator} are
      * equal to the defined model.
      *
-     * @param iter The {@link ExecutionNodePreorderIterator} to test.
-     * @param expectedRoots The expected model.
-     * @param iterateOverSubtree Start new sub tree iteration at the current node?
-     * @throws ProofInputException Occurred Exception.
+     * @param iter
+     *        The {@link ExecutionNodePreorderIterator} to test.
+     * @param expectedRoots
+     *        The expected model.
+     * @param iterateOverSubtree
+     *        Start new sub tree iteration at the current node?
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected void assertExpectedNodes(ExecutionNodePreorderIterator iter,
             ExpectedNode[] expectedRoots, boolean iterateOverSubtree) throws ProofInputException {
@@ -235,7 +244,8 @@ public class TestExecutionNodePreorderIterator {
         /**
          * Constructor.
          *
-         * @param expectedName The expected name.
+         * @param expectedName
+         *        The expected name.
          */
         public ExpectedNode(String expectedName) {
             this.expectedName = expectedName;
@@ -244,8 +254,10 @@ public class TestExecutionNodePreorderIterator {
         /**
          * Constructor.
          *
-         * @param expectedName The expected name.
-         * @param expectedChildren The expected children.
+         * @param expectedName
+         *        The expected name.
+         * @param expectedChildren
+         *        The expected children.
          */
         public ExpectedNode(String expectedName, ExpectedNode[] expectedChildren) {
             this.expectedName = expectedName;
@@ -274,8 +286,10 @@ public class TestExecutionNodePreorderIterator {
     /**
      * Creates new {@link ExpectedNode}s with the given names and children.
      *
-     * @param expectedNames The given names.
-     * @param children The given children.
+     * @param expectedNames
+     *        The given names.
+     * @param children
+     *        The given children.
      * @return The created {@link ExpectedNode}s.
      */
     protected ExpectedNode[] createExpectedNodes(String[] expectedNames,
@@ -291,7 +305,8 @@ public class TestExecutionNodePreorderIterator {
     /**
      * Creates new {@link ExpectedNode}s with the given names.
      *
-     * @param expectedNames The given names.
+     * @param expectedNames
+     *        The given names.
      * @return The created {@link ExpectedNode}s.
      */
     protected ExpectedNode[] createExpectedNodes(String... expectedNames) {
@@ -305,8 +320,10 @@ public class TestExecutionNodePreorderIterator {
     /**
      * Appends a new node to the given parent {@link Node}.
      *
-     * @param proof The {@link Proof} which forms the test model.
-     * @param parent The parent {@link Node} to add to.
+     * @param proof
+     *        The {@link Proof} which forms the test model.
+     * @param parent
+     *        The parent {@link Node} to add to.
      * @return The new created child {@link Node}.
      */
     protected Node appendNode(Proof proof, Node parent) {
@@ -318,7 +335,8 @@ public class TestExecutionNodePreorderIterator {
     /**
      * Sets a new root {@link Node} on the proof.
      *
-     * @param proof The {@link Proof} to set root on.
+     * @param proof
+     *        The {@link Proof} to set root on.
      * @return The created root {@link Node}.
      */
     protected Node appendRoot(Proof proof) {

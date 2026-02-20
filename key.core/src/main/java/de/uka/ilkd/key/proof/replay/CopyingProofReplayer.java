@@ -24,8 +24,10 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
     /**
      * Construct a new replayer.
      *
-     * @param originalProof proof to copy from
-     * @param proof proof to add steps to
+     * @param originalProof
+     *        proof to copy from
+     * @param proof
+     *        proof to add steps to
      */
     public CopyingProofReplayer(Proof originalProof, Proof proof) {
         super(originalProof, proof);
@@ -34,10 +36,14 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
     /**
      * Copy steps from <code>originalNode</code> to <code>newNode</code>
      *
-     * @param originalNode original proof
-     * @param newNode open goal in new proof
-     * @param skippedNodes nodes to skip when copying
-     * @throws IntermediateProofReplayer.BuiltInConstructionException on error
+     * @param originalNode
+     *        original proof
+     * @param newNode
+     *        open goal in new proof
+     * @param skippedNodes
+     *        nodes to skip when copying
+     * @throws IntermediateProofReplayer.BuiltInConstructionException
+     *         on error
      */
     public void copy(Node originalNode, Goal newNode, Set<Node> skippedNodes)
             throws IntermediateProofReplayer.BuiltInConstructionException {

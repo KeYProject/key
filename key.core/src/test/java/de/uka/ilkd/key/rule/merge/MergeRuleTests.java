@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -28,6 +28,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MergeRuleTests {
     private static final Path TEST_RESOURCES_DIR_PREFIX =
         HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/");
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleTests.class);
 
     /**
      * Simple regression test case loading an existing closed proof (standard Gcd example)
@@ -296,6 +299,10 @@ public class MergeRuleTests {
         }
     }
 
+    public static Proof loadProof(String directory, String proofFileName) {
+        return loadProof(Paths.get(directory), proofFileName);
+    }
+
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof is not null, and
      * fails if the proof could not be loaded.
@@ -309,17 +316,21 @@ public class MergeRuleTests {
         assertTrue(Files.exists(proofFile),
             "Proof file: " + proofFile.toAbsolutePath() + " could not be found!");
 
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            Assertions.assertNotNull(proof);
-
-            return proof;
-        } catch (ProblemLoaderException e) {
-            Assertions.fail("Proof could not be loaded", e);
-            return null;
+        var environment = Assertions
+                .assertDoesNotThrow(() -> KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile, null, null, null, true));
+        Proof proof = environment.getLoadedProof();
+        Assertions.assertNotNull(proof, "Loaded proof should not be null");
+        var errors = environment.getReplayResult().getErrorList();
+        if (!errors.isEmpty()) {
+            LOGGER.warn("There were errors during load");
+            for (int i = 0; i < errors.size(); i++) {
+                var error = errors.get(i);
+                LOGGER.warn("Error " + i + ": ", error);
+            }
+            Assertions.fail("There were errors during load");
         }
+        return proof;
     }
 
     private static class IncompleteRuleAppException extends RuntimeException {

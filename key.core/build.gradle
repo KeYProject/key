@@ -1,5 +1,4 @@
 plugins {
-    id 'org.javacc.javacc' version '4.0.3'
 }
 
 description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
@@ -11,46 +10,34 @@ dependencies {
     api project(':key.ncore')
     api project(':key.ncore.calculus')
     //api group: group, name: 'recoderkey', version: '1.0'
-    api project(':recoder')
 
     // JavaCC
-    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    //implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    //javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
+
+    api project(':key.util')
+
+    def JP_VERSION = "3.28.0-K10.1-SNAPSHOT"
+    api "org.key-project.proofjava:javaparser-core:$JP_VERSION"
+    api "org.key-project.proofjava:javaparser-core-serialization:$JP_VERSION"
+    api "org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION"
+
+    testImplementation("com.google.truth:truth:1.4.4")
+    testImplementation(project(":key.core"))
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
 }
 
 // The target directory for JavaCC (parser generation)
-def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
-def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+//def javaCCOutputDir = layout.buildDirectory.dir("generated-src/javacc").getOrNull()
+//def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
-sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
+sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")
 
-// Generate code from JavaCC grammars.
-compileJavacc {
-    outputDirectory = javaCCOutputDirMain
-    inputDirectory = file("src/main/javacc")
-    doLast {
-        // Some manual overwriting of Token files needed
-        copy {
-            from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/Token.java")
-            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
-        }
-        copy {
-            from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/Token.java")
-            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
-        }
-        copy {
-            from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/JavaCharStream.java")
-            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
-        }
-        copy {
-            from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/JavaCharStream.java")
-            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
-        }
-    }
-}
 
 tasks.register('generateSMTListings') {
     def pack = "de/uka/ilkd/key/smt/newsmt2"
@@ -244,4 +231,4 @@ tasks.register('generateRAPUnitTests', JavaExec) {
 
 sourceSets.test.java.srcDirs(rapDir)
 
-sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc)
+sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key)

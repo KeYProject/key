@@ -82,17 +82,22 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
      */
     private Instantiation lastInstantiation;
 
-    private LoopContractExternalRule() {
-    }
+    private LoopContractExternalRule() {}
 
     /**
      *
-     * @param contextUpdate the context update.
-     * @param heaps the heaps.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param variables the variables.
-     * @param modifiableClauses the modifiable clauses.
-     * @param services services.
+     * @param contextUpdate
+     *        the context update.
+     * @param heaps
+     *        the heaps.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param variables
+     *        the variables.
+     * @param modifiableClauses
+     *        the modifiable clauses.
+     * @param services
+     *        services.
      * @return the updates for the usage branch.
      */
     private static JTerm[] createUpdates(final JTerm contextUpdate,
@@ -109,12 +114,18 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
 
     /**
      *
-     * @param selfTerm the self term.
-     * @param contract the loop contract being applied.
-     * @param heaps the heaps.
-     * @param localInVariables all free program variables in the block.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
-     * @param services services.
+     * @param selfTerm
+     *        the self term.
+     * @param contract
+     *        the loop contract being applied.
+     * @param heaps
+     *        the heaps.
+     * @param localInVariables
+     *        all free program variables in the block.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
+     * @param services
+     *        services.
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final JTerm selfTerm, final LoopContract contract,
@@ -135,9 +146,12 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
 
     /**
      *
-     * @param localOutVariables all free program variables modified by the block.
-     * @param anonymisationHeaps the anonymization heaps.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param localOutVariables
+     *        all free program variables modified by the block.
+     * @param anonymisationHeaps
+     *        the anonymization heaps.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder.
      * @return preconditions for the usage branch.
      */
     private static JTerm[] createUsageAssumptions(

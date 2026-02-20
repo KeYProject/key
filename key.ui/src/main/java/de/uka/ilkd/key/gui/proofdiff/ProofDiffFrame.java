@@ -75,7 +75,8 @@ public class ProofDiffFrame extends JFrame {
     /**
      * Instantiates a new proof-diff frame.
      *
-     * @param mainWindow the main window of the system
+     * @param mainWindow
+     *        the main window of the system
      */
     public ProofDiffFrame(MainWindow mainWindow) {
         super("Visual difference between two sequents");
@@ -263,7 +264,8 @@ public class ProofDiffFrame extends JFrame {
     /**
      * Render special html characters and spaces and new lines
      *
-     * @param string an arbitrary string
+     * @param string
+     *        an arbitrary string
      * @return the string converted to html
      */
     private String toHtml(String string) {
@@ -278,9 +280,11 @@ public class ProofDiffFrame extends JFrame {
     /**
      * Gets the pretty printed node text for a node.
      *
-     * @param nodeNumber the number of the node to search
+     * @param nodeNumber
+     *        the number of the node to search
      * @return the proof node text
-     * @throws IllegalArgumentException if the number string is bad or there is no proof.
+     * @throws IllegalArgumentException
+     *         if the number string is bad or there is no proof.
      */
     private String getProofNodeText(int nodeNumber) {
 

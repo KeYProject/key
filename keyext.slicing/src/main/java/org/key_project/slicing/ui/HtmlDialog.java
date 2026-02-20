@@ -21,10 +21,14 @@ public class HtmlDialog extends JDialog {
     /**
      * Construct and show a new dialog for the provided HTML.
      *
-     * @param window parent window
-     * @param title title of the new dialog
-     * @param html HTML to show
-     * @param linkPressedCallback if the user clicks on a link, this callback receives the URL
+     * @param window
+     *        parent window
+     * @param title
+     *        title of the new dialog
+     * @param html
+     *        HTML to show
+     * @param linkPressedCallback
+     *        if the user clicks on a link, this callback receives the URL
      */
     public HtmlDialog(Window window, String title, String html,
             Consumer<String> linkPressedCallback) {

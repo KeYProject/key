@@ -177,9 +177,11 @@ public class StrategySettingsDefinition {
     /**
      * Constructor.
      *
-     * @param propertiesTitle The label shown in front of the controls to edit
+     * @param propertiesTitle
+     *        The label shown in front of the controls to edit
      *        {@link StrategyProperties}.
-     * @param properties Defines the controls to edit {@link StrategyProperties}.
+     * @param properties
+     *        Defines the controls to edit {@link StrategyProperties}.
      */
     public StrategySettingsDefinition(String propertiesTitle,
             AbstractStrategyPropertyDefinition... properties) {
@@ -190,17 +192,24 @@ public class StrategySettingsDefinition {
     /**
      * Constructor.
      *
-     * @param showMaxRuleApplications Defines if a user interface control is shown to edit
+     * @param showMaxRuleApplications
+     *        Defines if a user interface control is shown to edit
      *        {@link StrategySettings#getMaxSteps()}.
-     * @param maxRuleApplicationsLabel The label shown in front of the control to edit
+     * @param maxRuleApplicationsLabel
+     *        The label shown in front of the control to edit
      *        {@link StrategySettings#getMaxSteps()}.
-     * @param defaultMaxRuleApplications The default maximal rule applications.
-     * @param propertiesTitle The label shown in front of the controls to edit
+     * @param defaultMaxRuleApplications
+     *        The default maximal rule applications.
+     * @param propertiesTitle
+     *        The label shown in front of the controls to edit
      *        {@link StrategyProperties}.
-     * @param defaultPropertiesFactory The {@link IDefaultStrategyPropertiesFactory} used to create
+     * @param defaultPropertiesFactory
+     *        The {@link IDefaultStrategyPropertiesFactory} used to create
      *        default {@link StrategyProperties}.
-     * @param furtherDefaults further defaults used to create default {@link StrategyProperties}.
-     * @param properties Defines the controls to edit {@link StrategyProperties}.
+     * @param furtherDefaults
+     *        further defaults used to create default {@link StrategyProperties}.
+     * @param properties
+     *        Defines the controls to edit {@link StrategyProperties}.
      */
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
             String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,

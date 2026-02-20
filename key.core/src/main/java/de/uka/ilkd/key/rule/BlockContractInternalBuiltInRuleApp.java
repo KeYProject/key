@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;

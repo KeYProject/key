@@ -22,7 +22,8 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
     /**
      * Create a new action.
      *
-     * @param mainWindow the main window.
+     * @param mainWindow
+     *        the main window.
      */
     public ToggleOriginHighlightAction(MainWindow mainWindow) {
         super(mainWindow);

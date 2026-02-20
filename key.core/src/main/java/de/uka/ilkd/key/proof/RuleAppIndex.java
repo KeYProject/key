@@ -128,7 +128,8 @@ public final class RuleAppIndex {
     /**
      * adds a change listener to the index
      *
-     * @param l the AppIndexListener to add
+     * @param l
+     *        the AppIndexListener to add
      */
     public void setNewRuleListener(@Nullable NewRuleListener l) {
         ruleListener = l;
@@ -138,9 +139,12 @@ public final class RuleAppIndex {
      * returns the set of rule applications for the given heuristics at the given position of the
      * given sequent.
      *
-     * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param filter
+     *        the TacletFiler filtering the taclets of interest
+     * @param pos
+     *        the PosInOccurrence to focus
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      */
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter filter,
@@ -160,9 +164,12 @@ public final class RuleAppIndex {
      * returns the rule applications at the given PosInOccurrence and at all Positions below this.
      * The method calls getTacletAppAt for all the Positions below.
      *
-     * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the position where to start from
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param filter
+     *        the TacletFiler filtering the taclets of interest
+     * @param pos
+     *        the position where to start from
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return the possible rule applications
      */
@@ -183,8 +190,10 @@ public final class RuleAppIndex {
     /**
      * collects all FindTacletInstantiations for the given heuristics and position
      *
-     * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the PosInOccurrence to focus
+     * @param filter
+     *        the TacletFiler filtering the taclets of interest
+     * @param pos
+     *        the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter,
@@ -200,8 +209,10 @@ public final class RuleAppIndex {
     /**
      * collects all NoFindTacletInstantiations for the given heuristics
      *
-     * @param filter the TacletFiler filtering the taclets of interest
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param filter
+     *        the TacletFiler filtering the taclets of interest
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -219,8 +230,10 @@ public final class RuleAppIndex {
      * collects all RewriteTacletInstantiations for the given heuristics in a subterm of the
      * constraintformula described by a PosInOccurrence
      *
-     * @param filter the TacletFiler filtering the taclets of interest
-     * @param pos the PosInOccurrence to focus
+     * @param filter
+     *        the TacletFiler filtering the taclets of interest
+     * @param pos
+     *        the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(TacletFilter filter,
@@ -249,7 +262,8 @@ public final class RuleAppIndex {
     /**
      * adds a new Taclet with instantiation information to the Taclet Index of this TacletAppIndex.
      *
-     * @param tacletApps the NoPosTacletApp describing a partial instantiated Taclet to add
+     * @param tacletApps
+     *        the NoPosTacletApp describing a partial instantiated Taclet to add
      */
     public void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
         tacletIndex.addTaclets(tacletApps);
@@ -265,7 +279,8 @@ public final class RuleAppIndex {
     /**
      * adds a new Taclet with instantiation information to the Taclet Index of this TacletAppIndex.
      *
-     * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
+     * @param tacletApp
+     *        the NoPosTacletApp describing a partial instantiated Taclet to add
      */
     public void addNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.add(tacletApp);
@@ -281,7 +296,8 @@ public final class RuleAppIndex {
     /**
      * remove a Taclet with instantiation information from the Taclet Index of this TacletAppIndex.
      *
-     * @param tacletApp the NoPosTacletApp to remove
+     * @param tacletApp
+     *        the NoPosTacletApp to remove
      */
     public void removeNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.remove(tacletApp);
@@ -297,7 +313,8 @@ public final class RuleAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param sci SequentChangeInfo describing the change of the sequent
+     * @param sci
+     *        SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
         if (!autoMode) {
@@ -339,8 +356,10 @@ public final class RuleAppIndex {
      * Report all rule applications that are supposed to be applied automatically, and that are
      * currently stored by the index
      *
-     * @param l the NewRuleListener
-     * @param services the Services
+     * @param l
+     *        the NewRuleListener
+     * @param services
+     *        the Services
      */
     public void reportAutomatedRuleApps(NewRuleListener l, Services services) {
         automatedTacletAppIndex.reportRuleApps(l, services);
@@ -350,7 +369,8 @@ public final class RuleAppIndex {
     /**
      * Report builtin rules to all registered NewRuleListener instances.
      *
-     * @param p_goal the Goal which to scan
+     * @param p_goal
+     *        the Goal which to scan
      */
     public void scanBuiltInRules(Goal p_goal) {
         builtInRuleAppIndex().scanApplicableRules(p_goal, newRuleListener);

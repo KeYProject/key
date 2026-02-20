@@ -51,9 +51,12 @@ public abstract class NodeInfoVisualizer extends JComponent
     /**
      * Creates a new {@link NodeInfoVisualizer}.
      *
-     * @param node the node this visualizer is associated with.
-     * @param longName the visualizer's long name.
-     * @param shortName the visualizer's short name.
+     * @param node
+     *        the node this visualizer is associated with.
+     * @param longName
+     *        the visualizer's long name.
+     * @param shortName
+     *        the visualizer's short name.
      */
     protected NodeInfoVisualizer(Node node, String longName, String shortName) {
         this.node = node;
@@ -67,7 +70,8 @@ public abstract class NodeInfoVisualizer extends JComponent
      * Returns {@code true} iff there are any open {@code NodeInfoWindow}s associated with the
      * specified node.
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return {@code true} iff there are any open {@code NodeInfoWindow}s associated with the
      *         specified node.
      */
@@ -78,7 +82,8 @@ public abstract class NodeInfoVisualizer extends JComponent
     /**
      * Returns the set of open {@code NodeInfoWindow}s associated with the specified node.
      *
-     * @param node a node.
+     * @param node
+     *        a node.
      * @return the set of open {@code NodeInfoWindow}s associated with the specified node.
      */
     public static SortedSet<NodeInfoVisualizer> getInstances(Node node) {
@@ -90,7 +95,8 @@ public abstract class NodeInfoVisualizer extends JComponent
     /**
      * Adds a listener.
      *
-     * @param listener the listener to add.
+     * @param listener
+     *        the listener to add.
      */
     public static void addListener(NodeInfoVisualizerListener listener) {
         listeners.add(listener);
@@ -99,7 +105,8 @@ public abstract class NodeInfoVisualizer extends JComponent
     /**
      * Removes a listener.
      *
-     * @param listener the listener to remove.
+     * @param listener
+     *        the listener to remove.
      */
     public static void removeListener(NodeInfoVisualizerListener listener) {
         listeners.remove(listener);
@@ -108,7 +115,8 @@ public abstract class NodeInfoVisualizer extends JComponent
     /**
      * Ensures that the specified visualizer will not be returned by {@link #getInstances(Node)}.
      *
-     * @param vis the visualizer to unregister.
+     * @param vis
+     *        the visualizer to unregister.
      * @see #getInstances(Node)
      */
     protected static void unregister(NodeInfoVisualizer vis) {

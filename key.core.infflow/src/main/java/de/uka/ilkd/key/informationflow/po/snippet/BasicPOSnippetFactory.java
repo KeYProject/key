@@ -75,7 +75,7 @@ public interface BasicPOSnippetFactory {
 
         // miscellaneous snippets
         SELF_NOT_NULL(BasicSelfNotNullSnippet.class), // "self != null"
-        SELF_CREATED(BasicSelfCreatedSnippet.class), // "self.<created> = TRUE"
+        SELF_CREATED(BasicSelfCreatedSnippet.class), // "self.$created = TRUE"
         SELF_EXACT_TYPE(BasicSelfExactTypeSnippet.class), // "MyClass::exactInstance(self) = TRUE"
         PARAMS_OK(BasicParamsOkSnippet.class), // the general assumption that all parameter
                                                // arguments are valid

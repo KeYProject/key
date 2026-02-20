@@ -2074,10 +2074,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
      *
-     * @param app rule application
-     * @param pio corresponding {@link PosInOccurrence}
-     * @param goal corresponding goal
-     * @param mState the {@link MutableState} to query for information like current value of
+     * @param app
+     *        rule application
+     * @param pio
+     *        corresponding {@link PosInOccurrence}
+     * @param goal
+     *        corresponding goal
+     * @param mState
+     *        the {@link MutableState} to query for information like current value of
      *        {@link TermBuffer}s or
      *        {@link ChoicePoint}s
      * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
@@ -2101,9 +2105,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * Re-Evaluate a <code>RuleApp</code>. This method is called immediately before a rule is really
      * applied
      *
-     * @param app the rule application
-     * @param pio the position in occurrence
-     * @param goal the goal
+     * @param app
+     *        the rule application
+     * @param pio
+     *        the position in occurrence
+     * @param goal
+     *        the goal
      * @return true iff the rule should be applied, false otherwise
      */
     @Override

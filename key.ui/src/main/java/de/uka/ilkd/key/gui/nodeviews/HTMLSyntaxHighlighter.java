@@ -76,7 +76,7 @@ public class HTMLSyntaxHighlighter {
 
     private final static String[] DYNAMIC_LOGIC_KEYWORDS =
         { "\\forall", "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum", "bsum",
-            "\\in", "exactInstance", "wellFormed", "measuredByEmpty", "<created>", "<inv>", "\\cup",
+            "\\in", "exactInstance", "wellFormed", "measuredByEmpty", "$created", "<inv>", "\\cup",
             "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
 
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
@@ -210,7 +210,8 @@ public class HTMLSyntaxHighlighter {
     /**
      * Adds CSS rules to the given document.
      *
-     * @param document The {@link HTMLDocument}
+     * @param document
+     *        The {@link HTMLDocument}
      */
     public static void addCSSRulesTo(HTMLDocument document) {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()) {
@@ -226,8 +227,10 @@ public class HTMLSyntaxHighlighter {
      * Computes a String for the given plain text where HTML elements have been escaped and syntax
      * highlighting has been added.
      *
-     * @param plainTextString The String to add syntax highlighting to.
-     * @param displayedNode The node the sequent of which should be augmented with syntax
+     * @param plainTextString
+     *        The String to add syntax highlighting to.
+     * @param displayedNode
+     *        The node the sequent of which should be augmented with syntax
      *        highlighting.
      * @return A HTML version of the input String with added syntax highlighting.
      */
@@ -278,8 +281,10 @@ public class HTMLSyntaxHighlighter {
     /**
      * Adds syntax highlighting to the given HTML String.
      *
-     * @param htmlString The HTML String to add syntax highlighting tags to.
-     * @param programVariables The program variables to highlight.
+     * @param htmlString
+     *        The HTML String to add syntax highlighting tags to.
+     * @param programVariables
+     *        The program variables to highlight.
      * @return The input String augmented by syntax highlighting tags.
      */
     private static String addSyntaxHighlighting(String htmlString,
@@ -329,7 +334,8 @@ public class HTMLSyntaxHighlighter {
     /**
      * Shortcut for {@link LogicPrinter#escapeHTML(String, boolean)}.
      *
-     * @param plainTextString The String to transform.
+     * @param plainTextString
+     *        The String to transform.
      * @return A HTML-compatible version of plainTextString.
      */
     public static String toHTML(String plainTextString) {
@@ -340,8 +346,10 @@ public class HTMLSyntaxHighlighter {
      * Concatenates the given String array where the elements are separated by the given delimiter
      * in the result String.
      *
-     * @param delim Delimiter for the elements in the array.
-     * @param strings Strings to concatenate.
+     * @param delim
+     *        Delimiter for the elements in the array.
+     * @param strings
+     *        Strings to concatenate.
      * @return The concatenated array, elements separated by the given delimiter.
      */
     private static String concat(String delim, Iterable<?> strings) {
@@ -352,9 +360,12 @@ public class HTMLSyntaxHighlighter {
      * Concatenates the given String array where the elements are separated by the given delimiter
      * in the result String.
      *
-     * @param delim Delimiter for the elements in the array.
-     * @param strings Strings to concatenate.
-     * @param strTransformer Transformation applied to the input Strings before the concatenation is
+     * @param delim
+     *        Delimiter for the elements in the array.
+     * @param strings
+     *        Strings to concatenate.
+     * @param strTransformer
+     *        Transformation applied to the input Strings before the concatenation is
      *        performed.
      * @return The concatenated array, elements separated by the given delimiter.
      */
@@ -373,7 +384,8 @@ public class HTMLSyntaxHighlighter {
     /**
      * Concatenates the given Strings using a {@link StringBuilder}.
      *
-     * @param strings Strings to concatenate.
+     * @param strings
+     *        Strings to concatenate.
      * @return The concatenated Strings.
      */
     public static String concat(String... strings) {

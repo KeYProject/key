@@ -65,7 +65,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     /**
      * Converts a set of parameter variables into a list of parameter variables
      *
-     * @param set a set of parameter variables
+     * @param set
+     *        a set of parameter variables
      * @return a list of the parameter variables
      */
     final static ImmutableList<LocationVariable> convertParams(ImmutableSet<LocationVariable> set) {
@@ -90,10 +91,14 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * Aggregates and preprocesses the proof obligation data into the according terms for the
      * well-definedness sequent of the jml statement.
      *
-     * @param po the proof obligation terms of the statement
-     * @param vars the new (current) variables
-     * @param leadingUpdate the context update of the program before the statement
-     * @param localAnon anonymize local variables
+     * @param po
+     *        the proof obligation terms of the statement
+     * @param vars
+     *        the new (current) variables
+     * @param leadingUpdate
+     *        the context update of the program before the statement
+     * @param localAnon
+     *        anonymize local variables
      * @param services
      * @return the actual terms used in the well-definedness sequent
      */
@@ -113,16 +118,26 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     /**
      * This is where the proof sequent is built.
      *
-     * @param self The current self variable
-     * @param exception The current exception variable
-     * @param result The current result variable
-     * @param heap The current heap
-     * @param heapAtPre The current old heap
-     * @param anonHeap The anonymized heap
-     * @param ps The current parameter variables
-     * @param leadingUpdate The context update
-     * @param localAnonUpdate anonymization update of local variables
-     * @param services The current services reference
+     * @param self
+     *        The current self variable
+     * @param exception
+     *        The current exception variable
+     * @param result
+     *        The current result variable
+     * @param heap
+     *        The current heap
+     * @param heapAtPre
+     *        The current old heap
+     * @param anonHeap
+     *        The anonymized heap
+     * @param ps
+     *        The current parameter variables
+     * @param leadingUpdate
+     *        The context update
+     * @param localAnonUpdate
+     *        anonymization update of local variables
+     * @param services
+     *        The current services reference
      * @return The proof sequent for the well-definedness check
      */
     public SequentFormula generateSequent(LocationVariable self,
@@ -149,12 +164,18 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * nature of the jml statement. This means no exception variable, no result variable and
      * variable for the heap of the pre-state.
      *
-     * @param self self variable
-     * @param heap heap variable
-     * @param anonHeap anonymised heap
-     * @param ps set of parameter variables
-     * @param leadingUpdate the context update
-     * @param localAnonUpdate anonymization update of local variables
+     * @param self
+     *        self variable
+     * @param heap
+     *        heap variable
+     * @param anonHeap
+     *        anonymised heap
+     * @param ps
+     *        set of parameter variables
+     * @param leadingUpdate
+     *        the context update
+     * @param localAnonUpdate
+     *        anonymization update of local variables
      * @param services
      * @return The proof sequent for the well-definedness check
      */

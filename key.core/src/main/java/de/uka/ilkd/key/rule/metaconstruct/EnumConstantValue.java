@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -35,7 +35,8 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      * If the program variable is the nextToCreate-field resolve it to the number of enum constants
      * of the container. Otherwise result in the index of the constant.
      *
-     * @throws IllegalArgumentException if the pv is neither a constant nor ntc.
+     * @throws IllegalArgumentException
+     *         if the pv is neither a constant nor ntc.
      */
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         term = term.sub(0);

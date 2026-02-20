@@ -1,6 +1,6 @@
 // verbose: true
 // broken: false
-// exceptionClass: ConvertException
+// exceptionClass: RuntimeException
 // msgContains: JML model fields cannot be declared within a method
 
 class ModelFieldinMethod {

@@ -55,7 +55,8 @@ public class Style {
         /**
          * Sets the title.
          *
-         * @param title tooltip title
+         * @param title
+         *        tooltip title
          */
         public void setTitle(String title) {
             this.title = title;
@@ -64,9 +65,12 @@ public class Style {
         /**
          * Adds a piece of additional information.
          *
-         * @param key the key
-         * @param value the value
-         * @param block whether this should be rendered as a block
+         * @param key
+         *        the key
+         * @param value
+         *        the value
+         * @param block
+         *        whether this should be rendered as a block
          */
         public void addAdditionalInfo(@NonNull String key, @NonNull String value, boolean block) {
             additionalInfo.add(new Fragment(key, value, block));
@@ -75,7 +79,8 @@ public class Style {
         /**
          * Adds notes
          *
-         * @param notes the notes
+         * @param notes
+         *        the notes
          */
         public void addNotes(@NonNull String notes) {
             addAdditionalInfo("Notes", notes, false);
@@ -84,7 +89,8 @@ public class Style {
         /**
          * Adds rule information
          *
-         * @param rule the rule
+         * @param rule
+         *        the rule
          */
         public void addRule(@NonNull String rule) {
             addAdditionalInfo("Rule", rule, false);
@@ -93,7 +99,8 @@ public class Style {
         /**
          * Adds applied on infos
          *
-         * @param on the info
+         * @param on
+         *        the info
          */
         public void addAppliedOn(@NonNull String on) {
             addAdditionalInfo("Applied on", LogicPrinter.escapeHTML(on, true), true);

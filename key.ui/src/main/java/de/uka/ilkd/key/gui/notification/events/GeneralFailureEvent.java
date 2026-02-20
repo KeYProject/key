@@ -25,7 +25,8 @@ public class GeneralFailureEvent extends NotificationEvent {
     /**
      * creates an instance of this event
      *
-     * @param errorMessage a String describing the failure
+     * @param errorMessage
+     *        a String describing the failure
      */
     public GeneralFailureEvent(String errorMessage) {
         super(NotificationEventID.GENERAL_FAILURE);

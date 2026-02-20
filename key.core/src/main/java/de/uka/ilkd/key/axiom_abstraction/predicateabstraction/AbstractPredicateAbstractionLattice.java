@@ -26,11 +26,15 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
     /**
      * Joins to abstract elements in the lattice.
      *
-     * @param a First domain element for the join.
-     * @param b Second domain element for the join.
-     * @param combiner The combination function (e.g., "AND") for the respective predicates of the
+     * @param a
+     *        First domain element for the join.
+     * @param b
+     *        Second domain element for the join.
+     * @param combiner
+     *        The combination function (e.g., "AND") for the respective predicates of the
      *        inputs..
-     * @param abstrElemConstructor A function constructing abstract domain elements from predicates.
+     * @param abstrElemConstructor
+     *        A function constructing abstract domain elements from predicates.
      * @return The joined abstract domain element.
      */
     protected AbstractPredicateAbstractionDomainElement join(AbstractDomainElement a,
@@ -107,7 +111,8 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
          * Constructs a new {@link AbstractPredicateLatticeIterator}; initializes the bit sets for
          * the iteration.
          *
-         * @param numApplPreds The number of applicable predicates for the lattice.
+         * @param numApplPreds
+         *        The number of applicable predicates for the lattice.
          */
         protected AbstractPredicateLatticeIterator(int numApplPreds) {
             // We work with bit sets of length n (where n is the number of

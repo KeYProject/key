@@ -40,12 +40,16 @@ public class ProofObligationCreator {
      * Creates for each taclet in <code>taclets</code> a proof obligation containing the
      * corresponding FOL formula of the taclet.
      *
-     * @param taclets Sets of taclets the proof obligations should be created for.
-     * @param initConfigs the initial configuration that should be used for creating the proofs.
-     * @param axioms The set of user-defined taclets that should be used as additional rules. This
+     * @param taclets
+     *        Sets of taclets the proof obligations should be created for.
+     * @param initConfigs
+     *        the initial configuration that should be used for creating the proofs.
+     * @param axioms
+     *        The set of user-defined taclets that should be used as additional rules. This
      *        taclets are added to the single proof obligation so that they can be used for the
      *        proof.
-     * @param listeners a listener that observes the single steps. Used for status information.
+     * @param listeners
+     *        a listener that observes the single steps. Used for status information.
      * @return A proof aggregate containing the proofs created by this method.
      */
     public ProofAggregate create(ImmutableSet<Taclet> taclets, InitConfig[] initConfigs,

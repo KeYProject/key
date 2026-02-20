@@ -31,13 +31,13 @@ public final class SwingUtil {
     private static final String NOTIFICATION_ERROR = "failed to show notification ";
 
 
-    private SwingUtil() {
-    }
+    private SwingUtil() {}
 
     /**
      * Wrapper for {@link java.awt.Desktop#browse(URI)} that also works on Linux.
      *
-     * @param uri the URI to be displayed in the user's default browser
+     * @param uri
+     *        the URI to be displayed in the user's default browser
      */
     public static void browse(URI uri) throws IOException {
         try {
@@ -68,10 +68,13 @@ public final class SwingUtil {
      * Find a component of the specified class in the container.
      * This will search the view hierarchy recursively.
      *
-     * @param container container to search in
-     * @param classToFind class to look for
+     * @param container
+     *        container to search in
+     * @param classToFind
+     *        class to look for
      * @return the object if found, otherwise null
-     * @param <T> class of the component
+     * @param <T>
+     *        class of the component
      */
     public static <T> T findComponent(Container container, Class<T> classToFind) {
         for (int i = 0; i < container.getComponentCount(); i++) {
@@ -93,10 +96,13 @@ public final class SwingUtil {
      * This will search the view hierarchy recursively and is limited
      * to "visible" elements (on screen or on visible tab).
      *
-     * @param container container to search in
-     * @param classToFind class to look for
+     * @param container
+     *        container to search in
+     * @param classToFind
+     *        class to look for
      * @return the object(s) if found (may be empty)
-     * @param <T> class of the component
+     * @param <T>
+     *        class of the component
      */
     public static <T> List<T> findAllComponents(Container container, Class<T> classToFind) {
         List<T> l = new ArrayList<>();
@@ -178,7 +184,8 @@ public final class SwingUtil {
      * Create a scroll pane around the given table.
      * It will always have vertical and horizontal scroll bars.
      *
-     * @param table the table
+     * @param table
+     *        the table
      * @return the scroll pane
      */
     public static JScrollPane createScrollPane(JTable table) {
@@ -196,8 +203,10 @@ public final class SwingUtil {
     /**
      * Set the provided font on the component and recursively on all children components.
      *
-     * @param component the component
-     * @param font the font
+     * @param component
+     *        the component
+     * @param font
+     *        the font
      */
     public static void setFont(JComponent component, Font font) {
         if (component == null) {
@@ -223,8 +232,10 @@ public final class SwingUtil {
     /**
      * Show a desktop notification to the user.
      *
-     * @param title title of the notification
-     * @param text text of the notification
+     * @param title
+     *        title of the notification
+     * @param text
+     *        text of the notification
      */
     public static void showNotification(String title, String text) {
         if (System.getProperty("os.name").startsWith("Linux")) {

@@ -234,14 +234,16 @@ public class TestEqualsHashCodeResetter {
     /**
      * Utility class used in tests.
      *
-     * @param value A value.
+     * @param value
+     *        A value.
      * @author Martin Hentschel
      */
     private record MyBean(String value) {
         /**
          * Constructor.
          *
-         * @param value A value.
+         * @param value
+         *        A value.
          */
         private MyBean {
             assertNotNull(value);

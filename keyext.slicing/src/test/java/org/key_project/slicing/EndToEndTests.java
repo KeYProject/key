@@ -49,7 +49,8 @@ class EndToEndTests {
      * works
      * as expected.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceAgatha() throws Exception {
@@ -74,7 +75,8 @@ class EndToEndTests {
      * de-duplication).
      * Keeps slicing until no more size improvements are possible.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceMultipleIterations() throws Exception {
@@ -110,7 +112,8 @@ class EndToEndTests {
     /**
      * Integration test of the dependency analysis algorithm on a proof related to a Java method.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceJavaProof() throws Exception {
@@ -125,7 +128,8 @@ class EndToEndTests {
     /**
      * Test that the dependency analyzer can remove a cut on <code>true</code>.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceCutExample() throws Exception {
@@ -135,7 +139,8 @@ class EndToEndTests {
     /**
      * Test that slicing works as expected on a pruned version of a real proof.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceAgathaWithOpenGoal() throws Exception {
@@ -146,7 +151,8 @@ class EndToEndTests {
     /**
      * Test that slicing works as expected for simple proofs with one open goal.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceWithOpenGoal() throws Exception {
@@ -158,7 +164,8 @@ class EndToEndTests {
      * Test that the branch analysis of the dependency analysis works as expected.
      * Also tests that the de-duplication analysis works as expected on this proof.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceIfThenElseSplit() throws Exception {
@@ -188,7 +195,8 @@ class EndToEndTests {
     /**
      * Test that slicing a proof closed by SMT is possible.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceSimpleSMT() throws Exception {
@@ -203,7 +211,8 @@ class EndToEndTests {
     /**
      * Test a very specific condition in the rule application de-duplication algorithm.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void deduplicateChecksMergabilityCorrectly() throws Exception {
@@ -213,7 +222,8 @@ class EndToEndTests {
     /**
      * Test that the de-duplication algorithm works as expected for a small example.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceDuplicatesAway() throws Exception {
@@ -235,7 +245,8 @@ class EndToEndTests {
     /**
      * Test that the de-duplication algorithm also works if there are open branches in the proof.
      *
-     * @throws Exception on error
+     * @throws Exception
+     *         on error
      */
     @Test
     void sliceDuplicatesAwayOpenGoals() throws Exception {
@@ -283,7 +294,8 @@ class EndToEndTests {
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         LOGGER.trace("Loading {}", proofFile.toAbsolutePath());
         KeYEnvironment<?> environment =
-            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
+            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
+                null, null,
                 null, proof -> {
                     if (trackOnline) {
                         tracker.set(new DependencyTracker(proof));

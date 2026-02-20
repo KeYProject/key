@@ -1142,13 +1142,20 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     /**
      * Performs an {@link TruthValueTracingUtil} test.
      *
-     * @param proofFilePathInBaseDir The path to the java file inside the base directory.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param expectedResults The expected results.
-     * @throws Exception Occurred Exception.
+     * @param proofFilePathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param expectedResults
+     *        The expected results.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected void doTruthValueEvaluationTest(String proofFilePathInBaseDir,
             String oraclePathInBaseDirFile, boolean useOperationContracts,
@@ -1173,14 +1180,22 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     /**
      * Performs an {@link TruthValueTracingUtil} test.
      *
-     * @param javaPathInBaseDir The path to the java file inside the base directory.
-     * @param baseContractName The name of the contract.
-     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
-     * @param useOperationContracts Use operation contracts?
-     * @param useLoopInvariants Use loop invariants?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param expectedResults The expected results.
-     * @throws Exception Occurred Exception.
+     * @param javaPathInBaseDir
+     *        The path to the java file inside the base directory.
+     * @param baseContractName
+     *        The name of the contract.
+     * @param oraclePathInBaseDirFile
+     *        The path to the oracle file inside the base directory.
+     * @param useOperationContracts
+     *        Use operation contracts?
+     * @param useLoopInvariants
+     *        Use loop invariants?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param expectedResults
+     *        The expected results.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected void doTruthValueEvaluationTest(String javaPathInBaseDir, String baseContractName,
             String oraclePathInBaseDirFile, boolean useOperationContracts,
@@ -1205,9 +1220,12 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     /**
      * Performs an {@link TruthValueTracingUtil} test.
      *
-     * @param env The {@link SymbolicExecutionEnvironment} to use.
-     * @param expectedResults The expected results.
-     * @throws Exception Occurred Exception.
+     * @param env
+     *        The {@link SymbolicExecutionEnvironment} to use.
+     * @param expectedResults
+     *        The expected results.
+     * @throws Exception
+     *         Occurred Exception.
      */
     protected void doTruthValueEvaluationTest(
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env,
@@ -1248,8 +1266,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     /**
      * Asserts the results.
      *
-     * @param expected The expected results.
-     * @param current The current results.
+     * @param expected
+     *        The expected results.
+     * @param current
+     *        The current results.
      */
     protected void assertResults(ExpectedTruthValueEvaluationResult[] expected,
             List<TruthValueTracingResult> current) {
@@ -1267,8 +1287,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     /**
      * Asserts the truth value results.
      *
-     * @param expected The expected results.
-     * @param current The current results.
+     * @param expected
+     *        The expected results.
+     * @param current
+     *        The current results.
      */
     protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected,
             TruthValueTracingResult current) {
@@ -1282,8 +1304,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     /**
      * Asserts the branch results.
      *
-     * @param expected The expected results.
-     * @param current The current results.
+     * @param expected
+     *        The expected results.
+     * @param current
+     *        The current results.
      */
     protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
         Map<String, MultiEvaluationResult> currentResults = current.results();
@@ -1322,7 +1346,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
         /**
          * Constructor.
          *
-         * @param branchResults The expected branches.
+         * @param branchResults
+         *        The expected branches.
          */
         public ExpectedTruthValueEvaluationResult(ExpectedBranchResult... branchResults) {
             this.branchResults = branchResults;
@@ -1343,7 +1368,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
         /**
          * Constructor.
          *
-         * @param labelResults The truth values of all labels.
+         * @param labelResults
+         *        The truth values of all labels.
          */
         public ExpectedBranchResult(ExpectedTruthValueResult... labelResults) {
             for (ExpectedTruthValueResult result : labelResults) {
@@ -1371,8 +1397,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
         /**
          * Constructor.
          *
-         * @param labelId The label ID.
-         * @param value The truth value.
+         * @param labelId
+         *        The label ID.
+         * @param value
+         *        The truth value.
          */
         public ExpectedTruthValueResult(String labelId, TruthValue value) {
             this.labelId = labelId;

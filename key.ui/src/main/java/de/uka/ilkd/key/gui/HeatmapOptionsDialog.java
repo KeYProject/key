@@ -170,7 +170,8 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param radioButtons the radio buttons to set
+     * @param radioButtons
+     *        the radio buttons to set
      */
     private void loadSettings(JRadioButton[] radioButtons) {
         if (VS.isShowHeatmap()) {
@@ -213,8 +214,10 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param okButton the ok button on the panel
-     * @param cancelButton the cancel button on the panel
+     * @param okButton
+     *        the ok button on the panel
+     * @param cancelButton
+     *        the cancel button on the panel
      * @return a panel with ok and cancel button
      */
     private JPanel setupButtonPanel(JButton okButton, JButton cancelButton) {
@@ -227,7 +230,8 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param spinner the spinner shown on the panel
+     * @param spinner
+     *        the spinner shown on the panel
      * @return a panel with spinner and explanation
      */
     private JPanel setupSpinnerPanel(JSpinner spinner, Color bg) {
@@ -248,8 +252,10 @@ public class HeatmapOptionsDialog extends JDialog {
     }
 
     /**
-     * @param radioButtons the radio buttons shown on the panel
-     * @param bg the background color
+     * @param radioButtons
+     *        the radio buttons shown on the panel
+     * @param bg
+     *        the background color
      * @return a panel with all the radio buttons and explanations
      */
     private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg, JDialog parent) {
@@ -300,9 +306,12 @@ public class HeatmapOptionsDialog extends JDialog {
     /**
      * Sets up the action that is called on pressing the ok button
      *
-     * @param panel the main panel
-     * @param group the radio button group
-     * @param spinner the age spinner
+     * @param panel
+     *        the main panel
+     * @param group
+     *        the radio button group
+     * @param spinner
+     *        the age spinner
      * @return
      */
     private Action setupOkAction(JPanel panel, final ButtonGroup group, JSpinner spinner) {
@@ -358,9 +367,12 @@ public class HeatmapOptionsDialog extends JDialog {
 
         /**
          *
-         * @param s the description
-         * @param title title of the dialog
-         * @param owner the parent window
+         * @param s
+         *        the description
+         * @param title
+         *        title of the dialog
+         * @param owner
+         *        the parent window
          */
         public InfoDialog(String title, String s, final JDialog owner) {
             super(owner);

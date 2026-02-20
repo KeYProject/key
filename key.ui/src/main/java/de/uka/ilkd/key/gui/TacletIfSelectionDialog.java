@@ -39,7 +39,8 @@ public class TacletIfSelectionDialog extends JPanel {
     /**
      * creates a new dialog
      *
-     * @param model the model to be displayed
+     * @param model
+     *        the model to be displayed
      */
     public TacletIfSelectionDialog(TacletInstantiationModel model,
             TacletMatchCompletionDialog owner) {

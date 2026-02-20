@@ -35,11 +35,15 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
     /**
      * Returns the {@link ISymbolicAssociation} with the given {@link IProgramVariable}.
      *
-     * @param programVariable The {@link IProgramVariable} for which the
+     * @param programVariable
+     *        The {@link IProgramVariable} for which the
      *        {@link ISymbolicAssociation} is requested.
-     * @param isArrayIndex Is array index?
-     * @param arrayIndex The array index.
-     * @param condition The optional condition under which this association is valid.
+     * @param isArrayIndex
+     *        Is array index?
+     * @param arrayIndex
+     *        The array index.
+     * @param condition
+     *        The optional condition under which this association is valid.
      * @return The found {@link ISymbolicAssociation} or {@code null} if no
      *         {@link ISymbolicAssociation} is available with the given {@link IProgramVariable}.
      */
@@ -56,11 +60,15 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
     /**
      * Returns the {@link ISymbolicValue} with the given {@link IProgramVariable}.
      *
-     * @param programVariable The {@link IProgramVariable} for which the {@link ISymbolicValue} is
+     * @param programVariable
+     *        The {@link IProgramVariable} for which the {@link ISymbolicValue} is
      *        requested.
-     * @param isArrayIndex Is array index?
-     * @param arrayIndex The array index.
-     * @param condition The optional condition under which this value is valid.
+     * @param isArrayIndex
+     *        Is array index?
+     * @param arrayIndex
+     *        The array index.
+     * @param condition
+     *        The optional condition under which this value is valid.
      * @return The found {@link ISymbolicValue} or {@code null} if no {@link ISymbolicValue} is
      *         available with the given {@link IProgramVariable}.
      */

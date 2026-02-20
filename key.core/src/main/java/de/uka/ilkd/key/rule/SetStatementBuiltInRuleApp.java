@@ -20,8 +20,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp<SetStatementRule> {
     /**
-     * @param rule the rule being applied
-     * @param occurrence the position at which the rule is applied
+     * @param rule
+     *        the rule being applied
+     * @param occurrence
+     *        the position at which the rule is applied
      */
     public SetStatementBuiltInRuleApp(SetStatementRule rule, PosInOccurrence occurrence) {
         super(rule, Objects.requireNonNull(occurrence, "rule application needs a position"), null);

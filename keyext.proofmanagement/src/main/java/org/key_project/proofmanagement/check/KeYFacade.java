@@ -8,9 +8,8 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.JavaSourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -46,14 +45,14 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  */
 public final class KeYFacade {
     // prevents from instantiating this class
-    private KeYFacade() {
-    }
+    private KeYFacade() {}
 
     /**
      * Ensures that the given CheckerData object has a valid DependencyGraph built.
      * Does not update an existing DependencyGraph!
      *
-     * @param data the CheckerData object to store the result
+     * @param data
+     *        the CheckerData object to store the result
      */
     public static void ensureDependencyGraphBuilt(CheckerData data) {
         if (data.getDependencyGraph() == null) {
@@ -70,7 +69,8 @@ public final class KeYFacade {
      * CheckerData object. Does not replay the proofs! Proofs that already have been loaded
      * are not reloaded.
      *
-     * @param data the CheckerData object to store the result
+     * @param data
+     *        the CheckerData object to store the result
      * @throws ProofManagementException
      */
     public static void ensureProofsLoaded(CheckerData data) throws ProofManagementException {
@@ -207,7 +207,7 @@ public final class KeYFacade {
         }
         Contract contract = contractPO.getContract();
         line.contract = contract;
-        Type type = contract.getTarget().getContainerType().getJavaType();
+        var type = contract.getTarget().getContainerType().getJavaType();
         if (type instanceof JavaSourceElement jse) {
             line.sourceFile = jse.getPositionInfo().getURL().orElseThrow();
             String str = line.sourceFile.toString();
@@ -224,7 +224,8 @@ public final class KeYFacade {
      * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
      *
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
             InitConfig initConfig, Configuration properties) throws Exception {
@@ -286,7 +287,8 @@ public final class KeYFacade {
      * inside the given CheckerData object. Proofs for which a replay has already been tried are not
      * replayed again.
      *
-     * @param data the CheckerData object to store the result
+     * @param data
+     *        the CheckerData object to store the result
      * @throws ProofManagementException
      */
     public static void ensureProofsReplayed(CheckerData data) throws ProofManagementException {
@@ -413,7 +415,8 @@ public final class KeYFacade {
      * Ensures that the source files contained by the bundle stored in the given CheckerData object
      * are loaded. Result is stored in CheckerData object as SLEnvInput.
      *
-     * @param data the CheckerData object to store the results
+     * @param data
+     *        the CheckerData object to store the results
      * @throws ProofManagementException
      */
     public static void ensureSourceLoaded(CheckerData data) throws ProofManagementException {

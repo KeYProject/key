@@ -32,8 +32,10 @@ public abstract class ProofModifyingUserAction extends UserAction {
     /**
      * Save the current state of the proof.
      *
-     * @param mediator the mediator
-     * @param originalState the proof
+     * @param mediator
+     *        the mediator
+     * @param originalState
+     *        the proof
      */
     protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState) {
         super(mediator, originalState);
@@ -46,9 +48,12 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * Save the current state of the proof.
      * Mark the just modified node as an open goal.
      *
-     * @param mediator the mediator
-     * @param originalState the proof
-     * @param justModifiedNode just modified node
+     * @param mediator
+     *        the mediator
+     * @param originalState
+     *        the proof
+     * @param justModifiedNode
+     *        just modified node
      */
     protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState,
             Node justModifiedNode) {

@@ -659,6 +659,7 @@ public abstract class SequentView extends JEditorPane {
      * Highlights the term at the specified position as the user's selection.
      *
      * @param pis the term to select.
+     *
      * @see #setUserSelectionHighlight(Point)
      * @see #removeUserSelectionHighlight()
      * @see #isInUserSelectionHighlight(Point)

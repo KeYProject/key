@@ -29,9 +29,12 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * Return zero iff the multiplication of mult1 and mult2 is allowed, because the resulting
      * product is partially covered by target.
      *
-     * @param mult1Candidate the left side of the first inequation to be multiplied
-     * @param mult2Candidate the left side of the second inequation to be multiplied
-     * @param targetCandidate the left side of the inequation that is supposed to bound the other
+     * @param mult1Candidate
+     *        the left side of the first inequation to be multiplied
+     * @param mult2Candidate
+     *        the left side of the second inequation to be multiplied
+     * @param targetCandidate
+     *        the left side of the inequation that is supposed to bound the other
      *        two inequations
      */
     public static Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,

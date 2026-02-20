@@ -254,8 +254,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "is not applied on Skolemized formulas in order to<br>"
             + "limit the number of inductive proofs." + "</html>";
 
-    public JavaCardDLStrategyFactory() {
-    }
+    public JavaCardDLStrategyFactory() {}
 
     public static final String toolTipUserOff(int i) {
         return "Taclets of the rule set \"userTaclets" + i + "\" are not applied automatically";

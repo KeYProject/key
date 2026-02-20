@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;

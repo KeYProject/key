@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -26,7 +26,8 @@ public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<Sourc
      * Returns the human readable node name including the return value ({@link #getReturnValues()}).
      *
      * @return The human readable node name including the return value.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getNameIncludingReturnValue() throws ProofInputException;
 
@@ -34,7 +35,8 @@ public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<Sourc
      * Returns the human readable signature including the return value ({@link #getReturnValues()}).
      *
      * @return The human readable signature including the return value.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getSignatureIncludingReturnValue() throws ProofInputException;
 
@@ -50,7 +52,8 @@ public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<Sourc
      * Returns the possible return values.
      *
      * @return The possible return values.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException;
 }

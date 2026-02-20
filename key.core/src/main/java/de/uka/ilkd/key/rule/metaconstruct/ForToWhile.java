@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -67,9 +67,12 @@ public class ForToWhile extends ProgramTransformer {
     /**
      * creates an loop to while - ProgramTransformer
      *
-     * @param loop the LoopStatement contained by the meta construct
-     * @param innerLabel the label used to handle continue
-     * @param outerLabel the label used to handle break (only needed for do-while-loops)
+     * @param loop
+     *        the LoopStatement contained by the meta construct
+     * @param innerLabel
+     *        the label used to handle continue
+     * @param outerLabel
+     *        the label used to handle break (only needed for do-while-loops)
      */
     public ForToWhile(SchemaVariable innerLabel, SchemaVariable outerLabel, Statement loop) {
         super("#for-to-while", loop);
@@ -93,7 +96,8 @@ public class ForToWhile extends ProgramTransformer {
     /**
      * return a list of the SV that are relevant to this UnwindLoop
      *
-     * @param svInst the instantiations so far - ignored
+     * @param svInst
+     *        the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override

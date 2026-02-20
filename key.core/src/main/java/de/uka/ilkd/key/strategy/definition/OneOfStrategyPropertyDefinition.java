@@ -31,9 +31,12 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
     /**
      * Constructor.
      *
-     * @param apiKey The key used in KeY's API.
-     * @param name The human readable name of the property.
-     * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
+     * @param apiKey
+     *        The key used in KeY's API.
+     * @param name
+     *        The human readable name of the property.
+     * @param values
+     *        The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
     public OneOfStrategyPropertyDefinition(String apiKey, String name,
             StrategyPropertyValueDefinition... values) {
@@ -43,10 +46,14 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
     /**
      * Constructor.
      *
-     * @param apiKey The key used in KeY's API.
-     * @param name The human readable name of the property.
-     * @param columnsPerRow Defines optionally how many columns are shown per row.
-     * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
+     * @param apiKey
+     *        The key used in KeY's API.
+     * @param name
+     *        The human readable name of the property.
+     * @param columnsPerRow
+     *        Defines optionally how many columns are shown per row.
+     * @param values
+     *        The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
     public OneOfStrategyPropertyDefinition(String apiKey, String name, int columnsPerRow,
             StrategyPropertyValueDefinition... values) {
@@ -56,10 +63,14 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
     /**
      * Constructor.
      *
-     * @param apiKey The key used in KeY's API.
-     * @param name The human readable name of the property.
-     * @param subProperties Optional children which edits related properties to this.
-     * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
+     * @param apiKey
+     *        The key used in KeY's API.
+     * @param name
+     *        The human readable name of the property.
+     * @param subProperties
+     *        Optional children which edits related properties to this.
+     * @param values
+     *        The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
     public OneOfStrategyPropertyDefinition(String apiKey, String name,
             AbstractStrategyPropertyDefinition[] subProperties,
@@ -70,12 +81,18 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
     /**
      * Constructor.
      *
-     * @param apiKey The key used in KeY's API.
-     * @param name The human readable name of the property.
-     * @param tooltip The optional tooltip text which describes this property.
-     * @param columnsPerRow Defines optionally how many columns are shown per row.
-     * @param subProperties Optional children which edits related properties to this.
-     * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
+     * @param apiKey
+     *        The key used in KeY's API.
+     * @param name
+     *        The human readable name of the property.
+     * @param tooltip
+     *        The optional tooltip text which describes this property.
+     * @param columnsPerRow
+     *        Defines optionally how many columns are shown per row.
+     * @param subProperties
+     *        Optional children which edits related properties to this.
+     * @param values
+     *        The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
     public OneOfStrategyPropertyDefinition(String apiKey, String name, String tooltip,
             int columnsPerRow, AbstractStrategyPropertyDefinition[] subProperties,

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
@@ -33,11 +33,10 @@ public class TestTermParser extends AbstractTestTermParser {
     private LogicVariable x, y, z, xs, ys;
     private JTerm t_x, t_y, t_z, t_xs, t_ys;
     private JTerm t_headxs, t_tailys, t_nil;
-    private final Recoder2KeY r2k;
+    private final JavaService r2k;
 
     public TestTermParser() {
-        r2k = new Recoder2KeY(services, nss);
-        r2k.parseSpecialClasses();
+        r2k = services.getJavaService();
         r2k.readCompilationUnit(COMPILATION_UNIT);
     }
 
@@ -367,10 +366,13 @@ public class TestTermParser extends AbstractTestTermParser {
     public void testAmbigiousFuncVarPred() {
         // tests bug id 216
         String s = """
-                \\functions {} \\predicates{mypred(int, int);}
+                \\functions {}
+                \\predicates{mypred(int, int);}
                 \\problem {\\forall int x; mypred(x, 0)}
-                 \\proof {
-                (branch "dummy ID"(opengoal "  ==> true  -> true ") ) }""";
+                \\proof {
+                    (branch "dummy ID"(opengoal "  ==> true  -> true ") )
+                }
+                """;
         try {
             parseProblem(s);
         } catch (Exception re) {
@@ -379,10 +381,21 @@ public class TestTermParser extends AbstractTestTermParser {
         }
     }
 
-    static final String COMPILATION_UNIT = "public class T extends " + "java.lang.Object{ "
-        + "private T a;" + "private static T b;" + "T c;" + "static T d;" + "public T e;"
-        + "public static T f;" + "protected T g;" + "protected T h;" + "public T query(){} "
-        + "public static T staticQ(T p){} " + "public static T staticQ() {}}";
+    static final String COMPILATION_UNIT = """
+            public class T extends java.lang.Object {
+                private T a;
+                private static T b;
+                T c;
+                static T d;
+                public T e;
+
+                public static T f;
+                protected T g; protected T h;
+                public T query()             {  }
+                public static T staticQ(T p) {  }
+                public static T staticQ()    {  }
+            }
+            """;
 
 
     public JTerm testParseQueriesAndAttributes(String expr) throws Exception {

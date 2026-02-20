@@ -43,6 +43,7 @@ public class ExprTest {
 
     private KeyIO getIo() throws IOException {
         Services services = new Services(new JavaProfile());
+        services.activateJava(null);
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);

@@ -30,7 +30,8 @@ public class SymbolicExecutionTermLabelFactory
             val = Integer.parseInt(parameters.get(0));
         } catch (NumberFormatException e) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
-                + " requires exactly one Integer-Parameter with its ID.", e);
+                + " requires exactly one Integer-Parameter with its ID.",
+                e);
         }
 
         return new SymbolicExecutionTermLabel(val);

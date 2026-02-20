@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.StrategySettings;
@@ -43,7 +43,7 @@ public interface IBreakpoint {
             int countApplied);
 
     /**
-     * Determines if the breakpoint represented by this BreakpointStopConition is triggered.
+     * Determines if the breakpoint represented by this BreakpointStopCondition is triggered.
      * Override this method in order to suspend execution when a breakpoint is hit.
      *
      * @param activeStatement the activeStatement of the node

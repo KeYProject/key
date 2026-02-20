@@ -32,7 +32,8 @@ public final class Immutables {
      *
      * The implementation uses a hash set internally and thus runs in O(n).
      *
-     * @param list any list, must not be <code>null</code>
+     * @param list
+     *        any list, must not be <code>null</code>
      * @return true iff every
      */
     public static <T extends @Nullable Object> boolean isDuplicateFree(ImmutableList<T> list) {
@@ -68,7 +69,8 @@ public final class Immutables {
      *
      * Sidenote: Would that not make a nice KeY-Verification condition? Eat your own dogfood.
      *
-     * @param list any list, must not be <code>null</code>
+     * @param list
+     *        any list, must not be <code>null</code>
      *
      * @return a duplicate-free version of the argument, never <code>null</code>
      */
@@ -142,7 +144,8 @@ public final class Immutables {
      *
      * The iteration order of the result is identical to that of the argument.
      *
-     * @param iterable the collection to iterate through to obtain the elements
+     * @param iterable
+     *        the collection to iterate through to obtain the elements
      *        for the resulting list
      *
      * @return the view onto the iterable as an immutable set
@@ -158,7 +161,8 @@ public final class Immutables {
      *
      * The iteration order of the result is identical to that of the argument.
      *
-     * @param iterable the collection to iterate through to obtain the elements
+     * @param iterable
+     *        the collection to iterate through to obtain the elements
      *        for the resulting list
      *
      * @return the view onto the iterable as an immutable list
@@ -176,9 +180,11 @@ public final class Immutables {
      * Returns an immutable list consisting of the elements of the list that match
      * the given predicate.
      *
-     * @param ts non-null immutable list.
+     * @param ts
+     *        non-null immutable list.
      *
-     * @param predicate a non-interfering, stateless
+     * @param predicate
+     *        a non-interfering, stateless
      *        predicate to apply to each element to determine if it
      *        should be included
      *
@@ -203,9 +209,12 @@ public final class Immutables {
      * Returns an immutable list consisting of the results of applying the given
      * function to the elements of the list.
      *
-     * @param <R> The element type of the result list
-     * @param ts ts non-null immutable list.
-     * @param function a non-interfering, stateless function to apply to each element
+     * @param <R>
+     *        The element type of the result list
+     * @param ts
+     *        ts non-null immutable list.
+     * @param function
+     *        a non-interfering, stateless function to apply to each element
      * @return the mapped list of the same length as this
      */
     public static <T extends @Nullable Object, R extends @Nullable Object> ImmutableList<R> map(

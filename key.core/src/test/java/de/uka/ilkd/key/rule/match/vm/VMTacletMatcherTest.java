@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
-import java.io.File;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.parser.ParserException;
@@ -38,9 +36,9 @@ public class VMTacletMatcherTest {
 
     @BeforeAll
     public static void init() {
-        HelperClassForTests helper = new HelperClassForTests();
-        ProofAggregate pa = helper.parse(
-            new File(HelperClassForTests.TESTCASE_DIRECTORY + "/tacletmatch/tacletMatch1.key"));
+        ProofAggregate pa = HelperClassForTests.parse(
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletmatch")
+                    .resolve("tacletMatch1.key"));
 
         for (int i = 0; i < NR_TACLETS; i++) {
             taclet[i] = pa.getFirstProof().getInitConfig()

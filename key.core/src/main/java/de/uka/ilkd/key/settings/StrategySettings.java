@@ -71,7 +71,8 @@ public class StrategySettings extends AbstractSettings {
     /**
      * sets the maximal amount of heuristic steps before a user interaction is required
      *
-     * @param mSteps maximal amount of heuristic steps
+     * @param mSteps
+     *        maximal amount of heuristic steps
      */
     public void setMaxSteps(int mSteps) {
         var old = maxSteps;
@@ -119,7 +120,8 @@ public class StrategySettings extends AbstractSettings {
                 LOGGER.debug("StrategySettings: failure while converting the string "
                     + "with the allowed steps of heuristics applications to int."
                     + "Use default value 1000 instead."
-                    + "\nThe String that has been tried to convert was {}", numString);
+                    + "\nThe String that has been tried to convert was {}",
+                    numString);
             }
         }
 
@@ -129,7 +131,8 @@ public class StrategySettings extends AbstractSettings {
             } catch (NumberFormatException e) {
                 LOGGER.debug("StrategySettings: failure while converting the string "
                     + "with rule application timeout. "
-                    + "\nThe String that has been tried to convert was {}", timeoutString);
+                    + "\nThe String that has been tried to convert was {}",
+                    timeoutString);
             }
         }
 
@@ -190,7 +193,8 @@ public class StrategySettings extends AbstractSettings {
             LOGGER.debug("StrategySettings: failure while converting the string "
                 + "with the allowed steps of heuristics applications to int."
                 + "Use default value 1000 instead."
-                + "\nThe String that has been tried to convert was {}", props.get(STEPS_KEY));
+                + "\nThe String that has been tried to convert was {}",
+                props.get(STEPS_KEY));
         }
 
         try {
@@ -198,7 +202,8 @@ public class StrategySettings extends AbstractSettings {
         } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
                 + "with rule application timeout. "
-                + "\nThe String that has been tried to convert was {}", props.get(TIMEOUT_KEY));
+                + "\nThe String that has been tried to convert was {}",
+                props.get(TIMEOUT_KEY));
         }
 
         // set active strategy
@@ -256,7 +261,8 @@ public class StrategySettings extends AbstractSettings {
     /**
      * sets the time after which automatic rule application shall be aborted (-1 disables timeout)
      *
-     * @param timeout a long specifying the timeout in ms
+     * @param timeout
+     *        a long specifying the timeout in ms
      */
     public void setTimeout(long timeout) {
         var old = this.timeout;
@@ -299,7 +305,8 @@ public class StrategySettings extends AbstractSettings {
      * Defines the {@link StopCondition} which is used in an {@link ApplyStrategy} to determine
      * after each applied rule if more rules should be applied or not.
      *
-     * @param customApplyStrategyStopCondition The customized {@link StopCondition} to use or
+     * @param customApplyStrategyStopCondition
+     *        The customized {@link StopCondition} to use or
      *        {@code null} to use the default one.
      */
     public void setCustomApplyStrategyStopCondition(
@@ -324,7 +331,8 @@ public class StrategySettings extends AbstractSettings {
      * select the next {@link Goal} to apply a rule on. If no one is defined the default one of the
      * {@link ApplyStrategy}, which is defined by the user interface, is used.
      *
-     * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null} to use the
+     * @param customGoalChooser
+     *        The customized {@link GoalChooser} to use or {@code null} to use the
      *        default one of the {@link ApplyStrategy}.
      */
     public void setCustomApplyStrategyGoalChooser(GoalChooser<Proof, Goal> customGoalChooser) {

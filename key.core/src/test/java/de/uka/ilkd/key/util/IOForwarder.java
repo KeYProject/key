@@ -38,7 +38,8 @@ public class IOForwarder extends Thread {
      * <p>
      * This method launches two new threads.
      *
-     * @param process process whose output is to be forwarded.
+     * @param process
+     *        process whose output is to be forwarded.
      */
     public static void forward(Process process) {
         IOForwarder f2 = new IOForwarder("stdout", process.getInputStream(), System.out);

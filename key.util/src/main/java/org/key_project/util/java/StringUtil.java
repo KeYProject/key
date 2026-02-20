@@ -554,4 +554,22 @@ public final class StringUtil {
         return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
     }
 
+
+    /**
+     * Efficient way to append repeated characters to a StringBuilder instead of String::repeat.
+     * Allocates only once instead of twice and does half the work
+     *
+     * @param b
+     *        the builder to append to
+     * @param value
+     *        the character
+     * @param count
+     *        the times to repeat the character
+     */
+    public static void appendRepeated(StringBuilder b, char value, int count) {
+        b.ensureCapacity(b.length() + count);
+        for (int i = 0; i < count; i++) {
+            b.append(value);
+        }
+    }
 }

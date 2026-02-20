@@ -40,9 +40,12 @@ public class Transformer extends JFunction {
      * Looks up the function namespace for a term transformer with the given attributes, assuming it
      * to be uniquely defined by its name. If none is found, a new term transformer is created.
      *
-     * @param name name of the term transformer
-     * @param sort sort of the term transformer
-     * @param argSorts array of the transformer's argument sorts
+     * @param name
+     *        name of the term transformer
+     * @param sort
+     *        sort of the term transformer
+     * @param argSorts
+     *        array of the transformer's argument sorts
      * @param services
      * @return the term transformer of interest
      */
@@ -62,7 +65,8 @@ public class Transformer extends JFunction {
      * equivalent already exists. If this is the case, it returns the found transformer, otherwise
      * it creates a new one.
      *
-     * @param t the template for a term transformer
+     * @param t
+     *        the template for a term transformer
      * @param services
      * @return the term transformer to be used
      */
@@ -73,7 +77,8 @@ public class Transformer extends JFunction {
     /**
      * Examines a position for whether it is inside a term transformer.
      *
-     * @param pio A position in an occurrence of a term
+     * @param pio
+     *        A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
     public static boolean inTransformer(PosInOccurrence pio) {
@@ -96,7 +101,8 @@ public class Transformer extends JFunction {
      * Examines a position for whether it is inside a term transformer. If this is the case, the
      * found term transformer is returned.
      *
-     * @param pio A position in an occurrence of a term
+     * @param pio
+     *        A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
     public static Transformer getTransformer(PosInOccurrence pio) {

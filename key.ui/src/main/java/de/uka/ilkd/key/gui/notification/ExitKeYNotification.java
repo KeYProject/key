@@ -23,8 +23,10 @@ public class ExitKeYNotification extends NotificationTask {
      * overwritten as invokeAndWait is taken called to execute the notification task, but this
      * method only takes care that we are in the even dispatcher thread
      *
-     * @param manager the NotificationManager to which this tasks belongs to
-     * @param event the NotificationEvent triggering this task
+     * @param manager
+     *        the NotificationManager to which this tasks belongs to
+     * @param event
+     *        the NotificationEvent triggering this task
      */
     @Override
     public void execute(NotificationEvent event, NotificationManager manager) {

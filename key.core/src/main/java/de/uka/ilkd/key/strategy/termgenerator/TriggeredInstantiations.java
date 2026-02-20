@@ -53,7 +53,8 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
 
     /**
      *
-     * @param checkConditions boolean indicating if conditions should be checked
+     * @param checkConditions
+     *        boolean indicating if conditions should be checked
      */
     public TriggeredInstantiations(boolean checkConditions) {
         this.checkConditions = checkConditions;

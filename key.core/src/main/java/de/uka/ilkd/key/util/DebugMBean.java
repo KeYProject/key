@@ -15,7 +15,8 @@ public interface DebugMBean {
     /**
      * set the current debug state. If set to true, debug messages are printed to stdout.
      *
-     * @param debug the new debug state to set
+     * @param debug
+     *        the new debug state to set
      */
     void setDebugState(boolean debug);
 
@@ -41,7 +42,8 @@ public interface DebugMBean {
      * class name that triggered it. Only if the classname begins with one entry of this list, the
      * message will be displayed-
      *
-     * @param showOnlyPrefixes a ":"-separated list of prefixes
+     * @param showOnlyPrefixes
+     *        a ":"-separated list of prefixes
      */
     void setShowOnlyPrefixes(String showOnlyPrefixes);
 

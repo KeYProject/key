@@ -23,10 +23,13 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already loaded {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already loaded {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,

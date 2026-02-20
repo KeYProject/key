@@ -73,7 +73,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * This launches the first macro and registers a new {@link AutoModeListener} with the
      * {@code mediator}. This listener unregisters itself after the last macro.
      *
-     * @throws InterruptedException if one of the wrapped macros is interrupted.
+     * @throws InterruptedException
+     *         if one of the wrapped macros is interrupted.
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,

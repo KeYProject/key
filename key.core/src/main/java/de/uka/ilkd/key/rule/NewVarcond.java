@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 

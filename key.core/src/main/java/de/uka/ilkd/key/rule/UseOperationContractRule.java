@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -144,11 +146,11 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                     // execContext are in different packages we have to
                     // simulate visibility rules like being in prefixType
                     result = methRef.method(services, staticType,
-                        methRef.getMethodSignature(services, ec), staticType);
+                        methRef.getMethodSignature(services, ec));
                 }
             } else {
                 result = methRef.method(services, staticType,
-                    methRef.getMethodSignature(services, ec), staticType);
+                    methRef.getMethodSignature(services, ec));
             }
         } else {
             New n = (New) mr;
@@ -632,7 +634,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         private final RuleApp ruleApp;
         protected final Services services;
 
-        protected Instantiation inst;
+        protected UseOperationContractRule.Instantiation inst;
         protected TermLabelState termLabelState;
         protected JavaBlock jb;
         protected TermBuilder tb;
@@ -662,7 +664,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected JTerm wellFormedAnon;
         protected JTerm atPreUpdates;
         protected JTerm reachableState;
-        protected ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
+        protected ImmutableList<UseOperationContractRule.AnonUpdateData> anonUpdateDatas =
+            ImmutableSLList.nil();
         protected final Map<LocationVariable, JTerm> modifiables;
         protected final JTerm globalDefs;
         protected final JTerm originalPre;
@@ -748,9 +751,10 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
             // prepare common stuff for the three branches
             for (LocationVariable heap : heapContext) {
-                final AnonUpdateData tAnon;
+                final UseOperationContractRule.AnonUpdateData tAnon;
                 if (!contract.hasModifiable(heap)) {
-                    tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
+                    tAnon = new UseOperationContractRule.AnonUpdateData(tb.tt(), tb.skip(),
+                        tb.var(heap), tb.var(heap),
                         tb.var(heap));
                 } else {
                     tAnon = createAnonUpdate(heap, inst.pm, modifiables.get(heap), services);

@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,11 +34,13 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
-
-    public static final Path TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
+    public static final Path TESTCASE_DIRECTORY =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
     public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
@@ -52,46 +54,27 @@ public class HelperClassForTests {
         }
     };
 
-    public HelperClassForTests() {
-
-    }
-
-    public ProofAggregate parse(File file) {
-        return parse(file.toPath(), profile);
-    }
-
-    public ProofAggregate parse(File file, Profile profile) {
-        return parse(file.toPath(), profile);
-    }
-
-    public ProofAggregate parse(Path file) {
+    public static ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
-    public ProofAggregate parse(Path file, Profile profile) {
-        ProblemInitializer pi = null;
-        ProofAggregate result = null;
-
+    public static ProofAggregate parse(Path file, Profile profile) {
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
-            pi = new ProblemInitializer(profile);
-
-            result = pi.startProver(po, po);
-
-        } catch (Exception e) {
+            return parseThrowException(file, profile);
+        } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
-        return result;
     }
 
-    public ProofAggregate parseThrowException(Path file) throws ProofInputException {
+    public static ProofAggregate parseThrowException(Path file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public ProofAggregate parseThrowException(Path file, Profile profile)
+    public static ProofAggregate parseThrowException(Path file, Profile profile)
             throws ProofInputException {
-        KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+        KeYUserProblemFile po =
+            new KeYUserProblemFile("Test", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
     }
@@ -103,7 +86,7 @@ public class HelperClassForTests {
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
-    public static boolean isOneStepSimplificationEnabled(Proof proof) {
+    public static boolean isOneStepSimplificationEnabled(@Nullable Proof proof) {
         StrategyProperties props;
         if (proof != null && !proof.isDisposed()) {
             props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -122,7 +105,7 @@ public class HelperClassForTests {
      * @param enabled {@code true} use one step simplification, {@code false} do not use one step
      *        simplification.
      */
-    public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
+    public static void setOneStepSimplificationEnabled(@Nullable Proof proof, boolean enabled) {
         final String newVal = enabled ? StrategyProperties.OSS_ON : StrategyProperties.OSS_OFF;
 
         {
@@ -187,12 +170,10 @@ public class HelperClassForTests {
      * @param containerTypeName The type name which provides the target.
      * @param targetName The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptionsForTarget(Path javaFile,
             String containerTypeName,
-            final String targetName) throws ProblemLoaderException, ProofInputException {
+            final String targetName) {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> environment = null;
             Proof proof = null;
@@ -284,7 +265,7 @@ public class HelperClassForTests {
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         // Assert.assertNotNull(containerKJT);
-        ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+        Iterable<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
         IProgramMethod pm =
             CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
         if (pm == null) {
@@ -297,8 +278,7 @@ public class HelperClassForTests {
     }
 
     public static Services createServices(Path keyFile) {
-        JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
+        return HelperClassForTests.parse(keyFile).getFirstProof().getServices();
     }
 
     public static Services createServices() {

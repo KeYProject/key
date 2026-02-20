@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,8 +40,9 @@ public class SetStatementTest {
     /**
      * the filename of the key file which is needed to create Services and JavaInfo
      */
-    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "setStatements" + File.separator + "testFile.key";
+    private static final Path TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY
+            .resolve("setStatements")
+            .resolve("testFile.key");
 
     /**
      * JavaInfo containing information about the available datatypes and methods
@@ -67,8 +70,7 @@ public class SetStatementTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo =
-                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+            javaInfo = HelperClassForTests.parse(TEST_FILE).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
@@ -111,11 +113,29 @@ public class SetStatementTest {
         ImmutableList<TextualJMLConstruct> constructs =
             new de.uka.ilkd.key.speclang.njml.PreParser(true).parseMethodLevel(statementText, null,
                 Position.newOneBased(1, 1));
-        assertEquals(constructs.size(), 1);
+        assertEquals(1, constructs.size());
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());
         var statement = (TextualJMLSetStatement) constructs.head();
         JmlParser.Set_statementContext context = statement.getAssignment();
         JTerm assignee = jmlIO.translateTerm(context.assignee);
         return jsf.checkSetStatementAssignee(assignee);
+    }
+
+
+
+    @Test
+    void preservationOfGhostFlag() throws ProblemLoaderException {
+        var input = """
+                class Foo {
+                    //@ ghost int x;
+                }
+                """;
+        var env = HelperClassForTests.createKeYEnvironment();
+        var js = env.getServices().getJavaService();
+        var cu = js.readCompilationUnit(input);
+        var fields = cu.getDeclarations().get(0).getAllFields(env.getServices());
+        var fieldX = fields.stream().filter(it -> "Foo::x".equals(it.getName())).findFirst().get();
+
+        Assertions.assertTrue(fieldX.getProgramVariable().isRigid());
     }
 }

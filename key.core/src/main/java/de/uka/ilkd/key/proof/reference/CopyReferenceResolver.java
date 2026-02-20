@@ -18,11 +18,15 @@ public class CopyReferenceResolver {
      * For each branch closed by reference to another proof,
      * copy the relevant proof steps into this proof.
      *
-     * @param toComplete the proof whose references to closed branched shall be resolved by
+     * @param toComplete
+     *        the proof whose references to closed branched shall be resolved by
      *        copying the branches
-     * @param referencedFrom filter, if not null copy only from that proof
-     * @param callbackTotal callback that gets the total number of branches to complete
-     * @param callbackBranch callback notified every time a branch has been copied
+     * @param referencedFrom
+     *        filter, if not null copy only from that proof
+     * @param callbackTotal
+     *        callback that gets the total number of branches to complete
+     * @param callbackBranch
+     *        callback notified every time a branch has been copied
      */
     public static void copyCachedGoals(
             Proof toComplete,

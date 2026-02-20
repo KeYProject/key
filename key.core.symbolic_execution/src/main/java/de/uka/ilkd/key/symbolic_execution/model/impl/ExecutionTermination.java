@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.Node;
@@ -41,12 +41,16 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param exceptionVariable Contains the exception variable which is used to check if the
+     * @param exceptionVariable
+     *        Contains the exception variable which is used to check if the
      *        executed program in proof terminates normally.
-     * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is
+     * @param terminationKind
+     *        The {@link TerminationKind} or {@code null} to compute it when it is
      *        requested the first time (normal or exceptional termination only).
      */
     public ExecutionTermination(ITreeSettings settings, Node proofNode,

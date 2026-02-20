@@ -22,8 +22,10 @@ public interface PredicateEstimator {
     PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
 
     /**
-     * @param partner Structure comprising the partners of a join.
-     * @param proof The underlying proof.
+     * @param partner
+     *        Structure comprising the partners of a join.
+     * @param proof
+     *        The underlying proof.
      * @return A decision predicate for the two nodes in partner. The predicate should be true in
      *         the sequent of the first node and false in the sequent of the second node.
      */
@@ -111,7 +113,8 @@ class StdPredicateEstimator implements PredicateEstimator {
      * Goes up to the common node of partner.getNode(0) and partner.getNode(1) and returns the next
      * node on the path to partner.getNode(0).
      *
-     * @param partner The prospective partner object.
+     * @param partner
+     *        The prospective partner object.
      * @return The next node on the path to partner.getNode(0).
      */
     private Node getFirstDifferentNode(ProspectivePartner partner) {
@@ -147,8 +150,10 @@ class StdPredicateEstimator implements PredicateEstimator {
     /**
      * Translates a branch label (without common prefixes such as "CUT:" etc.) to a term.
      *
-     * @param estimation The branch label without prefix.
-     * @param services The services object.
+     * @param estimation
+     *        The branch label without prefix.
+     * @param services
+     *        The services object.
      * @return A term corresponding to the branch label.
      */
     private JTerm translate(String estimation, Services services) {

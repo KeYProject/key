@@ -37,8 +37,10 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
      * Returns the abstract domain lattice for the given sort or null if there has no lattice been
      * specified for that sort.
      *
-     * @param s The sort to return the matching lattice for.
-     * @param services The services object.
+     * @param s
+     *        The sort to return the matching lattice for.
+     * @param services
+     *        The services object.
      * @return The abstract domain lattice suitable for the given sort. Return null if there is no
      *         abstract domain for that sort; in this case, an if-then-else merge will be performed.
      */

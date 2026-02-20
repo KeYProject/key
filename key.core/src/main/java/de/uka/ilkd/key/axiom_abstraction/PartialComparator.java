@@ -14,7 +14,8 @@ package de.uka.ilkd.key.axiom_abstraction;
  * value as <tt>e1.equals(e2)</tt> for every <tt>e1</tt> and <tt>e2</tt> in <tt>S</tt>.
  * <p>
  *
- * @param <T> the type of objects that may be compared by this comparator
+ * @param <T>
+ *        the type of objects that may be compared by this comparator
  *
  * @author Dominic Scheurer
  * @see java.util.Comparator
@@ -34,8 +35,10 @@ public interface PartialComparator<T> {
      * or greater than the second.
      * <p>
      *
-     * @param o1 the first object to be compared.
-     * @param o2 the second object to be compared.
+     * @param o1
+     *        the first object to be compared.
+     * @param o2
+     *        the second object to be compared.
      * @return LTE, EQ, or GTE as the first argument is less than, equal to, or greater than the
      *         second; returns UNDEF if the arguments are incomparable.
      */

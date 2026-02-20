@@ -31,8 +31,7 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
     /**
      * Hidden constructor since this class is a Singleton.
      */
-    private MergeWithPredicateAbstractionFactory() {
-    }
+    private MergeWithPredicateAbstractionFactory() {}
 
     /**
      * @return The Singleton instance of {@link MergeWithPredicateAbstractionFactory}.
@@ -57,8 +56,10 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
     /**
      * Creates a complete instance of {@link MergeWithPredicateAbstraction}.
      *
-     * @param predicates The predicates for the lattices to create.
-     * @param latticeType The concrete lattice type which determines how abstract elements are
+     * @param predicates
+     *        The predicates for the lattices to create.
+     * @param latticeType
+     *        The concrete lattice type which determines how abstract elements are
      *        generated from abstraction predicates.
      * @return A complete instance of {@link MergeWithPredicateAbstraction}.
      */

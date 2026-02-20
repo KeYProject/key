@@ -46,8 +46,8 @@
    inReachableState
 -> \forall java.lang.String s; 
      \forall java.lang.String t; 
-       (     s.<created>@(java.lang.Object) = TRUE
-           & t.<created>@(java.lang.Object) = TRUE
+       (     s.$created@(java.lang.Object) = TRUE
+           & t.$created@(java.lang.Object) = TRUE
            & !s = null
            & !t = null
         -> (    StringDistance.distance(s, t) = 0
@@ -5154,7 +5154,7 @@
    )
 )
 (branch " Case 2"
-   (opengoal "   inReachableState -> \\forall java.lang.String s;       \\forall java.lang.String t;         (     s.<created>@(java.lang.Object) = TRUE            & t.<created>@(java.lang.Object) = TRUE            & !s = null            & !t = null         -> (    StringDistance.distance(s, t) = 0             <-> s.equals@(java.lang.String)(t) = TRUE)) ")
+   (opengoal "   inReachableState -> \\forall java.lang.String s;       \\forall java.lang.String t;         (     s.$created@(java.lang.Object) = TRUE            & t.$created@(java.lang.Object) = TRUE            & !s = null            & !t = null         -> (    StringDistance.distance(s, t) = 0             <-> s.equals@(java.lang.String)(t) = TRUE)) ")
 )
 )
 

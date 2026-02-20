@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -90,13 +90,19 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     /**
      * Decides if the given {@link Node} is part of the slice or not.
      *
-     * @param node The {@link Node} to check.
-     * @param previousChild The previously visited child {@link Node} or {@code null} the first
+     * @param node
+     *        The {@link Node} to check.
+     * @param previousChild
+     *        The previously visited child {@link Node} or {@code null} the first
      *        time.
-     * @param services The {@link Services} to use.
-     * @param relevantLocations The relevant locations.
-     * @param info The {@link SequentInfo} with the aliases and so on.
-     * @param activeStatement The currently active statement.
+     * @param services
+     *        The {@link Services} to use.
+     * @param relevantLocations
+     *        The relevant locations.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
+     * @param activeStatement
+     *        The currently active statement.
      * @return {@code true} {@link Node} should be part of slice, {@code false} {@link Node} should
      *         not be part of slice.
      */
@@ -107,10 +113,14 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     /**
      * Updates the relevant locations.
      *
-     * @param read The {@link Expression} which provides new relevant locations.
-     * @param relevantLocations The relevant locations to update.
-     * @param info The {@link SequentInfo} with the aliases and so on.
-     * @param services The {@link Services} to use.
+     * @param read
+     *        The {@link Expression} which provides new relevant locations.
+     * @param relevantLocations
+     *        The relevant locations to update.
+     * @param info
+     *        The {@link SequentInfo} with the aliases and so on.
+     * @param services
+     *        The {@link Services} to use.
      */
     protected void updateRelevantLocations(final ProgramElement read,
             final Set<Location> relevantLocations, final SequentInfo info,
@@ -130,12 +140,18 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      * Updates the outdated locations. This means that locations with the given prefix are replaced
      * with another previously (old) available alternative.
      *
-     * @param services The {@link Services} to use.
-     * @param oldLocationsToUpdate The locations to update.
-     * @param newAliases The new aliases.
-     * @param oldAliases The old aliases.
-     * @param outdatedPrefix The prefix of outdated locations.
-     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
+     * @param services
+     *        The {@link Services} to use.
+     * @param oldLocationsToUpdate
+     *        The locations to update.
+     * @param newAliases
+     *        The new aliases.
+     * @param oldAliases
+     *        The old aliases.
+     * @param outdatedPrefix
+     *        The prefix of outdated locations.
+     * @param thisReference
+     *        The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      * @return The updated locations.
      */

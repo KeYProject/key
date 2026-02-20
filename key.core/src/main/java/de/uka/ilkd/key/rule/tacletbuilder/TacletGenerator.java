@@ -5,12 +5,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -49,8 +49,7 @@ public class TacletGenerator {
     private static final TacletGenerator instance = new TacletGenerator();
 
 
-    private TacletGenerator() {
-    }
+    private TacletGenerator() {}
 
 
     public static TacletGenerator getInstance() {
@@ -595,7 +594,7 @@ public class TacletGenerator {
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                 .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
         final IProgramMethod targetImpl = services.getJavaInfo().getProgramMethod(kjt,
-            ((ProgramMethod) target).getName(), sig, kjt);
+            ((ProgramMethod) target).getName(), sig);
 
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
             resultProgSV, new ImmutableArray<>(paramProgSVs));
@@ -807,7 +806,8 @@ public class TacletGenerator {
      * Replaces any bound logical variables in t with schema variables (necessary for proof
      * saving/loading, if t occurs as part of a taclet).
      *
-     * @param services TODO
+     * @param services
+     *        TODO
      */
     private TermAndBoundVarPair replaceBoundLogicVars(JTerm t, TermServices services) {
         // recursive replacement process

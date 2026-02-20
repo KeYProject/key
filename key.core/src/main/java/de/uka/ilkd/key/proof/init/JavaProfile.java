@@ -199,7 +199,8 @@ public class JavaProfile extends AbstractProfile {
      * new instance of a {@link ComplexRuleJustification} otherwise the rule justification
      * determined by the super class is returned
      *
-     * @param r the rule described above
+     * @param r
+     *        the rule described above
      * @return justification for the given rule
      */
     @Override
@@ -232,7 +233,8 @@ public class JavaProfile extends AbstractProfile {
      * {@link Thread}).
      * </p>
      *
-     * @param perms boolean to decide whether we use permissions
+     * @param perms
+     *        boolean to decide whether we use permissions
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
     public static synchronized JavaProfile getDefaultInstance(boolean perms) {

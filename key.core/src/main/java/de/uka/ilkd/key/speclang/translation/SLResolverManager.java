@@ -7,9 +7,9 @@ package de.uka.ilkd.key.speclang.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -173,9 +173,12 @@ public abstract class SLResolverManager {
     /**
      * Resolves arbitrary property calls.
      *
-     * @param receiver the specified explicit receiver, or null
-     * @param name name of the property
-     * @param parameters actual parameters of the property call, or null
+     * @param receiver
+     *        the specified explicit receiver, or null
+     * @param name
+     *        name of the property
+     * @param parameters
+     *        actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
     public SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)

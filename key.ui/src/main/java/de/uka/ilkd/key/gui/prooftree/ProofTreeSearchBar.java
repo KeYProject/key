@@ -169,8 +169,10 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     /**
      * returns true if <tt>searchString</tt> is contained in the lowercase search string of the node
      *
-     * @param node the node index in the cache
-     * @param searchString the String to be looked for
+     * @param node
+     *        the node index in the cache
+     * @param searchString
+     *        the String to be looked for
      * @return true if a match has been found
      */
     private boolean nodeContainsString(int node, @NonNull String searchString) {

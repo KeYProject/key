@@ -31,10 +31,14 @@ public class CachedProofBranch {
     /**
      * Create a new data object about a cached proof branch.
      *
-     * @param proofFile the file the proof is stored in
-     * @param choiceSettings choice settings of the proof
-     * @param stepIndex step index of the referenced node
-     * @param sequent sequent of that node
+     * @param proofFile
+     *        the file the proof is stored in
+     * @param choiceSettings
+     *        choice settings of the proof
+     * @param stepIndex
+     *        step index of the referenced node
+     * @param sequent
+     *        sequent of that node
      */
     CachedProofBranch(File proofFile, String choiceSettings, int stepIndex, String sequent) {
         this.proofFile = proofFile;

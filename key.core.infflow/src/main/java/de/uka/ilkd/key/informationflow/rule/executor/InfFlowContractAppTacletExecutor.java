@@ -86,8 +86,10 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     /**
      * Add the contract application formula to the list of the INF_FLOW_CONTRACT_APPL_PROPERTY.
      *
-     * @param goal the current goal
-     * @param applFormula the information contract application formula added by this taclet
+     * @param goal
+     *        the current goal
+     * @param applFormula
+     *        the information contract application formula added by this taclet
      */
     private void updateStrategyInfo(Goal goal, final JTerm applFormula) {
         ImmutableList<JTerm> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);

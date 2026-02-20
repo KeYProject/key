@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +14,8 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -138,6 +142,11 @@ public class ProveTest {
                     LOGGER.info("({}) Finished proof: {}", caseId,
                         (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile.toFile());
+
+                    var path = Paths.get("proofs",
+                        loadedProof.getProofFile().getFileName() + ".proof.xml");
+                    saveProofXml(loadedProof, path);
+
                     if (success) {
                         reload(proofFile, loadedProof);
                     }
@@ -160,6 +169,33 @@ public class ProveTest {
         if (!success) {
             fail(message);
         }
+    }
+
+    public static void saveProofXml(Proof loadedProof, Path path) throws IOException {
+        // Files.createDirectories(path.getParent());
+        // try (var out = new PrintWriter(new GZIPOutputStream(Files.newOutputStream(path)))) {
+        // toXml(out, loadedProof.root());
+        // }
+    }
+
+    private static void toXml(PrintWriter out, Node node) {
+        Name name1;
+        try {
+            name1 = node.getAppliedRuleApp().rule().name();
+        } catch (NullPointerException e) {
+            name1 = new Name("<null>");
+        }
+        out.format("\n<node label=\"%s\" taclet=\"%s\">", node.getNodeInfo().getBranchLabel(),
+            name1);
+        out.format("\n<raw><![CDATA[%s]]>\n</raw>", node.sequent());
+        out.format("\n<lpr><![CDATA[%s]]>\n</lpr>",
+            LogicPrinter.quickPrintSequent(node.sequent(), node.proof().getServices()));
+        out.format("\n<children>\n");
+        for (Node child : node.children()) {
+            toXml(out, child);
+        }
+        out.format("</children>\n");
+        out.format("</node>\n");
     }
 
     /**
@@ -260,7 +296,7 @@ public class ProveTest {
         try {
             StatisticsFile statisticsFile = getStatisticsFile();
             if (statisticsFile != null) {
-                statisticsFile.appendStatistics(loadedProof, keyFile);
+                statisticsFile.appendStatistics(loadedProof, keyFile.toPath());
             }
         } catch (IOException e) {
             LOGGER.warn("Failed to append stats", e);

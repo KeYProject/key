@@ -5,9 +5,9 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -410,7 +410,4 @@ public class JmlIO {
     public void clearWarnings() {
         warnings = ImmutableSLList.nil();
     }
-
-    // region
-    // endregion
 }

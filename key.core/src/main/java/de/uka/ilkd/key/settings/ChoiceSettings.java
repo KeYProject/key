@@ -94,7 +94,8 @@ public class ChoiceSettings extends AbstractSettings {
      * updates <code>category2Choices</code> if new entries are found in <code>choiceNS</code> or if
      * entries of <code>category2Choices</code> are no longer present in <code>choiceNS</code>
      *
-     * @param remove remove entries not present in <code>choiceNS</code>
+     * @param remove
+     *        remove entries not present in <code>choiceNS</code>
      */
     public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
         // Translate the given namespace into a map of 'string -> list[string]'

@@ -26,8 +26,10 @@ public class SelectionForwardAction extends MainWindowAction
      * Construct a new action. Make to sure to use the same {@link SelectionHistory} to
      * construct your {@link SelectionBackAction}!
      *
-     * @param mainWindow the main window
-     * @param history selection history
+     * @param mainWindow
+     *        the main window
+     * @param history
+     *        selection history
      */
     public SelectionForwardAction(MainWindow mainWindow, SelectionHistory history) {
         super(mainWindow);

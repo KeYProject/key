@@ -28,10 +28,14 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *
-     * @param addedSeq new Sequent to be added
-     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
-     * @param replacewith the Term that replaces another one
-     * @param pvs the set of schema variables
+     * @param addedSeq
+     *        new Sequent to be added
+     * @param addedRules
+     *        IList<Taclet> contains the new allowed rules at this branch
+     * @param replacewith
+     *        the Term that replaces another one
+     * @param pvs
+     *        the set of schema variables
      */
     public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
             JTerm replacewith, ImmutableSet<SchemaVariable> pvs) {

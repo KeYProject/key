@@ -7,6 +7,15 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
 
@@ -15,7 +24,6 @@ import org.key_project.util.collection.Pair;
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
 
 /**
  * A container to hold parsed configurations. Configurations are a mapping between property names
@@ -411,7 +419,7 @@ public class Configuration {
      * @param writer a writer
      * @param comment a comment
      */
-    public void save(Writer writer, String comment) {
+    public void save(Writer writer, @Nullable String comment) {
         new ConfigurationWriter(writer).printComment(comment).printMap(this.data);
     }
 
@@ -496,7 +504,11 @@ public class Configuration {
             return this;
         }
 
-        public ConfigurationWriter printComment(String comment) {
+        public ConfigurationWriter printComment(@Nullable String comment) {
+            if (comment == null) {
+                return this;
+            }
+
             if (comment.contains("\n")) {
                 out.format("/* %s */\n", comment);
             } else {

@@ -34,7 +34,8 @@ public class PosInSequent {
      * Additionally a boolean indicates whether the the whole SequentFormula or just the formula is
      * meant.
      *
-     * @param posInOcc the PositionInOccurrence describing the SequentFormula and maybe a subterm of
+     * @param posInOcc
+     *        the PositionInOccurrence describing the SequentFormula and maybe a subterm of
      *        its formula.
      */
     public static PosInSequent createCfmaPos(PosInOccurrence posInOcc) {
@@ -53,7 +54,8 @@ public class PosInSequent {
      * sets the bounds, i.e. the start and end positions of the PosInSequent in a string
      * representation of a sequent.
      *
-     * @param r the range of character positions
+     * @param r
+     *        the range of character positions
      */
     public void setBounds(Range r) {
         bounds = r;
@@ -73,7 +75,8 @@ public class PosInSequent {
      * sets the bounds, i.e. the start and end positions of the first Java statement, of a
      * corresponding Java program in a string representation of the sequent.
      *
-     * @param r the range for the first statement in the corresponding program
+     * @param r
+     *        the range for the first statement in the corresponding program
      */
     public void setFirstJavaStatementRange(Range r) {
         firstJavaStatementRange = r;

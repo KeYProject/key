@@ -28,8 +28,7 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-    }
+    public void actionPerformed(ActionEvent e) {}
 
     JTerm promptForTerm(MainWindow window, JTerm term) {
         final String initialValue =

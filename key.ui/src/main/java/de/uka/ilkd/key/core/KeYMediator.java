@@ -123,7 +123,8 @@ public class KeYMediator {
      * Register a proof load listener. Will be called whenever a new proof is loaded, but before
      * it is replayed. The listener MUST be able to accept the same proof twice!
      *
-     * @param listener callback
+     * @param listener
+     *        callback
      */
     public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
         proofLoadListeners.add(listener);
@@ -219,8 +220,10 @@ public class KeYMediator {
      * The method itself does not fire
      * {@link KeYSelectionListener#selectedProofChanged(KeYSelectionEvent)}
      *
-     * @param newProof the proof to select.
-     * @param previousProof the previously selected proof
+     * @param newProof
+     *        the proof to select.
+     * @param previousProof
+     *        the previously selected proof
      */
     void setProof(Proof newProof, Proof previousProof) {
         if (previousProof == newProof) {
@@ -248,7 +251,8 @@ public class KeYMediator {
     /**
      * sets the maximum number of rule applications allowed in automatic mode
      *
-     * @param steps an int setting the limit
+     * @param steps
+     *        an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
         if (getSelectedProof() != null) {
@@ -274,7 +278,8 @@ public class KeYMediator {
      * adds a listener to the KeYSelectionModel, so that the listener will be informed if the proof
      * or node the user has selected changed
      *
-     * @param listener the KeYSelectionListener to add
+     * @param listener
+     *        the KeYSelectionListener to add
      */
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         keySelectionModel.addKeYSelectionListener(listener);
@@ -286,7 +291,8 @@ public class KeYMediator {
      *
      * adds the listener only if it not already registered
      *
-     * @param listener the KeYSelectionListener to add
+     * @param listener
+     *        the KeYSelectionListener to add
      */
     public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
         keySelectionModel.addKeYSelectionListenerChecked(listener);
@@ -295,7 +301,8 @@ public class KeYMediator {
     /**
      * removes a listener from the KeYSelectionModel
      *
-     * @param listener the KeYSelectionListener to be removed
+     * @param listener
+     *        the KeYSelectionListener to be removed
      */
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         keySelectionModel.removeKeYSelectionListener(listener);
@@ -304,7 +311,8 @@ public class KeYMediator {
     /**
      * adds a listener to GUI events
      *
-     * @param listener the GUIListener to be added
+     * @param listener
+     *        the GUIListener to be added
      */
     public void addGUIListener(GUIListener listener) {
         listenerList.add(GUIListener.class, listener);
@@ -313,7 +321,8 @@ public class KeYMediator {
     /**
      * adds a listener to GUI events
      *
-     * @param listener the GUIListener to be added
+     * @param listener
+     *        the GUIListener to be added
      */
     public void removeGUIListener(GUIListener listener) {
         listenerList.remove(GUIListener.class, listener);
@@ -330,7 +339,8 @@ public class KeYMediator {
     /**
      * sets the current goal
      *
-     * @param goal the Goal being displayed in the view of the sequent
+     * @param goal
+     *        the Goal being displayed in the view of the sequent
      */
     public void goalChosen(Goal goal) {
         keySelectionModel.setSelectedGoal(goal);
@@ -348,7 +358,8 @@ public class KeYMediator {
     /**
      * notifies that a node that is not a goal has been chosen
      *
-     * @param node the node being displayed in the view of the sequent
+     * @param node
+     *        the node being displayed in the view of the sequent
      */
     public void nonGoalNodeChosen(Node node) {
         keySelectionModel.setSelectedNode(node);
@@ -357,7 +368,8 @@ public class KeYMediator {
     /**
      * called to ask for modal access
      *
-     * @param src Object that is the asking component
+     * @param src
+     *        Object that is the asking component
      */
     public synchronized void requestModalAccess(Object src) {
         fireModalDialogOpened(new EventObject(src));
@@ -366,7 +378,8 @@ public class KeYMediator {
     /**
      * called if no more modal access is needed
      *
-     * @param src Object that is the asking component
+     * @param src
+     *        Object that is the asking component
      */
     public synchronized void freeModalAccess(Object src) {
         fireModalDialogClosed(new EventObject(src));
@@ -413,7 +426,8 @@ public class KeYMediator {
     /**
      * Fire the proof loaded event.
      *
-     * @param p the proof that was just loaded and is about to be replayed
+     * @param p
+     *        the proof that was just loaded and is about to be replayed
      */
     public synchronized void fireProofLoaded(Proof p) {
         if (p == null) {
@@ -472,7 +486,8 @@ public class KeYMediator {
     /**
      * Switches interactive mode on or off.
      *
-     * @param b true iff interactive mode is to be turned on
+     * @param b
+     *        true iff interactive mode is to be turned on
      */
     public void setInteractive(boolean b) {
         if (getSelectedProof() != null) {
@@ -528,9 +543,12 @@ public class KeYMediator {
      * <li>call {@code this.setInteractive(interactive)}</li>
      * </ol>
      *
-     * @param proof the {@link Proof} to be worked on
-     * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactove or automatic use
+     * @param proof
+     *        the {@link Proof} to be worked on
+     * @param fullStop
+     *        if a full freeze of the interface is requested
+     * @param interactive
+     *        whether the needed taclet index is for interactove or automatic use
      *        (normally false)
      */
     public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
@@ -549,12 +567,16 @@ public class KeYMediator {
      * used)</li>
      * </ol>
      *
-     * @param proof the {@link Proof} to be worked on
-     * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactive or automatic use shoul
+     * @param proof
+     *        the {@link Proof} to be worked on
+     * @param fullStop
+     *        if a full freeze of the interface is requested
+     * @param interactive
+     *        whether the needed taclet index is for interactive or automatic use shoul
      *        be selected
      *        (normally true)
-     * @param selection a Runnable that selects the correct node after unfreezing the interface
+     * @param selection
+     *        a Runnable that selects the correct node after unfreezing the interface
      */
     public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
             Runnable selection) {
@@ -583,8 +605,10 @@ public class KeYMediator {
     /**
      * Retrieves a user-defined data.
      *
-     * @param service the class for which the data were registered
-     * @param <T> any class
+     * @param service
+     *        the class for which the data were registered
+     * @param <T>
+     *        any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
@@ -602,8 +626,10 @@ public class KeYMediator {
     /**
      * Register a user-defined data in this node info.
      *
-     * @param obj an object to be registered
-     * @param service the key under it should be registered
+     * @param obj
+     *        an object to be registered
+     * @param service
+     *        the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -613,9 +639,12 @@ public class KeYMediator {
     /**
      * Remove a previous registered user-defined data.
      *
-     * @param obj registered object
-     * @param service the key under which the data was registered
-     * @param <T> arbitray object
+     * @param obj
+     *        registered object
+     * @param service
+     *        the key under which the data was registered
+     * @param <T>
+     *        arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
@@ -700,8 +729,7 @@ public class KeYMediator {
          * invoked if automatic execution has stopped
          */
         @Override
-        public void autoModeStopped(ProofEvent e) {
-        }
+        public void autoModeStopped(ProofEvent e) {}
     }
 
     /*
@@ -737,7 +765,8 @@ public class KeYMediator {
     /**
      * takes a notification event and informs the notification manager
      *
-     * @param event the NotificationEvent
+     * @param event
+     *        the NotificationEvent
      */
     public void notify(NotificationEvent event) {
         ui.notify(event);
@@ -770,7 +799,8 @@ public class KeYMediator {
     /**
      * sets the time out after which automatic rule application stops
      *
-     * @param timeout a long specifying the timeout time in ms
+     * @param timeout
+     *        a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
         if (getSelectedProof() != null) {
@@ -811,7 +841,8 @@ public class KeYMediator {
     /**
      * Add another listener for user actions.
      *
-     * @param listener listener object
+     * @param listener
+     *        listener object
      */
     public void addUserActionListener(UserActionListener listener) {
         userActionListeners.add(listener);
@@ -820,7 +851,8 @@ public class KeYMediator {
     /**
      * Notify all user action listeners about a performed action.
      *
-     * @param action the user action
+     * @param action
+     *        the user action
      */
     public void fireActionPerformed(UserAction action) {
         for (UserActionListener listener : userActionListeners) {

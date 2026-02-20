@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof_references.testcase;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     public void testIsInnerType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
             TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
-            null, null, null);
+            null, null,
+            null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -110,7 +111,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     public void testIsType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
             TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
-            null, null, null);
+            null, null,
+            null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -145,7 +147,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     public void testGetType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
             TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
-            null, null, null);
+            null, null,
+            null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);

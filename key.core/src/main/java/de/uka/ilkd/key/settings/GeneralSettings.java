@@ -157,7 +157,8 @@ public class GeneralSettings extends AbstractSettings {
      * Sets the ensureSourceConsistency flag. This enables/disables caching of source files at first
      * use via a FileRepo.
      *
-     * @param b the new truth value of the flag
+     * @param b
+     *        the new truth value of the flag
      */
     public void setEnsureSourceConsistency(boolean b) {
         var old = ensureSourceConsistency;
@@ -228,7 +229,8 @@ public class GeneralSettings extends AbstractSettings {
      * given Properties object. Only entries of the form
      * <key> = <value> (,<value>)* are allowed.
      *
-     * @param props the Properties object where to write the settings as (key, value) pair
+     * @param props
+     *        the Properties object where to write the settings as (key, value) pair
      */
     @Override
     public void writeSettings(Properties props) {

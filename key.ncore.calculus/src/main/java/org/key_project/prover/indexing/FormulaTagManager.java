@@ -137,7 +137,8 @@ public final class FormulaTagManager {
     /**
      * Create new tags for all formulas of a sequent
      *
-     * @param p_goal The sequent
+     * @param p_goal
+     *        The sequent
      */
     private void createNewTags(ProofGoal<?> p_goal) {
         final Sequent seq = p_goal.sequent();
@@ -165,7 +166,8 @@ public final class FormulaTagManager {
     /**
      * Add a new tag to the maps
      *
-     * @param p_pio The formula for which a new tag is supposed to be created
+     * @param p_pio
+     *        The formula for which a new tag is supposed to be created
      */
     private void createNewTag(PosInOccurrence p_pio, long age) {
         final FormulaTag tag = new FormulaTag();

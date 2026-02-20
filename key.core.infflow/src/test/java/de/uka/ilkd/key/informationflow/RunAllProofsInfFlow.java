@@ -9,7 +9,10 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.

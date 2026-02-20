@@ -41,7 +41,7 @@ public class Issue3452Test {
     }
 
     @Test
-    void testIllegalNoState() throws ProblemLoaderException, ProofInputException {
+    void testIllegalNoState() {
         final var input = Paths.get(
             "src/test/resources/de/uka/ilkd/key/nparser/fix3452/problem/Issue3452IllegalNoState.java");
 

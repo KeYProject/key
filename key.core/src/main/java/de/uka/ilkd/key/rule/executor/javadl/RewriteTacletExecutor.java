@@ -131,17 +131,26 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
     /**
      * adds the sequent of the add part of the Taclet to the goal sequent
      *
-     * @param add the Sequent to be added
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
+     * @param add
+     *        the Sequent to be added
+     * @param termLabelState
+     *        The {@link TermLabelState} of the current rule application.
+     * @param currentSequent
+     *        the Sequent which is the current (intermediate) result of applying the
      *        taclet
-     * @param posOfFind describes the application position of the find expression in the original
+     * @param posOfFind
+     *        describes the application position of the find expression in the original
      *        sequent
-     * @param whereToAdd the PosInOccurrence describes the place where to add the semisequent
-     * @param matchCond the MatchConditions with all required instantiations
-     * @param goal the Goal the taclet is applied to
-     * @param ruleApp the rule application to apply
-     * @param services the Services encapsulating all java information
+     * @param whereToAdd
+     *        the PosInOccurrence describes the place where to add the semisequent
+     * @param matchCond
+     *        the MatchConditions with all required instantiations
+     * @param goal
+     *        the Goal the taclet is applied to
+     * @param ruleApp
+     *        the rule application to apply
+     * @param services
+     *        the Services encapsulating all java information
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,

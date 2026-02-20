@@ -169,7 +169,8 @@ public class SemisequentTacletAppIndex {
      * Create an index object for the semisequent determined by <code>s</code> and
      * <code>antec</code> that contains term indices for each formula.
      *
-     * @param antec iff true create an index for the antecedent of <code>s</code>, otherwise for the
+     * @param antec
+     *        iff true create an index for the antecedent of <code>s</code>, otherwise for the
      *        succedent
      */
     SemisequentTacletAppIndex(Sequent s, boolean antec, Services services, TacletIndex tacletIndex,
@@ -223,7 +224,8 @@ public class SemisequentTacletAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param sci SequentChangeInfo describing the change of the sequent
+     * @param sci
+     *        SequentChangeInfo describing the change of the sequent
      */
     public SemisequentTacletAppIndex sequentChanged(
             SequentChangeInfo sci,
@@ -254,7 +256,8 @@ public class SemisequentTacletAppIndex {
      * Create an index that additionally contains the taclets that are selected by
      * <code>filter</code>
      *
-     * @param filter The taclets that are supposed to be added
+     * @param filter
+     *        The taclets that are supposed to be added
      */
     public SemisequentTacletAppIndex addTaclets(RuleFilter filter, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {

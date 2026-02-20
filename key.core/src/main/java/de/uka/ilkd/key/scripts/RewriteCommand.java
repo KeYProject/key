@@ -208,8 +208,10 @@ public class RewriteCommand extends AbstractCommand {
     /**
      * Calculates term at the PosInOccurrence pio
      *
-     * @param sf top-level formula
-     * @param pio PosInOccurrence of the to be returned term
+     * @param sf
+     *        top-level formula
+     * @param pio
+     *        PosInOccurrence of the to be returned term
      * @return term at pio
      */
     public JTerm getTermAtPos(SequentFormula sf, PosInOccurrence pio) {

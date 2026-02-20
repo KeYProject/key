@@ -8,7 +8,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;

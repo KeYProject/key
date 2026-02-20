@@ -142,7 +142,6 @@ public class TestTacletBuild {
     }
 
     private final HelperClassForTests helper = new HelperClassForTests();
-
     public static final Path testRules =
         HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletprefix");
 
@@ -163,6 +162,5 @@ public class TestTacletBuild {
         }
         fail("Expected an invalid prefix exception as the the addrule contains "
             + "a schemavariable with wrong prefix.");
-
     }
 }

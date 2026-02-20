@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -45,7 +45,6 @@ import org.xml.sax.SAXException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import recoder.ParserException;
 
 /**
  * The main entry point for KeY
@@ -533,11 +532,13 @@ public final class Main implements Callable<Integer> {
             }
             // only use one input file
             Path fileNameOnStartUp = inputFiles.getFirst().toAbsolutePath();
-            RIFLTransformer transformer = new RIFLTransformer();
-            transformer.doTransform(riflFileName, fileNameOnStartUp,
-                RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
-            LOGGER.info("[RIFL] Writing transformed Java files to {}  ...", fileNameOnStartUp);
-            inputFiles = transformer.getProblemFiles();
+            /*
+             * RIFLTransformer transformer = new RIFLTransformer();
+             * transformer.doTransform(riflFileName, fileNameOnStartUp,
+             * RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+             * LOGGER.info("[RIFL] Writing transformed Java files to {}  ...", fileNameOnStartUp);
+             * inputFiles = transformer.getProblemFiles();
+             */
         }
 
         if (inputFiles != null && !inputFiles.isEmpty()) {

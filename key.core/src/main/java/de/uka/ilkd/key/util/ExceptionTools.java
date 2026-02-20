@@ -5,15 +5,11 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.nio.file.Paths;
-import java.util.regex.Matcher;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.Token;
-import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
@@ -43,17 +39,17 @@ public final class ExceptionTools {
     public static final Pattern TOKEN_MGR_ERR_PATTERN =
         Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
-    private ExceptionTools() {
-    }
+    private ExceptionTools() {}
 
     /**
      * Get the throwable's message. This will return a nicer error message for
      * certain ANTLR exceptions.
      *
-     * @param throwable a throwable
+     * @param throwable
+     *        a throwable
      * @return message for the exception
      */
-    public static String getMessage(@Nullable Throwable throwable) {
+    public static String getMessage(Throwable throwable) {
         if (throwable == null) {
             return "";
         } else if (throwable instanceof ParseCancellationException
@@ -112,24 +108,22 @@ public final class ExceptionTools {
      * Tries to resolve the location (i.e., file name, line, and column) from a parsing exception.
      * Result may be null.
      *
-     * @param exc the Throwable to extract the Location from
+     * @param exc
+     *        the Throwable to extract the Location from
      * @return the Location stored inside the Throwable or null if no such can be found
-     * @throws MalformedURLException if the no URL can be parsed from the String stored inside the
+     * @throws MalformedURLException
+     *         if the no URL can be parsed from the String stored inside the
      *         given Throwable can not be successfully converted to a URL and thus no Location can
      *         be created
      */
-    public static @Nullable Location getLocation(@NonNull Throwable exc)
+    public static Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
-        } else if (exc instanceof ParseException) {
-            return getLocation((ParseException) exc);
-        } else if (exc instanceof TokenMgrError) {
-            return getLocation((TokenMgrError) exc);
-        } else if (exc instanceof InputMismatchException ime) {
-            return getLocation(ime);
-        } else if (exc instanceof NoViableAltException nvae) {
-            return getLocation(nvae);
+        }
+
+        if (exc instanceof InputMismatchException ime) {
+            return Location.fromToken(ime.getOffendingToken());
         }
 
         if (exc.getCause() != null) {
@@ -139,41 +133,22 @@ public final class ExceptionTools {
         return null;
     }
 
-    private static @Nullable Location getLocation(ParseException exc) {
-        // JavaCC has 1-based column numbers
-        Token token = exc.currentToken;
-        return token == null ? null
-                : new Location(null, Position.fromToken(token.next));
+    private static URI parseFileName(String filename) throws MalformedURLException {
+        try {
+            return filename == null ? null : MiscTools.parseURL(filename).toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private static @Nullable Location getLocation(NoViableAltException exc) {
-        var token = exc.getOffendingToken();
-
-        return token == null ? null
-                : new Location(
-                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
-                            .normalize().toUri(),
-                    Position.fromToken(token));
-    }
-
-    private static @Nullable Location getLocation(InputMismatchException exc) {
-        var token = exc.getOffendingToken();
-
-        return token == null ? null
-                : new Location(
-                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
-                            .normalize().toUri(),
-                    Position.fromToken(token));
-    }
-
-    private static @Nullable Location getLocation(TokenMgrError exc) {
-        Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
-        if (m.find()) {
-            int line = Integer.parseInt(m.group(1));
-            int col = Integer.parseInt(m.group(2));
-            return new Location(null, Position.newOneBased(line, col));
+    // TODO javaparser this was not unused
+    @Nullable
+    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
+        // ANTLR 3 - Recognition Exception.
+        if (exc.input != null) {
+            // ANTLR has 0-based column numbers
+            return new Location(parseFileName(exc.input.getSourceName()), exc.position);
         }
         return null;
     }
-
 }

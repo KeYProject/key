@@ -47,11 +47,15 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param returnValue The return value.
-     * @param condition The optional condition or {@code null} if no condition is available.
+     * @param returnValue
+     *        The return value.
+     * @param condition
+     *        The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
             PosInOccurrence modalityPIO, JTerm returnValue,

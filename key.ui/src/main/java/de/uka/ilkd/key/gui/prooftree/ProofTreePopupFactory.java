@@ -49,8 +49,7 @@ public final class ProofTreePopupFactory {
     public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
         createFeature("DELAY_CUT", "Activates the delayed cut rule.");
 
-    private ProofTreePopupFactory() {
-    }
+    private ProofTreePopupFactory() {}
 
     /**
      * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.

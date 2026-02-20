@@ -7,12 +7,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -319,7 +319,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             }
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
-        ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
+        List<KeYJavaType> kjts = info.getAllSupertypes(containerType);
         ImmutableList<LocationVariable> globalVars = ImmutableSLList.nil();
         for (KeYJavaType kjtloc : kjts) {
             if (kjtloc.getJavaType() instanceof TypeDeclaration) {

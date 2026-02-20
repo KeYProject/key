@@ -268,8 +268,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     class ButtonListener implements ActionListener {
 
 
-        public ButtonListener() {
-        }
+        public ButtonListener() {}
 
 
         private void errorPositionKnown(String errorMessage, int row, int col,

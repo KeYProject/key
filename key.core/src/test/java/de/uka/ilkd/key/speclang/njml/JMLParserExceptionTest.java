@@ -25,12 +25,12 @@ import org.junit.jupiter.params.provider.MethodSource;
  * This test case is used to ensure that errors in JML (and perhaps also in Java)
  * are reported with a reasonable error message and the right position pointing
  * into the file.
- *
+ * <p>
  * To add a test case, locate the "exceptional" directory in the resources
  * (below the directory for this package here) and add your single Java file
  * that contains an error that should be presented to the user (like syntax
  * error, unresolved names, ...)
- *
+ * <p>
  * See README.md in said directory for information on the meta-data inside
  * the Java files.
  *

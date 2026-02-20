@@ -76,7 +76,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private final LinkedList<Throwable> errors = new LinkedList<>();
 
     /**
-     * @param proof Proof object for storing meta information about the parsed proof.
+     * @param proof
+     *        Proof object for storing meta information about the parsed proof.
      */
     public IntermediatePresentationProofFileParser(Proof proof) {
         this.proof = proof;
@@ -127,7 +128,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             {
                 TacletInformation tacletInfo = (TacletInformation) ruleInfo;
                 if (tacletInfo.loadedInsts == null) {
-                    tacletInfo.loadedInsts = new LinkedList<>();
+                    tacletInfo.loadedInsts = new ArrayList<>(4);
                 }
                 tacletInfo.loadedInsts.add(str);
             }
@@ -326,7 +327,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     /**
      * Loads proof settings.
      *
-     * @param preferences The preferences to load.
+     * @param preferences
+     *        The preferences to load.
      */
     private void loadPreferences(String preferences) {
         final ProofSettings proofSettings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
@@ -371,7 +373,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
-        protected LinkedList<String> loadedInsts = null;
+        protected List<String> loadedInsts = null;
         protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.nil();
         protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.nil();
 
@@ -415,7 +417,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      *
      * @author Dominic Scheurer
      */
-    public record Result(List<Throwable> errors, String status,
+    public record Result(
+            List<Throwable> errors, String status,
             BranchNodeIntermediate parsedResult) {
     }
 

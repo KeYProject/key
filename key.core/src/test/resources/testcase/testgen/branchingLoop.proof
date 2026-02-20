@@ -56,7 +56,7 @@ int _n;
 
 \problem {
      inReachableState
-   & (  self.<created>@(java.lang.Object) = TRUE
+   & (  self.$created@(java.lang.Object) = TRUE
       & !self = null)
    & inInt(n)
 -> {_n:=n}
@@ -334,7 +334,7 @@ int _n;
          (rule "add_literals" (formula "9") (term "0,0,1,0"))
          (rule "polySimp_addAssoc" (formula "9") (term "0,0"))
          (rule "add_literals" (formula "9") (term "0,0,0"))
-         (opengoal "     inReachableState    & (  self.<created>@(java.lang.Object) = TRUE       & !self = null)    & inInt(n) -> {_n:=n}      \\[{          exc=null;try {            self.doIt(_n)@BranchingLoop;          }  catch (java.lang.Throwable e) {            exc=e;          }        }\\] exc = null ")
+         (opengoal "     inReachableState    & (  self.$created@(java.lang.Object) = TRUE       & !self = null)    & inInt(n) -> {_n:=n}      \\[{          exc=null;try {            self.doIt(_n)@BranchingLoop;          }  catch (java.lang.Throwable e) {            exc=e;          }        }\\] exc = null ")
       )
       (branch " i_0 >= 64 FALSE"
          (rule "inEqSimp_geqRight" (formula "7"))
@@ -390,7 +390,7 @@ int _n;
          (rule "add_literals" (formula "8") (term "0,0,1,0"))
          (rule "polySimp_addAssoc" (formula "8") (term "0,0"))
          (rule "add_literals" (formula "8") (term "0,0,0"))
-         (opengoal "     inReachableState    & (  self.<created>@(java.lang.Object) = TRUE       & !self = null)    & inInt(n) -> {_n:=n}      \\[{          exc=null;try {            self.doIt(_n)@BranchingLoop;          }  catch (java.lang.Throwable e) {            exc=e;          }        }\\] exc = null ")
+         (opengoal "     inReachableState    & (  self.$created@(java.lang.Object) = TRUE       & !self = null)    & inInt(n) -> {_n:=n}      \\[{          exc=null;try {            self.doIt(_n)@BranchingLoop;          }  catch (java.lang.Throwable e) {            exc=e;          }        }\\] exc = null ")
       )
    )
    (branch " i_0 <= -1 + _n_0 * 2 FALSE"

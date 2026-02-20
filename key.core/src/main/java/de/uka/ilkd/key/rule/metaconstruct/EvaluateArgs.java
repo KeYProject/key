@@ -7,23 +7,23 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodOrConstructorReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperConstructorReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.MethodOrConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.SuperReference;
+import de.uka.ilkd.key.java.ast.reference.ThisConstructorReference;
+import de.uka.ilkd.key.java.ast.reference.ThisReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -41,7 +41,8 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe the instance of expression contained by the meta construct
+     * @param pe
+     *        the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
         super("#evaluate-arguments", pe);
@@ -50,10 +51,14 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * TODO Comment.
      *
-     * @param e TODO
-     * @param l TODO
-     * @param services TODO
-     * @param ec TODO
+     * @param e
+     *        TODO
+     * @param l
+     *        TODO
+     * @param services
+     *        TODO
+     * @param ec
+     *        TODO
      * @return TODO
      */
     public static ProgramVariable evaluate(Expression e, List<? super LocalVariableDeclaration> l,

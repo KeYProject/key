@@ -34,7 +34,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * Creates an ImmutableList from a List.
      *
-     * @param list a List.
+     * @param list
+     *        a List.
      * @return an ImmutableList containing the same elements as the specified list.
      */
     static <T extends @Nullable Object> ImmutableList<T> fromList(Iterable<? extends T> list) {
@@ -51,7 +52,8 @@ public interface ImmutableList<T extends @Nullable Object>
      * Return an empty immutable list.
      *
      * @return empty immutable list.
-     * @param <T> the entry type of the list.
+     * @param <T>
+     *        the entry type of the list.
      */
     static <T extends @Nullable Object> ImmutableList<T> of() {
         return ImmutableSLList.nil();
@@ -60,9 +62,11 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * Return a singleton immutable list.
      *
-     * @param e1 the element to put into the list
+     * @param e1
+     *        the element to put into the list
      * @return singleton immutable list.
-     * @param <T> the entry type of the list.
+     * @param <T>
+     *        the entry type of the list.
      */
     static <T extends @Nullable Object> ImmutableList<T> of(T e1) {
         return ImmutableSLList.singleton(e1);
@@ -72,10 +76,13 @@ public interface ImmutableList<T extends @Nullable Object>
      * Return an immutable list with two elements.
      * The iteration order is: e1 then e2
      *
-     * @param e1 the element to put into the list
-     * @param e2 the element to put into the list
+     * @param e1
+     *        the element to put into the list
+     * @param e2
+     *        the element to put into the list
      * @return (e1, e2) as immutable list
-     * @param <T> the entry type of the list.
+     * @param <T>
+     *        the entry type of the list.
      */
     static <T extends @Nullable Object> ImmutableList<T> of(T e1, T e2) {
         return ImmutableSLList.singleton(e2).prepend(e1);
@@ -85,11 +92,15 @@ public interface ImmutableList<T extends @Nullable Object>
      * Return an immutable list with three elements.
      * The iteration order is: e1 then e2 then e3
      *
-     * @param e1 the element to put into the list
-     * @param e2 the element to put into the list
-     * @param e3 the element to put into the list
+     * @param e1
+     *        the element to put into the list
+     * @param e2
+     *        the element to put into the list
+     * @param e3
+     *        the element to put into the list
      * @return (e1, e2, e3) as immutable list
-     * @param <T> the entry type of the list.
+     * @param <T>
+     *        the entry type of the list.
      */
     static <T extends @Nullable Object> ImmutableList<T> of(T e1, T e2, T e3) {
         return ImmutableSLList.singleton(e3).prepend(e2).prepend(e1);
@@ -99,9 +110,11 @@ public interface ImmutableList<T extends @Nullable Object>
      * Return an immutable list with the iterated elements.
      * The iteration order is the order of the arguments
      *
-     * @param es the elements to put into the list
+     * @param es
+     *        the elements to put into the list
      * @return (e1, e2, e3, ...) as immutable list
-     * @param <T> the entry type of the list.
+     * @param <T>
+     *        the entry type of the list.
      */
     static <T extends @Nullable Object> ImmutableList<T> of(T... es) {
         ImmutableList<T> result = ImmutableSLList.nil();
@@ -114,7 +127,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * prepends element to the list (non-destructive)
      *
-     * @param element the head of the created list
+     * @param element
+     *        the head of the created list
      * @return IList<T> with the new element as head and this list as tail
      */
     ImmutableList<T> prepend(T element);
@@ -122,7 +136,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * prepends a whole list (non-destructive)
      *
-     * @param list the list to be prepended
+     * @param list
+     *        the list to be prepended
      * @return IList<T> list++this
      */
 
@@ -147,7 +162,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * prepends array (O(n))
      *
-     * @param array the array of the elements to be prepended
+     * @param array
+     *        the array of the elements to be prepended
      * @return IList<T> the new list
      */
     ImmutableList<T> prepend(@SuppressWarnings("unchecked") T... array);
@@ -155,7 +171,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * appends element to the list (non-destructive)
      *
-     * @param element to be added at the end
+     * @param element
+     *        to be added at the end
      * @return IList<T> with the new element at the end
      */
     ImmutableList<T> append(T element);
@@ -163,7 +180,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * appends a whole list (non-destructive)
      *
-     * @param list the list to be appended
+     * @param list
+     *        the list to be appended
      * @return IList<T> this++list
      */
     ImmutableList<T> append(ImmutableList<T> list);
@@ -176,7 +194,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * appends element at end (non-destructive) (O(n))
      *
-     * @param array the array to be appended
+     * @param array
+     *        the array to be appended
      * @return IList<T> the new list
      */
     ImmutableList<T> append(@SuppressWarnings("unchecked") T... array);
@@ -189,7 +208,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * return true if predicate is fullfilled for at least one element
      *
-     * @param predicate the predicate
+     * @param predicate
+     *        the predicate
      * @return true if predicate is fullfilled for at least one element
      */
     boolean exists(Predicate<? super T> predicate);
@@ -284,7 +304,8 @@ public interface ImmutableList<T extends @Nullable Object>
      * Returns an immutable list consisting of the elements of this list that match
      * the given predicate.
      *
-     * @param predicate a non-interfering, stateless
+     * @param predicate
+     *        a non-interfering, stateless
      *        predicate to apply to each element to determine if it
      *        should be included
      *
@@ -298,8 +319,10 @@ public interface ImmutableList<T extends @Nullable Object>
      * Returns an immutable list consisting of the results of applying the given
      * function to the elements of this list.
      *
-     * @param <R> The element type of the result list
-     * @param function a non-interfering, stateless function to apply to each element
+     * @param <R>
+     *        The element type of the result list
+     * @param function
+     *        a non-interfering, stateless function to apply to each element
      * @return the mapped list of the same length as this
      */
     default <R extends @Nullable Object> ImmutableList<R> map(Function<? super T, R> function) {
@@ -307,7 +330,8 @@ public interface ImmutableList<T extends @Nullable Object>
     }
 
     /**
-     * @param other prefix to check for
+     * @param other
+     *        prefix to check for
      * @return whether this list starts with the elements of the provided prefix
      */
     default boolean hasPrefix(ImmutableList<? extends T> other) {
@@ -327,9 +351,11 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * Remove a prefix from this list.
      *
-     * @param prefix prefix to remove
+     * @param prefix
+     *        prefix to remove
      * @return new list with the prefix removed
-     * @throws IllegalArgumentException if the provided prefix is not a prefix of this list
+     * @throws IllegalArgumentException
+     *         if the provided prefix is not a prefix of this list
      */
     default ImmutableList<T> stripPrefix(ImmutableList<? extends T> prefix) {
         if (prefix.isEmpty()) {
@@ -363,9 +389,11 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * Get the n-th element of this list.
      *
-     * @param idx the 0-based index of the element
+     * @param idx
+     *        the 0-based index of the element
      * @return the element at index idx.
-     * @throws IndexOutOfBoundsException if idx is less than 0 or at
+     * @throws IndexOutOfBoundsException
+     *         if idx is less than 0 or at
      *         least {@link #size()}.
      */
     default T get(int idx) {

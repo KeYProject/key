@@ -4,19 +4,19 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This{@link ExceptionBreakpoint} represents an exception breakpoint and is responsible to tell the
@@ -113,7 +113,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
                     } else if (suspendOnSubclasses) {
                         JavaInfo info = node.proof().getServices().getJavaInfo();
                         KeYJavaType kjt = locVar.getKeYJavaType();
-                        ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
+                        List<KeYJavaType> kjts = info.getAllSupertypes(kjt);
                         for (KeYJavaType kjtloc : kjts) {
                             if (kjtloc.getSort().toString().equals(exceptionName)
                                     && !exceptionParentNodes.contains(SETParent)) {

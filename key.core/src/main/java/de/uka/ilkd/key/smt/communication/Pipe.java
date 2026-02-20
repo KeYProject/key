@@ -18,8 +18,10 @@ public interface Pipe {
     /**
      * Sends a message to the external process the Pipe is connected to.
      *
-     * @param message the message to send
-     * @throws IOException if an I/O error occurs
+     * @param message
+     *        the message to send
+     * @throws IOException
+     *         if an I/O error occurs
      */
     void sendMessage(@NonNull String message) throws IOException;
 
@@ -28,8 +30,10 @@ public interface Pipe {
      * message or the underlying stream has been closed.
      *
      * @return the received message
-     * @throws IOException if reading fails
-     * @throws InterruptedException if interrupted while waiting
+     * @throws IOException
+     *         if reading fails
+     * @throws InterruptedException
+     *         if interrupted while waiting
      */
     @Nullable
     String readMessage() throws IOException, InterruptedException;

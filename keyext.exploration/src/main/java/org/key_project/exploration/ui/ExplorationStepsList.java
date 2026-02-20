@@ -63,7 +63,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * Sets the shown proof. If null is given the scenery is emptied otherwise the model
      * reconstructed.
      *
-     * @param proof a proof or null
+     * @param proof
+     *        a proof or null
      */
     public void setProof(@Nullable Proof proof) {
         if (currentProof != null) {
@@ -84,7 +85,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    public Proof getProof() { return currentProof; }
+    public Proof getProof() {
+        return currentProof;
+    }
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
@@ -130,10 +133,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * During collection of the nodes, the nodes are grouped in the given TreeModel {@code dtm}
      * </p>
      *
-     * @param node start node of exploration
-     * @param foundNodes filled with found exploration nodes
-     * @param dtm a tree model which is filled with nodes
-     * @param parent the corresponding entry of {@code n} in the tree model
+     * @param node
+     *        start node of exploration
+     * @param foundNodes
+     *        filled with found exploration nodes
+     * @param dtm
+     *        a tree model which is filled with nodes
+     * @param parent
+     *        the corresponding entry of {@code n} in the tree model
      */
     private void findExplorationChildren(@NonNull Node node,
             final @NonNull ArrayList<Node> foundNodes, @NonNull DefaultTreeModel dtm,

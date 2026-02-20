@@ -172,7 +172,7 @@ public class TestSchemaModalOperators {
     @Test
     public void testSchemaModalities2() {
         // Debug.ENABLE_DEBUG = true;
-        NoPosTacletApp testmodal1 = TacletForTests.getRules().lookup("testSchemaModal1");
+        NoPosTacletApp testmodal1 = TacletForTests.lookupTaclet("testSchemaModal1");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal1);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
@@ -207,7 +207,7 @@ public class TestSchemaModalOperators {
     @Test
     public void testSchemaModalities3() {
         // Debug.ENABLE_DEBUG = true;
-        NoPosTacletApp testmodal2 = TacletForTests.getRules().lookup("testSchemaModal2");
+        NoPosTacletApp testmodal2 = TacletForTests.lookupTaclet("testSchemaModal2");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal2);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
@@ -238,7 +238,7 @@ public class TestSchemaModalOperators {
     @Test
     public void testSchemaModalities4() {
         // Debug.ENABLE_DEBUG = true;
-        NoPosTacletApp testmodal3 = TacletForTests.getRules().lookup("testSchemaModal3");
+        NoPosTacletApp testmodal3 = TacletForTests.lookupTaclet("testSchemaModal3");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal3);
         Goal goal = createGoal(proof[1].root(), tacletIndex);

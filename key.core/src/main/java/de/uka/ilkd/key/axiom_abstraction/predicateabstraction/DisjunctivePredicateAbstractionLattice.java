@@ -36,7 +36,8 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
      * applicable predicates. The caller is responsible for making sure that no combinations of
      * predicates are valid.
      *
-     * @param applicablePredicates The predicates to generate the lattice from.
+     * @param applicablePredicates
+     *        The predicates to generate the lattice from.
      */
     public DisjunctivePredicateAbstractionLattice(List<AbstractionPredicate> applicablePredicates) {
         super();

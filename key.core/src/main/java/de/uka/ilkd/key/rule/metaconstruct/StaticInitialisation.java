@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.transformations.pipeline.ClassInitializeMethodBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -48,8 +48,7 @@ public class StaticInitialisation extends ProgramTransformer {
             if (ec == null) {
                 // in this case we are at the top level of a diamond
                 // in this case we assume as scope the type of the method prefix
-                m = mr.method(services, mrPrefixType, mr.getMethodSignature(services, null),
-                    mrPrefixType);
+                m = mr.method(services, mrPrefixType, mr.getMethodSignature(services, null));
             } else {
                 m = mr.method(services, mr.determineStaticPrefixType(services, ec), ec);
             }
@@ -63,7 +62,7 @@ public class StaticInitialisation extends ProgramTransformer {
 
         } else {
             // at the moment the 'new' case is catched via static method
-            // call of <createObject>
+            // call of $createObject
             Debug.fail("static initialisation: Unexpected case in static initialisation.");
         }
 

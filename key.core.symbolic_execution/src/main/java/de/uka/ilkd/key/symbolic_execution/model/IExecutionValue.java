@@ -26,7 +26,8 @@ public interface IExecutionValue extends IExecutionElement {
      * Returns the condition under which the variable ({@link #getVariable()}) has this value.
      *
      * @return The condition.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     JTerm getCondition() throws ProofInputException;
 
@@ -35,7 +36,8 @@ public interface IExecutionValue extends IExecutionElement {
      * human readable {@link String}.
      *
      * @return The condition as human readable {@link String}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getConditionString() throws ProofInputException;
 
@@ -98,7 +100,8 @@ public interface IExecutionValue extends IExecutionElement {
      *
      * @return {@code true} is an object, {@code false} is an attribute of the object defined by the
      *         parent {@link IExecutionValue}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     boolean isValueAnObject() throws ProofInputException;
 
@@ -127,7 +130,8 @@ public interface IExecutionValue extends IExecutionElement {
      * Returns all available {@link IExecutionConstraint}s.
      *
      * @return The available {@link IExecutionConstraint}s.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     IExecutionConstraint[] getConstraints() throws ProofInputException;
 }

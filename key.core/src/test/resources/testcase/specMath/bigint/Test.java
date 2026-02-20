@@ -1,6 +1,7 @@
 // This test uses method resolution to return BigIntMarker or IntMarker from the accept model method
 // Test failure is indicated by method resolution failing
-public /*@ spec_bigint_math @*/ class Test {
+/*@ spec_bigint_math @*/
+public class Test {
 	public static class BigIntMarker {
 		public boolean isBigint() {
 			return true;

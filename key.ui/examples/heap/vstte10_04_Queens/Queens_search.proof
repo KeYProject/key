@@ -23,7 +23,7 @@
    & (  inInt(pos)
       & (    boolean::select(heap,
                              board,
-                             java.lang.Object::<created>)
+                             java.lang.Object::#$created)
            = TRUE
          | board = null))
    & mbyAtPre = javaSubInt(length(board), pos)
@@ -165,7 +165,7 @@
                    | !o = null
                    & !  boolean::select(heapAtPre,
                                         o,
-                                        java.lang.Object::<created>)
+                                        java.lang.Object::#$created)
                       = TRUE
                    |   any::select(heap, o, f)
                      = any::select(heapAtPre, o, f)))
@@ -5348,7 +5348,7 @@
     (  _var61 >= 1 + pos
      & _var61 <= -1 + mbyAtPre + pos
      & arr(_var61) = f_4)
-& !f_4 = <created> TRUE"
+& !f_4 = $created TRUE"
                                           (rule "andLeft" (formula "1"))
                                           (rule "notLeft" (formula "2"))
                                           (rule "exLeft" (formula "1") (inst "sk=_var61_0"))
@@ -5425,7 +5425,7 @@
     (  _var61 >= 1 + pos
      & _var61 <= -1 + mbyAtPre + pos
      & arr(_var61) = f_4)
-& !f_4 = <created> FALSE"
+& !f_4 = $created FALSE"
                                           (rule "cnf_rightDist" (formula "37") (term "1,1,0,0"))
                                           (rule "commute_or" (formula "37") (term "0,1,1,0,0"))
                                           (rule "cnf_rightDist" (formula "35") (term "0,0"))
@@ -5776,14 +5776,14 @@
                                           (rule "inEqSimp_exactShadow3" (formula "39") (ifseqformula "41"))
                                           (builtin "One Step Simplification" (formula "39"))
                                           (rule "cut_direct" (formula "53") (term "0,1"))
-                                          (branch " CUT: f_4 = <created> TRUE"
+                                          (branch " CUT: f_4 = $created TRUE"
                                              (builtin "One Step Simplification" (formula "54"))
                                              (rule "false_right" (formula "54"))
                                              (rule "replace_known_left" (formula "54") (term "0,1,0,0") (ifseqformula "1"))
                                              (builtin "One Step Simplification" (formula "54"))
                                              (rule "closeTrue" (formula "54"))
                                           )
-                                          (branch " CUT: f_4 = <created> FALSE"
+                                          (branch " CUT: f_4 = $created FALSE"
                                              (builtin "One Step Simplification" (formula "54"))
                                              (rule "replace_known_right" (formula "55") (term "0,1,0,0") (ifseqformula "53"))
                                              (builtin "One Step Simplification" (formula "55"))
@@ -11503,7 +11503,7 @@
     (  _var120 >= 1 + pos
      & _var120 <= -1 + mbyAtPre + pos
      & arr(_var120) = f_5)
-& !f_5 = <created> TRUE"
+& !f_5 = $created TRUE"
                                              (rule "andLeft" (formula "1"))
                                              (rule "notLeft" (formula "2"))
                                              (rule "exLeft" (formula "1") (inst "sk=_var120_0"))
@@ -11580,7 +11580,7 @@
     (  _var120 >= 1 + pos
      & _var120 <= -1 + mbyAtPre + pos
      & arr(_var120) = f_5)
-& !f_5 = <created> FALSE"
+& !f_5 = $created FALSE"
                                              (rule "shift_paren_or" (formula "26") (term "0,0"))
                                              (rule "inEqSimp_or_tautInEq3" (formula "26") (term "0,0,0"))
                                              (rule "inEqSimp_homoInEq1" (formula "26") (term "1,0,0,0"))
@@ -11800,14 +11800,14 @@
                                              (rule "inEqSimp_contradInEq1" (formula "41") (term "0") (ifseqformula "10"))
                                              (builtin "One Step Simplification" (formula "41"))
                                              (rule "cut_direct" (formula "47") (term "0,1"))
-                                             (branch " CUT: f_5 = <created> TRUE"
+                                             (branch " CUT: f_5 = $created TRUE"
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "false_right" (formula "48"))
                                                 (rule "replace_known_left" (formula "48") (term "0,1,0,0") (ifseqformula "1"))
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "closeTrue" (formula "48"))
                                              )
-                                             (branch " CUT: f_5 = <created> FALSE"
+                                             (branch " CUT: f_5 = $created FALSE"
                                                 (builtin "One Step Simplification" (formula "48"))
                                                 (rule "replace_known_right" (formula "49") (term "0,1,0,0") (ifseqformula "47"))
                                                 (builtin "One Step Simplification" (formula "49"))

@@ -27,7 +27,8 @@ public class JmlMarkerDecision {
     /**
      * Initialize this class with default {@code enabledKeys} of {@code "key"}.
      *
-     * @param lexer a lexer instance which stream is used
+     * @param lexer
+     *        a lexer instance which stream is used
      */
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
@@ -39,7 +40,8 @@ public class JmlMarkerDecision {
      * Sets the enabled keys for the recognition of active JML comments. Keys are treated
      * case-insensitive.
      *
-     * @param markers a collection of keys without prefix ([+-])
+     * @param markers
+     *        a collection of keys without prefix ([+-])
      */
     public void setEnabledKeys(@NonNull Collection<String> markers) {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());

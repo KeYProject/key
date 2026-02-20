@@ -15,15 +15,17 @@ import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 public class ProofBundleMerger {
-    private ProofBundleMerger() {
-    }
+    private ProofBundleMerger() {}
 
     /**
      * This method merges n proof bundles into a single one.
      *
-     * @param inputs the paths to the input bundles to merge
-     * @param output the target path (will be zipped)
-     * @throws ProofManagementException if any of the files can not be accessed
+     * @param inputs
+     *        the paths to the input bundles to merge
+     * @param output
+     *        the target path (will be zipped)
+     * @throws ProofManagementException
+     *         if any of the files can not be accessed
      */
     public static void merge(List<Path> inputs, Path output, boolean force, Logger logger)
             throws ProofManagementException {

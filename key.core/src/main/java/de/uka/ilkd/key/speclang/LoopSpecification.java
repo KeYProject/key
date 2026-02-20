@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -45,10 +45,14 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the invariant formula.
      *
-     * @param heap the heap variable.
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
+     * @param heap
+     *        the heap variable.
+     * @param selfTerm
+     *        the self term.
+     * @param atPres
+     *        the operators used for the pre-heap.
+     * @param services
+     *        the Services object.
      * @return The invariant formula as a term.
      */
     JTerm getInvariant(LocationVariable heap, JTerm selfTerm,
@@ -65,10 +69,14 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the modifiable clause.
      *
-     * @param heap the heap variable.
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
+     * @param heap
+     *        the heap variable.
+     * @param selfTerm
+     *        the self term.
+     * @param atPres
+     *        the operators used for the pre-heap.
+     * @param services
+     *        the Services object.
      * @return The modifiable clause as a term.
      */
     JTerm getModifiable(LocationVariable heap, JTerm selfTerm,
@@ -77,9 +85,12 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the modifiable clause.
      *
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
+     * @param selfTerm
+     *        the self term.
+     * @param atPres
+     *        the operators used for the pre-heap.
+     * @param services
+     *        the Services object.
      * @return The modifiable clause as a term.
      */
     JTerm getModifiable(JTerm selfTerm, Map<LocationVariable, JTerm> atPres, Services services);
@@ -87,10 +98,14 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the free modifiable clause.
      *
-     * @param heap the heap variable.
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
+     * @param heap
+     *        the heap variable.
+     * @param selfTerm
+     *        the self term.
+     * @param atPres
+     *        the operators used for the pre-heap.
+     * @param services
+     *        the Services object.
      * @return The modifiable clause as a term.
      */
     JTerm getFreeModifiable(LocationVariable heap, JTerm selfTerm,
@@ -112,9 +127,12 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the variant term.
      *
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
+     * @param selfTerm
+     *        the self term.
+     * @param atPres
+     *        the operators used for the pre-heap.
+     * @param services
+     *        the Services object.
      * @return The variant term.
      */
     JTerm getVariant(JTerm selfTerm, Map<LocationVariable, JTerm> atPres, Services services);
@@ -181,19 +199,32 @@ public interface LoopSpecification extends SpecificationElement {
      * Create and return a new loop specification element from the existing one where the arguments
      * given are replaced.
      *
-     * @param loop the new loop statement.
-     * @param pm the new program method.
-     * @param kjt the new KeYJavaType.
-     * @param invariants the new loop invariant clauses.
-     * @param freeInvariants the new "free" loop invariant clauses.
-     * @param modifiable the new modifiable clauses.
-     * @param freeModifiable the new free modifiable clauses.
-     * @param infFlowSpecs the new information flow specification elements.
-     * @param variant the new loop variant term.
-     * @param selfTerm the new self term.
-     * @param localIns the new local in-variables.
-     * @param localOuts the new local out-variables.
-     * @param atPres the new operators used for the pre-heap.
+     * @param loop
+     *        the new loop statement.
+     * @param pm
+     *        the new program method.
+     * @param kjt
+     *        the new KeYJavaType.
+     * @param invariants
+     *        the new loop invariant clauses.
+     * @param freeInvariants
+     *        the new "free" loop invariant clauses.
+     * @param modifiable
+     *        the new modifiable clauses.
+     * @param freeModifiable
+     *        the new free modifiable clauses.
+     * @param infFlowSpecs
+     *        the new information flow specification elements.
+     * @param variant
+     *        the new loop variant term.
+     * @param selfTerm
+     *        the new self term.
+     * @param localIns
+     *        the new local in-variables.
+     * @param localOuts
+     *        the new local out-variables.
+     * @param atPres
+     *        the new operators used for the pre-heap.
      * @return The new loop specification element.
      */
     LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
@@ -207,17 +238,28 @@ public interface LoopSpecification extends SpecificationElement {
      * Create and return a new loop specification element from the existing one where the arguments
      * given are replaced.
      *
-     * @param loop the new loop statement.
-     * @param invariants the new loop invariant clauses.
-     * @param freeInvariants the new "free" loop invariant clauses.
-     * @param modifiable the new modifiable clauses.
-     * @param freeModifiable the new free modifiable clauses.
-     * @param infFlowSpecs the new information flow specification elements.
-     * @param variant the new loop variant term.
-     * @param selfTerm the new self term.
-     * @param localIns the new local in-variables.
-     * @param localOuts the new local out-variables.
-     * @param atPres the new operators used for the pre-heap.
+     * @param loop
+     *        the new loop statement.
+     * @param invariants
+     *        the new loop invariant clauses.
+     * @param freeInvariants
+     *        the new "free" loop invariant clauses.
+     * @param modifiable
+     *        the new modifiable clauses.
+     * @param freeModifiable
+     *        the new free modifiable clauses.
+     * @param infFlowSpecs
+     *        the new information flow specification elements.
+     * @param variant
+     *        the new loop variant term.
+     * @param selfTerm
+     *        the new self term.
+     * @param localIns
+     *        the new local in-variables.
+     * @param localOuts
+     *        the new local out-variables.
+     * @param atPres
+     *        the new operators used for the pre-heap.
      * @return The new loop specification element.
      */
     LoopSpecification create(LoopStatement loop,
@@ -231,9 +273,12 @@ public interface LoopSpecification extends SpecificationElement {
      * Instantiate a (raw) loop specification with loop invariant clauses and a loop variant,
      * possibly together with (if any) "free" loop invariant clauses.
      *
-     * @param invariants the loop invariant clauses for instantiation.
-     * @param freeInvariants the "free" loop invariant clauses for instantiation.
-     * @param variant the loop variant for instantiation.
+     * @param invariants
+     *        the loop invariant clauses for instantiation.
+     * @param freeInvariants
+     *        the "free" loop invariant clauses for instantiation.
+     * @param variant
+     *        the loop variant for instantiation.
      * @return the instantiated loop specification.
      */
     LoopSpecification instantiate(Map<LocationVariable, JTerm> invariants,
@@ -244,12 +289,18 @@ public interface LoopSpecification extends SpecificationElement {
      * clauses, a loop variant, modifiable clauses, information flow specification elements, and a
      * loop variant, possibly together with (if any) "free" loop invariant clauses.
      *
-     * @param invariants the new loop invariant clauses.
-     * @param freeInvariants the new "free" loop invariant clauses.
-     * @param modifiable the new modifiable clauses.
-     * @param freeModifiable the new free modifiable clauses.
-     * @param infFlowSpecs the new information flow specification elements.
-     * @param variant the new loop variant.
+     * @param invariants
+     *        the new loop invariant clauses.
+     * @param freeInvariants
+     *        the new "free" loop invariant clauses.
+     * @param modifiable
+     *        the new modifiable clauses.
+     * @param freeModifiable
+     *        the new free modifiable clauses.
+     * @param infFlowSpecs
+     *        the new information flow specification elements.
+     * @param variant
+     *        the new loop variant.
      * @return The configured loop specification.
      */
     LoopSpecification configurate(
@@ -269,11 +320,16 @@ public interface LoopSpecification extends SpecificationElement {
      * one. Take care: the variables used for the receiver, parameters, and local variables must
      * stay the same!
      *
-     * @param invariants the loop invariant clauses.
-     * @param freeInvariants the "free" loop invariant clauses.
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
+     * @param invariants
+     *        the loop invariant clauses.
+     * @param freeInvariants
+     *        the "free" loop invariant clauses.
+     * @param selfTerm
+     *        the self term.
+     * @param atPres
+     *        the operators used for the pre-heap.
+     * @param services
+     *        the Services object.
      * @return The new loop invariant.
      */
     LoopSpecification setInvariant(Map<LocationVariable, JTerm> invariants,
@@ -289,10 +345,14 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the invariant in pretty plain text format.
      *
-     * @param services the Services object.
-     * @param heapContext all corresponding heaps.
-     * @param usePrettyPrinting whether the text should be pretty-printed.
-     * @param useUnicodeSymbols whether Unicode symbols should be used.
+     * @param services
+     *        the Services object.
+     * @param heapContext
+     *        all corresponding heaps.
+     * @param usePrettyPrinting
+     *        whether the text should be pretty-printed.
+     * @param useUnicodeSymbols
+     *        whether Unicode symbols should be used.
      * @return a String containing the plain text representation of this invariant.
      */
     String getPlainText(Services services, Iterable<LocationVariable> heapContext,

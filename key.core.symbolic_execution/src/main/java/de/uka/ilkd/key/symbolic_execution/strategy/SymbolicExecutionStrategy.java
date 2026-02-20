@@ -58,8 +58,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
      * Constructor.
      *
-     * @param proof The proof.
-     * @param sp The {@link StrategyProperties} to use.
+     * @param proof
+     *        The proof.
+     * @param sp
+     *        The {@link StrategyProperties} to use.
      */
     private SymbolicExecutionStrategy(Proof proof, StrategyProperties sp) {
         super(proof, sp);
@@ -206,13 +208,19 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
      * Returns the default {@link StrategyProperties} of symbolic execution.
      *
-     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
-     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
-     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
-     * @param blockTreatmentContract Block contracts or expand otherwise?
-     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by
+     * @param quantifierInstantiationWithSplitting
+     *        Instantiate quantifiers?
+     * @param methodTreatmentContract
+     *        Use method contracts or inline method bodies otherwise?
+     * @param loopTreatmentInvariant
+     *        Use loop invariants or unrole loops otherwise?
+     * @param blockTreatmentContract
+     *        Block contracts or expand otherwise?
+     * @param nonExecutionBranchHidingSideProofs
+     *        {@code true} hide non execution branch labels by
      *        side proofs, {@code false} do not hide execution branch labels.
-     * @param aliasChecks Do alias checks?
+     * @param aliasChecks
+     *        Do alias checks?
      * @return The default {@link StrategyProperties} for symbolic execution.
      */
     public static StrategyProperties getSymbolicExecutionStrategyProperties(

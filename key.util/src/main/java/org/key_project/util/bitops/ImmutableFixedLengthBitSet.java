@@ -24,7 +24,8 @@ public class ImmutableFixedLengthBitSet {
      * Constructs a new {@link ImmutableFixedLengthBitSet} for the given length. All bits are set to
      * zero (so the {@link ImmutableFixedLengthBitSet} represents the number 0).
      *
-     * @param length The length of the new {@link ImmutableFixedLengthBitSet}.
+     * @param length
+     *        The length of the new {@link ImmutableFixedLengthBitSet}.
      */
     public ImmutableFixedLengthBitSet(int length) {
         this.bitSet = new boolean[length];
@@ -36,8 +37,10 @@ public class ImmutableFixedLengthBitSet {
      * and value. Note: It is not checked that the value really faithfully represents the bitSet, so
      * callers are responsible to make sure that this property holds.
      *
-     * @param bitSet The new bit set.
-     * @param value The value for bitSet.
+     * @param bitSet
+     *        The new bit set.
+     * @param value
+     *        The value for bitSet.
      */
     private ImmutableFixedLengthBitSet(boolean[] bitSet, int value) {
         this.bitSet = bitSet;
@@ -66,7 +69,8 @@ public class ImmutableFixedLengthBitSet {
     /**
      * Sets this {@link ImmutableFixedLengthBitSet} to the given value.
      *
-     * @param value Value to set the {@link ImmutableFixedLengthBitSet} to.
+     * @param value
+     *        Value to set the {@link ImmutableFixedLengthBitSet} to.
      */
     public ImmutableFixedLengthBitSet setToValue(int value) {
         assert value < intPow(2, bitSet.length) : "Value to high for this bit set.";
@@ -143,8 +147,10 @@ public class ImmutableFixedLengthBitSet {
     /**
      * Power function for integers.
      *
-     * @param a The base.
-     * @param b The exponent.
+     * @param a
+     *        The base.
+     * @param b
+     *        The exponent.
      * @return a^b.
      */
     private static int intPow(int a, int b) {

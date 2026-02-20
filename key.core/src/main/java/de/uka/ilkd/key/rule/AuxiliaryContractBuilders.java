@@ -8,11 +8,19 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.NotEquals;
+import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.ast.statement.Catch;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.Try;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
@@ -48,6 +56,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -1579,8 +1588,8 @@ public final class AuxiliaryContractBuilders {
         private StatementBlock finishTransactionIfModalityIsTransactional(
                 final Statement statement) {
             if (instantiation.isTransactional()) {
-                return new StatementBlock(statement, new TransactionStatement(
-                    de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
+                return new StatementBlock(statement,
+                    new TransactionStatement(KeyTransactionStatement.TransactionType.FINISH));
             } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;

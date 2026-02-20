@@ -44,7 +44,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     /**
      * Constructor.
      *
-     * @param termLabelNameToRemove The {@link Name} of the supported {@link TermLabel}.
+     * @param termLabelNameToRemove
+     *        The {@link Name} of the supported {@link TermLabel}.
      */
     public RemoveInCheckBranchesTermLabelRefactoring(Name termLabelNameToRemove) {
         assert termLabelNameToRemove != null;

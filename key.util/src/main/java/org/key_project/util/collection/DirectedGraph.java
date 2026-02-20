@@ -13,8 +13,10 @@ import java.util.Set;
 /**
  * Simple implementation of the {@link Graph} interface.
  *
- * @param <V> vertex type
- * @param <E> edge type
+ * @param <V>
+ *        vertex type
+ * @param <E>
+ *        edge type
  * @author Arne Keller
  */
 @SuppressWarnings("nullness")

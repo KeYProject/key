@@ -46,12 +46,18 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
     /**
      * Creates a wellformedness condition containing the applicable heaps.
      *
-     * @param isTransaction Signals a transaction modality.
-     * @param isPermissions Signals the permission profile.
-     * @param anonHeapTerm The Skolem term for the standard heap.
-     * @param anonSavedHeapTerm The Skolem term for the saved (transaction) heap.
-     * @param anonPermissionsHeapTerm The Skolem term for the permissions heap.
-     * @param services The {@link Services} object.
+     * @param isTransaction
+     *        Signals a transaction modality.
+     * @param isPermissions
+     *        Signals the permission profile.
+     * @param anonHeapTerm
+     *        The Skolem term for the standard heap.
+     * @param anonSavedHeapTerm
+     *        The Skolem term for the saved (transaction) heap.
+     * @param anonPermissionsHeapTerm
+     *        The Skolem term for the permissions heap.
+     * @param services
+     *        The {@link Services} object.
      * @return The wellformedness condition.
      */
     private JTerm createWellformedCond(boolean isTransaction, boolean isPermissions,

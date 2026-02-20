@@ -8,13 +8,13 @@ public final class IntegerUtil {
     /**
      * Forbid instances.
      */
-    private IntegerUtil() {
-    }
+    private IntegerUtil() {}
 
     /**
      * Computes the factorial value of n.
      *
-     * @param n The value.
+     * @param n
+     *        The value.
      * @return The computed factorial value or {@code -1} if n is negative.
      */
     public static int factorial(int n) {

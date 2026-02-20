@@ -88,7 +88,8 @@ public class RuleSetDispatchFeature implements Feature {
     /**
      * Returns the used {@link Feature} for the given {@link RuleSet}.
      *
-     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
+     * @param ruleSet
+     *        The {@link RuleSet} to get its {@link Feature}.
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */

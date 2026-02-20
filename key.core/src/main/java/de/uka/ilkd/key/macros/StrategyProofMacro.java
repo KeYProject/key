@@ -59,7 +59,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * Subclasses can use this method to do some postprocessing on the proof-object after the
      * strategy has finished.
      *
-     * @param proof The proof object.
+     * @param proof
+     *        The proof object.
      */
     protected void doPostProcessing(Proof proof) {}
 

@@ -50,9 +50,12 @@ public final class GenericSortInstantiations {
      * instantiations of the generic sorts used within "p_instantiations" are sought for which are
      * compatible with the instantiations of the SVs
      *
-     * @param p_instantiations list of SV instantiations
-     * @param p_conditions additional conditions for sort instantiations
-     * @throws GenericSortException iff the conditions could not be solved
+     * @param p_instantiations
+     *        list of SV instantiations
+     * @param p_conditions
+     *        additional conditions for sort instantiations
+     * @throws GenericSortException
+     *         iff the conditions could not be solved
      */
     public static GenericSortInstantiations create(
             Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> p_instantiations,
@@ -87,9 +90,12 @@ public final class GenericSortInstantiations {
      * Create an object that holds instantiations of the generic sorts "p_sorts" satisfying the
      * conditions "p_conditions"
      *
-     * @param p_sorts generic sorts to instantiate
-     * @param p_conditions conditions the instantiations have to satisfy
-     * @throws GenericSortException if no instantiations has been found
+     * @param p_sorts
+     *        generic sorts to instantiate
+     * @param p_conditions
+     *        conditions the instantiations have to satisfy
+     * @throws GenericSortException
+     *         if no instantiations has been found
      */
     public static GenericSortInstantiations create(ImmutableList<GenericSort> p_sorts,
             ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
@@ -172,10 +178,12 @@ public final class GenericSortInstantiations {
 
 
     /**
-     * @param services the Services class
+     * @param services
+     *        the Services class
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is instantiated with
      *         currently otherwise
-     * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
+     * @throws GenericSortException
+     *         iff p_s is a generic sort which is not yet instantiated
      */
     public Sort getRealSort(OperatorSV p_sv, TermServices services) {
         return getRealSort(p_sv.sort(), services);
@@ -201,9 +209,12 @@ public final class GenericSortInstantiations {
     /**
      * Really solve the conditions given
      *
-     * @param p_sorts generic sorts that must be instantiated
-     * @param p_conditions conditions to be solved
-     * @throws GenericSortException no solution could be found
+     * @param p_sorts
+     *        generic sorts that must be instantiated
+     * @param p_conditions
+     *        conditions to be solved
+     * @throws GenericSortException
+     *         no solution could be found
      * @return the/a found solution
      */
     private static ImmutableMap<GenericSort, Sort> solve(ImmutableList<GenericSort> p_sorts,
@@ -240,9 +251,12 @@ public final class GenericSortInstantiations {
      * Method which is called recursively and tries to instantiate one (the first) generic sort from
      * the "p_remainingSorts"-list
      *
-     * @param p_remainingSorts generic sorts which needs to be instantiated (topologically sorted)
-     * @param p_curRes instantiations so far
-     * @param p_conditions conditions (see above)
+     * @param p_remainingSorts
+     *        generic sorts which needs to be instantiated (topologically sorted)
+     * @param p_curRes
+     *        instantiations so far
+     * @param p_conditions
+     *        conditions (see above)
      * @return a solution if one could be found, null otherwise
      */
     private static ImmutableMap<GenericSort, Sort> solveHelp(
@@ -394,8 +408,10 @@ public final class GenericSortInstantiations {
      * GSCForceInstantiation-conditions (with "maximum" parameter) are contained within
      * "p_conditions"
      *
-     * @param p_curRes instantiations so far
-     * @param p_conditions conditions (see above)
+     * @param p_curRes
+     *        instantiations so far
+     * @param p_conditions
+     *        conditions (see above)
      * @return a solution if one could be found, null otherwise
      */
     private static ImmutableMap<GenericSort, Sort> solveForcedInst(
@@ -423,9 +439,11 @@ public final class GenericSortInstantiations {
      * Method which is called recursively and tries to instantiate one (the first) generic sort from
      * the "p_remainingSorts"-list
      *
-     * @param p_remainingSorts generic sorts which needs to be instantiated (topologically sorted,
+     * @param p_remainingSorts
+     *        generic sorts which needs to be instantiated (topologically sorted,
      *        starting with the most general sort)
-     * @param p_curRes instantiations so far
+     * @param p_curRes
+     *        instantiations so far
      * @return a solution if one could be found, null otherwise
      */
     private static ImmutableMap<GenericSort, Sort> solveForcedInstHelp(

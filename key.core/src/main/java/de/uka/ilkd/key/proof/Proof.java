@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.*;
@@ -13,8 +12,7 @@ import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -157,7 +155,7 @@ public class Proof implements ProofObject<Goal>, Named {
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<>();
 
     /**
-     * The {@link File} under which this {@link Proof} was saved the last time if available or
+     * The {@link Path} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
     private @Nullable Path proofFile;
@@ -238,8 +236,9 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
+    @Deprecated
     public Proof(String name, Sequent problem, String header, InitConfig initConfig,
-            Path proofFile) {
+            @Nullable Path proofFile) {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
         problemHeader = header;
@@ -611,7 +610,6 @@ public class Proof implements ProofObject<Goal>, Named {
      * adds a new goal to the list of goals
      *
      * @param goal the Goal to be added
-     *
      * @deprecated use {@link #reOpenGoal(Goal)} when re-opening a goal
      */
     @Deprecated // eventually, this method should be made private
@@ -1237,9 +1235,9 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
-     * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
+     * Returns the {@link Path} under which the {@link Proof} was saved the last time if available.
      *
-     * @return The {@link File} under which the {@link Proof} was saved the last time or
+     * @return The {@link Path} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
     public @Nullable Path getProofFile() {
@@ -1247,9 +1245,9 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
-     * Sets the {@link File} under which the {@link Proof} was saved the last time.
+     * Sets the {@link Path} under which the {@link Proof} was saved the last time.
      *
-     * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
+     * @param proofFile The {@link Path} under which the {@link Proof} was saved the last time.
      */
     public void setProofFile(@Nullable Path proofFile) {
         this.proofFile = proofFile;

@@ -115,7 +115,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
      * Determines whether any refactorings should be applied on an application of the given taclet.
      * For some taclets, performing refactorings causes {@link FormulaTag}s to go missing.
      *
-     * @param taclet a taclet rule.
+     * @param taclet
+     *        a taclet rule.
      * @return whether any refactorings should be applied on an application of the given rule.
      *
      * @see TermLabelRefactoring#shouldRefactorOnBuiltInRule(Rule, Goal, Object)

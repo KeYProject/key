@@ -6,13 +6,11 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.util.Stack;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -48,7 +46,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
     @BeforeEach
     public void setUp() throws IOException {
-        services = new Services(AbstractProfile.getDefaultProfile());
+        services = super.services;
         nss = services.getNamespaces();
         tf = services.getTermFactory();
         io = new KeyIO(services, nss);
@@ -56,20 +54,21 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         parseDecls(sorts);
         assertNotNull(nss.sorts().lookup("boolean"));
 
-        Recoder2KeY r2k = new Recoder2KeY(services, nss);
+        services.activateJava(null);
+        JavaService r2k = services.getJavaService();
+        assertNotNull(r2k);
         r2k.parseSpecialClasses();
 
-        parseDecls(
-            """
-                    \\sorts { srt; }
-                    \\functions {
-                      srt f(srt);
-                      srt g(srt,srt);
-                    }
-                    \\predicates {
-                      p(srt);
-                      q(srt,srt);
-                    }""");
+        parseDecls("""
+                \\sorts { srt; }
+                \\functions {
+                  srt f(srt);
+                  srt g(srt,srt);
+                }
+                \\predicates {
+                  p(srt);
+                  q(srt,srt);
+                }""");
 
         srt = lookup_sort("srt");
 
@@ -150,7 +149,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                         bv[visited.varsBoundHere(0).size() + i] = top.varsBoundHere(0).get(i);
                     }
                     subStack.pop();
-                    subStack.push(TacletForTests.services().getTermBuilder().all(
+                    subStack.push(tb.all(
                         ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
                     return;
                 }
@@ -259,7 +258,9 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
             "substitution on multi");
     }
 
-    private JTerm parseFma(String s) throws Exception { return parseTerm(s); }
+    private JTerm parseFma(String s) throws Exception {
+        return parseTerm(s);
+    }
 
     @Test
     public void testMultiShareBound() throws Exception {
@@ -334,7 +335,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst " + x1.name()
-            + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"), cfs.apply(t),
+            + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"),
+            cfs.apply(t),
             "substitution");
         nss.setVariables(nss.variables().parent());
     }

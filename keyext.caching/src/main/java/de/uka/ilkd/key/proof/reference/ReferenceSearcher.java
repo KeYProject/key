@@ -32,8 +32,10 @@ public final class ReferenceSearcher {
     /**
      * Try to find a closed branch in another proof that is equivalent to the <code>newNode</code>.
      *
-     * @param previousProofs old proofs
-     * @param newNode new node (must be an open goal)
+     * @param previousProofs
+     *        old proofs
+     * @param newNode
+     *        new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
     public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
@@ -141,8 +143,10 @@ public final class ReferenceSearcher {
     /**
      * Check whether all formulas in {@code subset} are conatined in {@code superset}.
      *
-     * @param superset Semisequent supposed to contain {@code subset}
-     * @param subset Semisequent supposed to be in {@code superset}
+     * @param superset
+     *        Semisequent supposed to contain {@code subset}
+     * @param subset
+     *        Semisequent supposed to be in {@code superset}
      * @return whether all formulas are present
      */
     private static boolean containedIn(Semisequent superset, Semisequent subset) {
@@ -167,7 +171,8 @@ public final class ReferenceSearcher {
      * This is not the case if it contains any terms influenced by external factors:
      * Java blocks or program methods (query terms).
      *
-     * @param node the node to check
+     * @param node
+     *        the node to check
      * @return whether it can be closed by reference
      */
     public static boolean suitableForCloseByReference(Node node) {

@@ -47,7 +47,8 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     /**
      * Creates a bookmark panel and bind it to the given {@code chooser}.
      *
-     * @param chooser non null {@link JFileChooser}
+     * @param chooser
+     *        non null {@link JFileChooser}
      */
     public KeYFileChooserBookmarkPanel(@NonNull JFileChooser chooser) {
         this.chooser = chooser;

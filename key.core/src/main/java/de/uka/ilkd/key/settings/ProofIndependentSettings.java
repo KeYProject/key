@@ -186,7 +186,8 @@ public class ProofIndependentSettings {
     /**
      * Defines if pretty printing is enabled or not.
      *
-     * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty
+     * @param usePrettyPrinting
+     *        {@code true} pretty printing is enabled, {@code false} pretty
      *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {

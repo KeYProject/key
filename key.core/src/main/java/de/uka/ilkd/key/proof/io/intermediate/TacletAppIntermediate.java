@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -19,7 +19,7 @@ public class TacletAppIntermediate extends AppIntermediate {
 
     private String tacletName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
-    private LinkedList<String> insts = null;
+    private List<String> insts = null;
     private ImmutableList<String> ifSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
     private ImmutableList<Name> newNames = null;
@@ -27,16 +27,20 @@ public class TacletAppIntermediate extends AppIntermediate {
     /**
      * Constructs a new intermediate taclet application.
      *
-     * @param tacletName Name of the taclet.
-     * @param posInfo Position information (Integer representing position of the target formula,
+     * @param tacletName
+     *        Name of the taclet.
+     * @param posInfo
+     *        Position information (Integer representing position of the target formula,
      *        PosInTerm for relevant term inside the formula).
-     * @param insts Schema variable instantiations.
+     * @param insts
+     *        Schema variable instantiations.
      * @param ifSeqFormulaList
      * @param ifDirectFormulaList
-     * @param newNames New names registered during taclet application.
+     * @param newNames
+     *        New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
-            LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
+            List<String> insts, ImmutableList<String> ifSeqFormulaList,
             ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
@@ -56,7 +60,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         return posInfo;
     }
 
-    public LinkedList<String> getInsts() {
+    public List<String> getInsts() {
         return insts;
     }
 

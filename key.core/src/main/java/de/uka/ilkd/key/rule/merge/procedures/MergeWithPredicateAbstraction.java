@@ -54,15 +54,16 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     /**
      * Default constructor for subclasses.
      */
-    protected MergeWithPredicateAbstraction() {
-    }
+    protected MergeWithPredicateAbstraction() {}
 
     /**
      * Creates a new instance of {@link MergeWithPredicateAbstraction}. This {@link MergeProcedure}
      * cannot be a Singleton since it depends on the given list of predicates!
      *
-     * @param predicates The predicates for the created lattices.
-     * @param latticeType The concrete lattice type which determines how abstract elements are
+     * @param predicates
+     *        The predicates for the created lattices.
+     * @param latticeType
+     *        The concrete lattice type which determines how abstract elements are
      *        generated from abstraction predicates.
      */
     public MergeWithPredicateAbstraction(Iterable<AbstractionPredicate> predicates,
@@ -100,10 +101,14 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * Instantiates the abstract domain lattice for the given sort or null if there has no lattice
      * been specified for that sort.
      *
-     * @param s {@link Sort} of for elements in the lattice.
-     * @param applicablePredicates {@link AbstractionPredicate}s for all sorts.
-     * @param latticeType Type of {@link AbstractPredicateAbstractionLattice}.
-     * @param services The {@link Services} object.
+     * @param s
+     *        {@link Sort} of for elements in the lattice.
+     * @param applicablePredicates
+     *        {@link AbstractionPredicate}s for all sorts.
+     * @param latticeType
+     *        Type of {@link AbstractPredicateAbstractionLattice}.
+     * @param services
+     *        The {@link Services} object.
      * @return The corresponding {@link AbstractDomainLattice}.
      */
     public static AbstractDomainLattice instantiateAbstractDomain(final Sort s,
@@ -139,7 +144,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     }
 
     /**
-     * @param predicates The abstraction predicates (map from program variables to formula terms).
+     * @param predicates
+     *        The abstraction predicates (map from program variables to formula terms).
      */
     public void setPredicates(HashMap<Sort, ArrayList<AbstractionPredicate>> predicates) {
         this.predicates = predicates;
@@ -148,7 +154,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     /**
      * Adds a new predicate to the set of abstraction predicates.
      *
-     * @param predicate The predicate.
+     * @param predicate
+     *        The predicate.
      */
     public void addPredicate(AbstractionPredicate predicate) {
         Sort s = predicate.getArgSort();
@@ -163,7 +170,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     /**
      * Adds a new predicate to the set of abstraction predicates.
      *
-     * @param predicates The predicates to set.
+     * @param predicates
+     *        The predicates to set.
      */
     public void addPredicates(Iterable<AbstractionPredicate> predicates) {
         for (AbstractionPredicate predicate : predicates) {

@@ -74,7 +74,8 @@ public class HelpFacade {
     /**
      * Opens the specified subpage of the KeY documentation website in the default system browser.
      *
-     * @param path a valid suffix to the current URI
+     * @param path
+     *        a valid suffix to the current URI
      */
     public static void openHelp(String path) {
         if (path.startsWith("https://")) {
@@ -111,7 +112,8 @@ public class HelpFacade {
      * <p>
      * The class needs to be annotated with {@see HelpInfo}.
      *
-     * @param clazz non-null class instance.
+     * @param clazz
+     *        non-null class instance.
      */
     public static boolean openHelpOfClass(Class<?> clazz) {
         HelpInfo help = clazz.getAnnotation(HelpInfo.class);
@@ -126,7 +128,8 @@ public class HelpFacade {
      * Creates a {@link CButton}, that can be add to dockables and opens the given help pages at
      * {@link #HELP_BASE_URL}
      *
-     * @param s path to help page
+     * @param s
+     *        path to help page
      * @return
      */
     public static CAction createHelpButton(String s) {

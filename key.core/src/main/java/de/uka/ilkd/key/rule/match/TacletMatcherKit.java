@@ -59,7 +59,8 @@ public abstract class TacletMatcherKit {
     /**
      * the creator method returning the matcher for the specified taclet
      *
-     * @param taclet the {@link Taclet} for which to create a matcher
+     * @param taclet
+     *        the {@link Taclet} for which to create a matcher
      * @return the matcher for the given taclet
      */
     public abstract TacletMatcher createTacletMatcher(Taclet taclet);

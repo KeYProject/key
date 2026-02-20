@@ -4,11 +4,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.PackageReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
@@ -42,8 +44,10 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     /**
      * creates a ProgramTransformer
      *
-     * @param name the Name of the meta construct
-     * @param body the ProgramElement contained by the meta construct
+     * @param name
+     *        the Name of the meta construct
+     * @param body
+     *        the ProgramElement contained by the meta construct
      */
     protected ProgramTransformer(Name name, ProgramElement body) {
         this.name = name;
@@ -53,8 +57,10 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     /**
      * creates a ProgramTransformer
      *
-     * @param name the String with the name of the meta construct
-     * @param body the ProgramElement contained by the meta construct
+     * @param name
+     *        the String with the name of the meta construct
+     * @param body
+     *        the ProgramElement contained by the meta construct
      */
     protected ProgramTransformer(String name, ProgramElement body) {
         this(new Name(name), body);
@@ -63,9 +69,12 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     /**
      * performs the program transformation needed for symbolic program transformation
      *
-     * @param pe the ProgramElement on which the execution is performed
-     * @param services the Services with all necessary information about the java programs
-     * @param svInst the instantiations of the schemavariables
+     * @param pe
+     *        the ProgramElement on which the execution is performed
+     * @param services
+     *        the Services with all necessary information about the java programs
+     * @param svInst
+     *        the instantiations of the schemavariables
      * @return the transformated program
      */
     public abstract ProgramElement[] transform(ProgramElement pe, Services services,
@@ -141,9 +150,11 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array.
      *
-     * @param index an index into this node's "virtual" child array
+     * @param index
+     *        an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException
+     *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         return body;
@@ -200,7 +211,8 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v the Visitor
+     * @param v
+     *        the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnProgramMetaConstruct(this);
@@ -237,7 +249,8 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * get a list of schema variables that are needed by this entity when working given a SV
      * instantiation set.
      *
-     * @param svInst the instatiations of SV so far.
+     * @param svInst
+     *        the instatiations of SV so far.
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {

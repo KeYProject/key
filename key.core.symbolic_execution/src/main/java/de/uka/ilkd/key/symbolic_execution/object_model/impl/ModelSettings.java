@@ -29,11 +29,14 @@ public class ModelSettings implements IModelSettings {
     /**
      * Constructor.
      *
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      */
     public ModelSettings(boolean useUnicode, boolean usePrettyPrinting,

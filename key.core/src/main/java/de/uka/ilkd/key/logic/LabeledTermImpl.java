@@ -43,11 +43,16 @@ public class LabeledTermImpl extends TermImpl {
     /**
      * creates an instance of a labeled term.
      *
-     * @param op the top level operator
-     * @param subs the Term that are the subterms of this term
-     * @param boundVars logic variables bound by the operator
-     * @param labels the term's labels (must not be null or empty)
-     * @param origin a String with origin information
+     * @param op
+     *        the top level operator
+     * @param subs
+     *        the Term that are the subterms of this term
+     * @param boundVars
+     *        logic variables bound by the operator
+     * @param labels
+     *        the term's labels (must not be null or empty)
+     * @param origin
+     *        a String with origin information
      */
     public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -61,10 +66,14 @@ public class LabeledTermImpl extends TermImpl {
     /**
      * creates an instance of a labeled term.
      *
-     * @param op the top level operator
-     * @param subs the Term that are the subterms of this term
-     * @param boundVars logic variables bound by the operator
-     * @param labels the terms labels (must not be null or empty)
+     * @param op
+     *        the top level operator
+     * @param subs
+     *        the Term that are the subterms of this term
+     * @param boundVars
+     *        logic variables bound by the operator
+     * @param labels
+     *        the terms labels (must not be null or empty)
      */
     public LabeledTermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -100,7 +109,8 @@ public class LabeledTermImpl extends TermImpl {
     /**
      * returns true if the given label is attached
      *
-     * @param label the TermLabel for which to look (must not be null)
+     * @param label
+     *        the TermLabel for which to look (must not be null)
      * @return true iff. the label is attached to this term
      */
     @Override

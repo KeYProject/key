@@ -1,7 +1,7 @@
 <entry key="store.dl"><![CDATA[
     \forall Heap h; \forall Object o; \forall Field f; \forall Object o2; \forall Field f2; \forall any v;
       any::select(store(h,o,f,v), o2, f2)<<Trigger>> =
-         \if(o = o2 & f = f2 & f != java.lang.Object::<created>)
+         \if(o = o2 & f = f2 & f != java.lang.Object::#$created)
          \then(v)
          \else(any::select(h, o2, f2))
 ]]></entry>
@@ -13,7 +13,7 @@
 <entry key="anon.dl"><![CDATA[
     \forall Heap h; \forall Object o; \forall Field f; \forall Heap h2; \forall LocSet ls;
       any::select(anon(h, ls, h2), o, f)<<Trigger>> =
-         \if(elementOf(o, f, ls) & f != java.lang.Object::<created>
+         \if(elementOf(o, f, ls) & f != java.lang.Object::#$created
            | elementOf(o, f, freshLocs(h)))
          \then(any::select(h2, o, f))
          \else(any::select(h, o, f))
@@ -22,7 +22,7 @@
 <entry key="memset.dl"><![CDATA[
     \forall Heap h; \forall LocSet s; \forall any x; \forall Object o; \forall Field f;
       any::select(memset(h, s, x), o, f)<<Trigger>> =
-         \if(elementOf(o, f, s) & f != java.lang.Object::<created>)
+         \if(elementOf(o, f, s) & f != java.lang.Object::#$created)
          \then(x)
          \else(any::select(h, o, f))
 ]]></entry>
@@ -30,14 +30,14 @@
 <entry key="create.dl"><![CDATA[
   \forall Heap h; \forall Object o; \forall Object o2; \forall Field f;
       any::select(create(h, o), o2, f)<<Trigger>> =
-         \if(o = o2 & o != null & f = java.lang.Object::<created>)
+         \if(o = o2 & o != null & f = java.lang.Object::#$created)
          \then(TRUE)
          \else(any::select(h, o2, f))
 ]]></entry>
 
 <entry key="wellFormed.dl"><![CDATA[
   \forall Heap h; \forall Object o; \forall Field f; (wellFormed(h) ->
-      boolean::select(h, (java.lang.Object::select(h, o, f))<<Trigger>>, java.lang.Object::<created>) = TRUE
+      boolean::select(h, (java.lang.Object::select(h, o, f))<<Trigger>>, java.lang.Object::#$created) = TRUE
     | (java.lang.Object::select(h, o, f)) = null)
 ]]></entry>
 

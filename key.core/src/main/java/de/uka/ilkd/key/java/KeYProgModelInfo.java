@@ -4,206 +4,133 @@
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import com.github.javaparser.ast.AccessSpecifier;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.declarations.*;
+import com.github.javaparser.resolution.logic.MethodResolutionCapability;
+import com.github.javaparser.resolution.logic.MethodResolutionLogic;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.PrimitiveType;
-import recoder.bytecode.MethodInfo;
-import recoder.java.CompilationUnit;
-import recoder.service.CrossReferenceSourceInfo;
-import recoder.service.DefaultNameInfo;
+
 
 public class KeYProgModelInfo {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);
 
-    private final Services services;
-    private final KeYCrossReferenceServiceConfiguration sc;
-    private final KeYRecoderMapping mapping;
-    private final TypeConverter typeConverter;
+    private final KeYJPMapping mapping;
+    private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
-    private KeYRecoderExcHandler exceptionHandler = null;
 
-    public KeYProgModelInfo(Services services, TypeConverter typeConverter,
-            KeYRecoderExcHandler keh) {
-        this(services, new KeYCrossReferenceServiceConfiguration(keh), new KeYRecoderMapping(),
-            typeConverter);
-        exceptionHandler = keh;
+    public KeYProgModelInfo(JavaService service) {
+        this.typeConverter = service.getTypeConverter();
+        this.mapping = service.getMapping();
     }
 
-    KeYProgModelInfo(Services services, KeYCrossReferenceServiceConfiguration crsc,
-            KeYRecoderMapping krm, TypeConverter typeConverter) {
-        this.services = services;
-        sc = crsc;
-        this.typeConverter = typeConverter;
-        this.mapping = krm;
-    }
-
-
-    public KeYRecoderMapping rec2key() {
+    public KeYJPMapping rec2key() {
         return mapping;
     }
 
-    public KeYCrossReferenceServiceConfiguration getServConf() {
-        return sc;
-    }
-
-    public KeYRecoderExcHandler getExceptionHandler() {
-        return exceptionHandler;
-    }
-
     /**
-     * Returns all KeY-elements mapped by Recoder2KeY object of this KeYProgModelInfo.
+     * Returns all KeY-elements mapped by Recoder2KeY object of this
+     * KeYProgModelInfo.
      *
      * @return a Set object containing the KeY-elements.
      */
-
+    // TODO javaparser Check usages: Does not contain KeYJavaType
     public Set<Object> allElements() {
         return rec2key().elemsKeY();
     }
 
-    private List<recoder.abstraction.Method> getAllRecoderMethods(KeYJavaType kjt) {
-        if (kjt.getJavaType() instanceof TypeDeclaration) {
-            Object o = rec2key().toRecoder(kjt);
-            if (o instanceof ClassType) {
-                return ((ClassType) o).getAllMethods();
-            }
-        }
-        return new ArrayList<>();
+    /**
+     * Returns all KeY-elements mapped by Recoder2KeY object of this
+     * KeYProgModelInfo.
+     *
+     * @return a Set object containing the KeY-elements.
+     */
+
+    public Collection<KeYJavaType> allTypes() {
+        return rec2key().keYTypes();
     }
 
+    @NonNull
+    private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
+        var type = rec2key().resolveType(kjt);
+        if (type.isReferenceType()) {
+            return type.asReferenceType().getAllMethods();
+        }
+        return Collections.emptyList();
+    }
 
     /**
-     * Returns all visible methods that are defined in this class type or any of its supertypes. The
-     * methods are in topological order with respect to the inheritance hierarchy.
+     * Returns all visible methods that are defined in this
+     * class type or any of its supertypes. The methods are
+     * in topological order with respect to the inheritance hierarchy.
      *
      * @return the list of visible methods of this type and its supertypes.
      */
-
-    public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
-        List<recoder.abstraction.Method> rmethods = getAllRecoderMethods(kjt);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rmethods.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rmethods.get(i);
-            Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
-            result = result.prepend(m);
-        }
-        return result;
-    }
-
-
-    /**
-     * Returns all visible methods that are defined in this class type or any of its supertypes. The
-     * methods are in topological order with respect to the inheritance hierarchy.
-     *
-     * @return the list of visible methods of this type and its supertypes.
-     */
-
-    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
-        List<recoder.abstraction.Method> rmethods = getAllRecoderMethods(kjt);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
-        for (int i = rmethods.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rmethods.get(i);
-            IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
-            if (m != null) {
-                result = result.prepend(m);
+    public List<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+        var methods = getAllMethods(kjt);
+        List<IProgramMethod> result = new ArrayList<>(methods.size());
+        for (var rm : methods) {
+            var declaration = rec2key().resolvedDeclarationToKeY(rm);
+            if (declaration != null) {
+                result.add((IProgramMethod) declaration);
             }
         }
         return result;
     }
 
-    private List<recoder.abstraction.Type> getRecoderTypes(ImmutableList<? extends Type> types) {
-        if (types == null) {
-            return null;
-        }
-        final ArrayList<recoder.abstraction.Type> tl = new ArrayList<>(types.size());
-        for (final Type n : types) {
-            tl.add((recoder.abstraction.Type) rec2key().toRecoder(n));
-        }
-        return tl;
-    }
-
-
-    @SuppressWarnings("unchecked")
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
-        ClassType result;
-
-        recoder.abstraction.Type rt = (recoder.abstraction.Type) rec2key().toRecoder(context);
-
-
-        if (rt instanceof recoder.java.declaration.ClassDeclaration) {
-
-            // check for inner types
-            result =
-                searchType(shortName, ((recoder.java.declaration.ClassDeclaration) rt).getTypes());
-
-            if (result != null) {
-                return (KeYJavaType) rec2key().toKeY(result);
-            }
-
-            // check for imported types
-            recoder.java.NonTerminalProgramElement rct =
-                (recoder.java.NonTerminalProgramElement) rt;
-            CompilationUnit cunit;
-            while (!(rct.getASTParent() instanceof CompilationUnit)) {
-                rct = rct.getASTParent();
-            }
-
-            cunit = (CompilationUnit) rct.getASTParent();
-
-            for (recoder.java.Import i : cunit.getImports()) {
-                final List<? extends ClassType> types;
-                if (i.getPackageReference() != null) {
-                    types = sc.getCrossReferenceSourceInfo().getPackage(i.getPackageReference())
-                            .getTypes();
-                } else {
-                    if (i.isMultiImport()) {
-                        ClassType type = (ClassType) sc
-                                .getCrossReferenceSourceInfo().getType(i.getTypeReference());
-                        types = type.getTypes();
-                    } else {
-                        types = new LinkedList<>();
-                        ((LinkedList<ClassType>) types).add(
-                            (ClassType) sc.getCrossReferenceSourceInfo()
-                                    .getType(i.getTypeReference()));
-                    }
-                }
-                result = searchType(shortName, types);
-                if (result != null) {
-                    return (KeYJavaType) rec2key().toKeY(result);
-                }
-
-            }
+        var type = new ClassOrInterfaceType(null, shortName);
+        var rt = getCompilationUnit(context).orElseThrow();
+        try {
+            type.setParentNode(rt);
+            var rtype = type.resolve();
+            return typeConverter.getKeYJavaType(rtype);
+        } finally {
+            rt.remove(type);
         }
-        return null;
-
     }
 
-    private ClassType searchType(String shortName,
-            final List<? extends ClassType> types) {
-        for (ClassType type : types) {
-            if (type.getName().equals(shortName)) {
-                return type;
-            }
-        }
-        return null;
+    private Optional<CompilationUnit> getCompilationUnit(KeYJavaType kjt) {
+        return getReferenceType(kjt)
+                .flatMap(ResolvedReferenceType::getTypeDeclaration)
+                .flatMap(AssociableToAST::toAst)
+                .flatMap(Node::findCompilationUnit);
     }
 
     /**
@@ -211,264 +138,166 @@ public class KeYProgModelInfo {
      *
      * @return the full name of t as a String.
      */
-
     public String getFullName(KeYJavaType t) {
-        recoder.abstraction.Type rt = (recoder.abstraction.Type) rec2key().toRecoder(t);
-        return rt.getFullName();
+        var rt = rec2key().resolveType(t);
+        if (rt.isReferenceType())
+            return rt.asReferenceType().getQualifiedName();
+        return rt.describe();
     }
-
-    public recoder.abstraction.Type getType(TypeReference tr) {
-        recoder.abstraction.Type result;
-        if (tr instanceof TypeRef) {
-            result = (recoder.abstraction.Type) rec2key().toRecoder(tr.getKeYJavaType());
-            return result;
-        }
-        result = getServConf().getSourceInfo()
-                .getType((recoder.java.reference.TypeReference) rec2key().toRecoder(tr));
-        return result;
-    }
-
 
     public boolean isFinal(KeYJavaType kjt) {
-        final recoder.abstraction.Type recoderType =
-            (recoder.abstraction.Type) rec2key().toRecoder(kjt);
-        if (recoderType instanceof recoder.java.declaration.TypeDeclaration) {
-            return ((recoder.java.declaration.TypeDeclaration) recoderType).isFinal();
-        } else // array or primitive type
-        {
+        var type = rec2key().resolveType(kjt);
+        if (type.isArray() || type.isPrimitive() || type.isVoid() || type.isNull()) {
             return false;
         }
+        if (type.isReferenceType()) { // TODO weigl enum declarations and records!
+            var rt = type.asReferenceType();
+            var td = rt.getTypeDeclaration().orElseThrow();
+            if (td.isClass()) {
+                var node = (NodeWithModifiers<?>) td.asClass().toAst().get();
+                return node.hasModifier(Modifier.Keyword.FINAL);
+            }
+            if (td.isInterface()) {
+                // Interfaces can't be final
+                return false;
+            }
+            if (td instanceof ResolvedLogicalType) {
+                // Logic types are not final? Just following primitive types here
+                return false;
+            }
+        }
+        throw new UnsupportedOperationException("Type " + type.getClass() + " is not supported");
     }
-
 
     /**
      * Checks whether subType is a subtype of superType or not.
      *
-     * @return true if subType is subtype of superType, false in the other case.
+     * @return true if subType is subtype of superType,
+     *         false in the other case.
      */
-
     public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
-        return isSubtype((recoder.abstraction.Type) rec2key().toRecoder(subType),
-            (recoder.abstraction.Type) rec2key().toRecoder(superType));
+        return isSubtype(rec2key().resolveType(subType), rec2key().resolveType(superType));
     }
 
-    private boolean isSubtype(recoder.abstraction.Type subType,
-            recoder.abstraction.Type superType) {
-        if (subType instanceof ClassType
-                && superType instanceof ClassType) {
-            return isSubtype((ClassType) subType,
-                (ClassType) superType);
-        } else if (superType instanceof recoder.abstraction.ArrayType
-                && subType instanceof recoder.abstraction.ArrayType) {
-            return isAssignmentCompatible((recoder.abstraction.ArrayType) subType,
-                (recoder.abstraction.ArrayType) superType);
-        } else if (subType instanceof recoder.abstraction.ArrayType
-                && superType instanceof ClassType) {
-            return "java.lang.Object".equals(superType.getFullName())
-                    || "Object".equals(superType.getName());
-        }
-        // should not occur
-        throw new RuntimeException("Method isSubtype in class KeYProgModelInfo "
-            + "currently only supports two class types or two " + "array type but no mixture!");
+    private boolean isSubtype(ResolvedType subType, ResolvedType superType) {
+        // reference and array type is checked to avoid the method returning
+        // true for "int" and "Integer" as s.th. like "Integer i = 0";
+        // is compilable
+        return (subType.isReferenceType() || subType.isArray())
+                && (superType.isReferenceType() || subType.isArray()) &&
+                superType.isAssignableBy(subType); // TODO weigl check if it is the right method and
+        // order.
     }
 
-    private boolean isSubtype(ClassType classSubType,
-            ClassType classType) {
-        boolean isSub = getServConf().getSourceInfo().isSubtype(classSubType, classType);
-        if (!isSub) {
-            return getServConf().getByteCodeInfo().isSubtype(classSubType, classType);
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * checks if name refers to a package
-     *
-     * @param name a String with the name to be checked
-     * @return true iff name refers to a package
-     */
     public boolean isPackage(String name) {
-        return ((DefaultNameInfo) sc.getNameInfo()).isPackage(name);
+        return mapping.isPackageName(name);
+    }
+
+    private List<ResolvedConstructorDeclaration> getDeclaredConstructors(KeYJavaType ct) {
+        return getReferenceType(ct)
+                .flatMap(ResolvedReferenceType::getTypeDeclaration)
+                .map(ResolvedReferenceTypeDeclaration::getConstructors)
+                .orElseGet(ArrayList::new);
+    }
+
+    private ResolvedType getJavaParserType(KeYJavaType ct) {
+        return rec2key().resolveType(ct);
+    }
+
+    private Optional<ResolvedReferenceType> getReferenceType(KeYJavaType ct) {
+        var type = rec2key().resolveType(ct);
+        return type.isReferenceType() ? Optional.of(type.asReferenceType()) : Optional.empty();
     }
 
     /**
-     * checks whether subType is assignment compatible to type according to the rules defined in the
-     * java language specification
-     */
-    private boolean isAssignmentCompatible(recoder.abstraction.ArrayType subType,
-            recoder.abstraction.ArrayType type) {
-        recoder.abstraction.Type bt1 = subType.getBaseType();
-        recoder.abstraction.Type bt2 = type.getBaseType();
-        if (bt1 instanceof PrimitiveType
-                && bt2 instanceof PrimitiveType) {
-            return bt1.getFullName().equals(bt2.getFullName());
-        }
-        if (bt1 instanceof ClassType
-                && bt2 instanceof ClassType) {
-            return isSubtype((ClassType) bt1,
-                (ClassType) bt2);
-        }
-        if (bt1 instanceof recoder.abstraction.ArrayType
-                && bt2 instanceof recoder.abstraction.ArrayType) {
-            return isAssignmentCompatible((recoder.abstraction.ArrayType) bt1,
-                (recoder.abstraction.ArrayType) bt2);
-        }
-        if (bt1 instanceof ClassType
-                && bt2 instanceof recoder.abstraction.ArrayType) {
-            return false;
-        }
-        if (bt1 instanceof recoder.abstraction.ArrayType
-                && bt2 instanceof ClassType) {
-            if (((ClassType) bt2).isInterface()) {
-                return bt2.getFullName().equals("java.lang.Cloneable")
-                        || bt2.getFullName().equals("java.lang.Serializable");
-            } else {
-                return bt2.getFullName().equals("java.lang.Object");
-            }
-        }
-        return false;
-    }
-
-    private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType kjt) {
-        if (kjt.getJavaType() instanceof TypeDeclaration) {
-            Object o = rec2key().toRecoder(kjt);
-            if (o instanceof ClassType rct) {
-                return rct.getProgramModelInfo().getMethods(rct);
-            }
-        }
-        return new ArrayList<>();
-    }
-
-    private List<? extends Constructor> getRecoderConstructors(KeYJavaType ct) {
-        ClassType rct = (ClassType) rec2key().toRecoder(ct);
-        return rct.getProgramModelInfo().getConstructors(rct);
-    }
-
-    private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType ct, String m,
-            ImmutableList<? extends Type> signature, KeYJavaType context) {
-        ClassType rct = (ClassType) rec2key().toRecoder(ct);
-        ClassType rcontext =
-            (ClassType) rec2key().toRecoder(context);
-
-        // passing null to typeArgs param: no generic type variables yet
-        return rct.getProgramModelInfo().getMethods(rct, m, getRecoderTypes(signature), null,
-            rcontext);
-    }
-
-
-    private List<? extends Constructor> getRecoderConstructors(KeYJavaType ct,
-            ImmutableList<KeYJavaType> signature) {
-        ClassType rct = (ClassType) rec2key().toRecoder(ct);
-        return rct.getProgramModelInfo().getConstructors(rct, getRecoderTypes(signature));
-    }
-
-
-    /**
-     * Returns the list of most specific methods with the given name that are defined in the given
-     * type or in a supertype where they are visible for the given type, and have a signature that
-     * is compatible to the given one. If used to resolve a method call, the result should be
-     * defined and unambiguous.
-     *
-     * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
-     * @param signature the statical type signature of a callee.
-     */
-
-    public ImmutableList<Method> getMethods(KeYJavaType ct, String m, ImmutableList<Type> signature,
-            KeYJavaType context) {
-        List<recoder.abstraction.Method> rml = getRecoderMethods(ct, m, signature, context);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rml.get(i);
-            Method method = (Method) rec2key().toKeY(rm);
-            result = result.prepend(method);
-        }
-        return result;
-    }
-
-
-    /**
-     * Returns the methods locally defined within the given class type. If the type is represented
-     * in source code, the returned list matches the syntactic order.
+     * Returns the ProgramMethods locally defined within the given
+     * class type.
      *
      * @param ct a class type.
      */
-
-    public ImmutableList<Method> getMethods(KeYJavaType ct) {
-        List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<Method> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rml.get(i);
-            if (!(rm instanceof MethodInfo)) {
-                Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
-                result = result.prepend(m);
-            }
+    public List<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
+        var result = new ArrayList<ProgramMethod>();
+        var type = getJavaParserType(ct);
+        if (!type.isReferenceType()) {
+            return result;
         }
-        return result;
-    }
-
-    /**
-     * Returns the ProgramMethods locally defined within the given class type. If the type is
-     * represented in source code, the returned list matches the syntactic order.
-     *
-     * @param ct a class type.
-     */
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct) {
-        List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<ProgramMethod> result = ImmutableSLList.nil();
-        for (int i = rml.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rml.get(i);
-            if (!(rm instanceof MethodInfo)) {
-                final var element = (ProgramMethod) rec2key().toKeY(rm);
+        var rml = type.asReferenceType().getDeclaredMethods();
+        result.ensureCapacity(rml.size());
+        for (MethodUsage methodUsage : rml) {
+            if (methodUsage.getDeclaration() instanceof JavaParserMethodDeclaration) {
+                var element = mapping.resolvedDeclarationToKeY(methodUsage.getDeclaration());
                 if (element != null) {
-                    result = result.prepend(element);
+                    result.add((ProgramMethod) element);
                 }
-
             }
         }
         return result;
     }
 
     /**
-     * Returns the constructors locally defined within the given class type. If the type is
-     * represented in source code, the returned list matches the syntactic order.
+     * Returns the constructors locally defined within the given
+     * class type. If the type is represented in source code,
+     * the returned list matches the syntactic order.
      *
      * @param ct a class type.
      */
 
-    public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct) {
-        List<? extends Constructor> rcl = getRecoderConstructors(ct);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
-        for (int i = rcl.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Method rm = rcl.get(i);
-            IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
+    public List<IProgramMethod> getConstructors(KeYJavaType ct) {
+        var rcl = getDeclaredConstructors(ct);
+        var result = new ArrayList<IProgramMethod>(rcl.size());
+        for (ResolvedConstructorDeclaration decl : rcl) {
+            if (decl instanceof DefaultConstructorDeclaration) {
+                // TODO javaparser this node is only returned by
+                // ResolvedReferenceTypeDeclaration::getConstructors
+                // and neither implements hashCode nor equals
+                continue;
+            }
+            var m = mapping.resolvedDeclarationToKeY(decl);
             if (m != null) {
-                result = result.prepend(m);
+                result.add((IProgramMethod) m);
             }
         }
         return result;
     }
 
     /**
-     * retrieves the most specific constructor declared in the given type with respect to the given
-     * signature
+     * retrieves the most specific constructor declared in the given type with
+     * respect to the given signature
      *
      * @param ct the KeYJavyType where to look for the constructor
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
+    @Nullable
     public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature) {
-        List<? extends Constructor> constructors =
-            getRecoderConstructors(ct, signature);
-        if (constructors.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(constructors.get(0));
+        var rt = getJavaParserType(ct).asReferenceType().getTypeDeclaration();
+        if (rt.isPresent()) {
+            List<ResolvedType> sig = signature.stream().map(this::getJavaParserType).toList();
+
+            List<ResolvedConstructorDeclaration> constructors = rt.get().getConstructors();
+            constr: for (var constructor : constructors) {
+                if (sig.size() != constructor.getNumberOfParams()) {
+                    continue;
+                }
+
+                if (sig.isEmpty()) { // fast track for default constructor calls!
+                    var ast = constructor.toAst().get();
+                    return (IProgramMethod) mapping.nodeToKeY(ast);
+                }
+
+                // compare types of the parameters
+                List<ResolvedType> types = constructor.formalParameterTypes();
+                for (int i = 0; i < types.size(); i++) {
+                    if (!types.get(i).equals(sig.get(i))) {
+                        break constr;
+                    }
+                }
+                var ast = constructor.toAst().get();
+                return (IProgramMethod) mapping.nodeToKeY(ast);
+            }
+            // ((ClassOrInterfaceDeclaration)
+            // rt.get().toAst().get()).getConstructorByParameterTypes()
         }
-        if (constructors.isEmpty()) {
-            LOGGER.debug("javainfo: Constructor not found: {}", ct);
-            return null;
-        }
-        Debug.fail();
         return null;
     }
 
@@ -496,98 +325,206 @@ public class KeYProgModelInfo {
         return null;
     }
 
-
     /**
-     * Returns the IProgramMethods with the given name that is defined in the given type or in a
-     * supertype where it is visible for the given type, and has a signature that is compatible to
-     * the given one.
+     * Returns the IProgramMethods with the given name that is defined
+     * in the given type or in a supertype where it is visible for the
+     * given type, and has a signature that is compatible to the given one.
      *
      * @param ct the class type to get methods from.
-     * @param m the name of the methods in question.
+     * @param name the name of the methods in question.
      * @param signature the statical type signature of a callee.
-     * @return the IProgramMethods, if one is found, null if none or more than one IProgramMethod is
-     *         found (in this case a debug output is written to console).
+     * @return the IProgramMethods, if one is found,
+     *         null if none or more than one IProgramMethod is found (in this case
+     *         a debug output is written to console).
      */
-    public IProgramMethod getProgramMethod(KeYJavaType ct, String m,
-            ImmutableList<? extends Type> signature, KeYJavaType context) {
-        if (ct.getJavaType() instanceof ArrayType || context.getJavaType() instanceof ArrayType) {
-            return getImplicitMethod(ct, m);
+    @Nullable
+    public IProgramMethod getProgramMethod(@NonNull KeYJavaType ct, String name,
+            Iterable<KeYJavaType> signature) {
+        if (ct.getJavaType() instanceof ArrayType) {
+            return getImplicitMethod(ct, name);
         }
 
-        List<recoder.abstraction.Method> methodlist = getRecoderMethods(ct, m, signature, context);
-
-        if (methodlist.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
-        } else if (methodlist.isEmpty()) {
-            return null;
-        } else {
-            Debug.fail();
+        var type = getJavaParserType(ct);
+        if (!type.isReferenceType()) {
             return null;
         }
+        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+        List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
+                .map(this::getJavaParserType).toList();
+        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+
+        if (!method.isSolved())
+            return null;
+
+        return method.getDeclaration()
+                .map(d -> (IProgramMethod) Objects
+                        .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+                .orElse(null);
     }
 
+    // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
+    // copy-and-past
+    public Type getType(ResolvedType type) {
+        if (type.isArray()) {
+            // TODO weigl type.arrayLevel()
+            return new com.github.javaparser.ast.type.ArrayType(
+                getType(type.asArrayType().getComponentType()));
+        }
+
+        if (type.isReferenceType()) {
+            return getType(type.asReferenceType().getQualifiedName().split("[.]"));
+        }
+
+        if (type.isPrimitive()) {
+            return new PrimitiveType(PrimitiveType.Primitive.valueOf(type.asPrimitive().name()));
+        }
+
+        return null;
+    }
+
+    // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
+    // copy-and-past
+    public ClassOrInterfaceType getType(String... names) {
+        ClassOrInterfaceType type = null;
+        for (String name : names) {
+            type = new ClassOrInterfaceType(type, name);
+        }
+        return type;
+    }
 
     /**
-     * returns the same fields as given in <tt>rfl</tt> and returns their KeY representation
+     * Returns the IProgramMethods with the given name that is defined
+     * in the given type or in a supertype where it is visible for the
+     * given type, and has a signature that is compatible to the given one.
      *
-     * @param rfl the List of fields to be looked up
-     * @return list with the corresponding fields as KeY datastructures
+     * @param ct the class type to get methods from.
+     * @param name the name of the methods in question.
+     * @param signature the statical type signature of a callee.
+     * @return the IProgramMethods, if one is found,
+     *         null if none or more than one IProgramMethod is found (in this case
+     *         a debug output is written to console).
      */
-    private ImmutableList<Field> asKeYFields(List<? extends recoder.abstraction.Field> rfl) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
-        if (rfl == null) {
-            // this occurs for the artificial Null object at the moment
-            // should it have implicit fields?
-            return result;
-        }
-        for (int i = rfl.size() - 1; i >= 0; i--) {
-            recoder.abstraction.Field rf = rfl.get(i);
-            Field f = (Field) rec2key().toKeY(rf);
-            if (f != null) {
-                result = result.prepend(f);
-            } else {
-                LOGGER.debug("Field has no KeY equivalent (recoder field): {}", rf.getFullName());
-                LOGGER.debug("This happens currently as classes only available in byte code "
-                    + "are only partially converted ");
-            }
-        }
-        return result;
+    public @Nullable IProgramMethod getProgramMethod(
+            @NonNull KeYJavaType ct, String name,
+            Iterable<KeYJavaType> signature, KeYJavaType context) {
+        return getProgramMethod(ct, name, signature);
+        // NodeList<Expression> args = new NodeList<>();
+        // for (var argType : signature) {
+        // Type javaType = getType(getJavaParserType(argType));
+        // if (!javaType.isPrimitiveType()) {
+        // args.add(new CastExpr(javaType, new NullLiteralExpr()));
+        // } else {
+        // PrimitiveType pt = (PrimitiveType) javaType;
+        // switch (pt.type().asString()) {
+        // case "boolean":
+        // args.add(new BooleanLiteralExpr(false));
+        // break;
+        // case "byte":
+        // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+        // break;
+        // case "short":
+        // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+        // break;
+        // case "int":
+        // args.add(new IntegerLiteralExpr(0));
+        // break;
+        // case "long":
+        // args.add(new LongLiteralExpr(0));
+        // break;
+        // case "char":
+        // args.add(new CharLiteralExpr('a'));
+        // break;
+        // case "double":
+        // args.add(new DoubleLiteralExpr(0));
+        // break;
+        // case "float":
+        // args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
+        // break;
+        // }
+        // }
+        // }
+        //
+        // // TODO: Type arguments
+        // var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
+        // MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
+        // var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
+        // if (classContext.getParentNode().isEmpty()) {
+        // var cu = new CompilationUnit();
+        // // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
+        // var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
+        // .getTypeDeclaration().get().toAst().get().getSymbolResolver();
+        // solver.inject(cu);
+        // mapping.getJavaServices().getProgramFactory().getTypeSolver();
+        // classContext.setParentNode(cu);
+        // }
+        // mce.setParentNode(classContext);
+        //
+        // return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
+
+        // if (context.getJavaType() instanceof ArrayType) {
+        // return getImplicitMethod(ct, name);
+        // }
+        //
+        // var type = getJavaParserType(ct);
+        // if (!type.isReferenceType()) {
+        // return null;
+        // }
+        //
+        // var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+        // List<ResolvedType> jpSignature =
+        // StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType)
+        // .toList();
+        // var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+        // return method.getDeclaration()
+        // .map(d -> (IProgramMethod) Objects
+        // .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+        // .orElse(null);
+    }
+
+    private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
+        return rfl.flatMap(
+            it -> ((FieldDeclaration) Objects.requireNonNull(mapping.resolvedDeclarationToKeY(it)))
+                    .getFieldSpecifications().stream())
+                .collect(Collectors.toList());
     }
 
     /**
-     * returns the fields defined within the given class type. If the type is represented in source
-     * code, the returned list matches the syntactic order.
+     * returns the fields defined within the given class type.
+     * If the type is represented in source code, the returned list
+     * matches the syntactic order.
      *
      * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
-    public ImmutableList<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
+    public List<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
         if (ct.getJavaType() instanceof ArrayType) {
             return getVisibleArrayFields(ct);
         }
-        ClassType rct = (ClassType) rec2key().toRecoder(ct);
-
-        return asKeYFields(rct.getProgramModelInfo().getFields(rct));
+        return getReferenceType(ct)
+                .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
+                .orElseGet(ArrayList::new);
     }
 
 
     /**
-     * returns all in <tt>ct</tt> visible fields declared in <tt>ct</tt> or one of its supertypes in
-     * topological order starting with the fields of the given type If the type is represented in
-     * source code, the returned list matches the syntactic order.
+     * returns all in <tt>ct</tt> visible fields
+     * declared in <tt>ct</tt> or one of its supertypes
+     * in topological order starting with the fields of
+     * the given type
+     * If the type is represented in source code, the returned list
+     * matches the syntactic order.
      *
      * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
-    public ImmutableList<Field> getAllVisibleFields(KeYJavaType ct) {
+    public List<Field> getAllVisibleFields(KeYJavaType ct) {
         if (ct.getJavaType() instanceof ArrayDeclaration) {
             return getVisibleArrayFields(ct);
         }
-
-        ClassType rct = (ClassType) rec2key().toRecoder(ct);
-        List<recoder.abstraction.Field> rfl = rct.getProgramModelInfo().getAllFields(rct);
-
-        return asKeYFields(rfl);
+        // TODO javaparser this should be declared + visible to inheritors of super
+        return getReferenceType(ct)
+                .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
+                .orElseGet(ArrayList::new);
     }
 
     /**
@@ -596,80 +533,108 @@ public class KeYProgModelInfo {
      * @param arrayType the KeYJavaType of the array
      * @return the list of visible fields
      */
-    private ImmutableList<Field> getVisibleArrayFields(KeYJavaType arrayType) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
-
+    private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
         final ImmutableArray<MemberDeclaration> members =
             ((ArrayDeclaration) arrayType.getJavaType()).getMembers();
-
-        for (int i = members.size() - 1; i >= 0; i--) {
-            final MemberDeclaration member = members.get(i);
+        List<Field> result = new ArrayList<>();
+        for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
                     ((FieldDeclaration) member).getFieldSpecifications();
-                for (int j = specs.size() - 1; j >= 0; j--) {
-                    result = result.prepend(specs.get(j));
+                for (FieldSpecification spec : specs) {
+                    result.add(spec);
                 }
             }
         }
 
         // fields of java.lang.Object visible in an array
-        final ImmutableList<Field> javaLangObjectField = getAllVisibleFields(
-            (KeYJavaType) rec2key().toKeY(sc.getNameInfo().getJavaLangObject()));
-
-        for (Field aJavaLangObjectField : javaLangObjectField) {
-            if (!((recoder.abstraction.Field) rec2key().toRecoder(aJavaLangObjectField))
-                    .isPrivate()) {
-                result = result.append(aJavaLangObjectField);
-            }
-        }
+        var kjt = typeConverter.getObjectType();
+        var objectFields = getReferenceType(kjt)
+                .orElseThrow()
+                .getDeclaredFields()
+                .stream()
+                .filter(f -> f.accessSpecifier() != AccessSpecifier.PRIVATE)
+                .map(f -> (Field) Objects.requireNonNull(mapping.resolvedDeclarationToKeY(f)))
+                .toList();
+        result.addAll(objectFields);
         return result;
     }
 
     /**
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
      */
-    private List<ClassType> getAllRecoderSubtypes(KeYJavaType ct) {
-        return sc.getCrossReferenceSourceInfo()
-                .getAllSubtypes((ClassType) rec2key().toRecoder(ct));
-    }
+    private List<ResolvedReferenceTypeDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
+        final ResolvedType rt = getJavaParserType(ct);
+        final ResolvedReferenceTypeDeclaration rtAsTypeDecl =
+            rt.asReferenceType().getTypeDeclaration().get();
 
-    /**
-     * returns all supertypes of the given class type with the type itself as first element
-     */
-    private List<ClassType> getAllRecoderSupertypes(KeYJavaType ct) {
-        return sc.getCrossReferenceSourceInfo()
-                .getAllSupertypes((ClassType) rec2key().toRecoder(ct));
-    }
+        // TODO javaparser get all known java types in classpath
+        // best approximation is to use the recoder2key mapping
 
+        List<Node> types = rec2key().elemsRec().stream()
+                .filter(it -> it instanceof com.github.javaparser.ast.body.TypeDeclaration)
+                .toList();
 
-    /**
-     * returns a list of KeYJavaTypes representing the given recoder types in the same order
-     *
-     * @param rctl the ASTList<ClassType> to be converted
-     * @return list of KeYJavaTypes representing the given recoder types in the same order
-     */
-    private ImmutableList<KeYJavaType> asKeYJavaTypes(
-            final List<ClassType> rctl) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
-        for (int i = rctl.size() - 1; i >= 0; i--) {
-            final ClassType rct = rctl.get(i);
-            final KeYJavaType kct = (KeYJavaType) rec2key().toKeY(rct);
-            if (kct != null) {
-                result = result.prepend(kct);
+        List<ResolvedReferenceTypeDeclaration> res = new ArrayList<>(1024);
+        for (var decl : types) {
+            ResolvedReferenceTypeDeclaration resolved =
+                ((com.github.javaparser.ast.body.TypeDeclaration) decl).resolve();
+            if (resolved.canBeAssignedTo(rtAsTypeDecl) && // TODO weigl correct direction?
+                    !(rtAsTypeDecl.equals(decl))) {
+                res.add(resolved);
             }
         }
-        return result;
+        // TODO weigl
+        return res;
     }
 
     /**
-     * Returns all known supertypes of the given class type with the type itself as first element.
+     * returns all supertypes of the given class type with the type itself as
+     * first element
+     */
+    private List<ResolvedReferenceType> getAllDeclaredSupertypes(KeYJavaType ct) {
+        return getReferenceType(ct)
+                .map(r -> {
+                    var ancestors = r.getAllAncestors();
+                    List<ResolvedReferenceType> res = new ArrayList<>(ancestors.size() + 1);
+                    res.add(r);
+                    res.addAll(ancestors);
+                    return res;
+                })
+                .orElse(Collections.emptyList());
+    }
+
+
+    /**
+     * returns a list of KeYJavaTypes representing the given recoder types in
+     * the same order
+     *
+     * @param rctl the ASTList<ClassType> to be converted
+     * @return list of KeYJavaTypes representing the given recoder types in
+     *         the same order
+     */
+    private List<KeYJavaType> asKeYJavaTypes(
+            final Stream<ResolvedReferenceTypeDeclaration> rctl) {
+        return rctl
+                .map(it -> Objects
+                        .requireNonNull(rec2key().resolvedTypeToKeY(new ReferenceTypeImpl(it))))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all known supertypes of the given class type with the type itself
+     * as first element.
      *
      * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
-    public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
-        return asKeYJavaTypes(getAllRecoderSupertypes(ct));
+    public List<KeYJavaType> getAllSupertypes(KeYJavaType ct) {
+        final var superTypes = getAllDeclaredSupertypes(ct)
+                .stream().map(ResolvedReferenceType::asReferenceType)
+                .filter(it -> it.getTypeDeclaration().isPresent())
+                .map(it -> it.getTypeDeclaration().get());
+
+        return asKeYJavaTypes(superTypes);
     }
 
     /**
@@ -678,75 +643,53 @@ public class KeYProgModelInfo {
      * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
-    public ImmutableList<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
-        return asKeYJavaTypes(getAllRecoderSubtypes(ct));
+    public List<KeYJavaType> getAllSubtypes(KeYJavaType ct) {
+        return asKeYJavaTypes(getAllRecoderSubtypes(ct).stream());
     }
 
-    private Recoder2KeY createRecoder2KeY(NamespaceSet nss) {
-        return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter);
-    }
-
-    /**
-     * Parses a given JavaBlock using cd as context to determine the right references.
-     *
-     * @param block a String describing a java block
-     * @param cd ClassDeclaration representing the context in which the block has to be interpreted.
-     * @return the parsed and resolved JavaBlock
-     */
-    public JavaBlock readBlock(String block, ClassDeclaration cd, NamespaceSet nss) {
-        return createRecoder2KeY(nss).readBlock(block,
-            new Context(sc, (recoder.java.declaration.ClassDeclaration) rec2key().toRecoder(cd)));
-    }
-
-
-    /**
-     * Parses a given JavaBlock using an empty context.
-     *
-     * @param block a String describing a java block
-     * @return the parsed and resolved JavaBlock
-     */
-    public JavaBlock readJavaBlock(String block, NamespaceSet nss) {
-        return createRecoder2KeY(nss).readBlockWithEmptyContext(block);
-    }
-
-
-    public ImmutableList<KeYJavaType> findImplementations(Type ct, String name,
+    /// Returns all {@link KeYJavaType},
+    /// ```
+    /// for all loaded type declarations td
+    /// if td <: ct and implements method with name
+    /// add to the returning list
+    /// endif
+    /// endfor
+    /// ```
+    public ImmutableList<KeYJavaType> findImplementations(KeYJavaType ct, String name,
             ImmutableList<KeYJavaType> signature) {
 
-        // set up recoder inputs
-        ClassType rct = (ClassType) rec2key().toRecoder(ct);
-        // transform the signature up to recoder conventions
-        ArrayList<recoder.abstraction.Type> rsignature = new ArrayList<>(signature.size());
-        Iterator<KeYJavaType> i = signature.iterator();
-        int j = 0;
-        while (i.hasNext()) {
-            rsignature.add(j, (recoder.abstraction.Type) rec2key().toRecoder(i.next()));
-            j++;
+        var type = rec2key().resolveType(ct);
+
+        // only reference types has overridable methods
+        if (!type.isReferenceType()) {
+            return ImmutableList.of();
         }
+
+        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+        List<ResolvedType> jpSignature = signature.map(this::getJavaParserType).toList();
 
         // If ct is an interface, but does not declare the method, we
         // need to start the search "upstairs"
 
-        while (rct.isInterface() && !isDeclaringInterface(rct, name, rsignature)) {
-            rct = rct.getAllSupertypes().get(1);
+        while (rct.toAst(ClassOrInterfaceDeclaration.class).get().isInterface()
+                && !isDeclaringInterface(rct, name, jpSignature)) {
+            rct = rct.getAncestors().get(1).getTypeDeclaration().orElseThrow();
         }
 
-
         ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
-        classList = recFindImplementations(rct, name, rsignature, classList);
+        classList = recFindImplementations(rct, name, jpSignature, classList);
 
-
-        if (!declaresApplicableMethods(rct, name, rsignature)) {
+        if (!declaresApplicableMethods(rct, name, jpSignature)) {
             // ct has no implementation, go up
-            List<ClassType> superTypes = rct.getAllSupertypes();
+            List<ResolvedReferenceType> superTypes = rct.getAncestors();
             int k = 0;
-            while (k < superTypes.size()
-                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature)) {
+            while (k < superTypes.size() && !declaresApplicableMethods(
+                superTypes.get(k).getTypeDeclaration().orElseThrow(), name,
+                jpSignature))
                 k++;
-            }
             if (k < superTypes.size()) {
-                rct = superTypes.get(k);
-                KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
+                rct = superTypes.get(k).getTypeDeclaration().orElseThrow();
+                KeYJavaType r = (KeYJavaType) mapping.resolvedDeclarationToKeY(rct);
                 if (r == null) {
                     LOGGER.info("Type {}", rct.getName());
                 } else {
@@ -759,81 +702,79 @@ public class KeYProgModelInfo {
     }
 
 
-    private ImmutableList<KeYJavaType> recFindImplementations(ClassType ct,
-            String name, List<recoder.abstraction.Type> signature,
-            ImmutableList<KeYJavaType> result) {
-        CrossReferenceSourceInfo si = getServConf().getCrossReferenceSourceInfo();
-
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private ImmutableList<KeYJavaType> recFindImplementations(
+            ResolvedTypeDeclaration ct,
+            String name, List<ResolvedType> signature, ImmutableList<KeYJavaType> result) {
         if (declaresApplicableMethods(ct, name, signature)) {
-            KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
+            var r = typeConverter.getKeYJavaType(ct.getQualifiedName());
             if (r == null) {
-                LOGGER.info("Type {}: {} not found", ct.getFullName(), name);
+                LOGGER.info("Type {}: {} not found", ct.getQualifiedName(), name);
+                return result;
             } else if (!result.contains(r)) {
                 result = result.prepend(r);
             }
         }
 
-        List<ClassType> classes = si.getSubtypes(ct);
+        List<ResolvedReferenceTypeDeclaration> classes = getAllRecoderSubtypes(result.head());
 
         // alpha sorting to make order deterministic
-        ClassType[] classesArray = classes.toArray(new ClassType[0]);
-        Arrays.sort(classesArray,
-            (o1, o2) -> o2.getFullName().compareTo(o1.getFullName()));
+        var classesArray = classes.toArray(new ResolvedTypeDeclaration[0]);
+        java.util.Arrays.sort(classesArray,
+            (o1, o2) -> o2.getQualifiedName().compareTo(o1.getQualifiedName()));
 
-        for (ClassType c : classesArray) {
-            result = recFindImplementations(c, name, signature, result);
+        for (var c : classesArray) {
+            if (!c.equals(ct)) {
+                result = recFindImplementations(c, name, signature, result);
+            }
         }
         return result;
     }
 
 
-    private boolean declaresApplicableMethods(ClassType ct, String name,
-            List<recoder.abstraction.Type> signature) {
-        CrossReferenceSourceInfo si = getServConf().getCrossReferenceSourceInfo();
-
-        List<recoder.abstraction.Method> list = si.getMethods(ct);
-        int s = list.size();
-        int i = 0;
-        while (i < s) {
-            recoder.abstraction.Method m = list.get(i);
-            if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct) && !m.isAbstract()) {
-                return true;
-            } else {
-                i++;
-            }
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private boolean declaresApplicableMethods(ResolvedTypeDeclaration rt, String name,
+            List<ResolvedType> signature) {
+        if (rt instanceof MethodResolutionCapability mrc) {
+            var method = mrc.solveMethod(name, signature, false);
+            return method.isSolved();
         }
         return false;
     }
 
-    private boolean isDeclaringInterface(ClassType ct, String name,
-            List<recoder.abstraction.Type> signature) {
-        CrossReferenceSourceInfo si = getServConf().getCrossReferenceSourceInfo();
-
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private boolean isDeclaringInterface(
+            ResolvedTypeDeclaration ct, String name,
+            List<ResolvedType> signature) {
         Debug.assertTrue(ct.isInterface());
-
-        List<recoder.abstraction.Method> list = si.getMethods(ct);
-        int s = list.size();
-        int i = 0;
-        while (i < s) {
-            recoder.abstraction.Method m = list.get(i);
-            if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct)) {
+        var id = ct.asInterface();
+        var set = id.getDeclaredMethods();
+        for (var m : set) {
+            // TODO: check if m is visible for ct
+            if (name.equals(m.getName())
+                    && isCompatibleSignature(signature, m.formalParameterTypes()))
                 return true;
-            } else {
-                i++;
-            }
         }
         return false;
     }
 
-    public void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
+    // TODO(weigl): Implemented by @Drodt, no idea if it's correct
+    private boolean isCompatibleSignature(List<ResolvedType> sig1, List<ResolvedType> sig2) {
+        int sl1 = sig1.size();
+        int sl2 = sig2.size();
+        if (sl1 != sl2) // TODO: what about variadic signatures
+            return false;
+        for (int i = 0; i < sl1; ++i) {
+            var t1 = sig1.get(i);
+            var t2 = sig2.get(i);
+            if (!isSubtype(t2, t1))
+                return false;
+        }
+        return true;
+    }
+
+    private void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
         Map<String, IProgramMethod> map = implicits.computeIfAbsent(t, k -> new LinkedHashMap<>());
         map.put(m.name().toString(), m);
-    }
-
-
-    public KeYProgModelInfo copy() {
-        return new KeYProgModelInfo(services, getServConf(), rec2key().copy(), typeConverter);
     }
 }

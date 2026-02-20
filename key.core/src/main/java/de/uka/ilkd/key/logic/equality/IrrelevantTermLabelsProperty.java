@@ -39,12 +39,16 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for some
      * irrelevant labels.
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
-     * @param v should not be used for this equality check
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
+     * @param v
+     *        should not be used for this equality check
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}, except
      *         for their irrelevant labels.
-     * @param <V> is not needed for this equality check
+     * @param <V>
+     *        is not needed for this equality check
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
@@ -87,7 +91,8 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
     /**
      * Computes the hash code of {@code term} while ignoring irrelevant labels.
      *
-     * @param term the term to compute the hash code for
+     * @param term
+     *        the term to compute the hash code for
      * @return the hash code
      */
     @Override

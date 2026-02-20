@@ -87,7 +87,7 @@ public class ProofSettings {
         addSettings(newSMTSettings);
     }
 
-    /*
+    /**
      * copy constructor - substitutes .clone() in classes implementing Settings
      */
     public ProofSettings(ProofSettings toCopy) {
@@ -138,7 +138,7 @@ public class ProofSettings {
      * Used by saveSettings() and settingsToString()
      */
     public void settingsToStream(Writer out) {
-        getConfiguration().save(out, "Proof-Settings-Config-File");
+        getConfiguration().save(out, null);
     }
 
     /**
@@ -281,7 +281,8 @@ public class ProofSettings {
     /**
      * Update the proof settings according to the entries on the properties.
      *
-     * @param props a non-<code>null</code> object with KeY properties.
+     * @param props
+     *        a non-<code>null</code> object with KeY properties.
      */
     public void update(Properties props) {
         for (Settings s : settings) {

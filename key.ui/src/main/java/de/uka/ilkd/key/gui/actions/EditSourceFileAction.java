@@ -73,8 +73,10 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent the parent
-     * @param exception the exception
+     * @param parent
+     *        the parent
+     * @param exception
+     *        the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
         setName("Edit File");

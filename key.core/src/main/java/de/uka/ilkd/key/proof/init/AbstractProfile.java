@@ -143,7 +143,8 @@ public abstract class AbstractProfile implements Profile {
     /**
      * sets the user selected goal chooser builder to be used as prototype
      *
-     * @throws IllegalArgumentException if a goal chooser of the given name is not supported
+     * @throws IllegalArgumentException
+     *         if a goal chooser of the given name is not supported
      */
     @Override
     public void setSelectedGoalChooserBuilder(String name) {
@@ -160,7 +161,8 @@ public abstract class AbstractProfile implements Profile {
      * looks up the demanded goal chooser is supported and returns a new instance if possible
      * otherwise <code>null</code> is returned
      *
-     * @param name the String with the goal choosers name
+     * @param name
+     *        the String with the goal choosers name
      * @return a new instance of the builder or <code>null</code> if the demanded chooser is not
      *         supported
      */
@@ -222,7 +224,8 @@ public abstract class AbstractProfile implements Profile {
      * Sets the default profile which is used if no profile is defined in custom problem files
      * (loaded via {@link KeYUserProblemFile}).
      *
-     * @param defaultProfile The default profile which is used if no profile is defined in custom
+     * @param defaultProfile
+     *        The default profile which is used if no profile is defined in custom
      *        problem files (loaded via {@link KeYUserProblemFile}).
      */
     public static void setDefaultProfile(Profile defaultProfile) {

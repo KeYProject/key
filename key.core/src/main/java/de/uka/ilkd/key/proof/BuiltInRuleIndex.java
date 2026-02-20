@@ -23,13 +23,13 @@ public class BuiltInRuleIndex implements Serializable {
     private ImmutableList<BuiltInRule> rules = ImmutableSLList.nil();
 
     /** constructs empty rule index */
-    public BuiltInRuleIndex() {
-    }
+    public BuiltInRuleIndex() {}
 
     /**
      * creates a new index with the given built-in-rules
      *
-     * @param rules a IList<BuiltInRule> with available built-in rules
+     * @param rules
+     *        a IList<BuiltInRule> with available built-in rules
      */
     public BuiltInRuleIndex(ImmutableList<BuiltInRule> rules) {
         this.rules = rules;

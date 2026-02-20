@@ -13,8 +13,10 @@ import org.jspecify.annotations.Nullable;
 /**
  * Simple value object to hold two values.
  *
- * @param <T1> type of first element
- * @param <T2> type of second element
+ * @param <T1>
+ *        type of first element
+ * @param <T2>
+ *        type of second element
  */
 public class Pair<T1, T2> {
     /**
@@ -30,8 +32,10 @@ public class Pair<T1, T2> {
     /**
      * Construct a new pair containing the given values.
      *
-     * @param first first element
-     * @param second second element
+     * @param first
+     *        first element
+     * @param second
+     *        second element
      */
     public Pair(T1 first, T2 second) {
         this.first = first;
@@ -64,7 +68,8 @@ public class Pair<T1, T2> {
     /**
      * Convert a collection of pairs into a map.
      *
-     * @throws IllegalArgumentException if it contains duplicate first entries
+     * @throws IllegalArgumentException
+     *         if it contains duplicate first entries
      */
     public static <S, T> Map<S, T> toMap(Collection<Pair<S, T>> pairs) {
         Map<S, T> res = new java.util.LinkedHashMap<>();

@@ -36,9 +36,12 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     /**
      * Creates a SequentViewLogicPrinter that does not create a position table.
      *
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services The Services object
-     * @param visibleTermLabels the visible term labels
+     * @param notationInfo
+     *        the NotationInfo for the concrete syntax
+     * @param services
+     *        The Services object
+     * @param visibleTermLabels
+     *        the visible term labels
      */
     public static SequentViewLogicPrinter purePrinter(NotationInfo notationInfo, Services services,
             VisibleTermLabels visibleTermLabels) {
@@ -49,10 +52,14 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     /**
      * Creates a SequentViewLogicPrinter that does not create a position table.
      *
-     * @param lineWidth line width
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services The Services object
-     * @param visibleTermLabels the visible term labels
+     * @param lineWidth
+     *        line width
+     * @param notationInfo
+     *        the NotationInfo for the concrete syntax
+     * @param services
+     *        The Services object
+     * @param visibleTermLabels
+     *        the visible term labels
      */
     public static SequentViewLogicPrinter purePrinter(int lineWidth, NotationInfo notationInfo,
             Services services, VisibleTermLabels visibleTermLabels) {
@@ -63,9 +70,12 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     /**
      * Creates a SequentViewLogicPrinter that creates a position table.
      *
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services The Services object
-     * @param visibleTermLabels the visible term labels
+     * @param notationInfo
+     *        the NotationInfo for the concrete syntax
+     * @param services
+     *        The Services object
+     * @param visibleTermLabels
+     *        the visible term labels
      */
     public static SequentViewLogicPrinter positionPrinter(NotationInfo notationInfo,
             Services services, VisibleTermLabels visibleTermLabels) {

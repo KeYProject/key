@@ -78,7 +78,8 @@ public class TryCloseMacro extends AbstractProofMacro {
     /**
      * Instantiates a new try close macro.
      *
-     * @param numberSteps the max number of steps. -1 means no change.
+     * @param numberSteps
+     *        the max number of steps. -1 means no change.
      */
     public TryCloseMacro(int numberSteps) {
         this.numberSteps = numberSteps;

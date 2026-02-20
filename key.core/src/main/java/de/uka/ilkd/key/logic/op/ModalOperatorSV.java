@@ -30,8 +30,10 @@ public final class ModalOperatorSV extends JModality.JavaModalityKind
     /**
      * creates a new SchemaVariable that is used as placeholder for modal operators.
      *
-     * @param name the Name of the SchemaVariable
-     * @param modalityKinds modal operators matched by this SV
+     * @param name
+     *        the Name of the SchemaVariable
+     * @param modalityKinds
+     *        modal operators matched by this SV
      */
     ModalOperatorSV(Name name, ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
         super(name);

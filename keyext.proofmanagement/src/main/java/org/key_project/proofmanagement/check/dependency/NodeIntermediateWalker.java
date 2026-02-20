@@ -18,7 +18,8 @@ public abstract class NodeIntermediateWalker {
     /**
      * create a walker starting from the given root
      *
-     * @param root the root of the intermediate proof representation
+     * @param root
+     *        the root of the intermediate proof representation
      */
     protected NodeIntermediateWalker(NodeIntermediate root) {
         this.root = root;
@@ -32,7 +33,8 @@ public abstract class NodeIntermediateWalker {
     /**
      * walks the tree while performing specified action
      *
-     * @param node the current position of the walker in tree
+     * @param node
+     *        the current position of the walker in tree
      */
     protected void walk(NodeIntermediate node) {
         doAction(node);
@@ -45,7 +47,8 @@ public abstract class NodeIntermediateWalker {
     /**
      * the action to be performed just before leaving the node the last time
      *
-     * @param node the current position of the walker
+     * @param node
+     *        the current position of the walker
      */
     protected abstract void doAction(NodeIntermediate node);
 }

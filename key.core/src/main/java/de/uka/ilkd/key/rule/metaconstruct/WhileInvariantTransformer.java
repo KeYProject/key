@@ -8,11 +8,15 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -33,6 +37,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import com.github.javaparser.ast.key.KeyTransactionStatement;
 
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
@@ -218,7 +224,7 @@ public final class WhileInvariantTransformer {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
-                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
+                        KeyTransactionStatement.TransactionType.FINISH))
                 : new StatementBlock(resSta));
         return services.getTermBuilder().prog(loopBodyModalityKind, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,

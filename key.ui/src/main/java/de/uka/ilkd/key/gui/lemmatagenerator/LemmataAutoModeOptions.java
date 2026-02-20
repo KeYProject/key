@@ -119,7 +119,8 @@ public class LemmataAutoModeOptions {
     private void checkForValidity() {
         if (pathOfRuleFile != null && !Files.exists(pathOfRuleFile)) {
             throwError(String.format("Error while setting the file containing the rules:\n"
-                + "'%s' is not a valid file in your system.", pathOfRuleFile));
+                + "'%s' is not a valid file in your system.",
+                pathOfRuleFile));
         }
 
         if (pathOfResult != null && !pathOfResult.isDirectory()) {

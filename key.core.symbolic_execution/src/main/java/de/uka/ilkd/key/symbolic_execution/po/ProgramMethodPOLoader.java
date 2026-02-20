@@ -19,8 +19,10 @@ public class ProgramMethodPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     @Override

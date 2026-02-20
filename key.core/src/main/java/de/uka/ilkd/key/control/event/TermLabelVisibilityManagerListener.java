@@ -16,7 +16,8 @@ public interface TermLabelVisibilityManagerListener extends EventListener {
     /**
      * When the visible term labels have changed.
      *
-     * @param e The change event.
+     * @param e
+     *        The change event.
      */
     void visibleLabelsChanged(TermLabelVisibilityManagerEvent e);
 }

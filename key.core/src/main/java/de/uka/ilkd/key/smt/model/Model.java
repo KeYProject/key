@@ -78,7 +78,8 @@ public class Model {
     /**
      * marks the model as empty or full
      *
-     * @param empty indicates model status
+     * @param empty
+     *        indicates model status
      */
     public void setEmpty(boolean empty) {
         this.empty = empty;
@@ -87,7 +88,8 @@ public class Model {
     /**
      * Transforms an Object id from binary form to #on, where n is a decimal number.
      *
-     * @param objectID object id in binary form
+     * @param objectID
+     *        object id in binary form
      * @return #on, where n is a decimal number.
      */
     private String processObjectID(String objectID) {
@@ -100,7 +102,8 @@ public class Model {
     /**
      * Transforms a sequence id from binary form to #sn, where n is a decimal number.
      *
-     * @param sequenceID sequence id in binary form
+     * @param sequenceID
+     *        sequence id in binary form
      * @return #sn, where n is a decimal number.
      */
     private String processSeqID(String sequenceID) {
@@ -212,7 +215,8 @@ public class Model {
     }
 
     /**
-     * @param types the types to set
+     * @param types
+     *        the types to set
      */
     public void setTypes(ProblemTypeInformation types) {
         this.types = types;
@@ -238,8 +242,10 @@ public class Model {
     /**
      * Adds a constant to the model.
      *
-     * @param key the constant name
-     * @param value the constant value
+     * @param key
+     *        the constant name
+     * @param value
+     *        the constant value
      */
     public void addConstant(String key, String value) {
         constants.put(key, value);
@@ -248,7 +254,8 @@ public class Model {
     /**
      * Adds a heap to the model.
      *
-     * @param e The heap to be added
+     * @param e
+     *        The heap to be added
      */
     public void addHeap(Heap e) {
         heaps.add(e);
@@ -257,7 +264,8 @@ public class Model {
     /**
      * Adds a location set to the model.
      *
-     * @param e The location set to be added.
+     * @param e
+     *        The location set to be added.
      */
     public void addLocationSet(LocationSet e) {
         locsets.add(e);
@@ -266,7 +274,8 @@ public class Model {
     /**
      * Adds a sequence set to the model.
      *
-     * @param s The sequence to be added.
+     * @param s
+     *        The sequence to be added.
      */
     public void addSequence(Sequence s) {
         sequences.add(s);
@@ -277,8 +286,10 @@ public class Model {
      * letter of the actual sort name and n is the decimal value of corresponding to the any value
      * after the removal of the three type bits and the fill up bits.
      *
-     * @param val original any value
-     * @param s actual sort of the any sort
+     * @param val
+     *        original any value
+     * @param s
+     *        actual sort of the any sort
      * @return formatted value
      */
     private String formatAny(String val, SMTSort s) {
@@ -295,8 +306,10 @@ public class Model {
     /**
      * Transforms a constant value from binary/hexadecimal form to a human redable form.
      *
-     * @param val binary/hexadecimal value of constant
-     * @param s sort of constant
+     * @param val
+     *        binary/hexadecimal value of constant
+     * @param s
+     *        sort of constant
      * @return human readable form #sn with s the first letter of the sort of the constant, and n
      *         the decimal value of the constant
      */
@@ -331,7 +344,8 @@ public class Model {
      * letter of the actual sort name and n is the decimal value of corresponding to the any value
      * after the removal of the three type bits and the fill up bits.
      *
-     * @param val the original any value in binary/hexadecimal
+     * @param val
+     *        the original any value in binary/hexadecimal
      * @return the formatted value
      */
     public String processAnyValue(String val) {
@@ -444,7 +458,8 @@ public class Model {
     /**
      * returns an alias for the given name
      *
-     * @param original the name for which an alias is created
+     * @param original
+     *        the name for which an alias is created
      * @return the alias
      */
     private String getAliasedName(String original) {
@@ -503,7 +518,8 @@ public class Model {
     /**
      * extracts all function values for the specified object
      *
-     * @param o the ObjectVal
+     * @param o
+     *        the ObjectVal
      * @return set with all function values
      */
     private Map<String, String> extractFunctionValuesFor(ObjectVal o) {
@@ -521,7 +537,8 @@ public class Model {
     /**
      * extracts all array values for the specified object
      *
-     * @param o the ObjectVal
+     * @param o
+     *        the ObjectVal
      * @return set with all array values
      */
     private Map<Integer, String> extractArrayValuesFor(ObjectVal o) {
@@ -539,7 +556,8 @@ public class Model {
     /**
      * extracts all field values for the specified object
      *
-     * @param o the ObjectVal
+     * @param o
+     *        the ObjectVal
      * @return set with all field values
      */
     private Map<String, String> extractFieldValuesFor(ObjectVal o) {
@@ -591,7 +609,8 @@ public class Model {
     /**
      * finds the object the ref parameter is referring to
      *
-     * @param ref the reference to the object
+     * @param ref
+     *        the reference to the object
      * @return the object the ref parameter is referring to or null otherwise
      */
     public ObjectVal findObject(String ref) {
@@ -650,8 +669,10 @@ public class Model {
     /**
      * returns all objects reachable from the specified one in the fiven heap
      *
-     * @param name the name of the object from where to look
-     * @param heap the heap
+     * @param name
+     *        the name of the object from where to look
+     * @param heap
+     *        the heap
      * @return set of reachable objects
      */
     public Set<ObjectVal> getReachableObjects(String name, Heap heap) {
@@ -697,8 +718,10 @@ public class Model {
     /**
      * set of objects the specified object points to
      *
-     * @param name the source object
-     * @param heap the heap
+     * @param name
+     *        the source object
+     * @param heap
+     *        the heap
      * @return set of objects the specified object points to
      */
     public Set<ObjectVal> pointsTo(String name, Heap heap) {
@@ -738,8 +761,10 @@ public class Model {
     /**
      * returns the object of the given name found in the heap
      *
-     * @param name the object to look up
-     * @param heap the heap
+     * @param name
+     *        the object to look up
+     * @param heap
+     *        the heap
      * @return the object of the given name found in the heap
      */
     public ObjectVal getObject(String name, Heap heap) {
@@ -755,7 +780,8 @@ public class Model {
     /**
      * removes the pipe character at the start and end from the given string
      *
-     * @param s the String to process
+     * @param s
+     *        the String to process
      * @return String identical to the parameter except with pipe characters at the start and end
      *         removed
      */

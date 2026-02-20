@@ -21,9 +21,11 @@ public class GeneralInformationEvent extends NotificationEvent {
     /**
      * Creates an event informing the user about the fact given as string
      *
-     * @param context the String describing the context/category of the information (e.g. used as
+     * @param context
+     *        the String describing the context/category of the information (e.g. used as
      *        window title, head line etc.)
-     * @param informationMessage the String containing the information
+     * @param informationMessage
+     *        the String containing the information
      */
     public GeneralInformationEvent(String context, String informationMessage) {
         super(NotificationEventID.GENERAL_INFORMATION);
@@ -34,7 +36,8 @@ public class GeneralInformationEvent extends NotificationEvent {
     /**
      * Creates an event informing the user about the fact given as string
      *
-     * @param informationMessage the String containing the information
+     * @param informationMessage
+     *        the String containing the information
      */
     public GeneralInformationEvent(String informationMessage) {
         this("Information", informationMessage);

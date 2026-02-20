@@ -24,12 +24,12 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
             "/proofReferences/constructorTest/ConstructorTest.java", "ConstructorTest",
             "ConstructorTest", false, new MethodCallProofReferencesAnalyst(),
             new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                "ConstructorTest::<createObject>"),
-            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<allocate>"),
+                "ConstructorTest::$createObject"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::$allocate"),
             new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                "ConstructorTest::<prepareEnter>"),
-            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<prepare>"),
-            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<init>"),
+                "ConstructorTest::$prepareEnter"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::$prepare"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::$init"),
             new ExpectedProofReferences(IProofReference.CALL_METHOD, "A::magic"),
             new ExpectedProofReferences(IProofReference.CALL_METHOD, "B::staticMagic"));
     }

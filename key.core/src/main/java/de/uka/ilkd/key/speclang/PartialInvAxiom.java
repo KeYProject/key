@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
@@ -48,8 +48,10 @@ public final class PartialInvAxiom extends ClassAxiom {
     /**
      * Creates a new class axiom.
      *
-     * @param inv (partial) invariant from which the axiom is derived
-     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
+     * @param inv
+     *        (partial) invariant from which the axiom is derived
+     * @param isStatic
+     *        whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
      *        instance invariants (i.e., &lt;inv&gt;)
      * @param services
      */

@@ -62,22 +62,22 @@ java.lang.String get_0(java.lang.String[],int);
 \problem {
      inReachableState
    & \forall java.lang.String j_0; 
-       (     j_0.<created>@(java.lang.Object) = TRUE
+       (     j_0.$created@(java.lang.Object) = TRUE
            & !j_0 = null
         -> j_0.hashCode@(java.lang.String)() >= 0)
    & \forall StringSet s_0; 
-       (     s_0.<created>@(java.lang.Object) = TRUE
+       (     s_0.$created@(java.lang.Object) = TRUE
            & !s_0 = null
         -> s_0.size@(StringSet) >  (jint)(0))
    & \forall StringSet s_0; 
-       (     s_0.<created>@(java.lang.Object) = TRUE
+       (     s_0.$created@(java.lang.Object) = TRUE
            & !s_0 = null
         ->   !s_0.elements@(StringSet) = null
            &   s_0.elements@(StringSet).length
              = s_0.size@(StringSet))
-   & (  self.<created>@(java.lang.Object) = TRUE
+   & (  self.$created@(java.lang.Object) = TRUE
       & !self = null)
-   & (s.<created>@(java.lang.Object) = TRUE | s = null)
+   & (s.$created@(java.lang.Object) = TRUE | s = null)
    & (  !s = null
       &   self.elements@(StringSet)[(jint)(javaMod({\for StringSet x; elementsAtPre_0(x):=
                                                     x.elements@(StringSet) ||

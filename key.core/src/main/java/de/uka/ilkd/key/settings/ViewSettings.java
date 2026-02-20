@@ -299,7 +299,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Sets maxTooltipLines
      *
-     * @param b The new value for maxTooltipLines
+     * @param b
+     *        The new value for maxTooltipLines
      */
     public void setMaxTooltipLines(int b) {
         maxTooltipLines.set(b);
@@ -317,7 +318,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Sets whether the "Load Examples" dialog window should be shown on startup
      *
-     * @param b indicates whether the "Load Examples" dialog window should be shown on startup or
+     * @param b
+     *        indicates whether the "Load Examples" dialog window should be shown on startup or
      *        not
      */
     public void setShowLoadExamplesDialog(boolean b) {
@@ -338,7 +340,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Sets whether the Find and VarCond part of Taclets should be pretty-printed with
      * instantiations of schema-variables or not
      *
-     * @param b indicates whether the Find and VarCond part of Taclets should be pretty-printed with
+     * @param b
+     *        indicates whether the Find and VarCond part of Taclets should be pretty-printed with
      *        instantiations of schema-variables or not
      */
     public void setShowWholeTaclet(boolean b) {
@@ -355,7 +358,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Sets FontIndex
      *
-     * @param b The new value for SizeIndex
+     * @param b
+     *        The new value for SizeIndex
      */
     public void setFontIndex(int b) {
         sizeIndex.set(b);
@@ -372,7 +376,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Set which look-and-feel to use.
      *
-     * @param className class name of the look and feel
+     * @param className
+     *        class name of the look and feel
      */
     public void setLookAndFeel(String className) {
         lookAndFeel.set(className);
@@ -399,7 +404,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * @param show Whether a notification when opening a file should be shown
+     * @param show
+     *        Whether a notification when opening a file should be shown
      */
     public void setNotifyLoadBehaviour(boolean show) {
         notifyLoadBehaviour.set(show);
@@ -413,7 +419,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * @param hide Whether intermediate proof steps should be hidden
+     * @param hide
+     *        Whether intermediate proof steps should be hidden
      */
     public void setHideIntermediateProofsteps(boolean hide) {
         hideIntermediateProofsteps.set(hide);
@@ -427,7 +434,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * @param hide Whether non-interactive proof steps should be hidden
+     * @param hide
+     *        Whether non-interactive proof steps should be hidden
      */
     public void setHideAutomodeProofsteps(boolean hide) {
         hideAutomodeProofsteps.set(hide);
@@ -441,7 +449,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * @param hide Whether closed subtrees should be hidden
+     * @param hide
+     *        Whether closed subtrees should be hidden
      */
     public void setHideClosedSubtrees(boolean hide) {
         hideClosedSubtrees.set(hide);
@@ -529,10 +538,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Updates heatmap settings (all of the at the same time, so that fireSettingsChanged is called
      * only once.
      *
-     * @param showHeatmap true if heatmap on
-     * @param heatmapSF true for sequent formulas, false for terms
-     * @param heatmapNewest true if newest, false for "up to age"
-     * @param maxAgeForHeatmap the maximum age for term or sequent formulas, concerning heatmap
+     * @param showHeatmap
+     *        true if heatmap on
+     * @param heatmapSF
+     *        true for sequent formulas, false for terms
+     * @param heatmapNewest
+     *        true if newest, false for "up to age"
+     * @param maxAgeForHeatmap
+     *        the maximum age for term or sequent formulas, concerning heatmap
      *        highlighting
      */
     public void setHeatmapOptions(boolean showHeatmap, boolean heatmapSF, boolean heatmapNewest,

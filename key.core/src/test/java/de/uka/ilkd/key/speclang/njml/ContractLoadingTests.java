@@ -42,7 +42,7 @@ public class ContractLoadingTests {
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1658/Test.java");
         Assumptions.assumeTrue(Files.exists(javaFile));
         KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test

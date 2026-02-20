@@ -18,8 +18,10 @@ public class Cvc5Socket extends AbstractSolverSocket {
     /**
      * Create a new Cvc5Socket.
      *
-     * @param name the socket's name (usually "CVC5", but other solvers might also use it).
-     * @param query the ModelExtractor for model interpretation (currently not used by this socket)
+     * @param name
+     *        the socket's name (usually "CVC5", but other solvers might also use it).
+     * @param query
+     *        the ModelExtractor for model interpretation (currently not used by this socket)
      */
     public Cvc5Socket(String name, ModelExtractor query) {
         super(name, query);

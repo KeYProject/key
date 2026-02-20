@@ -289,8 +289,10 @@ public class Statistics {
          * Increment numbers of rule applications according to given node and (already collected)
          * interactive rule applications
          *
-         * @param node the given node
-         * @param interactiveAppsDetails already collected interactive rule applications
+         * @param node
+         *        the given node
+         * @param interactiveAppsDetails
+         *        already collected interactive rule applications
          */
         private void changeOnNode(final Node node,
                 final HashMap<String, Integer> interactiveAppsDetails) {
@@ -328,7 +330,8 @@ public class Statistics {
         /**
          * Add the node's children's branches (minus one) to current number of branches
          *
-         * @param node the node of which we compute its children's branches
+         * @param node
+         *        the node of which we compute its children's branches
          * @return the children's branches minus one
          */
         private int childBranches(final Node node) {
@@ -342,7 +345,8 @@ public class Statistics {
         /**
          * Check whether this node is closed by cache.
          *
-         * @param node a goal node
+         * @param node
+         *        a goal node
          * @return 1 if the node is cached, 0 otherwise
          */
         private int cachedBranches(final Node node) {
@@ -353,8 +357,10 @@ public class Statistics {
         /**
          * Compute number of interactive rule applications and collect their names.
          *
-         * @param node the considered node
-         * @param intAppsDetails the already collected interactive rule applications
+         * @param node
+         *        the considered node
+         * @param intAppsDetails
+         *        the already collected interactive rule applications
          * @return the number of interactive rule apllications
          */
         private int interactiveRuleApps(final Node node,
@@ -377,7 +383,8 @@ public class Statistics {
         /**
          * Compute number of available one-step-simplification rules
          *
-         * @param ruleApp the rule application considered
+         * @param ruleApp
+         *        the rule application considered
          * @return the number of captured oss rule applications
          */
         private int tmpOssCaptured(final RuleApp ruleApp) {
@@ -393,7 +400,8 @@ public class Statistics {
         /**
          * Returns 1 if ruleApp is a loop scope invariant taclet application, and 0 otherwise.
          *
-         * @param ruleApp The {@link RuleApp} to check.
+         * @param ruleApp
+         *        The {@link RuleApp} to check.
          * @return 1 or 0.
          */
         private int tmpLoopScopeInvTacletRuleApps(
@@ -404,7 +412,8 @@ public class Statistics {
         /**
          * Returns 1 if ruleApp belongs to the given rule set, and 0 otherwise.
          *
-         * @param ruleApp The {@link RuleApp} to check.
+         * @param ruleApp
+         *        The {@link RuleApp} to check.
          * @return 1 or 0.
          */
         private int tacletHasRuleSet(final RuleApp ruleApp,
@@ -416,7 +425,8 @@ public class Statistics {
         /**
          * Compute all rule applications regarding quantifiers
          *
-         * @param ruleApp the considered rule application
+         * @param ruleApp
+         *        the considered rule application
          * @return the number of quantifier rules
          */
         private int tmpQuantificationRuleApps(final RuleApp ruleApp) {

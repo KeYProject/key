@@ -1,0 +1,48 @@
+name: Singlewise RAP (not for main)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "weigl/key-javaparser3" ]
+  #pull_request:
+  #  branches:
+  #    - "main"
+
+jobs:
+  unit-tests:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
+      - name: z3 version
+        run: z3 --version
+
+      - name: cvc5 version
+        run: cvc5 --version
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: GenRap
+        run: ./gradlew --parallel generateRAPUnitTests
+
+      - name: Test with Gradle
+        run: ./gradlew :key.core:test --tests "de.uka.ilkd.key.proof.runallproofs.gen.*" --parallel --continue
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v6
+        if: success() || failure()
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.modules }}
+          path: |
+            **/build/test-results/*/*.xml
+            **/build/reports/
+            !**/jacocoTestReport.xml

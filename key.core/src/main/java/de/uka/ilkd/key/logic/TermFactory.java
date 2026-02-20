@@ -147,8 +147,10 @@ public final class TermFactory {
      * Reduce the given list of terms into a one term by using the operator. The reduction is
      * left-associative. e.g., the result is {@code ((a op b) op c) op d }.
      *
-     * @param junctor the left-associative operator to combine the terms together
-     * @param terms a list of non-null temrs
+     * @param junctor
+     *        the left-associative operator to combine the terms together
+     * @param terms
+     *        a list of non-null temrs
      */
     public @NonNull JTerm createTerm(@NonNull Operator junctor, @NonNull List<JTerm> terms) {
         if (terms.size() == 1) {

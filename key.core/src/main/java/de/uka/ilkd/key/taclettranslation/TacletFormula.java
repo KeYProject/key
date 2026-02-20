@@ -25,7 +25,8 @@ public interface TacletFormula {
 
     /**
      *
-     * @param services TODO
+     * @param services
+     *        TODO
      * @return the formula of the instance if the taclet is translatable otherwise
      *         <code>null</code>. If the translation of the taclet consists of several
      *         instantiations (e.g. the taclet has some generic sorts) the returned term is a

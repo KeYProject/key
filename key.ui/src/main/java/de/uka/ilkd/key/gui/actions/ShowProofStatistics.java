@@ -78,7 +78,8 @@ public class ShowProofStatistics extends MainWindowAction {
     /**
      * Gets the CSV statistics message.
      *
-     * @param proof the proof
+     * @param proof
+     *        the proof
      * @return the CSV statistics message
      */
     public static String getCSVStatisticsMessage(Proof proof) {
@@ -237,8 +238,10 @@ public class ShowProofStatistics extends MainWindowAction {
         /**
          * Creates a new (initially invisible) proof statistics window.
          *
-         * @param mainWindow the main windown.
-         * @param proof the proof whose statistics to show.
+         * @param mainWindow
+         *        the main windown.
+         * @param proof
+         *        the proof whose statistics to show.
          */
         public Window(MainWindow mainWindow, Proof proof) {
             super(mainWindow, "Proof Statistics");
@@ -256,8 +259,10 @@ public class ShowProofStatistics extends MainWindowAction {
         /**
          * Creates a new (initially invisible) proof statistics window.
          *
-         * @param mainWindow the main windown.
-         * @param node the node for which to show subtree statistics
+         * @param mainWindow
+         *        the main windown.
+         * @param node
+         *        the node for which to show subtree statistics
          */
         public Window(MainWindow mainWindow, Node node) {
             super(mainWindow, "Proof Statistics");

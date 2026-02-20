@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -11,7 +10,7 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
@@ -30,13 +29,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1 (6/1/21)
  */
 public class NJmlTranslatorTests {
-    public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "speclang" + File.separator + "testFile.key";
+    public static final Path testFile = HelperClassForTests.TESTCASE_DIRECTORY
+            .resolve("speclang")
+            .resolve("testFile.key");
+
     private final PreParser preParser;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
-            new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+            HelperClassForTests.parse(testFile).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");

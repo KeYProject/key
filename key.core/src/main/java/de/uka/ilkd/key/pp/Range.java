@@ -13,8 +13,10 @@ public class Range {
     /**
      * Creates a new range {@code [s,e)}.
      *
-     * @param s this range's (included) start position.
-     * @param e this range's (excluded) end position.
+     * @param s
+     *        this range's (included) start position.
+     * @param e
+     *        this range's (excluded) end position.
      */
     public Range(int s, int e) {
         start = s;
@@ -24,7 +26,8 @@ public class Range {
     /**
      * Creates a copy of the specified range.
      *
-     * @param r the range to copy.
+     * @param r
+     *        the range to copy.
      */
     public Range(Range r) {
         start = r.start;

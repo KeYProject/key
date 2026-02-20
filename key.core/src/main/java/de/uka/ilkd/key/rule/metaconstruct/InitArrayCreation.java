@@ -5,25 +5,25 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.If;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -44,7 +44,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;
-    private final static String createArrayName = "<createArray>";
+    private final static String createArrayName = "$createArray";
 
     public InitArrayCreation(SchemaVariable newObjectSV, ProgramElement newExpr) {
         super("init-array-creation", newExpr);
@@ -56,9 +56,11 @@ public class InitArrayCreation extends InitArray {
      * {@link NegativeArraySizeException} to be thrown. The if statement implementing this
      * behaviour is created by this method.
      *
-     * @param cond the Expression representing the guard checking if the given length is negative or
+     * @param cond
+     *        the Expression representing the guard checking if the given length is negative or
      *        not
-     * @param services the Services offering access to the type model
+     * @param services
+     *        the Services offering access to the type model
      * @return an if statement throwing a NegativeArraySizeException if cond is evaluated to false
      */
     private If checkNegativeDimension(Expression cond, Services services) {
@@ -78,9 +80,12 @@ public class InitArrayCreation extends InitArray {
      * and adds them to given list of statements. Further more the new declared program variables
      * initialised with the evaluated dimension expressions are returned
      *
-     * @param bodyStmnts the LinkedList of statements where the new statements are inserted
-     * @param dimExpr the ArrayOf<Expression> which describe the array's dimensions
-     * @param services the Services object
+     * @param bodyStmnts
+     *        the LinkedList of statements where the new statements are inserted
+     * @param dimExpr
+     *        the ArrayOf<Expression> which describe the array's dimensions
+     * @param services
+     *        the Services object
      */
     private ProgramVariable[] evaluateAndCheckDimensionExpressions(LinkedList<Statement> bodyStmnts,
             ImmutableArray<Expression> dimExpr, Services services) {

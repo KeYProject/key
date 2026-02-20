@@ -31,7 +31,8 @@ public class SearchNodePreorderIterator {
     /**
      * Constructor.
      *
-     * @param start The {@link Node} to iterate over its sub tree.
+     * @param start
+     *        The {@link Node} to iterate over its sub tree.
      */
     public SearchNodePreorderIterator(Node start) {
         this.next = start;

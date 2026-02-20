@@ -46,7 +46,8 @@ public class PositionTable {
      * creates a new PositionTable with the number of subterms (or number of SequentFormula in a
      * Semisequent, or the number of Semisequents in a Sequent, etc.)
      *
-     * @param rows the number of direct sub-elements in the term whose position information is
+     * @param rows
+     *        the number of direct sub-elements in the term whose position information is
      *        represented by the constructed object.
      */
     public PositionTable(int rows) {
@@ -98,8 +99,10 @@ public class PositionTable {
      * Returns the character range of the `lowest' subtable that includes <code>index</code> in its
      * range.
      *
-     * @param index the character index to search for.
-     * @param length the length of the whole string corresponding to this position table. Needed in
+     * @param index
+     *        the character index to search for.
+     * @param length
+     *        the length of the whole string corresponding to this position table. Needed in
      *        case it turns out the index belongs to the top level.
      *
      * @return the character range of the `lowest' subtable that includes <code>index</code> in its
@@ -147,8 +150,10 @@ public class PositionTable {
     }
 
     /**
-     * @param path the given integer list, i.e. path
-     * @param length length of the range
+     * @param path
+     *        the given integer list, i.e. path
+     * @param length
+     *        length of the range
      * @return Returns the character range for the subtable indicated by the given integer list.
      */
     public Range rangeForPath(ImmutableList<Integer> path, int length) {
@@ -167,9 +172,11 @@ public class PositionTable {
      * sets end in the position table to the next free end entry in the position table and sets the
      * given PositionTable as child of the sub-element finished by putting this end position
      *
-     * @param end char position that ends the sub-element started by the corresponding start entry
+     * @param end
+     *        char position that ends the sub-element started by the corresponding start entry
      *        in the position table
-     * @param child PositionTable for the sub-element from start to end
+     * @param child
+     *        PositionTable for the sub-element from start to end
      */
     public void setEnd(int end, PositionTable child) {
         endPos[currentEntry] = end;
@@ -181,7 +188,8 @@ public class PositionTable {
      *
      * The number is determined by increment the counter of subterms by one.
      *
-     * @param start char position that starts a sub-element
+     * @param start
+     *        char position that starts a sub-element
      */
     public void setStart(int start) {
         setStart(currentEntry + 1, start);
@@ -190,8 +198,10 @@ public class PositionTable {
     /**
      * Sets start in the position table for the subterm with the given number to start.
      *
-     * @param subTermNo the 0-based number of the subterm to evaluate
-     * @param start char position that starts a sub-element
+     * @param subTermNo
+     *        the 0-based number of the subterm to evaluate
+     * @param start
+     *        char position that starts a sub-element
      */
     public void setStart(int subTermNo, int start) {
         currentEntry = subTermNo;
@@ -227,8 +237,10 @@ public class PositionTable {
      * returned PosInSequent will refer to (a subterm of) one of the constrained formulae in the
      * sequent.
      *
-     * @param posList the position list that navigates through the position tables.
-     * @param filter the sequent print filter from that was used to print the sequent
+     * @param posList
+     *        the position list that navigates through the position tables.
+     * @param filter
+     *        the sequent print filter from that was used to print the sequent
      *
      * @return a PosInSequent for the given position list
      */
@@ -255,10 +267,13 @@ public class PositionTable {
      * assumed that this is a position table corresponding to the Term <code>term</code>, which has
      * one child table for each subterm.
      *
-     * @param filterEntry the print filter entry that contains information about which constrained
+     * @param filterEntry
+     *        the print filter entry that contains information about which constrained
      *        formula we are in and how the constraint and metavariables were printed.
-     * @param posList the position list that navigates through the position tables.
-     * @param pio the PosInOccurrence leading to the current term
+     * @param posList
+     *        the position list that navigates through the position tables.
+     * @param pio
+     *        the PosInOccurrence leading to the current term
      */
     private PosInSequent getTermPIS(SequentPrintFilterEntry filterEntry,
             ImmutableList<Integer> posList, PosInOccurrence pio) {

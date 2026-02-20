@@ -28,9 +28,12 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
     private final Feature body;
 
     /**
-     * @param var <code>TermBuffer</code> in which the terms are going to be stored
-     * @param generator the terms that are to be iterated over
-     * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
+     * @param var
+     *        <code>TermBuffer</code> in which the terms are going to be stored
+     * @param generator
+     *        the terms that are to be iterated over
+     * @param body
+     *        a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer<Goal> var,

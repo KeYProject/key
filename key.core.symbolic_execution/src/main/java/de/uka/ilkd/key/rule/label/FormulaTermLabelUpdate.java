@@ -108,8 +108,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
     /**
      * Returns the {@link TermLabel} with the given {@link Name}.
      *
-     * @param labels the {@link TermLabel}s to search in.
-     * @param name The {@link Name} of the {@link TermLabel} to search.
+     * @param labels
+     *        the {@link TermLabel}s to search in.
+     * @param name
+     *        The {@link Name} of the {@link TermLabel} to search.
      * @return The found {@link TermLabel} or {@code} null if no element was found.
      */
     protected TermLabel getTermLabel(Set<TermLabel> labels, final Name name) {

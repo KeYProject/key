@@ -205,7 +205,8 @@ public final class KeYGuiExtensionFacade {
     /**
      * Creates all toolbars for the known extension.
      *
-     * @param mainWindow non-null
+     * @param mainWindow
+     *        non-null
      * @return
      */
     public static List<JToolBar> createToolbars(MainWindow mainWindow) {
@@ -230,9 +231,12 @@ public final class KeYGuiExtensionFacade {
      * If the underlying object is a proof, this will also include the usual actions.
      * </p>
      *
-     * @param kind what kind of object the context menu is built on
-     * @param underlyingObject the object the context menu is built on
-     * @param mediator the KeY mediator
+     * @param kind
+     *        what kind of object the context menu is built on
+     * @param underlyingObject
+     *        the object the context menu is built on
+     * @param mediator
+     *        the KeY mediator
      * @return populated context menu
      */
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
@@ -281,8 +285,10 @@ public final class KeYGuiExtensionFacade {
     }
 
     /**
-     * @param clazz the interface class
-     * @param <T> the interface of the service
+     * @param clazz
+     *        the interface class
+     * @param <T>
+     *        the interface of the service
      * @return a list of all found and enabled service implementations
      */
     @SuppressWarnings("unchecked")
@@ -301,7 +307,8 @@ public final class KeYGuiExtensionFacade {
      * A plugin can either disabled by adding its fqn to the {@see #forbiddenPlugins} list or
      * setting <code>-P[fqn]=false</code> add the command line.
      *
-     * @param a an instance of a plugin, non-null
+     * @param a
+     *        an instance of a plugin, non-null
      * @return
      */
     private static <T> boolean isNotForbidden(Class<T> a) {
@@ -386,8 +393,10 @@ public final class KeYGuiExtensionFacade {
 
     /**
      *
-     * @param window the main window.
-     * @param pos the position the user selected.
+     * @param window
+     *        the main window.
+     * @param pos
+     *        the position the user selected.
      * @return every term info string from every loaded extension.
      */
     public static List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {
@@ -409,7 +418,8 @@ public final class KeYGuiExtensionFacade {
      * If this extension is already loaded, it will be removed from the list of extensions. This
      * does not include a removal from the GUI in all cases.
      *
-     * @param clazz a fqdn of a class
+     * @param clazz
+     *        a fqdn of a class
      */
     public void forbidClass(String clazz) {
         forbiddenPlugins.add(clazz);

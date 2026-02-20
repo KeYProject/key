@@ -96,12 +96,14 @@ public class SMTHandlerServices {
      *
      * An empty handlerNames list leads to the usage of the handlers defined by defaultHandlers.txt.
      *
-     * @param handlerNames a non-null list of non-null strings with class names (s. above)
+     * @param handlerNames
+     *        a non-null list of non-null strings with class names (s. above)
      *
      * @return a fresh collection containing only the original SMTHandlers from the snippetMap's key
      *         set that match the given handler names. The collection's order matches that of the
      *         names as well.
-     * @throws IOException if loading the snippet Properties for a handler class fails
+     * @throws IOException
+     *         if loading the snippet Properties for a handler class fails
      */
     public Collection<SMTHandler> getTemplateHandlers(String[] handlerNames) throws IOException {
         // If handlerNames is empty, use default handlerNames list.
@@ -167,13 +169,18 @@ public class SMTHandlerServices {
      * Get a copy of freshly created {@link SMTHandler}s by cloning the reference handlers. They can
      * be used to translate problems to SMT.
      *
-     * @param services passed on to the handlers for initialisation
-     * @param handlerNames the fully classified class names of the SMTHandlers to be used If this is
+     * @param services
+     *        passed on to the handlers for initialisation
+     * @param handlerNames
+     *        the fully classified class names of the SMTHandlers to be used If this is
      *        empty or null, all existing handlers will be used.
-     * @param handlerOptions arbitrary String options for the SMTHandlers
-     * @param mh passed on to the handlers for initialisation
+     * @param handlerOptions
+     *        arbitrary String options for the SMTHandlers
+     * @param mh
+     *        passed on to the handlers for initialisation
      * @return a freshly created list of freshly created handlers
-     * @throws IOException if the resources cannot be read
+     * @throws IOException
+     *         if the resources cannot be read
      */
 
     public List<SMTHandler> getFreshHandlers(Services services, @NonNull String[] handlerNames,
@@ -208,9 +215,11 @@ public class SMTHandlerServices {
      * Look up the resource for the snippets of a particular smt handler class. They must be in the
      * same package and have the name of the class with ".preamble.xml" attached.
      *
-     * @param aClass class reference for localisation
+     * @param aClass
+     *        class reference for localisation
      * @return freshly created property object, null if the resource does not exist
-     * @throws IOException may be thrown during reading of the resource
+     * @throws IOException
+     *         may be thrown during reading of the resource
      */
     private static Properties loadSnippets(Class<?> aClass) throws IOException {
         String resourceName = aClass.getSimpleName() + ".preamble.xml";
@@ -261,7 +270,8 @@ public class SMTHandlerServices {
      * new smt properties may be added after calling the method so that it has to be called again.
      *
      * @return an unmodifiable view on the smt properties, not null
-     * @throws IOException if resources cannot be read
+     * @throws IOException
+     *         if resources cannot be read
      */
     public Collection<SMTHandlerProperty<?>> getSMTProperties() throws IOException {
         List<SMTHandlerProperty<?>> properties;

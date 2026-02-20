@@ -159,7 +159,8 @@ class TacletConditions {
      *
      * @param s1
      * @param s2
-     * @param mode see {@link TypeComparisonCondition}
+     * @param mode
+     *        see {@link TypeComparisonCondition}
      * @return <code>true</code> if the taclet contains the condition, otherwise false.
      */
     public boolean containsComparisionCondition(Sort s1, Sort s2,
@@ -231,7 +232,8 @@ class TacletConditions {
     /**
      * Returns whether the taclet has a "isReference"-condition.
      *
-     * @param s the sort according to the "isReference"-condition.
+     * @param s
+     *        the sort according to the "isReference"-condition.
      * @return returns 0 if there is no "isReference"-condition, else a value greater than 0:<br>
      *         - <code>FALSE</code>: the taclet has no "isReference"-condition according to the
      *         given sort s.<br>

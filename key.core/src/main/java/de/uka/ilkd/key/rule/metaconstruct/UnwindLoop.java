@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -29,7 +29,13 @@ import org.key_project.util.collection.ImmutableSLList;
  *
  * <pre>
  * {@code
- * if (i<10) l1:{ l2:{ i++; } while (i<10) { i++; } }
+ * if (i < 10)
+ *     l1: {
+ *         l2: {
+ *             i++;
+ *         }
+ *         while (i < 10) { i++; }
+ *     }
  * }
  * </pre>
  *
@@ -44,9 +50,12 @@ public class UnwindLoop extends ProgramTransformer {
     /**
      * creates an unwind-loop ProgramTransformer
      *
-     * @param loop the LoopStatement contained by the meta construct
-     * @param innerLabel The inner label SV
-     * @param outerLabel The outer label SV
+     * @param loop
+     *        the LoopStatement contained by the meta construct
+     * @param innerLabel
+     *        The inner label SV
+     * @param outerLabel
+     *        The outer label SV
      */
     public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, LoopStatement loop) {
         super("#unwind-loop", loop);
@@ -81,7 +90,8 @@ public class UnwindLoop extends ProgramTransformer {
     /**
      * return a list of the SV that are relevant to this UnwindLoop
      *
-     * @param svInst the instantiations so far - ignored
+     * @param svInst
+     *        the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override

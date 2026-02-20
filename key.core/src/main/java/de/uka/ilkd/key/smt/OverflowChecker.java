@@ -133,7 +133,8 @@ public class OverflowChecker {
     /**
      * Creates guards for the given terms
      *
-     * @param terms - the terms that must be guarded against integer overflows
+     * @param terms
+     *        - the terms that must be guarded against integer overflows
      * @return a list of generated guards
      */
     public List<SMTTerm> createGuards(Set<SMTTerm> terms) {
@@ -319,11 +320,16 @@ public class OverflowChecker {
     /**
      * Searches for non ground terms in sub, and stores them in terms. Begin with empty lists.
      *
-     * @param terms list where the terms are stored
-     * @param sub the term to be searched
-     * @param universalVars universal variables
-     * @param existentialVars existential variables
-     * @param bind variables bounded by the current quantifier
+     * @param terms
+     *        list where the terms are stored
+     * @param sub
+     *        the term to be searched
+     * @param universalVars
+     *        universal variables
+     * @param existentialVars
+     *        existential variables
+     * @param bind
+     *        variables bounded by the current quantifier
      */
     public void searchArithTerms(Set<SMTTerm> terms, SMTTerm sub,
             Set<SMTTermVariable> universalVars, Set<SMTTermVariable> existentialVars,

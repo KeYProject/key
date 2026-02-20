@@ -5,31 +5,19 @@ package de.uka.ilkd.key.pp;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqPut;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.ccatch.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -56,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * A configurable pretty printer for Java source elements originally from COMPOST.
  *
  * @author AL
- *
+ *         <p>
  *         CHANGED FOR KeY. Comments are not printed!
  */
 @NullMarked
@@ -71,10 +59,12 @@ public class PrettyPrinter implements Visitor {
 
     private final SVInstantiations instantiations;
     private final @Nullable Services services;
-    private boolean usePrettyPrinting;
-    private boolean useUnicodeSymbols;
+    private final boolean usePrettyPrinting;
+    private final boolean useUnicodeSymbols;
 
-    /** creates a new PrettyPrinter */
+    /**
+     * creates a new PrettyPrinter
+     */
     public PrettyPrinter(PosTableLayouter out) {
         this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
     }
@@ -247,14 +237,14 @@ public class PrettyPrinter implements Visitor {
         layouter.print(")");
     }
 
-    private void printReferencePrefix(ReferencePrefix p) {
+    private void printReferencePrefix(@Nullable ReferencePrefix p) {
         if (p != null) {
             p.visit(this);
             layouter.print(".");
         }
     }
 
-    private void printArguments(ImmutableArray<? extends Expression> args) {
+    private void printArguments(@Nullable ImmutableArray<? extends Expression> args) {
         beginMultilineBracket();
         if (args != null) {
             writeCommaList(args);
@@ -391,7 +381,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnSeqConcat(SeqConcat x) {
-        printDLFunctionOperator("\\singleton", x);
+        printDLFunctionOperator("\\seq_concat", x);
     }
 
     @Override
@@ -412,8 +402,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnSeqPut(
-            SeqPut x) {
+    public void performActionOnSeqPut(SeqPut x) {
         printDLFunctionOperator("\\seq_upd", x);
     }
 
@@ -515,7 +504,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnParameterDeclaration(ParameterDeclaration x) {
+    public void performActionOnParameterDeclaration(@Nullable ParameterDeclaration x) {
         performActionOnVariableDeclaration(x);
     }
 
@@ -524,10 +513,6 @@ public class PrettyPrinter implements Visitor {
         performActionOnVariableSpecification(x);
     }
 
-    @Override
-    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
-        performActionOnVariableSpecification(x);
-    }
 
     @Override
     public void performActionOnSchematicFieldReference(SchematicFieldReference x) {
@@ -607,16 +592,20 @@ public class PrettyPrinter implements Visitor {
         printOperator(x, "<:");
     }
 
+    private void performActionOnType(@Nullable Type type) {
+        if (type == null) {
+            layouter.print("unknown");
+        } else if (type instanceof ArrayDeclaration arr) {
+            performActionOnType(arr.getBaseType().getKeYJavaType().getJavaType());
+            layouter.print("[]");
+        } else {
+            layouter.print(type.getFullName());
+        }
+    }
+
     @Override
     public void performActionOnArrayDeclaration(ArrayDeclaration type) {
-        Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
-        assert baseType != null;
-        if (baseType instanceof ArrayDeclaration) {
-            performActionOnArrayDeclaration((ArrayDeclaration) baseType);
-        } else {
-            layouter.print(baseType.getFullName());
-        }
-        layouter.print("[]");
+        performActionOnType(type);
     }
 
     @Override
@@ -634,10 +623,10 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printTypeReference(ReferencePrefix prefix, KeYJavaType type,
+    private void printTypeReference(ReferencePrefix prefix, @Nullable KeYJavaType type,
             ProgramElementName name, boolean fullTypeNames) {
         printReferencePrefix(prefix);
-        if (fullTypeNames) {
+        if (fullTypeNames && type != null) {
             layouter.print(type.getFullName());
         } else {
             performActionOnProgramElementName(name);
@@ -701,9 +690,12 @@ public class PrettyPrinter implements Visitor {
             if (hasImports || hasPackageSpec) {
                 layouter.nl();
             }
-            for (TypeDeclaration td : x.getDeclarations()) {
+            for (int i = 0; i < x.getDeclarations().size(); i++) {
+                if (i != 0) {
+                    layouter.nl();
+                }
                 layouter.nl();
-                td.visit(this);
+                x.getDeclarations().get(i).visit(this);
             }
         }
     }
@@ -711,6 +703,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnClassDeclaration(ClassDeclaration x) {
         layouter.beginC();
+        layouter.beginC(0);
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
@@ -723,23 +716,35 @@ public class PrettyPrinter implements Visitor {
             layouter.keyWord("class").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null) {
-            layouter.print(" ");
+        layouter.end();
+        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
+            layouter.brk().beginC(0);
             performActionOnExtends(x.getExtendedTypes());
+            layouter.end();
         }
-        if (x.getImplementedTypes() != null) {
-            layouter.print(" ");
+        if (x.getImplementedTypes() != null && x.getImplementedTypes().getChildCount() != 0) {
+            layouter.brk();
             performActionOnImplements(x.getImplementedTypes());
         }
         // not an anonymous class
         if (x.getProgramElementName() != null) {
             layouter.print(" ");
         }
-        if (x.getMembers() != null) {
+        layouter.end();
+
+        performActionOnMemberDeclarations(x.getMembers());
+    }
+
+    private void performActionOnMemberDeclarations(
+            @Nullable ImmutableArray<MemberDeclaration> members) {
+        if (members != null && !members.isEmpty()) {
             beginBlock();
-            for (MemberDeclaration m : x.getMembers()) {
+            for (int i = 0; i < members.size(); ++i) {
+                if (i != 0) {
+                    layouter.nl();
+                }
                 layouter.nl();
-                m.visit(this);
+                members.get(i).visit(this);
             }
             endBlock();
         } else {
@@ -762,22 +767,14 @@ public class PrettyPrinter implements Visitor {
             layouter.keyWord("interface").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null) {
+        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
             layouter.print(" ");
             performActionOnExtends(x.getExtendedTypes());
         }
         layouter.print(" ");
+        layouter.end();
 
-        if (x.getMembers() != null) {
-            beginBlock();
-            for (MemberDeclaration m : x.getMembers()) {
-                layouter.nl();
-                m.visit(this);
-            }
-            endBlock();
-        } else {
-            layouter.print("{}");
-        }
+        performActionOnMemberDeclarations(x.getMembers());
     }
 
     @Override
@@ -791,7 +788,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnVariableDeclaration(VariableDeclaration x) {
+    public void performActionOnVariableDeclaration(@Nullable VariableDeclaration x) {
         layouter.beginI();
         ImmutableArray<Modifier> modifiers = x.getModifiers();
         if (modifiers != null && !modifiers.isEmpty()) {
@@ -809,7 +806,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
-        layouter.beginC();
+        layouter.beginC(0);
         ImmutableArray<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
@@ -835,9 +832,10 @@ public class PrettyPrinter implements Visitor {
             performActionOnThrows(x.getThrown());
         }
         if (x.getBody() != null) {
+            layouter.print(" ").end();
             printStatementBlock(x.getBody());
         } else {
-            layouter.print(";");
+            layouter.print(";").end();
         }
     }
 
@@ -856,7 +854,8 @@ public class PrettyPrinter implements Visitor {
 
     protected void performActionOnStatement(SourceElement s) {
         layouter.beginRelativeC(0);
-        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix);
+        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix
+                || s instanceof TypeDeclarationContainer);
         if (validStatement) {
             markStart(s);
         }
@@ -864,7 +863,8 @@ public class PrettyPrinter implements Visitor {
         if (validStatement) {
             markEnd(s);
         }
-        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)) {
+        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)
+                && !(s instanceof TypeDeclarationContainer)) {
             layouter.print(";");
         }
         layouter.end();
@@ -885,7 +885,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     public boolean printStatementBlock(StatementBlock x) {
-        boolean emptyBlock = x.getBody() == null || x.getBody().isEmpty();
+        boolean emptyBlock = x.getBody().isEmpty();
         if (emptyBlock) {
             // We have an empty statement block ...
             markStart(x);
@@ -906,18 +906,18 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnBreak(Break x) {
         layouter.keyWord("break");
-        if (x.getProgramElementName() != null) {
+        if (x.getLabel() != null) {
             layouter.brk();
-            x.getProgramElementName().visit(this);
+            x.getLabel().visit(this);
         }
     }
 
     @Override
     public void performActionOnContinue(Continue x) {
         layouter.keyWord("continue");
-        if (x.getProgramElementName() != null) {
+        if (x.getLabel() != null) {
             layouter.brk();
-            x.getProgramElementName().visit(this);
+            x.getLabel().visit(this);
         }
     }
 
@@ -960,7 +960,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private boolean handleBlockStatementOrEmpty(Statement body, boolean includeBody) {
+    private boolean handleBlockStatementOrEmpty(@Nullable Statement body, boolean includeBody) {
         if (includeBody) {
             if (body == null || body instanceof EmptyStatement) {
                 layouter.print(";");
@@ -983,9 +983,7 @@ public class PrettyPrinter implements Visitor {
         layouter.keyWord("while");
         layouter.print(" ");
         beginMultilineBracket();
-        if (x.getGuard() != null) {
-            x.getGuard().visit(this);
-        }
+        x.getGuard().visit(this);
         endMultilineBracket();
         layouter.print(";");
     }
@@ -1008,9 +1006,7 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" :");
         layouter.brk();
 
-        if (x.getGuard() != null) {
-            x.getGuardExpression().visit(this);
-        }
+        x.getGuardExpression().visit(this);
 
         endMultilineBracket();
 
@@ -1125,7 +1121,9 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printTryLike(String name, StatementBlock body, ImmutableArray<Branch> branches) {
+    private void printTryLike(String name,
+            @Nullable StatementBlock body,
+            @Nullable ImmutableArray<Branch> branches) {
         layouter.keyWord(name);
         layouter.print(" ");
         if (body != null) {
@@ -1263,16 +1261,20 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnExtends(Extends x) {
         if (x.getSupertypes() != null) {
-            layouter.keyWord("extends").print(" ");
+            layouter.beginC();
+            layouter.keyWord("extends").brk();
             writeCommaList(x.getSupertypes());
+            layouter.end();
         }
     }
 
     @Override
     public void performActionOnImplements(Implements x) {
         if (x.getSupertypes() != null) {
-            layouter.keyWord("implements").print(" ");
+            layouter.beginC();
+            layouter.keyWord("implements").brk();
             writeCommaList(x.getSupertypes());
+            layouter.end();
         }
     }
 
@@ -1659,7 +1661,11 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnExecutionContext(ExecutionContext x) {
         layouter.beginRelativeC();
         layouter.print("source=");
-        writeFullMethodSignature(x.getMethodContext());
+        if (x.getMethodContext() == null) {
+            layouter.print("null");
+        } else {
+            writeFullMethodSignature(x.getMethodContext());
+        }
         layouter.print("@");
         x.getTypeReference().visit(this);
         if (x.getRuntimeInstance() != null) {
@@ -1719,7 +1725,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printCaseBody(ImmutableArray<Statement> body) {
+    private void printCaseBody(@Nullable ImmutableArray<Statement> body) {
         if (body != null && !body.isEmpty()) {
             for (int i = 0; i < body.size(); i++) {
                 Statement statement = body.get(i);
@@ -1813,11 +1819,12 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnEmptyStatement(EmptyStatement x) {}
+    public void performActionOnEmptyStatement(EmptyStatement x) {
+    }
 
     @Override
     public void performActionOnComment(Comment x) {
-        // l.print("/* " + x.getText().trim() + " */");
+        // layouter.print("/* " + x.getText().trim() + " */");
     }
 
     @Override
@@ -1926,7 +1933,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnCcatchContinueWildcardParameterDeclaration(
             CcatchContinueWildcardParameterDeclaration x) {
-        layouter.keyWord("\\Continue");
+        layouter.keyWord("\\Continue").brk().print("*");
     }
 
     /**

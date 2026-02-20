@@ -9,15 +9,16 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -294,8 +295,7 @@ public class JMLSpecFactory {
         public final Map<LocationVariable, Boolean> hasFreeAssignable = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
 
-        public void clear() {
-        }
+        public void clear() {}
     }
 
     // -------------------------------------------------------------------------
@@ -977,11 +977,15 @@ public class JMLSpecFactory {
     /**
      * Generate functional operation contracts.
      *
-     * @param name base name of the contract (does not have to be unique)
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param progVars pre-generated collection of variables for the receiver object, operation
+     * @param name
+     *        base name of the contract (does not have to be unique)
+     * @param pm
+     *        the IProgramMethod to which the contract belongs
+     * @param progVars
+     *        pre-generated collection of variables for the receiver object, operation
      *        parameters, operation result, thrown exception and the pre-heap
-     * @param clauses pre-translated JML clauses
+     * @param clauses
+     *        pre-translated JML clauses
      * @return operation contracts including new functional operation contracts
      */
     public ImmutableSet<Contract> createFunctionalOperationContracts(String name, IProgramMethod pm,
@@ -1054,10 +1058,13 @@ public class JMLSpecFactory {
     /**
      * Generate dependency operation contract out of the JML accessible clause.
      *
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param progVars collection of variables for the receiver object, operation parameters,
+     * @param pm
+     *        the IProgramMethod to which the contract belongs
+     * @param progVars
+     *        collection of variables for the receiver object, operation parameters,
      *        operation result, thrown exception and the pre-heap
-     * @param clauses pre-translated JML clauses
+     * @param clauses
+     *        pre-translated JML clauses
      * @return operation contracts including a new dependency contract
      */
     private ImmutableSet<Contract> createDependencyOperationContract(IProgramMethod pm,
@@ -1223,8 +1230,10 @@ public class JMLSpecFactory {
      * Creates a class axiom from a textual JML representation. As JML axioms are always without
      * modifiers, they are implicitly non-static and public.
      *
-     * @param kjt the type where the axiom is declared
-     * @param textual textual representation
+     * @param kjt
+     *        the type where the axiom is declared
+     * @param textual
+     *        textual representation
      * @return created {@link ClassAxiom}
      */
     public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {
@@ -1281,10 +1290,13 @@ public class JMLSpecFactory {
     /**
      * Creates operation contracts out of the passed JML specification.
      *
-     * @param pm corresponding program method
-     * @param textualSpecCase textual representation of spec
+     * @param pm
+     *        corresponding program method
+     * @param textualSpecCase
+     *        textual representation of spec
      * @return created JML operation contracts
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
             TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
@@ -1393,12 +1405,17 @@ public class JMLSpecFactory {
     /**
      * Creates a set of block contracts for a block from a textual specification case.
      *
-     * @param method the method containing the block.
-     * @param labels all labels belonging to the block.
-     * @param block the block which the block contracts belong to.
-     * @param specificationCase the textual specification case.
+     * @param method
+     *        the method containing the block.
+     * @param labels
+     *        all labels belonging to the block.
+     * @param block
+     *        the block which the block contracts belong to.
+     * @param specificationCase
+     *        the textual specification case.
      * @return a set of block contracts for a block from a textual specification case.
-     * @throws SLTranslationException translation exception
+     * @throws SLTranslationException
+     *         translation exception
      */
     public ImmutableSet<BlockContract> createJMLBlockContracts(IProgramMethod method,
             List<Label> labels, StatementBlock block, TextualJMLSpecCase specificationCase)
@@ -1426,12 +1443,17 @@ public class JMLSpecFactory {
     /**
      * Creates a set of loop contracts for a loop from a textual specification case.
      *
-     * @param method the method containing the block.
-     * @param labels all labels belonging to the block.
-     * @param loop the loop which the loop contracts belong to.
-     * @param specificationCase the textual specification case.
+     * @param method
+     *        the method containing the block.
+     * @param labels
+     *        all labels belonging to the block.
+     * @param loop
+     *        the loop which the loop contracts belong to.
+     * @param specificationCase
+     *        the textual specification case.
      * @return a set of loop contracts for a block from a textual specification case.
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
             final List<Label> labels, final LoopStatement loop,
@@ -1460,12 +1482,17 @@ public class JMLSpecFactory {
     /**
      * Creates a set of loop contracts for a block from a textual specification case.
      *
-     * @param method the method containing the block.
-     * @param labels all labels belonging to the block.
-     * @param block the block which the loop contracts belong to.
-     * @param specificationCase the textual specification case.
+     * @param method
+     *        the method containing the block.
+     * @param labels
+     *        all labels belonging to the block.
+     * @param block
+     *        the block which the loop contracts belong to.
+     * @param specificationCase
+     *        the textual specification case.
      * @return a set of loop contracts for a block from a textual specification case.
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     public ImmutableSet<LoopContract> createJMLLoopContracts(IProgramMethod method,
             List<Label> labels, StatementBlock block, TextualJMLSpecCase specificationCase)
@@ -1515,8 +1542,10 @@ public class JMLSpecFactory {
     /**
      * Translates the condition Term of a JmlAssert statement.
      *
-     * @param jmlAssert the statement to create the condition for
-     * @param pm the enclosing method
+     * @param jmlAssert
+     *        the statement to create the condition for
+     * @param pm
+     *        the enclosing method
      */
     public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
         final var pv = createProgramVariablesForStatement(jmlAssert, pm);
@@ -1565,8 +1594,10 @@ public class JMLSpecFactory {
     /**
      * Translates a set statement.
      *
-     * @param statement the set statement
-     * @param pm the enclosing method
+     * @param statement
+     *        the set statement
+     * @param pm
+     *        the enclosing method
      */
     public void translateSetStatement(final SetStatement statement, final IProgramMethod pm)
             throws SLTranslationException {
@@ -1619,9 +1650,12 @@ public class JMLSpecFactory {
      * program variables that occur freely in the block as parameters (i.e., in
      * {@link ProgramVariableCollection#paramVars}).
      *
-     * @param method the method containing the block.
-     * @param block the block.
-     * @param variables an instance of {@link AuxiliaryContract.Variables} for the block.
+     * @param method
+     *        the method containing the block.
+     * @param block
+     *        the block.
+     * @param variables
+     *        an instance of {@link AuxiliaryContract.Variables} for the block.
      */
     private ProgramVariableCollection createProgramVariables(final IProgramMethod method,
             final JavaStatement block, final AuxiliaryContract.Variables variables) {
@@ -1864,10 +1898,13 @@ public class JMLSpecFactory {
      * contract looks like:<br>
      * <tt>requires true;<br>ensures ini;<br>signals (Exception) ini;<br>diverges true;</tt>
      *
-     * @param ini initially clause
-     * @param pm constructor
+     * @param ini
+     *        initially clause
+     * @param pm
+     *        constructor
      * @return the translated (functional operation) contract
-     * @throws SLTranslationException a translation exception
+     * @throws SLTranslationException
+     *         a translation exception
      */
     public FunctionalOperationContract initiallyClauseToContract(InitiallyClause ini,
             IProgramMethod pm) throws SLTranslationException {

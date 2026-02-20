@@ -221,7 +221,8 @@ public class ContractSelectionPanel extends JPanel {
 
     /**
      *
-     * @param grayOutAuxiliaryContracts whether or not an auxiliary contract should be grayed out if
+     * @param grayOutAuxiliaryContracts
+     *        whether or not an auxiliary contract should be grayed out if
      *        it has not been applied in a proof for a non-auxiliary contract.
      *
      * @see Contract#isAuxiliary()
@@ -281,7 +282,8 @@ public class ContractSelectionPanel extends JPanel {
     /**
      * Selects the given contract in the list.
      *
-     * @param contract The {@link Contract}
+     * @param contract
+     *        The {@link Contract}
      */
     public void selectContract(Contract contract) {
         contractList.setSelectedValue(contract, true);
@@ -300,8 +302,10 @@ public class ContractSelectionPanel extends JPanel {
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
      *
-     * @param services The {@link Services}
-     * @param selection The selected contracts.
+     * @param services
+     *        The {@link Services}
+     * @param selection
+     *        The selected contracts.
      * @return The selected {@link Contract} or {@code null} if not available.
      */
     public static Contract computeContract(Services services, List<Contract> selection) {

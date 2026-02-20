@@ -136,7 +136,8 @@ public final class DefaultTacletSetTranslation
     /**
      * Stores the translation to a file by using the key-format for problem files.
      *
-     * @param dest the path of the file.
+     * @param dest
+     *        the path of the file.
      */
     public void storeToFile(String dest) {
         FileWriter fw;

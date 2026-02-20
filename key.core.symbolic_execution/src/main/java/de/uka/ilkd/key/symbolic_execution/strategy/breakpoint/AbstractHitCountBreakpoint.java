@@ -6,7 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -37,9 +37,12 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     /**
      * Creates a new {@link AbstractHitCountBreakpoint}.
      *
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param enabled flag if the Breakpoint is enabled
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param enabled
+     *        flag if the Breakpoint is enabled
      */
     protected AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
         super(proof, enabled);
@@ -92,7 +95,8 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     /**
      * Set the hitCount to the new value
      *
-     * @param hitCount the new value
+     * @param hitCount
+     *        the new value
      */
     public void setHitCount(int hitCount) {
         if (this.hitCount != hitCount) {

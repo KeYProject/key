@@ -41,7 +41,8 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     /**
-     * @param intValue the intValue to set
+     * @param intValue
+     *        the intValue to set
      */
     public void setIntValue(int intValue) {
         this.intValue = intValue;
@@ -55,7 +56,8 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     /**
-     * @param bitSize the bitSize to set
+     * @param bitSize
+     *        the bitSize to set
      */
     public void setBitSize(int bitSize) {
         this.bitSize = bitSize;
@@ -69,7 +71,8 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     /**
-     * @param upp the upp to set
+     * @param upp
+     *        the upp to set
      */
     public void setUpp(SMTTerm upp) {
         this.upp = upp;

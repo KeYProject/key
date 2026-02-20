@@ -48,7 +48,8 @@ public abstract class SequentPrintFilter {
     /**
      * sets the (original) sequent of this filter
      *
-     * @param s the sequent s is set to
+     * @param s
+     *        the sequent s is set to
      */
     public void setSequent(Sequent s) {
         originalSequent = s;

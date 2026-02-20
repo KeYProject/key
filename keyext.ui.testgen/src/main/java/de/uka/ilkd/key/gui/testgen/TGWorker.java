@@ -102,9 +102,12 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     /**
      * Constructor.
      *
-     * @param mediator The {@link KeYMediator} to use.
-     * @param originalProof The {@link Proof} to generate test cases for.
-     * @param showInMainWindow Defines if created {@link Proof}s are visible in the
+     * @param mediator
+     *        The {@link KeYMediator} to use.
+     * @param originalProof
+     *        The {@link Proof} to generate test cases for.
+     * @param showInMainWindow
+     *        Defines if created {@link Proof}s are visible in the
      *        {@link MainWindow} or not.
      */
     public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof,

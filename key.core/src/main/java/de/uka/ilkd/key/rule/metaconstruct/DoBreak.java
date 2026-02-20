@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -25,7 +25,8 @@ public class DoBreak extends ProgramTransformer {
     /**
      * creates a do-break ProgramTransformer
      *
-     * @param labeledBreak the LabeledStatement contained by the meta construct
+     * @param labeledBreak
+     *        the LabeledStatement contained by the meta construct
      */
     public DoBreak(LabeledStatement labeledBreak) {
         super("do-break", labeledBreak);
@@ -34,8 +35,10 @@ public class DoBreak extends ProgramTransformer {
     /**
      * a helper method to perform the symbolic execution of the doBreak metaconstruct.
      *
-     * @param block the NonTerminalProgramElement to go through and look for the label
-     * @param breakLabel the Label the break statement marked
+     * @param block
+     *        the NonTerminalProgramElement to go through and look for the label
+     * @param breakLabel
+     *        the Label the break statement marked
      */
     private ProgramElement doBreak(NonTerminalProgramElement block, Label breakLabel, Break b) {
 
@@ -59,7 +62,8 @@ public class DoBreak extends ProgramTransformer {
     /**
      * performs the program transformation needed for symbolic program transformation
      *
-     * @param services the Services with all necessary information about the java programs
+     * @param services
+     *        the Services with all necessary information about the java programs
      * @return the transformated program
      */
     @Override

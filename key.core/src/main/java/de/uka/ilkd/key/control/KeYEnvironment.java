@@ -7,12 +7,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Proof;
@@ -193,7 +192,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes)
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes)
             throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, false);
     }
@@ -338,7 +338,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      */
     public List<Contract> getProofContracts() {
         var proofContracts = new ArrayList<Contract>();
-        Set<KeYJavaType> kjts = getJavaInfo().getAllKeYJavaTypes();
+        var kjts = getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =

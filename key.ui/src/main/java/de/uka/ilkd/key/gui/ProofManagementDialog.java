@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -21,9 +20,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -314,9 +313,12 @@ public final class ProofManagementDialog extends JDialog {
      * to start a new proof for a selected method.</b>
      * </p>
      *
-     * @param initConfig the initial prover configuration
-     * @param selectedKJT the selected {@link KeYJavaType}
-     * @param selectedTarget the selected target
+     * @param initConfig
+     *        the initial prover configuration
+     * @param selectedKJT
+     *        the selected {@link KeYJavaType}
+     * @param selectedTarget
+     *        the selected target
      */
     public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
             IObserverFunction selectedTarget) {
@@ -434,7 +436,8 @@ public final class ProofManagementDialog extends JDialog {
      * Finds a proof for the given contract. Preferring a already closed proof, laking that a proof
      * that just misses lemmas.
      *
-     * @param contract the contract for which to find a proof
+     * @param contract
+     *        the contract for which to find a proof
      * @return a proof for the contract, preferring closed proofs then closed proofs needing some
      *         lemmas and then just any proof or {@code null} if there is no proof for the contract
      */
@@ -564,7 +567,7 @@ public final class ProofManagementDialog extends JDialog {
         SpecificationRepository specRepos = services.getSpecificationRepository();
 
 
-        Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = services.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType kjt : kjts) {
             // skip library classes, the user isn't shown contracts for them
             if (kjt.getJavaType() instanceof TypeDeclaration
@@ -665,11 +668,15 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.
      *
-     * @param keyJavaTypeName The key java type name.
-     * @param methodName The method name.
-     * @param contractName The contract name.
+     * @param keyJavaTypeName
+     *        The key java type name.
+     * @param methodName
+     *        The method name.
+     * @param contractName
+     *        The contract name.
      */
-    private record ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
+    private record ContractId(
+            @Nullable String keyJavaTypeName, @Nullable String methodName,
             @Nullable String contractName) {
     }
 }

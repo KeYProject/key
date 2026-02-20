@@ -49,7 +49,8 @@ public class BoundUniquenessChecker {
     /**
      * adds <tt>term</tt> to the list of terms to include in the uniqueness check
      *
-     * @param term a Term
+     * @param term
+     *        a Term
      */
     public void addTerm(JTerm term) {
         terms = terms.prepend(term);
@@ -58,7 +59,8 @@ public class BoundUniquenessChecker {
     /**
      * adds all formulas in the sequent to the list of terms to include in the uniqueness check
      *
-     * @param seq the Sequent with the formulas to add
+     * @param seq
+     *        the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
         for (final SequentFormula cf : seq) {

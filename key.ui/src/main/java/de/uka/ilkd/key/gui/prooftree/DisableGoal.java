@@ -38,7 +38,8 @@ public abstract class DisableGoal extends AbstractAction {
     /**
      * enables or disables all given goals
      *
-     * @param goals array of goals to be enabled or disabled
+     * @param goals
+     *        array of goals to be enabled or disabled
      */
     private void setGoalStatus(Iterable<Goal> goals) {
         for (final Goal g : goals) {

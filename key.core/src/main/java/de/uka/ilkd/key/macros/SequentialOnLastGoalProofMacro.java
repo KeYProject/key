@@ -26,7 +26,8 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      * The macros are always started on the last active goal (in contrast to the same goal as it is
      * done in the SequentialProofMacro).
      *
-     * @throws InterruptedException if one of the wrapped macros is interrupted.
+     * @throws InterruptedException
+     *         if one of the wrapped macros is interrupted.
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,

@@ -35,7 +35,8 @@ public class AppliedRuleAppsNameCache {
     /**
      * Fills the cache value of this instance for node
      *
-     * @param node the node
+     * @param node
+     *        the node
      * @return the value
      */
     private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(
@@ -107,8 +108,10 @@ public class AppliedRuleAppsNameCache {
      * * Non leaf nodes are not changed, pruning is allowed
      * * If the tree is pruned the removed nodes are discarded and not reused
      *
-     * @param node the node
-     * @param name the name
+     * @param node
+     *        the node
+     * @param name
+     *        the name
      * @return rule apps
      */
     public @NonNull List<RuleApp> get(@NonNull Node node,

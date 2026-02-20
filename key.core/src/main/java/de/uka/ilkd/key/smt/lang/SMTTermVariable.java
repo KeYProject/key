@@ -49,7 +49,8 @@ public class SMTTermVariable extends SMTTerm {
     }
 
     /**
-     * @param quant the quant to set
+     * @param quant
+     *        the quant to set
      */
     public void setQuant(SMTTerm quant) {
         this.quant = quant;

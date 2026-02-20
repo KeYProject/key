@@ -5,8 +5,13 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -62,10 +67,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * of all block contracts for blocks in {@code blocks} by {@code atPreVars} and
      * {@code atPreHeapVars}
      *
-     * @param statements the blocks and loops whose contracts to update.
-     * @param atPreVars all remembrance variables.
-     * @param atPreHeapVars all remembrance heaps.
-     * @param services services.
+     * @param statements
+     *        the blocks and loops whose contracts to update.
+     * @param atPreVars
+     *        all remembrance variables.
+     * @param atPreHeapVars
+     *        all remembrance heaps.
+     * @param services
+     *        services.
      */
     public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
             Map<LocationVariable, LocationVariable> atPreVars,

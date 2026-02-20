@@ -29,9 +29,11 @@ public abstract class AbstractDomainElement implements Named {
      * the formula "varOrConst % 2 == 0".
      * </p>
      *
-     * @param varOrConst The logical / program variable or skolem constant representing an instance
+     * @param varOrConst
+     *        The logical / program variable or skolem constant representing an instance
      *        of this abstract domain element.
-     * @param services A services object.
+     * @param services
+     *        A services object.
      * @return A JavaDL formula expressing that the given variable or constant represents an
      *         instance of this abstract domain element.
      */
@@ -43,7 +45,8 @@ public abstract class AbstractDomainElement implements Named {
      * {@link AbstractDomainLattice} l, that {@code l.fromString(e.toParseableString(),
      * services).equals(e)}.
      *
-     * @param services The services object.
+     * @param services
+     *        The services object.
      * @return A parseable String representation of this domain element.
      */
     public abstract String toParseableString(Services services);

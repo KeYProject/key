@@ -3,32 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReduxFileCollection;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
@@ -40,19 +31,21 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * EnvInput for standalone specification language front ends.
  */
 public final class SLEnvInput extends AbstractEnvInput {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SLEnvInput.class);
 
 
     // -------------------------------------------------------------------------
@@ -63,11 +56,6 @@ public final class SLEnvInput extends AbstractEnvInput {
             Profile profile, List<Path> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
-    }
-
-
-    public SLEnvInput(@Nullable Path javaPath, Profile profile) {
-        this(javaPath, null, null, profile, null);
     }
 
 
@@ -94,40 +82,32 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
 
-    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
-            Path path) throws ProofInputException {
+    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(
+            Collection<KeYJavaType> allKJTs,
+            Path basePath) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+        int i = 0;
         for (KeYJavaType kjt : allKJTs) {
-            if (kjt.getJavaType() instanceof TypeDeclaration
-                    && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
-                final String filePath =
-                    String.format("%s/%s.key", path,
-                        kjt.getFullName().replace(".", "/")
-                                .replace('<', '_')
-                                .replace('>', '_'));
-                RuleSource rs = null;
-
-                // external or internal path?
-                var file = Paths.get(filePath);
-                if (Files.isRegularFile(file)) {
-                    rs = RuleSourceFactory.initRuleFile(file);
-                } else {
-                    URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
-                        filePath);
-                    if (url != null) {
-                        rs = RuleSourceFactory.initRuleFile(url);
-                    }
-                }
-
-                // rule source found? -> read
-                if (rs != null) {
-                    final KeYFile keyFile = new KeYFile(path.getFileName().toString(),
-                        rs, null, getProfile());
-                    keyFile.setInitConfig(initConfig);
-                    warnings = warnings.union(keyFile.read());
-                }
+            var javaType = kjt.getJavaType();
+            if (!(javaType instanceof TypeDeclaration)
+                    || !((TypeDeclaration) javaType).isLibraryClass()) {
+                continue;
             }
+
+            final Path file = basePath.resolve(kjt.getFullName().replace(".", "/") + ".key");
+            if (!Files.exists(file)) {
+                continue;
+            }
+            RuleSource rs = RuleSourceFactory.initRuleFile(file);
+
+            // read rule source found
+            LOGGER.debug("Reading library specification file: {}", file);
+            final KeYFile keyFile = new KeYFile(file.toString(), rs, null, getProfile());
+            keyFile.setInitConfig(initConfig);
+            warnings = warnings.union(keyFile.read());
+            i += 1;
         }
+        LOGGER.info("Read {} library specification files from {}", i, basePath);
         return warnings;
     }
 
@@ -137,27 +117,16 @@ public final class SLEnvInput extends AbstractEnvInput {
      * specifications from this file.
      */
     private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
-        final Set<KeYJavaType> allKJTs =
+        final var allKJTs =
             initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
-        // either boot class path or JavaRedux
-        if (bootClassPath != null) {
-            warnings = warnings
-                    .union(createDLLibrarySpecsHelper(allKJTs, bootClassPath.toAbsolutePath()));
-        } else {
-            Path path = JavaReduxFileCollection.JAVA_SRC_DIR;
-            if (!initConfig.getProfile().getInternalClassDirectory().isEmpty()) {
-                path = path.resolve(initConfig.getProfile().getInternalClassDirectory());
-            }
-            warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, path));
-        }
+        var javaService = initConfig.getServices().getJavaService();
+        warnings =
+            warnings.union(createDLLibrarySpecsHelper(allKJTs, javaService.getBootClassPath()));
 
-        // if applicable: class path
-        if (classPath != null) {
-            for (Path file : classPath) {
-                warnings =
-                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
-            }
+        for (var file : javaService.getLibraryPath()) {
+            warnings =
+                warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
         }
         return warnings;
     }
@@ -177,7 +146,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
+            final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Loop contracts on loops.
         // For loop contracts on blocks, see addBlockAndLoopContracts.
@@ -220,16 +189,14 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     private void addMergePointStatements(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final IProgramMethod pm,
-            final ImmutableSet<SpecificationElement> methodSpecs) throws ProofInputException {
+            final ImmutableList<LocationVariable> methodParameters) throws ProofInputException {
         // merge point statements
         final JavaASTCollector mpsCollector =
             new JavaASTCollector(pm.getBody(), MergePointStatement.class);
         mpsCollector.start();
         for (ProgramElement mps : mpsCollector.getNodes()) {
-            final ImmutableSet<MergeContract> mergeContracts = //
-                specExtractor.extractMergeContracts(pm, (MergePointStatement) mps,
-                    ((Contract) methodSpecs.iterator().next()).getOrigVars().params);
-
+            final ImmutableSet<MergeContract> mergeContracts = specExtractor
+                    .extractMergeContracts(pm, (MergePointStatement) mps, methodParameters);
             mergeContracts.forEach(specRepos::addMergeContract);
         }
     }
@@ -302,7 +269,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
 
         // sort types alphabetically (necessary for deterministic names)
-        final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
+        final var allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 
@@ -330,15 +297,15 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
 
             // contracts, loop invariants
-            final ImmutableList<ProgramMethod> pms =
-                javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
-            for (IProgramMethod pm : pms) {
+            for (IProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
                 // contracts
-                final ImmutableSet<SpecificationElement> methodSpecs =
+                final List<SpecificationElement> methodSpecs =
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
-                specRepos.addSpecs(methodSpecs);
+                var iter = methodSpecs.iterator();
+                var params = iter.hasNext() ? ((Contract) iter.next()).getOrigVars().params : null;
+                specRepos.addSpecs(DefaultImmutableSet.fromCollection(methodSpecs));
 
-                Type declaringType = pm.getContainerType().getJavaType();
+                var declaringType = pm.getContainerType().getJavaType();
 
                 // Create default contracts for all methods except KeY default methods (like <init>)
                 // and Object methods.
@@ -354,21 +321,20 @@ public final class SLEnvInput extends AbstractEnvInput {
                 }
 
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
-                addLoopContracts(specExtractor, specRepos, kjt, pm);
+                addLoopContracts(specExtractor, specRepos, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
-                addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
+                addMergePointStatements(specExtractor, specRepos, pm, params);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
                 transformProgramElements(pm);
             }
 
             // constructor contracts
-            final ImmutableList<IProgramMethod> constructors = javaInfo.getConstructors(kjt);
-            for (IProgramMethod constructor : constructors) {
+            for (IProgramMethod constructor : javaInfo.getConstructors(kjt)) {
                 assert constructor.isConstructor();
-                final ImmutableSet<SpecificationElement> constructorSpecs =
+                final List<SpecificationElement> constructorSpecs =
                     specExtractor.extractMethodSpecs(constructor, staticInvPresent);
-                specRepos.addSpecs(constructorSpecs);
+                specRepos.addSpecs(DefaultImmutableSet.fromCollection(constructorSpecs));
             }
             specRepos.processJavaType(kjt);
         }
