@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
@@ -24,6 +26,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -56,23 +59,6 @@ public class RuleCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "rule";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return """
-                Command that applies a calculus rule.
-                All parameters are passed as strings and converted by the command.
-
-                The parameters are:
-                <ol>
-                    <li>#2 = <String>rule name</String></li>
-                    <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
-                    <li>formula= toplevel formula in which term appears in</li>
-                    <li>occ = occurrence number</li>
-                    <li>inst_= instantiation</li>
-                </ol>
-                """;
     }
 
     @Override
@@ -160,9 +146,11 @@ public class RuleCommand extends AbstractCommand {
         ImmutableList<TacletApp> assumesCandidates = theApp
                 .findIfFormulaInstantiations(state.getFirstOpenAutomaticGoal().sequent(), services);
 
-        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
+        assumesCandidates = ImmutableList.fromList(filterList(services, p, assumesCandidates));
 
-        if (assumesCandidates.size() != 1) {
+        if (assumesCandidates.size() == 0) {
+            throw new ScriptException("No \\assumes instantiation");
+        } else if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
         }
 
@@ -241,7 +229,7 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("No matching applications.");
         }
 
-        if (p.occ < 0) {
+        if (p.occ == null || p.occ < 0) {
             if (matchingApps.size() > 1) {
                 throw new ScriptException("More than one applicable occurrence");
             }
@@ -249,7 +237,7 @@ public class RuleCommand extends AbstractCommand {
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
-                throw new ScriptException("Occurence " + p.occ
+                throw new ScriptException("Occurrence " + p.occ
                     + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
 
@@ -260,7 +248,7 @@ public class RuleCommand extends AbstractCommand {
     private TacletApp findTacletApp(Parameters p, EngineState state) throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
-        List<TacletApp> matchingApps = filterList(p, allApps);
+        List<TacletApp> matchingApps = filterList(state.getProof().getServices(), p, allApps);
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -268,7 +256,11 @@ public class RuleCommand extends AbstractCommand {
 
         if (p.occ < 0) {
             if (matchingApps.size() > 1) {
-                throw new ScriptException("More than one applicable occurrence");
+                // todo make a nice string here!
+                throw new ScriptException("More than one applicable occurrence:\n" +
+                        matchingApps.stream().map(
+                                ap -> ap.posInOccurrence().subTerm() + " " + ap.matchConditions())
+                                .collect(Collectors.joining("\n") ));
             }
             return matchingApps.get(0);
         } else {
@@ -290,7 +282,7 @@ public class RuleCommand extends AbstractCommand {
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -299,7 +291,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -321,7 +313,7 @@ public class RuleCommand extends AbstractCommand {
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -330,7 +322,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -350,8 +342,7 @@ public class RuleCommand extends AbstractCommand {
      * @param sf The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p,
-            SequentFormula sf, Services services)
+    private boolean isSequentFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         Term term = sf.formula();
         final boolean satisfiesFormulaParameter =
@@ -380,13 +371,14 @@ public class RuleCommand extends AbstractCommand {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Services services, Parameters p,
+            ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
+        TermComparisonWithHoles matcher = p.on == null ? null : p.on.getMatcher();
         for (TacletApp tacletApp : list) {
+            boolean add = true;
             if (tacletApp instanceof PosTacletApp pta) {
-                JTerm term = (JTerm) pta.posInOccurrence().subTerm();
-                boolean add =
-                    p.on == null || RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.on);
+                add = matcher == null || matcher.matches(pta.posInOccurrence());
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
@@ -398,6 +390,10 @@ public class RuleCommand extends AbstractCommand {
                             || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
+                if(tacletApp.assumesFormulaInstantiations() != null) {
+                    add &= checkAssumes(p, tacletApp.assumesFormulaInstantiations(), services);
+                }
+
                 if (add) {
                     matchingApps.add(pta);
                 }
@@ -406,27 +402,62 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
+    private boolean checkAssumes(Parameters p, ImmutableList<AssumesFormulaInstantiation> ifFormulaInstantiations, Services services) {
+        if(p.assumes == null) {
+            // no "assumes" restrictions specified.
+            return true;
+        }
+
+        return p.assumes.matches(ifFormulaInstantiations);
+    }
+
+
+    @Documentation(category = "Fundamental", value = """
+        This command can be used to apply a calculus rule to the currently active open goal.
+        
+        #### Examples:
+        - `rule cut inst_cutFormula: (a > 0)` applies the cut rule on the formula `a > 0` like the cut command.          
+        - `rule and_right on=(__ & __)` applies the rule `and_right` to the second occurrence
+            of a conjunction in the succedent.
+        - `rule my_rule on=(f(x)) formula="f\\(.*search.*\\)"` applies the rule `my_rule` to the term 
+            `f(x)` in a formula matching the regular expression.
+        """)
     public static class Parameters {
         @Argument
+        @Documentation("Name of the rule to be applied.")
         public @MonotonicNonNull String rulename;
 
         @Option(value = "on")
-        public @Nullable JTerm on;
+        @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule). " +
+                "This may contain placeholders.")
+        public @Nullable TermWithHoles on;
 
         @Option(value = "formula")
+        @Documentation("Top-level formula in which the term appears. This may contain placeholders.")
         public @Nullable JTerm formula;
 
         @Option(value = "occ")
-        public @Nullable int occ = -1;
+        @Documentation("Occurrence number if more than one occurrence matches. The first occurrence is 1. " +
+                "If ommitted, there must be exactly one occurrence.")
+        public @Nullable Integer occ = -1;
 
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
+        @Documentation("Instead of giving the toplevl formula completely, a regular expression can be " +
+                "specified to match the toplevel formula.")
         @Option(value = "matches")
         public @Nullable String matches = null;
+ 
+        @Option(value = "assumes")
+        @Documentation("""
+            If the rule has an `\\assumes` clause, this can be used to restrict the instantiations
+            """)
+        public @Nullable SequentWithHoles assumes;
 
         @OptionalVarargs(as = JTerm.class, prefix = "inst_")
+        @Documentation("Instantiations for term schema variables used in the rule.")
         public Map<String, JTerm> instantiations = new HashMap<>();
     }
 

@@ -974,7 +974,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(@NonNull Node node) {
+    public @Nullable Goal getOpenGoal(@NonNull Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -999,13 +999,27 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return the closed goal that belongs to the given node or null if the node is an inner one or
      *         an open goal
      */
-    public Goal getClosedGoal(Node node) {
+    public @Nullable Goal getClosedGoal(Node node) {
         for (final Goal result : closedGoals) {
             if (result.node() == node) {
                 return result;
             }
         }
         return null;
+    }
+
+    /**
+     * Get the goal (open or closed) belonging to the given node if it exists.
+     *
+     * @param node the Node where a corresponding goal is searched
+     * @return the goal that belongs to the given node or null if the node is an inner one
+     */
+    public @Nullable Goal getGoal(Node node) {
+        Goal g = getOpenGoal(node);
+        if (g == null) {
+            g = getClosedGoal(node);
+        }
+        return g;
     }
 
     /**

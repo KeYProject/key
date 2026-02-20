@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -21,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
- * Proof script command to insert a formula hidden earlier in the proof.
+ * Proof script command to insert formulas hidden earlier in the proof.
  *
  * Usage:
  *
@@ -83,7 +84,12 @@ public class UnhideCommand extends AbstractCommand {
         return "unhide";
     }
 
+    @Documentation(category = "Control", value = """
+        The unhide command re-inserts formulas that have been hidden earlier in the proof using the hide command.
+        It takes a sequent as parameter and re-inserts all formulas in this sequent that have been hidden earlier.
+        """)
     public static class Parameters {
+        @Documentation("The sequent containing the formulas to be re-inserted. Placeholders are allowed.")
         @Argument
         public @MonotonicNonNull Sequent sequent;
     }

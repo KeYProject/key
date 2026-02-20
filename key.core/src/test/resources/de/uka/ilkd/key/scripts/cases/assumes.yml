@@ -1,0 +1,7 @@
+key: |
+  \programVariables { int a,b,c,d,e,f; }
+  \problem { a=b, a=d ==> a=c }
+script: |
+  rule "applyEq" on:(?focus(a) = c) assumes:( ? = b ==> ) ;
+goals:
+  - a = b, a = d ==> b = c
