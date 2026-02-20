@@ -5,13 +5,17 @@ package de.uka.ilkd.key.gui.settings;
 
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
 import net.miginfocom.layout.AC;
@@ -232,6 +236,65 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRowWithHelp(helpText, label, component);
     }
 
+    protected <T> JList<T> addListBox(String title, String info,
+            final Validator<List<T>> validator,
+            List<T> seq, Function<String, T> converter) {
+        var model = new DefaultListModel<T>();
+        model.addAll(seq);
+
+        JList<T> list = new JList<>(model);
+
+        var txtAdd = new JTextField();
+        var btnAdd = new JButton(IconFactory.PLUS_SQUARED.get(16f));
+        var btnRemove = new JButton(IconFactory.MINUS.get(16f));
+
+        JScrollPane field = new JScrollPane(list);
+
+        var panel = new JPanel(new MigLayout(new LC().fillX()));
+        panel.add(field, new CC().span(3).growX().wrap());
+        panel.add(txtAdd, new CC().growX());
+        panel.add(btnAdd, new CC().gapAfter("16px"));
+        panel.add(btnRemove);
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setLabelFor(list);
+        pCenter.add(lblTitle);
+        pCenter.add(new JSeparator(JSeparator.HORIZONTAL));
+        JLabel infoButton = createHelpLabel(info);
+        pCenter.add(infoButton, new CC().wrap());
+        pCenter.add(new JLabel());
+        pCenter.add(panel);
+
+        list.addListSelectionListener(e -> {
+            try {
+                if (validator != null) {
+                    List<T> ary = Collections.list(model.elements());
+                    validator.validate(ary);
+                }
+                demarkComponentAsErrornous(list);
+            } catch (Exception ex) {
+                markComponentAsErrornous(list, ex.getMessage());
+            }
+        });
+
+        final ActionListener addItem = e -> {
+            String value = txtAdd.getText();
+            if (value != null && !value.isEmpty()) {
+                model.addElement(converter.apply(value));
+            }
+        };
+        txtAdd.addActionListener(addItem);
+        btnAdd.addActionListener(addItem);
+
+        ActionListener removeItem = e -> {
+            if (list.getSelectedIndex() != -1) {
+                model.removeElementAt(list.getSelectedIndex());
+            }
+        };
+        btnRemove.addActionListener(removeItem);
+
+        return list;
+    }
 
     protected JTextArea addTextArea(String title, String text, String info,
             final Validator<String> validator) {
@@ -281,7 +344,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * also determines how the default {@link javax.swing.text.NumberFormatter} used by the
      * {@link JSpinner} formats entered Strings
      * (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
-     *
+     * <p>
      * If there are additional restrictions for the entered values, the passed validator can check
      * those. The entered values have to be of a subclass of {@link Number} (as this is a number
      * text
@@ -294,8 +357,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      *        buttons
      * @param info arbitrary information about the text field
      * @param validator a validator for checking the entered values
-     * @return the created JSpinner
      * @param <T> the class of the minimum value
+     * @return the created JSpinner
      */
     protected <T extends Number & Comparable<T>> JSpinner addNumberField(String title, T min,
             Comparable<T> max, Number step, String info, final Validator<Number> validator) {
