@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * which specifies whether a test run was successful or not.
  */
 public record TestResult(String message, boolean success) implements Serializable {
+    @Serial
     private static final long serialVersionUID = 7635762713077999920L;
 
 }
