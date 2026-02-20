@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         java: [21]
-        tests: [":key.core.proof_references:test", ":key.core.symbolic_execution:test"]
+        name: ["proof_references", "symbolic_execution"]
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v6
@@ -27,13 +27,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Test with Gradle
-        run: ./gradlew --continue ${{ matrix.tests }}
+        run: ./gradlew --continue :key.core.${{ matrix.name }}:test
 
       - name: Upload test results
         uses: actions/upload-artifact@v6
         if: success() || failure()
         with:
-          name: test-results-${{ matrix.tests }}
+          name: test-results-${{ matrix.name }}
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/            
