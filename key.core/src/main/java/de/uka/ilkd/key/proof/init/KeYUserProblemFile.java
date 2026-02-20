@@ -158,7 +158,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
+            new Proof(name, problem, getParseContext().getProblemHeader(), initConfig,
                 file.file()),
             name);
     }
@@ -252,6 +252,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         } else {
             return null;
         }
+    }
+
+
+    ///
+    public KeyAst.@Nullable Declarations getProblemHeader() {
+        return getParseContext().getProblemHeader();
     }
 
     /**
