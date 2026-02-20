@@ -4,9 +4,19 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+
+import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,24 +26,13 @@ import org.slf4j.LoggerFactory;
  * This class is intended to be called from gradle. See the gradle task
  * {@code generateRunAllProofs}.
  * <p>
- * The considered proof collections files are configured statically in
- * {@link ProofCollections}.
+ * The considered proof collections files are configured statically in the source code.
  *
  * @author Alexander Weigl
  * @version 1 (6/14/20)
  */
-public class GenerateUnitTests {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTests.class);
-
-    public static void main(String[] args) throws IOException {
-        var collections = List.of(ProofCollections.automaticJavaDL());
-        if (args.length != 1) {
-            System.err.println("Usage: <main> <output-folder>");
-            System.exit(1);
-        }
-        var outputFolder = Paths.get(args[0]);
-        run(outputFolder, collections);
-    }
+public class GenerateUnitTestsUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateUnitTestsUtil.class);
 
     public static void run(Path outputFolder, List<ProofCollection> collections)
             throws IOException {
@@ -60,8 +59,6 @@ public class GenerateUnitTests {
                 import org.junit.jupiter.api.*;
                 import static org.junit.jupiter.api.Assertions.*;
 
-                //@org.junit.jupiter.api.Timeout(180)
-                @org.junit.jupiter.api.Tag("RAP")
                 public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
                   public static final String STATISTIC_FILE = "$statisticsFile";
 
@@ -75,8 +72,6 @@ public class GenerateUnitTests {
                     this.globalSettings = "$keySettings";
                     this.localSettings =  "$localSettings";
                   }
-
-                  $killSwitch
 
                   $timeout
                   $methods
@@ -113,13 +108,19 @@ public class GenerateUnitTests {
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
 
-        vars.put("keySettings", settings.getGlobalKeYSettings().replace("\n", "\\\\n"));
+        vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\\\n"));
-        if (unit.isResetEachTest()) {
-            vars.put("killSwitch",
-                "@BeforeEach void killInitConfig() { de.uka.ilkd.key.proof.init.BaseConfigCache.reset(); }");
+                    .replace("\n", "\\n"));
+
+        vars.put("timeout", "");
+
+        if (false) {// disabled
+            int globalTimeout = 0;
+            if (globalTimeout > 0) {
+                vars.put("timeout",
+                    "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
+            }
         }
 
         StringBuilder methods = new StringBuilder();
@@ -175,5 +176,11 @@ public class GenerateUnitTests {
         var folder = outputFolder.resolve(packageName.replace('.', '/'));
         Files.createDirectories(folder);
         Files.writeString(folder.resolve(className + ".java"), sb.toString());
+    }
+
+    public static String loadFromFile(String name) throws IOException {
+        var stream = GenerateUnitTestsUtil.class.getResourceAsStream(name);
+        Assertions.assertNotNull(stream, "Failed to find " + name);
+        return IOUtil.readFrom(stream);
     }
 }
