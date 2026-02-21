@@ -2,8 +2,6 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 
-package de.uka.ilkd.key;
-
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -107,7 +105,7 @@ public class RewriteSettings {
                 settings.loadSettingsFromPropertyString(text.substring(1, text.length() - 1));
                 output.append(settings.settingsToString());
 
-                while (iterator.hasNext() && token.getType() != KeYLexer.SEMI) {
+                while (iterator.hasNext() && token.getType() != KeYLexer.RBRACE) {
                     token = iterator.next();
                 }
             } else {
@@ -122,11 +120,20 @@ public class RewriteSettings {
 
         boolean write = true;
         try {
+            // Try to parse the new content.
             ParsingFacade.parseFile(CharStreams.fromString(output.toString()));
         } catch (ParseCancellationException e) {
-            write = false;
-            LOGGER.error("Error parsing after rewrite file {}: {}", file, e.getMessage(), e);
-            System.err.println(output);
+            try {
+                // if failed, check if the old content is also not parseable.
+                ParsingFacade.parseFile(CharStreams.fromString(output.toString()));
+
+                // on success: do not write this file.
+                write = false;
+                LOGGER.error("Error parsing after rewrite file {}: {}", file, e.getMessage(), e);
+                Files.writeString(file.resolveSibling(file.getFileName() + "-rewritten.error"), output.toString());
+            } catch (ParseCancellationException e2) {
+                //on error write file.
+            }
         }
 
         if (write || ALWAYS_WRITE) {
