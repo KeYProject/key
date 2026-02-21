@@ -223,6 +223,7 @@ func_decl
 :
   doc=DOC_COMMENT?
   (UNIQUE)?
+  (NON_RIGID)? // LEGACY support
   retSort = sortId
   func_name = funcpred_name
 	whereToBind=where_to_bind?
