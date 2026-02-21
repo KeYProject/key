@@ -40,6 +40,10 @@ lexer grammar KeYLexer;
    }
 
     private Token tokenBackStorage = null;
+    private boolean proofIsEOF = true;
+    public void setProofIsEOF(boolean b) { proofIsEOF = b;}
+    public boolean isProofIsEOF() { return proofIsEOF;}
+
     @Override
     public void emit(Token token) {
        int MAX_K = 10;
@@ -51,7 +55,7 @@ lexer grammar KeYLexer;
                break;
            }
        }
-       if(token.getType() == PROOF) {
+       if(token.getType() == PROOF && isProofIsEOF()) {
           tokenBackStorage = super.emitEOF();
           //will later be overwritten the EOF token
        }
@@ -212,6 +216,7 @@ FUNCTIONS : '\\functions';
 DATATYPES : '\\datatypes';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
+NON_RIGID: '\\nonRigid';
 FREE : '\\free';
 
 RULES : '\\rules';

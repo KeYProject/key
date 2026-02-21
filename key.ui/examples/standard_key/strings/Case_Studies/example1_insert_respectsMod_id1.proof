@@ -1,39 +1,110 @@
 \settings {
-"#Proof-Settings-Config-File
-#Thu Sep 17 15:34:26 CEST 2009
-[General]SoundNotification=false
-[View]FontIndex=2
-[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
-[General]UseOCL=false
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_HIGH
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_LOW
-[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_LOW
-[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
-[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
-[DecisionProcedure]Timeout=60
-[View]ShowWholeTaclet=false
-[General]ProofAssistant=false
-[View]MaxTooltipLines=40
-[General]DnDDirectionSensitive=true
-[SimultaneousUpdateSimplifier]EagerSimplification=true
-[General]StupidMode=true
-[Strategy]Timeout=-1
-[Strategy]MaximumNumberOfAutomaticApplications=500
-[Libraries]Default=acc.key-false, stringRules.key-false, /Users/geilmann/.key/libraries/deprecatedRules.key-false, /Users/geilmann/.key/libraries/acc.key-false, /Users/geilmann/.key/libraries/stringRules.key-false, deprecatedRules.key-false
-[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_EXPAND
-[Choice]DefaultChoices=throughout-throughout\:toutOn , transactions-transactions\:transactionsOn , assertions-assertions\:on , intRules-intRules\:arithmeticSemanticsIgnoringOF , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , nullPointerPolicy-nullPointerPolicy\:nullCheck , stringRules-stringRules\:withoutStringPool , javacard-javacard\:jcOff
-[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
-[DecisionProcedure]ActiveRule=_noname_
-[General]UseJML=true
-[View]HideClosedSubtrees=false
-[Choice]Choices=throughout-throughout\:toutOn-throughout\:toutOff , transactions-transactions\:transactionsOn-transactions\:transactionsOff , assertions-assertions\:on-assertions\:off-assertions\:safe , intRules-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF-intRules\:arithmeticSemanticsCheckingOF , programRules-programRules\:Java-programRules\:ODL , initialisation-initialisation\:enableStaticInitialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn-transactionAbort\:abortOff , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck , stringRules-stringRules\:withStringPool-stringRules\:withoutStringPool-stringRules\:platformIndependent , javacard-javacard\:jcOff-javacard\:jcOn
-[View]HideIntermediateProofsteps=false
-[Strategy]ActiveStrategy=JavaCardDLStrategy
-[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
-"
+    "Choice" : {
+        "assertions" : "assertions:on",
+        "initialisation" : "initialisation:disableStaticInitialisation",
+        "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
+        "javacard" : "javacard:jcOff",
+        "nullPointerPolicy" : "nullPointerPolicy:nullCheck",
+        "programRules" : "programRules:Java",
+        "stringRules" : "stringRules:withoutStringPool",
+        "throughout" : "throughout:toutOn",
+        "transactionAbort" : "transactionAbort:abortOn",
+        "transactions" : "transactions:transactionsOn"
+    },
+    "Labels" : {
+        "UseOriginLabels" : true
+    },
+    "NewSMT" : {
+        
+    },
+    "SMTSettings" : {
+        "SelectedTaclets" : [
+            
+        ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+    },
+    "Strategy" : {
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : {
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+        }
+    },
+    "Labels" : {
+        "UseOriginLabels" : true
+    },
+    "NewSMT" : {
+        
+    },
+    "SMTSettings" : {
+        "SelectedTaclets" : [
+            
+        ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+    },
+    "Strategy" : {
+        "ActiveStrategy" : "JavaCardDLStrategy",
+        "MaximumNumberOfAutomaticApplications" : 500,
+        "Timeout" : -1,
+        "options" : {
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "LOOP_OPTIONS_KEY" : "LOOP_NONE",
+            "METHOD_OPTIONS_KEY" : "METHOD_EXPAND",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_DEF_OPS",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_LOW",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_LOW",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_HIGH",
+            "VBT_PHASE" : "VBT_SYM_EX"
+        }
+    }
 }
 
 \include "./example1.key";
