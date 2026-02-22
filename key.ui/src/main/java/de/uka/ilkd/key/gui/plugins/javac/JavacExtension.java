@@ -156,10 +156,13 @@ public class JavacExtension
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             JavacSettings settings = JavacSettingsProvider.getJavacSettings();
-            CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.checkExternally(mediator.getUI(), bootClassPath, classpath,
-                    javaPath,
-                    settings);
+            CompletableFuture<List<PositionedIssueString>> task = settings.getUseProcessors()
+                    ? JavaCompilerCheckFacade.checkExternally(mediator.getUI(), bootClassPath,
+                        classpath,
+                        javaPath,
+                        settings)
+                    : JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath,
+                        javaPath, settings);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");

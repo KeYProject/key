@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.javac;
 
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-
 import java.io.Serializable;
+
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 /**
  * Settings for the javac extention.

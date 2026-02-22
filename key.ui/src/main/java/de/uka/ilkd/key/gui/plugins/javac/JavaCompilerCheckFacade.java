@@ -12,25 +12,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.tools.*;
 
-import com.formdev.flatlaf.json.Json;
 import de.uka.ilkd.key.gui.PositionedIssueString;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.settings.Configuration;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.checkerframework.checker.units.qual.C;
+
 import org.key_project.util.Streams;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,69 +51,37 @@ public class JavaCompilerCheckFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaCompilerCheckFacade.class);
 
-
     public static void main(String[] args) {
         try (var input = new InputStreamReader(System.in)) {
-            var params = ParsingFacade.readConfigurationFile(CharStreams.fromReader(input));
+            var params = Configuration.load(CharStreams.fromReader(input));
 
             var settings = new JavacSettings();
             settings.readSettings(params);
 
-            var result = check(new ProblemInitializer.ProblemInitializerListener() {
-                                   @Override
-                                   public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
-
-                                   }
-
-                                   @Override
-                                   public void progressStarted(Object sender) {
-
-                                   }
-
-                                   @Override
-                                   public void progressStopped(Object sender) {
-
-                                   }
-
-                                   @Override
-                                   public void reportStatus(Object sender, String status, int progress) {
-                                       LOGGER.info(status);
-                                   }
-
-                                   @Override
-                                   public void reportStatus(Object sender, String status) {
-                                       LOGGER.info(status);
-                                   }
-
-                                   @Override
-                                   public void resetStatus(Object sender) {
-
-                                   }
-
-                                   @Override
-                                   public void reportException(Object sender, ProofOblInput input, Exception e) {
-
-                                   }
-                               },
-                    Paths.get(params.getString("bootClassPath")),
-                    params.getStringList("classPath").stream().map(Paths::get).toList(),
-                    Paths.get(params.getString("javaPath")), settings).get();
+            var result = check(null,
+                Paths.get(params.getString("bootClassPath")),
+                params.getStringList("classPath").stream().map(Paths::get).toList(),
+                Paths.get(params.getString("javaPath")), settings).get();
 
             var out = new Configuration();
             out.set("messages",
-                    result.stream().map(it ->
-                            {
-                                return Map.of("message", it.text,
-                                        "kind", it.getKind().toString(),
-                                        "line", it.location.getPosition().line(),
-                                        "fileUri", it.location.fileUri().toString(),
-                                        "column", it.location.getPosition().column()
-                                );
-                            }
+                result.stream().map(it -> {
+                    var map = Map.of(
+                        "message", it.text,
+                        "kind", it.getKind().toString(),
+                        "line", it.location.getPosition().line(),
+                        "column", it.location.getPosition().column(),
+                        "additionalInfo", it.getAdditionalInfo());
+                    if (it.location.fileUri() != null) {
+                        map = new HashMap<>(map);
+                        map.put("fileUri", it.location.fileUri().toString());
+                    }
+                    return map;
+                }).toList());
 
-                    ).toList()
-            );
-            out.save(new OutputStreamWriter(System.err), null);
+            Writer writer = new OutputStreamWriter(System.err);
+            out.save(writer, null);
+            writer.close();
         } catch (Exception e) {
             LOGGER.error("Error during execution.", e);
         }
@@ -134,63 +95,78 @@ public class JavaCompilerCheckFacade {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
-
+        LOGGER.info("External Javac check is triggered.");
         var params = new Configuration();
         params.set("bootClassPath", Objects.toString(bootClassPath));
-        params.set("classPath", classPath.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
+        params.set("classPath",
+            classPath.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
         params.set("javaPath", Objects.toString(javaPath));
         settings.writeSettings(params);
 
         String classpath = System.getProperty("java.class.path");
-        String path = Paths.get(System.getProperty("java.home"), "bin", "java").toAbsolutePath().toString();
+        String path =
+            Paths.get(System.getProperty("java.home"), "bin", "java").toAbsolutePath().toString();
         ProcessBuilder processBuilder =
-                new ProcessBuilder(path,
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-                        "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-                        "--add-opens", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
-                        "-cp",
-                        classpath,
-                        JavaCompilerCheckFacade.class.getCanonicalName());
+            new ProcessBuilder(path,
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+                "--add-opens", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+                "-cp",
+                classpath,
+                JavaCompilerCheckFacade.class.getCanonicalName());
         return CompletableFuture.supplyAsync(() -> {
             try {
                 var process = processBuilder.start();
                 params.save(process.outputWriter(), null);
                 process.outputWriter().close();
 
-
-                List<PositionedIssueString> strings;
-                var cfg = ParsingFacade.parseConfigurationFile(CharStreams.fromStream(process.getErrorStream()));
-                var errors = Streams.toString(process.getInputStream());
+                var errors = Streams.toString(process.getInputStream()); // what should be done with
+                                                                         // the errors ??
+                var cfg = Configuration.load(CharStreams.fromStream(process.getErrorStream()));
                 process.waitFor();
 
-                // TODO weigl, transform Configuration back to PositionedIssueString
-                return List.of();
-            } catch (IOException  | InterruptedException e) {
+                return cfg.getList("messages").stream()
+                        .map(msgObj -> {
+                            Configuration msg = (Configuration) msgObj;
+                            return new PositionedIssueString(
+                                msg.getString("message"),
+                                new Location(
+                                    msg.exists("fileUri")
+                                            ? URI.create(msg.getString("fileUri"))
+                                            : null,
+                                    msg.getInt("line") == -1 || msg.getInt("column") == -1
+                                            ? Position.UNDEFINED
+                                            : Position.newOneBased(
+                                                msg.getInt("line"),
+                                                msg.getInt("column"))),
+                                msg.getString("additionalInfo"),
+                                PositionedIssueString.Kind.valueOf(msg.getString("kind")));
+                        }).toList();
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
     }
-
 
     /**
      * initiates the compilation check on the target Java source (the Java program to be verified)
      * and
      * reports any issues to the provided <code>listener</code>
      *
-     * @param listener      the {@link ProblemInitializer.ProblemInitializerListener} to be informed
-     *                      about any issues found in the target Java program
+     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     *        about any issues found in the target Java program
      * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
-     * @param classPath     the {@link List} of {@link Path}s referring to the directory that make up
-     *                      the target Java programs classpath
-     * @param javaPath      the {@link Path} to the source of the target Java program
-     * @param settings      the {@link JavacSettings} that describe what other options the compiler
-     *                      should be called with
+     * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
+     *        the target Java programs classpath
+     * @param javaPath the {@link Path} to the source of the target Java program
+     * @param settings the {@link JavacSettings} that describe what other options the compiler
+     *        should be called with
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
@@ -208,14 +184,16 @@ public class JavaCompilerCheckFacade {
 
         if (compiler == null) {
             LOGGER.info("Javac is not available in current java runtime. Javac check skipped");
-            listener.reportStatus(null, "No javac compiler found. Java check disabled.");
+            if (listener != null) {
+                listener.reportStatus(null, "No javac compiler found. Java check disabled.");
+            }
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
         JavaFileManagerDelegate fileManager =
-                new JavaFileManagerDelegate(
-                        compiler.getStandardFileManager(
-                                diagnostics, Locale.ENGLISH, Charset.defaultCharset()));
+            new JavaFileManagerDelegate(
+                compiler.getStandardFileManager(
+                    diagnostics, Locale.ENGLISH, Charset.defaultCharset()));
 
         StringWriter output = new StringWriter();
         List<String> classes = new ArrayList<>();
@@ -224,14 +202,13 @@ public class JavaCompilerCheckFacade {
         List<String> options = new ArrayList<>();
 
         if (settings.getUseProcessors()) {
-
             String newlineClassPath = settings.getClassPaths();
             List<Path> processorClassPath =
-                    Arrays.asList(newlineClassPath.split(System.lineSeparator()))
-                            .stream()
-                            .filter(s -> !s.isBlank())
-                            .map(Paths::get)
-                            .toList();
+                Arrays.asList(newlineClassPath.split(System.lineSeparator()))
+                        .stream()
+                        .filter(s -> !s.isBlank())
+                        .map(Paths::get)
+                        .toList();
 
             if (!processorClassPath.isEmpty()) {
                 classPath = new ArrayList<>(classPath);
@@ -239,10 +216,10 @@ public class JavaCompilerCheckFacade {
             }
 
             List<String> processors =
-                    Arrays.asList(settings.getProcessors().split(System.lineSeparator()))
-                            .stream()
-                            .filter(s -> !s.isBlank())
-                            .toList();
+                Arrays.asList(settings.getProcessors().split(System.lineSeparator()))
+                        .stream()
+                        .filter(s -> !s.isBlank())
+                        .toList();
 
             if (!processors.isEmpty()) {
                 options.add("-processor");
@@ -251,18 +228,17 @@ public class JavaCompilerCheckFacade {
         }
 
         if (bootClassPath != null) {
-            options.add("-Xbootclasspath");
+            options.add("-bootclasspath");
             options.add(bootClassPath.toAbsolutePath().toString());
         }
 
         if (classPath != null && !classPath.isEmpty()) {
             options.add("-classpath");
             options.add(
-                    classPath.stream().map(Path::toAbsolutePath)
-                            .map(Objects::toString)
-                            .collect(Collectors.joining(":")));
+                classPath.stream().map(Path::toAbsolutePath)
+                        .map(Objects::toString)
+                        .collect(Collectors.joining(":")));
         }
-
 
         ArrayList<Path> files = new ArrayList<>();
         if (Files.isDirectory(javaPath)) {
@@ -278,10 +254,10 @@ public class JavaCompilerCheckFacade {
         }
 
         Iterable<? extends JavaFileObject> compilationUnits =
-                fileManager.getJavaFileObjects(files.toArray(new Path[0]));
+            fileManager.getJavaFileObjects(files.toArray(new Path[0]));
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
-                options, classes, compilationUnits);
+            options, classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
@@ -291,17 +267,17 @@ public class JavaCompilerCheckFacade {
                 LOGGER.info("{}", diagnostic);
             }
             return diagnostics.getDiagnostics().stream().map(
-                            it -> new PositionedIssueString(
-                                    it.getMessage(Locale.ENGLISH),
-                                    new Location(
-                                            it.getSource() == null
-                                                    ? null
-                                                    : fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
-                                            it.getPosition() != Diagnostic.NOPOS
-                                                    ? Position.newOneBased((int) it.getLineNumber(),
-                                                    (int) it.getColumnNumber())
-                                                    : Position.UNDEFINED),
-                                    it.getCode() + " " + it.getKind()))
+                it -> new PositionedIssueString(
+                    it.getMessage(Locale.ENGLISH),
+                    new Location(
+                        it.getSource() == null
+                                ? null
+                                : fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
+                        it.getPosition() != Diagnostic.NOPOS
+                                ? Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())
+                                : Position.UNDEFINED),
+                    it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
     }
@@ -383,7 +359,7 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
     @Override
     public void setLocationForModule(Location location, String moduleName,
-                                     Collection<? extends Path> paths) throws IOException {
+            Collection<? extends Path> paths) throws IOException {
         fileManager.setLocationForModule(location, moduleName, paths);
     }
 
@@ -414,7 +390,7 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
     @Override
     public Iterable<JavaFileObject> list(Location location, String packageName,
-                                         Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
+            Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
         return fileManager.list(location, packageName, kinds, recurse);
     }
 
@@ -435,13 +411,13 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
     @Override
     public JavaFileObject getJavaFileForInput(Location location, String className,
-                                              JavaFileObject.Kind kind) throws IOException {
+            JavaFileObject.Kind kind) throws IOException {
         return fileManager.getJavaFileForInput(location, className, kind);
     }
 
     @Override
     public JavaFileObject getJavaFileForOutput(Location location, String className,
-                                               JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+            JavaFileObject.Kind kind, FileObject sibling) throws IOException {
         if (kind == JavaFileObject.Kind.CLASS && location == StandardLocation.CLASS_OUTPUT) {
             // do not save compiled .class files on disk
             try {
@@ -462,7 +438,7 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
     @Override
     public FileObject getFileForOutput(Location location, String packageName, String relativeName,
-                                       FileObject sibling) throws IOException {
+            FileObject sibling) throws IOException {
         return fileManager.getFileForOutput(location, packageName, relativeName, sibling);
     }
 
