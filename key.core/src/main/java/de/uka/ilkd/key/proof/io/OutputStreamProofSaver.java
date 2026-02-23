@@ -240,7 +240,7 @@ public class OutputStreamProofSaver {
         var classPath = jm.getClassPath();
         if (classPath != null && !classPath.isEmpty()) {
             for (Path path : classPath) {
-                out.printf("\\classpath \"%s\";\\n", safePathRelativeTo(path, basePath));
+                out.printf("\\classpath \"%s\";\n", safePathRelativeTo(path, basePath));
             }
         }
 
