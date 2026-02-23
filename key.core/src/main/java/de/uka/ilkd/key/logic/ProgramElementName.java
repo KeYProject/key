@@ -70,7 +70,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String n, String q) {
         super(q + "::" + n);
-        // TODO: WP: Is this assertion needed? With it, the quicksort example does not load ...
+        //weigl: This does make sense, as ProgramElementNames can be in the default (empty package).
         //assert !q.isEmpty() : "Tried to create qualified name with missing qualifier";
 
         this.qualifierString = q.intern();

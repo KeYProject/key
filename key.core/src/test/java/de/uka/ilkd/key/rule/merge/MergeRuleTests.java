@@ -144,6 +144,10 @@ public class MergeRuleTests {
      * has to result in a renaming. An interactive cut in the proof should make sure that the
      * renaming works and resolves the clashes. The test case includes a "is weakening" goal.
      * Underlying Java file: "A.java".
+     *
+     * Unfortunately, this test case was broken by a change in the taclet database. I replaced the
+     * proof file by the automatic proof for the same proof obligation, hoping that the same issue
+     * is still covered. M.U. 2/2026
      */
     @Test
     public void testLoadProofWithDiffVarsWithSameNameAndMPS() {

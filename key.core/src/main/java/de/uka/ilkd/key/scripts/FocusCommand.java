@@ -14,20 +14,16 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * The command "focus" allows you to select formulas from the current sequent
@@ -53,13 +49,13 @@ public class FocusCommand extends AbstractCommand {
             The command "focus" allows you to select formulas from the current sequent
             to focus verification on. This means that all other formulas are discarded
             (i.e. hidden using `hide_right`, `hide_left`).
-            
+
             Benefits are: The automation is guided into focussing on a relevant set of
             formulas.
-            
+
             The selected set of sequent formulas can be regarded as an equivalent to a
             believed "unsat core" of the sequent.
-            
+
             #### Examples:
             - `focus x > 2 ==> x > 1` only keeps the mentioned to formulas in the current goal
               removing all other formulas that could distract the automation.
@@ -92,14 +88,14 @@ public class FocusCommand extends AbstractCommand {
         assert goal != null : "not null by contract of the method";
 
         for (SequentFormula seqFormula : goal.sequent().antecedent().asList()) {
-            if(!toKeep.containsAntecendent(seqFormula)) {
+            if (!toKeep.containsAntecendent(seqFormula)) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
         }
 
         for (SequentFormula seqFormula : goal.sequent().succedent().asList()) {
-            if(!toKeep.containsSuccedent(seqFormula)) {
+            if (!toKeep.containsSuccedent(seqFormula)) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }

@@ -222,19 +222,20 @@ public class InstantiateCommand extends AbstractCommand {
         return "instantiate";
     }
 
-    @Documentation(category = "Fundamental", value = """
-        Instantiate a universally quantified formula (in the antecedent;
-        or an existentially quantified formula in succedent) by a term.
-        One of `var` or `formula` must be specified. If `var` is given, the formula is determined by looking for
-        a particular occurrence of a quantifier over that variable name.
-        If `formula` is given, that quantified formula is used directly.
-        `with` must be specified.
-        
-        #### Examples:
-        
-        * `instantiate var:a occ:2 with:a_8 hide`
-        * `instantiate formula:"\\forall int a; phi(a)" with="a_8"`
-        """)
+    @Documentation(category = "Fundamental",
+        value = """
+                Instantiate a universally quantified formula (in the antecedent;
+                or an existentially quantified formula in succedent) by a term.
+                One of `var` or `formula` must be specified. If `var` is given, the formula is determined by looking for
+                a particular occurrence of a quantifier over that variable name.
+                If `formula` is given, that quantified formula is used directly.
+                `with` must be specified.
+
+                #### Examples:
+
+                * `instantiate var:a occ:2 with:a_8 hide`
+                * `instantiate formula:"\\forall int a; phi(a)" with="a_8"`
+                """)
     public static class Parameters {
         @Documentation("The toplevel quantified formula to instantiate. Placeholder matching symbols can be used.")
         @Option(value = "formula")
@@ -251,7 +252,7 @@ public class InstantiateCommand extends AbstractCommand {
         public @Nullable int occ = 1;
 
         @Documentation("If given, the rule used for instantiation is the one that hides the instantiated formula to "
-                    + "prevent it from being used for further automatic proof steps.")
+            + "prevent it from being used for further automatic proof steps.")
         @Flag("hide")
         public boolean hide;
 

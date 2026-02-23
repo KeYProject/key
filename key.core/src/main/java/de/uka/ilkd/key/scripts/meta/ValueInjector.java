@@ -6,7 +6,6 @@ package de.uka.ilkd.key.scripts.meta;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 
@@ -14,7 +13,6 @@ import org.key_project.util.java.IntegerUtil;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -342,14 +340,15 @@ public class ValueInjector {
      *         converter is known.
      */
     @SuppressWarnings("unchecked")
-    public <R, T> @NonNull Converter<R, T> getConverter(Class<R> ret, Class<T> arg) throws NoSpecifiedConverterException {
+    public <R, T> @NonNull Converter<R, T> getConverter(Class<R> ret, Class<T> arg)
+            throws NoSpecifiedConverterException {
         if (ret.isAssignableFrom(arg)) {
             return (T it) -> (R) it;
         }
         Converter<R, T> result = (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
         if (result == null) {
             throw new NoSpecifiedConverterException(
-                    "No converter registered for class: " + ret.getName() + " from " + arg.getName());
+                "No converter registered for class: " + ret.getName() + " from " + arg.getName());
         }
         return result;
     }

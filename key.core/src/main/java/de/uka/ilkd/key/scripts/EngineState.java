@@ -15,24 +15,18 @@ import java.util.function.Consumer;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.scripts.meta.ConversionException;
-import de.uka.ilkd.key.scripts.meta.Converter;
-import de.uka.ilkd.key.scripts.meta.NoSpecifiedConverterException;
 import de.uka.ilkd.key.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
@@ -92,11 +86,11 @@ public class EngineState {
 
         // to terms with holes
         v.addConverter(TermWithHoles.class, String.class,
-                str -> TermWithHoles.fromString(this, str));
+            str -> TermWithHoles.fromString(this, str));
 
         // to sequents with holes
         v.addConverter(SequentWithHoles.class, String.class,
-                str -> SequentWithHoles.fromString(this, str));
+            str -> SequentWithHoles.fromString(this, str));
 
         // from KeY parse tree to everything
         ExprEvaluator exprEvaluator = new ExprEvaluator(this);

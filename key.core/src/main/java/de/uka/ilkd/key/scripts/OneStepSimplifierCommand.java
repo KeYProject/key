@@ -34,7 +34,7 @@ public class OneStepSimplifierCommand extends AbstractCommand {
 
         final Goal goal = state.getFirstOpenAutomaticGoal();
 
-        if(Boolean.TRUE.equals(arguments.recentOnly)) {
+        if (Boolean.TRUE.equals(arguments.recentOnly)) {
             SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
             var ante = sci.addedFormulas(true)
                     .prepend(sci.modifiedFormulas(true).map(FormulaChangeInfo::newFormula));
@@ -56,38 +56,42 @@ public class OneStepSimplifierCommand extends AbstractCommand {
     }
 
 
-        private static void applyOSS(Iterable<SequentFormula> antecedent, Goal goal, boolean inAntec) {
-            for (SequentFormula sf : antecedent) {
-                ImmutableList<IBuiltInRuleApp> builtins = goal.ruleAppIndex().getBuiltInRules(goal,
-                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec));
-                for (IBuiltInRuleApp builtin : builtins) {
-                    if (builtin instanceof OneStepSimplifierRuleApp) {
-                        goal.apply(builtin);
-                    }
+    private static void applyOSS(Iterable<SequentFormula> antecedent, Goal goal, boolean inAntec) {
+        for (SequentFormula sf : antecedent) {
+            ImmutableList<IBuiltInRuleApp> builtins = goal.ruleAppIndex().getBuiltInRules(goal,
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec));
+            for (IBuiltInRuleApp builtin : builtins) {
+                if (builtin instanceof OneStepSimplifierRuleApp) {
+                    goal.apply(builtin);
                 }
             }
         }
+    }
 
 
-        @Documentation(category = "Fundamental", value = """
-        The oss command applies the *one step simplifier* on the current proof goal.
-        This simplifier applies a set of built-in simplification rules to the formulas in the sequent.
-        It can be configured to apply the one step simplifier only on the antecedent or succedent.
-        By default, it is applied on both sides of the sequent.
-        """)
+    @Documentation(category = "Fundamental",
+        value = """
+                The oss command applies the *one step simplifier* on the current proof goal.
+                This simplifier applies a set of built-in simplification rules to the formulas in the sequent.
+                It can be configured to apply the one step simplifier only on the antecedent or succedent.
+                By default, it is applied on both sides of the sequent.
+                """)
     public static class Parameters {
-        @Documentation("Application of the one step simplifier can be forbidden on the antecedent side by setting " +
-                "this option to false. Default is true.")
+        @Documentation("Application of the one step simplifier can be forbidden on the antecedent side by setting "
+            +
+            "this option to false. Default is true.")
         @Option(value = "antecedent")
         public @Nullable Boolean antecedent = Boolean.TRUE;
 
-        @Documentation("Application of the one step simplifier can be forbidden on the succedent side by setting " +
-                "this option to false. Default is true.")
+        @Documentation("Application of the one step simplifier can be forbidden on the succedent side by setting "
+            +
+            "this option to false. Default is true.")
         @Option(value = "succedent")
         public @Nullable Boolean succedent = Boolean.TRUE;
 
-        @Documentation("Limit the application to the recently added or changed formulas. Deactivates the " +
-                "antecedent and succedent options.")
+        @Documentation("Limit the application to the recently added or changed formulas. Deactivates the "
+            +
+            "antecedent and succedent options.")
         @Flag("recentOnly")
         public @Nullable Boolean recentOnly = Boolean.FALSE;
     }

@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.control.TermLabelVisibilityManager;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.Strategy;
-import org.jspecify.annotations.NonNull;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Modality;
@@ -21,15 +25,9 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.util.Streams;
-import org.key_project.util.java.StringUtil;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This macro is very restritive in which rules are allowed to be applied for symbolic
@@ -44,11 +42,16 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
     static {
         try {
             ADMITTED_RULES = Arrays.asList(
-                    Streams.toString(SymbolicExecutionOnlyMacro.class.getResourceAsStream("SymbolicExecutionOnlyMacro.admittedRules.txt")).split("\n"));
+                Streams.toString(SymbolicExecutionOnlyMacro.class
+                        .getResourceAsStream("SymbolicExecutionOnlyMacro.admittedRules.txt"))
+                        .split("\n"));
             ADMITTED_RULE_SETS = Arrays.asList(
-                    Streams.toString(SymbolicExecutionOnlyMacro.class.getResourceAsStream("SymbolicExecutionOnlyMacro.admittedRuleSets.txt")).split("\n"));
+                Streams.toString(SymbolicExecutionOnlyMacro.class
+                        .getResourceAsStream("SymbolicExecutionOnlyMacro.admittedRuleSets.txt"))
+                        .split("\n"));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load admitted rules for symbolic execution macro.", e);
+            throw new RuntimeException(
+                "Failed to load admitted rules for symbolic execution macro.", e);
         }
     }
 
@@ -93,11 +96,11 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
             }
         }
 
-        if("ifthenelse_split_for".equals(name)) {
+        if ("ifthenelse_split_for".equals(name)) {
             Term iteTerm = ruleApp.posInOccurrence().subTerm();
             Term then = iteTerm.sub(1);
             Term elze = iteTerm.sub(2);
-            if(isUpdatedModality(then) && isUpdatedModality(elze)) {
+            if (isUpdatedModality(then) && isUpdatedModality(elze)) {
                 return true;
             }
         }
@@ -111,10 +114,10 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
             }
         }
 
-        if(rule instanceof UseOperationContractRule ||
+        if (rule instanceof UseOperationContractRule ||
                 rule instanceof JmlAssertRule ||
                 rule instanceof WhileInvariantRule ||
-                rule instanceof LoopScopeInvariantRule )
+                rule instanceof LoopScopeInvariantRule)
             return true;
 
         return false;
@@ -124,13 +127,14 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
      * return true if there is a boolean combination of updated modalities
      */
     private static boolean isUpdatedModality(Term term) {
-        while(term.op() instanceof UpdateApplication) {
+        while (term.op() instanceof UpdateApplication) {
             term = term.sub(1);
         }
-        if(term.op() instanceof Modality) {;
+        if (term.op() instanceof Modality) {
+            ;
             return true;
         }
-        if(term.op() == Junctor.IMP || term.op() == Junctor.AND) {
+        if (term.op() == Junctor.IMP || term.op() == Junctor.AND) {
             return term.subs().stream().allMatch(SymbolicExecutionOnlyMacro::isUpdatedModality);
         }
         return false;
@@ -152,7 +156,7 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(!hasModality(goal) || isThrowNullBranch(goal)) {
+            if (!hasModality(goal) || isThrowNullBranch(goal)) {
                 return false;
             }
             return isAdmittedRule(app) && super.isApprovedApp(app, pio, goal);
@@ -178,7 +182,7 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
         }
 
         private boolean hasModality(Term term) {
-            if(term.op() instanceof Modality) {
+            if (term.op() instanceof Modality) {
                 return true;
             }
             return term.subs().stream().anyMatch(this::hasModality);

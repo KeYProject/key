@@ -45,12 +45,13 @@ public class AssertOpenGoalsCommand extends AbstractCommand {
     /**
      * The Assigned parameters (currently only the passed goals).
      */
-    @Documentation(category = "Control", value = """
-            The assert command checks if the number of open and enabled goals is equal to the given number.
-            If not, the script is halted with an error message.
+    @Documentation(category = "Control",
+        value = """
+                The assert command checks if the number of open and enabled goals is equal to the given number.
+                If not, the script is halted with an error message.
 
-            Note: This command was called "assert" originally.
-            """)
+                Note: This command was called "assert" originally.
+                """)
     public static class Parameters {
         /**
          * The number of open and enabled goals.

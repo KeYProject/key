@@ -10,8 +10,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -100,10 +100,11 @@ public class HideCommand extends AbstractCommand {
         return "hide";
     }
 
-    @Documentation(category = "Control", value = """
-        The hide command hides all formulas of the current proof goal that are in the given sequent.
-        The formulas in the given sequent are hidden using the taclets hide_left and hide_right.
-        """)
+    @Documentation(category = "Control",
+        value = """
+                The hide command hides all formulas of the current proof goal that are in the given sequent.
+                The formulas in the given sequent are hidden using the taclets hide_left and hide_right.
+                """)
     public static class Parameters {
         @Argument
         @MonotonicNonNull

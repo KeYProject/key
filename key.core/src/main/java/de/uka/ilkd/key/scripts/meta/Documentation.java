@@ -17,5 +17,6 @@ import java.lang.annotation.Target;
 public @interface Documentation {
     /// @return a non-null string
     String value();
+
     String category() default "";
 }

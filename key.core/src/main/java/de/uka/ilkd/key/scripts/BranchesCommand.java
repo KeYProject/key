@@ -117,7 +117,7 @@ public class BranchesCommand extends AbstractCommand {
             if (branch.equals(label)) {
                 return findGoalByNode(root.proof(), node);
             }
-            number ++;
+            number++;
         }
         throw new ScriptException(
             "Unknown branch " + branch + ". Known branches are " + knownBranchLabels);

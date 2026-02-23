@@ -173,7 +173,7 @@ public final class SpecificationRepository {
                 ImmutableSLList.nil(), unlimitedTerm));
         tacletBuilder.setName(
             MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
-        //tacletBuilder.addRuleSet(new RuleSet(new Name("unlimitObserver")));
+        // tacletBuilder.addRuleSet(new RuleSet(new Name("unlimitObserver")));
         return tacletBuilder.getTaclet();
     }
 
@@ -1880,7 +1880,8 @@ public final class SpecificationRepository {
      * list of terms, in
      * an immutable fasion. Updates require to create instances.
      * <p>
-     * <b>Note:</b> There is an immutability hole in {@link ProgramVariableCollection} due to mutable
+     * <b>Note:</b> There is an immutability hole in {@link ProgramVariableCollection} due to
+     * mutable
      * {@link Map}
      * <p>
      * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert

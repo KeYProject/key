@@ -9,8 +9,8 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -31,8 +31,9 @@ public class CheatCommand extends NoArgumentCommand {
     static {
         TacletApplPart applPart =
             new TacletApplPart(JavaDLSequentKit.getInstance().getEmptySequent(),
-                new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE), ImmutableList.of(),
-                    ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+                new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE),
+                ImmutableList.of(),
+                ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
         CHEAT_TACLET =
             new NoFindTaclet(new Name("CHEAT"), applPart, ImmutableList.of(), ImmutableList.of(),
                 new TacletAttributes("cheat", null), DefaultImmutableMap.nilMap(), ChoiceExpr.TRUE,

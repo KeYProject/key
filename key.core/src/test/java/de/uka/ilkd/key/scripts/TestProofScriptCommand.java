@@ -12,19 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,10 +58,11 @@ public class TestProofScriptCommand {
                 .toAbsolutePath();
 
         Predicate<Path> filter;
-        if(ONLY_CASES != null && !ONLY_CASES.isEmpty()) {
+        if (ONLY_CASES != null && !ONLY_CASES.isEmpty()) {
             // if ONLY_CASES is set, only run those cases (comma separated)
             Set<String> only = Set.of(ONLY_CASES.split(" *, *"));
-            filter = p -> only.contains(p.getFileName().toString().substring(0, p.getFileName().toString().length() - 4));
+            filter = p -> only.contains(
+                p.getFileName().toString().substring(0, p.getFileName().toString().length() - 4));
         } else {
             filter = p -> true;
         }
@@ -78,15 +75,14 @@ public class TestProofScriptCommand {
 
             List<Arguments> args = new ArrayList<>(files.size());
             for (Path path : files) {
-                if(!filter.test(path)) {
+                if (!filter.test(path)) {
                     continue;
                 }
                 try {
                     TestInstance instance =
                         objectMapper.readValue(path.toFile(), TestInstance.class);
-                    var name = instance.name == null ?
-                            path.getFileName().toString().substring(0, path.getFileName().toString().length() - 4) :
-                            instance.name;
+                    var name = instance.name == null ? path.getFileName().toString().substring(0,
+                        path.getFileName().toString().length() - 4) : instance.name;
                     args.add(Arguments.of(instance, name));
                 } catch (Exception e) {
                     System.out.println(path);
@@ -143,7 +139,8 @@ public class TestProofScriptCommand {
 
             if (data.selectedGoal() != null) {
                 Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
-                assertThat(normaliseSpace(goal.toString())).isEqualTo(data.goals()[data.selectedGoal()]);
+                assertThat(normaliseSpace(goal.toString()))
+                        .isEqualTo(data.goals()[data.selectedGoal()]);
             }
         }
     }

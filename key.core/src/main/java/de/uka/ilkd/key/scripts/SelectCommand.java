@@ -15,8 +15,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.InjectionException;
 import de.uka.ilkd.key.scripts.meta.Option;
-
 import de.uka.ilkd.key.scripts.meta.ValueInjector;
+
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -165,8 +165,9 @@ public class SelectCommand extends AbstractCommand {
             """)
     public static class Parameters implements ValueInjector.VerifyableParameters {
         /** A formula defining the goal to select */
-        @Documentation("A formula defining the goal to select. May contain placeholder symbols. If there is a formula " +
-                "matching the given formula in multiple goals, the first one is selected.")
+        @Documentation("A formula defining the goal to select. May contain placeholder symbols. If there is a formula "
+            +
+            "matching the given formula in multiple goals, the first one is selected.")
         @Option(value = "formula")
         public @Nullable JTerm formula;
 
@@ -174,23 +175,28 @@ public class SelectCommand extends AbstractCommand {
          * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
          * the last goal, -2 the second-to-last, etc.
          */
-        @Documentation("The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is " +
-                "the last goal, -2 the second-to-last, etc.")
+        @Documentation("The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is "
+            +
+            "the last goal, -2 the second-to-last, etc.")
         @Option(value = "number")
         public @Nullable Integer number;
 
         /** The name of the branch to select */
-        @Documentation("The name of the branch to select. If there are multiple branches with the same name, " +
-                "the first one is selected.")
+        @Documentation("The name of the branch to select. If there are multiple branches with the same name, "
+            +
+            "the first one is selected.")
         @Option(value = "branch")
         public @Nullable String branch;
 
         @Override
         public void verifyParameters() throws IllegalArgumentException, InjectionException {
             int cnt = 0;
-            if (formula != null) cnt++;
-            if (number != null) cnt++;
-            if (branch != null) cnt++;
+            if (formula != null)
+                cnt++;
+            if (number != null)
+                cnt++;
+            if (branch != null)
+                cnt++;
             if (cnt != 1) {
                 throw new InjectionException(
                     "Exactly one of 'formula', 'branch' or 'number' are required");
