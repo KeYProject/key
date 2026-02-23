@@ -17989,6 +17989,7 @@ tryCatchThrow {
     #slist1
   }
 ... }}| (post))
+\sameUpdateLevel
 \add []==>[equals(#se,null)] \replacewith(#allmodal ((modal operator))|{{ ..
   if (#se instanceof #t) {
     #t #v0;
