@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.javac;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -62,6 +64,12 @@ public class JavacSettingsProvider extends SettingsPanel implements SettingsProv
         useProcessors = addCheckBox(
             "Enable Annotation Processing", USE_PROCESSORS_INFO, false, e -> {
             });
+        useProcessors.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                processors.setEnabled(itemEvent.getStateChange() == ItemEvent.SELECTED);
+                paths.setEnabled(itemEvent.getStateChange() == ItemEvent.SELECTED);
+            }
+        });
         processors = addTextArea("Annotation Processors", "", PROCESSORS_INFO, e -> {
         });
         paths = addTextArea("Processor Class Paths", "", CLASS_PATHS_INFO, e -> {

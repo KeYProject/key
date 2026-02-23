@@ -51,6 +51,9 @@ public class JavaCompilerCheckFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaCompilerCheckFacade.class);
 
+    /**
+     * This main method be exclusively used by `checkExternally` to perform javac checks
+     */
     public static void main(String[] args) {
         try (var input = new InputStreamReader(System.in)) {
             var params = Configuration.load(CharStreams.fromReader(input));
@@ -79,6 +82,7 @@ public class JavaCompilerCheckFacade {
                     return map;
                 }).toList());
 
+            // send the data over stderr to not interfere with the log messages
             Writer writer = new OutputStreamWriter(System.err);
             out.save(writer, null);
             writer.close();
@@ -87,6 +91,21 @@ public class JavaCompilerCheckFacade {
         }
     }
 
+    /**
+     * initiates the compilation check on the target Java source (the Java program to be verified)
+     * in a separate process (with another java runtime) and
+     * reports any issues to the provided <code>listener</code>
+     *
+     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     *        about any issues found in the target Java program
+     * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
+     * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
+     *        the target Java programs classpath
+     * @param javaPath the {@link Path} to the source of the target Java program
+     * @param settings the {@link JavacSettings} that describe what other options the compiler
+     *        should be called with
+     * @return future providing the list of diagnostics
+     */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> checkExternally(
             ProblemInitializer.ProblemInitializerListener listener,
             Path bootClassPath, List<Path> classPath, Path javaPath,
@@ -95,7 +114,8 @@ public class JavaCompilerCheckFacade {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
-        LOGGER.info("External Javac check is triggered.");
+        LOGGER.info(
+            "External Javac check is triggered. To disable use property -PKEY_JAVAC_DISABLE=true");
         var params = new Configuration();
         params.set("bootClassPath", Objects.toString(bootClassPath));
         params.set("classPath",
@@ -126,12 +146,12 @@ public class JavaCompilerCheckFacade {
                 params.save(process.outputWriter(), null);
                 process.outputWriter().close();
 
-                var errors = Streams.toString(process.getInputStream()); // what should be done with
-                                                                         // the errors ??
-                var cfg = Configuration.load(CharStreams.fromStream(process.getErrorStream()));
+                // the KeY logging messages from `process` (currently not used)
+                var logs = Streams.toString(process.getInputStream());
+                var messages = Configuration.load(CharStreams.fromStream(process.getErrorStream()));
                 process.waitFor();
 
-                return cfg.getList("messages").stream()
+                return messages.getList("messages").stream()
                         .map(msgObj -> {
                             Configuration msg = (Configuration) msgObj;
                             return new PositionedIssueString(
