@@ -73,7 +73,7 @@ public class JavaCompilerCheckFacade {
                         "column", it.location.getPosition().column(),
                         "additionalInfo", it.getAdditionalInfo());
                     if (it.location.fileUri() != null) {
-                        map = new HashMap<>(map);
+                        map = new TreeMap<>(map);
                         map.put("fileUri", it.location.fileUri().toString());
                     }
                     return map;
