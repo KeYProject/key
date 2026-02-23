@@ -18,6 +18,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -648,6 +649,9 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
      */
     protected void doJavaProfileTest(String proofFilePathInBaseDir, String oraclePathInBaseDirFile)
             throws Exception {
+        proofFilePathInBaseDir = cleanStartSlash(proofFilePathInBaseDir);
+        oraclePathInBaseDirFile = cleanStartSlash(oraclePathInBaseDirFile);
+
         // Ensure that JavaProfile was used before
         KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
             testCaseDirectory.resolve(proofFilePathInBaseDir), null, null, null, true);
@@ -660,6 +664,13 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory, proofFilePathInBaseDir, oraclePathInBaseDirFile,
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
+    }
+
+    private static @NonNull String cleanStartSlash(String proofFilePathInBaseDir) {
+        if (proofFilePathInBaseDir.startsWith("/")) {
+            proofFilePathInBaseDir = proofFilePathInBaseDir.substring(1);
+        }
+        return proofFilePathInBaseDir;
     }
 
     /**

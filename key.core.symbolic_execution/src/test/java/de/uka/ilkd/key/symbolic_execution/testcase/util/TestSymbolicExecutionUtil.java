@@ -43,7 +43,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     @Test
     public void test1ImproveReadability() throws ProblemLoaderException {
         Path location = testCaseDirectory.resolve(
-            "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
+            "readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
                 .toAbsolutePath();
         assertTrue(Files.exists(location), "Could not find required resource: " + location);
 
