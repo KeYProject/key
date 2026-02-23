@@ -228,7 +228,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder FINAL =
         new ConstructorBasedBuilder("final", FinalReferenceCondition.class, SV);
     public static final AbstractConditionBuilder ENUM_CONST =
-        new ConstructorBasedBuilder("isEnumConst", EnumConstantCondition.class, SV);
+        new ConstructorBasedBuilder("isEnumConst", EnumConstantCondition.class, SORT, SV);
     public static final AbstractConditionBuilder LOCAL_VARIABLE =
         new ConstructorBasedBuilder("isLocalVariable", LocalVariableCondition.class, SV);
     public static final AbstractConditionBuilder ARRAY_LENGTH =
@@ -260,8 +260,8 @@ public class TacletBuilderManipulators {
                 return new TypeCondition((TypeResolver) arguments[0], !negated, non_null);
             }
         };
-    public static final AbstractConditionBuilder ENUM_TYPE =
-        new ConstructorBasedBuilder("reference", EnumTypeCondition.class, SV, SV, SV);
+    // public static final AbstractConditionBuilder ENUM_TYPE =
+    // new ConstructorBasedBuilder("reference", EnumTypeCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder CONTAINS_ASSIGNMENT =
         new ConstructorBasedBuilder("containsAssignment", ContainsAssignmentCondition.class, SV);
     public static final AbstractConditionBuilder FIELD_TYPE =
@@ -377,7 +377,7 @@ public class TacletBuilderManipulators {
             FREE_3, FREE_4, FINAL_TYPE,
             FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON, FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL,
             ENUM_CONST, LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
-            MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,
+            MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, /* ENUM_TYPE, */
             CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS, SAME_OBSERVER,
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
             STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,

@@ -582,6 +582,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
         } catch (Throwable e) {
+            LOGGER.debug("Unexpected exception while producing variable condition", e);
             return false;
         }
     }
