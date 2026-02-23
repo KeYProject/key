@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.util.MiscTools;
 
 import com.github.javaparser.ast.CompilationUnit;

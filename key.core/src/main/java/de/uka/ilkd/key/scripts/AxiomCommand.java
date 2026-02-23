@@ -9,8 +9,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 

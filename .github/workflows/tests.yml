@@ -71,9 +71,6 @@ jobs:
             **/build/reports/
             !**/jacocoTestReport.xml
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v6
-
   integration-tests:
     env:
       GH_TOKEN: ${{ github.token }}

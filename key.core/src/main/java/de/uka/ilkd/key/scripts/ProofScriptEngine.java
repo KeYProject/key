@@ -13,8 +13,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
@@ -22,7 +20,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.antlr.v4.runtime.RuleContext;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +91,7 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         try {
-            if(start != null) {
+            if (start != null) {
                 URI url = start.fileUri();
                 stateMap.setBaseFileName(Paths.get(url));
             }

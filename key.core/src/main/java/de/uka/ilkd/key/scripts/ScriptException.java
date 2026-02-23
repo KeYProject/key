@@ -6,6 +6,8 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
+import org.jspecify.annotations.Nullable;
+
 
 public class ScriptException extends Exception implements HasLocation {
 

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CancellationException;

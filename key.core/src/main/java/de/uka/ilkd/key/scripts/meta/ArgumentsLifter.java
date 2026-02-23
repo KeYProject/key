@@ -7,8 +7,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-import de.uka.ilkd.key.scripts.AbstractCommand;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -43,11 +43,12 @@ public final class ArgumentsLifter {
         var sb = new StringBuilder(commandName);
         for (var meta : args) {
             sb.append(' ');
-            if(!meta.isRequired() || meta.isFlag())
+            if (!meta.isRequired() || meta.isFlag())
                 sb.append("[");
 
             if (meta.isPositional()) {
-                sb.append(OPEN_BRACKET + meta.getType().getSimpleName() + " (" + meta.getName() + ")" + CLOSE_BRACKET);
+                sb.append(OPEN_BRACKET + meta.getType().getSimpleName() + " (" + meta.getName()
+                    + ")" + CLOSE_BRACKET);
             }
 
             if (meta.isOption()) {
@@ -67,8 +68,8 @@ public final class ArgumentsLifter {
             if (meta.isOptionalVarArgs()) {
                 sb.append("%s...".formatted(meta.getName()));
             }
-            
-            if(!meta.isRequired() || meta.isFlag())
+
+            if (!meta.isRequired() || meta.isFlag())
                 sb.append("]");
         }
 
@@ -81,8 +82,9 @@ public final class ArgumentsLifter {
         StringBuilder sb = new StringBuilder();
 
         Deprecated dep = commandClazz.getAnnotation(Deprecated.class);
-        if(dep != null) {
-            sb.append("**Caution! This proof script command is deprecated, and may be removed soon!**\n\n");
+        if (dep != null) {
+            sb.append(
+                "**Caution! This proof script command is deprecated, and may be removed soon!**\n\n");
         }
 
         Documentation docCommand = commandClazz.getAnnotation(Documentation.class);
@@ -91,7 +93,7 @@ public final class ArgumentsLifter {
             sb.append("\n\n");
         }
 
-        if(parameterClazz == null) {
+        if (parameterClazz == null) {
             return sb.toString();
         }
 
@@ -164,13 +166,14 @@ public final class ArgumentsLifter {
         };
     }
 
-    public static String extractCategory(Class<? extends ProofScriptCommand> commandClazz, @Nullable Class<?> parameterClazz) {
+    public static String extractCategory(Class<? extends ProofScriptCommand> commandClazz,
+            @Nullable Class<?> parameterClazz) {
         Documentation docCommand = commandClazz.getAnnotation(Documentation.class);
         if (docCommand != null && !docCommand.category().isBlank()) {
             return docCommand.category();
         }
 
-        if(parameterClazz != null) {
+        if (parameterClazz != null) {
             Documentation docAn = parameterClazz.getAnnotation(Documentation.class);
             if (docAn != null && !docAn.category().isBlank()) {
                 return docAn.category();
@@ -183,36 +186,38 @@ public final class ArgumentsLifter {
 
     private static @NonNull List<ProofScriptArgument> getSortedProofScriptArguments(
             Class<?> parameterClazz) {
-//        Comparator<ProofScriptArgument> optional =
-//            Comparator.comparing(ProofScriptArgument::isOption);
-//        Comparator<ProofScriptArgument> positional =
-//            Comparator.comparing(ProofScriptArgument::isPositional);
-//        Comparator<ProofScriptArgument> flagal = Comparator.comparing(ProofScriptArgument::isFlag);
-//        Comparator<ProofScriptArgument> allargsal =
-//            Comparator.comparing(ProofScriptArgument::isPositionalVarArgs);
-//        Comparator<ProofScriptArgument> byRequired =
-//            Comparator.comparing(ProofScriptArgument::isRequired);
-//        Comparator<ProofScriptArgument> byName = Comparator.comparing(ProofScriptArgument::getName);
-//
-//        Comparator<ProofScriptArgument> byPos = Comparator.comparing(it -> {
-//            if (it.isPositionalVarArgs()) {
-//                it.getPositionalVarargs().startIndex();
-//            }
-//            if (it.isPositional()) {
-//                it.getArgument().value();
-//            }
-//
-//            return -1;
-//        });
-//
-//
-//        var comp = optional
-//                .thenComparing(flagal)
-//                .thenComparing(positional)
-//                .thenComparing(allargsal)
-//                .thenComparing(byRequired)
-//                .thenComparing(byPos)
-//                .thenComparing(byName);
+        // Comparator<ProofScriptArgument> optional =
+        // Comparator.comparing(ProofScriptArgument::isOption);
+        // Comparator<ProofScriptArgument> positional =
+        // Comparator.comparing(ProofScriptArgument::isPositional);
+        // Comparator<ProofScriptArgument> flagal =
+        // Comparator.comparing(ProofScriptArgument::isFlag);
+        // Comparator<ProofScriptArgument> allargsal =
+        // Comparator.comparing(ProofScriptArgument::isPositionalVarArgs);
+        // Comparator<ProofScriptArgument> byRequired =
+        // Comparator.comparing(ProofScriptArgument::isRequired);
+        // Comparator<ProofScriptArgument> byName =
+        // Comparator.comparing(ProofScriptArgument::getName);
+        //
+        // Comparator<ProofScriptArgument> byPos = Comparator.comparing(it -> {
+        // if (it.isPositionalVarArgs()) {
+        // it.getPositionalVarargs().startIndex();
+        // }
+        // if (it.isPositional()) {
+        // it.getArgument().value();
+        // }
+        //
+        // return -1;
+        // });
+        //
+        //
+        // var comp = optional
+        // .thenComparing(flagal)
+        // .thenComparing(positional)
+        // .thenComparing(allargsal)
+        // .thenComparing(byRequired)
+        // .thenComparing(byPos)
+        // .thenComparing(byName);
 
         var args = Arrays.stream(parameterClazz.getDeclaredFields())
                 .map(ProofScriptArgument::new)

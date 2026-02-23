@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.equality.TermLabelsProperty;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -12,7 +10,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.logic.Term;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;

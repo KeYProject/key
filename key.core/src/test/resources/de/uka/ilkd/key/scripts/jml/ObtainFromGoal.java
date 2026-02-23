@@ -1,6 +1,8 @@
-//! deleteTmpDir : false
+/*!
+deleteTmpDir : false
+*/
 
-class Test {
+class ObtainFromGoal {
 
     //@ model int f(int arg);
 

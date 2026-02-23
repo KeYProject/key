@@ -8,6 +8,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -212,7 +213,7 @@ public class JmlIO {
             case KeYJavaType kjt -> kjt;
             case Type type -> services.getJavaInfo().getKeYJavaType(type);
             default -> throw new IllegalArgumentException("Cannot translate to KeYJavaType: " +
-                    interpreted + " of class " + interpreted.getClass());
+                interpreted + " of class " + interpreted.getClass());
         };
     }
 

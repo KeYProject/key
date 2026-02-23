@@ -1,6 +1,4 @@
-//! deleteTmpDir : false
-
-class Test {
+class Obtain1 {
     //@ ensures true;
     void test() {
         int x = 42;

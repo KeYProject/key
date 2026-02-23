@@ -20,7 +20,6 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.ModularJavaDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 

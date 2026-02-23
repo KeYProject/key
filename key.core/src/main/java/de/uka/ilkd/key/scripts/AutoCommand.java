@@ -95,10 +95,12 @@ public class AutoCommand extends AbstractCommand {
 
         final Strategy originalStrategy = state.getProof().getActiveStrategy();
         if (arguments.additionalRules != null) {
-            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
+            state.getProof().setActiveStrategy(
+                new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
         }
         if (arguments.onlyRules != null) {
-            state.getProof().setActiveStrategy(new AdditionalRulesStrategy(originalStrategy, arguments.onlyRules, true));
+            state.getProof().setActiveStrategy(
+                new AdditionalRulesStrategy(originalStrategy, arguments.onlyRules, true));
         }
 
         // Give some feedback
@@ -171,7 +173,7 @@ public class AutoCommand extends AbstractCommand {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
-    @Documentation(category = "Fundamental", value ="""
+    @Documentation(category = "Fundamental", value = """
             The AutoCommand invokes the automatic strategy "Auto" of KeY (which is also launched by
             when clicking the "Auto" button in the GUI).
             It can be used to try to automatically prove the current goal.
@@ -201,8 +203,9 @@ public class AutoCommand extends AbstractCommand {
          * Run on formula matching the given regex
          */
         @Option(value = "breakpoint")
-        @Documentation("When doing symbolic execution by auto, this option can be used to set a Java statement at which " +
-                "symbolic execution has to stop.")
+        @Documentation("When doing symbolic execution by auto, this option can be used to set a Java statement at which "
+            +
+            "symbolic execution has to stop.")
         public @Nullable String breakpoint = null;
 
         @Flag(value = "modelsearch")
@@ -228,26 +231,26 @@ public class AutoCommand extends AbstractCommand {
 
         @Option(value = "add")
         @Documentation("""
-               Additional rules to be used by the auto strategy. The rules have to be given as a
-               comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
-               (high, low, medium or a natural number) using an equals sign.
-               Cannot be combined with the 'only' parameter.
-               """)
+                Additional rules to be used by the auto strategy. The rules have to be given as a
+                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+                (high, low, medium or a natural number) using an equals sign.
+                Cannot be combined with the 'only' parameter.
+                """)
         public @Nullable String additionalRules;
 
         @Option(value = "only")
         @Documentation("""
-               Limit the rules to be used by the auto strategy. The rules have to be given as a
-               comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
-               (high, low, medium or a natural number) using an equals sign.
-               All rules application which do not match the given names will be disabled.
-               Cannot be combined with the 'add' parameter.
-               """)
+                Limit the rules to be used by the auto strategy. The rules have to be given as a
+                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+                (high, low, medium or a natural number) using an equals sign.
+                All rules application which do not match the given names will be disabled.
+                Cannot be combined with the 'add' parameter.
+                """)
         public @Nullable String onlyRules;
 
         @Override
         public void verifyParameters() throws IllegalArgumentException, InjectionException {
-            if(onlyRules != null && additionalRules != null) {
+            if (onlyRules != null && additionalRules != null) {
                 throw new InjectionException("Parameters 'add' and 'only' are mutually exclusive.");
             }
         }

@@ -292,7 +292,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public String visitSimple_ident(KeYParser.Simple_identContext ctx) {
-        return ctx.id.getText();
+        return ctx.getText();
     }
 
     @Override

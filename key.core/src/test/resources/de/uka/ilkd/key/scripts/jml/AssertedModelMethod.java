@@ -1,10 +1,12 @@
-//! settings:
-//!   CLASS_AXIOM_OPTIONS_KEY: CLASS_AXIOM_OFF
+/*!
+settings:
+  CLASS_AXIOM_OPTIONS_KEY: CLASS_AXIOM_OFF
+*/
 
 // Was a bug:
 // Instantiation Test::pred(heap,self,int::select(heap,self,Test::$f)) of cutFormula (formula) does not satisfy the variable conditions
 
-class Test {
+class AssertedModelMethod {
 
     //@ model boolean pred(int x) { return x > 20; }
 

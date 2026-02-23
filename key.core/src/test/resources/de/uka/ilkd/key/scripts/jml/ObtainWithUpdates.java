@@ -1,7 +1,8 @@
-//! settings:
-//!   CLASS_AXIOM_OPTIONS_KEY: CLASS_AXIOM_OFF
-
-class Test {
+/*!
+settings:
+  CLASS_AXIOM_OPTIONS_KEY: CLASS_AXIOM_OFF
+*/
+class ObtainWithUpdates {
 
     //@ model int f(int arg) { return arg + arg; }
 

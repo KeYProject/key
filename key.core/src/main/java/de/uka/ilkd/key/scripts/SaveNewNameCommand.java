@@ -89,14 +89,15 @@ public class SaveNewNameCommand extends AbstractCommand {
         }
     }
 
-    @Documentation(category = "Internal", value = """
-        Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
-        introduced by the last rule which matches certain criteria into an abbreviation for
-        later use. A nice use case is a manual loop invariant rule application, where the newly
-        introduced anonymizing Skolem constants can be saved for later interactive instantiations. As for
-        the let command, it is not allowed to call this command multiple times with the same name
-        argument (all names used for remembering instantiations are "final").
-        """)
+    @Documentation(category = "Internal",
+        value = """
+                Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
+                introduced by the last rule which matches certain criteria into an abbreviation for
+                later use. A nice use case is a manual loop invariant rule application, where the newly
+                introduced anonymizing Skolem constants can be saved for later interactive instantiations. As for
+                the let command, it is not allowed to call this command multiple times with the same name
+                argument (all names used for remembering instantiations are "final").
+                """)
     public static class Parameters {
         @Documentation("The abbreviation to store the new name under, must start with @")
         @Argument

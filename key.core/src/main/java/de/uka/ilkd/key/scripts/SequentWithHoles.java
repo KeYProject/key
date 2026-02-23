@@ -3,35 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.GenericSort;
+import java.util.List;
+
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
-import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableList;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;
-import org.key_project.logic.Name;
-import org.key_project.logic.PosInTerm;
-import org.key_project.logic.sort.AbstractSort;
-import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
-import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 @NullMarked
 public class SequentWithHoles {
@@ -54,21 +40,21 @@ public class SequentWithHoles {
 
     public static SequentWithHoles fromParserContext(EngineState state, ParserRuleContext ctx) {
 
-        if(ctx instanceof KeYParser.ProofScriptExpressionContext psctx) {
+        if (ctx instanceof KeYParser.ProofScriptExpressionContext psctx) {
             ctx = psctx.seq();
         }
 
-        if(ctx instanceof KeYParser.SeqContext seqCtx) {
+        if (ctx instanceof KeYParser.SeqContext seqCtx) {
             List<TermWithHoles> antecedent = new java.util.ArrayList<>();
             KeYParser.SemisequentContext semseq = seqCtx.ant;
-            while(semseq != null && semseq.term() != null) {
+            while (semseq != null && semseq.term() != null) {
                 antecedent.add(TermWithHoles.fromParserContext(state, semseq.term()));
                 semseq = semseq.semisequent();
             }
 
             List<TermWithHoles> succedent = new java.util.ArrayList<>();
             semseq = seqCtx.suc;
-            while(semseq != null && semseq.term() != null) {
+            while (semseq != null && semseq.term() != null) {
                 succedent.add(TermWithHoles.fromParserContext(state, semseq.term()));
                 semseq = semseq.semisequent();
             }

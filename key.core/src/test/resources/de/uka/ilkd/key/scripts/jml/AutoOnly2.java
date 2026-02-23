@@ -1,6 +1,8 @@
-//! shouldClose: false
+/*!
+shouldClose: false
+*/
 
-class Test {
+class AutoOnly2 {
 
     //@ model int f(int arg) { return arg + arg; }
 

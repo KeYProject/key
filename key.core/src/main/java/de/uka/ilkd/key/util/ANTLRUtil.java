@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.ArrayList;
@@ -17,7 +20,7 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public final class ANTLRUtil {
-    private ANTLRUtil() { }
+    private ANTLRUtil() {}
 
     /**
      * Reconstructs the original source text from a given ANTLR4 parse tree.
@@ -32,10 +35,12 @@ public final class ANTLRUtil {
 
         for (TerminalNode tn : terminals) {
             Token t = tn.getSymbol();
-            if (t == null) continue;
-            if (t.getType() == Token.EOF) continue;
+            if (t == null)
+                continue;
+            if (t.getType() == Token.EOF)
+                continue;
 
-            if(curLine == -1) {
+            if (curLine == -1) {
                 // use first token to initialize line and column
                 curCol = t.getCharPositionInLine();
                 curLine = t.getLine();
@@ -59,7 +64,8 @@ public final class ANTLRUtil {
             }
 
             String text = t.getText();
-            if (text == null) text = "";
+            if (text == null)
+                text = "";
 
             sb.append(text);
 
@@ -78,7 +84,8 @@ public final class ANTLRUtil {
     }
 
     private static void collectTerminals(ParseTree node, List<TerminalNode> out) {
-        if (node == null) return;
+        if (node == null)
+            return;
         if (node instanceof TerminalNode) {
             out.add((TerminalNode) node);
             return;
@@ -90,7 +97,9 @@ public final class ANTLRUtil {
 
     private static int countOccurrences(String s, char c) {
         int cnt = 0;
-        for (int i = 0; i < s.length(); i++) if (s.charAt(i) == c) cnt++;
+        for (int i = 0; i < s.length(); i++)
+            if (s.charAt(i) == c)
+                cnt++;
         return cnt;
     }
 }

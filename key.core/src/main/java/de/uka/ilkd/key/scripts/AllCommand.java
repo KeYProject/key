@@ -14,7 +14,7 @@ import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
         Executes a given block of script commands on all open goals.
         The current goal is set to each open goal in turn while executing the block.
         It expects exactly one positional argument, which is the block to be executed on each goal.
-        
+
         #### Examples:
         * `onAll { smt solver="z3"; }`
         * `onAll { auto; }`

@@ -6,16 +6,13 @@ package de.uka.ilkd.key.scripts;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /// The *let* command lets you introduce entries to the abbreviation table.
 /// ```
@@ -37,18 +34,19 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class LetCommand extends AbstractCommand {
 
-    @Documentation(category = "Fundamental", value = """
-        The let command lets you introduce entries to the abbreviation table.
-        
-            let @abbrev1=term1 ... @abbrev2=term2;
+    @Documentation(category = "Fundamental",
+        value = """
+                The let command lets you introduce entries to the abbreviation table.
 
-        or
-        
-            letf @abbrev1=term1 ... @abbrev2=term2;
-   
-        One or more key-value pairs are supported where key starts is @ followed by an identifier and
-        value is a term.
-        If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
+                    let @abbrev1=term1 ... @abbrev2=term2;
+
+                or
+
+                    letf @abbrev1=term1 ... @abbrev2=term2;
+
+                One or more key-value pairs are supported where key starts is @ followed by an identifier and
+                value is a term.
+                If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
 
 
     public static class Parameters {

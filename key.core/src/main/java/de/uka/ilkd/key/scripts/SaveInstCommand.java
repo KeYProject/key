@@ -8,8 +8,8 @@ import java.util.Map;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletApp;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -25,11 +25,12 @@ import org.key_project.prover.rules.RuleApp;
  *
  * @author Dominic Steinhoefel
  */
-@Documentation(category = "Internal", value = """
-    Saves the instantiation of a schema variable by the last taclet application into an abbreviation for later use.
-    A nice use case is a manual loop invariant rule application, where the newly introduced anonymizing Skolem constants can be saved for later interactive instantiations.
-    As for the let command, it is not allowed to call this command multiple times with the same name argument (all names used for remembering instantiations are "final").
-    """)
+@Documentation(category = "Internal",
+    value = """
+            Saves the instantiation of a schema variable by the last taclet application into an abbreviation for later use.
+            A nice use case is a manual loop invariant rule application, where the newly introduced anonymizing Skolem constants can be saved for later interactive instantiations.
+            As for the let command, it is not allowed to call this command multiple times with the same name argument (all names used for remembering instantiations are "final").
+            """)
 public class SaveInstCommand extends AbstractCommand {
     public SaveInstCommand() {
         super(null);

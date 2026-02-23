@@ -1,7 +1,9 @@
-//! settings:
-//!   CLASS_AXIOM_OPTIONS_KEY: CLASS_AXIOM_OFF
+/*!
+settings:
+  CLASS_AXIOM_OPTIONS_KEY: CLASS_AXIOM_OFF
+*/
 
-class Test {
+class AutoOnly {
 
     //@ model int f(int arg) { return arg + arg; }
 

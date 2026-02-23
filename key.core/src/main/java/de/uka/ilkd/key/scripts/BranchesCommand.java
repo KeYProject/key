@@ -20,10 +20,13 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.lookup.Property;
 
 import org.jspecify.annotations.Nullable;
 
 public class BranchesCommand extends AbstractCommand {
+    private static final Property<Stack<Integer>> USER_DATA_BRANCH_STACK =
+        new Property<>("BRANCH_STACK");
 
     public BranchesCommand() {
         super(Parameters.class);
@@ -38,11 +41,7 @@ public class BranchesCommand extends AbstractCommand {
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var args = state().getValueInjector().inject(new BranchesCommand.Parameters(), arguments);
 
-        Stack<Integer> stack = (Stack<Integer>) state.getUserData("_branchStack");
-        if (stack == null) {
-            stack = new Stack<>();
-            state.putUserData("_branchStack", stack);
-        }
+        Stack<Integer> stack = state.getUserData().putIfAbsent(USER_DATA_BRANCH_STACK, Stack::new);
 
         if (args.mode == null) {
             throw new ScriptException("For 'branches', a mode must be specified");
@@ -117,7 +116,7 @@ public class BranchesCommand extends AbstractCommand {
             if (branch.equals(label)) {
                 return findGoalByNode(root.proof(), node);
             }
-            number ++;
+            number++;
         }
         throw new ScriptException(
             "Unknown branch " + branch + ". Known branches are " + knownBranchLabels);

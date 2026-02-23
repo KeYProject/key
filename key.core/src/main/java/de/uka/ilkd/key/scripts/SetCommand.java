@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.scripts;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,9 +20,14 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.util.lookup.Property;
+
 import org.jspecify.annotations.Nullable;
 
 public class SetCommand extends AbstractCommand {
+    public static final Property<ArrayList<StrategyProperties>> USER_DATA_SETTINGS_STACK =
+        new Property<>("settingsStack");
+
     public SetCommand() {
         super(Parameters.class);
     }
@@ -58,19 +63,15 @@ public class SetCommand extends AbstractCommand {
         }
 
         if (args.stackAction != null) {
-            Stack<StrategyProperties> stack =
-                (Stack<StrategyProperties>) state.getUserData("settingsStack");
-            if (stack == null) {
-                stack = new Stack<>();
-                state.putUserData("settingsStack", stack);
-            }
+            ArrayList<StrategyProperties> stack =
+                state.getUserData().putIfAbsent(USER_DATA_SETTINGS_STACK, ArrayList::new);
             switch (args.stackAction) {
                 case "push":
-                    stack.push(newProps.clone());
+                    stack.addLast(newProps.clone());
                     break;
                 case "pop":
                     // TODO sensible error if empty
-                    var resetProps = stack.pop();
+                    var resetProps = stack.removeLast();
                     updateStrategySettings(state, resetProps);
                     break;
                 default:
@@ -82,7 +83,7 @@ public class SetCommand extends AbstractCommand {
                 throw new IllegalArgumentException(
                     "userData must be of the form key:value. Use userData:\"myKey:myValue\".");
             }
-            state.putUserData("user." + kv[0], kv[1]);
+            state.getUserData().set(new Property<>("user." + kv[0]), kv[1]);
         } else {
             throw new IllegalArgumentException(
                 "You have to set oss, steps, stack, or key(s) and value(s).");

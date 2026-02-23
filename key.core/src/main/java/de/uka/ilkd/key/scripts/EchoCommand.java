@@ -5,8 +5,8 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**

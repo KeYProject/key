@@ -1,24 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.KeYConstants;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import recoder.util.Debug;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -27,13 +11,26 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.logging.LogManager;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.macros.ScriptAwareMacro;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.KeYConstants;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JmlScriptTest {
 
-    private static final Path KEY_FILE;
     private static final Logger LOGGER = LoggerFactory.getLogger(JmlScriptTest.class);
 
     // Set this to a specific case to only run that case for debugging
@@ -41,78 +38,108 @@ public class JmlScriptTest {
     // Set this to true to save the proof after running the script
     private static final boolean SAVE_PROOF = false;
 
-    static {
-        URL url = JmlScriptTest.class.getResource("jml/project.key");
-        try {
-            KEY_FILE = Paths.get(url.toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("filesProvider")
     public void testJmlScript(Path path, String identifier) throws Exception {
-
         Parameters params = readParams(path);
-
         Path tmpDir = Files.createTempDirectory("key.jmltest.");
         try {
             Files.copy(path, tmpDir.resolve("Test.java"));
             Path projectFile = tmpDir.resolve("project.key");
-            Files.copy(KEY_FILE, projectFile);
+            createKeYFile(projectFile, identifier.replace(".java", ""));
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(projectFile);
-            if(params.settings != null && !params.settings.isEmpty()) {
+            System.out.println(params.settings);
+            if (params.settings != null && !params.settings.isEmpty()) {
                 for (Map.Entry<String, String> entry : params.settings.entrySet()) {
-                    env.getLoadedProof().getSettings().getStrategySettings().getActiveStrategyProperties()
+                    env.getLoadedProof().getSettings().getStrategySettings()
+                            .getActiveStrategyProperties()
                             .setProperty(entry.getKey(), entry.getValue());
                 }
             }
-            KeyAst.ProofScript script = env.getProofScript();
-            if (script != null) {
-                ProofScriptEngine pse = new ProofScriptEngine(env.getLoadedProof());
-                pse.execute(env.getUi(), script);
-            }
 
-            if(SAVE_PROOF) {
+            var macro = new ScriptAwareMacro();
+            macro.applyTo(
+                env.getUi(),
+                env.getLoadedProof(),
+                env.getLoadedProof().openGoals(),
+                null,
+                env.getUi().getProofControl().getDefaultProverTaskListener());
+
+            if (SAVE_PROOF) {
                 String filename = tmpDir.resolve("saved.proof").toString();
-                ProofSaver saver = new ProofSaver(env.getLoadedProof(), filename, KeYConstants.INTERNAL_VERSION);
+                ProofSaver saver =
+                    new ProofSaver(env.getLoadedProof(), filename, KeYConstants.INTERNAL_VERSION);
                 saver.save();
                 LOGGER.info("Saved proof to {}", filename);
             }
 
-            if(params.shouldClose) {
+            System.out.println(env.getLoadedProof());
+
+            if (params.shouldClose) {
                 Assertions.assertTrue(env.getLoadedProof().closed(), "Proof did not close.");
             } else {
                 Assertions.assertFalse(env.getLoadedProof().closed(), "Proof closes unexpectedly.");
             }
         } finally {
             // Uncomment the following line to delete the temporary directory after the test
-            if(params.deleteTmpDir && !SAVE_PROOF) {
+            if (params.deleteTmpDir && !SAVE_PROOF) {
                 LOGGER.info("Deleting temporary directory: {}", tmpDir);
-                Files.walk(tmpDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+                try (var walker = Files.walk(tmpDir)) {
+                    walker.sorted(Comparator.reverseOrder())
+                            .forEach(it -> {
+                                try {
+                                    Files.deleteIfExists(it);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                }
             } else {
                 LOGGER.info("Temporary directory retained for inspection: {}", tmpDir);
             }
         }
-
     }
 
+    private void createKeYFile(Path projectFile, String className) throws IOException {
+        Files.writeString(projectFile,
+            """
+                    \\profile "Java Profile";
+                    \\javaSource ".";
+
+                    \\proofObligation {
+                        "class" : "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+                        "contract" : "%s[%s::test()].JML operation contract.0",
+                        "name" : "%s[%s::test()].JML operation contract.0"
+                     }
+
+                    \\proofScript {
+                      macro "script-auto";
+                    }
+                    """.formatted(className, className, className, className));
+    }
+
+    private static final Pattern SETTINGS =
+        Pattern.compile("[/][*]!(?<yaml>.+?)[*][/]", Pattern.DOTALL | Pattern.MULTILINE);
+
     private static Parameters readParams(Path path) throws IOException {
-        String input = Files.lines(path).filter(l -> l.startsWith("//!")).map(l -> l.substring(3))
-                        .collect(Collectors.joining("\n")).trim();
-        if(input.isEmpty()) {
+        String lines = Files.readString(path);
+        var matcher = SETTINGS.matcher(lines).results().toList();
+        if (!matcher.isEmpty()) {
+            var input = matcher.getFirst().group("yaml");
+            var objectMapper = new ObjectMapper(new YAMLFactory());
+            objectMapper.findAndRegisterModules();
+            return objectMapper.readValue(input, Parameters.class);
+        } else {
             return new Parameters();
         }
-        var objectMapper = new ObjectMapper(new YAMLFactory());
-        objectMapper.findAndRegisterModules();
-        return objectMapper.readValue(input, Parameters.class);
     }
 
     public static Stream<Arguments> filesProvider() throws URISyntaxException, IOException {
         URL jmlUrl = JmlScriptTest.class.getResource("jml");
         if (ONLY_CASE != null) {
-            return Stream.of(Arguments.of(Paths.get(jmlUrl.toURI()).resolve(ONLY_CASE), "single specified case: " + ONLY_CASE));
+            return Stream.of(Arguments.of(Paths.get(jmlUrl.toURI()).resolve(ONLY_CASE),
+                "single specified case: " + ONLY_CASE));
         } else {
             return Files.list(Paths.get(jmlUrl.toURI()))
                     .filter(p -> p.toString().endsWith(".java"))
@@ -127,6 +154,4 @@ public class JmlScriptTest {
         public boolean deleteTmpDir = true;
         public Map<String, String> settings;
     }
-
-
 }

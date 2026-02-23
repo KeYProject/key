@@ -229,14 +229,12 @@ public final class JMLTransformer extends JavaTransformerAbstract {
 
     private Statement transformAssertStatement(TextualJMLAssertStatement stat) {
         KeyAst.Expression ctx = stat.getContext();
-        de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
         int kind = switch (stat.getKind()) {
             case ASSERT -> KIND_ASSERT;
             case ASSUME -> KIND_ASSUME;
         };
         KeYMarkerStatement stmt = new KeYMarkerStatement(kind);
-        // TODO simulate/ copy token range.
-        stmt.setData(KEY_EXPR, ctx);
+        stmt.setData(KEY_ASSERT, stat);
         return stmt;
     }
 

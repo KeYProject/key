@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
@@ -84,6 +84,16 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(JmlAssert other) {
         this(other.kind, other.optLabel, other.condition, other.assertionProof,
             other.getPositionInfo());
+    }
+
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, TextualJMLAssertStatement construct,
+            PositionInfo pi) {
+        super(pi);
+        this.kind = kind;
+        this.optLabel = construct.getOptLabel();
+        this.condition = construct.getContext();
+        // script may be null
+        this.assertionProof = construct.getAssertionProof();
     }
 
     public TextualJMLAssertStatement.Kind getKind() {

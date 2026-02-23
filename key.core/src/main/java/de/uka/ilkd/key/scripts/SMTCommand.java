@@ -115,13 +115,13 @@ public class SMTCommand extends AbstractCommand {
     }
 
     @Documentation(category = "Fundamental", value = """
-        The smt command invokes an SMT solver on the current goal(s).
-        By default, it uses the Z3 solver on the first open automatic goal.
-        If the option 'all' is given, it runs on all open goals.
-        If the option 'solver' is given, it uses the specified solver(s) instead of Z3.
-        Multiple solvers can be specified by separating their names with commas.
-        The available solvers depend on your system: KeY supports at least z3, cvc5.
-        """)
+            The smt command invokes an SMT solver on the current goal(s).
+            By default, it uses the Z3 solver on the first open automatic goal.
+            If the option 'all' is given, it runs on all open goals.
+            If the option 'solver' is given, it uses the specified solver(s) instead of Z3.
+            Multiple solvers can be specified by separating their names with commas.
+            The available solvers depend on your system: KeY supports at least z3, cvc5.
+            """)
     public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";

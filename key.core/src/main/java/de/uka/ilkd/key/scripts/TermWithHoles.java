@@ -3,55 +3,45 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.control.AbstractProofControl;
+import java.util.List;
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.scripts.meta.*;
-import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Objects;
 
 @NullMarked
 public class TermWithHoles {
 
     private final JTerm term;
+
     public TermWithHoles(JTerm term) {
         this.term = Objects.requireNonNull(term);
     }
@@ -93,6 +83,11 @@ public class TermWithHoles {
         public boolean extendsTrans(Sort s) {
             return true;
         }
+
+        @Override
+        public boolean containsGenericSort() {
+            return false;
+        }
     }
 
     public static TermWithHoles fromString(EngineState engineState, String str) {
@@ -103,13 +98,14 @@ public class TermWithHoles {
         return fromParserContext(engineState, term);
     }
 
-    public static TermWithHoles fromProofScriptExpression(EngineState engineState, KeYParser.ProofScriptExpressionContext ctx) throws ConversionException {
-        if(ctx.string_literal() != null) {
+    public static TermWithHoles fromProofScriptExpression(EngineState engineState,
+            KeYParser.ProofScriptExpressionContext ctx) throws ConversionException {
+        if (ctx.string_literal() != null) {
             String text = StringUtil.stripQuotes(ctx.string_literal().getText());
             return fromString(engineState, text);
-        } else if(ctx.proofScriptCodeBlock() != null) {
+        } else if (ctx.proofScriptCodeBlock() != null) {
             throw new ConversionException("A block cannot be used as a term");
-        } else if(ctx.seq() != null) {
+        } else if (ctx.seq() != null) {
             throw new ConversionException("A sequent cannot be used as a term");
         } else {
             return fromParserContext(engineState, ctx.getRuleContext(ParserRuleContext.class, 0));
@@ -118,7 +114,7 @@ public class TermWithHoles {
 
     public static TermWithHoles fromParserContext(EngineState state, ParseTree ctx) {
         var expressionBuilder =
-                new ExpressionBuilder(state.getProof().getServices(), enrichState(state));
+            new ExpressionBuilder(state.getProof().getServices(), enrichState(state));
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
         JTerm t = (JTerm) ctx.accept(expressionBuilder);
         List<BuildingIssue> warnings = expressionBuilder.getBuildingIssues();
@@ -128,10 +124,11 @@ public class TermWithHoles {
     }
 
     private static NamespaceSet enrichState(EngineState state) {
-        NamespaceSet ns = state.getProof().getServices().getNamespaces().copy();
+        final var services = state.getProof().getServices();
+        NamespaceSet ns = services.getNamespaces().copy();
 
         // Sort Nothing as bottom sort
-        NothingSort nothing = new NothingSort(state.getProof().getServices());
+        NothingSort nothing = new NothingSort(services);
         ns.sorts().add(nothing);
 
         ns.functions().addSafely(new JFunction(HOLE_NAME, nothing));
@@ -139,8 +136,12 @@ public class TermWithHoles {
         ns.functions().addSafely(new JFunction(FOCUS_NAME, nothing, JavaDLTheory.ANY));
         ns.functions().addSafely(new JFunction(ELLIPSIS_NAME, nothing, JavaDLTheory.ANY));
         GenericSort g = new GenericSort(new Name("G"));
-        ns.functions().addSafely(SortDependingFunction.createFirstInstance(g, HOLE_SORT_DEP_NAME, g,
-                        new Sort[0], false));
+        GenericParameter p = new GenericParameter(g, GenericParameter.Variance.INVARIANT);
+        final var decl = new ParametricFunctionDecl(HOLE_SORT_DEP_NAME,
+            ImmutableSLList.singleton(p),
+            new ImmutableArray<>(),
+            g, null, false, false, false);
+        ns.parametricFunctions().addSafely(decl);
         return ns;
     }
 

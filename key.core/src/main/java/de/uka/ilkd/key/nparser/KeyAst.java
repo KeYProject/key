@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
@@ -27,8 +27,8 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-
 import de.uka.ilkd.key.speclang.njml.JmlParserBaseVisitor;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
@@ -231,7 +231,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
             @Override
             public Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
-                if(ctx.obtain != null) {
+                if (ctx.obtain != null) {
                     KeYJavaType type = io.translateType(ctx.typespec());
                     ProgramElementName name = new ProgramElementName(ctx.var.getText());
                     collectedVars = collectedVars.prepend(new LocationVariable(name, type, true));
@@ -265,7 +265,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         public ImmutableList<LocationVariable> getObtainedProgramVars(JmlIO io) {
-            if(obtainedProgramVars == null) {
+            if (obtainedProgramVars == null) {
                 var visitor = new ObtainedVarsVisitor(io);
                 ctx.accept(visitor);
                 obtainedProgramVars = visitor.collectedVars;
