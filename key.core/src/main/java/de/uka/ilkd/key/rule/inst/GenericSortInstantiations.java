@@ -8,10 +8,12 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
@@ -59,7 +61,7 @@ public final class GenericSortInstantiations {
             ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         ImmutableList<GenericSort> sorts = ImmutableSLList.nil();
-        GenericSortCondition c;
+        ImmutableList<GenericSortCondition> c;
 
         final Iterator<GenericSortCondition> it;
 
@@ -75,8 +77,10 @@ public final class GenericSortInstantiations {
                 p_instantiations.next();
             c = GenericSortCondition.createCondition(entry.key(), entry.value());
             if (c != null) {
-                p_conditions = p_conditions.prepend(c);
-                sorts = sorts.prepend(c.getGenericSort());
+                for (var cond : c) {
+                    p_conditions = p_conditions.prepend(c);
+                    sorts = sorts.prepend(cond.getGenericSort());
+                }
             }
         }
         return create(sorts, p_conditions, services);
@@ -112,9 +116,10 @@ public final class GenericSortInstantiations {
             return Boolean.TRUE;
         }
 
-        final GenericSortCondition c = GenericSortCondition.createCondition(sv, p_entry);
+        final ImmutableList<GenericSortCondition> c =
+            GenericSortCondition.createCondition(sv, p_entry);
         if (c != null) {
-            return checkCondition(c);
+            return checkConditions(c);
         }
 
         if (GenericSortCondition.subSortsAllowed(sv)) {
@@ -124,6 +129,14 @@ public final class GenericSortInstantiations {
         }
     }
 
+    public Boolean checkConditions(ImmutableList<GenericSortCondition> p_condition) {
+        for (var cond : p_condition) {
+            var r = checkCondition(cond);
+            if (r == null || !r)
+                return null;
+        }
+        return true;
+    }
 
     /**
      * @return Boolean.TRUE if the generic sort instantiations within "this" satisfy "p_condition",
@@ -172,21 +185,34 @@ public final class GenericSortInstantiations {
 
 
     /**
-     * @param services the Services class
      * @return p_s iff p_s is not a generic sort, the concrete sort p_s is instantiated with
      *         currently otherwise
      * @throws GenericSortException iff p_s is a generic sort which is not yet instantiated
      */
-    public Sort getRealSort(OperatorSV p_sv, TermServices services) {
+    public Sort getRealSort(OperatorSV p_sv, Services services) {
         return getRealSort(p_sv.sort(), services);
     }
 
-    public Sort getRealSort(Sort p_s, TermServices services) {
-        if (p_s instanceof GenericSort) {
-            p_s = getInstantiation((GenericSort) p_s);
+    public Sort getRealSort(Sort p_s, Services services) {
+        if (p_s instanceof GenericSort gs) {
+            p_s = getInstantiation(gs);
             if (p_s == null) {
                 throw new GenericSortException("Generic sort is not yet instantiated", null);
             }
+        } else if (p_s instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
+            ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+            for (int i = psi.getArgs().size() - 1; i >= 0; i--) {
+                GenericArgument oa = psi.getArgs().get(i);
+                Sort realSort = getRealSort(oa.sort(), services);
+                if (realSort == null) {
+                    throw new GenericSortException("Generic sort is not yet instantiated", null);
+                }
+                args = args.prepend(new GenericArgument(realSort));
+            }
+            var inst = ParametricSortInstance.get(psi.getBase(), args, services);
+            if (inst.containsGenericSort())
+                throw new GenericSortException("Generic sort is not yet instantiated", null);
+            p_s = inst;
         }
 
         return p_s;

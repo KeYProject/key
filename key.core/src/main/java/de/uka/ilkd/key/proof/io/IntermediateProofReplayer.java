@@ -924,6 +924,10 @@ public class IntermediateProofReplayer {
             }
 
             String value = s.substring(eq + 1);
+            int colon = value.lastIndexOf(':');
+            if (colon != -1 && value.charAt(colon - 1) != ':') {
+                value = value.substring(0, colon);
+            }
             app = parseSV2(app, sv, value, currGoal);
         }
 
@@ -961,6 +965,8 @@ public class IntermediateProofReplayer {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
                 varNS, functNS, proof.getNamespaces().sorts(),
+                proof.getNamespaces().parametricSorts(),
+                proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException(
@@ -992,7 +998,18 @@ public class IntermediateProofReplayer {
      */
     public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
-        LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(sv, services));
+        var colon = value.indexOf(':');
+        Sort sort;
+        String name;
+        if (colon < 0) {
+            name = value;
+            sort = app.getRealSort(sv, services);
+        } else {
+            name = value.substring(0, colon);
+            sort = services.getNamespaces().sorts().lookup(value.substring(colon + 1));
+
+        }
+        LogicVariable lv = new LogicVariable(new Name(name), sort);
         JTerm instance = services.getTermFactory().createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services, true);
     }

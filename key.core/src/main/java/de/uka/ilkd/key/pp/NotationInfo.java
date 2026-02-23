@@ -496,6 +496,13 @@ public final class NotationInfo {
             }
         }
 
+        if (op instanceof ParametricFunctionInstance pfi) {
+            result = notationTable.get(pfi.getBase());
+            if (result != null) {
+                return result;
+            }
+        }
+
         return new Notation.FunctionNotation();
     }
 

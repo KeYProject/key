@@ -339,7 +339,6 @@ public class TacletFindModel extends AbstractTableModel {
      * @throws SVInstantiationException if the instantiation is incorrect
      */
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
-
         final TermBuilder tb = services.getTermBuilder();
         TacletApp result = originalApp;
         SchemaVariable sv = null;
@@ -392,7 +391,6 @@ public class TacletFindModel extends AbstractTableModel {
             }
 
             for (irow = noEditRow + 1; irow < entries.size(); irow++) {
-
                 if (!isInputAvailable(irow)) {
                     continue;
                 }

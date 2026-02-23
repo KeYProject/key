@@ -14,6 +14,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.varexp.ArgumentType;
@@ -30,6 +31,7 @@ import org.key_project.logic.Choice;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
@@ -249,24 +251,38 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        var tbAx = createAxiomTaclet(ctx);
+        var genParams = ctx.formal_sort_param_decls() == null ? null
+                : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
+        final Sort sort;
+        if (genParams != null) {
+            var psd = namespaces().parametricSorts().lookup(ctx.name.getText());
+            assert psd != null;
+            ImmutableList<GenericArgument> args = ImmutableSLList.nil();
+            for (int i = psd.getParameters().size() - 1; i >= 0; i--) {
+                args = args.prepend(new GenericArgument(psd.getParameters().get(i).sort()));
+            }
+            sort = ParametricSortInstance.get(psd, args, services);
+        } else {
+            sort = sorts().lookup(ctx.name.getText());
+        }
+
+        var tbAx = createAxiomTaclet(ctx, sort);
         registerTaclet(ctx, tbAx);
 
-        var tbInd = createInductionTaclet(ctx);
+        var tbInd = createInductionTaclet(ctx, sort);
         registerTaclet(ctx, tbInd);
 
-        var tbSplit = createConstructorSplit(ctx);
+        var tbSplit = createConstructorSplit(ctx, sort);
         registerTaclet(ctx, tbSplit);
 
-        Sort dtSort = namespaces().sorts().lookup(ctx.name.getText());
         for (var constructor : ctx.datatype_constructor()) {
             for (int i = 0; i < constructor.sortId().size(); i++) {
                 var argName = constructor.argName.get(i).getText();
 
-                var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i, dtSort);
+                var tbDeconstructor = createDeconstructorTaclet(constructor, argName, i, sort);
                 registerTaclet(ctx, tbDeconstructor);
 
-                var tbDeconsEq = createDeconstructorEQTaclet(constructor, argName, i, dtSort);
+                var tbDeconsEq = createDeconstructorEQTaclet(constructor, argName, i, sort);
                 registerTaclet(ctx, tbDeconsEq);
             }
         }
@@ -299,8 +315,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             args[i] = tb.var(sv);
         }
 
-        var function = namespaces().functions().lookup(argName);
-        var consFn = namespaces().functions().lookup(constructor.name.getText());
+        var function = getPossiblyParametricFunction(argName, dtSort);
+        var consFn = getPossiblyParametricFunction(constructor.name.getText(), dtSort);
 
         // Find, e.g, tail(Cons(head_sv, tail_sv))
         tacletBuilder.setFind(tb.func(function, tb.func(consFn, args)));
@@ -338,8 +354,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             args[i] = tb.var(sv);
         }
 
-        var function = namespaces().functions().lookup(argName);
-        var consFn = namespaces().functions().lookup(constructor.name.getText());
+        var function = getPossiblyParametricFunction(argName, dtSort);
+        var consFn = getPossiblyParametricFunction(constructor.name.getText(), dtSort);
 
         var x = declareSchemaVariable(constructor, argName + "_x", dtSort, false, false, false,
             new SchemaVariableModifierSet.TermSV());
@@ -357,11 +373,29 @@ public class TacletPBuilder extends ExpressionBuilder {
         return tacletBuilder;
     }
 
+    private Function getPossiblyParametricFunction(String name, Sort sort) {
+        var fn = functions().lookup(name);
+        if (fn != null)
+            return fn;
+        var psi = (ParametricSortInstance) sort;
+        var pfn = namespaces().parametricFunctions().lookup(name);
+        assert pfn != null;
+        return ParametricFunctionInstance.get(pfn, psi.getArgs(), services);
+    }
+
+    private Sort getPossiblyParametricSort(String name, Sort sort) {
+        var s = sorts().lookup(name);
+        if (s != null)
+            return s;
+        var psi = (ParametricSortInstance) sort;
+        var ps = namespaces().parametricSorts().lookup(name);
+        assert ps != null;
+        return ParametricSortInstance.get(ps, psi.getArgs(), services);
+    }
 
     private TacletBuilder<? extends Taclet> createInductionTaclet(
-            KeYParser.Datatype_declContext ctx) {
+            KeYParser.Datatype_declContext ctx, Sort sort) {
         var tacletBuilder = new NoFindTacletBuilder();
-        final var sort = sorts().lookup(ctx.name.getText());
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
         var tb = services.getTermBuilder();
@@ -374,35 +408,45 @@ public class TacletPBuilder extends ExpressionBuilder {
                 .map(it -> createGoalDtConstructor(it, qvar, tb.var(phi), sort))
                 .collect(Collectors.toList());
 
+        for (var c : cases) {
+            if (c.vars == null)
+                continue;
+            for (var v : c.vars) {
+                tacletBuilder.addVarsNotFreeIn((SchemaVariable) v, phi);
+            }
+        }
+
         var use = tb.all(qvar, tb.var(phi));
         var useCase = new TacletGoalTemplate(
             JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(new SequentFormula(use))),
             ImmutableSLList.nil());
         useCase.setName("Use case of " + ctx.name.getText());
-        cases.add(useCase);
+        cases.add(new GoalTemplAndVars(useCase, null));
 
-        cases.forEach(tacletBuilder::addTacletGoalTemplate);
+        cases.stream().map(GoalTemplAndVars::tgt).forEach(tacletBuilder::addTacletGoalTemplate);
         tacletBuilder.setName(new Name(String.format("DT_%s_Induction", sort.name())));
         tacletBuilder.setDisplayName(String.format("DT %s Induction", sort.name()));
         return tacletBuilder;
     }
 
-    private TacletGoalTemplate createGoalDtConstructor(KeYParser.Datatype_constructorContext it,
+    private GoalTemplAndVars createGoalDtConstructor(KeYParser.Datatype_constructorContext it,
             VariableSV qvar, JTerm var, Sort sort) {
         var constr = createQuantifiedFormula(it, qvar, var, sort);
         var goal = new TacletGoalTemplate(
             JavaDLSequentKit
-                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(constr))),
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(constr.term))),
             ImmutableSLList.nil());
         goal.setName(it.getText());
-        return goal;
+        return new GoalTemplAndVars(goal, constr.vars);
     }
 
+    private record GoalTemplAndVars(TacletGoalTemplate tgt,
+            @Nullable List<QuantifiableVariable> vars) {
+    }
 
     private TacletBuilder<NoFindTaclet> createAxiomTaclet(
-            KeYParser.Datatype_declContext ctx) {
+            KeYParser.Datatype_declContext ctx, Sort sort) {
         var tacletBuilder = new NoFindTacletBuilder();
-        final var sort = sorts().lookup(ctx.name.getText());
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
             false, false, new SchemaVariableModifierSet.FormulaSV());
         var tb = services.getTermBuilder();
@@ -415,7 +459,15 @@ public class TacletPBuilder extends ExpressionBuilder {
                 .map(it -> createQuantifiedFormula(it, qvar, tb.var(phi), sort))
                 .collect(Collectors.toList());
 
-        var axiom = tb.equals(find, tb.and(cases));
+        for (var c : cases) {
+            if (c.vars == null)
+                continue;
+            for (var v : c.vars) {
+                tacletBuilder.addVarsNotFreeIn((SchemaVariable) v, phi);
+            }
+        }
+
+        var axiom = tb.equals(find, tb.and(cases.stream().map(TermAndVars::term).toList()));
 
         var goal = new TacletGoalTemplate(
             JavaDLSequentKit
@@ -428,18 +480,18 @@ public class TacletPBuilder extends ExpressionBuilder {
         return tacletBuilder;
     }
 
-    private JTerm createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
+    private TermAndVars createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
             QuantifiableVariable qvX, JTerm phi, Sort dt) {
         var tb = services.getTermBuilder();
-        var fn = functions().lookup(context.name.getText());
+        var fn = getPossiblyParametricFunction(context.name.getText(), dt);
         if (context.argName.isEmpty())
-            return tb.subst(qvX, tb.func(fn), phi);
+            return new TermAndVars(tb.subst(qvX, tb.func(fn), phi), null);
 
         var args = new JTerm[context.argName.size()];
 
         var argSort =
             context.argSort.stream()
-                    .map(it -> sorts().lookup(it.getText()))
+                    .map(it -> getPossiblyParametricSort(it.simple_ident_dots().getText(), dt))
                     .toList();
         var argNames =
             context.argName.stream()
@@ -449,7 +501,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var ind = new ArrayList<JTerm>(args.length);
 
         for (int i = 0; i < argSort.size(); i++) {
-            final var qv = new LogicVariable(new Name(argNames.get(i)), argSort.get(i));
+            final var qv =
+                SchemaVariableFactory.createVariableSV(new Name(argNames.get(i)), argSort.get(i));
             qvs.add(qv);
             args[i] = services.getTermFactory().createTerm(qvs.get(i));
 
@@ -459,15 +512,19 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
 
         if (ind.isEmpty()) {
-            return tb.all(qvs, tb.subst(qvX, tb.func(fn, args), phi));
+            return new TermAndVars(tb.all(qvs, tb.subst(qvX, tb.func(fn, args), phi)), qvs);
         } else {
             var base = tb.and(ind);
-            return tb.all(qvs, tb.imp(base, tb.subst(qvX, tb.func(fn, args), phi)));
+            return new TermAndVars(tb.all(qvs, tb.imp(base, tb.subst(qvX, tb.func(fn, args), phi))),
+                qvs);
         }
     }
 
+    private record TermAndVars(JTerm term, @Nullable List<QuantifiableVariable> vars) {
+    }
+
     private RewriteTacletBuilder<RewriteTaclet> createConstructorSplit(
-            KeYParser.Datatype_declContext ctx) {
+            KeYParser.Datatype_declContext ctx, Sort sort) {
         final var tb = services.getTermBuilder();
 
         final String prefix = ctx.name.getText() + "_";
@@ -476,8 +533,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
             for (int i = 0; i < context.argName.size(); i++) {
                 var name = context.argName.get(i).getText();
-                var sort = sorts().lookup(context.argSort.get(i).getText());
-                var sv = declareSchemaVariable(ctx, prefix + name, sort,
+                var argSort = getPossiblyParametricSort(
+                    context.argSort.get(i).simple_ident_dots().getText(), sort);
+                var sv = declareSchemaVariable(ctx, prefix + name, argSort,
                     false, true, false,
                     new SchemaVariableModifierSet.TermSV());
                 variables.put(name, tb.var(sv));
@@ -487,17 +545,16 @@ public class TacletPBuilder extends ExpressionBuilder {
         final var b = new RewriteTacletBuilder<>();
         b.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
-        final var sort = sorts().lookup(ctx.name.getText());
 
         b.setName(new Name("DT_" + sort.name() + "_ctor_split"));
-        b.setDisplayName(String.format("DT %s case distinction ", sort.name()));
+        b.setDisplayName(String.format("DT %s case distinction", sort.name()));
 
         var phi = declareSchemaVariable(ctx, "var", sort,
             false, false, false,
             new SchemaVariableModifierSet.TermSV());
         b.setFind(tb.var(phi));
         for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
-            var func = functions().lookup(context.name.getText());
+            var func = getPossiblyParametricFunction(context.name.getText(), sort);
             JTerm[] args = new JTerm[context.argName.size()];
             for (int i = 0; i < args.length; i++) {
                 args[i] = variables.get(context.argName.get(i).getText());
@@ -656,8 +713,10 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         Sort s = visitSortId(ctx.term().getText(), ctx.term());
         if (s != null) {
-            if (s instanceof GenericSort) {
-                return TypeResolver.createGenericSortResolver((GenericSort) s);
+            if (s instanceof GenericSort gs) {
+                return TypeResolver.createGenericSortResolver(gs);
+            } else if (s instanceof ParametricSortInstance psi) {
+                return TypeResolver.createParametricSortResolver(psi);
             } else {
                 return TypeResolver.createNonGenericSortResolver(s);
             }
