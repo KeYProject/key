@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -32,11 +33,13 @@ public class EchoCommand extends AbstractCommand {
         }
     }
 
+    @Documentation(category = "Control", value = """
+            A simple "print" command for giving progress feedback to the
+            human verfier during lengthy executions.
+            """)
     public static class Parameters {
-        /**
-         * The message to show.
-         */
         @Argument
+        @Documentation("The message to be printed.")
         public @MonotonicNonNull String message;
     }
 

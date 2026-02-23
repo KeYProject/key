@@ -8,10 +8,17 @@ import java.util.Objects;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML assert statement.
@@ -29,21 +36,36 @@ public class JmlAssert extends JavaStatement {
      */
     private final TextualJMLAssertStatement.Kind kind;
 
+    /*
+     * Temporary solution until full jml labels are there ...
+     * (To be clarified if compatible still)
+     */
+    private final String optLabel;
+
     /**
      * the condition in parse tree form
      */
-    private KeyAst.Expression condition;
+    private final KeyAst.Expression condition;
+
+    /**
+     * the assertion proof in parse tree form
+     */
+    private final KeyAst.@Nullable JMLProofScript assertionProof;
 
     /**
      * @param kind assert or assume
      * @param condition the condition of this statement
+     * @param assertionProof the optional proof for an assert statement (not for assume)
      * @param positionInfo the position information for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, String label, KeyAst.Expression condition,
+            KeyAst.@Nullable JMLProofScript assertionProof,
             PositionInfo positionInfo) {
         super(positionInfo);
         this.kind = kind;
+        this.optLabel = label;
         this.condition = condition;
+        this.assertionProof = assertionProof;
     }
 
     /**
@@ -52,11 +74,15 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(ExtList children) {
         super(children);
         this.kind = Objects.requireNonNull(children.get(TextualJMLAssertStatement.Kind.class));
+        this.optLabel = children.get(String.class);
         this.condition = Objects.requireNonNull(children.get(KeyAst.Expression.class));
+        // script may be null
+        this.assertionProof = children.get(KeyAst.JMLProofScript.class);
     }
 
     public JmlAssert(JmlAssert other) {
-        this(other.kind, other.condition, other.getPositionInfo());
+        this(other.kind, other.optLabel, other.condition, other.assertionProof,
+            other.getPositionInfo());
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -148,6 +174,10 @@ public class JmlAssert extends JavaStatement {
         return System.identityHashCode(this);
     }
 
+    public KeyAst.@Nullable JMLProofScript getAssertionProof() {
+        return assertionProof;
+    }
+
     @Override
     public int getChildCount() {
         return 0;
@@ -161,5 +191,31 @@ public class JmlAssert extends JavaStatement {
     @Override
     public void visit(Visitor v) {
         v.performActionOnJmlAssert(this);
+    }
+
+    /**
+     * This method collects all terms contained in this assertion. This is at least the condition.
+     * If there is a proof script, all terms in the proof script are collected as well.
+     *
+     * @return a freshly created list of at least one term
+     */
+    public @NonNull ImmutableList<JmlParser.ExpressionContext> collectTerms() {
+        ImmutableList<JmlParser.ExpressionContext> result = ImmutableList.of();
+        if (assertionProof != null) {
+            result = result.prepend(assertionProof.collectTerms());
+        }
+        result = result.prepend(condition.ctx);
+        return result;
+    }
+
+    public ImmutableList<LocationVariable> collectVariablesInProof(JmlIO io) {
+        if (assertionProof != null) {
+            return assertionProof.getObtainedProgramVars(io);
+        }
+        return ImmutableList.of();
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 }

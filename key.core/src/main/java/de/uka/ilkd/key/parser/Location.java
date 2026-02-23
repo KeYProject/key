@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.IntStream;
@@ -67,6 +68,16 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     public Optional<URI> getFileURI() { return Optional.ofNullable(fileUri); }
 
     public Position getPosition() { return position; }
+
+    public static Location fromPositionInfo(PositionInfo info) {
+        Optional<URI> uri = info.getURI();
+        if (uri.isEmpty()) {
+            return UNDEFINED;
+        } else {
+            Position pos = info.getStartPosition();
+            return new Location(uri.get(), pos);
+        }
+    }
 
     /**
      * Internal string representation. Do not rely on format!

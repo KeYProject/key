@@ -12,11 +12,30 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.prover.sequent.Sequent;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
+/**
+ * This command allows to execute arbitrary JavaScript code. The code is executed in a context where
+ * the current selected goal is available as {@code goal} and a function {@code setVar(v,t)} is
+ * available to set an abbreviation (where {@code v} is the name of the variable including the
+ * leading {@code @} and {@code t} is either a term or a string that can be parsed as a term).
+ * <p>
+ * Example:
+ *
+ * <pre>
+ * javascript {
+ *   var x = goal.getAntecedent().get(0).getFormula();
+ *   setVar("@myVar", x);
+ * }
+ * </pre>
+ *
+ * This command is powerful but should be used with care, as it can easily lead to unsound proofs if
+ * used incorrectly.
+ */
 public class JavascriptCommand extends AbstractCommand {
 
     private static final String PREAMBLE = """
@@ -52,7 +71,26 @@ public class JavascriptCommand extends AbstractCommand {
         return "javascript";
     }
 
+    @Documentation(category = "Internal",
+        value = """
+                This command allows to execute arbitrary JavaScript code. The code is executed in a context where
+                the current selected goal is available as `goal` and a function `setVar(v,t)` is
+                available to set an abbreviation (where `v` is the name of the variable including the
+                leading `@` and `t` is either a term or a string that can be parsed as a term).
+
+                #### Example:
+                ```
+                javascript {
+                  var x = goal.getAntecedent().get(0).getFormula();
+                  setVar("@myVar", x);
+                }
+                ```
+
+                This command is powerful but should be used with care, as it can easily lead to unsound proofs if
+                used incorrectly.
+                """)
     public static class Parameters {
+        @Documentation("The JavaScript code to execute.")
         @Argument
         public @MonotonicNonNull String script;
     }

@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Jul 29 22:37:48 CEST 2025
+# Date: Tue Feb 17 23:36:47 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -17989,19 +17989,21 @@ tryCatchThrow {
     #slist1
   }
 ... }}| (post))
-\replacewith(#allmodal ((modal operator))|{{ ..
-  if (#se == null) {
-    try {
-      throw new java.lang.NullPointerException();
-    } catch (#t #v0) {
-      #slist1
-    }
-  } else if (#se instanceof #t) {
+\sameUpdateLevel
+\add []==>[equals(#se,null)] \replacewith(#allmodal ((modal operator))|{{ ..
+  if (#se instanceof #t) {
     #t #v0;
     #v0 = (#t) #se;
     #slist1
   } else {
     throw #se;
+  }
+... }}| (post)) ;
+\add [equals(#se,null)]==>[] \replacewith(#allmodal ((modal operator))|{{ ..
+  try {
+    throw new java.lang.NullPointerException();
+  } catch (#t #v0) {
+    #slist1
   }
 ... }}| (post)) 
 \heuristics(simplify_prog)

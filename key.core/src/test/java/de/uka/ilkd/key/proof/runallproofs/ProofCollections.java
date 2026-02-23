@@ -355,15 +355,12 @@ public class ProofCollections {
         g.provable("heap/removeDups/contains.key");
         g.provable("heap/removeDups/removeDup.key");
         g.provable("heap/saddleback_search/Saddleback_search.key");
-        // TODO: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for
-        // that.
-        g.loadable("heap/BoyerMoore/BM(BM__bm((I)).JML normal_behavior operation contract.0.proof");
-        g.loadable(
-            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML accessible clause.0.proof");
-        g.loadable(
-            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML model_behavior operation contract.0.proof");
-        g.loadable(
-            "heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
+        // DONE: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for
+        // that. YESSS, it runs with scripts now ...
+        g.provable("heap/BoyerMoore/BM.bm.key");
+        g.provable("heap/BoyerMoore/BM.count.accessible.key");
+        g.provable("heap/BoyerMoore/BM.count.key");
+        g.provable("heap/BoyerMoore/BM.monoLemma.key");
 
         g = c.group("quicksort");
         g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");

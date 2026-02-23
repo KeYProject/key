@@ -28,7 +28,10 @@
  * The  example has  been  added  to show  the  power of  proof
  * scripts.
  *
- * @author Mattias Ulbrich, 2015
+ * Translated to the use of JML proof scripts in 2025. Currently,
+ * this still increases the size of proof.
+ *
+ * @author Mattias Ulbrich, 2015, 2025
  */
 
 class Quicksort {
@@ -58,9 +61,18 @@ class Quicksort {
       @*/
     private void sort(int[] array, int from, int to) {
         if(from < to) {
+            //@ ghost \seq seq0 = \dl_array2seq(array);
             int splitPoint = split(array, from, to);
+            //@ ghost \seq seq1 = \dl_array2seq(array);
             sort(array, from, splitPoint-1);
+            //@ ghost \seq seq2 = \dl_array2seq(array);
             sort(array, splitPoint+1, to);
+            //@ ghost \seq seq3 = \dl_array2seq(array);
+            /*@ assert \dl_seqPerm(seq3, seq0) \by {
+              @   assert \dl_seqPerm(seq1, seq0) \by auto;
+              @   assert \dl_seqPerm(seq2, seq0) \by auto;
+              @   auto;
+              @ } */
         }
     }
 
@@ -97,12 +109,37 @@ class Quicksort {
                 int t = array[i];
                 array[i] = array[j];
                 array[j] = t;
+                /*@ assert \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array))) \by {
+                  @  oss;
+                  @  rule "seqPermFromSwap";
+                  @  rule "andRight" \by {
+                  @    case "Case 1": // the first of the two conjuncts is easy
+                  @      auto;
+                  @    case "Case 2": // the 2nd requires instantiations:
+                  @      instantiate hide:true var:"iv" with:i;
+                  @      instantiate hide:true var:"jv" with:j;
+                  @      auto;
+                  @  }
+                  @ };  */
                 i++;
             }
         }
 
         array[to] = array[i];
         array[i] = pivot;
+
+         /*@ assert \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array))) \by {
+           @  oss;
+           @  rule "seqPermFromSwap";
+           @  rule "andRight" \by {
+           @    case "Case 1": // the first of the two conjuncts is easy
+           @      auto;
+           @    case "Case 2": // the 2nd requires instantiations:
+           @      instantiate hide:true var:"iv" with:i;
+           @      instantiate hide:true var:"jv" with:to;
+           @      auto;
+           @  }
+           @ };  */
 
         return i;
 

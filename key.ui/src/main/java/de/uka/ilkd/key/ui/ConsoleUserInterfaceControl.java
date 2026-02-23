@@ -166,10 +166,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                     var script = problemLoader.getProofScript();
                     if (script != null) {
                         ProofScriptEngine pse =
-                            new ProofScriptEngine(script);
+                            new ProofScriptEngine(proof);
                         this.taskStarted(
                             new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                        pse.execute(this, proof);
+                        pse.execute(this, script);
                         // The start and end messages are fake to persuade the system ...
                         // All this here should refactored anyway ...
                         this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));

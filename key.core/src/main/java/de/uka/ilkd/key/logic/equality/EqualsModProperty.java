@@ -49,7 +49,7 @@ public interface EqualsModProperty<T> {
      * @param <V> the type of the additional parameters needed by {@code property} for the
      *        comparison
      */
-    <V> boolean equalsModProperty(Object o, Property<T> property, V... v);
+    <V> boolean equalsModProperty(Object o, Property<? super T> property, V... v);
 
     /**
      * Computes the hash code according to the given ignored {@code property}.

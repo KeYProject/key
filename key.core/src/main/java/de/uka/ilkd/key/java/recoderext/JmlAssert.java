@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.recoderext;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 
+import org.jspecify.annotations.Nullable;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
@@ -23,6 +24,10 @@ public class JmlAssert extends JavaStatement {
      */
     private final TextualJMLAssertStatement.Kind kind;
 
+    /**
+     * The optional proof for an assert statement (not for assume)
+     */
+    private final KeyAst.@Nullable JMLProofScript assertionProof;
 
     /**
      * The condition of this statement in parse tree form
@@ -31,12 +36,21 @@ public class JmlAssert extends JavaStatement {
     private final KeyAst.Expression condition;
 
     /**
-     * @param kind the kind of this statement
-     * @param condition the condition for this statement
+     * The optional label for this assertion (may be null)
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition) {
+    private final @Nullable String optLabel;
+
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+            String optLabel) {
+        this(kind, condition, null, optLabel);
+    }
+
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition,
+            KeyAst.@Nullable JMLProofScript assertionProof, String optLabel) {
         this.kind = kind;
         this.condition = condition;
+        this.assertionProof = assertionProof;
+        this.optLabel = optLabel;
     }
 
     /**
@@ -48,6 +62,8 @@ public class JmlAssert extends JavaStatement {
         super(proto);
         this.kind = proto.kind;
         this.condition = proto.condition;
+        this.assertionProof = proto.assertionProof;
+        this.optLabel = proto.optLabel;
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -56,6 +72,10 @@ public class JmlAssert extends JavaStatement {
 
     public KeyAst.Expression getCondition() {
         return condition;
+    }
+
+    public KeyAst.@Nullable JMLProofScript getAssertionProof() {
+        return assertionProof;
     }
 
     @Override
@@ -86,5 +106,9 @@ public class JmlAssert extends JavaStatement {
     @Override
     public Statement deepClone() {
         return new JmlAssert(this);
+    }
+
+    public String getOptLabel() {
+        return optLabel;
     }
 }

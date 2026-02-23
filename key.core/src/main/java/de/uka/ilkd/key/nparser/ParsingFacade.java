@@ -100,7 +100,7 @@ public final class ParsingFacade {
     }
 
 
-    private static KeYParser createParser(CharStream stream) {
+    public static KeYParser createParser(CharStream stream) {
         return createParser(createLexer(stream));
     }
 
