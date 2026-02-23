@@ -9,8 +9,8 @@ import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 

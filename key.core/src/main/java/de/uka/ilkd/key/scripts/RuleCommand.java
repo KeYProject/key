@@ -258,9 +258,9 @@ public class RuleCommand extends AbstractCommand {
             if (matchingApps.size() > 1) {
                 // todo make a nice string here!
                 throw new ScriptException("More than one applicable occurrence:\n" +
-                        matchingApps.stream().map(
-                                ap -> ap.posInOccurrence().subTerm() + " " + ap.matchConditions())
-                                .collect(Collectors.joining("\n") ));
+                    matchingApps.stream().map(
+                        ap -> ap.posInOccurrence().subTerm() + " " + ap.matchConditions())
+                            .collect(Collectors.joining("\n")));
             }
             return matchingApps.get(0);
         } else {
@@ -390,7 +390,7 @@ public class RuleCommand extends AbstractCommand {
                             || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
-                if(tacletApp.assumesFormulaInstantiations() != null) {
+                if (tacletApp.assumesFormulaInstantiations() != null) {
                     add &= checkAssumes(p, tacletApp.assumesFormulaInstantiations(), services);
                 }
 
@@ -402,8 +402,9 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
-    private boolean checkAssumes(Parameters p, ImmutableList<AssumesFormulaInstantiation> ifFormulaInstantiations, Services services) {
-        if(p.assumes == null) {
+    private boolean checkAssumes(Parameters p,
+            ImmutableList<AssumesFormulaInstantiation> ifFormulaInstantiations, Services services) {
+        if (p.assumes == null) {
             // no "assumes" restrictions specified.
             return true;
         }
@@ -412,24 +413,26 @@ public class RuleCommand extends AbstractCommand {
     }
 
 
-    @Documentation(category = "Fundamental", value = """
-        This command can be used to apply a calculus rule to the currently active open goal.
-        
-        #### Examples:
-        - `rule cut inst_cutFormula: (a > 0)` applies the cut rule on the formula `a > 0` like the cut command.          
-        - `rule and_right on=(__ & __)` applies the rule `and_right` to the second occurrence
-            of a conjunction in the succedent.
-        - `rule my_rule on=(f(x)) formula="f\\(.*search.*\\)"` applies the rule `my_rule` to the term 
-            `f(x)` in a formula matching the regular expression.
-        """)
+    @Documentation(category = "Fundamental",
+        value = """
+                This command can be used to apply a calculus rule to the currently active open goal.
+
+                #### Examples:
+                - `rule cut inst_cutFormula: (a > 0)` applies the cut rule on the formula `a > 0` like the cut command.
+                - `rule and_right on=(__ & __)` applies the rule `and_right` to the second occurrence
+                    of a conjunction in the succedent.
+                - `rule my_rule on=(f(x)) formula="f\\(.*search.*\\)"` applies the rule `my_rule` to the term
+                    `f(x)` in a formula matching the regular expression.
+                """)
     public static class Parameters {
         @Argument
         @Documentation("Name of the rule to be applied.")
         public @MonotonicNonNull String rulename;
 
         @Option(value = "on")
-        @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule). " +
-                "This may contain placeholders.")
+        @Documentation("Term on which the rule should be applied to (matching the 'find' clause of the rule). "
+            +
+            "This may contain placeholders.")
         public @Nullable TermWithHoles on;
 
         @Option(value = "formula")
@@ -437,23 +440,25 @@ public class RuleCommand extends AbstractCommand {
         public @Nullable JTerm formula;
 
         @Option(value = "occ")
-        @Documentation("Occurrence number if more than one occurrence matches. The first occurrence is 1. " +
-                "If ommitted, there must be exactly one occurrence.")
+        @Documentation("Occurrence number if more than one occurrence matches. The first occurrence is 1. "
+            +
+            "If ommitted, there must be exactly one occurrence.")
         public @Nullable Integer occ = -1;
 
         /**
          * Represents a part of a formula (may use Java regular expressions as long as supported by
          * proof script parser). Rule is applied to the sequent formula which matches that string.
          */
-        @Documentation("Instead of giving the toplevl formula completely, a regular expression can be " +
-                "specified to match the toplevel formula.")
+        @Documentation("Instead of giving the toplevl formula completely, a regular expression can be "
+            +
+            "specified to match the toplevel formula.")
         @Option(value = "matches")
         public @Nullable String matches = null;
- 
+
         @Option(value = "assumes")
         @Documentation("""
-            If the rule has an `\\assumes` clause, this can be used to restrict the instantiations
-            """)
+                If the rule has an `\\assumes` clause, this can be used to restrict the instantiations
+                """)
         public @Nullable SequentWithHoles assumes;
 
         @OptionalVarargs(as = JTerm.class, prefix = "inst_")

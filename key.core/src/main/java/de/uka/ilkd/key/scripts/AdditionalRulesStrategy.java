@@ -1,12 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import org.jspecify.annotations.Nullable;
-import org.key_project.prover.rules.Rule;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import de.uka.ilkd.key.macros.FilterStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
+
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -15,18 +23,15 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 class AdditionalRulesStrategy extends FilterStrategy {
     /** Name of that strategy */
     private static final Name NAME = new Name(
-            AdditionalRulesStrategy.class.getSimpleName());
+        AdditionalRulesStrategy.class.getSimpleName());
 
     private static final Map<String, String> TRANSLATIONS =
-            Map.of("high", "-50", "medium", "1000", "low", "10000");
+        Map.of("high", "-50", "medium", "1000", "low", "10000");
     private static final RuleAppCost DEFAULT_PRIORITY = NumberRuleAppCost.create(1000);
 
     private final List<Pair<String, RuleAppCost>> additionalRules;
@@ -45,14 +50,15 @@ class AdditionalRulesStrategy extends FilterStrategy {
             RuleAppCost prio;
             if (parts.length == 2) {
                 String prioStr = parts[1];
-                if(prioStr.equals("off")) {
+                if (prioStr.equals("off")) {
                     prio = TopRuleAppCost.INSTANCE;
                 }
                 prioStr = TRANSLATIONS.getOrDefault(prioStr, prioStr);
                 try {
                     prio = NumberRuleAppCost.create(Integer.parseInt(prioStr));
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Invalid value for additional rule: " + parts[1]);
+                    throw new IllegalArgumentException(
+                        "Invalid value for additional rule: " + parts[1]);
                 }
             } else {
                 prio = DEFAULT_PRIORITY;
@@ -93,7 +99,7 @@ class AdditionalRulesStrategy extends FilterStrategy {
     private @Nullable RuleAppCost computeLocalCost(Rule rule) {
         String name = rule.name().toString();
         Optional<RuleAppCost> cost = lookup(name);
-        if(cost.isPresent()) {
+        if (cost.isPresent()) {
             return cost.get();
         }
 
@@ -101,7 +107,7 @@ class AdditionalRulesStrategy extends FilterStrategy {
             for (RuleSet rs : taclet.getRuleSets()) {
                 String rname = rs.name().toString();
                 cost = lookup(rname);
-                if(cost.isPresent()) {
+                if (cost.isPresent()) {
                     return cost.get();
                 }
             }

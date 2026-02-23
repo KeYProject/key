@@ -8,8 +8,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

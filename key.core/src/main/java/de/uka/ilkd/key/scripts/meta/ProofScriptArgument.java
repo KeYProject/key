@@ -142,12 +142,13 @@ public class ProofScriptArgument {
     /**
      * This is used for ordering arguments in the usage string and documention.
      *
-     * A twodigit number is used for positional arguments. 'M' for mandatory, 'O' for optional flags and options.
+     * A twodigit number is used for positional arguments. 'M' for mandatory, 'O' for optional flags
+     * and options.
      */
     public String orderString() {
-        if(isPositional())
+        if (isPositional())
             return "%02d".formatted(getArgumentPosition());
-        if(isRequired())
+        if (isRequired())
             return "M " + getName();
         return "O " + getName();
     }

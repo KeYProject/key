@@ -10,8 +10,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
-
 import de.uka.ilkd.key.scripts.meta.Documentation;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
@@ -51,18 +51,19 @@ public class CutCommand extends AbstractCommand {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        var formula = state.getProof().getServices().getTermBuilder().convertToFormula(args.formula);
+        var formula =
+            state.getProof().getServices().getTermBuilder().convertToFormula(args.formula);
 
         app = app.addCheckedInstantiation(sv, formula, state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
     @Documentation(category = "Fundamental", value = """
-         The cut command makes a case distinction (a cut) on a formula on the current proof goal.
-         From within JML scripts, the alias 'assert' is more common than using 'cut'.
-         If followed by a `\\by proof` suffix in JML, it refers the sequent where
-         the cut formula is introduced to the succedent (i.e. where it is to be established).
-         """)
+            The cut command makes a case distinction (a cut) on a formula on the current proof goal.
+            From within JML scripts, the alias 'assert' is more common than using 'cut'.
+            If followed by a `\\by proof` suffix in JML, it refers the sequent where
+            the cut formula is introduced to the succedent (i.e. where it is to be established).
+            """)
     public static class Parameters {
         @Argument
         @Documentation("The formula to make the case distinction on.")

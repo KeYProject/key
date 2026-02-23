@@ -213,7 +213,7 @@ public class JmlIO {
             case KeYJavaType kjt -> kjt;
             case Type type -> services.getJavaInfo().getKeYJavaType(type);
             default -> throw new IllegalArgumentException("Cannot translate to KeYJavaType: " +
-                    interpreted + " of class " + interpreted.getClass());
+                interpreted + " of class " + interpreted.getClass());
         };
     }
 
