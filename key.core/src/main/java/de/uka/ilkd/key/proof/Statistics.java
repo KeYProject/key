@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
@@ -123,7 +121,7 @@ public class Statistics {
             blockLoopContractApps = tmp.block;
             loopInvApps = tmp.inv;
             autoModeTimeInMillis = startNode.proof().getAutoModeTime();
-            timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
+            timeInMillis = (System.currentTimeMillis() - startNode.proof().getCreationTime());
         }
 
         this.nodes = nodes;
@@ -173,7 +171,7 @@ public class Statistics {
         this.blockLoopContractApps = tmp.block;
         this.loopInvApps = tmp.inv;
         this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
-        this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
+        this.timeInMillis = (System.currentTimeMillis() - startNode.proof().getCreationTime());
         timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float) (nodes - 1));
 
         generateSummary(startNode.proof());
@@ -183,7 +181,7 @@ public class Statistics {
         this(proof.root());
     }
 
-    static Statistics create(Statistics side, long creationTime) {
+    protected static Statistics create(Statistics side, long creationTime) {
         return new Statistics(side.nodes, side.branches, side.cachedBranches, side.interactiveSteps,
             side.symbExApps,
             side.quantifierInstantiations, side.ossApps, side.mergeRuleApps, side.totalRuleApps,
@@ -192,21 +190,8 @@ public class Statistics {
             System.currentTimeMillis() - creationTime, side.timePerStepInMillis);
     }
 
-    private void generateSummary(Proof proof) {
+    protected void generateSummary(Proof proof) {
         Statistics stat = this;
-
-        boolean sideProofs = false;
-        if (proof instanceof InfFlowProof) { // TODO: get rid of that instanceof by subclassing
-            sideProofs = ((InfFlowProof) proof).hasSideProofs();
-            if (sideProofs) {
-                final long autoTime = proof.getAutoModeTime()
-                        + ((InfFlowProof) proof).getSideProofStatistics().autoModeTimeInMillis;
-                final SideProofStatistics side = ((InfFlowProof) proof).getSideProofStatistics()
-                        .add(this).setAutoModeTime(autoTime);
-                stat = create(side, proof.creationTime);
-            }
-        }
-
         final String nodeString = EnhancedStringBuffer.format(stat.nodes).toString();
         summaryList.add(new Pair<>("Nodes", nodeString));
         summaryList.add(new Pair<>("Branches",
@@ -219,8 +204,7 @@ public class Statistics {
         summaryList.add(new Pair<>("Interactive steps", String.valueOf(stat.interactiveSteps)));
         summaryList.add(new Pair<>("Symbolic execution steps", String.valueOf(stat.symbExApps)));
 
-
-        final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
+        final long time = proof.getAutoModeTime();
 
         summaryList.add(new Pair<>("Automode time",
             EnhancedStringBuffer.formatTime(time).toString()));
@@ -270,11 +254,11 @@ public class Statistics {
         for (Pair<String, String> p : summaryList) {
             final String c = p.first;
             final String s = p.second;
-            sb = sb.append(c);
-            if (!"".equals(s)) {
-                sb = sb.append(": ").append(s);
+            sb.append(c);
+            if (!s.isEmpty()) {
+                sb.append(": ").append(s);
             }
-            sb = sb.append('\n');
+            sb.append('\n');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();

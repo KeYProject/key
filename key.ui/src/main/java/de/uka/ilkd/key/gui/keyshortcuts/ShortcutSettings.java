@@ -34,7 +34,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         super();
         setHeaderText("Keyboard Shortcuts");
         setSubHeaderText(
-            "These settings are stored in " + KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
+            "These settings are stored in " + KeyStrokeSettings.SETTINGS_FILE.toAbsolutePath());
         add(new JScrollPane(tblShortcuts));
     }
 

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class GroupedProofCollectionUnit extends ProofCollectionUnit {
-
     private static final long serialVersionUID = 1L;
     private final String groupName;
     private final List<TestFile> testFiles;
@@ -32,6 +31,10 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     @Override
     public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) {
         return new RunAllProofsTestUnit(testName, settings, testFiles, false);
+    }
+
+    public List<TestFile> getTestFiles() {
+        return testFiles;
     }
 
     @Override

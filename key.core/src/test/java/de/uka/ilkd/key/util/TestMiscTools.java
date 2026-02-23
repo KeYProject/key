@@ -4,9 +4,7 @@
 package de.uka.ilkd.key.util;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -19,8 +17,21 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
+import de.uka.ilkd.key.speclang.njml.*;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.IOUtil;
 
 import org.junit.jupiter.api.Disabled;
@@ -258,5 +269,31 @@ public class TestMiscTools {
 
         // clean up temporary file
         Files.deleteIfExists(zipP);
+    }
+
+    @Test
+    public void testLocalOuts() {
+        var services = TacletForTests.services().copy(false);
+        KeYJavaType intKjt = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
+        var x = new LocationVariable(new ProgramElementName("x"), intKjt);
+        var y = new LocationVariable(new ProgramElementName("y"), intKjt);
+        var z = new LocationVariable(new ProgramElementName("z"), intKjt);
+        var stmt1 = new CopyAssignment(x, y);
+        var lexer = JmlFacade.createLexer("set z = 1;");
+        var parser = JmlFacade.createParser(lexer);
+        var setCtx = parser.set_statement();
+        var stmt2 = new SetStatement(new KeyAst.SetStatementContext(setCtx), null);
+        var pv = new ProgramVariableCollection();
+        var objKjt = services.getJavaInfo().getJavaLangObject();
+        var io = new JmlIO(services).classType(objKjt).specMathMode(SpecMathMode.BIGINT);
+        var value = io.translateTerm(stmt2.getParserContext().getValue());
+        services.getSpecificationRepository().addStatementSpec(stmt2,
+            new SpecificationRepository.JmlStatementSpec(pv,
+                ImmutableList.of(services.getTermBuilder().var(z), value)));
+        var block = new StatementBlock(stmt1, stmt2);
+        var outs = MiscTools.getLocalOuts(block, services);
+        assertEquals(2, outs.size());
+        assertTrue(outs.contains(x));
+        assertTrue(outs.contains(z));
     }
 }

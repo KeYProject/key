@@ -29,12 +29,13 @@ public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var file = new File(PathConfig.getProofIndependentSettings().replace(".props", ".json"));
+        var file = new File(PathConfig.getProofIndependentSettings().toString()
+                .replace(".props", ".json"));
         if (file.exists()) {
             DEFAULT_INSTANCE = new ProofIndependentSettings(file);
         } else {
-            var old = new File(PathConfig.getProofIndependentSettings());
-            DEFAULT_INSTANCE = new ProofIndependentSettings(old);
+            var old = PathConfig.getProofIndependentSettings();
+            DEFAULT_INSTANCE = new ProofIndependentSettings(old.toFile());
         }
     }
 
@@ -109,7 +110,7 @@ public class ProofIndependentSettings {
                 lastReadProperties = properties;
             }
         } else {
-            this.lastReadConfiguration = Configuration.load(file);
+            this.lastReadConfiguration = Configuration.load(file.toPath());
             for (Settings settings : settings) {
                 settings.readSettings(lastReadConfiguration);
             }

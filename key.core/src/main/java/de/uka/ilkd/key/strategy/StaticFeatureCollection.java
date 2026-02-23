@@ -8,15 +8,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractExternalRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.LoopApplyHeadRule;
-import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
@@ -28,22 +20,13 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.CompareCostsFeature;
-import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
-import org.key_project.prover.strategy.costbased.feature.ConstFeature;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.LetFeature;
-import org.key_project.prover.strategy.costbased.feature.ShannonFeature;
-import org.key_project.prover.strategy.costbased.feature.SortComparisonFeature;
-import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
-import org.key_project.prover.strategy.costbased.termfeature.ApplyTFFeature;
-import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
@@ -59,10 +42,8 @@ public abstract class StaticFeatureCollection {
     protected static Feature loopInvFeature(Feature costStdInv) {
         // NOTE (DS, 2019-04-10): This feature also deactivates the built-in loop
         // scope invariant rule (always!) since we use the taclets now.
-        final SetRuleFilter filterLoopInv = new SetRuleFilter();
-        filterLoopInv.addRuleToSet(WhileInvariantRule.INSTANCE);
-        final SetRuleFilter filterLoopScopeInv = new SetRuleFilter();
-        filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
+        final RuleFilter filterLoopInv = (r) -> r instanceof WhileInvariantRule;
+        final RuleFilter filterLoopScopeInv = (r) -> r instanceof LoopScopeInvariantRule;
 
         return ConditionalFeature.createConditional(filterLoopInv, costStdInv,
             ConditionalFeature.createConditional(filterLoopScopeInv, inftyConst()));
@@ -73,8 +54,7 @@ public abstract class StaticFeatureCollection {
      * @return a feature for {@link BlockContractInternalRule} with the specified cost.
      */
     protected static Feature blockContractInternalFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(BlockContractInternalRule.INSTANCE);
+        RuleFilter filter = (p) -> p instanceof BlockContractInternalRule;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -83,8 +63,7 @@ public abstract class StaticFeatureCollection {
      * @return a feature for {@link BlockContractExternalRule} with the specified cost.
      */
     protected static Feature blockContractExternalFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(BlockContractExternalRule.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof BlockContractExternalRule;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -93,8 +72,7 @@ public abstract class StaticFeatureCollection {
      * @return a feature for {@link LoopContractInternalRule} with the specified cost.
      */
     protected static Feature loopContractInternalFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(LoopContractInternalRule.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof LoopContractInternalRule;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -103,8 +81,7 @@ public abstract class StaticFeatureCollection {
      * @return a feature for {@link LoopContractExternalRule} with the specified cost.
      */
     protected static Feature loopContractExternalFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(LoopContractExternalRule.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof LoopContractExternalRule;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -113,26 +90,22 @@ public abstract class StaticFeatureCollection {
      * @return a feature for {@link LoopApplyHeadRule} with the specified cost.
      */
     protected static Feature loopContractApplyHead(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(LoopApplyHeadRule.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof LoopApplyHeadRule;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
     protected static Feature methodSpecFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(UseOperationContractRule.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof UseOperationContractRule;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
     protected static Feature querySpecFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(QueryExpand.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof QueryExpand;
         return ConditionalFeature.createConditional(filter, cost);
     }
 
     protected static Feature mergeRuleFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(MergeRule.INSTANCE);
+        RuleFilter filter = (r) -> r instanceof MergeRule;
         return ConditionalFeature.createConditional(filter,
             SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
     }

@@ -149,7 +149,7 @@ public class MasterHandlerTest {
                 Path srcDir = Files.createTempDirectory("SMT_key_" + name);
                 Path tmpSrc = srcDir.resolve("src.java");
                 Files.writeString(tmpSrc, javaSrc);
-                keySrc += "\\javaSource \"" + srcDir + "\";\n";
+                keySrc = "\\javaSource \"" + srcDir + "\";\n" + keySrc;
             }
 
             Path tmpKey = Files.createTempFile("SMT_key_%s".formatted(name), ".key");

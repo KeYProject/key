@@ -11,8 +11,14 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContractInfo;
+import de.uka.ilkd.key.speclang.infflow.InformationFlowContractSupplier;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
@@ -23,8 +29,12 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
-import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
+import static de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 
 /**
  * Contracts should only be created through methods of this class
@@ -33,6 +43,7 @@ import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
  *
  */
 public class ContractFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContractFactory.class);
 
     /**
      * The base name for symbolic execution contracts.
@@ -46,6 +57,7 @@ public class ContractFactory {
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
+
     private final Services services;
     private final TermBuilder tb;
 
@@ -224,22 +236,48 @@ public class ContractFactory {
             Contract.INVALID_ID);
     }
 
-    public InformationFlowContract createInformationFlowContract(KeYJavaType forClass,
-            IProgramMethod pm, KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind,
-            JTerm requires,
-            JTerm requiresFree, JTerm measuredBy, JTerm modifiable, boolean hasModifiable,
+    /// A flag to prevent multiple warnings about information flow module missing.
+    private boolean shouldWarnInfFlowMissing = true;
+
+    /// Create an information flow contract given the parameters using the first
+    /// implementation of [InformationFlowContractSupplier].
+    ///
+    /// @return an {@link InformationFlowContract} or null if no [InformationFlowContractSupplier]
+    /// is registered
+    public @Nullable InformationFlowContract createInformationFlowContract(
+            KeYJavaType forClass, IProgramMethod pm, KeYJavaType specifiedIn,
+            JModality.JavaModalityKind modalityKind,
+            JTerm requires, JTerm requiresFree, JTerm measuredBy, JTerm modifiable,
+            boolean hasModifiable,
             ProgramVariableCollection progVars, JTerm accessible,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
+
+        var supplier = ServiceLoader.load(InformationFlowContractSupplier.class)
+                .findFirst();
+        if (supplier.isEmpty()) {
+            if (shouldWarnInfFlowMissing) {
+                shouldWarnInfFlowMissing = false;
+                LOGGER.warn("An implementation of InformationFlowContractSupplier is missing. " +
+                    "You can ignore this warning if you do not want to use information flow POs. " +
+                    "Such an implementation is defined in key.core.infflow and usually delivered with `key.ui`. "
+                    +
+                    "On test execution in `key.core` etc. it is not present at all. " +
+                    "This warning appear only once when an information flow contract is discovered");
+            }
+            return null;
+        }
+
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         final JTerm atPre = tb.var(progVars.atPreVars.get(baseHeap));
         final JTerm self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
         final ImmutableList<JTerm> params = tb.var(progVars.paramVars);
         final JTerm result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
         final JTerm exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
-        return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
+        var info = new InformationFlowContractInfo(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
             specifiedIn, modalityKind, requires, requiresFree, measuredBy, modifiable,
-            hasModifiable, self,
-            params, result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
+            hasModifiable, self, params, result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
+
+        return supplier.get().create(info);
     }
 
     @Override
@@ -822,7 +860,9 @@ public class ContractFactory {
         return new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t);
     }
 
-    /** replace in original the variables used for self and parameters */
+    /**
+     * replace in original the variables used for self and parameters
+     */
     private JTerm replaceVariables(JTerm original, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, LocationVariable originalSelfVar,
@@ -832,7 +872,9 @@ public class ContractFactory {
             originalSelfVar, null, null, originalParamVars, originalAtPreVars);
     }
 
-    /** replace in original the variables used for self, result, exception, heap, and parameters */
+    /**
+     * replace in original the variables used for self, result, exception, heap, and parameters
+     */
     private JTerm replaceVariables(JTerm original, LocationVariable selfVar,
             LocationVariable resultVar,
             LocationVariable excVar, ImmutableList<LocationVariable> paramVars,
