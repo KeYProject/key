@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -26,6 +28,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -131,8 +134,21 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         } while (btManager.backtrack());
     }
 
-    protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState);
+    /**
+     * returns the service instance for access to {@link de.uka.ilkd.key.ldt.LDT}s
+     *
+     * @return the services for access to the meta logic
+     */
+    protected final Services getServices() {
+        return getProof().getServices();
+    }
+
+    protected final Feature isBelow(TermFeature t) {
+        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
+            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
+        return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
+            not(applyTF(superTerm, t))));
+    }
 
     protected Feature forEach(TermBuffer<Goal> x, TermGenerator<Goal> gen, Feature body) {
         return ForEachCP.create(x, gen, body);
@@ -147,22 +163,25 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
-    // it is possible to turn off the method <code>instantiate</code>,
-    // which can be useful in order to use the same feature definitions both for
-    // cost computation and instantiation
-
-    private boolean instantiateActive = false;
+    /// It is possible to turn off the method <code>instantiate</code>,
+    /// which can be useful in order to use the same feature definitions both for
+    /// cost computation and instantiation.
+    ///
+    /// Counts nesting depth of instantiation activation to avoid premature deactivation.
+    private short instantiateActive = 0;
 
     protected void enableInstantiate() {
-        instantiateActive = true;
+        instantiateActive++;
+        assert instantiateActive >= 0 : "overflow occurred";
     }
 
     protected void disableInstantiate() {
-        instantiateActive = false;
+        instantiateActive--;
+        assert instantiateActive >= 0;
     }
 
     protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
-        if (instantiateActive) {
+        if (instantiateActive != 0) {
             return SVInstantiationCP.create(sv, value);
         } else {
             return longConst(0);
@@ -170,7 +189,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     }
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
-        if (instantiateActive) {
+        if (instantiateActive != 0) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
             return longConst(0);

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.nparser;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -129,7 +129,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         /// Returns the includes (possible empty but not null) computed from the underlying parse
         /// tree.
-        public Includes getIncludes(URL base) {
+        public Includes getIncludes(Path base) {
             IncludeFinder finder = new IncludeFinder(base);
             accept(finder);
             return finder.getIncludes();

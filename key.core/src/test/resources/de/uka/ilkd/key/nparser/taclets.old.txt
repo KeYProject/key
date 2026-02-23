@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Jul 29 22:37:48 CEST 2025
+# Date: Wed Nov 19 11:46:34 CET 2025
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1148,7 +1148,7 @@ array_self_reference {
 \assumes ([wellFormed(heapSV)]==>[equals(array,null)]) 
 \find(arrayStoreValid(array,G::select(heapSV,array,arr(idx))))
 \sameUpdateLevel\replacewith(true) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == array_self_reference_eq (array_self_reference_eq) =========================================
@@ -1156,7 +1156,7 @@ array_self_reference_eq {
 \assumes ([wellFormed(heapSV),equals(G::select(heapSV,array,arr(idx)),EQ)]==>[equals(array,null)]) 
 \find(arrayStoreValid(array,EQ))
 \sameUpdateLevel\replacewith(true) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == array_store_known_dynamic_array_type (known dynamic array type) =========================================
@@ -1165,7 +1165,7 @@ array_store_known_dynamic_array_type {
 \find(arrayStoreValid(array,obj))
 \sameUpdateLevel\varcond(\isReference[non_null]( J ))
 \replacewith(or(equals(obj,null),equals(#arrayBaseInstanceOf(J::exactInstance(array),obj),TRUE))) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == asinIsNaN (asinIsNaN) =========================================
@@ -10007,7 +10007,7 @@ ifElseSkipElse {
   #loc = true;
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSkipElseConditionInBlock (ifElseSkipElse) =========================================
@@ -10025,7 +10025,7 @@ ifElseSkipElseConditionInBlock {
   }
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSkipThen (ifElseSkipThen) =========================================
@@ -10039,7 +10039,7 @@ ifElseSkipThen {
   #loc = false;
   #s1
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSkipThenConditionInBlock (ifElseSkipThen) =========================================
@@ -10057,7 +10057,7 @@ ifElseSkipThenConditionInBlock {
   }
   #s1
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSplit (ifElseSplit) =========================================
@@ -10131,7 +10131,7 @@ ifEnterThen {
   #loc = true;
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifEnterThenConditionInBlock (ifEnterThen) =========================================
@@ -10148,7 +10148,7 @@ ifEnterThenConditionInBlock {
   }
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifEqualsInteger (ifEqualsInteger) =========================================
@@ -10337,7 +10337,7 @@ ifSkipThen {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #loc = false;
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifSkipThenConditionInBlock (ifSkipThen) =========================================
@@ -10353,7 +10353,7 @@ ifSkipThenConditionInBlock {
     #loc = false;
   }
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifSplit (ifElseSplit) =========================================
@@ -11307,7 +11307,7 @@ Choices: true}
 insert_constant_value {
 \find(#cv)
 \replacewith(#constantvalue(#cv)) 
-\heuristics(concrete)
+\heuristics(concrete_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == insert_eq_all (insert_eq_all) =========================================
@@ -11632,12 +11632,6 @@ intersectionSetMinusItself_2 {
 \replacewith(empty) 
 \heuristics(concrete)
 Choices: programRules:Java}
------------------------------------------------------
-== introduceAxiom (introduceAxiom) =========================================
-introduceAxiom {
-\add [cutFormula]==>[] 
-
-Choices: true}
 -----------------------------------------------------
 == irrflConcrete1 (irrflConcrete1) =========================================
 irrflConcrete1 {
@@ -13931,7 +13925,7 @@ null_can_always_be_stored_in_a_reference_type_array {
 \find(arrayStoreValid(array,null))
 \sameUpdateLevel\varcond(\isReferenceArray(array (GOS term)))
 \replacewith(true) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == observerDependency (observerDependency) =========================================

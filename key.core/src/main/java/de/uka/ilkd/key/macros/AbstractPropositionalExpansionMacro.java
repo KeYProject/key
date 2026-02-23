@@ -86,7 +86,6 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * rejects everything else.
      */
     private static class PropExpansionStrategy implements Strategy<Goal> {
-
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
@@ -142,6 +141,5 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         public boolean isStopAtFirstNonCloseableGoal() {
             return false;
         }
-
     }
 }

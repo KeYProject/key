@@ -5,7 +5,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -85,7 +84,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                 .equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY))) {
             // Make sure that an immediately alias check is performed by doing cuts of objects to
             // find out if they can be the same or not
-            RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
+            RuleSetDispatchFeature instRsd = getDispatcher(StrategyAspect.Instantiation);
             enableInstantiate();
             final TermBuffer<Goal> buffer = new TermBuffer<>();
             Feature originalCut = instRsd.get(getHeuristic("cut"));
@@ -106,7 +105,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupApprovalF() {
+    protected @NonNull Feature setupApprovalF() {
         Feature result = super.setupApprovalF();
         // Make sure that cuts are only applied if the cut term is not already part of the sequent.
         // This check is performed exactly before the rule is applied because the sequent might has
@@ -122,17 +121,17 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupGlobalF(Feature dispatcher) {
+    protected @NonNull Feature setupGlobalF(@NonNull Feature dispatcher) {
         Feature globalF = super.setupGlobalF(dispatcher);
         // Make sure that modalities without symbolic execution label are executed first because
         // they might forbid rule application on modalities with symbolic execution label (see loop
         // body branches)
         globalF = add(globalF, ifZero(not(new BinaryFeature() {
             @Override
-            protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-                    PosInOccurrence pos, Goal goal, MutableState mState) {
+            protected <GOAL extends ProofGoal<@NonNull GOAL>> boolean filter(RuleApp app,
+                    PosInOccurrence pos, GOAL goal, MutableState mState) {
                 return pos != null
-                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel((JTerm) pos.subTerm());
+                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
             }
         }), longConst(-3000)));
         // Make sure that the modality which executes a loop body is preferred against the
@@ -141,9 +140,9 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             add(globalF,
                 ifZero(add(new Feature() {
                     @Override
-                    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(
+                    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(
                             RuleApp app, PosInOccurrence pos,
-                            Goal goal, MutableState mState) {
+                            GOAL goal, MutableState mState) {
                         return pos != null ? cost(0) : TopRuleAppCost.INSTANCE;
                     }
                 },
@@ -302,7 +301,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public StrategySettingsDefinition getSettingsDefinition() {
+        public @NonNull StrategySettingsDefinition getSettingsDefinition() {
             // Properties
             OneOfStrategyPropertyDefinition methodTreatment = new OneOfStrategyPropertyDefinition(
                 StrategyProperties.METHOD_OPTIONS_KEY, "Method Treatment",

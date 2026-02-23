@@ -81,10 +81,11 @@ public final class OneStepSimplifier implements BuiltInRule {
      * "evaluate_instanceof"; in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets = ImmutableSLList.<String>nil()
-            .append("concrete").append("update_elim").append("update_apply_on_update")
+            .append("concrete").append("concrete_java").append("update_elim")
+            .append("update_apply_on_update")
             .append("update_apply").append("update_join").append("elimQuantifier");
 
-    private static final boolean[] bottomUp = { false, false, true, true, true, false };
+    private static final boolean[] bottomUp = { false, false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
         new LRUCache<>(APPLICABILITY_CACHE_SIZE);
 
@@ -687,7 +688,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
         return result;
     }
-
 
     // -------------------------------------------------------------------------
     // inner classes

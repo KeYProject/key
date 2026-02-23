@@ -61,10 +61,11 @@ public class UrlRuleSource extends RuleSource {
             try {
                 return Paths.get(uri);
             } catch (FileSystemNotFoundException e) {
-                URI rootFs = URI.create(StringUtil.takeUntil(uri.toString(), "!"));
-                String internal = StringUtil.takeAfter(uri.toString(), "!");
-                FileSystem zipfs = FileSystems.newFileSystem(rootFs, new HashMap<>());
-                return zipfs.getPath(internal);
+                URI rootFs = URI.create(StringUtil.takeUntil(uri.toString(), "\\!"));
+                String internal = StringUtil.takeAfter(uri.toString(), "\\!");
+                try (FileSystem zipfs = FileSystems.newFileSystem(rootFs, new HashMap<>())) {
+                    return zipfs.getPath(internal);
+                }
             }
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
