@@ -2256,7 +2256,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * translate a bsum function. Alos add the created functionsymbol created depending on the term.
      *
      * @param bsumterm The term used as third argument of the bsum function.
-     * @pram sub The two terms used as first and second argument of the bsum operator.
+     * @param sub The two terms used as first and second argument of the bsum operator.
      * @return
      */
     protected final StringBuilder translateBsumFunction(JTerm bsumterm,
@@ -2294,7 +2294,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * term.
      *
      * @param bprodterm The term used as third argument of the bsum function.
-     * @pram sub The two terms used as first and second argument of the bsum operator.
+     * @param sub The two terms used as first and second argument of the bsum operator.
      * @return
      */
     protected final StringBuilder translateBprodFunction(JTerm bprodterm,
@@ -2330,7 +2330,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *
      * @param op the operator used for this function.
      * @param sorts the list of sort parameter of this function
-     * @result the function's result sort
+     * @return the function's result sort
      */
     private void addFunction(Operator op, ArrayList<Sort> sorts, Sort result, Services services) {
         if (!this.functionDecls.containsKey(op)) {

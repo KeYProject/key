@@ -16,7 +16,7 @@ jobs:
         tests: [":key.core.proof_references:test", ":key.core.symbolic_execution:test"]
     runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up JDK ${{matrix.java}}
         uses: actions/setup-java@v5
         with:
@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew --continue ${{ matrix.tests }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: success() || failure()
         with:
           name: test-results-${{ matrix.tests }}

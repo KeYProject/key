@@ -74,7 +74,7 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
     /**
      * Get the exact Class the denoted method body is from.
      *
-     * @returns the TypeReference
+     * @return the TypeReference
      */
 
     public TypeReference getBodySource() {

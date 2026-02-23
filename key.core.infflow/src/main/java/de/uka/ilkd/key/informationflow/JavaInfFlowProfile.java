@@ -1,0 +1,62 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.informationflow;
+
+import de.uka.ilkd.key.InfFlowUseOperationContractRule;
+import de.uka.ilkd.key.informationflow.rule.InfFlowBlockContractInternalRule;
+import de.uka.ilkd.key.informationflow.rule.InfFlowWhileInvariantRule;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.rule.*;
+
+import org.key_project.util.collection.ImmutableList;
+
+/**
+ * This profile sets up KeY for verification of JavaCard programs.
+ */
+public class JavaInfFlowProfile extends JavaProfile {
+    public static final String NAME = "Java InfFlow Profile";
+    public static final String PROFILE_ID = "java-infflow";
+
+    @Override
+    public String ident() {
+        return PROFILE_ID;
+    }
+
+    @Override
+    public String displayName() {
+        return NAME;
+    }
+
+    @Override
+    public String description() {
+        return "Profile with Built-In rules for Information Flow proofs. " +
+            "Required for 'non-inference' proof obligations.";
+    }
+
+    @Override
+    public UseOperationContractRule getUseOperationContractRule() {
+        return InfFlowUseOperationContractRule.INSTANCE;
+    }
+
+    @Override
+    protected ImmutableList<BuiltInRule> initBuiltInRules() {
+        var rules = super.initBuiltInRules();
+        return rules.map(it -> {
+            if (it == BlockContractInternalRule.INSTANCE) {
+                return InfFlowBlockContractInternalRule.INSTANCE;
+            }
+            if (it instanceof UseOperationContractRule) {
+                return InfFlowUseOperationContractRule.INSTANCE;
+            }
+            if (it instanceof WhileInvariantRule) {
+                return InfFlowWhileInvariantRule.INSTANCE;
+            }
+
+            return it;
+        })
+                .filter(it -> it != BlockContractExternalRule.INSTANCE)
+                .filter(it -> !(it instanceof LoopScopeInvariantRule))
+                .filter(it -> !(it instanceof LoopContractExternalRule));
+    }
+}

@@ -19,6 +19,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
@@ -235,7 +237,7 @@ public interface LoopSpecification extends SpecificationElement {
      * @return the instantiated loop specification.
      */
     LoopSpecification instantiate(Map<LocationVariable, JTerm> invariants,
-            Map<LocationVariable, JTerm> freeInvariants, JTerm variant);
+            Map<LocationVariable, JTerm> freeInvariants, @Nullable JTerm variant);
 
     /**
      * Configure the existing loop specification element with new elements, i.e., loop invariant
