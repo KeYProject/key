@@ -26,29 +26,77 @@ class JavaCompilerCheckFacadeTest {
             new ProblemInitializer.ProblemInitializerListener() {
                 @Override
                 public void proofCreated(ProblemInitializer sender,
-                        ProofAggregate proofAggregate) {}
+                        ProofAggregate proofAggregate) {
+                }
 
                 @Override
-                public void progressStarted(Object sender) {}
+                public void progressStarted(Object sender) {
+                }
 
                 @Override
-                public void progressStopped(Object sender) {}
+                public void progressStopped(Object sender) {
+                }
 
                 @Override
-                public void reportStatus(Object sender, String status, int progress) {}
+                public void reportStatus(Object sender, String status, int progress) {
+                }
 
                 @Override
-                public void reportStatus(Object sender, String status) {}
+                public void reportStatus(Object sender, String status) {
+                }
 
                 @Override
-                public void resetStatus(Object sender) {}
+                public void resetStatus(Object sender) {
+                }
 
                 @Override
-                public void reportException(Object sender, ProofOblInput input, Exception e) {}
+                public void reportException(Object sender, ProofOblInput input, Exception e) {
+                }
             };
         var promise =
             JavaCompilerCheckFacade.check(emptyListener, null, Collections.emptyList(),
-                src.toPath());
+                src.toPath(), new JavacSettings());
+        promise.get();
+    }
+
+    @Test
+    void compileExternal() throws ExecutionException, InterruptedException {
+        File src = new File("examples/firstTouch/06-BinarySearch/src/").getAbsoluteFile();
+        System.out.println(src);
+        ProblemInitializer.ProblemInitializerListener emptyListener =
+            new ProblemInitializer.ProblemInitializerListener() {
+                @Override
+                public void proofCreated(ProblemInitializer sender,
+                        ProofAggregate proofAggregate) {
+                }
+
+                @Override
+                public void progressStarted(Object sender) {
+                }
+
+                @Override
+                public void progressStopped(Object sender) {
+                }
+
+                @Override
+                public void reportStatus(Object sender, String status, int progress) {
+                }
+
+                @Override
+                public void reportStatus(Object sender, String status) {
+                }
+
+                @Override
+                public void resetStatus(Object sender) {
+                }
+
+                @Override
+                public void reportException(Object sender, ProofOblInput input, Exception e) {
+                }
+            };
+        var promise =
+            JavaCompilerCheckFacade.checkExternally(emptyListener, null, Collections.emptyList(),
+                src.toPath(), new JavacSettings());
         promise.get();
     }
 
