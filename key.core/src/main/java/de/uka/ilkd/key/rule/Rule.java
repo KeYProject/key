@@ -4,11 +4,18 @@
 package de.uka.ilkd.key.rule;
 
 
+import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.HasOrigin;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
  * This interface has to be implemented by all classes that want to act as a rule in the calculus.
  */
-public interface Rule extends org.key_project.prover.rules.Rule, HasOrigin {
+public interface Rule extends org.key_project.prover.rules.Rule, HasOrigin, HasDocumentation {
+    @Override
+    default @NonNull String getDocumentationKey() {
+        return "rule/" + this.name();
+    }
 }

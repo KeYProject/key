@@ -157,7 +157,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
      * Fires the event
-     * {@link TermLabelVisibilityManagerListener#visibleLabelsChanged( TermLabelVisibilityManagerEvent)}
+     * {@link TermLabelVisibilityManagerListener#visibleLabelsChanged(TermLabelVisibilityManagerEvent)}
      * to all listeners.
      *
      * @param e The event object.

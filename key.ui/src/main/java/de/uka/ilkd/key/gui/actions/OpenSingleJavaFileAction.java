@@ -39,7 +39,8 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
 
         if (result == JFileChooser.APPROVE_OPTION) {
             Path file = fc.getSelectedFile().toPath();
-            mainWindow.addRecentFile(file.toAbsolutePath().toString());
+            mainWindow.addRecentFile(file.toAbsolutePath().toString(),
+                null, true, null);
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
             ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,

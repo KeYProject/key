@@ -65,35 +65,10 @@ public abstract class AbstractProblemLoader {
      */
     private boolean loadSingleJavaFile = false;
 
-    public static class ReplayResult {
-
-        private final Node node;
-        private final List<Throwable> errors;
-        private final String status;
-
-        public ReplayResult(String status, List<Throwable> errors, Node node) {
-            this.status = status;
-            this.errors = errors;
-            this.node = node;
-        }
-
-        public Node getNode() {
-            return node;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public List<Throwable> getErrorList() {
-            return errors;
-        }
-
-        public boolean hasErrors() {
-            return errors != null && !errors.isEmpty();
-        }
-
-    }
+    /**
+     *
+     */
+    private @Nullable Configuration additionalProfileOptions;
 
     /**
      * The file or folder to load.
@@ -552,6 +527,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        pi.setAdditionalProfileOptions(additionalProfileOptions);
         pi.setFileRepo(fileRepo);
         return pi;
     }
@@ -858,5 +834,46 @@ public abstract class AbstractProblemLoader {
 
     public void setIgnoreWarnings(boolean ignoreWarnings) {
         this.ignoreWarnings = ignoreWarnings;
+    }
+
+    public void setAdditionalProfileOptions(@Nullable Configuration additionalProfileOptions) {
+        this.additionalProfileOptions = additionalProfileOptions;
+    }
+
+    /// An arbitrary object representing additional options for the given profile.
+    /// @see ProblemInitializer
+    public Configuration getAdditionalProfileOptions() {
+        return additionalProfileOptions;
+    }
+
+
+    public static class ReplayResult {
+
+        private final Node node;
+        private final List<Throwable> errors;
+        private final String status;
+
+        public ReplayResult(String status, List<Throwable> errors, Node node) {
+            this.status = status;
+            this.errors = errors;
+            this.node = node;
+        }
+
+        public Node getNode() {
+            return node;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public List<Throwable> getErrorList() {
+            return errors;
+        }
+
+        public boolean hasErrors() {
+            return errors != null && !errors.isEmpty();
+        }
+
     }
 }

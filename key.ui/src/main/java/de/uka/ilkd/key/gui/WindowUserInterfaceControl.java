@@ -97,9 +97,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
 
     public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
-        mainWindow.addRecentFile(file.toAbsolutePath().toString());
         ProblemLoader problemLoader = getProblemLoader(file, null, null, null, getMediator());
         configure.accept(problemLoader);
+        mainWindow.addRecentFile(file.toAbsolutePath().toString(),
+            problemLoader.getProfileOfNewProofs(),
+            problemLoader.isLoadSingleJavaFile(),
+            problemLoader.getAdditionalProfileOptions());
         problemLoader.runAsynchronously();
     }
 
@@ -112,16 +115,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      */
     public void loadProblem(Path file, @Nullable List<Path> classPath,
             @Nullable Path bootClassPath, @Nullable List<Path> includes) {
-        mainWindow.addRecentFile(file.toAbsolutePath().toString());
+        mainWindow.addRecentFile(file.toAbsolutePath().toString(), null, false, null);
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     public void loadProblem(Path file, Profile profile) {
-        loadProblem(file, (pl) -> {
-            pl.setProfileOfNewProofs(profile);
-        });
+        loadProblem(file, (pl) -> pl.setProfileOfNewProofs(profile));
     }
 
     @Override
@@ -131,7 +132,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
-        mainWindow.addRecentFile(proofBundle.toAbsolutePath().toString());
+        mainWindow.addRecentFile(proofBundle.toAbsolutePath().toString(), null, false, null);
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -369,7 +370,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
-            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString());
+            mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString(), profile,
+                false, null);
         }
         try {
             getMediator().stopInterface(true);

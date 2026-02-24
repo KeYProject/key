@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
+import org.key_project.logic.HasDocumentation;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
@@ -14,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Rulesets had been originally called heuristics.
 ///
-public record RuleSet(Name name) implements Named {
+public record RuleSet(Name name) implements Named, HasDocumentation {
     /// creates a ruleset
     ///
     /// @param name the [Name] of the ruleset
@@ -44,4 +45,9 @@ public record RuleSet(Name name) implements Named {
 
     /// toString
     public String toString() { return name.toString(); }
+
+    @Override
+    public String getDocumentationKey() {
+        return "heuristic/" + name;
+    }
 }

@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 /// A choice is represented by a string, where the category is separated by the option with a colon.
 ///
 /// Choices can be declared within KeY files. They influence the activation of taclets.
-public class Choice implements Named {
+public class Choice implements Named, HasDocumentation {
     private final @NonNull Name name;
     private final @NonNull String category;
 
@@ -57,5 +57,10 @@ public class Choice implements Named {
     @Override
     public String toString() {
         return name.toString();
+    }
+
+    @Override
+    public String getDocumentationKey() {
+        return "choice/" + name;
     }
 }

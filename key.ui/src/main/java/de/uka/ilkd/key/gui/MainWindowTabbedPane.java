@@ -32,7 +32,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         assert mainWindow != null;
 
         proofTreeView = new ProofTreeView(mediator);
-        InfoView infoView = new InfoView(mainWindow, mediator);
+        InfoView infoView = new InfoView(mediator);
         StrategySelectionView strategySelectionView =
             new StrategySelectionView(mainWindow, mediator);
         GoalList openGoalsView = new GoalList(mediator);
