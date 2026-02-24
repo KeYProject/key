@@ -662,9 +662,9 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
-        var act = new ActionHistoryExtension(this, mediator);
-        toolBar.add(act.getUndoButton().getAction());
-        toolBar.add(act.getUndoUptoButton());
+        //var act = new ActionHistoryExtension(this, mediator);
+        //toolBar.add(act.getUndoButton().getAction());
+        //toolBar.add(act.getUndoUptoButton());
         toolBar.addSeparator();
 
         return toolBar;
