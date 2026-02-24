@@ -13,7 +13,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -48,7 +48,7 @@ public abstract class AbstractPO implements IPersistablePO {
     protected ImmutableSet<NoPosTacletApp> taclets;
     protected JTerm[] poTerms;
     protected String[] poNames;
-    private String header;
+    private KeyAst.Declarations header;
     private ProofAggregate proofAggregate;
 
 
@@ -376,37 +376,6 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     /**
-     * Creates declarations necessary to save/load proof in textual form (helper for createProof()).
-     */
-    private void createProofHeader(
-            JavaModel model, Services services) {
-
-        if (header != null) {
-            return;
-        }
-
-        final StringBuilder sb = new StringBuilder(model.asKeyString());
-
-        // contracts
-        ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
-        for (Contract c : contractsToSave) {
-            if (!c.toBeSaved()) {
-                contractsToSave = contractsToSave.remove(c);
-            }
-        }
-        if (!contractsToSave.isEmpty()) {
-            sb.append("\\contracts {\n");
-            for (Contract c : contractsToSave) {
-                sb.append(c.proofToString(services));
-            }
-            sb.append("}\n\n");
-        }
-
-        header = sb.toString();
-    }
-
-
-    /**
      * Creates a Proof (helper for getPO()).
      *
      * @param proofName name of the proof
@@ -418,8 +387,7 @@ public abstract class AbstractPO implements IPersistablePO {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
-        final JavaModel javaModel = proofConfig.getServices().getJavaModel();
-        createProofHeader(javaModel, proofConfig.getServices());
+        header = proofConfig.getProblemHeader();
 
         final Proof proof = createProofObject(proofName, header, poTerm, proofConfig);
 
@@ -428,7 +396,9 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected Proof createProofObject(String proofName, String proofHeader, JTerm poTerm,
+
+    protected Proof createProofObject(String proofName, KeyAst.Declarations proofHeader,
+            JTerm poTerm,
             InitConfig proofConfig) {
         return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }

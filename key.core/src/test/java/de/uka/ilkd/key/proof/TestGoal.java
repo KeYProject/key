@@ -49,7 +49,7 @@ public class TestGoal {
 
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
-        proof = new Proof("", seq, "", initConfig.createTacletIndex(),
+        proof = new Proof("", seq, null, initConfig.createTacletIndex(),
             initConfig.createBuiltInRuleIndex(), initConfig);
 
 

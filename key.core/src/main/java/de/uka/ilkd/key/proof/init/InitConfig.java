@@ -8,6 +8,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -34,6 +35,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -79,10 +81,12 @@ public class InitConfig {
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
 
+    // weigl this field is never set
     private String originalKeYFileName;
 
     private ProofSettings settings;
 
+    private KeyAst.@Nullable Declarations header;
 
 
     // -------------------------------------------------------------------------
@@ -437,6 +441,7 @@ public class InitConfig {
             (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
+        ic.header = header;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         return ic;
@@ -465,5 +470,13 @@ public class InitConfig {
                     .stream().filter(it -> choice.category().equals(it.category()))
                     .collect(ImmutableSet.collector())
                     .add(choice));
+    }
+
+    public KeyAst.@Nullable Declarations getProblemHeader() {
+        return header;
+    }
+
+    public void setHeader(KeyAst.@Nullable Declarations header) {
+        this.header = header;
     }
 }
