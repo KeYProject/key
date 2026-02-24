@@ -74,6 +74,22 @@ subprojects {
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
         testImplementation(testFixtures(project(":key.util")))
+
+        testImplementation("ch.qos.logback:logback-classic:1.5.27")
+
+        testImplementation(platform("org.junit:junit-bom:5.14.2"))
+        testImplementation ("org.junit.jupiter:junit-jupiter-api")
+        testImplementation ("org.junit.jupiter:junit-jupiter-params")
+        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation ("org.assertj:assertj-core:3.27.7")
+        testImplementation project(':key.util')
+
+        // test fixtures
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.0")
+
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
 
     tasks.withType(JavaCompile).configureEach {
