@@ -831,7 +831,13 @@ public final class IOUtil {
     /// @param basePath a directory
     /// @return a string that is printable (escaped) for KeY files
     public static String safePathRelativeTo(Path source, Path basePath) {
-        var abs = source.toAbsolutePath();
-        return safePath(basePath.relativize(abs));
+        if (Objects.equals(source.getRoot(), basePath.getRoot())) {
+            // required on Windows
+            var abs = source.toAbsolutePath();
+            return safePath(basePath.relativize(abs));
+        } else {
+            // fallback: return absolute path
+            return safePath(source.toAbsolutePath());
+        }
     }
 }
