@@ -1,15 +1,12 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy;
-
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.ProofSettings;
+package org.key_project.prover.strategy;
 
 import org.key_project.logic.Named;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -17,10 +14,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-
-/**
- * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
- */
 public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
@@ -33,9 +26,7 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return computeCost(app, pos, goal, new MutableState());
-    }
+    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal);
 
     /**
      * Checks if the {@link Strategy} should stop at the first non-closeable {@link Goal}.
@@ -62,21 +53,8 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
     void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector);
 
-    /**
-     * Updates the {@link Strategy} for the given {@link Proof} by setting the {@link Strategy}'s
-     * {@link StrategyProperties} to the given ones.
-     *
-     * @param proof The {@link Proof} the strategy of which should be updated.
-     * @param p The new {@link StrategyProperties}
-     */
-    static void updateStrategySettings(Proof proof, StrategyProperties p) {
-        final Strategy<de.uka.ilkd.key.proof.Goal> strategy = proof.getActiveStrategy();
-        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
-        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
+    boolean isResponsibleFor(RuleSet rs);
 
-        proof.getSettings().getStrategySettings().setStrategy(strategy.name());
-        proof.getSettings().getStrategySettings().setActiveStrategyProperties(p);
-
-        proof.setActiveStrategy(strategy);
-    }
+    RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            Goal goal, MutableState mState);
 }

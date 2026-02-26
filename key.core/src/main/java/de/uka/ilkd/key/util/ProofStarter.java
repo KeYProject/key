@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -27,6 +26,7 @@ import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

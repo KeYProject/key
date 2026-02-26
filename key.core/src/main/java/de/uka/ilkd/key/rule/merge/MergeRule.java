@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -657,7 +657,7 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pio, LogicServices services) {
         return new MergeRuleBuiltInRuleApp(this, pio);
     }
 

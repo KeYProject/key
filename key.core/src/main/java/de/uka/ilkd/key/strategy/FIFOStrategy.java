@@ -21,7 +21,7 @@ import org.jspecify.annotations.NonNull;
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp.
  */
-public class FIFOStrategy implements Strategy<Goal> {
+public class FIFOStrategy implements JavaStrategy {
 
     private static final Name NAME = new Name("FIFO");
 
@@ -57,14 +57,15 @@ public class FIFOStrategy implements Strategy<Goal> {
 
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            RuleAppCostCollector collector) {}
+            org.key_project.prover.strategy.RuleAppCostCollector collector) {}
 
     @Override
     public Name name() {
         return NAME;
     }
 
-    public static final Strategy<Goal> INSTANCE = new FIFOStrategy();
+    public static final org.key_project.prover.strategy.Strategy<Goal> INSTANCE =
+        new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
         @Override
@@ -73,7 +74,8 @@ public class FIFOStrategy implements Strategy<Goal> {
         }
 
         @Override
-        public Strategy<Goal> create(Proof proof, StrategyProperties properties) {
+        public org.key_project.prover.strategy.Strategy<Goal> create(Proof proof,
+                StrategyProperties properties) {
             return INSTANCE;
         }
 

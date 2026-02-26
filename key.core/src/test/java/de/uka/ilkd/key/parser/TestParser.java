@@ -6,6 +6,7 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -48,7 +49,7 @@ public class TestParser {
         expected.put(include.toString(), RuleSourceFactory.initRuleFile(include.toURI().toURL()));
         final String keyFile = "\\include \"" + include.getPath() + "\";";
         KeyAst.File file = ParsingFacade.parseFile(CharStreams.fromString(keyFile));
-        Includes actual = file.getIncludes(new File(".").toURI().toURL());
+        Includes actual = file.getIncludes(Path.of("."));
 
         // `Includes` does not provide an `Object#equals()` redefinition for the
         // moment, at least compare the list of filenames

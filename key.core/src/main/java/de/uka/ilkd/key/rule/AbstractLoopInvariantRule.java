@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -157,8 +158,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopInvariantBuiltInRuleApp(this, pos, services);
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services) {
+        return new LoopInvariantBuiltInRuleApp(this, pos, (TermServices) services);
     }
 
     @Override

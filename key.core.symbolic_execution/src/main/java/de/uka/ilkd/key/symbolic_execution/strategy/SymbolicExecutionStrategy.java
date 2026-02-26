@@ -5,18 +5,16 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
@@ -28,23 +26,26 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
+import org.key_project.prover.strategy.costbased.feature.CountBranchFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 import org.jspecify.annotations.NonNull;
 
 /**
- * {@link Strategy} to use for symbolic execution.
+ * {@link JavaStrategy} to use for symbolic execution.
  */
 public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
-     * The {@link Name} of the symbolic execution {@link Strategy}.
+     * The {@link Name} of the symbolic execution {@link JavaStrategy}.
      */
     public static final Name name = new Name("Symbolic Execution Strategy");
 
@@ -85,7 +86,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                 .equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY))) {
             // Make sure that an immediately alias check is performed by doing cuts of objects to
             // find out if they can be the same or not
-            RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
+            RuleSetDispatchFeature instRsd = getDispatcher(StrategyAspect.Instantiation);
             enableInstantiate();
             final TermBuffer<Goal> buffer = new TermBuffer<>();
             Feature originalCut = instRsd.get(getHeuristic("cut"));
@@ -106,7 +107,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupApprovalF() {
+    protected @NonNull Feature setupApprovalF() {
         Feature result = super.setupApprovalF();
         // Make sure that cuts are only applied if the cut term is not already part of the sequent.
         // This check is performed exactly before the rule is applied because the sequent might has
@@ -122,17 +123,17 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupGlobalF(Feature dispatcher) {
+    protected @NonNull Feature setupGlobalF(@NonNull Feature dispatcher) {
         Feature globalF = super.setupGlobalF(dispatcher);
         // Make sure that modalities without symbolic execution label are executed first because
         // they might forbid rule application on modalities with symbolic execution label (see loop
         // body branches)
         globalF = add(globalF, ifZero(not(new BinaryFeature() {
             @Override
-            protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-                    PosInOccurrence pos, Goal goal, MutableState mState) {
+            protected <GOAL extends ProofGoal<@NonNull GOAL>> boolean filter(RuleApp app,
+                    PosInOccurrence pos, GOAL goal, MutableState mState) {
                 return pos != null
-                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel((JTerm) pos.subTerm());
+                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
             }
         }), longConst(-3000)));
         // Make sure that the modality which executes a loop body is preferred against the
@@ -141,9 +142,9 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             add(globalF,
                 ifZero(add(new Feature() {
                     @Override
-                    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(
+                    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(
                             RuleApp app, PosInOccurrence pos,
-                            Goal goal, MutableState mState) {
+                            GOAL goal, MutableState mState) {
                         return pos != null ? cost(0) : TopRuleAppCost.INSTANCE;
                     }
                 },
@@ -302,7 +303,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public StrategySettingsDefinition getSettingsDefinition() {
+        public @NonNull StrategySettingsDefinition getSettingsDefinition() {
             // Properties
             OneOfStrategyPropertyDefinition methodTreatment = new OneOfStrategyPropertyDefinition(
                 StrategyProperties.METHOD_OPTIONS_KEY, "Method Treatment",

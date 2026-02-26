@@ -178,7 +178,7 @@ public abstract class TacletExecutor
             // collected, then it is looked if an instantiation is known and if
             // positive the instantiation is memorized. At last the Taclet with
             // its required instantiations is handed over to the goal, where a
-            // new TacletApp should be built including the necessary instantiation
+            // new ITacletApp should be built including the necessary instantiation
             // information
 
             SVInstantiations neededInstances = SVInstantiations.EMPTY_SVINSTANTIATIONS

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.ExternalSolverRule;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -48,7 +48,7 @@ public class SMTRule implements ExternalSolverRule {
 
 
     @Override
-    public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public SMTRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new SMTRuleApp(this, null, "");
     }
 

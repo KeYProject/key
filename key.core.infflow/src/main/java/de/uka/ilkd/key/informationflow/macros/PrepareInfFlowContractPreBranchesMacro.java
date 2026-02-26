@@ -10,12 +10,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
-import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -138,17 +138,9 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             return parentRuleName;
         }
 
-
-        @Override
-        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                MutableState mState) {
-            return computeCost(app, pio, goal, mState);
-        }
-
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
             return false;
         }
     }
-
 }

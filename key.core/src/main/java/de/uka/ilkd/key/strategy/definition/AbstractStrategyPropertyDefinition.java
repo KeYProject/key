@@ -62,9 +62,9 @@ public abstract class AbstractStrategyPropertyDefinition {
     }
 
     /**
-     * Returns the human readable name of the property.
+     * Returns the human-readable name of the property.
      *
-     * @return The human readable name of the property.
+     * @return The human-readable name of the property.
      */
     public String getName() {
         return name;

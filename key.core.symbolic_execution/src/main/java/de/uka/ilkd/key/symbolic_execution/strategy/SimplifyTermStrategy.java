@@ -26,13 +26,13 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.jspecify.annotations.NonNull;
 
 /**
- * {@link Strategy} used to simplify {@link JTerm}s in side proofs.
+ * {@link JavaStrategy} used to simplify {@link JTerm}s in side proofs.
  *
  * @author Martin Hentschel
  */
 public class SimplifyTermStrategy extends JavaCardDLStrategy {
     /**
-     * The {@link Name} of the side proof {@link Strategy}.
+     * The {@link Name} of the side proof {@link JavaStrategy}.
      */
     public static final Name name = new Name("Simplify Term Strategy");
 
@@ -100,7 +100,8 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Strategy<Goal> create(Proof proof, StrategyProperties sp) {
+        public org.key_project.prover.strategy.Strategy<Goal> create(Proof proof,
+                StrategyProperties sp) {
             return new SimplifyTermStrategy(proof, sp);
         }
 

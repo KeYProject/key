@@ -235,12 +235,12 @@ public class TestCollisionResolving {
         /*
          * IList<SVInstantiations> sviList=taclet.matchIf (seq,
          * taclet.match(semiseq.get(0).formula(), taclet.find(),
-         * MatchConditions.EMPTY_MATCHCONDITIONS, null, Constraint.BOTTOM), null); TacletApp app =
+         * MatchConditions.EMPTY_MATCHCONDITIONS, null, Constraint.BOTTOM), null); ITacletApp app =
          * PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos);
          */
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertNotSame(app, app1,
-            "A different TacletApp should have been created to resolve" + " name conflicts");
+            "A different ITacletApp should have been created to resolve" + " name conflicts");
 
         assertNotEquals(((JTerm) app1.instantiations().getInstantiation(u)).op().name(),
             ((JTerm) app1.instantiations().getInstantiation(v)).op().name(),
@@ -315,10 +315,10 @@ public class TestCollisionResolving {
      * Sequent seq=Sequent.createSuccSequent(semiseq); PosInOccurrence pos=new
      * PosInOccurrence(semiseq.get(1), PosInTerm.TOP_LEVEL.down(0), seq); IList<SVInstantiations>
      * sviList=taclet.matchIf (seq, taclet.match(semiseq.get(1).formula().sub(0), taclet.find(),
-     * taclet.createInitialInstantiation())); TacletApp app =
-     * PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos); TacletApp
+     * taclet.createInitialInstantiation())); ITacletApp app =
+     * PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos); ITacletApp
      * app1=app.prepareUserInstantiation();
-     * assertTue("A different TacletApp should have been created to resolve" +" name conflicts",
+     * assertTue("A different ITacletApp should have been created to resolve" +" name conflicts",
      * app!=app1); assertTrue("The names of x and the instantiations of v should be different",
      * !(new Name("x")).equals (((Term)app1.instantiations().getInstantiation(v)).op().name()));
      *
