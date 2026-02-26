@@ -80,7 +80,8 @@ public class OutputStreamProofSaver {
      * Whether the proof steps should be output (usually true).
      */
     protected final boolean saveProofSteps;
-
+    /// Whether steps by the [OneStepSimplifier] should be expanded.
+    protected final boolean expandOneStepSimplifier;
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -110,6 +111,7 @@ public class OutputStreamProofSaver {
         this.proof = proof;
         this.internalVersion = internalVersion;
         this.saveProofSteps = true;
+        this.expandOneStepSimplifier = true;
     }
 
     /**
@@ -119,10 +121,12 @@ public class OutputStreamProofSaver {
      * @param internalVersion currently running KeY version
      * @param saveProofSteps whether to save the performed proof steps
      */
-    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps) {
+    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps,
+            boolean expandOneStepSimplifier) {
         this.proof = proof;
         this.internalVersion = internalVersion;
         this.saveProofSteps = saveProofSteps;
+        this.expandOneStepSimplifier = expandOneStepSimplifier;
     }
 
     /**
@@ -328,13 +332,31 @@ public class OutputStreamProofSaver {
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
      */
-
     private void printSingleTacletApp(TacletApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
+        printSingleTacletApp(appliedRuleApp, node, prefix, output, false);
+    }
 
+    /**
+     * Print applied taclet rule for a single taclet rule application into the passed writer.
+     *
+     * @param appliedRuleApp the rule application to be printed
+     * @param prefix a string which the printed rule is concatenated to
+     * @param output the writer in which the rule is printed
+     * @param isOSSStep whether this node is an expanded OSS rule app step
+     * @throws IOException an exception thrown when printing fails
+     */
+    private void printSingleTacletApp(TacletApp appliedRuleApp, Node node, String prefix,
+            Appendable output, boolean isOSSStep) throws IOException {
+        /*
+         * An OSS rule application may contain rule applications on top-level formulas that get
+         * deleted when expanding the OSS steps. In that case, the rule after the OSS must also be
+         * deleted, as the formula to be removed was never added in the first place.
+         */
+        String tacletName = appliedRuleApp.taclet().name().toString();
         output.append(prefix);
         output.append("(rule \"");
-        output.append(appliedRuleApp.rule().name().toString());
+        output.append(tacletName);
         output.append("\"");
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
@@ -346,6 +368,9 @@ public class OutputStreamProofSaver {
         }
         output.append("");
         userInteraction2Proof(node, output);
+        if (isOSSStep) {
+            output.append(" (ossStep)");
+        }
         notes2Proof(node, output);
         output.append(")\n");
     }
@@ -528,7 +553,7 @@ public class OutputStreamProofSaver {
     private void printSingleBuiltInRuleApp(IBuiltInRuleApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(prefix);
-        output.append(" (builtin \"");
+        output.append("(builtin \"");
         output.append(appliedRuleApp.rule().name().toString());
         output.append("\"");
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
@@ -592,8 +617,34 @@ public class OutputStreamProofSaver {
 
         if (appliedRuleApp instanceof TacletApp) {
             printSingleTacletApp((TacletApp) appliedRuleApp, node, prefix, output);
+        } else if (expandOneStepSimplifier
+                && appliedRuleApp instanceof OneStepSimplifierRuleApp ossa) {
+            printExpandedOneStepSimplifierRuleApp(ossa, node, prefix, output);
         } else if (appliedRuleApp instanceof IBuiltInRuleApp) {
             printSingleBuiltInRuleApp((IBuiltInRuleApp) appliedRuleApp, node, prefix, output);
+        }
+    }
+
+    private void printExpandedOneStepSimplifierRuleApp(OneStepSimplifierRuleApp ossa, Node node,
+            String prefix, Appendable output) throws IOException {
+        OneStepSimplifier.Protocol protocol = ossa.getProtocol();
+        int seqFNum = node.sequent().formulaNumberInSequent(ossa.posInOccurrence());
+        for (int i = 0; i < protocol.size(); i++) {
+            var app = protocol.get(i);
+            Node n = new Node(node.proof());
+            if (i == 0) {
+                n.setNameRecorder(node.getNameRecorder());
+            }
+            Sequent seq = node.sequent()
+                    .replaceFormula(seqFNum, app.posInOccurrence().sequentFormula()).sequent();
+            n.setSequent(seq);
+            if (app instanceof TacletApp ta) {
+                printSingleTacletApp(ta, n, prefix, output, true);
+            } else if (app instanceof IBuiltInRuleApp ba) {
+                // This case does not currently happen, but just in case any built-ins get added to
+                // the OSS...
+                printSingleBuiltInRuleApp(ba, n, prefix, output);
+            }
         }
     }
 
@@ -606,7 +657,6 @@ public class OutputStreamProofSaver {
      * @throws IOException an exception thrown when printing fails
      */
     private void collectProof(Node node, String prefix, Appendable output) throws IOException {
-
         printSingleNode(node, prefix, output);
         Iterator<Node> childrenIt;
 
@@ -695,8 +745,9 @@ public class OutputStreamProofSaver {
         if (pos == null) {
             return "";
         }
+        int inSequent = seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula());
         return " (formula \""
-            + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+            + inSequent
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
@@ -763,7 +814,6 @@ public class OutputStreamProofSaver {
                                     sequentFormula))
                         .append("\")");
             } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
-
                 final String directInstantiation =
                     printTerm((JTerm) sequentFormula.formula(), node.proof().getServices());
 
