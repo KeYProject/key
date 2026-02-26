@@ -86,6 +86,7 @@ public class JavaCompilerCheckFacade {
 
         // gather configured bootstrap classpath and regular classpath
         List<String> options = new ArrayList<>();
+
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
             options.add(bootClassPath.toAbsolutePath().toString());
@@ -97,6 +98,7 @@ public class JavaCompilerCheckFacade {
                         .map(Objects::toString)
                         .collect(Collectors.joining(":")));
         }
+
         ArrayList<Path> files = new ArrayList<>();
         if (Files.isDirectory(javaPath)) {
             try (var s = Files.walk(javaPath)) {

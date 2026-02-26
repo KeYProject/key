@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.reference.ConstructorReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -72,15 +74,30 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         accessPath = rp;
     }
 
-
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
+     * @param arguments the arguments to the constructor
      * @param type a TypeReference (the referred type)
      * @param rp a ReferencePrefix as access path for the constructor
      */
     public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
         super(arguments, type);
+        anonymousClass = null;
+        accessPath = rp;
+    }
+
+    /**
+     * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
+     * @param arguments the arguments to the constructor
+     * @param type a TypeReference (the referred type)
+     * @param rp a ReferencePrefix as access path for the constructor
+     * @param annotations the annotations on the constructor call
+     */
+    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp,
+            ImmutableArray<AnnotationUseSpecification> annotations) {
+        super(arguments, type, annotations);
         anonymousClass = null;
         accessPath = rp;
     }
@@ -156,6 +173,9 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         if (anonymousClass != null) {
             result++;
         }
+        if (annotations != null) {
+            result += annotations.size();
+        }
         return result;
     }
 
@@ -185,6 +205,13 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         if (anonymousClass != null) {
             if (index == 0) {
                 return anonymousClass;
+            }
+            index--;
+        }
+        if (annotations != null) {
+            len = annotations.size();
+            if (len > index) {
+                return annotations.get(index);
             }
         }
         throw new ArrayIndexOutOfBoundsException();

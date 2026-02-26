@@ -39,6 +39,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -77,6 +79,7 @@ import org.jspecify.annotations.Nullable;
  * @author Martin Hentschel
  */
 public abstract class AbstractOperationPO extends AbstractPO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationPO.class);
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
     protected InitConfig proofConfig;

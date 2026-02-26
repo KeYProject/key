@@ -708,6 +708,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | GET_VARIANT
   | IS_LABELED
   | ISINSTRICTFP
+  | HAS_ANNOTATION
 ;
 
 varexp_argument
