@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.strategy.DelegatingRuleAppManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
@@ -137,7 +138,7 @@ public final class Goal implements ProofGoal<Goal> {
         this.goalStrategy = null;
         this.strategyInfos = new MapProperties();
         this.tagManager = new FormulaTagManager(this);
-        setRuleAppManager(new QueueRuleApplicationManager());
+        setRuleAppManager(new DelegatingRuleAppManager(new QueueRuleApplicationManager()));
         this.localNamespaces =
             node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
     }
