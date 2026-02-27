@@ -55,7 +55,7 @@ public class LoopInvariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
+        final LoopStatement loop = svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = //
             services.getSpecificationRepository().getLoopSpec(loop);
 
@@ -71,9 +71,7 @@ public class LoopInvariantCondition implements VariableCondition {
         final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        // TODO: handle exception
-        final JModality.JavaModalityKind modalityKind =
-            (JModality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind = svInst.getInstantiation(modalitySV);
 
         JTerm invInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
@@ -84,6 +82,10 @@ public class LoopInvariantCondition implements VariableCondition {
                 loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
             invInst = maybeInvInst.map(inv -> tb.and(currentInvInst, inv)).orElse(invInst);
+        }
+
+        for (final LocationVariable modifiedVar : MiscTools.getLocalOuts(loop, services)) {
+            invInst = tb.and(invInst, tb.reachableValue(modifiedVar));
         }
 
         return matchCond.setInstantiations( //

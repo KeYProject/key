@@ -54,8 +54,8 @@ public class ProofIndependentSettings {
     private final List<Settings> settings = new LinkedList<>();
 
     private final PropertyChangeListener settingsListener = e -> saveSettings();
-    private Properties lastReadedProperties;
-    private Configuration lastReadedConfiguration;
+    private Properties lastReadProperties;
+    private Configuration lastReadConfiguration;
 
     private ProofIndependentSettings() {
         addSettings(smtSettings);
@@ -75,11 +75,11 @@ public class ProofIndependentSettings {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
             settings.addPropertyChangeListener(settingsListener);
-            if (lastReadedProperties != null) {
-                settings.readSettings(lastReadedProperties);
+            if (lastReadProperties != null) {
+                settings.readSettings(lastReadProperties);
             }
-            if (lastReadedConfiguration != null) {
-                settings.readSettings(lastReadedConfiguration);
+            if (lastReadConfiguration != null) {
+                settings.readSettings(lastReadConfiguration);
             }
         }
     }
@@ -107,19 +107,22 @@ public class ProofIndependentSettings {
                 for (Settings settings : settings) {
                     settings.readSettings(properties);
                 }
-                lastReadedProperties = properties;
+                lastReadProperties = properties;
             }
         } else {
-            this.lastReadedConfiguration = Configuration.load(file.toPath());
+            this.lastReadConfiguration = Configuration.load(file.toPath());
             for (Settings settings : settings) {
-                settings.readSettings(lastReadedConfiguration);
+                settings.readSettings(lastReadConfiguration);
             }
         }
     }
 
     public void saveSettings() {
         if (!filename.getName().endsWith(".json")) {
-            Properties result = new Properties();
+            Properties result = lastReadProperties == null
+                    ? new Properties()
+                    : new Properties(lastReadProperties);
+
             for (Settings settings : settings) {
                 settings.writeSettings(result);
             }
@@ -136,6 +139,10 @@ public class ProofIndependentSettings {
         }
 
         Configuration config = new Configuration();
+        if (lastReadConfiguration != null) {
+            config.overwriteWith(lastReadConfiguration);
+        }
+
         for (var settings : settings)
             settings.writeSettings(config);
         if (!filename.exists()) {

@@ -46,15 +46,20 @@ class TypeManager {
         for (Sort s : master.getSorts()) {
             Set<Sort> children = directChildSorts(s, master.getSorts(), services);
             for (Sort child : children) {
+                // axiom: child <: s
                 master.addAxiom(new SExpr("assert",
                     new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild))
                             && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
-                        SExpr st = new SExpr("subtype", SExprs.sortExpr(child),
-                            SExprs.sortExpr(otherChild));
-                        master.addAxiom(new SExpr("assert", new SExpr("not", st)));
+                        // check: if otherChild is an interface, child might still be subtype of it
+                        if (!child.extendsTrans(otherChild)) {
+                            // axiom: !(child <: otherChild) (if child != otherChild)
+                            SExpr st = new SExpr("subtype", SExprs.sortExpr(child),
+                                SExprs.sortExpr(otherChild));
+                            master.addAxiom(new SExpr("assert", new SExpr("not", st)));
+                        }
                     }
                 }
             }
