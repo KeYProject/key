@@ -100,23 +100,36 @@ public class MissingProofsChecker implements Checker {
             // Only contracts defined in files inside src directory of bundle are
             // considered. For other contracts (e.g. from bootclasspath) a message is
             // printed if loglevel is low enough.
-            Type type = c.getKJT().getJavaType();
-            if (type instanceof TypeDeclaration td) {
-                PositionInfo positionInfo = td.getPositionInfo();
-                URI uri = positionInfo.getURI().orElseThrow().normalize();
-                URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
-
-
-                // ignore contracts from files not in src path (e.g. from bootclasspath)
-                // (this check works independent from number of slashes in URIs)
-                if (srcURI.relativize(uri).isAbsolute()) {
-                    data.addContractWithoutProof(c, true);
-                    data.print(LogLevel.DEBUG, "Ignoring internal contract " + c.getName());
-                    continue;
-                }
+            boolean internal = isInternalContract(c, data);
+            data.addContractWithoutProof(c, internal);
+            if (internal) {
+                data.print(LogLevel.INFO, "Ignoring internal contract " + c.getName());
+            } else {
+                data.print(LogLevel.WARNING, "No proof found for contract " + c.getName());
             }
-            data.addContractWithoutProof(c, false);
-            data.print(LogLevel.WARNING, "No proof found for contract " + c.getName());
         }
+    }
+
+    /**
+     * This method checks if the given contract is an internal contract (i.e., it is not in the
+     * user-provided sources).
+     *
+     * @param c the contract to check
+     * @param data the CheckerData used as a basis
+     * @return true iff the contract is internal
+     */
+    public static boolean isInternalContract(Contract c, CheckerData data) {
+        Type type = c.getKJT().getJavaType();
+        if (type instanceof TypeDeclaration td) {
+            PositionInfo positionInfo = td.getPositionInfo();
+            URI uri = positionInfo.getURI().orElseThrow().normalize();
+            URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
+
+            // ignore contracts from files not in src path (e.g. from bootclasspath)
+            // (this check works independent of number of slashes in URIs)
+            return srcURI.relativize(uri).isAbsolute();
+        }
+        // strange case: not sure what happened here ...
+        return false;
     }
 }
