@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
+import de.uka.ilkd.key.proof.runallproofs.GenerateUnitTestsUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests.*;
 
 /**
  * Generation of test cases (JUnit) for given proof collection files.
@@ -36,6 +34,6 @@ public class GenerateUnitTests {
             System.exit(1);
         }
         var outputFolder = Paths.get(args[0]);
-        run(outputFolder, collections);
+        GenerateUnitTestsUtil.run(outputFolder, collections);
     }
 }

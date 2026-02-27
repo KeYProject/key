@@ -63,9 +63,6 @@ subprojects {
 
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.17")
-        implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.27")
-
 
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
@@ -76,8 +73,8 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.27")
-        testImplementation("org.assertj:assertj-core:3.27.7")
+        testImplementation(testFixtures(project(":key.util")))
+
         testImplementation("ch.qos.logback:logback-classic:1.5.27")
 
         testImplementation(platform("org.junit:junit-bom:5.14.2"))

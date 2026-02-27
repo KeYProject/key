@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +23,9 @@ import org.slf4j.LoggerFactory;
  * @author Kai Wallisch
  */
 public final class RunAllProofsTestUnit implements Serializable {
+    @Serial
     private static final long serialVersionUID = -2406881153415390252L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsTestUnit.class);
 
     /**
      * The name of this test.

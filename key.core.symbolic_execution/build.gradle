@@ -2,7 +2,6 @@ description = "API for using KeY as a symbolic execution engine for Java program
 
 dependencies {
     implementation project(":key.core")
-    testImplementation project(":key.core").sourceSets.test.output
 }
 
 test {

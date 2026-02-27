@@ -24,10 +24,9 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.collection.Pair;
 
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -44,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Alexander Weigl
  * @version 1 (12.07.19)
- * @see GenerateUnitTests
+ * @see GenerateUnitTestsUtil
  */
 public class ProveTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
@@ -93,7 +92,7 @@ public class ProveTest {
         LOGGER.info("({}) Active Settings: {}", caseId,
             ProofSettings.DEFAULT_SETTINGS.settingsToString());
 
-        assertTrue(Files.exists(keyFile), "File " + keyFile + " does not exists");
+        Assertions.assertTrue(Files.exists(keyFile), "File " + keyFile + " does not exists");
 
         // File that the created proof will be saved to.
         var proofFile = Paths.get(keyFile.toAbsolutePath() + ".proof");
@@ -121,11 +120,11 @@ public class ProveTest {
             }
 
             if (testProperty == TestProperty.NOTLOADABLE) {
-                assertTrue(replayResult.hasErrors(),
+                Assertions.assertTrue(replayResult.hasErrors(),
                     "Loading problem file succeeded but it shouldn't");
                 success = true;
             } else {
-                assertFalse(replayResult.hasErrors(), "Loading problem file failed");
+                Assertions.assertFalse(replayResult.hasErrors(), "Loading problem file failed");
 
                 // For a reload test we are done at this point. Loading was successful.
                 if (testProperty == TestProperty.LOADABLE) {
@@ -158,7 +157,7 @@ public class ProveTest {
             success ? " was successful " : " failed ", keyFile);
 
         if (!success) {
-            fail(message);
+            Assertions.fail(message);
         }
     }
 
@@ -172,7 +171,7 @@ public class ProveTest {
             ProofSaver.saveToFile(proofFile, loadedProof);
             boolean reloadedClosed = reloadProof(proofFile);
 
-            assertEquals(loadedProof.closed(), reloadedClosed,
+            Assertions.assertEquals(loadedProof.closed(), reloadedClosed,
                 "Reloaded proof did not close: " + proofFile);
             debugOut("... success: reloaded.");
         }
