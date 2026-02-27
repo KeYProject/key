@@ -113,6 +113,7 @@ public class MissingProofsChecker implements Checker {
     /**
      * This method checks if the given contract is an internal contract (i.e., it is not in the
      * user-provided sources).
+     *
      * @param c the contract to check
      * @param data the CheckerData used as a basis
      * @return true iff the contract is internal
