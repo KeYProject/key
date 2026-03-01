@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew --continue ${{ matrix.tests }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
           name: test-results-${{ matrix.tests }}
