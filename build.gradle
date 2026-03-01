@@ -11,7 +11,7 @@ plugins {
     id "com.diffplug.spotless" version "8.2.1"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.61"
+    id "org.checkerframework" version "1.0.2"
 
     id("org.sonarqube") version "7.2.2.6593"
 
@@ -64,7 +64,7 @@ subprojects {
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.17")
         implementation("org.slf4j:slf4j-api:2.0.17")
-        testImplementation("ch.qos.logback:logback-classic:1.5.27")
+        testImplementation("ch.qos.logback:logback-classic:1.5.32")
 
 
         compileOnly("org.jspecify:jspecify:1.0.0")
@@ -76,11 +76,11 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.27")
+        testImplementation("ch.qos.logback:logback-classic:1.5.32")
         testImplementation("org.assertj:assertj-core:3.27.7")
-        testImplementation("ch.qos.logback:logback-classic:1.5.27")
+        testImplementation("ch.qos.logback:logback-classic:1.5.32")
 
-        testImplementation(platform("org.junit:junit-bom:5.14.2"))
+        testImplementation(platform("org.junit:junit-bom:5.14.3"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
@@ -89,8 +89,8 @@ subprojects {
         testImplementation project(':key.util')
 
         // test fixtures
-        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0")
-        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.0")
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.1")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.1")
 
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }

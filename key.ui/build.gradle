@@ -8,7 +8,7 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://github.com/GradleUp/shadow
-    id 'com.gradleup.shadow' version "9.3.1"
+    id 'com.gradleup.shadow' version "9.3.2"
 }
 
 description = "User interface for the deductive verification of Java programs"
@@ -26,12 +26,12 @@ dependencies {
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
-    api 'com.miglayout:miglayout-swing:11.4.2'
+    api 'com.miglayout:miglayout-swing:11.4.3'
 
     implementation("info.picocli:picocli:4.7.7")
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.5.27'
+    implementation 'ch.qos.logback:logback-classic:1.5.32'
 
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
