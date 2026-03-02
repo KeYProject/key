@@ -84,7 +84,7 @@ public class JMLCommentTransformer extends JavaTransformer {
                 List<Comment> specs = new ArrayList<>();
                 try {
                     specs = node.getData(BEFORE_COMMENTS);
-                } catch (Exception _) {
+                } catch (Exception e) {
                 }
                 specs.addAll(mods);
                 node.setData(BEFORE_COMMENTS, specs);
