@@ -117,6 +117,8 @@ public class Recoder2KeYConverter {
         assert result instanceof CompilationUnit
                 : "a compilation unit must result in a compilation unit!";
 
+        JavaASTDebugOut.logCompilationUnit((CompilationUnit) result);
+
         return (CompilationUnit) result;
     }
 
