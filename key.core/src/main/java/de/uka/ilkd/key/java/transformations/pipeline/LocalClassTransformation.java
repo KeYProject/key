@@ -40,7 +40,7 @@ public class LocalClassTransformation extends JavaTransformer {
 
     @Override
     public void apply(TypeDeclaration<?> td) {
-        var outerVars = services.getFinalVariables(td);
+        var outerVars = services.getLocalVarsExternalToAnonClass(td);
         if (outerVars != null) {
             for (var v : outerVars) {
                 for (final var vr : services.getUsages(v, td)) {

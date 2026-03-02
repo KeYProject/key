@@ -67,6 +67,11 @@ public abstract class JavaTransformer {
     public void apply(CompilationUnit cu) {
         for (TypeDeclaration<?> type : cu.getTypes()) {
             apply(type);
+            for (var m : type.getMembers()) {
+                if (m instanceof TypeDeclaration<?> ty) {
+                    apply(ty);
+                }
+            }
         }
     }
 

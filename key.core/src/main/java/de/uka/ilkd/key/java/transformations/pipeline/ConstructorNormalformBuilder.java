@@ -29,7 +29,6 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.VoidType;
-import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -93,11 +92,11 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         cd.addMember(nf);
         final var etId = "$ENCLOSING_THIS";
 
-        final var outerVars = services.getFinalVariables(cd);
+        final var outerVars = services.getLocalVarsExternalToAnonClass(cd);
 
         Parameter implictParameter = null;
 
-        if (enclosingClass.isPresent()) {
+        if (enclosingClass.isPresent() && !cd.isStatic()) {
             Optional<FieldDeclaration> et = getImplicitEnclosingThis(cd);
             ClassOrInterfaceDeclaration td = enclosingClass.get();
             if (et.isPresent()) {
@@ -211,9 +210,9 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             }
 
             if (outerVars != null) {
-                for (ResolvedFieldDeclaration outerVar : outerVars) {
+                for (var outerVar : outerVars) {
                     final var fieldAccessExpr = new FieldAccessExpr(new ThisExpr(),
-                        PipelineConstants.FINAL_VAR_PREFIX + outerVar.getName());
+                        outerVar.getName());
                     var assign = new AssignExpr(fieldAccessExpr, new NameExpr(outerVar.getName()),
                         AssignExpr.Operator.ASSIGN);
                     body.addStatement(1, assign);
