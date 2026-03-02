@@ -12,10 +12,11 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.utils.PositionUtils;
 import org.jspecify.annotations.NonNull;
 
@@ -36,16 +37,16 @@ public class JMLCommentTransformer extends JavaTransformer {
         super(services);
     }
 
-    private void attachComments(Node cu, List<Comment> allComments) {
-        if (!hasJmlCommentInside(cu)) {
+    private void attachComments(Node node, List<Comment> allComments) {
+        if (!hasJmlCommentInside(node)) {
             return;
         }
 
-        var orphan = cu.getOrphanComments();
+        var orphan = node.getOrphanComments();
         for (Comment comment : orphan) {
-            comment.setParentNode(cu);
+            comment.setParentNode(node);
         }
-        var filterComments = filterToplevel(allComments, cu);
+        var filterComments = filterToplevel(allComments, node);
         filterComments.addAll(orphan);
         PositionUtils.sortByBeginPosition(filterComments);
         if (filterComments.isEmpty()) {
@@ -53,7 +54,7 @@ public class JMLCommentTransformer extends JavaTransformer {
         }
 
         // attach to next Node
-        Iterator<Node> iter = cu.getChildNodes().iterator();
+        Iterator<Node> iter = node.getChildNodes().iterator();
         int commentIdx = 0;
 
         Node n = null;
@@ -83,33 +84,21 @@ public class JMLCommentTransformer extends JavaTransformer {
         }
     }
 
-    private boolean hasJmlCommentInside(Node cu) {
-        if (cu instanceof CompilationUnit)
-            return true;
-        if (cu instanceof TypeDeclaration<?>)
-            return true;
-        if (cu instanceof BodyDeclaration<?>)
-            return true;
-        if (cu instanceof BlockStmt)
-            return true;
-        if (cu instanceof LabeledStmt) {
-            return true;
-        }
-        if (cu instanceof WhileStmt) {
-            return true;
-        }
-        if (cu instanceof ForStmt) {
-            return true;
-        }
-        if (cu instanceof ForEachStmt) {
-            return true;
-        }
-        if (cu instanceof DoStmt) {
-            return true;
-        }
-        if (cu instanceof MethodDeclaration)
-            return true;
-        return false;
+    private boolean hasJmlCommentInside(Node n) {
+        return switch (n) {
+            case CompilationUnit ignored -> true;
+            case TypeDeclaration<?> ignored -> true;
+            case BodyDeclaration<?> ignored -> true;
+            case BlockStmt ignored -> true;
+            case LabeledStmt ignored -> true;
+            case WhileStmt ignored -> true;
+            case ForStmt ignored -> true;
+            case ForEachStmt ignored -> true;
+            case DoStmt ignored -> true;
+            case Type ignored -> true;
+            case Parameter ignored -> true;
+            case null, default -> false;
+        };
     }
 
     private List<Comment> filterToplevel(List<Comment> comments, Node n) {
@@ -126,7 +115,8 @@ public class JMLCommentTransformer extends JavaTransformer {
         var comments = cu.getAllComments();
         cu.walk(it -> attachComments(it, comments));
         if (!comments.isEmpty()) {
-            throw new IllegalStateException("Some comments were not attached to nodes");
+            throw new IllegalStateException(
+                "Some comments were not attached to nodes:\n\t" + comments);
         }
     }
 }
