@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractInfo;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractSupplier;
@@ -56,7 +57,6 @@ public class ContractFactory {
 
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
-    private static final String CONTRACT_COMBINATION_MARKER = "#";
 
     private final Services services;
     private final TermBuilder tb;
@@ -808,7 +808,8 @@ public class ContractFactory {
         // determine names
         StringBuilder nameSB = new StringBuilder(t.getName());
         for (FunctionalOperationContract other : others) {
-            nameSB.append(CONTRACT_COMBINATION_MARKER).append(other.getName());
+            nameSB.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                    .append(other.getName());
         }
         final String name = nameSB.toString();
 
