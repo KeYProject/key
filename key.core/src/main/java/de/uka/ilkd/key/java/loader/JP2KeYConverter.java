@@ -632,6 +632,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var name = lookupSchemaVariable(n.getName());
             return new SchematicFieldReference(pi, c, name, scope);
         }
+        if ("length".equals(n.getName().getId())) {
+            // Handle .length access of sequences
+            // TODO: Move this to KeYJavaParser project once its aware of logical types
+            var ty = n.scope().calculateResolvedType();
+            if (ty instanceof ReferenceTypeImpl rti && rti.getTypeDeclaration().isPresent() &&
+                    rti.getTypeDeclaration().get() instanceof ResolvedLogicalType rlt
+                    && rlt.getKeYJavaType().getSort() == services.getTypeConverter().getSeqLDT()
+                            .targetSort()) {
+                var child = (Expression) n.scope().accept(this, null);
+                return new SeqLength(pi, c, child);
+            }
+        }
         try {
             ResolvedValueDeclaration target = n.resolve();
             var rtype = n.calculateResolvedType();
@@ -1633,6 +1645,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case "\\indexOf" -> new SeqIndexOf(pi, c, args.get(0), args.get(1));
             case "\\seq_concat" -> new SeqConcat(pi, c, args.get(0), args.get(1));
             case "\\seq_get" -> new SeqGet(pi, c, args.get(0), args.get(1));
+            case "\\seq_upd" -> new SeqPut(pi, c, args.get(0), args.get(1), args.get(2));
             default -> {
                 Function named =
                     services.getNamespaces().functions()
