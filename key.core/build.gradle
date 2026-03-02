@@ -9,6 +9,8 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     api project(':key.ncore.calculus')
+    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.1'
     //api group: group, name: 'recoderkey', version: '1.0'
 
     // JavaCC
