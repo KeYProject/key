@@ -21,12 +21,12 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,7 +191,7 @@ public class TransformationPipelineServices {
     }
 
     public List<SymbolReference<? extends ResolvedValueDeclaration>> getUsages(
-            ResolvedFieldDeclaration v, Node node) {
+            ResolvedValueDeclaration v, Node node) {
         // TODO
         return Collections.emptyList();// ;resolver.solveSymbol(v.getName(), node);
     }
@@ -413,17 +413,63 @@ public class TransformationPipelineServices {
 
     }
 
-    public Collection<ResolvedFieldDeclaration> getFinalVariables(TypeDeclaration<?> n) {
-        var seq = new LinkedList<ResolvedFieldDeclaration>();
-        while (n.isNestedType()) {
-            n = (TypeDeclaration<?>) n.getParentNode().get();
-            var fields = n.resolve().getAllNonStaticFields();
-            seq.addAll(fields);
-        }
-        return seq;
+    /// Gets local variables outside the anonymous class `n` that should be treated as final fields
+    /// for said anonymous class.
+    public @Nullable List<ResolvedValueDeclaration> getLocalVarsExternalToAnonClass(
+            TypeDeclaration<?> n) {
+        return CaptureVariableCollector.collect(n).get(n);
     }
 
-    public LinkedList<ResolvedFieldDeclaration> getFinalVariables(LambdaExpr n) {
-        return new LinkedList<>();
+    public List<ResolvedValueDeclaration> getLocalVarsExternalToAnonClass(LambdaExpr n) {
+        return CaptureVariableCollector.collect(n).get(n);
+    }
+
+    private static final class CaptureVariableCollector {
+        public static Map<Node, List<ResolvedValueDeclaration>> collect(Node root) {
+            Map<Node, List<ResolvedValueDeclaration>> result = new HashMap<>();
+
+            // Handle lambdas
+            root.findAll(LambdaExpr.class).forEach(lambda -> {
+                result.put(lambda, findCaptured(lambda));
+            });
+
+            // Handle anonymous classes
+            root.findAll(ObjectCreationExpr.class).stream()
+                    .filter(oce -> oce.getAnonymousClassBody().isPresent())
+                    .forEach(anon -> {
+                        result.put(anon, findCaptured(anon));
+                    });
+
+            return result;
+        }
+
+        private static List<ResolvedValueDeclaration> findCaptured(Node scopeNode) {
+            Set<ResolvedValueDeclaration> captured = new HashSet<>();
+
+            scopeNode.findAll(NameExpr.class).forEach(nameExpr -> {
+                try {
+                    ResolvedValueDeclaration resolved = nameExpr.resolve();
+
+                    // Only local variables
+                    if (resolved instanceof VariableDeclarator) {
+                        resolved.toAst().ifPresent(declNode -> {
+                            if (!isInside(scopeNode, declNode)) {
+                                captured.add(resolved);
+                            }
+                        });
+                    }
+
+                } catch (Exception ignored) {
+                }
+            });
+
+            return new ArrayList<>(captured);
+        }
+
+        private static boolean isInside(Node container, Node declaration) {
+            return declaration.getRange().isPresent() &&
+                    container.getRange().isPresent() &&
+                    container.containsWithinRange(declaration);
+        }
     }
 }

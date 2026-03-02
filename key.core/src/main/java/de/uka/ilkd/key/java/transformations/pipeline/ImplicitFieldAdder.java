@@ -164,11 +164,11 @@ public class ImplicitFieldAdder extends JavaTransformer {
     }
 
     private void addFieldsForFinalVars(TypeDeclaration<?> td) {
-        final var vars = services.getFinalVariables(td);
-        if (!vars.isEmpty()) {
+        final var vars = services.getLocalVarsExternalToAnonClass(td);
+        if (vars != null && !vars.isEmpty()) {
             // not sure why, but doing it separated in two loops is much faster (for large programs)
             // then just in one
-            // strangely, the effect is not measureable for e.g. the class init. fields...
+            // strangely, the effect is not measurable for e.g. the class init. fields...
             for (final var v : vars) {
                 Type type = services.getType(v.getType());
                 td.addMember(createImplicitField(
@@ -179,13 +179,13 @@ public class ImplicitFieldAdder extends JavaTransformer {
     }
 
     public void apply(TypeDeclaration<?> td) {
+        addImplicitFields(td);
+        addFieldsForFinalVars(td);
+
         if (!transformedObject && td.resolve().isJavaLangObject()) {
             addGlobalImplicitFields(td);
             transformedObject = true;
         }
-
-        addImplicitFields(td);
-        addFieldsForFinalVars(td);
     }
 
 }

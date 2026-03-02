@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
+import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 import com.github.javaparser.ParseResult;
@@ -33,6 +34,8 @@ import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (19.02.22)
@@ -40,7 +43,15 @@ import org.slf4j.LoggerFactory;
 class KeyJavaPipelineTest {
     public KeYJavaPipeline createPipelineTest(Path testFolder) throws IOException {
         Services services = new Services(JavaProfile.getDefaultProfile());
+        var nss = services.getNamespaces();
+        NamespaceBuilder nb = new NamespaceBuilder(nss);
+        nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
+                .addSort("float");
+        assertNotNull(nss.sorts().lookup("boolean"));
+        assertNotNull(nss.sorts().lookup("int"));
+        assertNotNull(nss.sorts().lookup("boolean"));
         var js = services.activateJava(null, Collections.singleton(testFolder));
+        js.parseSpecialClasses();
 
         var inputFolder = testFolder.resolve("input");
         final var jp = js.getProgramFactory().createJavaParser();
@@ -80,6 +91,12 @@ class KeyJavaPipelineTest {
     Stream<DynamicTest> simple() throws IOException {
         return generatePipelineTests(Paths.get("pipelineTests/simple").toAbsolutePath());
     }
+
+    @TestFactory
+    Stream<DynamicTest> innerclass() throws IOException {
+        return generatePipelineTests(Paths.get("pipelineTests/innerclass").toAbsolutePath());
+    }
+
 
     private Stream<DynamicTest> generatePipelineTests(Path testFolder) throws IOException {
         var pt = createPipelineTest(testFolder);
