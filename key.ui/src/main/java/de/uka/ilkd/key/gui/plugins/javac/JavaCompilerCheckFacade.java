@@ -148,7 +148,8 @@ public class JavaCompilerCheckFacade {
 
                 // the KeY logging messages from `process` (currently not used)
                 String logs = Streams.toString(process.getInputStream());
-                Configuration messages = Configuration.load(CharStreams.fromStream(process.getErrorStream()));
+                Configuration messages =
+                    Configuration.load(CharStreams.fromStream(process.getErrorStream()));
                 process.waitFor();
 
                 return messages.getList("messages").stream()
