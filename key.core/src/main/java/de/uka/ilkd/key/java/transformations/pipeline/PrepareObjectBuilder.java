@@ -78,7 +78,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
         }
         NodeList<Statement> result = new NodeList<Statement>();
         for (FieldDeclaration field : fields) {
-            if (!field.isStatic()) {
+            if (!field.isStatic() && !field.hasModifier(Modifier.Keyword.MODEL)) {
                 for (VariableDeclarator variable : field.getVariables()) {
                     SimpleName fieldId = variable.getName();
                     if (!fieldId.getIdentifier().startsWith("" + JavaDLFieldNames.FIELD_PREFIX
