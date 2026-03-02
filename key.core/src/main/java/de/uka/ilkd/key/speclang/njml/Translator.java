@@ -866,7 +866,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
-        String fieldName = "<transactionConditionallyUpdated>";
+        String fieldName = "$transactionConditionallyUpdated";
         return lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx);
     }
 
@@ -1005,7 +1005,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (receiver == null) {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
-            return lookupIdentifier("<transient>", receiver, null, ctx);
+            return lookupIdentifier("$transient", receiver, null, ctx);
         }
         if (ctx.THIS() != null) {
             assert !methodCall;
