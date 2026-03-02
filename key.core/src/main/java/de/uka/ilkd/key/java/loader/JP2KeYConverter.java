@@ -909,8 +909,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(NameExpr n, Void arg) {
-        if (n.getNameAsString().startsWith("#")) {
+        String name = n.getNameAsString();
+        if (name.startsWith("#")) {
             return lookupSchemaVariable(n.getName());
+        }
+        if (name.startsWith("\\")) {
+            return switch (name) {
+                case "\\seq_empty" -> EmptySeqLiteral.INSTANCE;
+                case "\\empty" -> EmptySetLiteral.LOCSET;
+                default ->
+                    throw new UnsupportedOperationException("Unknown JML constant '" + name + "'");
+            };
         }
 
         ResolvedValueDeclaration target;
