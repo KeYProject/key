@@ -19,8 +19,6 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.net.URI;
 import java.util.*;
 
-import com.github.javaparser.ast.comments.JavadocComment;
-import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -39,6 +37,7 @@ import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.Statement;

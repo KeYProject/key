@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.github.javaparser.Position;
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
@@ -19,11 +24,6 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.utils.PositionUtils;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class JMLCommentTransformer extends JavaTransformer {
     public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
     };
@@ -34,7 +34,7 @@ public class JMLCommentTransformer extends JavaTransformer {
      * creates a transformer for the recoder model
      *
      * @param services the CrossReferenceServiceConfiguration to access
-     *                 model information
+     *        model information
      */
     public JMLCommentTransformer(@NonNull TransformationPipelineServices services) {
         super(services);
@@ -61,8 +61,7 @@ public class JMLCommentTransformer extends JavaTransformer {
         int commentIdx = 0;
 
         Node n = null;
-        nextNode:
-        while (iter.hasNext() && commentIdx < filterComments.size()) {
+        nextNode: while (iter.hasNext() && commentIdx < filterComments.size()) {
             n = iter.next();
             List<Comment> specs = new ArrayList<>();
             while (commentIdx < filterComments.size()) {
@@ -159,7 +158,7 @@ public class JMLCommentTransformer extends JavaTransformer {
         cu.walk(it -> attachComments(it, comments));
         if (!comments.isEmpty()) {
             throw new IllegalStateException(
-                    "Some comments were not attached to nodes:\n\t" + comments);
+                "Some comments were not attached to nodes:\n\t" + comments);
         }
     }
 }
