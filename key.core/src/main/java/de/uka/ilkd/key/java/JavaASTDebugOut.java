@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -14,6 +16,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class JavaASTDebugOut {
 
@@ -120,8 +126,34 @@ public class JavaASTDebugOut {
 
     private static void writeAST(SourceElement element, PrintWriter out, int indent) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         indent(out, indent);
-        out.println(element.getClass().getSimpleName() + " at " + element.getPositionInfo());
+        Position startPosition = element.getPositionInfo().getStartPosition();
+        Position endPosition = element.getPositionInfo().getEndPosition();
+        out.println(element.getClass().getSimpleName() + " at " + startPosition.line() + ":" + startPosition.column() + " - " + endPosition.line() + ":" + endPosition.column());
         writeASTChildren(element, out, indent+1);
+    }
+
+    private static void writeAST(TypeDeclaration td, PrintWriter out, int indent) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        indent(out, indent);
+        out.println(td.getClass().getSimpleName() + " " + td.getName());
+        List<Object> members = new ArrayList<>();
+        for(int i = 0; i < td.getChildCount(); i++) {
+            members.add(td.getChild(i));
+        }
+        Collections.sort(members, Comparator.comparing(o -> {
+            if(o instanceof ProgramMethod pm) {
+                return "2 " + pm.getName();
+            } else if(o instanceof TypeDeclaration td2) {
+                return "3 " + td2.getName();
+            } else if(o instanceof FieldDeclaration fd) {
+                return "1 " + fd.getVariables().get(0).getName();
+            } else {
+                return "0";
+            }
+        }));
+
+        for(Object member : members) {
+            writeASTDispatch(member, out, indent+1);
+        }
     }
 
     private static void writeAST(SyntaxElement element, PrintWriter out, int indent) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
