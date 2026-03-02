@@ -19,6 +19,8 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.net.URI;
 import java.util.*;
 
+import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -107,7 +109,7 @@ public final class JMLTransformer extends JavaTransformer {
             return sb.toString();
         }
         var first = iter.next();
-        if (first instanceof BlockComment) {
+        if (first instanceof BlockComment || first instanceof JavadocComment) {
             sb.append("/*").append(first.getContent()).append("*/");
         } else {
             sb.append("//").append(first.getContent());

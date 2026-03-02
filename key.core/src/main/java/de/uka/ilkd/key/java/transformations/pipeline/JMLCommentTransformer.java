@@ -3,22 +3,26 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.github.javaparser.Position;
+import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.utils.PositionUtils;
 import org.jspecify.annotations.NonNull;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class JMLCommentTransformer extends JavaTransformer {
     public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
@@ -29,9 +33,8 @@ public class JMLCommentTransformer extends JavaTransformer {
     /**
      * creates a transformer for the recoder model
      *
-     * @param services
-     *        the CrossReferenceServiceConfiguration to access
-     *        model information
+     * @param services the CrossReferenceServiceConfiguration to access
+     *                 model information
      */
     public JMLCommentTransformer(@NonNull TransformationPipelineServices services) {
         super(services);
@@ -58,7 +61,8 @@ public class JMLCommentTransformer extends JavaTransformer {
         int commentIdx = 0;
 
         Node n = null;
-        nextNode: while (iter.hasNext() && commentIdx < filterComments.size()) {
+        nextNode:
+        while (iter.hasNext() && commentIdx < filterComments.size()) {
             n = iter.next();
             List<Comment> specs = new ArrayList<>();
             while (commentIdx < filterComments.size()) {
@@ -73,6 +77,20 @@ public class JMLCommentTransformer extends JavaTransformer {
             }
         }
 
+        if (!allComments.isEmpty()) {
+            var mods = allComments.stream().filter(it -> isModifier(node, it)).toList();
+            if (!mods.isEmpty()) {
+                allComments.removeAll(mods);
+                List<Comment> specs = new ArrayList<>();
+                try {
+                    specs = node.getData(BEFORE_COMMENTS);
+                } catch (Exception _) {
+                }
+                specs.addAll(mods);
+                node.setData(BEFORE_COMMENTS, specs);
+            }
+        }
+
         if (commentIdx < filterComments.size()) {
             if (n != null) {
                 List<Comment> specs = new ArrayList<>();
@@ -82,6 +100,31 @@ public class JMLCommentTransformer extends JavaTransformer {
                 allComments.removeAll(comments);
             }
         }
+    }
+
+    private boolean isModifier(Node n, Comment c) {
+        if (c.getRange().isEmpty() || n.getRange().isEmpty()) {
+            return false;
+        }
+
+        Node end = null;
+        if (n instanceof CallableDeclaration<?> || n instanceof TypeDeclaration) {
+            end = ((NodeWithSimpleName<?>) n).getName();
+        }
+
+        if (end != null) {
+            Position start = n.getRange().get().begin;
+            Position stop = end.getRange().get().end;
+            var b = within(start, stop, c.getRange().get());
+            return b;
+        }
+
+        return false;
+    }
+
+    private boolean within(Position start, Position stop, Range range) {
+        return start.compareTo(range.begin) <= 0 &&
+                range.begin.compareTo(stop) <= 0;
     }
 
     private boolean hasJmlCommentInside(Node n) {
@@ -116,7 +159,7 @@ public class JMLCommentTransformer extends JavaTransformer {
         cu.walk(it -> attachComments(it, comments));
         if (!comments.isEmpty()) {
             throw new IllegalStateException(
-                "Some comments were not attached to nodes:\n\t" + comments);
+                    "Some comments were not attached to nodes:\n\t" + comments);
         }
     }
 }
