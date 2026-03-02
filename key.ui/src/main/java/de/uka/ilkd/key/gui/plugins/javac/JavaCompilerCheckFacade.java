@@ -56,12 +56,12 @@ public class JavaCompilerCheckFacade {
      */
     public static void main(String[] args) {
         try (var input = new InputStreamReader(System.in)) {
-            var params = Configuration.load(CharStreams.fromReader(input));
+            Configuration params = Configuration.load(CharStreams.fromReader(input));
 
             var settings = new JavacSettings();
             settings.readSettings(params);
 
-            var result = check(null,
+            List<PositionedIssueString> result = check(null,
                 Paths.get(params.getString("bootClassPath")),
                 params.getStringList("classPath").stream().map(Paths::get).toList(),
                 Paths.get(params.getString("javaPath")), settings).get();
@@ -147,8 +147,8 @@ public class JavaCompilerCheckFacade {
                 process.outputWriter().close();
 
                 // the KeY logging messages from `process` (currently not used)
-                var logs = Streams.toString(process.getInputStream());
-                var messages = Configuration.load(CharStreams.fromStream(process.getErrorStream()));
+                String logs = Streams.toString(process.getInputStream());
+                Configuration messages = Configuration.load(CharStreams.fromStream(process.getErrorStream()));
                 process.waitFor();
 
                 return messages.getList("messages").stream()
