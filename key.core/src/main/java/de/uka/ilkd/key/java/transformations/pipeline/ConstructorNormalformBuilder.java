@@ -108,7 +108,6 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                         et.get().getVariables().get(0).getName().getIdentifier()),
                     implictParameter.getNameAsExpression(), AssignExpr.Operator.ASSIGN);
 
-                parameters.add(implictParameter);
                 body.addStatement(ca);
             }
         }
@@ -135,6 +134,13 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             for (var v : outerVars) {
                 parameters.add(new Parameter(services.getType(v.getType()), v.getName()));
             }
+        }
+
+        if (implictParameter != null) {
+            if (parameters.isEmpty()) {
+                attachDefaultConstructor(cd);
+            }
+            parameters.add(implictParameter);
         }
 
         if (!cd.resolve().isJavaLangObject()) {
