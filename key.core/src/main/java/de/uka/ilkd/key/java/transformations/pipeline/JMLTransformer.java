@@ -460,6 +460,9 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     private void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
+        if (!td.containsData(KEY_CLASS_SPEC)) {
+            td.setData(KEY_CLASS_SPEC, new ArrayList<>());
+        }
         List<TextualJMLConstruct> specList = td.getData(KEY_CLASS_SPEC);
         if (specList == null) {
             specList = new ArrayList<>(4);
@@ -470,6 +473,9 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     private void addSpec(BodyDeclaration<?> nextMember, TextualJMLSpecCase specCase) {
+        if (!nextMember.containsData(KEY_SPEC_CASE)) {
+            nextMember.setData(KEY_SPEC_CASE, new ArrayList<>());
+        }
         List<TextualJMLSpecCase> specList = nextMember.getData(KEY_SPEC_CASE);
         if (specList == null) {
             specList = new ArrayList<>(4);
