@@ -80,7 +80,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                     boolean newAutomatic) {
                 if (!batchGoalStateChange
                         && ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS.isActive()) {
-                    updateTree((TreeNode) null);
+                    updateTree((GUIAbstractTreeNode) null);
                 }
             }
         };
@@ -135,7 +135,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 return;
             }
             if (globalFilterActive()) {
-                updateTree((TreeNode) null);
+                updateTree((GUIAbstractTreeNode) null);
             } else {
                 proofStructureChanged(e);
             }
@@ -151,7 +151,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             Collection<Node> nodesToUpdate) {
         if (!value && batchGoalStateChange) {
             if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
-                updateTree((TreeNode) null);
+                updateTree((GUIAbstractTreeNode) null);
             } else {
                 for (Node n : nodesToUpdate) {
                     updateTree(n);
@@ -190,7 +190,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 proof.addProofTreeListener(proofTreeListener);
                 // updateTree(null);
                 if (globalFilterActive()) {
-                    updateTree((TreeNode) null);
+                    updateTree((GUIAbstractTreeNode) null);
                 }
             } else {
                 proof.removeProofTreeListener(proofTreeListener);
@@ -276,7 +276,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 activeNodeFilter.setActive(false);
                 activeNodeFilter = null;
             }
-            updateTree((TreeNode) null);
+            updateTree((GUIAbstractTreeNode) null);
             return;
         }
         if (!filter.global()) {
@@ -286,7 +286,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             activeNodeFilter = active ? (NodeFilter) filter : null;
         }
         filter.setActive(active);
-        updateTree((TreeNode) null);
+        updateTree((GUIAbstractTreeNode) null);
     }
 
     /**
@@ -398,25 +398,32 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      *
      * @param trn tree node to update.
      */
-    private synchronized void updateTree(TreeNode trn) {
-        if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
+    private synchronized void updateTree(GUIAbstractTreeNode trn) {
+
+        // If possible, redraw only a certain subtree
+        // starting from the lowermost parent of trn that is not hidden
+        while (trn != null && trn != getRoot() && ProofTreeViewFilter.hiddenByGlobalFilters(trn.getNode())) {
+            trn = (GUIAbstractTreeNode) trn.getParent();
+        }
+
+        // bigger change, redraw whole tree
+        if (trn == null || trn == getRoot()) {
             proofTreeNodes.clear();
             branchNodes.clear();
             fireTreeStructureChanged(new Object[] { getRoot() });
             return;
         }
-        // otherwise redraw only a certain subtree
-        // starting from the parent of trn
+
         flushCaches(trn);
         // also flush the current node, it might be an OSS conceiving children in this step
-        ((GUIAbstractTreeNode) trn).flushCache();
+        trn.flushCache();
         TreeNode[] path = ((GUIAbstractTreeNode) trn.getParent()).getPath();
         fireTreeStructureChanged(path);
     }
 
     public synchronized void updateTree(Node p_node) {
         if (p_node == null) {
-            updateTree((TreeNode) null);
+            updateTree((GUIAbstractTreeNode) null);
         } else {
             updateTree(getProofTreeNode(p_node));
         }
