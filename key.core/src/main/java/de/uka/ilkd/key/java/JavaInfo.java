@@ -491,21 +491,6 @@ public final class JavaInfo {
      * @param classType the KeYJavaType of the class where to look for the method
      * @param methodName the name of the method
      * @param signature a IList<Type> with the arguments types
-     * @return a matching program method
-     */
-    @Nullable
-    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            Iterable<KeYJavaType> signature) {
-        return kpmi.getProgramMethod(classType, methodName, signature);
-    }
-
-    /**
-     * returns the program methods defined in the given KeYJavaType with name m and the list of
-     * types as signature of the method
-     *
-     * @param classType the KeYJavaType of the class where to look for the method
-     * @param methodName the name of the method
-     * @param signature a IList<Type> with the arguments types
      * @param context the KeYJavaType of the class context from <em>where</em> the method is called
      * @return a matching program method
      */
@@ -517,15 +502,16 @@ public final class JavaInfo {
     @Nullable
     private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
             String methodName, List<List<KeYJavaType>> signature,
-            ImmutableList<KeYJavaType> partialSignature) {
+            ImmutableList<KeYJavaType> partialSignature, KeYJavaType context) {
         if (signature.isEmpty()) {
-            return getProgramMethod(classType, methodName, partialSignature);
+            return getProgramMethod(classType, methodName, partialSignature, context);
         } else {
             List<KeYJavaType> types = signature.get(0);
             assert !types.isEmpty();
             for (KeYJavaType t : types) {
                 IProgramMethod programMethod = getProgramMethodFromPartialSignature(classType,
-                    methodName, signature.subList(1, signature.size()), partialSignature.append(t));
+                    methodName, signature.subList(1, signature.size()), partialSignature.append(t),
+                    context);
                 if (programMethod != null) {
                     return programMethod;
                 }
@@ -542,10 +528,10 @@ public final class JavaInfo {
      */
     @Nullable
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            List<List<KeYJavaType>> signature) {
+            List<List<KeYJavaType>> signature, KeYJavaType context) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
         return getProgramMethodFromPartialSignature(classType, methodName, signature,
-            partialSignature);
+            partialSignature, context);
     }
 
     /**
@@ -558,22 +544,22 @@ public final class JavaInfo {
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
-            ProgramVariable[] args) {
+            ProgramVariable[] args, KeYJavaType context) {
         List<KeYJavaType> types = new ArrayList<>(args.length);
         for (ProgramVariable arg : args) {
             types.add(arg.getKeYJavaType());
         }
-        return getProgramMethod(classType, methodName, types);
+        return getProgramMethod(classType, methodName, types, context);
     }
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt, String methodName,
             ImmutableList<KeYJavaType> sig) {
-        return findToplevelPM(kjt, methodName, sig);
+        return findToplevelPM(kjt, methodName, sig, kjt);
     }
 
     /* This method has been introduced as bugfix to #1487 */
     private IProgramMethod findToplevelPM(KeYJavaType kjt, String methodName,
-            ImmutableList<KeYJavaType> sig) {
+            ImmutableList<KeYJavaType> sig, KeYJavaType context) {
 
         // ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
         // ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
@@ -583,7 +569,7 @@ public final class JavaInfo {
         // return result;
         // }
         // }
-        return getProgramMethod(kjt, methodName, sig);
+        return getProgramMethod(kjt, methodName, sig, context);
     }
 
 
@@ -605,7 +591,7 @@ public final class JavaInfo {
     public JTerm getStaticProgramMethodTerm(String methodName, JTerm[] args, String className) {
         List<List<KeYJavaType>> signature = termArrayToSignature(args);
         KeYJavaType classKJT = getTypeByClassName(className);
-        IProgramMethod pm = getProgramMethod(classKJT, methodName, signature);
+        IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
@@ -634,7 +620,7 @@ public final class JavaInfo {
             List<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT);
             for (int i = allSupertypes.size() - 1; i >= 0; i--) {
                 KeYJavaType next = allSupertypes.get(i);
-                var method = getProgramMethod(next, methodName, signature);
+                var method = getProgramMethod(next, methodName, signature, next);
                 if (method != null && !(method.isPrivate() && !next.equals(classKJT))) {
                     /*
                      * Private methods from supertypes are not visible in their subtypes. They will
@@ -649,7 +635,7 @@ public final class JavaInfo {
              * Do not traverse type hierarchy. pm stays null in case classKJT does not contain a
              * method with the specified name.
              */
-            pm = getProgramMethod(classKJT, methodName, signature);
+            pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         }
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
@@ -1359,7 +1345,7 @@ public final class JavaInfo {
             throws NullPointerException {
         String name = method.getName();
         ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
-        IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes);
+        IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes, context);
         if (method.isPublic()) {
             /*
              * Canonical ProgramMmethod can be located in a supertype in case the method is public.

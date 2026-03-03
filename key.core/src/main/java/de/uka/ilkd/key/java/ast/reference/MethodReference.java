@@ -325,7 +325,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
                 ec.getTypeReference().getKeYJavaType());
         while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
-            pm = services.getJavaInfo().getProgramMethod(classType, methodName, sig);
+            pm = services.getJavaInfo().getProgramMethod(classType, methodName, sig,
+                ec.getTypeReference().getKeYJavaType());
             if (pm != null) {
                 return pm;
             }
@@ -345,9 +346,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @return the found program method
      */
     public IProgramMethod method(Services services, KeYJavaType classType,
-            ImmutableList<KeYJavaType> signature) {
+            ImmutableList<KeYJavaType> signature, KeYJavaType context) {
         final String methodName = name.toString();
-        return services.getJavaInfo().getProgramMethod(classType, methodName, signature);
+        return services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
     }
 
     public boolean implicit() {

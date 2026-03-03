@@ -81,7 +81,7 @@ public class Main {
                 // Find method to symbolically execute
                 KeYJavaType classType = env.getJavaInfo().getKeYJavaType("Number");
                 IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, "equals",
-                    ImmutableSLList.<KeYJavaType>nil().append(classType));
+                    ImmutableSLList.<KeYJavaType>nil().append(classType), classType);
                 // Instantiate proof for symbolic execution of the program method (Java semantics)
                 AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(),
                     "Symbolic Execution of: " + pm, pm, null, // An optional precondition

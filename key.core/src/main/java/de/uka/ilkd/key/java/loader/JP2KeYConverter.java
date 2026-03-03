@@ -1687,7 +1687,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         TypeReference classContext = requireTypeReference(n.getContext());
         ReferencePrefix runtimeInstance = accepto(n.getInstance());
         IProgramMethod methodContext =
-            resolveMethodSignature(classContext.getKeYJavaType(), n.getSignature());
+            resolveMethodSignature(classContext.getKeYJavaType(), n.getSignature(),
+                classContext.getKeYJavaType());
         if (methodContext == null) {
             return reportError(n, "Failed to resolve method");
         }
@@ -1749,11 +1750,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Nullable
-    private IProgramMethod resolveMethodSignature(KeYJavaType type, KeyMethodSignature sig) {
+    private IProgramMethod resolveMethodSignature(KeYJavaType type, KeyMethodSignature sig,
+            KeYJavaType context) {
         var name = sig.getName().asString();
         ImmutableArray<TypeReference> params = map(sig.getParamTypes());
         var paramTypes = params.stream().map(TypeReference::getKeYJavaType).toList();
-        return services.getJavaInfo().getProgramMethod(type, name, paramTypes);
+        return services.getJavaInfo().getProgramMethod(type, name, paramTypes, context);
     }
 
     @Override

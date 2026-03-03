@@ -339,7 +339,7 @@ public class KeYProgModelInfo {
      */
     @Nullable
     public IProgramMethod getProgramMethod(@NonNull KeYJavaType ct, String name,
-            Iterable<KeYJavaType> signature) {
+            Iterable<KeYJavaType> signature, KeYJavaType context) {
         if (ct.getJavaType() instanceof ArrayType) {
             return getImplicitMethod(ct, name);
         }
@@ -404,82 +404,82 @@ public class KeYProgModelInfo {
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
      */
-    public @Nullable IProgramMethod getProgramMethod(
-            @NonNull KeYJavaType ct, String name,
-            Iterable<KeYJavaType> signature, KeYJavaType context) {
-        return getProgramMethod(ct, name, signature);
-        // NodeList<Expression> args = new NodeList<>();
-        // for (var argType : signature) {
-        // Type javaType = getType(getJavaParserType(argType));
-        // if (!javaType.isPrimitiveType()) {
-        // args.add(new CastExpr(javaType, new NullLiteralExpr()));
-        // } else {
-        // PrimitiveType pt = (PrimitiveType) javaType;
-        // switch (pt.type().asString()) {
-        // case "boolean":
-        // args.add(new BooleanLiteralExpr(false));
-        // break;
-        // case "byte":
-        // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
-        // break;
-        // case "short":
-        // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
-        // break;
-        // case "int":
-        // args.add(new IntegerLiteralExpr(0));
-        // break;
-        // case "long":
-        // args.add(new LongLiteralExpr(0));
-        // break;
-        // case "char":
-        // args.add(new CharLiteralExpr('a'));
-        // break;
-        // case "double":
-        // args.add(new DoubleLiteralExpr(0));
-        // break;
-        // case "float":
-        // args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
-        // break;
-        // }
-        // }
-        // }
-        //
-        // // TODO: Type arguments
-        // var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
-        // MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
-        // var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
-        // if (classContext.getParentNode().isEmpty()) {
-        // var cu = new CompilationUnit();
-        // // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
-        // var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
-        // .getTypeDeclaration().get().toAst().get().getSymbolResolver();
-        // solver.inject(cu);
-        // mapping.getJavaServices().getProgramFactory().getTypeSolver();
-        // classContext.setParentNode(cu);
-        // }
-        // mce.setParentNode(classContext);
-        //
-        // return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
+    // public @Nullable IProgramMethod getProgramMethod(
+    // @NonNull KeYJavaType ct, String name,
+    // Iterable<KeYJavaType> signature, KeYJavaType context) {
+    // return getProgramMethod(ct, name, signature);
+    // NodeList<Expression> args = new NodeList<>();
+    // for (var argType : signature) {
+    // Type javaType = getType(getJavaParserType(argType));
+    // if (!javaType.isPrimitiveType()) {
+    // args.add(new CastExpr(javaType, new NullLiteralExpr()));
+    // } else {
+    // PrimitiveType pt = (PrimitiveType) javaType;
+    // switch (pt.type().asString()) {
+    // case "boolean":
+    // args.add(new BooleanLiteralExpr(false));
+    // break;
+    // case "byte":
+    // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+    // break;
+    // case "short":
+    // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+    // break;
+    // case "int":
+    // args.add(new IntegerLiteralExpr(0));
+    // break;
+    // case "long":
+    // args.add(new LongLiteralExpr(0));
+    // break;
+    // case "char":
+    // args.add(new CharLiteralExpr('a'));
+    // break;
+    // case "double":
+    // args.add(new DoubleLiteralExpr(0));
+    // break;
+    // case "float":
+    // args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
+    // break;
+    // }
+    // }
+    // }
+    //
+    // // TODO: Type arguments
+    // var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
+    // MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
+    // var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
+    // if (classContext.getParentNode().isEmpty()) {
+    // var cu = new CompilationUnit();
+    // // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
+    // var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
+    // .getTypeDeclaration().get().toAst().get().getSymbolResolver();
+    // solver.inject(cu);
+    // mapping.getJavaServices().getProgramFactory().getTypeSolver();
+    // classContext.setParentNode(cu);
+    // }
+    // mce.setParentNode(classContext);
+    //
+    // return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
 
-        // if (context.getJavaType() instanceof ArrayType) {
-        // return getImplicitMethod(ct, name);
-        // }
-        //
-        // var type = getJavaParserType(ct);
-        // if (!type.isReferenceType()) {
-        // return null;
-        // }
-        //
-        // var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
-        // List<ResolvedType> jpSignature =
-        // StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType)
-        // .toList();
-        // var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-        // return method.getDeclaration()
-        // .map(d -> (IProgramMethod) Objects
-        // .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
-        // .orElse(null);
-    }
+    // if (context.getJavaType() instanceof ArrayType) {
+    // return getImplicitMethod(ct, name);
+    // }
+    //
+    // var type = getJavaParserType(ct);
+    // if (!type.isReferenceType()) {
+    // return null;
+    // }
+    //
+    // var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+    // List<ResolvedType> jpSignature =
+    // StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType)
+    // .toList();
+    // var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+    // return method.getDeclaration()
+    // .map(d -> (IProgramMethod) Objects
+    // .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+    // .orElse(null);
+    // }
 
     private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
         return rfl.flatMap(

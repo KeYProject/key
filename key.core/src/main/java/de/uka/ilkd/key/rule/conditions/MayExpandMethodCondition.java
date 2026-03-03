@@ -162,7 +162,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         } else {
             // no execution context
             method =
-                mr.method(services, prefixType, mr.getMethodSignature(services, ec));
+                mr.method(services, prefixType, mr.getMethodSignature(services, ec), prefixType);
         }
 
         if (method == null) {

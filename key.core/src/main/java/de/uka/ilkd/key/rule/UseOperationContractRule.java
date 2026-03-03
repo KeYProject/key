@@ -146,11 +146,11 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                     // execContext are in different packages we have to
                     // simulate visibility rules like being in prefixType
                     result = methRef.method(services, staticType,
-                        methRef.getMethodSignature(services, ec));
+                        methRef.getMethodSignature(services, ec), staticType);
                 }
             } else {
                 result = methRef.method(services, staticType,
-                    methRef.getMethodSignature(services, ec));
+                    methRef.getMethodSignature(services, ec), staticType);
             }
         } else {
             New n = (New) mr;
