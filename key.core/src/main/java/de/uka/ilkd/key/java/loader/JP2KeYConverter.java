@@ -811,9 +811,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     public static List<TextualJMLSpecCase> getSpec(Node n) {
-        try{
+        try {
             return n.getData(JMLTransformer.KEY_SPEC_CASE);
-        }catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             return List.of();
         }
     }
@@ -1082,7 +1082,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 map(n.getModifiers());
         var va = n.isVarArgs();
         // Var arg expects an array type later on but JP gives us "normal" type
-        TypeReference type = accept(va ? new ArrayType(n.getType()) : n.getType());
+        TypeReference type;
+        if (va) {
+            var at = new ArrayType(n.getType());
+            at.setParentNode(n);
+            type = accept(at);
+        } else {
+            type = accept(n.getType());
+        }
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IProgramVariable pv;
@@ -1126,6 +1133,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ArrayType n, Void arg) {
+        try {
+            n.resolve();
+        } catch (IllegalStateException e) {
+            System.out.println(e);
+        }
         return new TypeRef(getKeYJavaType(n.resolve()));
     }
 
