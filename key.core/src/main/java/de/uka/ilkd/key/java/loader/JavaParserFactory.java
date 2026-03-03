@@ -94,6 +94,7 @@ public class JavaParserFactory {
             config = new ParserConfiguration();
             config.setStoreTokens(true);
         }
+        config.setLanguageLevel(ParserConfiguration.LanguageLevel.RAW);
         config.setSymbolResolver(getSymbolSolver());
         return config;
     }
