@@ -26,7 +26,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     private final boolean attachOriginLabel;
 
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
-    private ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
+    public ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
     private @Nullable TextualJMLSpecCase methodContract;
     private @Nullable TextualJMLLoopSpec loopContract;
 

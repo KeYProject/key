@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.collection.ImmutableList;
@@ -124,5 +125,15 @@ public class PreParser {
 
     public void clearWarnings() {
         warnings = ImmutableSLList.nil();
+    }
+
+    public ImmutableList<JMLModifier> parseModifiers(String modifiers) {
+        JmlParser p = JmlFacade.createParser(JmlFacade.createLexer(modifiers));
+        var ctx = p.modifiersEOF();
+        p.getErrorReporter().throwException();
+        TextualTranslator translator = new TextualTranslator(
+                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
+        ctx.accept(translator);
+        return translator.mods;
     }
 }

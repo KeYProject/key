@@ -11,6 +11,7 @@ options { tokenVocab=JmlLexer; }
   public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
+modifiersEOF: modifiers EOF;
 
 classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
