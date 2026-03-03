@@ -155,7 +155,7 @@ public class KeYProgModelInfo {
             var td = rt.getTypeDeclaration().orElseThrow();
             if (td.isClass()) {
                 var node = (NodeWithModifiers<?>) td.asClass().toAst().get();
-                return node.hasModifier(Modifier.Keyword.FINAL);
+                return node.hasModifier(Modifier.DefaultKeyword.FINAL);
             }
             if (td.isInterface()) {
                 // Interfaces can't be final

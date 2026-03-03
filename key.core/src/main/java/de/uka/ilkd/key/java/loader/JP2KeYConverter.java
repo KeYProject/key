@@ -80,6 +80,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
+import static com.github.javaparser.ast.Modifier.DefaultKeyword.JML_GHOST;
 import static java.lang.String.format;
 
 /**
@@ -687,8 +689,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
             final VariableDeclarator varDecl = variableCandidates.getFirst();
 
-            var isModel = fldDecl.hasModifier(Modifier.Keyword.MODEL);
-            var isGhost = fldDecl.hasModifier(Modifier.Keyword.GHOST);
+            var isModel = fldDecl.hasModifier(JML_MODEL);
+            var isGhost = fldDecl.hasModifier(JML_GHOST);
 
             final FullVariableDeclarator decl = new FullVariableDeclarator(varDecl,
                 fldDecl.isFinal(), fldDecl.isStatic(),
@@ -751,8 +753,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         TypeReference type = requireTypeReference(n.getVariables().get(0).getType());
         var varsList = new ArrayList<FieldSpecification>(n.getVariables().size());
         for (VariableDeclarator v : n.getVariables()) {
-            var isModel = n.hasModifier(Modifier.Keyword.MODEL);
-            var isGhost = n.hasModifier(Modifier.Keyword.GHOST);
+            var isModel = n.hasModifier(JML_MODEL);
+            var isGhost = n.hasModifier(JML_GHOST);
             // This is really odd, some interfaces have represents clauses. Those should be abstract
             // classes...
             // Normal fields of interfaces are implicitly static...
@@ -1304,7 +1306,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             pv = (IProgramVariable) lookupSchemaVariable(v.getNameAsString(), v);
         } else {
             var name = VariableNamer.parseName(v.getNameAsString());
-            pv = new LocationVariable(name, kjt, modifiers.hasModifier(Modifier.Keyword.FINAL));
+            pv = new LocationVariable(name, kjt, modifiers.hasModifier(FINAL));
         }
 
         return addToMapping(v, new VariableSpecification(pi, c, init, pv, 0, kjt));
@@ -1487,10 +1489,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case SYNCHRONIZED -> new Synchronized(pi, c);
             case NATIVE -> new Native(pi, c);
             case STRICTFP -> new StrictFp(pi, c);
-            case GHOST -> new Ghost(pi, c);
-            case MODEL -> new Model(pi, c);
-            case TWO_STATE -> new TwoState(pi, c);
-            case NO_STATE -> new NoState(pi, c);
+            case JML_GHOST -> new Ghost(pi, c);
+            case JML_MODEL -> new Model(pi, c);
+            case JML_TWO_STATE -> new TwoState(pi, c);
+            case JML_NO_STATE -> new NoState(pi, c);
             default -> {
                 reportUnsupportedElement(n);
                 yield null;

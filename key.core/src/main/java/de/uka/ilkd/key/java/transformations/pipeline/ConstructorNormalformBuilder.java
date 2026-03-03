@@ -53,7 +53,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
     private void attachDefaultConstructor(ClassOrInterfaceDeclaration cd) {
         // attach Java original
         if (!cd.isInterface() && cd.getConstructors().isEmpty()) {
-            cd.addConstructor(Modifier.Keyword.PUBLIC);
+            cd.addConstructor(Modifier.DefaultKeyword.PUBLIC);
         }
         // attach normalform
         var body = new BlockStmt();
@@ -62,7 +62,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         addInitializers(cd, body, 0);
         MethodDeclaration def =
             cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
-                Modifier.Keyword.PUBLIC);
+                Modifier.DefaultKeyword.PUBLIC);
         def.setBody(body);
     }
 

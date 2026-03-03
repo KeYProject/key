@@ -138,8 +138,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      */
     private MethodDeclaration createPrepareMethod(TypeDeclaration<?> td) {
         NodeList<Modifier> modifiers = new NodeList<>(
-            new Modifier(Modifier.Keyword.STATIC),
-            new Modifier(Modifier.Keyword.PRIVATE));
+            new Modifier(Modifier.DefaultKeyword.STATIC),
+            new Modifier(Modifier.DefaultKeyword.PRIVATE));
         MethodDeclaration method = new MethodDeclaration(modifiers,
             new VoidType(), // return type is void
             CLASS_PREPARE_IDENTIFIER);

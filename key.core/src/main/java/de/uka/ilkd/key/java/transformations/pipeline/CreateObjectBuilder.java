@@ -101,7 +101,7 @@ public class CreateObjectBuilder extends JavaTransformer {
     public void createMethod(ClassOrInterfaceDeclaration type) {
         var md = type.addMethod(
             IMPLICIT_OBJECT_CREATE,
-            Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+            Modifier.DefaultKeyword.PUBLIC, Modifier.DefaultKeyword.STATIC);
         md.setType(new ClassOrInterfaceType(null, type.getName(), null));
         md.setBody(createBody(type));
     }

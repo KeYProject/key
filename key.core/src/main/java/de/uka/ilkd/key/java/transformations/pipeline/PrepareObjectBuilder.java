@@ -57,7 +57,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
         List<VariableDeclarator> result = new ArrayList<>();
         outer: for (FieldDeclaration fd : cd.getFields()) {
             for (Modifier mod : fd.getModifiers()) {
-                if (mod.getKeyword() == Modifier.Keyword.MODEL)
+                if (mod.getKeyword() == Modifier.DefaultKeyword.JML_MODEL)
                     continue outer;
             }
             var fields = fd.getVariables();
@@ -78,7 +78,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
         }
         NodeList<Statement> result = new NodeList<Statement>();
         for (FieldDeclaration field : fields) {
-            if (!field.isStatic() && !field.hasModifier(Modifier.Keyword.MODEL)) {
+            if (!field.isStatic() && !field.hasModifier(Modifier.DefaultKeyword.JML_MODEL)) {
                 for (VariableDeclarator variable : field.getVariables()) {
                     SimpleName fieldId = variable.getName();
                     if (!fieldId.getIdentifier().startsWith("" + JavaDLFieldNames.FIELD_PREFIX
@@ -128,7 +128,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
      */
     public MethodDeclaration createMethod(TypeDeclaration type) {
         NodeList<Modifier> modifiers =
-            new NodeList<Modifier>(new Modifier(Modifier.Keyword.PROTECTED));
+            new NodeList<Modifier>(new Modifier(Modifier.DefaultKeyword.PROTECTED));
         MethodDeclaration md = new MethodDeclaration(modifiers,
             new VoidType(),
             IMPLICIT_OBJECT_PREPARE);
@@ -146,7 +146,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration<?> type) {
-        NodeList<Modifier> modifiers = new NodeList<>(new Modifier(Modifier.Keyword.PRIVATE));
+        NodeList<Modifier> modifiers = new NodeList<>(new Modifier(Modifier.DefaultKeyword.PRIVATE));
         MethodDeclaration md = new MethodDeclaration(modifiers,
             new VoidType(),
             IMPLICIT_OBJECT_PREPARE_ENTER);

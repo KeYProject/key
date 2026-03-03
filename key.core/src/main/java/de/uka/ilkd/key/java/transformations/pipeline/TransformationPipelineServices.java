@@ -239,7 +239,7 @@ public class TransformationPipelineServices {
                     !init.isStatic()) {
                 String name =
                     PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + objectInitializerCount;
-                var initializerMethod = cd.addMethod(name, Modifier.Keyword.PRIVATE);
+                var initializerMethod = cd.addMethod(name, Modifier.DefaultKeyword.PRIVATE);
                 initializerMethod.setBody(init.getBody().clone());
                 initializerMethod.setParentNode(cd);
                 result.add(new ExpressionStmt(new MethodCallExpr(name)));
