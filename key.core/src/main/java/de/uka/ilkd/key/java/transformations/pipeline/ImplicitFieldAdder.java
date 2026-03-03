@@ -80,16 +80,16 @@ public class ImplicitFieldAdder extends JavaTransformer {
             Type type, String fieldName, boolean isStatic, boolean isPrivate, boolean isFinal) {
         NodeList<Modifier> modifiers = new NodeList<>();
         if (isStatic) {
-            modifiers.add(new Modifier(Modifier.Keyword.STATIC));
+            modifiers.add(new Modifier(Modifier.DefaultKeyword.STATIC));
         }
         if (isPrivate) {
-            modifiers.add(new Modifier(Modifier.Keyword.PRIVATE));
+            modifiers.add(new Modifier(Modifier.DefaultKeyword.PRIVATE));
         } else {
-            modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
+            modifiers.add(new Modifier(Modifier.DefaultKeyword.PUBLIC));
         }
 
         if (isFinal) {
-            modifiers.add(new Modifier(Modifier.Keyword.FINAL));
+            modifiers.add(new Modifier(Modifier.DefaultKeyword.FINAL));
         }
 
         VariableDeclarator variable = new VariableDeclarator(type, fieldName);
@@ -148,7 +148,7 @@ public class ImplicitFieldAdder extends JavaTransformer {
             TypeDeclaration<?> container = (TypeDeclaration<?>) td.getParentNode().get();
             String id = container.getNameAsString();
             td.addField(new ClassOrInterfaceType(null, id),
-                PipelineConstants.IMPLICIT_ENCLOSING_THIS, Modifier.Keyword.PRIVATE);
+                PipelineConstants.IMPLICIT_ENCLOSING_THIS, Modifier.DefaultKeyword.PRIVATE);
         }
     }
 

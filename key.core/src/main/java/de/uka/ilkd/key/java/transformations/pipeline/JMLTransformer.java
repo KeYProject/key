@@ -37,6 +37,7 @@ import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -107,7 +108,7 @@ public final class JMLTransformer extends JavaTransformer {
             return sb.toString();
         }
         var first = iter.next();
-        if (first instanceof BlockComment) {
+        if (first instanceof BlockComment || first instanceof JavadocComment) {
             sb.append("/*").append(first.getContent()).append("*/");
         } else {
             sb.append("//").append(first.getContent());
@@ -229,7 +230,7 @@ public final class JMLTransformer extends JavaTransformer {
             throw new SLTranslationException(
                 "JML field declaration must be either ghost or model!", decl.getLocation());
         }
-        return isGhost ? Modifier.Keyword.GHOST : Modifier.Keyword.MODEL;
+        return isGhost ? Modifier.DefaultKeyword.JML_GHOST : Modifier.DefaultKeyword.JML_MODEL;
     }
 
     @NonNull
@@ -292,7 +293,7 @@ public final class JMLTransformer extends JavaTransformer {
 
         // parse declaration, attach to AST
 
-        if (mod == Modifier.Keyword.MODEL) {
+        if (mod == Modifier.DefaultKeyword.JML_MODEL) {
             throw new SLTranslationException(
                 "JML model fields cannot be declared within a method!",
                 declWithMods.location);
@@ -349,12 +350,12 @@ public final class JMLTransformer extends JavaTransformer {
         // about the 0 see the comment in transformFieldDecl() above
 
         // add model modifier
-        methodDecl.addModifier(Modifier.Keyword.MODEL);
+        methodDecl.addModifier(Modifier.DefaultKeyword.JML_MODEL);
         if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) {
-            methodDecl.addModifier(Modifier.Keyword.TWO_STATE);
+            methodDecl.addModifier(Modifier.DefaultKeyword.JML_TWO_STATE);
         }
         if (decl.getModifiers().contains(JMLModifier.NO_STATE)) {
-            methodDecl.addModifier(Modifier.Keyword.NO_STATE);
+            methodDecl.addModifier(Modifier.DefaultKeyword.JML_NO_STATE);
         }
 
         // set comments: the original list of comments with the declaration,

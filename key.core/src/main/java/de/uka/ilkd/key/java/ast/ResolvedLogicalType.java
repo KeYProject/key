@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.resolution.declarations.*;
+import com.github.javaparser.resolution.types.AssignableToPrimitive;
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.NonNull;
@@ -17,7 +19,8 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (23.06.23)
  */
-public class ResolvedLogicalType implements ResolvedReferenceTypeDeclaration {
+public class ResolvedLogicalType
+        implements ResolvedReferenceTypeDeclaration, AssignableToPrimitive {
     @NonNull
     private final KeYJavaType keYJavaType;
 
@@ -47,6 +50,20 @@ public class ResolvedLogicalType implements ResolvedReferenceTypeDeclaration {
 
     @Override
     public boolean isAssignableBy(ResolvedType type) {
+        if (type instanceof ResolvedPrimitiveType primitiveType) {
+            if (primitiveType.isBoolean()) {
+                return false;
+            }
+
+            if (primitiveType == ResolvedPrimitiveType.DOUBLE
+                    || primitiveType == ResolvedPrimitiveType.FLOAT) {
+                return false;
+            }
+
+            // integral types left
+            var s = keYJavaType.getSort();
+            return s.name().toString().equals("int");
+        }
         return false;
     }
 
@@ -118,5 +135,22 @@ public class ResolvedLogicalType implements ResolvedReferenceTypeDeclaration {
     @Override
     public int hashCode() {
         return Objects.hash(keYJavaType);
+    }
+
+
+    @Override
+    public boolean isAssignableToPrimitive(ResolvedPrimitiveType primitiveType) {
+        if (primitiveType.isBoolean()) {
+            return false;
+        }
+
+        if (primitiveType == ResolvedPrimitiveType.DOUBLE
+                || primitiveType == ResolvedPrimitiveType.FLOAT) {
+            return false;
+        }
+
+        // integral types left
+        var s = keYJavaType.getSort();
+        return s.name().equals("int");
     }
 }

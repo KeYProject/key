@@ -2038,7 +2038,8 @@ public abstract class KeYJavaASTFactory {
     public static MethodBodyStatement methodBody(final JavaInfo model, final ProgramVariable result,
             final ReferencePrefix reference, final KeYJavaType classType, final String methodName,
             final ProgramVariable[] arguments) {
-        final IProgramMethod method = model.getProgramMethod(classType, methodName, arguments);
+        final IProgramMethod method =
+            model.getProgramMethod(classType, methodName, arguments, classType);
         MethodBodyStatement methodBody = null;
 
         if (method != null) {

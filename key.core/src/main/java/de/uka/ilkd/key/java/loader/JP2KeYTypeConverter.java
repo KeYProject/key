@@ -363,7 +363,8 @@ public class JP2KeYTypeConverter {
             if (ast.isPresent()
                     && ast.get() instanceof com.github.javaparser.ast.body.TypeDeclaration<?>) {
                 var td = (com.github.javaparser.ast.body.TypeDeclaration<?>) ast.get();
-                isAbstract = td.hasModifier(com.github.javaparser.ast.Modifier.Keyword.ABSTRACT);
+                isAbstract =
+                    td.hasModifier(com.github.javaparser.ast.Modifier.DefaultKeyword.ABSTRACT);
             }
         }
         final Name name = new Name(ct.getQualifiedName());

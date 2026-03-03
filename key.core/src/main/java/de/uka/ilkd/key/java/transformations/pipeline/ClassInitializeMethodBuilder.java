@@ -281,7 +281,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         MethodDeclaration md = new MethodDeclaration(new NodeList<>(),
             new VoidType(),
             CLASS_INITIALIZE_IDENTIFIER);
-        md.addModifier(Modifier.Keyword.STATIC, Modifier.Keyword.PUBLIC);
+        md.addModifier(Modifier.DefaultKeyword.STATIC, Modifier.DefaultKeyword.PUBLIC);
         md.setBody(createInitializeMethodBody(td));
         return md;
     }

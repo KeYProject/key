@@ -73,8 +73,8 @@ public class CreateBuilder extends JavaTransformer {
      */
     public MethodDeclaration createMethod(TypeDeclaration<?> type) {
         NodeList<Modifier> modifiers = new NodeList<>();
-        modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
-        modifiers.add(new Modifier(Modifier.Keyword.STATIC));
+        modifiers.add(new Modifier(Modifier.DefaultKeyword.PUBLIC));
+        modifiers.add(new Modifier(Modifier.DefaultKeyword.STATIC));
 
         MethodDeclaration md = new MethodDeclaration(
             modifiers, new ClassOrInterfaceType(null, services.getId(type)),

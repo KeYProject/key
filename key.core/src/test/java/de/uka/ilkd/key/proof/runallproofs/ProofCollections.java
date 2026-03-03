@@ -603,8 +603,8 @@ public class ProofCollections {
         g.notprovable("standard_key/java_dl/danglingElse.key");
         // commented out -in the current handling of this references(from branch mostThisRef)
         // inner classes do not work.According to Richard, there is a bug in handling inner classes
-        // that needs a non -trivial fix.
-        // provable: ./standard_key/java_dl/innerClasses/inner.key");
+        // that needs a non-trivial fix.
+        // g.provable("./standard_key/java_dl/innerClasses/inner.key");
         g.provable("standard_key/java_dl/iteratedAssignment.key");
         g.notprovable("standard_key/java_dl/assert/assert1.key");
         g.provable("standard_key/java_dl/assert/assert2.key");

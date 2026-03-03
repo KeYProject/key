@@ -192,7 +192,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \nothing;
    */
-   public boolean /*@ helper */ startsWith(/*@ nullable*/ java.lang.String other, int startIdx);
+   public /*@ helper */ boolean startsWith(/*@ nullable*/ java.lang.String other, int startIdx);
 
    /*@
    public normal_behavior
@@ -205,7 +205,7 @@ public final class String extends java.lang.Object implements java.io.Serializab
       signals (java.lang.NullPointerException) true;
       assignable \nothing;
     */
-   public boolean /*@ helper */ startsWith(java.lang.String other);
+   public /*@ helper */ boolean startsWith(java.lang.String other);
 
    /*@
    public normal_behavior
