@@ -196,11 +196,17 @@ public final class HeapLDT extends LDT {
     public static String getPrettyFieldName(Named fieldSymbol) {
         String name = fieldSymbol.name().toString();
         int index = name.indexOf(JavaDLFieldNames.FIELD_INFIX);
-        if (index == -1) {
-            return name;
-        } else {
+        if (index >= 0) {
             return name.substring(index + JavaDLFieldNames.FIELD_INFIX.length());
         }
+
+        index = name.indexOf(JavaDLFieldNames.OLD_IMPLICIT_PATTERN);
+        if (index >= 0 && name.endsWith(">")) {
+            return name.substring(index + JavaDLFieldNames.OLD_IMPLICIT_PATTERN.length(),
+                name.length() - 1);
+        }
+
+        return name;
     }
 
 
