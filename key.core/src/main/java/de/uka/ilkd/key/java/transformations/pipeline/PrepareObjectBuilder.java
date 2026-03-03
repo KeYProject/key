@@ -146,7 +146,8 @@ public class PrepareObjectBuilder extends JavaTransformer {
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration<?> type) {
-        NodeList<Modifier> modifiers = new NodeList<>(new Modifier(Modifier.DefaultKeyword.PRIVATE));
+        NodeList<Modifier> modifiers =
+            new NodeList<>(new Modifier(Modifier.DefaultKeyword.PRIVATE));
         MethodDeclaration md = new MethodDeclaration(modifiers,
             new VoidType(),
             IMPLICIT_OBJECT_PREPARE_ENTER);

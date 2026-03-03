@@ -159,7 +159,7 @@ public class JMLCommentTransformer extends JavaTransformer {
         if (!comments.isEmpty()) {
             var path = cu.getStorage().get().getPath().toAbsolutePath().toString();
             throw new IllegalStateException(
-                    "Some comments were not attached to nodes in " + path + ":\n\t" + comments);
+                "Some comments were not attached to nodes in " + path + ":\n\t" + comments);
         }
     }
 }
