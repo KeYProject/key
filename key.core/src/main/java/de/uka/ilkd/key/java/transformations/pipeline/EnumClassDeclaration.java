@@ -13,6 +13,8 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
+import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
+
 /// This class is used to describe an enum type by its equivalent class declaration.
 /// The transformation [EnumClassBuilder] transform an [EnumDeclaration] to an
 /// EnumClassDeclaration by
@@ -67,9 +69,9 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
         for (var m : ed.modifiers()) {
             modifiers.add(m.clone());
         }
-        if (!ed.hasModifier(Modifier.Keyword.FINAL)) {
+        if (!ed.hasModifier(FINAL)) {
             // enum is always final
-            modifiers.add(new Modifier(Modifier.Keyword.FINAL));
+            modifiers.add(new Modifier(FINAL));
         }
         setModifiers(modifiers);
 
@@ -117,8 +119,8 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
         var init =
             new ObjectCreationExpr(null, new ClassOrInterfaceType(null, getNameAsString()), args);
         addMember(new FieldDeclaration(
-            new NodeList<>(new Modifier(Modifier.Keyword.PUBLIC),
-                new Modifier(Modifier.Keyword.STATIC), new Modifier(Modifier.Keyword.FINAL)),
+            new NodeList<>(new Modifier(PUBLIC),
+                new Modifier(STATIC), new Modifier(FINAL)),
             new VariableDeclarator(new ClassOrInterfaceType(null, getNameAsString()), e.name(),
                 init)));
     }
@@ -129,8 +131,8 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
             init.values().add(new StringLiteralExpr(ec.getNameAsString()));
         }
         addMember(new FieldDeclaration(
-            new NodeList<>(new Modifier(Modifier.Keyword.PRIVATE),
-                new Modifier(Modifier.Keyword.STATIC)),
+            new NodeList<>(new Modifier(PRIVATE),
+                new Modifier(STATIC)),
             new VariableDeclarator(new ArrayType(new ClassOrInterfaceType(null, "String")),
                 ENUM_NAMES, init)));
     }
@@ -142,8 +144,8 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
             consts.add(new NameExpr(ec.getNameAsString()));
         }
         addMember(new MethodDeclaration(
-            new NodeList<>(new Modifier(Modifier.Keyword.PUBLIC),
-                new Modifier(Modifier.Keyword.STATIC)),
+            new NodeList<>(new Modifier(PUBLIC),
+                new Modifier(STATIC)),
             new NodeList<>(), new NodeList<>(),
             new ArrayType(new ClassOrInterfaceType(null, getNameAsString())),
             new SimpleName("values"), new NodeList<>(), new NodeList<>(), new BlockStmt(
@@ -152,8 +154,8 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
         // public static #E valueOf(String string) { for (#E e : values()) { if
         // (e.name().equals(string)) return e; } throw new IllegalArgumentException(); }
         addMember(new MethodDeclaration(
-            new NodeList<>(new Modifier(Modifier.Keyword.PUBLIC),
-                new Modifier(Modifier.Keyword.STATIC)),
+            new NodeList<>(new Modifier(PUBLIC),
+                new Modifier(STATIC)),
             new NodeList<>(), new NodeList<>(), new ClassOrInterfaceType(null, getNameAsString()),
             new SimpleName("valueOf"),
             new NodeList<>(new Parameter(new ClassOrInterfaceType(null, "String"), "string")),
@@ -172,7 +174,7 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
                         new NodeList<>()))))));
 
         // public String name() { return $enumConstantNames[ordinal()]; }
-        addMember(new MethodDeclaration(new NodeList<>(new Modifier(Modifier.Keyword.PUBLIC)),
+        addMember(new MethodDeclaration(new NodeList<>(new Modifier(PUBLIC)),
             new NodeList<>(), new NodeList<>(), new ClassOrInterfaceType(null, getNameAsString()),
             new SimpleName("name"), new NodeList<>(), new NodeList<>(), new BlockStmt(
                 new NodeList<>(new ReturnStmt(new ArrayAccessExpr(new NameExpr(ENUM_NAMES),
