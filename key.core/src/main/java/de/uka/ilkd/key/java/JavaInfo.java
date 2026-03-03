@@ -186,7 +186,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
-        if (name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize) {
+        if (name2KJTCache == null || kpmi.rec2key().keYTypes().size() > nameCachedSize) {
             buildNameCache();
         }
         return name2KJTCache.get(fullName);
