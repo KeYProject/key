@@ -25,10 +25,8 @@ import com.github.javaparser.utils.PositionUtils;
 import org.jspecify.annotations.NonNull;
 
 public class JMLCommentTransformer extends JavaTransformer {
-    public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
-    };
-    public static final DataKey<List<Comment>> AFTER_COMMENTS = new DataKey<>() {
-    };
+    public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {};
+    public static final DataKey<List<Comment>> AFTER_COMMENTS = new DataKey<>() {};
 
     /**
      * creates a transformer for the recoder model

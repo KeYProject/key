@@ -26,6 +26,7 @@ import com.github.javaparser.ast.key.JmlDoc;
 import com.github.javaparser.ast.key.JmlDocModifier;
 import com.github.javaparser.ast.key.JmlDocsBodyDeclaration;
 import com.github.javaparser.ast.key.JmlDocsStatements;
+import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -246,7 +247,10 @@ public final class JMLTransformer extends JavaTransformer {
             modifiers.add(mod);
         }
 
-        int arrayDims = decl.getDecl().typespec().dims().LBRACKET().size() + decl.getDecl().LBRACKET().size();
+
+        final var dims = decl.getDecl().typespec().dims();
+
+        int arrayDims = (dims!=null?dims.LBRACKET().size():0) + decl.getDecl().LBRACKET().size();
         Type type = StaticJavaParser.parseType(decl.getDecl().typespec().type().getText() + Strings.repeat("[]", arrayDims));
         String name = decl.getDecl().IDENT().getText();
 
@@ -461,27 +465,17 @@ public final class JMLTransformer extends JavaTransformer {
 
     private void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
         if (!td.containsData(KEY_CLASS_SPEC)) {
-            td.setData(KEY_CLASS_SPEC, new ArrayList<>());
+            td.setData(KEY_CLASS_SPEC, new ArrayList<>(4));
         }
         List<TextualJMLConstruct> specList = td.getData(KEY_CLASS_SPEC);
-        if (specList == null) {
-            specList = new ArrayList<>(4);
-            td.setData(KEY_CLASS_SPEC, specList);
-        }
-
         specList.add(c);
     }
 
-    private void addSpec(BodyDeclaration<?> nextMember, TextualJMLSpecCase specCase) {
+    private void addSpec(Node nextMember, TextualJMLSpecCase specCase) {
         if (!nextMember.containsData(KEY_SPEC_CASE)) {
-            nextMember.setData(KEY_SPEC_CASE, new ArrayList<>());
+            nextMember.setData(KEY_SPEC_CASE, new ArrayList<>(4));
         }
         List<TextualJMLSpecCase> specList = nextMember.getData(KEY_SPEC_CASE);
-        if (specList == null) {
-            specList = new ArrayList<>(4);
-            nextMember.setData(KEY_SPEC_CASE, specList);
-        }
-
         specList.add(specCase);
     }
 
@@ -497,9 +491,7 @@ public final class JMLTransformer extends JavaTransformer {
         }
     }
 
-    // TODO
     private void transformMethodLevelCommentsAt(BlockStmt blockStmt) throws SLTranslationException {
-        // call preparser
         PreParser io = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         var stmts = new ArrayList<>(blockStmt.getStatements());
 
@@ -519,20 +511,29 @@ public final class JMLTransformer extends JavaTransformer {
 
                 int j = 0;
                 // handle ghost declarations and set assignments in textual constructs
-                for (TextualJMLConstruct c : constructs) {
+                outer: for (TextualJMLConstruct c : constructs) {
                     j++;
                     Statement statement;
-                    if (c instanceof TextualJMLFieldDecl) {
-                        statement = transformVariableDecl((TextualJMLFieldDecl) c);
-                    } else if (c instanceof TextualJMLSetStatement) {
-                        statement = transformSetStatement((TextualJMLSetStatement) c);
-                    } else if (c instanceof TextualJMLMergePointDecl) {
-                        statement = transformMergePointDecl((TextualJMLMergePointDecl) c);
-                    } else if (c instanceof TextualJMLAssertStatement) {
-                        statement = transformAssertStatement((TextualJMLAssertStatement) c);
-                    } else {
-                        LOGGER.trace("{}: Jml element unhandled: {}", c.getLocation(), c.getClass());
-                        continue;
+                    switch (c) {
+                        case TextualJMLFieldDecl field -> statement = transformVariableDecl(field);
+                        case TextualJMLSetStatement set -> statement = transformSetStatement(set);
+                        case TextualJMLMergePointDecl mergePointDecl -> statement = transformMergePointDecl(mergePointDecl);
+                        case TextualJMLAssertStatement assertStatement -> statement = transformAssertStatement(assertStatement);
+                        case TextualJMLSpecCase spec -> {
+                            for (int k = i; k < stmts.size(); k++) {
+                                var search = stmts.get(k);
+                                if (search instanceof BlockStmt bs || search instanceof NodeWithBody<?> /*aka loops*/) {
+                                    addSpec(search, spec);
+                                    continue outer;
+                                }
+                            }
+                            // Nothing found error
+                            throw new IllegalStateException("Could not find a suitable statement for the loop/block/invariant");
+                        }
+                        default -> {
+                            LOGGER.error("{}: Jml element unhandled: {}", c.getLocation(), c.getClass());
+                            continue;
+                        }
                     }
                     //TODO Block, loop specifications contracts
                     blockStmt.getStatements().add(i + j, statement);

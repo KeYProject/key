@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -19,8 +20,6 @@ import org.key_project.util.collection.ImmutableArray;
  */
 
 public class FieldDeclaration extends VariableDeclaration implements MemberDeclaration {
-
-
     /**
      * Field specs.
      */
@@ -67,6 +66,11 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             boolean parentIsInferface, ImmutableArray<FieldSpecification> fieldSpecs) {
         super(pi, c, modArray, type, parentIsInferface);
         this.fieldSpecs = fieldSpecs;
+    }
+
+    @Override
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
+        return modArray;
     }
 
     public ImmutableArray<FieldSpecification> getFieldSpecifications() {

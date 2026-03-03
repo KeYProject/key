@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -12,11 +10,13 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.List;
 
 /**
  * There are several types of class declarations:
@@ -72,22 +72,16 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Class declaration.
      *
-     * @param mods
-     *        a modifier array.
-     * @param name
-     *        Identifier of the class
-     * @param members
-     *        an array containing the memberdeclarations of this type
-     * @param implemented
-     *        of type Implement containing the interfaces implemented by this class
-     * @param extended
-     *        Extend containing the class extended by the class of this classdeclaration
-     * @param parentIsInterfaceDeclaration
-     *        boolean true iff parent is an InterfaceDeclaration
+     * @param mods                         a modifier array.
+     * @param name                         Identifier of the class
+     * @param members                      an array containing the memberdeclarations of this type
+     * @param implemented                  of type Implement containing the interfaces implemented by this class
+     * @param extended                     Extend containing the class extended by the class of this classdeclaration
+     * @param parentIsInterfaceDeclaration boolean true iff parent is an InterfaceDeclaration
      */
     public ClassDeclaration(Modifier[] mods, ProgramElementName name, Extends extended,
-            ProgramElementName fullName, Implements implemented, MemberDeclaration[] members,
-            boolean parentIsInterfaceDeclaration, boolean isLibrary) {
+                            ProgramElementName fullName, Implements implemented, MemberDeclaration[] members,
+                            boolean parentIsInterfaceDeclaration, boolean isLibrary) {
         super(mods, name, fullName, members, parentIsInterfaceDeclaration, isLibrary);
         this.extending = extended;
         this.implementing = implemented;
@@ -99,20 +93,17 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * uses children list to create non-anonymous class
      *
-     * @param children
-     *        the ExtList with all children building up this class declaration May contain:
-     *        a Extends (as pointer to a class), a Implements (as pointer to an interface)
-     *        ProgramElementName (as name), several MemberDeclaration (as members of the type), a
-     *        parentIsInterfaceDeclaration (indicating if parent is interface), several Modifier (as
-     *        modifiers of the type decl), a Comment
-     * @param fullName
-     *        the fully qualified ProgramElementName of this class
-     * @param isLibrary
-     *        a boolean flag indicating if this class represents a library class (such
-     *        classes have usually no method implementations but specifications)
+     * @param children  the ExtList with all children building up this class declaration May contain:
+     *                  a Extends (as pointer to a class), a Implements (as pointer to an interface)
+     *                  ProgramElementName (as name), several MemberDeclaration (as members of the type), a
+     *                  parentIsInterfaceDeclaration (indicating if parent is interface), several Modifier (as
+     *                  modifiers of the type decl), a Comment
+     * @param fullName  the fully qualified ProgramElementName of this class
+     * @param isLibrary a boolean flag indicating if this class represents a library class (such
+     *                  classes have usually no method implementations but specifications)
      */
     public ClassDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary,
-            boolean innerClass, boolean anonymousClass, boolean localClass) {
+                            boolean innerClass, boolean anonymousClass, boolean localClass) {
         super(children, fullName, isLibrary);
         extending = children.get(Extends.class);
         implementing = children.get(Implements.class);
@@ -126,16 +117,25 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
 
     public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
-            ProgramElementName name, ProgramElementName fullName,
-            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
-            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
-            boolean localClassDeclaration, boolean isAnonymousClass) {
+                            ProgramElementName name, ProgramElementName fullName,
+                            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
+                            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
+                            boolean localClassDeclaration, boolean isAnonymousClass) {
         super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary);
         this.extending = extending;
         this.implementing = implementing;
         this.isInnerClass = innerClass;
         this.isLocalClass = localClassDeclaration;
         this.isAnonymousClass = isAnonymousClass;
+    }
+
+    public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+                            ProgramElementName name, ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
+                            boolean parentIsInterface, boolean isLibrary, Extends extending, Implements implementing,
+                            boolean innerClass, boolean localClassDeclaration, boolean b, List<TextualJMLSpecCase> spec) {
+        this(pi,c,modArray,name,fullName,members,parentIsInterface,isLibrary,extending,implementing, innerClass,
+                localClassDeclaration, b);
+        attachedJml.addAll(spec);
     }
 
 
@@ -167,11 +167,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
@@ -274,8 +272,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnClassDeclaration(this);

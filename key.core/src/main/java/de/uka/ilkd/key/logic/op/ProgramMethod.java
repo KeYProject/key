@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -245,7 +246,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public ImmutableArray<Modifier> getModifiers() {
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
         return method.getModifiers();
     }
 

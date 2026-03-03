@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -58,12 +59,20 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     }
 
     public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
-            TypeReference o, Comment[] comments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> map1,
-            Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
+                                  TypeReference o, Comment[] comments, ProgramElementName name,
+                                  ImmutableArray<ParameterDeclaration> map1,
+                                  Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
         super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration);
     }
 
+    public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
+                                  TypeReference o, Comment[] comments, ProgramElementName name,
+                                  ImmutableArray<ParameterDeclaration> map1,
+                                  Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration,
+                                  List<TextualJMLSpecCase> specs) {
+        this(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration);
+        attachedJml.addAll(specs);
+    }
 
     /**
      * Constructors are never abstract.

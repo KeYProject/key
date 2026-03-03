@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.rule.MatchConditions;
-
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * A part of the program syntax that carries semantics in the model. taken from COMPOST and changed
@@ -21,6 +23,10 @@ public interface ProgramElement extends SourceElement, ModelElement {
      */
     Comment[] getComments();
 
+    ///
+    default List<TextualJMLConstruct> getAttachedJml() {
+        return List.of();
+    }
 
 
     /**
@@ -29,10 +35,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
      * found instantiations of the schemavariables. If the match failed, <tt>null</tt> is returned
      * instead.
      *
-     * @param source
-     *        the SourceData with the program element to match
-     * @param matchCond
-     *        the MatchConditions found up to this point
+     * @param source    the SourceData with the program element to match
+     * @param matchCond the MatchConditions found up to this point
      * @return the resulting match conditions or <tt>null</tt> if the match failed
      */
     @Nullable

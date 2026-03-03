@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -154,6 +155,13 @@ public abstract class VariableDeclaration extends JavaDeclaration
     public TypeReference getTypeReference() {
         return typeReference;
     }
+
+
+    @Override
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
+        return modArray;
+    }
+
 
     /**
      * Get variables.

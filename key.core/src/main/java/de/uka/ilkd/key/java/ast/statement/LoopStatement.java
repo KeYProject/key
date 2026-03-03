@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -47,6 +50,13 @@ public abstract class LoopStatement extends JavaStatement
      */
     @NonNull
     protected final Statement body;
+
+    protected final List<TextualJMLConstruct> attachedJml = new ArrayList<>();
+
+    @Override
+    public List<TextualJMLConstruct> getAttachedJml() {
+        return attachedJml;
+    }
 
     /**
      * Loop statement.

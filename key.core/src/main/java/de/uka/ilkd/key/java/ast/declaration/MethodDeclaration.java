@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.*;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
@@ -103,6 +105,18 @@ public class MethodDeclaration extends JavaDeclaration
         this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
     }
 
+    public MethodDeclaration(
+            PositionInfo pi, List<Comment> comments,
+            @NonNull ImmutableArray<Modifier> modArray,
+            TypeReference returnType,
+            Comment[] voidComments, ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
+            StatementBlock body, boolean parentIsInterfaceDeclaration,
+            List<TextualJMLSpecCase> specs) {
+        this(pi, comments, modArray, returnType, voidComments, name, parameters, exceptions,
+                body, parentIsInterfaceDeclaration);
+        attachedJml.addAll(specs);
+    }
     /**
      * Method declaration.
      *

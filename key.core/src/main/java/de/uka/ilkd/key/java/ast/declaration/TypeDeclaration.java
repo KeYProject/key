@@ -300,6 +300,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
         return count;
     }
 
+    @Override
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
+        return modArray;
+    }
+
     /*
      * Return the type declaration at the specified index in this node's "virtual" type declaration
      * array.

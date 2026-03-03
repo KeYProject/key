@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
@@ -39,6 +41,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Nullable
     private final MethodFrame innerMostMethodFrame;
+    private final List<TextualJMLConstruct> attacedJml = new ArrayList<>(0);
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
@@ -88,6 +91,16 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(Statement... body) {
         this(new ImmutableArray<>(body));
+    }
+
+    public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body, List<TextualJMLSpecCase> spec) {
+        this(pi, c, body);
+        attacedJml.addAll(spec);
+    }
+
+    @Override
+    public List<TextualJMLConstruct> getAttachedJml() {
+        return attacedJml;
     }
 
     @Override

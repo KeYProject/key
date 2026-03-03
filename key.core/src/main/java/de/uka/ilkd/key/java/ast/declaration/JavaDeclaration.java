@@ -16,6 +16,8 @@
 
 package de.uka.ilkd.key.java.ast.declaration;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.Comment;
@@ -24,18 +26,31 @@ import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.declaration.modifier.*;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Java declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
-public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
-        implements Declaration {
+public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
+    protected final List<TextualJMLSpecCase> attachedJml = new ArrayList<TextualJMLSpecCase>();
+
+    @Override
+    public List<TextualJMLConstruct> getAttachedJml() {
+        return Collections.unmodifiableList(attachedJml);
+    }
+
+    @Override
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
+        return modArray;
+    }
 
     /**
      * Modifiers.
@@ -85,16 +100,6 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
 
 
     /**
-     * Get modifiers.
-     *
-     * @return the modifier array wrapper.
-     */
-    public ImmutableArray<Modifier> getModifiers() {
-        return modArray;
-    }
-
-
-    /**
      * Returns a Public, Protected, or Private Modifier, if there
      * is one, null otherwise. A return value of null can usually be
      * interpreted as package visibility.
@@ -110,7 +115,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     }
 
 
-    private boolean containsModifier(Class<?> type) {
+    public boolean containsModifier(Class<?> type) {
         int s = modArray.size();
         for (int i = 0; i < s; i += 1) {
             if (type.isInstance(modArray.get(i))) {

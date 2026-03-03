@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -89,8 +90,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      *        a library (library interfaces come often with a specification and are
      *        only available as bytecode)
      */
-    public InterfaceDeclaration(ExtList children, ProgramElementName fullName,
-            boolean isLibrary) {
+    public InterfaceDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
         super(children, fullName, isLibrary);
         extending = children.get(Extends.class);
     }
@@ -100,6 +100,13 @@ public class InterfaceDeclaration extends TypeDeclaration {
             name, null,
             new MemberDeclaration[] {},
             true);
+    }
+
+    public InterfaceDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+                                ProgramElementName name, ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
+                                boolean parentIsInterface, boolean isLibrary, Extends extending, List<TextualJMLSpecCase> spec) {
+        this(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary, extending);
+        attachedJml.addAll(spec);
     }
 
 

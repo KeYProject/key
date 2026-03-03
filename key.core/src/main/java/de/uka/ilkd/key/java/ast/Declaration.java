@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
-
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
