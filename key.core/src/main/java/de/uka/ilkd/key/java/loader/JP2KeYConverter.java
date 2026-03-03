@@ -1007,6 +1007,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         ClassDeclaration decl = null;
         if (n.getAnonymousClassBody().isPresent()) {
+            // TODO: Add pipeline step for anonymous classes
             ImmutableArray<MemberDeclaration> bodies = map(n.getAnonymousClassBody().get());
             decl = new ClassDeclaration(pi, c, new ImmutableArray<>(), null, null,
                 bodies, true, false, null, null,
@@ -1200,8 +1201,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ThisExpr n, Void arg) {
-        // TODO
         ReferencePrefix prefix = null;
+        if (n.typeName() != null) {
+            var ty = typeConverter.getKeYJavaType(n.typeName().asString());
+            prefix = new TypeRef(ty);
+        }
         return new ThisReference(createPositionInfo(n), createComments(n), prefix);
     }
 
