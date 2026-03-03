@@ -402,7 +402,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
         // If possible, redraw only a certain subtree
         // starting from the lowermost parent of trn that is not hidden
-        while (trn != null && trn != getRoot() && ProofTreeViewFilter.hiddenByGlobalFilters(trn.getNode())) {
+        while (trn != null && trn != getRoot()
+                && ProofTreeViewFilter.hiddenByGlobalFilters(trn.getNode())) {
             trn = (GUIAbstractTreeNode) trn.getParent();
         }
 
