@@ -32,19 +32,19 @@ public class AstFactory {
     }
 
     public static Modifier mPublic() {
-        return modifier(Modifier.Keyword.PUBLIC);
+        return modifier(Modifier.DefaultKeyword.PUBLIC);
     }
 
     public static Modifier mStrictFP() {
-        return modifier(Modifier.Keyword.STRICTFP);
+        return modifier(Modifier.DefaultKeyword.STRICTFP);
     }
 
     public static Modifier mProtected() {
-        return modifier(Modifier.Keyword.PROTECTED);
+        return modifier(Modifier.DefaultKeyword.PROTECTED);
     }
 
     public static Modifier mPrivate() {
-        return modifier(Modifier.Keyword.PRIVATE);
+        return modifier(Modifier.DefaultKeyword.PRIVATE);
     }
 
     public static BooleanLiteralExpr mkTrue() {

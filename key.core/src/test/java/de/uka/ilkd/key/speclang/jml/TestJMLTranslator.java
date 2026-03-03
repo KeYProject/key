@@ -165,7 +165,7 @@ public class TestJMLTranslator {
     public void testSimpleQuery() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType, "getOne",
-            ImmutableSLList.nil());
+            ImmutableSLList.nil(), testClassType);
         JTerm result = jmlIO.parseExpression("this.getOne()");
         assertNotNull(result);
         assertTrue(termContains(result, selfVar));
@@ -319,7 +319,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm =
-            javaInfo.getProgramMethod(testClassType, "getOne", signature);
+            javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType);
 
         LocationVariable resultVar = buildResultVar(pm);
 
@@ -367,7 +367,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
         JTerm result = jmlIO.parseExpression("this.m((int)4 + 2) == this.m(i)");
 
@@ -382,7 +382,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG));
 
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
         JTerm result = jmlIO.parseExpression("this.m(l) == this.m((long)i + 3)");
 
@@ -397,7 +397,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature);
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
         JTerm result = jmlIO.parseExpression("this.m(s + 4) == this.m(+b)");
 
@@ -412,7 +412,7 @@ public class TestJMLTranslator {
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm =
-            javaInfo.getProgramMethod(testClassType, "staticMethod", signature);
+            javaInfo.getProgramMethod(testClassType, "staticMethod", signature, testClassType);
 
         JTerm result = jmlIO.parseExpression("testPackage.TestClass.staticMethod() == 4");
 
