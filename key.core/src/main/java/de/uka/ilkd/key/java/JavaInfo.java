@@ -561,17 +561,16 @@ public final class JavaInfo {
     private IProgramMethod findToplevelPM(KeYJavaType kjt, String methodName,
             ImmutableList<KeYJavaType> sig, KeYJavaType context) {
 
-        // ImmutableList<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
-        // ImmutableList<KeYJavaType> removed = allSupertypes.removeAll(kjt);
-        // for (KeYJavaType sup : removed) {
-        // final IProgramMethod result = findToplevelPM(sup, methodName, sig);
-        // if (result != null) {
-        // return result;
-        // }
-        // }
+        List<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
+        allSupertypes.remove(kjt);
+        for (KeYJavaType sup : allSupertypes) {
+            final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
+            if (result != null) {
+                return result;
+            }
+        }
         return getProgramMethod(kjt, methodName, sig, context);
     }
-
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
         final String methodName = pm.getName();
