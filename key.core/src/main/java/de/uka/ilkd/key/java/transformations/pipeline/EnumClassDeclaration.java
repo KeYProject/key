@@ -13,6 +13,38 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
+/// This class is used to describe an enum type by its equivalent class declaration.
+/// The transformation [EnumClassBuilder] transform an [EnumDeclaration] to an
+/// EnumClassDeclaration by
+/// - adding static fields for the enum constants
+/// - adding static field for names
+/// - adding the methods as specified in the JLS 8.9
+/// - adding "extends Enum" to the ClassDeclaration
+///
+/// Currently anonymous implementations for constants are not supported as they are anonymous inner
+/// classes which are not supported by KeY.
+///
+/// The additional methods are constructed as follows (E is the name of the enum, (e1, ..., en) its
+/// constants):
+/// <pre>
+/// public static E[] values() { return new E[] { e1,..., en } };
+///
+/// public static E valueOf(java.lang.String string) {
+/// for(E e : values()) {
+/// if(e.name().equals(string))
+/// return e;
+/// }
+/// throw new IllegalArgumentException();
+/// }
+///
+/// public java.lang.String name() { return ENUM_NAMES[ordinal()]; }
+/// </pre>
+///
+/// Additionally the fields that are enum constants are remembered.
+///
+/// @author mulbrich, drodt
+/// @since 2006-11-18
+/// @version 2026-03-03
 public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
     /// name of the static variable of the array holding the names of the constants.
     private static final String ENUM_NAMES = "$enumConstantNames";

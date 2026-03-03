@@ -13,6 +13,12 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.SwitchEntry;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserEnumConstantDeclaration;
 
+/// This transformation is made to transform any found [EnumDeclaration] into a corresponding
+/// [EnumClassDeclaration].
+///
+/// @author mulbrich, drodt
+/// @since 2006-11-20
+/// @version 2026-03-03
 public class EnumClassBuilder extends JavaTransformer {
     /// a mapping of enums to the newly created class declarations.
     final Map<EnumDeclaration, EnumClassDeclaration> substitutes = new LinkedHashMap<>();
