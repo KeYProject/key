@@ -1074,7 +1074,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modifiers =
             map(n.getModifiers());
         var va = n.isVarArgs();
-        TypeReference type = accept(n.getType());
+        // Var arg expects an array type later on but JP gives us "normal" type
+        TypeReference type = accept(va ? new ArrayType(n.getType()) : n.getType());
         var pi = createPositionInfo(n);
         var c = createComments(n);
         IProgramVariable pv;
