@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
@@ -338,29 +341,29 @@ public class KeYProgModelInfo {
      *         a debug output is written to console).
      */
     @Nullable
-    public IProgramMethod getProgramMethod(@NonNull KeYJavaType ct, String name,
-            Iterable<KeYJavaType> signature, KeYJavaType context) {
-        if (ct.getJavaType() instanceof ArrayType) {
-            return getImplicitMethod(ct, name);
-        }
-
-        var type = getJavaParserType(ct);
-        if (!type.isReferenceType()) {
-            return null;
-        }
-        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
-        List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
-                .map(this::getJavaParserType).toList();
-        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-
-        if (!method.isSolved())
-            return null;
-
-        return method.getDeclaration()
-                .map(d -> (IProgramMethod) Objects
-                        .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
-                .orElse(null);
-    }
+//    public IProgramMethod getProgramMethod(@NonNull KeYJavaType ct, String name,
+//            Iterable<KeYJavaType> signature, KeYJavaType context) {
+//        if (ct.getJavaType() instanceof ArrayType) {
+//            return getImplicitMethod(ct, name);
+//        }
+//
+//        var type = getJavaParserType(ct);
+//        if (!type.isReferenceType()) {
+//            return null;
+//        }
+//        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+//        List<ResolvedType> jpSignature = StreamSupport.stream(signature.spliterator(), false)
+//                .map(this::getJavaParserType).toList();
+//        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+//
+//        if (!method.isSolved())
+//            return null;
+//
+//        return method.getDeclaration()
+//                .map(d -> (IProgramMethod) Objects
+//                        .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+//                .orElse(null);
+//    }
 
     // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
     // copy-and-past
@@ -404,82 +407,94 @@ public class KeYProgModelInfo {
      *         null if none or more than one IProgramMethod is found (in this case
      *         a debug output is written to console).
      */
-    // public @Nullable IProgramMethod getProgramMethod(
-    // @NonNull KeYJavaType ct, String name,
-    // Iterable<KeYJavaType> signature, KeYJavaType context) {
-    // return getProgramMethod(ct, name, signature);
-    // NodeList<Expression> args = new NodeList<>();
-    // for (var argType : signature) {
-    // Type javaType = getType(getJavaParserType(argType));
-    // if (!javaType.isPrimitiveType()) {
-    // args.add(new CastExpr(javaType, new NullLiteralExpr()));
-    // } else {
-    // PrimitiveType pt = (PrimitiveType) javaType;
-    // switch (pt.type().asString()) {
-    // case "boolean":
-    // args.add(new BooleanLiteralExpr(false));
-    // break;
-    // case "byte":
-    // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
-    // break;
-    // case "short":
-    // args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
-    // break;
-    // case "int":
-    // args.add(new IntegerLiteralExpr(0));
-    // break;
-    // case "long":
-    // args.add(new LongLiteralExpr(0));
-    // break;
-    // case "char":
-    // args.add(new CharLiteralExpr('a'));
-    // break;
-    // case "double":
-    // args.add(new DoubleLiteralExpr(0));
-    // break;
-    // case "float":
-    // args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
-    // break;
-    // }
-    // }
-    // }
-    //
-    // // TODO: Type arguments
-    // var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
-    // MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
-    // var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
-    // if (classContext.getParentNode().isEmpty()) {
-    // var cu = new CompilationUnit();
-    // // var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
-    // var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
-    // .getTypeDeclaration().get().toAst().get().getSymbolResolver();
-    // solver.inject(cu);
-    // mapping.getJavaServices().getProgramFactory().getTypeSolver();
-    // classContext.setParentNode(cu);
-    // }
-    // mce.setParentNode(classContext);
-    //
-    // return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
+    public @Nullable IProgramMethod getProgramMethod(
+            @NonNull KeYJavaType ct, String name,
+            Iterable<KeYJavaType> signature, KeYJavaType context) {
 
-    // if (context.getJavaType() instanceof ArrayType) {
-    // return getImplicitMethod(ct, name);
-    // }
-    //
-    // var type = getJavaParserType(ct);
-    // if (!type.isReferenceType()) {
-    // return null;
-    // }
-    //
-    // var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
-    // List<ResolvedType> jpSignature =
-    // StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType)
-    // .toList();
-    // var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
-    // return method.getDeclaration()
-    // .map(d -> (IProgramMethod) Objects
-    // .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
-    // .orElse(null);
-    // }
+        if (context.getJavaType() instanceof ArrayType) {
+            return getImplicitMethod(ct, name);
+        }
+
+        MethodCallExpr mce = createVirtualMethodCallExpr(ct, name, signature, context);
+        try {
+            return (IProgramMethod) mapping.resolvedDeclarationToKeY(mce.resolve());
+        } catch (UnsolvedSymbolException use) {
+            return null;
+        }
+
+//        if (context.getJavaType() instanceof ArrayType) {
+//            return getImplicitMethod(ct, name);
+//        }
+//
+//        var type = getJavaParserType(ct);
+//        if (!type.isReferenceType()) {
+//            return null;
+//        }
+//
+//        var rct = type.asReferenceType().getTypeDeclaration().orElseThrow();
+//        List<ResolvedType> jpSignature =
+//                StreamSupport.stream(signature.spliterator(), false).map(this::getJavaParserType)
+//                        .toList();
+//        var method = MethodResolutionLogic.solveMethodInType(rct, name, jpSignature);
+//        return method.getDeclaration()
+//                .map(d -> (IProgramMethod) Objects
+//                        .requireNonNull(mapping.resolvedDeclarationToKeY(d)))
+//                .orElse(null);
+    }
+
+    private @NonNull MethodCallExpr createVirtualMethodCallExpr(@NonNull KeYJavaType ct, String name, Iterable<KeYJavaType> signature, KeYJavaType context) {
+        NodeList<Expression> args = new NodeList<>();
+        for (var argType : signature) {
+            Type javaType = getType(getJavaParserType(argType));
+            if (!javaType.isPrimitiveType()) {
+                args.add(new CastExpr(javaType, new NullLiteralExpr()));
+            } else {
+                PrimitiveType pt = (PrimitiveType) javaType;
+                switch (pt.type().asString()) {
+                    case "boolean":
+                        args.add(new BooleanLiteralExpr(false));
+                        break;
+                    case "byte":
+                        args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+                        break;
+                    case "short":
+                        args.add(new CastExpr(pt, new IntegerLiteralExpr(0)));
+                        break;
+                    case "int":
+                        args.add(new IntegerLiteralExpr(0));
+                        break;
+                    case "long":
+                        args.add(new LongLiteralExpr(0));
+                        break;
+                    case "char":
+                        args.add(new CharLiteralExpr('a'));
+                        break;
+                    case "double":
+                        args.add(new DoubleLiteralExpr(0));
+                        break;
+                    case "float":
+                        args.add(new CastExpr(pt, new DoubleLiteralExpr(0)));
+                        break;
+                }
+            }
+        }
+
+        // TODO: Type arguments
+        var caller = new CastExpr(getType(getJavaParserType(ct)), new NullLiteralExpr());
+        MethodCallExpr mce = new MethodCallExpr(caller, new SimpleName(name), args);
+        caller.setParentNode(mce);
+        var classContext = (ClassOrInterfaceType) getType(getJavaParserType(context));
+        if (classContext.getParentNode().isEmpty()) {
+            var cu = new CompilationUnit();
+//            var solver = mapping.getJavaServices().getProgramFactory().getSymbolSolver();
+            var solver = (JavaSymbolSolver) getJavaParserType(context).asReferenceType()
+                    .getTypeDeclaration().get().toAst().get().getSymbolResolver();
+            solver.inject(cu);
+            classContext.setParentNode(cu);
+        }
+        mce.setParentNode(classContext);
+        return mce;
+    }
 
     private List<Field> asKeYFieldsR(Stream<ResolvedFieldDeclaration> rfl) {
         return rfl.flatMap(
@@ -679,13 +694,13 @@ public class KeYProgModelInfo {
         ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
         classList = recFindImplementations(rct, name, jpSignature, classList);
 
-        if (!declaresApplicableMethods(rct, name, jpSignature)) {
+        if (!declaresApplicableMethods(rct, name, jpSignature, rct)) {
             // ct has no implementation, go up
             List<ResolvedReferenceType> superTypes = rct.getAncestors();
             int k = 0;
             while (k < superTypes.size() && !declaresApplicableMethods(
                 superTypes.get(k).getTypeDeclaration().orElseThrow(), name,
-                jpSignature))
+                jpSignature, superTypes.get(k).getTypeDeclaration().orElseThrow()))
                 k++;
             if (k < superTypes.size()) {
                 rct = superTypes.get(k).getTypeDeclaration().orElseThrow();
@@ -713,7 +728,7 @@ public class KeYProgModelInfo {
             ResolvedTypeDeclaration ct,
             String name, List<ResolvedType> signature, ImmutableList<KeYJavaType> result,
             Set<ResolvedTypeDeclaration> visited) {
-        if (declaresApplicableMethods(ct, name, signature)) {
+        if (declaresApplicableMethods(ct, name, signature, ct.asReferenceType())) {
             var r = typeConverter.getKeYJavaType(ct.getQualifiedName());
             if (r == null) {
                 LOGGER.info("Type {}: {} not found", ct.getQualifiedName(), name);
@@ -742,9 +757,9 @@ public class KeYProgModelInfo {
 
     // TODO(weigl): Implemented by @Drodt, no idea if it's correct
     private boolean declaresApplicableMethods(ResolvedTypeDeclaration rt, String name,
-            List<ResolvedType> signature) {
+            List<ResolvedType> signature, ResolvedReferenceTypeDeclaration context) {
         if (rt instanceof MethodResolutionCapability mrc) {
-            var method = mrc.solveMethod(name, signature, false);
+            var method = mrc.solveMethod(name, signature, false, context);
             return method.isSolved();
         }
         return false;

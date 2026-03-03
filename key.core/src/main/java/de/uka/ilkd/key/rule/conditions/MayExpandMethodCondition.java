@@ -127,13 +127,13 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
         ReferencePrefix rp = null;
         if (receiver != null) {
-            rp = (ReferencePrefix) svInst.getInstantiation(receiver);
+            rp = svInst.getInstantiation(receiver);
         }
 
-        MethodName mn = (MethodName) svInst.getInstantiation(methname);
+        MethodName mn = svInst.getInstantiation(methname);
 
         ImmutableArray<Expression> ar =
-            toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
+            toExpArray(svInst.getInstantiation(args));
         if (var == args) {
             ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
         }
