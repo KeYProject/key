@@ -337,13 +337,22 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // get textual JML constructs
         var constructs = pm.getMethodDeclaration().getAttachedJml();
 
+        ParserRuleContext modelMethodDefinition = null;
+        for (var c : constructs) {
+            if (c instanceof TextualJMLMethodDecl m) {
+                if (pm.getMethodDeclaration().containsModifier(Modifiers.JML_MODEL.class)) {
+                    modelMethodDefinition = m.getMethodDefinition();
+                    break;
+                }
+            }
+        }
+
+
         for (var c : constructs) {
             if (c instanceof TextualJMLSpecCase specCase) {
-                /*
-                 * if (modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
-                 * specCase.addClause(AXIOMS, null, modelMethodDecl.getMethodDefinition());
-                 * }
-                 */
+                if (modelMethodDefinition != null) {
+                    specCase.addClause(AXIOMS, null, modelMethodDefinition);
+                }
 
                 // add purity. Strict purity overrides purity.
                 if (isStrictlyPure || pm.isModel()) {

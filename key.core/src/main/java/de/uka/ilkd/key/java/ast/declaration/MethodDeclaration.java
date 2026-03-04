@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
@@ -111,7 +111,7 @@ public class MethodDeclaration extends JavaDeclaration
             Comment[] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration,
-            List<TextualJMLSpecCase> specs) {
+            List<TextualJMLConstruct> specs) {
         this(pi, comments, modArray, returnType, voidComments, name, parameters, exceptions,
             body, parentIsInterfaceDeclaration);
         attachedJml.addAll(specs);

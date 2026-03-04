@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -12,12 +10,14 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.List;
 
 /**
  * There are several types of class declarations:
@@ -136,7 +136,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             boolean parentIsInterface, boolean isLibrary, Extends extending,
             Implements implementing,
             boolean innerClass, boolean localClassDeclaration, boolean b,
-            List<TextualJMLSpecCase> spec) {
+            List<TextualJMLConstruct> spec) {
         this(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary, extending,
             implementing, innerClass,
             localClassDeclaration, b);

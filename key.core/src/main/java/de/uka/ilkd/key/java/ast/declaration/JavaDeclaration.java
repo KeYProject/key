@@ -25,13 +25,14 @@ import de.uka.ilkd.key.java.ast.Declaration;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.declaration.modifier.*;
+
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Java declaration.
@@ -39,7 +40,7 @@ import org.jspecify.annotations.NonNull;
  */
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
-    protected final List<TextualJMLSpecCase> attachedJml = new ArrayList<TextualJMLSpecCase>();
+    protected final List<TextualJMLConstruct> attachedJml = new ArrayList<TextualJMLConstruct>();
 
     @Override
     public List<TextualJMLConstruct> getAttachedJml() {
