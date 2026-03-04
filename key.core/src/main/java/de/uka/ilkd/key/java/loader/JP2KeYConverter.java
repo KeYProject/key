@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
+import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -568,6 +569,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(EmptyStmt n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
+        /*
         if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
             var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
             if (construct instanceof TextualJMLAssertStatement a) {
@@ -580,7 +582,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 return new MergePointStatement(pi, c, a, loc);
             }
             LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());
-        }
+        }*/
         return new EmptyStatement(pi, c);
     }
 
@@ -732,6 +734,37 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             node = node.getParentNode().orElse(null);
         }
         return null;
+    }
+
+    @Override
+    public Object visit(KeYMarkerStatement n, Void arg) {
+        var pi = createPositionInfo(n);
+        return switch(n.getKind()) {
+            case MarkerStatementHelper.KIND_ASSERT -> {
+                var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
+                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
+            }
+            case MarkerStatementHelper.KIND_ASSUME -> {
+                var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
+                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
+            }
+            case MarkerStatementHelper.KIND_SET->{
+                var context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
+                yield new SetStatement(context, pi);
+            }
+
+
+            case MarkerStatementHelper.KIND_MERGE_POINT -> {
+                var loc = new LocationVariable(
+                        services.getVariableNamer().getTemporaryNameProposal("x"),
+                        services.getNamespaces().sorts().lookup("boolean"));
+                List<Comment> c = createComments(n);
+
+                TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
+                yield new MergePointStatement(pi, c, a, loc);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + n.getKind());
+        };
     }
 
     @Override
@@ -1425,7 +1458,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             if (compileTimeConstant == null) {
                 pv = new LocationVariable(pen, getKeYJavaType(t),
                     getKeYJavaType(classType), decl.isStatic, decl.isModel,
-                    false, decl.isFinal);
+                    decl.isGhost, decl.isFinal);
             } else {
                 pv = new ProgramConstant(pen, getKeYJavaType(t),
                     getKeYJavaType(classType), decl.isStatic,
