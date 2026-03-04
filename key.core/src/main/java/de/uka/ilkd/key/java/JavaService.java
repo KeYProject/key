@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.ZipFileCollection;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
@@ -228,29 +229,25 @@ public class JavaService {
     }
 
     /**
-     * read a compilation unit, given as a string.
+     * read compilation units, given as a collection of {@link Path}s.
      *
-     * @param files where to read from
+     * @param parent directory ro relativize files
+     * @param files the files to read
      * @param repo the repo to use for reading
-     * @return a KeY structured compilation unit.
+     * @return a list of KeY structured compilation units.
      */
-    public <E extends Throwable> List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
+    public List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
             Path parent,
-            Collection<Path> files, FileRepo repo,
-            BiFunction<BuildingExceptions, Path, E> exceptionProvider)
-            throws IOException, E {
+            Collection<Path> files, FileRepo repo)
+            throws IOException, BuildingExceptions {
         parseSpecialClasses();
         var cus = new ArrayList<CompilationUnit>(files.size());
         for (Path file : files) {
-            try {
-                var cu = unwrapParseResult(file.toString(), parseCompilationUnit(file, repo));
-                if (cu.getPackageDeclaration().isEmpty()) {
-                    fixupPackageDeclaration(cu, parent.relativize(file).toString());
-                }
-                cus.add(cu);
-            } catch (BuildingExceptions e) {
-                throw exceptionProvider.apply(e, file);
+            var cu = unwrapParseResult(file.toString(), parseCompilationUnit(file, repo));
+            if (cu.getPackageDeclaration().isEmpty()) {
+                fixupPackageDeclaration(cu, parent.relativize(file).toString());
             }
+            cus.add(cu);
         }
         programFactory.addUserClasses(cus);
         transformModel(Collections.unmodifiableList(cus));
