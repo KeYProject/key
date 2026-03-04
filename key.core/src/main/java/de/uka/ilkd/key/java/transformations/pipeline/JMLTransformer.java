@@ -543,7 +543,7 @@ public final class JMLTransformer extends JavaTransformer {
                 transformModifiers(hasMods);
             }
 
-            if(member instanceof TypeDeclaration<?> inner) {
+            if (member instanceof TypeDeclaration<?> inner) {
                 transformClassLevelComments(inner);
             }
         }

@@ -754,8 +754,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // classes...
             // Normal fields of interfaces are implicitly static...
 
-            var isStatic = n.isStatic() && !n.hasModifier(JML_INSTANCE);
-            var decl = new FullVariableDeclarator(v, n.isFinal(), isStatic, isModel, isGhost);
+            boolean isInstance = n.hasModifier(JML_INSTANCE);
+            var isStatic = n.isStatic() && !isInstance;
+            boolean isFinal = n.isFinal() && !isInstance;
+            var decl = new FullVariableDeclarator(v, isFinal, isStatic, isModel, isGhost);
             final var fs = visitFieldSpecification(decl);
             varsList.add(fs);
             mapping.put(v, fs);
