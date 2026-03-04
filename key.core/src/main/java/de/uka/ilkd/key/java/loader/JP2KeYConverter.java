@@ -570,19 +570,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         /*
-        if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
-            var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
-            if (construct instanceof TextualJMLAssertStatement a) {
-                return new JmlAssert(a.getKind(), a.getContext(), pi);
-            }
-            if (construct instanceof TextualJMLMergePointDecl a) {
-                var loc =
-                    new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
-                        services.getNamespaces().sorts().lookup("boolean"));
-                return new MergePointStatement(pi, c, a, loc);
-            }
-            LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());
-        }*/
+         * if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
+         * var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
+         * if (construct instanceof TextualJMLAssertStatement a) {
+         * return new JmlAssert(a.getKind(), a.getContext(), pi);
+         * }
+         * if (construct instanceof TextualJMLMergePointDecl a) {
+         * var loc =
+         * new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
+         * services.getNamespaces().sorts().lookup("boolean"));
+         * return new MergePointStatement(pi, c, a, loc);
+         * }
+         * LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());
+         * }
+         */
         return new EmptyStatement(pi, c);
     }
 
@@ -739,7 +740,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(KeYMarkerStatement n, Void arg) {
         var pi = createPositionInfo(n);
-        return switch(n.getKind()) {
+        return switch (n.getKind()) {
             case MarkerStatementHelper.KIND_ASSERT -> {
                 var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
                 yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
@@ -748,7 +749,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
                 yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
             }
-            case MarkerStatementHelper.KIND_SET->{
+            case MarkerStatementHelper.KIND_SET -> {
                 var context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
                 yield new SetStatement(context, pi);
             }
@@ -756,8 +757,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
             case MarkerStatementHelper.KIND_MERGE_POINT -> {
                 var loc = new LocationVariable(
-                        services.getVariableNamer().getTemporaryNameProposal("x"),
-                        services.getNamespaces().sorts().lookup("boolean"));
+                    services.getVariableNamer().getTemporaryNameProposal("x"),
+                    services.getNamespaces().sorts().lookup("boolean"));
                 List<Comment> c = createComments(n);
 
                 TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
