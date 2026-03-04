@@ -8,8 +8,8 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -45,7 +45,8 @@ public class Do extends LoopStatement {
         super(pi, c, null, null, guard, body);
     }
 
-    public Do(PositionInfo pi, List<Comment> c, Guard guard, Statement body, List<TextualJMLSpecCase> spec) {
+    public Do(PositionInfo pi, List<Comment> c, Guard guard, Statement body,
+            List<TextualJMLSpecCase> spec) {
         this(pi, c, guard, body);
         attachedJml.addAll(spec);
     }

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.*;
@@ -11,13 +13,13 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.List;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
@@ -52,7 +54,7 @@ public final class JMLInfoExtractor {
      * Checks whether one of the passed comments is a JML comment containing "key" and not *bad*.
      */
     private static boolean checkForNotContaining(String key, String bad,
-                                                 ImmutableList<Comment> coms) {
+            ImmutableList<Comment> coms) {
         for (Comment c : coms) {
             if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
                 return true;
@@ -67,7 +69,8 @@ public final class JMLInfoExtractor {
     private static SpecMathMode checkForSpecMathMode(JavaDeclaration methodDeclaration) {
         // This is hacky but hard to do better
         // We exclude comments containing 'behaviour' since they can be from the method contract
-        var specBigintMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
+        var specBigintMath =
+            methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
         var specSafeMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_SAFE_MATH.class);
         var specJavaMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_JAVA_MATH.class);
         // Consistency: bigint > safe > java
@@ -118,16 +121,19 @@ public final class JMLInfoExtractor {
      */
     public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
 
-        /*var pure = checkFor("pure", comments);
-        var strictlyPure = checkFor("strictly_pure", comments);
-        var helper = checkFor("helper", comments);
-        var specMathMode = checkForSpecMathMode(comments);*/
+        /*
+         * var pure = checkFor("pure", comments);
+         * var strictlyPure = checkFor("strictly_pure", comments);
+         * var helper = checkFor("helper", comments);
+         * var specMathMode = checkForSpecMathMode(comments);
+         */
 
         var pure = methodDeclaration.containsModifier(Modifiers.JML_PURE.class);
         var strictlyPure = methodDeclaration.containsModifier(Modifiers.JML_STRICTLY_PURE.class);
         var helper = methodDeclaration.containsModifier(Modifiers.JML_HELPER.class);
 
-        var specBigintMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
+        var specBigintMath =
+            methodDeclaration.containsModifier(Modifiers.JML_SPEC_BIGINT_MATH.class);
         var specSafeMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_SAFE_MATH.class);
         var specJavaMath = methodDeclaration.containsModifier(Modifiers.JML_SPEC_JAVA_MATH.class);
         // Consistency: bigint > safe > java
@@ -140,7 +146,8 @@ public final class JMLInfoExtractor {
     /**
      * Extracts the list of comments for a given field. The comments should usually be modifiers.
      */
-    private static ImmutableArray<Modifier> extractFieldModifiers(String fieldName, TypeDeclaration td) {
+    private static ImmutableArray<Modifier> extractFieldModifiers(String fieldName,
+            TypeDeclaration td) {
         for (final MemberDeclaration decl : td.getMembers()) {
             if (decl instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
@@ -158,7 +165,7 @@ public final class JMLInfoExtractor {
     // public interface
     // -------------------------------------------------------------------------
 
-    public static boolean hasJMLModifier(FieldDeclaration fd, Class<?extends Modifier> modifier) {
+    public static boolean hasJMLModifier(FieldDeclaration fd, Class<? extends Modifier> modifier) {
         return fd.containsModifier(modifier);
     }
 
@@ -221,7 +228,8 @@ public final class JMLInfoExtractor {
 
         var specMathMode = checkForSpecMathMode(td);
 
-        return new TypeDeclaration.JMLModifiers(strictlyPure, pure, nullableByDefault, specMathMode);
+        return new TypeDeclaration.JMLModifiers(strictlyPure, pure, nullableByDefault,
+            specMathMode);
     }
 
     /**
@@ -259,7 +267,7 @@ public final class JMLInfoExtractor {
      */
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd) : "parameter " + pd
-                + " does not belong to method declaration " + pm;
+            + " does not belong to method declaration " + pm;
         boolean non_null = pd.containsModifier(Modifiers.JML_NON_NULL.class);
         boolean nullable = pd.containsModifier(Modifiers.JML_NULLABLE.class);
 

@@ -16,6 +16,22 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.net.URI;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.njml.PreParser;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.StringUtil;
+
 import com.github.javaparser.*;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
@@ -35,25 +51,11 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import com.google.common.base.Strings;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.njml.PreParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.jspecify.annotations.NonNull;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**
@@ -65,9 +67,9 @@ import java.util.regex.Pattern;
  */
 public final class JMLTransformer extends JavaTransformer {
     public static final EnumSet<JMLModifier> JAVA_MODS =
-            EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
-                    JMLModifier.PROTECTED,
-                    JMLModifier.PUBLIC, JMLModifier.STATIC);
+        EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
+            JMLModifier.PROTECTED,
+            JMLModifier.PUBLIC, JMLModifier.STATIC);
 
     public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {
     };
@@ -80,7 +82,7 @@ public final class JMLTransformer extends JavaTransformer {
      * ghost fields and model method declarations.
      *
      * @param services the CrossReferenceServiceConfiguration to access model
-     *                 information
+     *        information
      */
     public JMLTransformer(TransformationPipelineServices services) {
         super(services);
@@ -152,7 +154,7 @@ public final class JMLTransformer extends JavaTransformer {
      * (in order to preserve position information).
      */
     private PositionedString convertToString(ImmutableList<JMLModifier> mods,
-                                             ParserRuleContext ctx) {
+            ParserRuleContext ctx) {
         StringBuilder sb = new StringBuilder();
         for (JMLModifier mod : mods) {
             if (JAVA_MODS.contains(mod)) {
@@ -168,9 +170,10 @@ public final class JMLTransformer extends JavaTransformer {
         if (column <= 0) {
             column = 1;
         }
-        de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.newOneBased(ctx.start.getLine(), column);
+        de.uka.ilkd.key.java.Position pos =
+            de.uka.ilkd.key.java.Position.newOneBased(ctx.start.getLine(), column);
         Location location = new Location(
-                MiscTools.getURIFromTokenSource(ctx.start.getTokenSource().getSourceName()), pos);
+            MiscTools.getURIFromTokenSource(ctx.start.getTokenSource().getSourceName()), pos);
         return new PositionedString(sb.toString(), location);
     }
 
@@ -221,9 +224,9 @@ public final class JMLTransformer extends JavaTransformer {
 
         // determine parent, child index
         BlockStmt astParent =
-                (BlockStmt) comments.get(0).getParentNode().orElseThrow().getParentNode().orElseThrow();
+            (BlockStmt) comments.get(0).getParentNode().orElseThrow().getParentNode().orElseThrow();
         int childIndex =
-                astParent.getChildNodes().indexOf(comments.get(0).getParentNode().get());
+            astParent.getChildNodes().indexOf(comments.get(0).getParentNode().get());
         astParent.addStatement(childIndex, node);
     }
 
@@ -234,13 +237,14 @@ public final class JMLTransformer extends JavaTransformer {
         boolean isModel = decl.getModifiers().contains(JMLModifier.MODEL);
         if (isGhost == isModel) {
             throw new SLTranslationException(
-                    "JML field declaration must be either ghost or model!", decl.getLocation());
+                "JML field declaration must be either ghost or model!", decl.getLocation());
         }
         return isGhost ? Modifier.DefaultKeyword.JML_GHOST : Modifier.DefaultKeyword.JML_MODEL;
     }
 
     @NonNull
-    private FieldDeclaration transformClassFieldDecl(TextualJMLFieldDecl decl) throws SLTranslationException {
+    private FieldDeclaration transformClassFieldDecl(TextualJMLFieldDecl decl)
+            throws SLTranslationException {
         NodeList<Modifier> modifiers = new NodeList<>();
         for (JMLModifier m : decl.getModifiers()) {
             Modifier mod = new Modifier(m.getParserKeyword());
@@ -250,19 +254,20 @@ public final class JMLTransformer extends JavaTransformer {
 
         final var dims = decl.getDecl().typespec().dims();
 
-        int arrayDims = (dims!=null?dims.LBRACKET().size():0) + decl.getDecl().LBRACKET().size();
-        Type type = StaticJavaParser.parseType(decl.getDecl().typespec().type().getText() + Strings.repeat("[]", arrayDims));
+        int arrayDims =
+            (dims != null ? dims.LBRACKET().size() : 0) + decl.getDecl().LBRACKET().size();
+        Type type = StaticJavaParser.parseType(
+            decl.getDecl().typespec().type().getText() + Strings.repeat("[]", arrayDims));
         String name = decl.getDecl().IDENT().getText();
 
-        //TODO Copy position from textual jml field decl
+        // TODO Copy position from textual jml field decl
         FieldDeclaration fieldDecl = new FieldDeclaration(
-                modifiers, new VariableDeclarator(type, name)
-        );
+            modifiers, new VariableDeclarator(type, name));
 
         if (decl.getModifiers().contains(JMLModifier.INSTANCE)
                 && decl.getModifiers().contains(JMLModifier.STATIC)) {
             throw new SLTranslationException(
-                    "JML field can't be static and instance at once " + decl.getDecl().getText());
+                "JML field can't be static and instance at once " + decl.getDecl().getText());
         }
         return fieldDecl;
     }
@@ -278,13 +283,13 @@ public final class JMLTransformer extends JavaTransformer {
 
         if (mod == Modifier.DefaultKeyword.JML_MODEL) {
             throw new SLTranslationException(
-                    "JML model fields cannot be declared within a method!",
-                    declWithMods.location);
+                "JML model fields cannot be declared within a method!",
+                declWithMods.location);
         }
 
         ParseResult<BlockStmt> block = services.getParser().parseBlock(
-                fillWithWhitespaces(declWithMods.location.getPosition(),
-                        "{" + declWithMods.text + "}"));
+            fillWithWhitespaces(declWithMods.location.getPosition(),
+                "{" + declWithMods.text + "}"));
         if (!block.isSuccessful()) {
             throw new SLTranslationException("", declWithMods.location);
         }
@@ -309,20 +314,21 @@ public final class JMLTransformer extends JavaTransformer {
             throws SLTranslationException {
         // prepend Java modifiers
         PositionedString declWithMods =
-                new PositionedString(decl.getParsableDeclaration());
+            new PositionedString(decl.getParsableDeclaration());
 
         // only handle model methods
         if (!decl.getModifiers().contains(JMLModifier.MODEL)) {
             throw new SLTranslationException("JML method declaration has to be model!",
-                    declWithMods.location);
+                declWithMods.location);
         }
 
         // parse declaration, attach to AST
         MethodDeclaration methodDecl;
-        ParseResult<MethodDeclaration> md = services.getParser().parseMethodDeclaration(declWithMods.text);
+        ParseResult<MethodDeclaration> md =
+            services.getParser().parseMethodDeclaration(declWithMods.text);
         if (md.getResult().isEmpty()) {
             throw new SLTranslationException(
-                    "could not parse", declWithMods.location);
+                "could not parse", declWithMods.location);
         }
         methodDecl = md.getResult().get();
         updatePositionInformation(methodDecl, declWithMods.location.getPosition());
@@ -378,10 +384,10 @@ public final class JMLTransformer extends JavaTransformer {
                 if (it.getRange().isPresent()) {
                     Range range = it.getRange().get();
                     it.setRange(
-                            Range.range(range.begin.line + line,
-                                    range.begin.column + column,
-                                    range.end.line + line,
-                                    range.end.column + column));
+                        Range.range(range.begin.line + line,
+                            range.begin.column + column,
+                            range.end.line + line,
+                            range.end.column + column));
                 }
             });
         }
@@ -420,12 +426,16 @@ public final class JMLTransformer extends JavaTransformer {
             if (member instanceof JmlDocsBodyDeclaration bd) {
                 String concatenatedComment = sanitizer.asString(bd.jmlDocs());
                 Position astPos = bd.getRange().get().begin;
-                de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
+                de.uka.ilkd.key.java.Position pos =
+                    de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
 
-                // The preparser split along the grammar rules in KeYParser.g4, and gives you a list of JML entities.
+                // The preparser split along the grammar rules in KeYParser.g4, and gives you a list
+                // of JML entities.
                 PreParser pp = new PreParser(
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
-                ImmutableList<TextualJMLConstruct> constructs = pp.parseClassLevel(concatenatedComment, fileName, pos);
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                            .getUseOriginLabels());
+                ImmutableList<TextualJMLConstruct> constructs =
+                    pp.parseClassLevel(concatenatedComment, fileName, pos);
                 warnings = warnings.append(pp.getWarnings());
 
                 // handle model and ghost declarations in textual constructs
@@ -492,7 +502,8 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     private void transformMethodLevelCommentsAt(BlockStmt blockStmt) throws SLTranslationException {
-        PreParser io = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
+        PreParser io = new PreParser(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         var stmts = new ArrayList<>(blockStmt.getStatements());
 
         for (int i = 0; i < stmts.size(); i++) {
@@ -503,9 +514,11 @@ public final class JMLTransformer extends JavaTransformer {
 
             if (stmt instanceof JmlDocsStatements doc) {
                 Position astPos = doc.getRange().get().begin;
-                de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
+                de.uka.ilkd.key.java.Position pos =
+                    de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
                 String concat = sanitizer.asString(doc.getJmlDocs());
-                ImmutableList<TextualJMLConstruct> constructs = io.parseMethodLevel(concat, null, pos);
+                ImmutableList<TextualJMLConstruct> constructs =
+                    io.parseMethodLevel(concat, null, pos);
                 warnings = warnings.append(io.getWarnings());
 
 
@@ -517,25 +530,30 @@ public final class JMLTransformer extends JavaTransformer {
                     switch (c) {
                         case TextualJMLFieldDecl field -> statement = transformVariableDecl(field);
                         case TextualJMLSetStatement set -> statement = transformSetStatement(set);
-                        case TextualJMLMergePointDecl mergePointDecl -> statement = transformMergePointDecl(mergePointDecl);
-                        case TextualJMLAssertStatement assertStatement -> statement = transformAssertStatement(assertStatement);
+                        case TextualJMLMergePointDecl mergePointDecl ->
+                            statement = transformMergePointDecl(mergePointDecl);
+                        case TextualJMLAssertStatement assertStatement ->
+                            statement = transformAssertStatement(assertStatement);
                         case TextualJMLSpecCase spec -> {
                             for (int k = i; k < stmts.size(); k++) {
                                 var search = stmts.get(k);
-                                if (search instanceof BlockStmt bs || search instanceof NodeWithBody<?> /*aka loops*/) {
+                                if (search instanceof BlockStmt bs
+                                        || search instanceof NodeWithBody<?> /* aka loops */) {
                                     addSpec(search, spec);
                                     continue outer;
                                 }
                             }
                             // Nothing found error
-                            throw new IllegalStateException("Could not find a suitable statement for the loop/block/invariant");
+                            throw new IllegalStateException(
+                                "Could not find a suitable statement for the loop/block/invariant");
                         }
                         default -> {
-                            LOGGER.error("{}: Jml element unhandled: {}", c.getLocation(), c.getClass());
+                            LOGGER.error("{}: Jml element unhandled: {}", c.getLocation(),
+                                c.getClass());
                             continue;
                         }
                     }
-                    //TODO Block, loop specifications contracts
+                    // TODO Block, loop specifications contracts
                     blockStmt.getStatements().add(i + j, statement);
                 }
             }
@@ -558,7 +576,7 @@ public final class JMLTransformer extends JavaTransformer {
                 TypeDeclaration<?> td1 = unit.getType(j - 1);
                 TypeDeclaration<?> td2 = unit.getType(j);
                 td1.setAssociatedSpecificationComments(
-                        td2.getAssociatedSpecificationComments().get());
+                    td2.getAssociatedSpecificationComments().get());
             }
 
             // copy comments of compilation unit to last type declaration
@@ -575,7 +593,7 @@ public final class JMLTransformer extends JavaTransformer {
                 NodeList<Comment> tdComments = new NodeList<>();
                 if (unit.getAssociatedSpecificationComments().isPresent()) {
                     tdComments.addAll(TransformationPipelineServices.cloneList(
-                            unit.getAssociatedSpecificationComments().get()));
+                        unit.getAssociatedSpecificationComments().get()));
                 }
                 td.setAssociatedSpecificationComments(tdComments);
             }
@@ -620,7 +638,8 @@ public final class JMLTransformer extends JavaTransformer {
                 transformClassLevelComments(td);
 
                 for (BodyDeclaration<?> member : td.members()) {
-                    if (member instanceof NodeWithOptionalBlockStmt<?> call && call.getBody().isPresent()) {
+                    if (member instanceof NodeWithOptionalBlockStmt<?> call
+                            && call.getBody().isPresent()) {
                         transformMethodLevelCommentsAt(call.getBody().get());
                     }
 
@@ -638,7 +657,7 @@ public final class JMLTransformer extends JavaTransformer {
 
     private void transformModifiers(NodeWithModifiers<?> hasMods) {
         PreParser pp = new PreParser(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         warnings = warnings.append(pp.getWarnings());
 
         for (Modifier mod : hasMods.getModifiers()) {
@@ -654,6 +673,7 @@ public final class JMLTransformer extends JavaTransformer {
     }
 }
 
+
 record JmlDocSanitizer(Set<String> enabledKeys) {
 
     public String asString(NodeList<JmlDoc> jmlDocs) {
@@ -661,7 +681,8 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
     }
 
     public String asStringJT(Collection<JavaToken> jmlDocs, boolean emulateGlobalPosition) {
-        if (jmlDocs.isEmpty()) return "";
+        if (jmlDocs.isEmpty())
+            return "";
         StringConstructor s = new StringConstructor();
         for (JavaToken tok : jmlDocs) {
             if (emulateGlobalPosition) {
@@ -679,7 +700,8 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
     }
 
     public String asString(Collection<Token> jmlDocs, boolean emulateGlobalPosition) {
-        if (jmlDocs.isEmpty()) return "";
+        if (jmlDocs.isEmpty())
+            return "";
         StringConstructor s = new StringConstructor();
         for (Token tok : jmlDocs) {
             if (emulateGlobalPosition) {
@@ -708,7 +730,8 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
             if (cur == '\n') {
                 ++pos;
                 for (; pos < s.length(); pos++) {
-                    if (!Character.isWhitespace(s.charAt(pos))) break;
+                    if (!Character.isWhitespace(s.charAt(pos)))
+                        break;
                 }
                 for (; pos < s.length(); pos++) {
                     if ('@' == s.charAt(pos)) {
@@ -771,7 +794,8 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
 
     private boolean isJmlComment(StringBuilder s, int pos) {
         int posAt = s.indexOf("@", pos + 2);
-        if (posAt < 0) return false;
+        if (posAt < 0)
+            return false;
         for (int i = pos + 2; i < posAt; i++) {
             int point = s.charAt(i);
             if (!(Character.isJavaIdentifierPart(point) || point == '-' || point == '+')) {
@@ -779,7 +803,8 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
             }
         }
         // unconditional JML comment
-        if (pos + 2 == posAt) return true;
+        if (pos + 2 == posAt)
+            return true;
         String[] keys = splitTags(s.substring(pos + 2, posAt));
         return isActiveJmlSpec(keys);
     }
@@ -803,13 +828,17 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
         boolean plusKeyFound = false;
         // if at least one of these positive keys is enabled
         boolean enabledPlusKeyFound = false;
-        // a JML annotation with an enabled negative-key is ignored (even if there are enabled positive-keys).
+        // a JML annotation with an enabled negative-key is ignored (even if there are enabled
+        // positive-keys).
         boolean enabledNegativeKeyFound = false;
         for (String marker : keys) {
-            if (marker.isEmpty()) continue;
+            if (marker.isEmpty())
+                continue;
             plusKeyFound = plusKeyFound || isPositive(marker);
-            enabledPlusKeyFound = enabledPlusKeyFound || isPositive(marker) && isEnabled(activeKeys, marker);
-            enabledNegativeKeyFound = enabledNegativeKeyFound || isNegative(marker) && isEnabled(activeKeys, marker);
+            enabledPlusKeyFound =
+                enabledPlusKeyFound || isPositive(marker) && isEnabled(activeKeys, marker);
+            enabledNegativeKeyFound =
+                enabledNegativeKeyFound || isNegative(marker) && isEnabled(activeKeys, marker);
             if ("-".equals(marker) || "+".equals(marker)) {
                 return false;
             }
@@ -834,6 +863,7 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
         return marker.charAt(0) == '+';
     }
 }
+
 
 class StringConstructor {
 

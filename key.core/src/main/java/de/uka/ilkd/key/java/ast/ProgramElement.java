@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
+import java.util.List;
+
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import org.jspecify.annotations.Nullable;
 
-import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A part of the program syntax that carries semantics in the model. taken from COMPOST and changed
@@ -35,7 +36,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
      * found instantiations of the schemavariables. If the match failed, <tt>null</tt> is returned
      * instead.
      *
-     * @param source    the SourceData with the program element to match
+     * @param source the SourceData with the program element to match
      * @param matchCond the MatchConditions found up to this point
      * @return the resulting match conditions or <tt>null</tt> if the match failed
      */

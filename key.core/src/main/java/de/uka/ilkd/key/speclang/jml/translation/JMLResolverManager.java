@@ -34,9 +34,11 @@ public final class JMLResolverManager extends SLResolverManager {
 
     @Override
     public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
-        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, Modifiers.JML_SPEC_PUBLIC.class)) {
+        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
+            Modifiers.JML_SPEC_PUBLIC.class)) {
             return new Public();
-        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, Modifiers.JML_SPEC_PROTECTED.class)) {
+        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
+            Modifiers.JML_SPEC_PROTECTED.class)) {
             return new Protected();
         } else {
             return null;

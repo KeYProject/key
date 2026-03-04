@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.*;
@@ -114,9 +113,10 @@ public class MethodDeclaration extends JavaDeclaration
             StatementBlock body, boolean parentIsInterfaceDeclaration,
             List<TextualJMLSpecCase> specs) {
         this(pi, comments, modArray, returnType, voidComments, name, parameters, exceptions,
-                body, parentIsInterfaceDeclaration);
+            body, parentIsInterfaceDeclaration);
         attachedJml.addAll(specs);
     }
+
     /**
      * Method declaration.
      *

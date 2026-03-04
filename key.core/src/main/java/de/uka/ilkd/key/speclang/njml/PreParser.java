@@ -132,7 +132,7 @@ public class PreParser {
         var ctx = p.modifiersEOF();
         p.getErrorReporter().throwException();
         TextualTranslator translator = new TextualTranslator(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
         return translator.mods;
     }
