@@ -242,8 +242,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         if (programVariable instanceof ProgramVariable pv) {
             return pv.isModel();
         }
-        // This used to return always false.
-        throw new UnsupportedOperationException("Cannot determine finality of " + programVariable);
+        throw new UnsupportedOperationException("Cannot determine if " + programVariable + " is a model field");
     }
 
     public boolean hasInitializer() {
@@ -251,8 +250,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     public boolean isFinal() {
-        LOGGER.warn("Method in Variable Specification not implemented!");
-        return false;
+        if (programVariable instanceof ProgramVariable pv) {
+            return pv.isFinal();
+        }
+        throw new UnsupportedOperationException("Cannot determine if " + programVariable + " is final");
     }
 
 
