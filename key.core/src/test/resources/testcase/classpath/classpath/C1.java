@@ -9,7 +9,7 @@ public class C1 extends C {
     @   ensures true;
     @*/
   public static void m_C1() {
-//    that.is.going.to.be.discarded();
+    that.is.going.to.be.discarded();
   }
 
 }
