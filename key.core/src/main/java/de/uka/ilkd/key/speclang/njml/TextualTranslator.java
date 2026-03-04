@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -22,7 +23,17 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
 import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
 
+/**
+ * Helper class for the {@link PreParser} {@link JMLTransformer} that translates a token stream
+ * (represented by {@link JmlParser}'s inner classes) to a list of {@link TextualJMLConstruct}s.
+ * The list can be retrieved after parsing from {@link #constructs}.
+ *
+ * <p> In addition, any dangling modifiers at the end of the stream are in {@link #mods}. The PreParser turns these
+ * into a {@link TextualJMLModifierList} construct,
+ * which is then attached to the appropriate element by the {@link JMLTransformer}.
+ */
 class TextualTranslator extends JmlParserBaseVisitor<Object> {
+
     private final boolean attachOriginLabel;
 
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
@@ -76,6 +87,22 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         this.attachOriginLabel = attachOriginLabel;
     }
 
+    /**
+     * Adds the construct to our list.
+     * Then resets the collected modifiers and the current contract, so that we don't accidentally keep
+     * any state from the construct when parsing the next construct.
+     *
+     * You usually want to use this method instead of calling {@code constructs.append(construct)} directly.
+     *
+     * @param construct
+     */
+    protected void finishConstruct(TextualJMLConstruct construct) {
+        constructs = constructs.append(construct);
+        mods = ImmutableSLList.nil();
+        methodContract = null;
+        loopContract = null;
+    }
+
     @Override
     public Object visitModifier(JmlParser.ModifierContext ctx) {
         mods = mods.append(modifierFromToken(ctx.mod));
@@ -90,7 +117,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
         // read contract modifier and behavior ID
-        mods = ImmutableSLList.nil();
         if (ctx.modifiers() != null) {
             for (JmlParser.ModifierContext mod : ctx.modifiers().modifier()) {
                 mods = mods.append(modifierFromToken(mod.mod));
@@ -103,6 +129,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         constructs = constructs.append(methodContract);
         super.visitSpec_body(ctx.spec_body());
         methodContract = null;
+        mods = ImmutableSLList.nil();
         return null;
     }
 
@@ -241,7 +268,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         for (Name heap : heaps) {
             if (depends) {
                 TextualJMLDepends d = new TextualJMLDepends(mods, heaps, ctx2);
-                constructs = constructs.append(d);
+                finishConstruct(d);
             } else if (methodContract != null) {
                 methodContract.addClause(ACCESSIBLE, heap, ctx2);
             } else {
@@ -315,7 +342,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
         TextualJMLInitially initially =
             new TextualJMLInitially(mods, new LabeledParserRuleContext(ctx));
-        constructs = constructs.append(initially);
+        finishConstruct(initially);
         return null;
     }
 
@@ -323,7 +350,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
         TextualJMLRepresents represents =
             new TextualJMLRepresents(mods, new LabeledParserRuleContext(ctx));
-        constructs = constructs.append(represents);
+        finishConstruct(represents);
         return super.visitRepresents_clause(ctx);
     }
 
@@ -431,7 +458,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitModifiers(JmlParser.ModifiersContext ctx) {
-        mods = ImmutableSLList.nil();
         return super.visitModifiers(ctx);
     }
 
@@ -439,7 +465,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitClass_invariant(JmlParser.Class_invariantContext ctx) {
         final boolean isFree = ctx.INVARIANT().getText().endsWith("_free");
         TextualJMLClassInv inv = new TextualJMLClassInv(mods, ctx, isFree);
-        constructs = constructs.append(inv);
+        finishConstruct(inv);
         return null;
     }
 
@@ -447,7 +473,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
         TextualJMLClassAxiom inv =
             new TextualJMLClassAxiom(mods, new LabeledParserRuleContext(ctx));
-        constructs = constructs.append(inv);
+        finishConstruct(inv);
         return null;
     }
 
@@ -456,7 +482,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
         assert !mods.isEmpty();
         TextualJMLFieldDecl inv = new TextualJMLFieldDecl(mods, ctx);
-        constructs = constructs.append(inv);
+        finishConstruct(inv);
         return null;
     }
 
@@ -464,14 +490,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
         TextualJMLMethodDecl decl = new TextualJMLMethodDecl(mods, ctx);
-        constructs = constructs.append(decl);
+        finishConstruct(decl);
         return null;
     }
 
     @Override
     public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
         TextualJMLSetStatement inv = new TextualJMLSetStatement(mods, ctx);
-        constructs = constructs.append(inv);
+        finishConstruct(inv);
         return null;
     }
 
@@ -479,16 +505,15 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
         loopContract = new TextualJMLLoopSpec(mods);
         methodContract = null;
-        constructs = constructs.append(loopContract);
         super.visitLoop_specification(ctx);
-        loopContract = null;
+        finishConstruct(loopContract);
         return null;
     }
 
     @Override
     public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
         TextualJMLMergePointDecl mergePointDecl = new TextualJMLMergePointDecl(mods, ctx);
-        constructs = constructs.append(mergePointDecl);
+        finishConstruct(mergePointDecl);
         return null;
     }
 
@@ -514,7 +539,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
                 new KeyAst.Expression(ctx.expression()));
-        constructs = constructs.append(b);
+        finishConstruct(b);
         return null;
     }
 
@@ -523,7 +548,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
         TextualJMLAssertStatement b = new TextualJMLAssertStatement(
             TextualJMLAssertStatement.Kind.ASSERT, new KeyAst.Expression(ctx.expression()));
-        constructs = constructs.append(b);
+        finishConstruct(b);
         return null;
     }
 

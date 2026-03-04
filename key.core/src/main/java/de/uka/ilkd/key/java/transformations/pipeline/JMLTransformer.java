@@ -28,6 +28,7 @@ import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
@@ -423,6 +424,7 @@ public final class JMLTransformer extends JavaTransformer {
 
         ArrayList<BodyDeclaration<?>> members = new ArrayList<>(td.getMembers());
         ArrayList<TextualJMLSpecCase> specCases = new ArrayList<>();
+        TextualJMLModifierList jmlModifiers = null;
 
         for (int i = 0; i < members.size(); i++) {
             BodyDeclaration<?> member = members.get(i);
@@ -460,10 +462,23 @@ public final class JMLTransformer extends JavaTransformer {
                         addClassSpec(td, c);
                     } else if (c instanceof TextualJMLSpecCase specCase) {
                         specCases.add(specCase);
+                    } else if (c instanceof TextualJMLModifierList newModifiers) {
+                        assert jmlModifiers == null : "There seems to be more than one set of dangling modifiers";
+                        jmlModifiers = newModifiers;
                     } else {
-                        System.out.println("blubb " + c.getClass());
+                        throw new AssertionError("Unknown subclass of TextualJMLSpecCase: " + c.getClass());
                     }
                 }
+            } else if (jmlModifiers != null) {
+                // Attach any dangling modifiers from the preceding JML comment to the current node.
+                if (member instanceof NodeWithModifiers<?> hasMods) {
+                    for (var jmlMod : jmlModifiers.getModifiers()) {
+                        hasMods.addModifier(jmlMod.getParserKeyword());
+                    }
+                } else {
+                    throw new SLTranslationException("Modifiers before node that cannot have modifiers: " + member.getClass(), jmlModifiers.getLocation());
+                }
+                jmlModifiers = null;
             }
 
             if (member instanceof CallableDeclaration<?> c) {
