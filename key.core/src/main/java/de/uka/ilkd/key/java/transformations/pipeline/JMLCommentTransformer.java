@@ -24,6 +24,11 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.utils.PositionUtils;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * This class contains the old logic for attaching comments containing JML to AST nodes of
+ * JavaParser. It should not be used anymore.
+ */
+@Deprecated(forRemoval = true)
 public class JMLCommentTransformer extends JavaTransformer {
     public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
     };
