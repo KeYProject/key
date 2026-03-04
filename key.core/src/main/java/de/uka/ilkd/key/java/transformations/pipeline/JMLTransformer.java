@@ -569,13 +569,17 @@ public final class JMLTransformer extends JavaTransformer {
         PreParser io = new PreParser(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         var stmts = new ArrayList<>(blockStmt.getStatements());
+        var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size()*2);
 
         for (int i = 0; i < stmts.size(); i++) {
             var stmt = stmts.get(i);
+            newStmts.add(stmt);
             if (stmt instanceof BlockStmt bs) {
                 transformMethodLevelCommentsAt(bs);
-            }
-
+            }else 
+            if(stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
+                transformMethodLevelCommentsAt(b.getBody().asBlockStmt());
+            }else 
             if (stmt instanceof JmlDocsStatements doc) {
                 Position astPos = doc.getRange().get().begin;
                 de.uka.ilkd.key.java.Position pos =
@@ -585,10 +589,8 @@ public final class JMLTransformer extends JavaTransformer {
                     io.parseMethodLevel(concat, null, pos);
                 warnings = warnings.append(io.getWarnings());
 
-                int j = 0;
                 // handle ghost declarations and set assignments in textual constructs
                 outer: for (TextualJMLConstruct c : constructs) {
-                    j++;
                     Statement statement;
                     switch (c) {
                         // local ghost variable declaration!
@@ -631,10 +633,14 @@ public final class JMLTransformer extends JavaTransformer {
                         }
                     }
                     // TODO Block, loop specifications contracts
-                    blockStmt.getStatements().add(i + j, statement);
+                    newStmts.add(statement);
                 }
             }
+
         }
+
+        blockStmt.getStatements().clear();
+        blockStmt.getStatements().addAll(newStmts);
     }
 
     public void analyze() {
