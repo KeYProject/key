@@ -47,6 +47,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.EmptyStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
@@ -569,18 +570,23 @@ public final class JMLTransformer extends JavaTransformer {
         PreParser io = new PreParser(
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         var stmts = new ArrayList<>(blockStmt.getStatements());
-        var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size()*2);
+        var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size() * 2);
 
         for (int i = 0; i < stmts.size(); i++) {
             var stmt = stmts.get(i);
             newStmts.add(stmt);
             if (stmt instanceof BlockStmt bs) {
                 transformMethodLevelCommentsAt(bs);
-            }else 
-            if(stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
+            } else if (stmt instanceof IfStmt is) {
+                if (is.thenStmt().isBlockStmt()) {
+                    transformMethodLevelCommentsAt(is.thenStmt().asBlockStmt());
+                }
+                if (is.elseStmt() != null && is.elseStmt().isBlockStmt()) {
+                    transformMethodLevelCommentsAt(is.elseStmt().asBlockStmt());
+                }
+            } else if (stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
                 transformMethodLevelCommentsAt(b.getBody().asBlockStmt());
-            }else 
-            if (stmt instanceof JmlDocsStatements doc) {
+            } else if (stmt instanceof JmlDocsStatements doc) {
                 Position astPos = doc.getRange().get().begin;
                 de.uka.ilkd.key.java.Position pos =
                     de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
