@@ -387,7 +387,7 @@ public final class JMLTransformer extends JavaTransformer {
         // TODO javaparser error handling!
         NodeList<Statement> stmtList = result.getResult().orElseThrow().getStatements();
         assert stmtList.size() == 1;
-        Statement assignStmt = stmtList.get(0);
+        Statement assignStmt = stmtList.getFirst();
         shiftPosition(assignStmt, location.getPosition());
         // updatePositionInformation(assignStmt, pos);
         return assignStmt;
