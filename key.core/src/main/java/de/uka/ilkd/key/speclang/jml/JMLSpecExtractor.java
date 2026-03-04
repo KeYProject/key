@@ -305,13 +305,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 warnings = warnings.append(e.getWarning());
             }
         }
-        // Add default invariant when none is present
-        if (result.stream().noneMatch(s -> s instanceof ClassInvariant ci && !ci.isStatic())) {
-            // TODO result = result.add();
-        }
-        if (result.stream().noneMatch(s -> s instanceof ClassInvariant ci && ci.isStatic())) {
-            // TODO result = result.add();
-        }
         return result;
     }
 

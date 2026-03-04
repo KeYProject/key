@@ -43,8 +43,7 @@ public class ModifiersTest {
                 package test;
 
                 public class D {
-                    /*@ helper @*/
-                    public void a() {}
+                    public /*@ helper @*/ void a() {}
 
                     /*@ model_behaviour
                       @ requires true;
@@ -57,8 +56,7 @@ public class ModifiersTest {
 
                     /*@ model_behaviour
                       @ requires true;
-                      @ helper
-                      @ static model void modelB();
+                      @ static helper model void modelB();
                       @*/
                 }
                 """;

@@ -15,24 +15,21 @@ public class Environment {
       @ assignable  rep;
       @ determines  Environment.result, \result \by Environment.result;
       @*/
-    //@ helper
-    public static native int untrustedInput(); // Declared underspecified method as native
+    public static native /*@ helper @*/ int untrustedInput(); // Declared underspecified method as native
 
     /*@ normal_behavior
       @ ensures     0 <= \result && \result < x;
       @ assignable  rep;
       @ determines  Environment.result, \result \by Environment.result, x;
       @*/
-    //@ helper
-    public static native int untrustedInput(int x); // Declared underspecified method as native
+    public static native /*@ helper @*/ int untrustedInput(int x); // Declared underspecified method as native
 
     /*@ normal_behavior
       @ ensures     true;
       @ assignable  rep;
       @ determines  Environment.result \by Environment.result, x;
       @*/
-    //@ helper
-    public static void untrustedOutput(int x) {
+    public static /*@ helper @*/ void untrustedOutput(int x) {
         // under specified
     }
 
@@ -44,8 +41,7 @@ public class Environment {
       @             ( (\result != null) ? (\seq_def int i; 0; \result.length; \result[i]) : null )
       @        \by  Environment.result;
       @*/
-    //@ helper
-    public static /*@ nullable */ byte[] untrustedInputMessage() {
+    public static /*@ helper nullable */ byte[] untrustedInputMessage() {
         int len = untrustedInput();
         if (len < 0) {
             return null;
@@ -72,8 +68,7 @@ public class Environment {
       @             ( (\result != null) ? (\seq_def int i; 0; \result.length; \result[i]) : null )
       @        \by  Environment.result, returnval;
       @*/
-    //@ helper
-    public static byte[] untrustedInputMessage(byte[] returnval) {
+    public static /*@ helper @*/ byte[] untrustedInputMessage(byte[] returnval) {
         /*@ loop_invariant 0 <= i && i <= returnval.length;
           @ loop_invariant returnval != null && returnval == \old(returnval);
           @ assignable rep, returnval[*];
@@ -96,8 +91,7 @@ public class Environment {
       @        \by  Environment.result, t,
       @             ( (t != null) ? (\seq_def int i; 0; t.length; t[i]) : null );
       @*/
-    //@ helper
-    public static void untrustedOutputMessage(/*@ nullable */ byte[] t) {
+    public static /*@ helper @*/ void untrustedOutputMessage(/*@ nullable */ byte[] t) {
         if (t == null) {
             return;
         }

@@ -11,8 +11,7 @@ public class SMTEnv {
       @             ( (\result != null) ? (\seq_def int i; 0; \result.length; \result[i]) : null )
       @       \by   \itself;
       @*/
-    //@ helper
-    public static /*@ nullable */ byte[] send(int message_length,
+    public static /*@ helper nullable */ byte[] send(int message_length,
                                                            int sender_id,
                                                            int recipient_id,
                                                            Server server,
