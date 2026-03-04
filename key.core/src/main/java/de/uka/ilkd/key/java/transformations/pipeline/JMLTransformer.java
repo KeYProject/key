@@ -28,7 +28,6 @@ import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 
-import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
@@ -246,6 +245,7 @@ public final class JMLTransformer extends JavaTransformer {
     /**
      * Transform the given ghost or model field declaration into a "real" field declaration, and
      * attach modifiers.
+     *
      * @param decl the given textual model/ghost field declaration
      * @return the newly created FieldDeclaration
      * @throws SLTranslationException
@@ -281,8 +281,9 @@ public final class JMLTransformer extends JavaTransformer {
 
     /**
      * Transform the given local ghost/model variable declaration into a "real" statement.
+     *
      * @param decl the given ghost/model declaration (TextualJMLFieldDecl is also used to represent
-     *             local variable declarations!)
+     *        local variable declarations!)
      * @return the newly created statement
      * @throws SLTranslationException
      */
@@ -324,6 +325,7 @@ public final class JMLTransformer extends JavaTransformer {
 
     /**
      * Transform the given model method declaration into a "real" method declaration.
+     *
      * @param decl the give textual model method declaration
      * @return the new method declaration
      * @throws SLTranslationException
@@ -440,6 +442,7 @@ public final class JMLTransformer extends JavaTransformer {
      * method contract, model method declarations, ...) with the {@link PreParser} and attach them
      * to either the type declaration itself (model methods, class invariants, ...) or their
      * (directly) subsequent callable declaration (method contracts).
+     *
      * @param td the given type declaration (typically a class declaration)
      * @throws SLTranslationException
      */
@@ -462,7 +465,7 @@ public final class JMLTransformer extends JavaTransformer {
                 // of JML entities.
                 PreParser pp = new PreParser(
                     ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                        .getUseOriginLabels());
+                            .getUseOriginLabels());
                 // We might have multiple textual constructs now, because the single comment could
                 // contain multiple JML entities (e.g. method contract and ghost field declaration)
                 ImmutableList<TextualJMLConstruct> constructs =
@@ -484,20 +487,22 @@ public final class JMLTransformer extends JavaTransformer {
                         td.addMember(decl);
                         specCases.clear();
                     } else if (c instanceof TextualJMLClassAxiom
-                        || c instanceof TextualJMLRepresents
-                        || c instanceof TextualJMLClassInv
-                        || c instanceof TextualJMLInitially
-                        || c instanceof TextualJMLDepends) {
+                            || c instanceof TextualJMLRepresents
+                            || c instanceof TextualJMLClassInv
+                            || c instanceof TextualJMLInitially
+                            || c instanceof TextualJMLDepends) {
                         addClassSpec(td, c);
                     } else if (c instanceof TextualJMLSpecCase specCase) {
                         // accumulate spec cases (these are model method contracts) to attach them
                         // in a later loop iteration to the model method declaration
                         specCases.add(specCase);
                     } else if (c instanceof TextualJMLModifierList newModifiers) {
-                        assert jmlModifiers == null : "There seems to be more than one set of dangling modifiers";
+                        assert jmlModifiers == null
+                                : "There seems to be more than one set of dangling modifiers";
                         jmlModifiers = newModifiers;
                     } else {
-                        throw new AssertionError("Unknown subclass of TextualJMLSpecCase: " + c.getClass());
+                        throw new AssertionError(
+                            "Unknown subclass of TextualJMLSpecCase: " + c.getClass());
                     }
                 }
             } else if (jmlModifiers != null) {
@@ -507,7 +512,9 @@ public final class JMLTransformer extends JavaTransformer {
                         hasMods.addModifier(jmlMod.getParserKeyword());
                     }
                 } else {
-                    throw new SLTranslationException("Modifiers before node that cannot have modifiers: " + member.getClass(), jmlModifiers.getLocation());
+                    throw new SLTranslationException(
+                        "Modifiers before node that cannot have modifiers: " + member.getClass(),
+                        jmlModifiers.getLocation());
                 }
                 jmlModifiers = null;
             }
@@ -707,8 +714,10 @@ public final class JMLTransformer extends JavaTransformer {
 
             // iterate through all classes/interfaces/... in this compilation unit
             for (TypeDeclaration<?> td : cu.getTypes()) {
-                /* attach anything that should be directly inside classes (e.g. method contracts,
-                   model methods, class invariants, ghost field declarations, ...). */
+                /*
+                 * attach anything that should be directly inside classes (e.g. method contracts,
+                 * model methods, class invariants, ghost field declarations, ...).
+                 */
                 transformClassLevelComments(td);
 
                 for (BodyDeclaration<?> member : td.members()) {
@@ -734,6 +743,7 @@ public final class JMLTransformer extends JavaTransformer {
     /**
      * Parse modifiers inside JML comments and attach them to the node as proper modifiers
      * (modifiers are registered in JavaParser fork already).
+     *
      * @param hasMods the node the modifiers should be attached to
      */
     private void transformModifiers(NodeWithModifiers<?> hasMods) {

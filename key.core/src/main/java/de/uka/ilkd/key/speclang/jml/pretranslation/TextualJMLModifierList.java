@@ -7,7 +7,8 @@ import org.key_project.util.collection.ImmutableList;
 
 
 /**
- * A list of {@link JMLModifier}s that apply to some class-level element (e.g., field declaration, method declaration).
+ * A list of {@link JMLModifier}s that apply to some class-level element (e.g., field declaration,
+ * method declaration).
  *
  * @author lanzinger
  */

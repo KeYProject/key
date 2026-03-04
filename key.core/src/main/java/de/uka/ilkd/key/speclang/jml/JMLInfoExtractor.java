@@ -236,10 +236,10 @@ public final class JMLInfoExtractor {
      * Returns true, if <tt>containingClass</tt> is a reference Type and has a field declaration
      * with name <tt>fieldName</tt>, which is explicitly or implicitly declared "nullable"
      */
-    public static boolean isNullable(String fieldName, TypeDeclaration td) {
+    public static boolean isNullable(FieldDeclaration decl, TypeDeclaration td) {
 
-        boolean non_null = td.containsModifier(Modifiers.JML_NON_NULL.class);
-        boolean nullable = td.containsModifier(Modifiers.JML_NULLABLE.class);
+        boolean non_null = decl.containsModifier(Modifiers.JML_NON_NULL.class);
+        boolean nullable = decl.containsModifier(Modifiers.JML_NULLABLE.class);
 
         if (!non_null && !nullable) {
             return td.getJmlModifiers().nullableByDefault();

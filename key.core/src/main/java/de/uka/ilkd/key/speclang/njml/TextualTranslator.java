@@ -28,7 +28,9 @@ import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
  * (represented by {@link JmlParser}'s inner classes) to a list of {@link TextualJMLConstruct}s.
  * The list can be retrieved after parsing from {@link #constructs}.
  *
- * <p> In addition, any dangling modifiers at the end of the stream are in {@link #mods}. The PreParser turns these
+ * <p>
+ * In addition, any dangling modifiers at the end of the stream are in {@link #mods}. The PreParser
+ * turns these
  * into a {@link TextualJMLModifierList} construct,
  * which is then attached to the appropriate element by the {@link JMLTransformer}.
  */
@@ -89,10 +91,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     /**
      * Adds the construct to our list.
-     * Then resets the collected modifiers and the current contract, so that we don't accidentally keep
+     * Then resets the collected modifiers and the current contract, so that we don't accidentally
+     * keep
      * any state from the construct when parsing the next construct.
      *
-     * You usually want to use this method instead of calling {@code constructs.append(construct)} directly.
+     * You usually want to use this method instead of calling {@code constructs.append(construct)}
+     * directly.
      *
      * @param construct
      */

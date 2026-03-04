@@ -13,8 +13,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModifierList;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -50,9 +50,11 @@ public class PreParser {
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
 
-        // Add a construct for dangling modifiers. The JMLTransformer should attach this to the appropriate element
+        // Add a construct for dangling modifiers. The JMLTransformer should attach this to the
+        // appropriate element
         if (!translator.mods.isEmpty()) {
-            translator.constructs = translator.constructs.append(new TextualJMLModifierList(translator.mods));
+            translator.constructs =
+                translator.constructs.append(new TextualJMLModifierList(translator.mods));
         }
 
         return translator.constructs;
