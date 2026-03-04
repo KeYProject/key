@@ -527,6 +527,25 @@ public final class JMLTransformer extends JavaTransformer {
                 specCases.clear();
             }
         }
+
+
+
+        for (BodyDeclaration<?> member : td.members()) {
+            // attach anything that should be inside a method
+            if (member instanceof NodeWithOptionalBlockStmt<?> call
+                    && call.getBody().isPresent()) {
+                transformMethodLevelCommentsAt(call.getBody().get());
+            }
+
+            // modifiers (such as pure, spec_public, model, ghost, ...)
+            if (member instanceof NodeWithModifiers<?> hasMods) {
+                transformModifiers(hasMods);
+            }
+
+            if(member instanceof TypeDeclaration<?> inner) {
+                transformClassLevelComments(inner);
+            }
+        }
     }
 
     private void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
@@ -725,19 +744,6 @@ public final class JMLTransformer extends JavaTransformer {
                  * model methods, class invariants, ghost field declarations, ...).
                  */
                 transformClassLevelComments(td);
-
-                for (BodyDeclaration<?> member : td.members()) {
-                    // attach anything that should be inside a method
-                    if (member instanceof NodeWithOptionalBlockStmt<?> call
-                            && call.getBody().isPresent()) {
-                        transformMethodLevelCommentsAt(call.getBody().get());
-                    }
-
-                    // modifiers (such as pure, spec_public, model, ghost, ...)
-                    if (member instanceof NodeWithModifiers<?> hasMods) {
-                        transformModifiers(hasMods);
-                    }
-                }
             }
         } catch (SLTranslationException e) {
             // Wrap the exception into a runtime exception because recoder does
