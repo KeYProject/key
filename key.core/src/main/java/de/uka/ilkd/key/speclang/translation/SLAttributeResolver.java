@@ -71,7 +71,6 @@ public final class SLAttributeResolver extends SLExpressionResolver {
     @Override
     protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
-
         if (parameters != null) {
             return null;
         }
