@@ -37,10 +37,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -557,7 +554,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var guard = accept(n.getCondition());
         var body = accept(n.getBody());
         return new Do(pi, c, new Guard((Expression) guard),
-            (Statement) body, getSpec(n));
+            (Statement) body, getLoopSpec(n));
     }
 
     @Override
@@ -778,7 +775,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         LocalVariableDeclaration decl = accept(n.getVariable());
         ILoopInit init = new LoopInit(new LoopInitializer[] { decl });
         Guard guard = new Guard(null, null, accept(n.getIterable()));
-        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), getSpec(n));
+        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), getLoopSpec(n));
     }
 
     @Override
@@ -809,12 +806,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (!n.getUpdate().isEmpty()) {
             forUpdates = new ForUpdates(updates);
         }
-        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), getSpec(n));
+        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), getLoopSpec(n));
     }
 
     public static List<TextualJMLSpecCase> getSpec(Node n) {
         try {
             return n.getData(JMLTransformer.KEY_SPEC_CASE);
+        } catch (IllegalStateException e) {
+            return List.of();
+        }
+    }
+
+    public static List<TextualJMLLoopSpec> getLoopSpec(Node n) {
+        try {
+            return n.getData(JMLTransformer.KEY_LOOP_SPEC);
         } catch (IllegalStateException e) {
             return List.of();
         }
@@ -1473,7 +1478,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         Guard guard = new Guard((Expression) accept(n.getCondition()));
         Statement body = accept(n.getBody());
-        return new While(pi, c, guard, body, getSpec(n));
+        return new While(pi, c, guard, body, getLoopSpec(n));
     }
 
     @Override

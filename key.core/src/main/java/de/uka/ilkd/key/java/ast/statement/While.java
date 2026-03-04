@@ -8,7 +8,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 
 import org.key_project.util.ExtList;
 
@@ -65,7 +65,7 @@ public class While extends LoopStatement {
     }
 
     public While(PositionInfo pi, List<Comment> c, Guard guard, Statement body,
-            List<TextualJMLSpecCase> spec) {
+            List<TextualJMLLoopSpec> spec) {
         this(pi, c, guard, body);
         attachedJml.addAll(spec);
     }

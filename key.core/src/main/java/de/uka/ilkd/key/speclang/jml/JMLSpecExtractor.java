@@ -637,12 +637,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
         TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
         URI fileName = td.getPositionInfo().getURI().orElse(null);
 
-        // get comments
-        Comment[] comments = loop.getComments();
-        if (comments.length == 0) {
-            return result;
-        }
-
         ImmutableList<TextualJMLConstruct> constructs =
             ImmutableList.fromList(loop.getAttachedJml());
 

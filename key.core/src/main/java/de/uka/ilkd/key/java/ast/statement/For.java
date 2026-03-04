@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -57,7 +57,7 @@ public class For extends LoopStatement implements VariableScope {
 
     public <T> For(PositionInfo pi, List<Comment> c, ILoopInit forInit,
             IForUpdates forUpdates, IGuard forGuard, Statement body,
-            List<TextualJMLSpecCase> spec) {
+            List<TextualJMLLoopSpec> spec) {
         this(pi, c, forInit, forUpdates, forGuard, body);
         attachedJml.addAll(spec);
     }

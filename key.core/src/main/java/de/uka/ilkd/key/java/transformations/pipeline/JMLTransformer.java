@@ -414,6 +414,8 @@ public final class JMLTransformer extends JavaTransformer {
     };
     public static final DataKey<List<TextualJMLConstruct>> KEY_CLASS_SPEC = new DataKey<>() {
     };
+    public static final DataKey<List<TextualJMLLoopSpec>> KEY_LOOP_SPEC = new DataKey<>() {
+    };
 
     private void transformClassLevelComments(TypeDeclaration<?> td) throws SLTranslationException {
         URI fileName = td.findCompilationUnit().get().getStorage().get().getPath().toUri();
@@ -489,6 +491,14 @@ public final class JMLTransformer extends JavaTransformer {
         specList.add(specCase);
     }
 
+    private void addLoopSpec(Node nextMember, TextualJMLLoopSpec spec) {
+        if (!nextMember.containsData(KEY_LOOP_SPEC)) {
+            nextMember.setData(KEY_LOOP_SPEC, new ArrayList<>(4));
+        }
+        List<TextualJMLLoopSpec> specList = nextMember.getData(KEY_LOOP_SPEC);
+        specList.add(spec);
+    }
+
     private static Optional<BlockStmt> findInnermostBlock(Node node) {
         while (true) {
             node = node.getParentNode().get();
@@ -521,7 +531,6 @@ public final class JMLTransformer extends JavaTransformer {
                     io.parseMethodLevel(concat, null, pos);
                 warnings = warnings.append(io.getWarnings());
 
-
                 int j = 0;
                 // handle ghost declarations and set assignments in textual constructs
                 outer: for (TextualJMLConstruct c : constructs) {
@@ -545,7 +554,20 @@ public final class JMLTransformer extends JavaTransformer {
                             }
                             // Nothing found error
                             throw new IllegalStateException(
-                                "Could not find a suitable statement for the loop/block/invariant");
+                                "Could not find a suitable statement for the block invariant");
+                        }
+                        case TextualJMLLoopSpec spec -> {
+                            for (int k = i; k < stmts.size(); k++) {
+                                var search = stmts.get(k);
+                                if (search instanceof BlockStmt bs
+                                        || search instanceof NodeWithBody<?> /* aka loops */) {
+                                    addLoopSpec(search, spec);
+                                    continue outer;
+                                }
+                            }
+                            // Nothing found error
+                            throw new IllegalStateException(
+                                "Could not find a suitable statement for the loop invariant");
                         }
                         default -> {
                             LOGGER.error("{}: Jml element unhandled: {}", c.getLocation(),
