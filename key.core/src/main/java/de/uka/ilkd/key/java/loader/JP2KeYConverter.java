@@ -3,30 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.loader;
 
-import com.github.javaparser.ast.*;
-import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.body.*;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.comments.TraditionalJavadocComment;
-import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.key.*;
-import com.github.javaparser.ast.key.sv.*;
-import com.github.javaparser.ast.modules.*;
-import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
-import com.github.javaparser.ast.stmt.*;
-import com.github.javaparser.ast.type.*;
-import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
-import com.github.javaparser.ast.visitor.Visitable;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
-import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.resolution.types.ResolvedVoidType;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
-import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
+import java.net.URI;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.CompilationUnit;
@@ -57,21 +38,42 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
+import com.github.javaparser.ast.*;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.comments.TraditionalJavadocComment;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.key.*;
+import com.github.javaparser.ast.key.sv.*;
+import com.github.javaparser.ast.modules.*;
+import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
+import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.type.*;
+import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
+import com.github.javaparser.ast.visitor.Visitable;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.resolution.types.ResolvedVoidType;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 import static java.lang.String.format;

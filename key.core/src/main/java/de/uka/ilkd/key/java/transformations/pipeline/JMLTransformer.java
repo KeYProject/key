@@ -16,6 +16,22 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.net.URI;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.njml.PreParser;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.StringUtil;
+
 import com.github.javaparser.*;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
@@ -35,25 +51,11 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import com.google.common.base.Strings;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.njml.PreParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.jspecify.annotations.NonNull;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**
