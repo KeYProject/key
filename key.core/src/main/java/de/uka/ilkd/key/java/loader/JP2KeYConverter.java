@@ -754,8 +754,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // classes...
             // Normal fields of interfaces are implicitly static...
 
-            // TODO javaparser clarify the following condition. static model/ghost fields?
-            var isStatic = !isModel && n.isStatic();
+            var isStatic = n.isStatic();
             var decl = new FullVariableDeclarator(v, n.isFinal(), isStatic, isModel, isGhost);
             final var fs = visitFieldSpecification(decl);
             varsList.add(fs);
