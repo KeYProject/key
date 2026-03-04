@@ -94,7 +94,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body,
-            List<TextualJMLSpecCase> spec) {
+            List<TextualJMLConstruct> spec) {
         this(pi, c, body);
         attacedJml.addAll(spec);
     }

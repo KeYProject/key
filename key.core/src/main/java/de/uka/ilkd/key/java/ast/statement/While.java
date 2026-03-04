@@ -8,8 +8,9 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 
 /**
