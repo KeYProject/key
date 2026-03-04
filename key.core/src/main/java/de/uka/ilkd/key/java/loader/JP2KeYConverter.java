@@ -1614,11 +1614,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         // reportUnsupportedElement(n);
         TypeReference typeRef = (TypeReference) n.getParameter().get().getType().accept(this, arg);
 
-        ProgramSV name = (ProgramSV) lookupSchemaVariable(n.getParameter().get().getName());
-        VariableSpecification v = new VariableSpecification(name);
-        ParameterDeclaration parameter = new ParameterDeclaration(
-            new de.uka.ilkd.key.java.ast.declaration.Modifier[0],
-            typeRef, v, false);
+        ParameterDeclaration parameter;
+        if (n.getParameter().get().getNameAsString().startsWith("#")) {
+            ProgramSV name = (ProgramSV) lookupSchemaVariable(n.getParameter().get().getName());
+            VariableSpecification v = new VariableSpecification(name);
+            parameter = new ParameterDeclaration(
+                new de.uka.ilkd.key.java.ast.declaration.Modifier[0],
+                typeRef, v, false);
+        } else {
+            parameter = accept(n.parameter());
+        }
 
         StatementBlock body = n.getBlock().isEmpty()
                 ? new StatementBlock()
