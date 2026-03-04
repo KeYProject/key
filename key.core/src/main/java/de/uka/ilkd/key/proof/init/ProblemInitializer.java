@@ -41,6 +41,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -266,10 +267,11 @@ public final class ProblemInitializer {
                 }
             }
             try {
-                javaService.readCompilationUnits(javaPath, classes, fileRepo,
-                    (ex, p) -> new ProofInputException("Failed to parse file " + p, ex));
+                javaService.readCompilationUnits(javaPath, classes, fileRepo);
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
+            } catch (BuildingExceptions e) {
+                new ProofInputException("Failed to parse file", e);
             }
         }
         Path initialFile = envInput.getInitialFile();

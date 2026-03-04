@@ -5,6 +5,4 @@ class C {
 
   public static void m_C();
 
-  public cp.Unresolved1 n();
-
 }
