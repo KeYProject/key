@@ -443,9 +443,10 @@ public final class ProblemInitializer {
 
         // remove traces of the generic sorts within the base configuration
         cleanupNamespaces(config);
-        profile.prepareInitConfig(BASE_INPUT_CONFIG);
         BASE_INPUT_CONFIG = config;
-        return BASE_INPUT_CONFIG.copy();
+        config = BASE_INPUT_CONFIG.copy();
+        profile.prepareInitConfig(config);
+        return config;
     }
 
     /**
