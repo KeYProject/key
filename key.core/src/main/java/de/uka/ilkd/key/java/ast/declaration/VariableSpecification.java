@@ -242,7 +242,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         if (programVariable instanceof ProgramVariable pv) {
             return pv.isModel();
         }
-        throw new UnsupportedOperationException("Cannot determine if " + programVariable + " is a model field");
+        throw new UnsupportedOperationException(
+            "Cannot determine if " + programVariable + " is a model field");
     }
 
     public boolean hasInitializer() {
@@ -253,7 +254,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         if (programVariable instanceof ProgramVariable pv) {
             return pv.isFinal();
         }
-        throw new UnsupportedOperationException("Cannot determine if " + programVariable + " is final");
+        throw new UnsupportedOperationException(
+            "Cannot determine if " + programVariable + " is final");
     }
 
 
