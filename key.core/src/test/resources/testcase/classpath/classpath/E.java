@@ -5,7 +5,7 @@ package cp;
 
 enum E {
   e1(1), e2(20), e3(300);
-  public static final E e4 = e2;
+  public static E e4 = e2;
   E(int i) { }
 }
 
