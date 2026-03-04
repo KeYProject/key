@@ -348,11 +348,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.isInterface()) {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
-                parentIsInterface, isLibrary, extending, getSpec(n));
+                parentIsInterface, isLibrary, extending, getClassSpec(n));
         } else {
             td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
-                false, getSpec(n));
+                false, getClassSpec(n));
         }
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);
@@ -826,7 +826,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     public static List<TextualJMLConstruct> getClassSpec(Node n) {
-        return n.getData(JMLTransformer.KEY_CLASS_SPEC);
+        try {
+            return n.getData(JMLTransformer.KEY_CLASS_SPEC);
+        } catch (IllegalStateException e) {
+            return List.of();
+        }
     }
 
     @Override
