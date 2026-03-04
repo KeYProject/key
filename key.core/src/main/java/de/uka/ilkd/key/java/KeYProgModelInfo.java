@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -706,6 +707,11 @@ public class KeYProgModelInfo {
     private ImmutableList<KeYJavaType> recFindImplementations(
             ResolvedTypeDeclaration ct,
             String name, List<ResolvedType> signature, ImmutableList<KeYJavaType> result) {
+        return recFindImplementations(ct, name, signature, result, new HashSet<>());
+    }
+    private ImmutableList<KeYJavaType> recFindImplementations(
+            ResolvedTypeDeclaration ct,
+            String name, List<ResolvedType> signature, ImmutableList<KeYJavaType> result, Set<ResolvedTypeDeclaration> visited) {
         if (declaresApplicableMethods(ct, name, signature)) {
             var r = typeConverter.getKeYJavaType(ct.getQualifiedName());
             if (r == null) {
@@ -723,9 +729,10 @@ public class KeYProgModelInfo {
         java.util.Arrays.sort(classesArray,
             (o1, o2) -> o2.getQualifiedName().compareTo(o1.getQualifiedName()));
 
+        visited.add(ct);
         for (var c : classesArray) {
-            if (!c.equals(ct)) {
-                result = recFindImplementations(c, name, signature, result);
+            if (!visited.contains(c)) {
+                result = recFindImplementations(c, name, signature, result, visited);
             }
         }
         return result;

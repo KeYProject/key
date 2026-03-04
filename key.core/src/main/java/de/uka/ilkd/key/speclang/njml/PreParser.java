@@ -22,6 +22,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Transforms pure text comments into {@link TextualJMLConstruct}s.
+ */
 public class PreParser {
     /** warnings */
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
@@ -98,7 +101,9 @@ public class PreParser {
     }
 
     /**
-     * Parse and interpret class level comments.
+     * Parse and interpret a class level comment. Might "split" the comment (i.e., produce a list
+     * of textual constructs), for instance if there is a method contract and a modifier inside the
+     * given comment.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
             @Nullable URI fileName, Position pos) {
@@ -107,7 +112,9 @@ public class PreParser {
     }
 
     /**
-     * Parse and interpret class level comments.
+     * Parse and interpret class level comments. Might "split" the comment (i.e., produce a list
+     * of textual constructs), for instance if there is a method contract and a modifier inside the
+     * given comment.
      */
     private ImmutableList<TextualJMLConstruct> parseClassLevel(PositionedString positionedString) {
         JmlLexer lexer = JmlFacade.createLexer(positionedString);
