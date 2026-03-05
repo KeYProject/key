@@ -20,6 +20,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -290,30 +292,24 @@ public final class JMLTransformer extends JavaTransformer {
      */
     private @NonNull Statement transformVariableDecl(TextualJMLFieldDecl decl)
             throws SLTranslationException {
-        // prepend Java modifiers
-        PositionedString declWithMods = convertToString(decl.getModifiers(), decl.getDecl());
-        Modifier.Keyword mod = getModifier(decl);
-
-        // parse declaration, attach to AST
-
-        if (mod == Modifier.DefaultKeyword.JML_MODEL) {
-            throw new SLTranslationException(
-                "JML model fields cannot be declared within a method!",
-                declWithMods.location);
+        NodeList<Modifier> modifiers = new NodeList<>();
+        for (JMLModifier m : decl.getModifiers()) {
+            Modifier mod = new Modifier(m.getParserKeyword());
+            modifiers.add(mod);
         }
+        final var dims = decl.getDecl().typespec().dims();
 
-        ParseResult<BlockStmt> block = services.getParser().parseBlock(
-            fillWithWhitespaces(declWithMods.location.getPosition(),
-                "{" + declWithMods.text + "}"));
-        if (!block.isSuccessful()) {
-            throw new SLTranslationException("", declWithMods.location);
-        }
-        List<Statement> declStatement = block.getResult().get().getStatements();
-        assert declStatement.size() == 1;
-        // updatePositionInformation(fieldDecl, declWithMods.pos);
-        // Unlike above, here the value is really a child index, and here the
-        // position really matters.
-        return declStatement.get(0);
+        // for cases like `int[] a[]`, which are allowed in Java (a is 2d here)
+        int arrayDims =
+                (dims != null ? dims.LBRACKET().size() : 0) + decl.getDecl().LBRACKET().size();
+        Type type = StaticJavaParser.parseType(
+                decl.getDecl().typespec().type().getText() + Strings.repeat("[]", arrayDims));
+        String name = decl.getDecl().IDENT().getText();
+
+        // TODO Copy position from textual jml field decl
+        var expr = new VariableDeclarationExpr(type, name);
+        expr.setModifiers(modifiers);
+        return new ExpressionStmt(expr);
     }
 
     private String fillWithWhitespaces(de.uka.ilkd.key.java.Position pos, String s) {
