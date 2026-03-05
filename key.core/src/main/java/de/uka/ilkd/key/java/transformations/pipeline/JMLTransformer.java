@@ -577,7 +577,7 @@ public final class JMLTransformer extends JavaTransformer {
                 warnings = warnings.append(io.getWarnings());
 
                 // handle ghost declarations and set assignments in textual constructs
-                outer: for (TextualJMLConstruct c : constructs) {
+                for (TextualJMLConstruct c : constructs) {
                     Statement statement;
                     switch (c) {
                         // local ghost variable declaration!
@@ -588,41 +588,32 @@ public final class JMLTransformer extends JavaTransformer {
                         case TextualJMLAssertStatement assertStatement ->
                             statement = transformAssertStatement(assertStatement);
                         case TextualJMLSpecCase spec -> {
-                            // TODO weigl: The looping was necessary in the old version. It might be not necessary anymore,
-                            //             due to newStmts. Simplify to just looking at i+1 should be enough.
-                            for (int k = i; k < stmts.size(); k++) {
-                                var search = stmts.get(k);
-                                if (search instanceof LabeledStmt ls) {
-                                    // Find inner labled statement
-                                    while(ls.getStatement() instanceof LabeledStmt inner) {
-                                        ls = inner;
-                                    }
-                                    search = ls.getStatement(); // proceed with normal behavior, check for blocks.
-                                }
-                                if (search instanceof BlockStmt bs
-                                        || search instanceof NodeWithBody<?> /* aka loops */) {
-                                    addSpec(search, spec);
-                                    continue outer;
-                                }
+                            var specifiedStmt = stmts.get(i+1);
+                            if (specifiedStmt instanceof BlockStmt bs
+                                    || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
+                                    || specifiedStmt instanceof LabeledStmt) {
+                                addSpec(specifiedStmt, spec);
+                                continue;
+                            } else {
+                                throw new IllegalStateException(
+                                        "Could not find a suitable statement for the specification in body of "
+                                                + blockStmt.getRange().get().begin + " for contracts " + spec
+                                );
                             }
-                            // Nothing found error
-                            throw new IllegalStateException(
-                                "Could not find a suitable statement for the specification in body of "
-                                    + blockStmt.getRange().get().begin + " for contracts " + spec
-                            );
                         }
                         case TextualJMLLoopSpec spec -> {
-                            for (int k = i; k < stmts.size(); k++) {
-                                var search = stmts.get(k);
-                                if (search instanceof BlockStmt bs
-                                        || search instanceof NodeWithBody<?> /* aka loops */) {
-                                    addLoopSpec(search, spec);
-                                    continue outer;
-                                }
+                            var specifiedStmt = stmts.get(i+1);
+                            if (specifiedStmt instanceof BlockStmt bs
+                                    || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
+                                    || specifiedStmt instanceof LabeledStmt) {
+                                addLoopSpec(specifiedStmt, spec);
+                                continue;
+                            } else {
+                                throw new IllegalStateException(
+                                        "Could not find a suitable statement for the specification in body of "
+                                                + blockStmt.getRange().get().begin + " for contracts " + spec
+                                );
                             }
-                            // Nothing found error
-                            throw new IllegalStateException(
-                                "Could not find a suitable statement for the loop invariant");
                         }
                         default -> {
                             LOGGER.error("{}: Jml element unhandled: {}", c.getLocation(),
@@ -630,8 +621,10 @@ public final class JMLTransformer extends JavaTransformer {
                             continue;
                         }
                     }
-                    // TODO Block, loop specifications contracts
-                    newStmts.add(statement);
+
+                    if (statement != null) {
+                        newStmts.add(statement);
+                    }
                 }
             }
 

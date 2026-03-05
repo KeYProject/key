@@ -474,7 +474,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     @Override
     public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
             final StatementBlock block) throws SLTranslationException {
-        return createBlockContracts(method, new LinkedList<>(), block, block.getComments());
+        return createBlockContracts(method, new LinkedList<>(), block);
     }
 
     @Override
@@ -488,8 +488,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             nextNonLabeled = currentLabeled.getBody();
         }
         if (nextNonLabeled instanceof StatementBlock) {
-            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled,
-                labeled.getComments());
+            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled);
         } else {
             return DefaultImmutableSet.nil();
         }
@@ -540,7 +539,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
-            final List<Label> labels, final StatementBlock block, final Comment[] comments)
+            final List<Label> labels, final StatementBlock block)
             throws SLTranslationException {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
