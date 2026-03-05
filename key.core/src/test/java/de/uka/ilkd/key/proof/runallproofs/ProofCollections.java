@@ -640,7 +640,8 @@ public class ProofCollections {
         g.provable("standard_key/java_dl/splittingWithQueries.key");
         g.provable("standard_key/java_dl/strassen/strassen.key");
         g.provable("standard_key/java_dl/symmArray.key");
-        g.provable("standard_key/java_dl/testcontext.key");
+        g.provable("standard_key/java_dl/methodResolution/testcontext.key");
+        g.provable("standard_key/java_dl/methodResolution/testMethodCallContextInnerClasses.key");
         g.provable("standard_key/staticInitialisation/cascadeStaticInitialisation.key");
         g.provable(
             "standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key");
