@@ -20,6 +20,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.github.javaparser.ast.stmt.*;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -44,10 +46,6 @@ import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 import com.google.common.base.Strings;
@@ -590,8 +588,17 @@ public final class JMLTransformer extends JavaTransformer {
                         case TextualJMLAssertStatement assertStatement ->
                             statement = transformAssertStatement(assertStatement);
                         case TextualJMLSpecCase spec -> {
+                            // TODO weigl: The looping was necessary in the old version. It might be not necessary anymore,
+                            //             due to newStmts. Simplify to just looking at i+1 should be enough.
                             for (int k = i; k < stmts.size(); k++) {
                                 var search = stmts.get(k);
+                                if (search instanceof LabeledStmt ls) {
+                                    // Find inner labled statement
+                                    while(ls.getStatement() instanceof LabeledStmt inner) {
+                                        ls = inner;
+                                    }
+                                    search = ls.getStatement(); // proceed with normal behavior, check for blocks.
+                                }
                                 if (search instanceof BlockStmt bs
                                         || search instanceof NodeWithBody<?> /* aka loops */) {
                                     addSpec(search, spec);
@@ -600,7 +607,9 @@ public final class JMLTransformer extends JavaTransformer {
                             }
                             // Nothing found error
                             throw new IllegalStateException(
-                                "Could not find a suitable statement for the block invariant");
+                                "Could not find a suitable statement for the block invariant in body of "
+                                    + blockStmt.getRange().get().begin + " for contracts " + spec
+                            );
                         }
                         case TextualJMLLoopSpec spec -> {
                             for (int k = i; k < stmts.size(); k++) {
