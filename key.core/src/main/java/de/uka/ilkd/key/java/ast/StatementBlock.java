@@ -40,7 +40,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Nullable
     private final MethodFrame innerMostMethodFrame;
-    private final List<TextualJMLConstruct> attacedJml = new ArrayList<>(0);
+    private final List<TextualJMLConstruct> attachedJML = new ArrayList<>(0);
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
@@ -95,12 +95,12 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body,
             List<TextualJMLConstruct> spec) {
         this(pi, c, body);
-        attacedJml.addAll(spec);
+        attachedJML.addAll(spec);
     }
 
     @Override
     public List<TextualJMLConstruct> getAttachedJml() {
-        return attacedJml;
+        return attachedJML;
     }
 
     @Override

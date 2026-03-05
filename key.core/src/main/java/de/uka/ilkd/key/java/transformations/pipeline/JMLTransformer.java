@@ -607,7 +607,7 @@ public final class JMLTransformer extends JavaTransformer {
                             }
                             // Nothing found error
                             throw new IllegalStateException(
-                                "Could not find a suitable statement for the block invariant in body of "
+                                "Could not find a suitable statement for the specification in body of "
                                     + blockStmt.getRange().get().begin + " for contracts " + spec
                             );
                         }

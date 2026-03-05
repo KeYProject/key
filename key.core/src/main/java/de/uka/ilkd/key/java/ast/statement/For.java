@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 
 import org.key_project.util.ExtList;
@@ -50,16 +51,14 @@ public class For extends LoopStatement implements VariableScope {
             children.get(IForUpdates.class), children.get(Statement.class), children);
     }
 
-    public For(PositionInfo pi, List<Comment> c, ILoopInit inits, IForUpdates updates,
+    public For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
             IGuard guard, Statement body) {
-        super(pi, c, inits, updates, guard, body);
+        super(pi, comments, inits, updates, guard, body);
     }
 
-    public <T> For(PositionInfo pi, List<Comment> c, ILoopInit forInit,
-            IForUpdates forUpdates, IGuard forGuard, Statement body,
-            List<TextualJMLLoopSpec> spec) {
-        this(pi, c, forInit, forUpdates, forGuard, body);
-        attachedJml.addAll(spec);
+    public <T> For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
+            IGuard guard, Statement body, List<TextualJMLConstruct> specs) {
+        super(pi, comments, inits, updates, guard, body, specs);
     }
 
     public SourceElement getLastElement() {

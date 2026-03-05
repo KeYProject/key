@@ -554,8 +554,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         var guard = accept(n.getCondition());
         var body = accept(n.getBody());
+        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
+        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
+        loopSpecs.addAll(getSpec(n)); // loop contracts
         return new Do(pi, c, new Guard((Expression) guard),
-            (Statement) body, getLoopSpec(n));
+            (Statement) body, loopSpecs);
     }
 
     @Override
@@ -806,7 +809,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         LocalVariableDeclaration decl = accept(n.getVariable());
         ILoopInit init = new LoopInit(new LoopInitializer[] { decl });
         Guard guard = new Guard(null, null, accept(n.getIterable()));
-        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), getLoopSpec(n));
+        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
+        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
+        loopSpecs.addAll(getSpec(n)); // loop contracts
+        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), loopSpecs);
     }
 
     @Override
@@ -837,7 +843,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (!n.getUpdate().isEmpty()) {
             forUpdates = new ForUpdates(updates);
         }
-        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), getLoopSpec(n));
+        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
+        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
+        loopSpecs.addAll(getSpec(n)); // loop contracts
+        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), loopSpecs);
     }
 
     public static List<TextualJMLConstruct> getSpec(Node n) {
@@ -1514,7 +1523,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         Guard guard = new Guard((Expression) accept(n.getCondition()));
         Statement body = accept(n.getBody());
-        return new While(pi, c, guard, body, getLoopSpec(n));
+        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
+        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
+        loopSpecs.addAll(getSpec(n)); // loop contracts
+        return new While(pi, c, guard, body, loopSpecs);
     }
 
     @Override

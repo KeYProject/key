@@ -498,13 +498,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
             final LoopStatement loop) throws SLTranslationException {
-        return createLoopContracts(method, new LinkedList<>(), loop, loop.getComments());
+        return createLoopContracts(method, new LinkedList<>(), loop);
     }
 
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
             final StatementBlock block) throws SLTranslationException {
-        return createLoopContracts(method, new LinkedList<>(), block, block.getComments());
+        return createLoopContracts(method, new LinkedList<>(), block);
     }
 
     @Override
@@ -518,11 +518,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             nextNonLabeled = currentLabeled.getBody();
         }
         if (nextNonLabeled instanceof StatementBlock) {
-            return createLoopContracts(method, labels, (StatementBlock) nextNonLabeled,
-                labeled.getComments());
+            return createLoopContracts(method, labels, (StatementBlock) nextNonLabeled);
         } else if (nextNonLabeled instanceof LoopStatement) {
-            return createLoopContracts(method, labels, (LoopStatement) nextNonLabeled,
-                labeled.getComments());
+            return createLoopContracts(method, labels, (LoopStatement) nextNonLabeled);
         } else {
             return DefaultImmutableSet.nil();
         }
@@ -562,7 +560,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     private ImmutableSet<LoopContract> createLoopContracts(final IProgramMethod method,
-            final List<Label> labels, final LoopStatement loop, final Comment[] comments)
+            final List<Label> labels, final LoopStatement loop)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
@@ -582,7 +580,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     private ImmutableSet<LoopContract> createLoopContracts(final IProgramMethod method,
-            final List<Label> labels, final StatementBlock block, final Comment[] comments)
+            final List<Label> labels, final StatementBlock block)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
