@@ -1369,7 +1369,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             pv = (IProgramVariable) lookupSchemaVariable(v.getNameAsString(), v);
         } else {
             var name = VariableNamer.parseName(v.getNameAsString());
-            pv = new LocationVariable(name, kjt, modifiers.hasModifier(FINAL));
+            pv = new LocationVariable(name, kjt, modifiers.hasModifier(JML_GHOST),
+                modifiers.hasModifier(FINAL));
         }
 
         return addToMapping(v, new VariableSpecification(pi, c, init, pv, 0, kjt));
@@ -1569,7 +1570,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case JML_NULLABLE_BY_DEFAULT -> new Modifiers.SEALED(pi, c);
             case JML_NON_NULL -> new Modifiers.JML_NON_NULL(pi, c);
             case JML_NULLABLE -> new Modifiers.JML_NULLABLE(pi, c);
-            case JML_GHOST -> new Ghost(pi, c);
+            case JML_GHOST -> new Modifiers.JML_GHOST(pi, c);
             case JML_MODEL -> new Model(pi, c);
             case JML_TWO_STATE -> new TwoState(pi, c);
             case JML_SPEC_PUBLIC -> new Modifiers.JML_SPEC_PUBLIC(pi, c);
