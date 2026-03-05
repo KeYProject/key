@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -72,7 +71,8 @@ public abstract class LoopStatement extends JavaStatement
         this.guard = new Guard(guard);
     }
 
-    public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments, PositionInfo pos) {
+    public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
+            PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
         this.updates = null;
@@ -211,8 +211,8 @@ public abstract class LoopStatement extends JavaStatement
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-                         IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
-                         List<TextualJMLConstruct> specs) {
+            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
+            List<TextualJMLConstruct> specs) {
         this(pi, comments, inits, updates, guard, body);
         attachedJml.addAll(specs);
     }
