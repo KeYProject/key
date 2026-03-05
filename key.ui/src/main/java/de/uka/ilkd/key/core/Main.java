@@ -547,6 +547,9 @@ public final class Main implements Callable<Integer> {
                 workingDir = f;
             } else {
                 workingDir = f.getParent();
+                if (workingDir == null) {
+                    workingDir = IOUtil.getCurrentDirectory();
+                }
             }
         } else {
             workingDir = IOUtil.getCurrentDirectory();
