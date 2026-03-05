@@ -20,8 +20,6 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -41,11 +39,13 @@ import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
@@ -301,9 +301,9 @@ public final class JMLTransformer extends JavaTransformer {
 
         // for cases like `int[] a[]`, which are allowed in Java (a is 2d here)
         int arrayDims =
-                (dims != null ? dims.LBRACKET().size() : 0) + decl.getDecl().LBRACKET().size();
+            (dims != null ? dims.LBRACKET().size() : 0) + decl.getDecl().LBRACKET().size();
         Type type = StaticJavaParser.parseType(
-                decl.getDecl().typespec().type().getText() + Strings.repeat("[]", arrayDims));
+            decl.getDecl().typespec().type().getText() + Strings.repeat("[]", arrayDims));
         String name = decl.getDecl().IDENT().getText();
 
         // TODO Copy position from textual jml field decl
