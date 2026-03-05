@@ -1,0 +1,11 @@
+# Modelled after a bugfix for #3738
+# can be proved before the fix but not afterwards
+javaSrc: |
+  interface X {}
+  class Y extends Object implements X { }
+keySrc: |
+  \problem { !\exists Object o; (X::instance(o) = TRUE & Y::instance(o) = TRUE) }
+contains:
+  - (assert (subtype sort_Y sort_X))
+  - (assert (not (subtype sort_X sort_Y)))
+expected: FAIL

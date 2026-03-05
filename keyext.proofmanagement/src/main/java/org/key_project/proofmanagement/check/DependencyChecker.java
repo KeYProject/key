@@ -5,6 +5,9 @@ package org.key_project.proofmanagement.check;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyNode;
@@ -122,8 +125,13 @@ public class DependencyChecker implements Checker {
                 if (!closed.contains(n)) {
                     CheckerData.ProofEntry entry = data.getProofEntryByContract(n.getContract());
                     if (entry != null) {
+                        Set<DependencyNode> deps = n.getDependencies().keySet();
+                        // filter out internal contracts (not in use-provided sources)
+                        Set<DependencyNode> userDeps = deps.stream().filter(
+                            d -> !MissingProofsChecker.isInternalContract(d.getContract(), data))
+                                .collect(Collectors.toSet());
                         if (entry.proofState == CheckerData.ProofState.CLOSED
-                                && closed.containsAll(n.getDependencies().keySet())) {
+                                && closed.containsAll(userDeps)) {
                             closed.add(n);
 
                             // update status in data object
@@ -149,10 +157,18 @@ public class DependencyChecker implements Checker {
         for (CheckerData.ProofEntry entry : data.getProofEntries()) {
             if (entry.dependencyState == CheckerData.DependencyState.UNKNOWN
                     && entry.replayState == CheckerData.ReplayState.SUCCESS) {
-                entry.dependencyState = CheckerData.DependencyState.UNPROVEN_DEP;
-                data.print(LogLevel.WARNING, "Unproven dependencies found for proof "
-                    + entry.proof.name());
-                hasUnprovenDeps = true;
+                Contract c = entry.contract;
+
+                if (MissingProofsChecker.isInternalContract(c, data)) {
+                    // unproven internal dependencies only result in a warning
+                    data.print(LogLevel.INFO, "Unproven internal dependencies found for proof "
+                        + entry.proof.name());
+                } else {
+                    entry.dependencyState = CheckerData.DependencyState.UNPROVEN_DEP;
+                    data.print(LogLevel.WARNING, "Unproven dependencies found for proof "
+                        + entry.proof.name());
+                    hasUnprovenDeps = true;
+                }
             }
         }
 
