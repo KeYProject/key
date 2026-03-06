@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
-    private static InitConfig BASE_INPUT_CONFIG;
     private final Services services;
     private final ProgressMonitor progMon;
     private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
@@ -414,6 +413,7 @@ public final class ProblemInitializer {
             classPath != null ? classPath : Collections.emptyList());
     }
 
+
     /**
      * Creates an input config for the given env input
      *
@@ -423,8 +423,9 @@ public final class ProblemInitializer {
      */
     private InitConfig createInputConfigFor(EnvInput envInput) throws ProofInputException {
         var profile = services.getProfile();
-        if (BASE_INPUT_CONFIG != null && profile == BASE_INPUT_CONFIG.getProfile()) {
-            return BASE_INPUT_CONFIG.copy();
+        byte[] inputDigest = BaseConfigCache.computeClasspathDigest(envInput);
+        if (BaseConfigCache.matchesCachedConfig(profile, inputDigest)) {
+            return BaseConfigCache.getBaseInputConfig().copy();
         }
 
         var config = new InitConfig(services);
@@ -443,8 +444,8 @@ public final class ProblemInitializer {
 
         // remove traces of the generic sorts within the base configuration
         cleanupNamespaces(config);
-        BASE_INPUT_CONFIG = config;
-        config = BASE_INPUT_CONFIG.copy();
+        BaseConfigCache.setBaseInputConfig(config, inputDigest);
+        config = config.copy();
         profile.prepareInitConfig(config);
         return config;
     }
@@ -456,7 +457,7 @@ public final class ProblemInitializer {
         progressStarted(this);
         alreadyParsed.clear();
         InitConfig initConfig = createInputConfigFor(envInput);
-        //TODO maybe just reset java services here
+        // TODO maybe just reset java services here
         InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {
             printMatcher(ic);
