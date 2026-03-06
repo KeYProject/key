@@ -15,10 +15,7 @@ import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Modifiers;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.modifier.*;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
@@ -340,7 +337,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         ParserRuleContext modelMethodDefinition = null;
         for (var c : constructs) {
             if (c instanceof TextualJMLMethodDecl m) {
-                if (pm.getMethodDeclaration().containsModifier(Modifiers.JML_MODEL.class)) {
+                if (pm.getMethodDeclaration().containsModifier(Model.class)) {
                     modelMethodDefinition = m.getMethodDefinition();
                     break;
                 }

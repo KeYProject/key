@@ -173,7 +173,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                 // I need a little bit help, why this is triggerd for my JML thing.
                 throw new IllegalStateException(
                     "Only functional represents for model methods is currently supported,"
-                        + "this should not have occured.");
+                        + "this should not have occured. Name:"+name);
             }
             Taclet tacletWithShowSatisfiability =
                 tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target, heaps,
@@ -219,10 +219,8 @@ public final class RepresentsAxiom extends ClassAxiom {
      * package-privacy is implemented).
      * </p>
      *
-     * @param ax
-     *        some represents clause.
-     * @param tb
-     *        a term builder.
+     * @param ax some represents clause.
+     * @param tb a term builder.
      * @return a conjunction of this clause and {@code ax}.
      */
     public RepresentsAxiom conjoin(RepresentsAxiom ax, TermBuilder tb) {

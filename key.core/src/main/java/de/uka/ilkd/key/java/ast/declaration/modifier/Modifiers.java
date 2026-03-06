@@ -314,31 +314,6 @@ public class Modifiers {
         }
     }
 
-    public static class JML_GHOST extends Modifier {
-        public JML_GHOST() {
-        }
-
-        public JML_GHOST(PositionInfo pi, List<Comment> c) {
-            super(pi, c);
-        }
-
-        protected String getSymbol() {
-            return "ghost";
-        }
-    }
-
-    public static class JML_MODEL extends Modifier {
-        public JML_MODEL() {
-        }
-
-        public JML_MODEL(PositionInfo pi, List<Comment> c) {
-            super(pi, c);
-        }
-
-        protected String getSymbol() {
-            return "model";
-        }
-    }
 
     public static class JML_SPEC_PUBLIC extends Modifier {
         public JML_SPEC_PUBLIC() {
