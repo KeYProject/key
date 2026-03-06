@@ -347,6 +347,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         for (var c : constructs) {
             if (c instanceof TextualJMLSpecCase specCase) {
+                specCase = specCase.copy();
+
                 if (modelMethodDefinition != null) {
                     specCase.addClause(AXIOMS, null, modelMethodDefinition);
                 }

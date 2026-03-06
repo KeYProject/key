@@ -160,14 +160,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             final TextualJMLSpecCase base = methodContract;
             if (ctx.inner != null) {
                 assert base != null;
-                methodContract = base.clone();
+                methodContract = base.copy();
                 constructs = constructs.append(methodContract);
                 acceptAll(ctx.inner);
             }
 
             for (JmlParser.Spec_bodyContext it : ctx.spec_body()) {
                 assert base != null;
-                methodContract = base.clone();
+                methodContract = base.copy();
                 constructs = constructs.append(methodContract);
                 accept(it);
             }
