@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
-    private static InitConfig BASE_INIT_CONFIG;
     private final Services services;
     private final ProgressMonitor progMon;
     private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
@@ -444,6 +443,8 @@ public final class ProblemInitializer {
 
         // remove traces of the generic sorts within the base configuration
         cleanupNamespaces(config);
+
+        // cache the last used init config
         BaseConfigCache.setBaseInputConfig(config, inputDigest);
         config = config.copy();
         profile.prepareInitConfig(config);

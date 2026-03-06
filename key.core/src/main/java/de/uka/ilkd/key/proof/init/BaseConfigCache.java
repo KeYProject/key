@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * not
  * digested as not needed.
  *
- * This is only used in {@link ProblemInitializer#createInputConfigFor(EnvInput)}.
+ * This is only used in {@link ProblemInitializer#createInitConfigFor(EnvInput)}.
  *
  * @author Mattias Ulbrich
  * @see ProblemInitializer
@@ -56,19 +56,23 @@ class BaseConfigCache {
     }
 
     /**
-     * Updates the given message digest with the content of the given path. If the path is a
-     * directory, all files in the directory are also digested.
+     * Updates the given message digest with the content (name and content of all files and
+     * directories) of the given path. If the path is a directory, all files in the directory are
+     * also digested.
      *
      * @param md the message digest to update
      * @param path the path to digest
      */
     private static void digestPath(@NonNull MessageDigest md, @NonNull Path path) {
         try {
+            // just to be on the safe side: Also digest the file name
+            md.update(path.getFileName().toString().getBytes());
             if (Files.isDirectory(path)) {
                 try (Stream<Path> walker = Files.walk(path)) {
                     walker.sorted().forEach(it -> {
-                        if (!it.equals(path))
+                        if (!it.equals(path)) {
                             digestPath(md, it);
+                        }
                     });
                 } catch (IOException e) {
                     LOGGER.warn("Failed to read file: {}", path, e);
@@ -109,12 +113,13 @@ class BaseConfigCache {
         }
 
         try {
-            var totalHash = MessageDigest.getInstance("SHA-256");
-            classpath.stream().sorted().forEach(path -> digestPath(totalHash, path));
+            // Make sure to call "digest" only once, since the digest is reset after the call!
+            MessageDigest totalHash = MessageDigest.getInstance("SHA-256");
+            classpath.stream().sorted().forEachOrdered(path -> digestPath(totalHash, path));
             if (bootclasspath != null) {
                 digestPath(totalHash, bootclasspath);
             } else {
-                totalHash.digest(VALUE_FOR_REDUX_CLASSES);
+                totalHash.update(VALUE_FOR_REDUX_CLASSES);
             }
             return bytesToHex(totalHash.digest());
         } catch (Exception e) {
@@ -126,7 +131,9 @@ class BaseConfigCache {
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (int i = 0; i < hash.length; i++) {
+            // Maybe just use String.format("%02x", hash[i]) instead?
             String hex = Integer.toHexString(0xff & hash[i]);
+            // TODO: Does this work as intended? Appending "0" looks really weird ...
             if(hex.length() == 1) {
                 hexString.append('0');
             }
@@ -151,7 +158,7 @@ class BaseConfigCache {
 
     /**
      * Returns the cached base input config. This should only be called if
-     * {@link #matchesCachedConfig(Profile, byte[])} returns true.
+     * {@link #matchesCachedConfig(Profile, String)} returns true.
      *
      * @return the cached base input config
      * @throws IllegalStateException if no cached config is available
