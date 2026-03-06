@@ -495,8 +495,7 @@ public class JavaService {
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             mapping.setParsingLibraries(false);
         }
     }

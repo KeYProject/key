@@ -456,7 +456,7 @@ public final class ProblemInitializer {
         progressStarted(this);
         alreadyParsed.clear();
         InitConfig initConfig = createInputConfigFor(envInput);
-        //TODO maybe just reset java services here
+        // TODO maybe just reset java services here
         InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {
             printMatcher(ic);

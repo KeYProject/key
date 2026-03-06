@@ -173,7 +173,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                 // I need a little bit help, why this is triggerd for my JML thing.
                 throw new IllegalStateException(
                     "Only functional represents for model methods is currently supported,"
-                        + "this should not have occured. Name:"+name);
+                        + "this should not have occurred. Name:" + name);
             }
             Taclet tacletWithShowSatisfiability =
                 tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target, heaps,
