@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
+    private static InitConfig BASE_INIT_CONFIG;
     private final Services services;
     private final ProgressMonitor progMon;
     private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
@@ -413,7 +414,6 @@ public final class ProblemInitializer {
             classPath != null ? classPath : Collections.emptyList());
     }
 
-
     /**
      * Creates an input config for the given env input
      *
@@ -421,20 +421,20 @@ public final class ProblemInitializer {
      * @return a *new* config
      * @throws ProofInputException on load error
      */
-    private InitConfig createInputConfigFor(EnvInput envInput) throws ProofInputException {
-        var profile = services.getProfile();
+    private InitConfig createInitConfigFor(EnvInput envInput) throws ProofInputException {
+        Profile profile = services.getProfile();
         String inputDigest = BaseConfigCache.computeClasspathDigest(envInput);
         if (BaseConfigCache.matchesCachedConfig(profile, inputDigest)) {
             return BaseConfigCache.getBaseInputConfig().copy();
         }
 
-        var config = new InitConfig(services);
+        InitConfig config = new InitConfig(services);
         activateInitConfigJava(config, envInput);
 
         // the first time, read in standard rules
         ImmutableList<RuleSource> tacletBases = profile.getStandardRules().getTacletBase();
         if (tacletBases != null) {
-            for (var tacletBase : tacletBases) {
+            for (RuleSource tacletBase : tacletBases) {
                 KeYFile tacletBaseFile = new KeYFile(
                     "taclet base (%s)".formatted(tacletBase.file().getFileName()),
                     tacletBase, progMon, profile);
@@ -456,7 +456,7 @@ public final class ProblemInitializer {
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
         progressStarted(this);
         alreadyParsed.clear();
-        InitConfig initConfig = createInputConfigFor(envInput);
+        InitConfig initConfig = createInitConfigFor(envInput);
         // TODO maybe just reset java services here
         InitConfig ic = prepare(envInput, initConfig);
         if (Debug.ENABLE_DEBUG) {

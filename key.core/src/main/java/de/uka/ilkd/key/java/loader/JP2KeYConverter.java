@@ -1543,8 +1543,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var ref = translatePackageReference(n.getName());
             return new Import(ref, pi, c);
         } else {
-            TypeReference type = null; // TODO weigl
-            return new Import(type, n.isAsterisk(), pi, c);
+            // TODO: is the lookup correct? Seems to work in small examples ...
+            String typename = n.getName().asString();
+            KeYJavaType kjt = typeConverter.getKeYJavaType(typename);
+            TypeReference typeRef = new TypeRef(kjt);
+            return new Import(typeRef, n.isAsterisk(), pi, c);
         }
     }
 
