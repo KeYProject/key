@@ -135,11 +135,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             ImmutableArray<MemberDeclaration> members,
             boolean parentIsInterface, boolean isLibrary, Extends extending,
             Implements implementing,
-            boolean innerClass, boolean localClassDeclaration, boolean b,
+            boolean innerClass, boolean localClassDeclaration, boolean isAnonymousClass,
             List<TextualJMLConstruct> spec) {
         this(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary, extending,
             implementing, innerClass,
-            localClassDeclaration, b);
+            localClassDeclaration, isAnonymousClass);
         attachedJml.addAll(spec);
     }
 

@@ -481,6 +481,8 @@ public class JavaService {
         if (mapping.setParsedSpecial())
             return;
         mapping.setParsedSpecial(true);
+
+        mapping.setParsingLibraries(true);
         try {
             parseBootClasspath(fileRepo);
             parseLibraryPaths(fileRepo);
@@ -493,6 +495,9 @@ public class JavaService {
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        finally {
+            mapping.setParsingLibraries(false);
         }
     }
 
