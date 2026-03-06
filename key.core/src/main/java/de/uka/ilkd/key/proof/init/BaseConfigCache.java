@@ -9,11 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.proof.io.EnvInput;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ class BaseConfigCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfigCache.class);
 
     /** Special value used for no classpath config */
-    private static final byte[] VALUE_FOR_EMPTY = new byte[0];
+    private static final String VALUE_FOR_EMPTY = "";
 
     /** Special value used instead of parsing the redux classes */
     private static final byte[] VALUE_FOR_REDUX_CLASSES =
@@ -46,7 +48,7 @@ class BaseConfigCache {
     private static InitConfig baseInputConfig;
 
     /** The digest of the classpath that was used to create the cached instance */
-    private static byte[] baseInputConfigHash;
+    private static String baseInputConfigHash;
 
     private BaseConfigCache() {
         // prevent instantiation
@@ -98,7 +100,7 @@ class BaseConfigCache {
      * @param envInput the environment input to read the classpath from
      * @return the computed digest, or null if an error occurred while reading the classpath
      */
-    public static @NonNull byte[] computeClasspathDigest(@NonNull EnvInput envInput) {
+    public static @Nullable String computeClasspathDigest(@NonNull EnvInput envInput) {
         Path bootclasspath = envInput.readBootClassPath();
         Collection<Path> classpath = envInput.readClassPath();
 
@@ -114,19 +116,31 @@ class BaseConfigCache {
             } else {
                 totalHash.digest(VALUE_FOR_REDUX_CLASSES);
             }
-            return totalHash.digest();
+            return bytesToHex(totalHash.digest());
         } catch (Exception e) {
             LOGGER.error("Error while computing hash for classpaths (for caching init configs)", e);
             return null;
         }
     }
 
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 
-    public static boolean matchesCachedConfig(Profile profile, byte[] inputDigest) {
+
+    public static boolean matchesCachedConfig(Profile profile, String inputDigest) {
         if (baseInputConfig == null) {
             return false;
         }
-        if (!MessageDigest.isEqual(baseInputConfigHash, inputDigest)) {
+        if (!Objects.equals(baseInputConfigHash, inputDigest)) {
             return false;
         }
         if (profile != baseInputConfig.getProfile()) {
@@ -158,7 +172,7 @@ class BaseConfigCache {
      * @param config the config to cache
      * @param inputDigest the digest of the classpath of config.
      */
-    public static void setBaseInputConfig(@NonNull InitConfig config, byte[] inputDigest) {
+    public static void setBaseInputConfig(@NonNull InitConfig config, String inputDigest) {
         baseInputConfig = config;
         baseInputConfigHash = inputDigest;
     }

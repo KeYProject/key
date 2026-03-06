@@ -423,7 +423,7 @@ public final class ProblemInitializer {
      */
     private InitConfig createInputConfigFor(EnvInput envInput) throws ProofInputException {
         var profile = services.getProfile();
-        byte[] inputDigest = BaseConfigCache.computeClasspathDigest(envInput);
+        String inputDigest = BaseConfigCache.computeClasspathDigest(envInput);
         if (BaseConfigCache.matchesCachedConfig(profile, inputDigest)) {
             return BaseConfigCache.getBaseInputConfig().copy();
         }
