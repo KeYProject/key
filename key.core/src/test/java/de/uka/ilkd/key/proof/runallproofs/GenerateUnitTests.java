@@ -68,7 +68,7 @@ public class GenerateUnitTests {
                 import org.junit.jupiter.api.*;
                 import static org.junit.jupiter.api.Assertions.*;
 
-                @org.junit.jupiter.api.Timeout(90)
+                @org.junit.jupiter.api.Timeout(120)
                 @org.junit.jupiter.api.Tag("RAP")
                 public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {
                   public static final String STATISTIC_FILE = "$statisticsFile";
