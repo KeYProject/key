@@ -688,7 +688,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                     .getInstantiation();
 
             if (!contract.getTarget().equals(inst.pm)) {
-                throw new IllegalStateException("The given contract does not fit to the program method.");
+                throw new IllegalStateException(
+                    "The given contract does not fit to the program method.");
             }
 
             heapContext =

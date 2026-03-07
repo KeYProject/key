@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -22,8 +21,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.java.IOUtil;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are

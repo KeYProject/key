@@ -20,7 +20,6 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.ImmutableSet;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -30,7 +29,6 @@ import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
@@ -53,6 +51,7 @@ import com.google.common.base.Strings;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -322,19 +321,20 @@ public final class JMLTransformer extends JavaTransformer {
     /**
      * Transform the given model method declaration into a "real" method declaration.
      *
-     * @param decl         the give textual model method declaration
+     * @param decl the give textual model method declaration
      * @param jmlModifiers
      * @return the new method declaration
      * @throws SLTranslationException
      */
     private @NonNull MethodDeclaration transformMethodDecl(TextualJMLMethodDecl decl,
-                                                           @Nullable TextualJMLModifierList jmlModifiers)
+            @Nullable TextualJMLModifierList jmlModifiers)
             throws SLTranslationException {
         // prepend Java modifiers
         PositionedString declWithMods =
             new PositionedString(decl.getParsableDeclaration());
 
-        ImmutableList<JMLModifier> mods = jmlModifiers!=null?jmlModifiers.getModifiers(): ImmutableList.of();
+        ImmutableList<JMLModifier> mods =
+            jmlModifiers != null ? jmlModifiers.getModifiers() : ImmutableList.of();
         ImmutableList<JMLModifier> modifiers = mods.prepend(decl.getModifiers());
 
         // only handle model methods
@@ -355,16 +355,18 @@ public final class JMLTransformer extends JavaTransformer {
         updatePositionInformation(methodDecl, declWithMods.location.getPosition());
 
         // add model modifier
-        //methodDecl.addModifier(Modifier.DefaultKeyword.JML_MODEL);
+        // methodDecl.addModifier(Modifier.DefaultKeyword.JML_MODEL);
         for (var modifier : modifiers) {
             methodDecl.addModifier(modifier.getParserKeyword());
         }
-        /*if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) {
-            methodDecl.addModifier(Modifier.DefaultKeyword.JML_TWO_STATE);
-        }
-        if (decl.getModifiers().contains(JMLModifier.NO_STATE)) {
-            methodDecl.addModifier(Modifier.DefaultKeyword.JML_NO_STATE);
-        }*/
+        /*
+         * if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) {
+         * methodDecl.addModifier(Modifier.DefaultKeyword.JML_TWO_STATE);
+         * }
+         * if (decl.getModifiers().contains(JMLModifier.NO_STATE)) {
+         * methodDecl.addModifier(Modifier.DefaultKeyword.JML_NO_STATE);
+         * }
+         */
         addSpec(methodDecl, decl);
         return methodDecl;
     }
@@ -453,7 +455,7 @@ public final class JMLTransformer extends JavaTransformer {
                     } else if (c instanceof TextualJMLMethodDecl md) {
                         // model method decl.:
                         final MethodDeclaration decl = transformMethodDecl(md, jmlModifiers);
-                        jmlModifiers=null; // these are used now
+                        jmlModifiers = null; // these are used now
                         // attach all specification cases accumulated so far
                         for (TextualJMLSpecCase specCase : specCases) {
                             addSpec(decl, specCase);

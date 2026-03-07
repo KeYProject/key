@@ -166,11 +166,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public boolean contains(ClauseHd clause, @Nullable Name heapName) {
-        return clauses.stream().anyMatch(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+        return clauses.stream()
+                .anyMatch(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
     }
 
     public boolean removeClauses(ClauseHd clause, @Nullable Name heapName) {
-        return clauses.removeIf(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
+        return clauses
+                .removeIf(it -> it.clauseType.equals(clause) && Objects.equals(it.heap, heapName));
     }
 
     /**

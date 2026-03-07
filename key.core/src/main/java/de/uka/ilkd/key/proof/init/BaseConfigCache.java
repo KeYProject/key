@@ -134,7 +134,7 @@ class BaseConfigCache {
             // Maybe just use String.format("%02x", hash[i]) instead?
             String hex = Integer.toHexString(0xff & hash[i]);
             // TODO: Does this work as intended? Appending "0" looks really weird ...
-            if(hex.length() == 1) {
+            if (hex.length() == 1) {
                 hexString.append('0');
             }
             hexString.append(hex);

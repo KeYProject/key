@@ -347,7 +347,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // Model method without specification. We need to create a specCase
         // to attach the AXIOMS clase for its definition.
         if (modelMethodDefinition != null && constructs.size() == 1) {
-            TextualJMLSpecCase specCase = new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
+            TextualJMLSpecCase specCase =
+                new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
             constructs.add(specCase);
         }
 
