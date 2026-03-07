@@ -687,7 +687,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             contract = (FunctionalOperationContract) ((AbstractContractRuleApp<?>) ruleApp)
                     .getInstantiation();
 
-            assert contract.getTarget().equals(inst.pm);
+            if (!contract.getTarget().equals(inst.pm)) {
+                throw new IllegalStateException("The given contract does not fit to the program method.");
+            }
 
             heapContext =
                 HeapContext.getModifiableHeaps(goal.proof().getServices(), inst.transaction);

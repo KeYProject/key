@@ -332,7 +332,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
 
         // get textual JML constructs
-        var constructs = pm.getMethodDeclaration().getAttachedJml();
+        var constructs = new ArrayList<>(pm.getMethodDeclaration().getAttachedJml());
 
         ParserRuleContext modelMethodDefinition = null;
         for (var c : constructs) {
@@ -344,6 +344,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
         }
 
+        // Model method without specification. We need to create a specCase
+        // to attach the AXIOMS clase for its definition.
+        if (modelMethodDefinition != null && constructs.size() == 1) {
+            TextualJMLSpecCase specCase = new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
+            constructs.add(specCase);
+        }
 
         for (var c : constructs) {
             if (c instanceof TextualJMLSpecCase specCase) {
