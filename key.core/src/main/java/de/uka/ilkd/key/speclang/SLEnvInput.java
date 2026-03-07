@@ -8,10 +8,12 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -88,7 +90,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         int i = 0;
         for (KeYJavaType kjt : allKJTs) {
-            var javaType = kjt.getJavaType();
+            Type javaType = kjt.getJavaType();
             if (!(javaType instanceof TypeDeclaration)
                     || !((TypeDeclaration) javaType).isLibraryClass()) {
                 continue;
@@ -117,14 +119,14 @@ public final class SLEnvInput extends AbstractEnvInput {
      * specifications from this file.
      */
     private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
-        final var allKJTs =
+        final Collection<KeYJavaType> allKJTs =
             initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
-        var javaService = initConfig.getServices().getJavaService();
+        JavaService javaService = initConfig.getServices().getJavaService();
         warnings =
             warnings.union(createDLLibrarySpecsHelper(allKJTs, javaService.getBootClassPath()));
 
-        for (var file : javaService.getLibraryPath()) {
+        for (Path file : javaService.getLibraryPath()) {
             warnings =
                 warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
         }
@@ -269,7 +271,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
 
         // sort types alphabetically (necessary for deterministic names)
-        final var allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
+        final Collection<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 
@@ -301,11 +303,16 @@ public final class SLEnvInput extends AbstractEnvInput {
                 // contracts
                 final List<SpecificationElement> methodSpecs =
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
-                var iter = methodSpecs.iterator();
-                var params = iter.hasNext() ? ((Contract) iter.next()).getOrigVars().params : null;
+                ImmutableList<LocationVariable> params;
+                try {
+                    params = ((Contract) methodSpecs.getFirst()).getOrigVars().params;
+                } catch (NoSuchElementException e) {
+                    params = null;
+                }
+
                 specRepos.addSpecs(DefaultImmutableSet.fromCollection(methodSpecs));
 
-                var declaringType = pm.getContainerType().getJavaType();
+                Type declaringType = pm.getContainerType().getJavaType();
 
                 // Create default contracts for all methods except KeY default methods (like <init>)
                 // and Object methods.
