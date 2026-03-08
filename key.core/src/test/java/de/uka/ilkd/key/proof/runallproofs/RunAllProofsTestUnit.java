@@ -175,4 +175,8 @@ public final class RunAllProofsTestUnit implements Serializable {
     public int getTotalNumTests() {
         return this.testFiles.size();
     }
+
+    public boolean isResetEachTest() {
+        return settings.isResetEachTest();
+    }
 }

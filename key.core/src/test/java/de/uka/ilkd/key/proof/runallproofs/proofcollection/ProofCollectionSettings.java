@@ -99,6 +99,8 @@ public class ProofCollectionSettings implements Serializable {
         SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableMap(tmp);
     }
 
+    private boolean resetEachTest;
+
     /**
      * Creates a {@link ProofCollectionSettings} object from the specified
      * parameters with no parent
@@ -401,5 +403,13 @@ public class ProofCollectionSettings implements Serializable {
 
     public ProofCollectionSettings setDirectory(String s) {
         return set(DIRECTORY, s);
+    }
+
+    public boolean isResetEachTest() {
+        return resetEachTest;
+    }
+
+    public void setResetEachTest(boolean resetEachTest) {
+        this.resetEachTest = resetEachTest;
     }
 }

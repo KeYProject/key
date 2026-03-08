@@ -81,6 +81,10 @@ public final class ProofCollection {
 
     public GroupedProofCollectionUnit group(String name) {
         var settings = new ProofCollectionSettings(this.settings);
+        return group(name, settings);
+    }
+
+    public GroupedProofCollectionUnit group(String name, ProofCollectionSettings settings) {
         var unit = new GroupedProofCollectionUnit(name, settings);
         units.add(unit);
         return unit;

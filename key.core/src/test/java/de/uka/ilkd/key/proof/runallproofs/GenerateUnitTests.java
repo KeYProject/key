@@ -84,6 +84,8 @@ public class GenerateUnitTests {
                     this.localSettings =  "$localSettings";
                   }
 
+                  $killSwitch
+    
                   $timeout
                   $methods
                 }
@@ -123,6 +125,9 @@ public class GenerateUnitTests {
         vars.put("localSettings",
             (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
                     .replace("\n", "\\\\n"));
+        if(unit.isResetEachTest()) {
+            vars.put("killSwitch", "@BeforeEach void killInitConfig() { de.uka.ilkd.key.proof.init.BaseConfigCache.reset(); }");
+        }
 
         StringBuilder methods = new StringBuilder();
         Set<String> usedMethodNames = new TreeSet<>();

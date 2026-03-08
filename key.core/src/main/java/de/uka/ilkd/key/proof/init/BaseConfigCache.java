@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Mattias Ulbrich
  * @see ProblemInitializer
  */
-class BaseConfigCache {
+public class BaseConfigCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfigCache.class);
 
@@ -45,10 +45,10 @@ class BaseConfigCache {
         "Placeholder for reading REDUX classes".getBytes();
 
     /** The cached instance */
-    private static InitConfig baseInputConfig;
+    private static @Nullable InitConfig baseInputConfig;
 
     /** The digest of the classpath that was used to create the cached instance */
-    private static String baseInputConfigHash;
+    private static String baseInputConfigHash = "";
 
     private BaseConfigCache() {
         // prevent instantiation
@@ -182,5 +182,10 @@ class BaseConfigCache {
     public static void setBaseInputConfig(@NonNull InitConfig config, String inputDigest) {
         baseInputConfig = config;
         baseInputConfigHash = inputDigest;
+    }
+
+    public static void reset() {
+        baseInputConfig = null;
+        baseInputConfigHash = "";
     }
 }

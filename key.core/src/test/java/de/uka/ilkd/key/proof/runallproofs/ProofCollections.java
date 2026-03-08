@@ -793,7 +793,9 @@ public class ProofCollections {
 
 
         // Permission heap problems:
-        g = c.group("permissionHeap");
+        var pHSettings = new ProofCollectionSettings(settings);
+        settings.setResetEachTest(true);
+        g = c.group("permissionHeap", pHSettings);
         g.provable("heap/permissions/permissions_method0.key");
         g.provable("heap/permissions/permissions_method1.key");
         g.provable("heap/permissions/permissions_method3.key");
