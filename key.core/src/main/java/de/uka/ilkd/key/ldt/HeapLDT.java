@@ -409,7 +409,17 @@ public final class HeapLDT extends LDT {
             throw new IllegalArgumentException("%s is an array length".formatted(fieldPV));
         }
 
-        final Name name = new Name(getFieldSymbolName(fieldPV));
+        String nameString = getFieldSymbolName(fieldPV);
+        if (fieldPV.isModel()) {
+            assert nameString.contains("::#");
+            nameString = nameString.replace("::#", "::");
+            // HACK: what is the naming convention for implicit model fields
+            // Further: Shouldn't a Transformer insert the invariant model field earlier, so that we
+            // do not need
+            // the methods {@link JavaInfo#getInvProgramVar} and {@link
+            // JavaInfo#getInvFreeProgramVar}
+        }
+        final Name name = new Name(nameString);
         Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf(JavaDLFieldNames.SEPARATOR);

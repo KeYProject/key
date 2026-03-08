@@ -1217,9 +1217,9 @@ public final class JavaInfo {
                 || inv.getHeapCount(services) != HeapContext.getModifiableHeaps(services, false)
                         .size()) {
             inv = (ObserverFunction) services.getNamespaces().functions()
-                    .lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
+                    .lookup(ObserverFunction.createName("<$inv>", getJavaLangObject()));
             if (inv == null) {
-                inv = new ObserverFunction("<inv>", JavaDLTheory.FORMULA, null,
+                inv = new ObserverFunction("<$inv>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
                     false, new ImmutableArray<>(),
                     HeapContext.getModifiableHeaps(services, false).size(),
@@ -1238,7 +1238,7 @@ public final class JavaInfo {
      */
     public ProgramVariable getInvProgramVar() {
         if (invProgVar == null) {
-            ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
+            ProgramElementName pen = new ProgramElementName("<$inv>", "java.lang.Object");
             invProgVar =
                 new LocationVariable(pen, getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
                     getJavaLangObject(), false, true);
@@ -1256,9 +1256,9 @@ public final class JavaInfo {
         if (invFree == null || invFree.getHeapCount(services) != HeapContext
                 .getModifiableHeaps(services, false).size()) {
             invFree = (ObserverFunction) services.getNamespaces().functions()
-                    .lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
+                    .lookup(ObserverFunction.createName("<$inv_free>", getJavaLangObject()));
             if (invFree == null) {
-                invFree = new ObserverFunction("<inv_free>", JavaDLTheory.FORMULA, null,
+                invFree = new ObserverFunction("<$inv_free>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
                     false, new ImmutableArray<>(),
                     HeapContext.getModifiableHeaps(services, false).size(),
@@ -1278,7 +1278,7 @@ public final class JavaInfo {
      */
     public ProgramVariable getFreeInvProgramVar() {
         if (invFreeProgVar == null) {
-            ProgramElementName pen = new ProgramElementName("<inv_free>", "java.lang.Object");
+            ProgramElementName pen = new ProgramElementName("<$inv_free>", "java.lang.Object");
             invFreeProgVar = new LocationVariable(pen,
                 getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN), getJavaLangObject(),
                 false, true);
