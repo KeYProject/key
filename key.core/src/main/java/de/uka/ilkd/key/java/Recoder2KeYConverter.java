@@ -1281,6 +1281,7 @@ public class Recoder2KeYConverter {
                 Type recoderType =
                     (getServiceConfiguration().getSourceInfo()).getType(recoderVarSpec);
                 final ClassType recContainingClassType = recoderVarSpec.getContainingClassType();
+
                 final ProgramElementName pen =
                     new ProgramElementName(makeAdmissibleName(recoderVarSpec.getName()),
                         makeAdmissibleName(recContainingClassType.getFullName()));

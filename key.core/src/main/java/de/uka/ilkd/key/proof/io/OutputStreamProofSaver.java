@@ -44,7 +44,6 @@ import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Modality;
@@ -61,6 +60,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -680,7 +680,8 @@ public class OutputStreamProofSaver {
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
-        for (final ImmutableMapEntry<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> pair : inst.interesting()) {
+        for (final ImmutableMapEntry<@NonNull SchemaVariable, @NonNull InstantiationEntry<?>> pair : inst
+                .interesting()) {
             final SchemaVariable var = pair.key();
 
             final Object value = pair.value().getInstantiation();
