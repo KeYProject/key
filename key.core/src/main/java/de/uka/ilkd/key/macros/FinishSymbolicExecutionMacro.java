@@ -6,13 +6,14 @@ package de.uka.ilkd.key.macros;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,7 +21,8 @@ import org.jspecify.annotations.NonNull;
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
  * more modality on the sequent.
  * <p>
- * This is done by implementing a delegation {@link Strategy} which assigns to any rule application
+ * This is done by implementing a delegation {@link JavaStrategy} which assigns to any rule
+ * application
  * infinite costs if there is no modality on the sequent.
  *
  * @author mattias ulbrich

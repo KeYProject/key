@@ -70,7 +70,7 @@ public class AntecTacletExecutor extends FindTacletExecutor {
      *        match took place
      * @param matchCond the {@link MatchResultInfo} with all required instantiations
      * @param goal the Goal where the taclet is applied to
-     * @param ruleApp the {@link RuleApp} (a TacletApp) describing the current ongoing taclet
+     * @param ruleApp the {@link RuleApp} (a ITacletApp) describing the current ongoing taclet
      *        application
      * @param services the {@link Services} encapsulating all Java model information
      */

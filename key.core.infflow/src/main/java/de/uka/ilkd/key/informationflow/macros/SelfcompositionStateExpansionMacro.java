@@ -12,10 +12,7 @@ import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -65,7 +62,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+    protected org.key_project.prover.strategy.Strategy<@NonNull Goal> createStrategy(Proof proof,
             PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
@@ -113,7 +110,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      * This strategy accepts all rule apps for which the rule name is in the admitted set or has
      * INF_FLOW_UNFOLD_PREFIX as a prefix and rejects everything else.
      */
-    private class SelfCompExpansionStrategy implements Strategy<Goal> {
+    private class SelfCompExpansionStrategy implements JavaStrategy {
 
         private final Name NAME = new Name(
             SelfcompositionStateExpansionMacro.SelfCompExpansionStrategy.class.getSimpleName());
@@ -136,10 +133,10 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
-                JavaCardDLStrategyFactory strategyFactory = new JavaCardDLStrategyFactory();
-                Strategy<@NonNull Goal> javaDlStrategy =
+                ModularJavaDLStrategyFactory strategyFactory = new ModularJavaDLStrategyFactory();
+                org.key_project.prover.strategy.Strategy<@NonNull Goal> dlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
-                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal, mState);
+                RuleAppCost costs = dlStrategy.computeCost(ruleApp, pio, goal, mState);
                 if ("orLeft".equals(name)) {
                     costs = costs.add(NumberRuleAppCost.create(100));
                 }
@@ -157,7 +154,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
+                org.key_project.prover.strategy.RuleAppCostCollector collector) {
         }
 
         @Override

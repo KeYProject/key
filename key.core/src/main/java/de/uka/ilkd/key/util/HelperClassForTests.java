@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableList;
@@ -138,7 +138,7 @@ public class HelperClassForTests {
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
 
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
         }
     }

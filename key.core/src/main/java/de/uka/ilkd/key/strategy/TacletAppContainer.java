@@ -132,7 +132,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         @SuppressWarnings("unchecked")
         final ImmutableList<RuleAppContainer>[] resA = new ImmutableList[] { targetList };
 
-        final RuleAppCostCollector collector = (newApp, cost) -> {
+        final org.key_project.prover.strategy.RuleAppCostCollector collector = (newApp, cost) -> {
             if (cost instanceof TopRuleAppCost) {
                 return;
             }
@@ -214,7 +214,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create containers for FindTaclets or NoFindTaclets.
      *
      * @param p_app if <code>p_pio</code> is null, <code>p_app</code> has to be a
-     *        <code>TacletApp</code> for a <code>NoFindTaclet</code>, otherwise for a
+     *        <code>ITacletApp</code> for a <code>NoFindTaclet</code>, otherwise for a
      *        <code>FindTaclet</code>.
      * @return list of containers for currently applicable TacletApps, the cost may be an instance
      *         of <code>TopRuleAppCost</code>.

@@ -9,8 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.wd.*;
 import de.uka.ilkd.key.wd.po.*;
 
@@ -18,6 +17,8 @@ import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleAppCostCollector;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -95,7 +96,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name is a Well-Definedness rule and
      * rejects everything else.
      */
-    private static class WellDefinednessStrategy implements Strategy<Goal> {
+    private static class WellDefinednessStrategy implements JavaStrategy {
 
         private static final Name NAME = new Name(WellDefinednessStrategy.class.getSimpleName());
 

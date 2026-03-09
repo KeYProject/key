@@ -355,8 +355,8 @@ public class TestApplyTaclet {
      * proof=new Proof(); proof.setRoot(new Node(proof, initSeq)); IList<Goal>
      * goals=ImmSLList.<Goal>nil(); Goal goal=new Goal(proof.root(),new RuleAppIndex(index));
      * goals=goals.prepend(goal); while (goals.size()!=0) { SequentFormula cfma=null; SequentFormula
-     * userCfma=null; // in the real system the //user would select this IList<TacletApp>
-     * rapplist=ImmSLList.<TacletApp>nil(); out="\n"+out+("Goals: "+goals+"\n"); goal=goals.head();
+     * userCfma=null; // in the real system the //user would select this IList<ITacletApp>
+     * rapplist=ImmSLList.<ITacletApp>nil(); out="\n"+out+("Goals: "+goals+"\n"); goal=goals.head();
      * Iterator<SequentFormula> it=goal.node().sequent().antecedent().iterator(); while
      * (it.hasNext()) { userCfma=it.next(); rapplist=rapplist.prepend(goal.ruleAppIndex().
      * getTacletAppAtAndBelow(TacletFilter.TRUE, new PosInOccurrence(userCfma, PosInTerm.TOP_LEVEL,
@@ -393,7 +393,7 @@ public class TestApplyTaclet {
     @Test
     public void testIncompleteNoFindTacletApp() {
         NoPosTacletApp cut = TacletForTests.getRules().lookup("TestApplyTaclet_cut");
-        assertFalse(cut.complete(), "TacletApp should not be complete, as b is not instantiated");
+        assertFalse(cut.complete(), "ITacletApp should not be complete, as b is not instantiated");
         SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
         assertTrue(cut.uninstantiatedVars().contains(b),
             "b should be in the set of not instantiated SVs");
@@ -403,7 +403,7 @@ public class TestApplyTaclet {
     public void testIncompleteSuccTacletApp() {
         TacletApp orright = TacletForTests.getRules().lookup("or_right");
         assertFalse(orright.complete(),
-            "TacletApp should not be complete, as SVs are not instantiated");
+            "ITacletApp should not be complete, as SVs are not instantiated");
 
         Services services = TacletForTests.services();
         SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
@@ -413,14 +413,14 @@ public class TestApplyTaclet {
             "b and c should be in the set of not instantiated SVs");
         orright = orright.addInstantiation(b, TacletForTests.parseTerm("A"), false, services);
         assertFalse(orright.complete(),
-            "TacletApp should not be complete, as B is not instantiated");
+            "ITacletApp should not be complete, as B is not instantiated");
         orright = orright.addInstantiation(c, TacletForTests.parseTerm("B"), false, services);
-        assertFalse(orright.complete(), "TacletApp should not be complete, as Position unknown");
+        assertFalse(orright.complete(), "ITacletApp should not be complete, as Position unknown");
         Sequent seq = proof[0].root().sequent();
         orright = orright.setPosInOccurrence(
             new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false), services);
         assertTrue(orright.complete(),
-            "TacletApp should now be complete with Position set and SVs " + "instantiated");
+            "ITacletApp should now be complete with Position set and SVs " + "instantiated");
     }
 
 

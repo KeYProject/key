@@ -53,7 +53,7 @@ import org.jspecify.annotations.Nullable;
  * The find part of a taclet is used to attached the rule to a term in the sequent of the current
  * goal. Therefore the term of the sequent has to match the schema as found in the taclet's find
  * part. The taclet is then attached to this term, more precise not the taclet itself, but an
- * application object of this taclet (see {@link TacletApp TacletApp}. When
+ * application object of this taclet (see {@link TacletApp ITacletApp}. When
  * this attached taclet application object is applied, the new goals are constructed as described by
  * the goal descriptions. For example <br>
  * </br>
@@ -75,7 +75,7 @@ import org.jspecify.annotations.Nullable;
  * looking where it can be applied, these tasks have to be done in advance. For example by one of
  * the following classes {@link de.uka.ilkd.key.proof.RuleAppIndex RuleAppIndex} or
  * {@link de.uka.ilkd.key.proof.TacletAppIndex TacletAppIndex} or
- * {@link TacletApp TacletApp}
+ * {@link TacletApp ITacletApp}
  * </p>
  */
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
