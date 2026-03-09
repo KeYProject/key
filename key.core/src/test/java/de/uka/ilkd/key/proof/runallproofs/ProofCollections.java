@@ -793,15 +793,16 @@ public class ProofCollections {
 
 
         // Permission heap problems:
-        var pHSettings = new ProofCollectionSettings(settings);
-        settings.setResetEachTest(true);
-        g = c.group("permissionHeap", pHSettings);
+        //var pHSettings = new ProofCollectionSettings(settings);
+        //settings.setResetEachTest(true);
+        g = c.group("permissionHeap1");
         g.provable("heap/permissions/permissions_method0.key");
         g.provable("heap/permissions/permissions_method1.key");
         g.provable("heap/permissions/permissions_method3.key");
         g.provable("heap/permissions/permissions_setAB.key");
         g.provable("heap/permissions/permissionProperties.key");
 
+        g = c.group("permissionHeap2");
         g.provable("heap/permissions/threads/AFilter_AFilter.key");
         g.provable("heap/permissions/threads/AFilter_initPost_accessible.key");
         g.provable("heap/permissions/threads/AFilter_inv_accessible1.key");
@@ -815,6 +816,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/AFilter_stateInv_accessible.key");
         g.provable("heap/permissions/threads/AFilter_staticPermissions_accessible.key");
         g.provable("heap/permissions/threads/AFilter_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap3");
         g.provable("heap/permissions/threads/BFilter_BFilter.key");
         g.provable("heap/permissions/threads/BFilter_initPost_accessible.key");
         g.provable("heap/permissions/threads/BFilter_inv_accessible1.key");
@@ -828,6 +831,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/BFilter_stateInv_accessible.key");
         g.provable("heap/permissions/threads/BFilter_staticPermissions_accessible.key");
         g.provable("heap/permissions/threads/BFilter_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap4");
         g.provable("heap/permissions/threads/Fib_Fib.key");
         g.provable("heap/permissions/threads/Fib_initPost_accessible.key");
         g.provable("heap/permissions/threads/Fib_inv1_accessible.key");
@@ -839,6 +844,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/Fib_startTransfer_accessible.key");
         g.provable("heap/permissions/threads/Fib_startTransfer_contract.key");
         g.provable("heap/permissions/threads/Fib_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap5");
         g.provable("heap/permissions/threads/Plotter_initPost_accessible.key");
         g.provable("heap/permissions/threads/Plotter_inv_accessible1.key");
         g.provable("heap/permissions/threads/Plotter_inv_accessible2.key");
@@ -849,6 +856,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/Plotter_stateInv_accessible.key");
         g.provable("heap/permissions/threads/Plotter_staticPermissions_accessible.key");
         g.provable("heap/permissions/threads/Plotter_workingPermissions_accessible.key");
+
+        g = c.group("permissionHeap6");
         g.provable("heap/permissions/threads/Sampler_initPost_accessible.key");
         g.provable("heap/permissions/threads/Sampler_inv_accessible1.key");
         g.provable("heap/permissions/threads/Sampler_inv_accessible2.key");
@@ -856,6 +865,8 @@ public class ProofCollections {
         g.provable("heap/permissions/threads/Sampler_joinTransfer_contract.key");
         g.provable("heap/permissions/threads/Sampler_postJoin_accessible.key");
         g.provable("heap/permissions/threads/Sampler_preStart_accessible.key");
+
+        g = c.group("permissionHeap7");
         g.provable("heap/permissions/threads/Sampler_run.key");
         g.provable("heap/permissions/threads/Sampler_Sampler.key");
         g.provable("heap/permissions/threads/Sampler_startTransfer_accessible.key");
