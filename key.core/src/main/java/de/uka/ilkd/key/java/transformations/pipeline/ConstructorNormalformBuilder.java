@@ -199,12 +199,6 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                     // of the same outer class (JLS). If so, add $ENCLOSING_THIS to the parameters
                     // else not!
 
-                    var type =
-                        ((ExplicitConstructorInvocationStmt) first).resolve().declaringType();
-                    // var outer = JavaParserFacade.get().getTypeDeclaration(enclosingClass);
-                    // var outerClass = outer.getClassName();
-                    var className = type.getClassName();
-
                     // var container = type.containerType();//?
                     var expr = new MethodCallExpr(new SuperExpr(),
                         null,

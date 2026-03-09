@@ -7,7 +7,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
+import com.github.javaparser.ast.body.TypeDeclaration;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 
@@ -22,10 +24,10 @@ import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -146,7 +148,7 @@ public class JavaParserFactory {
          * rebuilds the type solver.
          */
         void rebuild() {
-            var ct = new CombinedTypeSolver();
+            CombinedTypeSolver ct = new CombinedTypeSolver();
             ct.add(new LogicalTypeSolver());
             ct.add(new ListTypeSolver(bootClasses));
             ct.add(new ListTypeSolver(libraryClasses));
@@ -232,17 +234,18 @@ public class JavaParserFactory {
         private SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveTypeUncached(
                 String name) {
             for (CompilationUnit unit : units) {
-                final var primaryType = unit.getPrimaryType();
+                final Optional<TypeDeclaration<?>> primaryType = unit.getPrimaryType();
                 if (primaryType.isPresent()) {
-                    var cname = primaryType.get().getFullyQualifiedName();
+                    Optional<String> cname = primaryType.get().getFullyQualifiedName();
                     if (cname.isPresent() && cname.get().equals(name)) {
-                        return SymbolReference
-                                .solved(JavaParserFacade.get(this)
-                                        .getTypeDeclaration(primaryType.get()));
+                        TypeDeclaration<?> typeDeclaration = primaryType.get();
+                        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(getRoot());
+                        ResolvedReferenceTypeDeclaration solved = symbolSolver.toTypeDeclaration(typeDeclaration);
+                        return SymbolReference.solved(solved);
                     }
                 }
 
-                var packageName =
+                String packageName =
                     unit.getPackageDeclaration().map(p -> p.getName().asString()).orElse("");
                 if (!name.startsWith(packageName)) {
                     continue;
@@ -252,11 +255,12 @@ public class JavaParserFactory {
                 int packageNameStart = packageName.isEmpty() ? 0 : packageName.length() + 1;
                 String localName =
                     name.substring(Math.min(name.length(), packageNameStart));
-                var astTypeDeclaration = Navigator.findType(unit, localName);
+                Optional<TypeDeclaration<?>> astTypeDeclaration = Navigator.findType(unit, localName);
                 if (astTypeDeclaration.isPresent()) {
-                    return SymbolReference
-                            .solved(JavaParserFacade.get(this)
-                                    .getTypeDeclaration(astTypeDeclaration.get()));
+                    final var typeDeclaration = astTypeDeclaration.get();
+                    JavaSymbolSolver symbolSolver = new JavaSymbolSolver(getRoot());
+                    ResolvedReferenceTypeDeclaration solved = symbolSolver.toTypeDeclaration(typeDeclaration);
+                    return SymbolReference.solved(solved);
                 }
             }
             return SymbolReference.unsolved();
@@ -281,7 +285,7 @@ public class JavaParserFactory {
         public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
             if (name.contains("\\")) { // e.g., java.math.\bigint.
                 name = "\\" + name.replaceFirst(".*\\\\", "");
-                var kjt = services.getJavaInfo().getPrimitiveKeYJavaType(name);
+                KeYJavaType kjt = services.getJavaInfo().getPrimitiveKeYJavaType(name);
                 if (kjt != null) {
                     return SymbolReference.solved(new ResolvedLogicalType(kjt));
                 }
