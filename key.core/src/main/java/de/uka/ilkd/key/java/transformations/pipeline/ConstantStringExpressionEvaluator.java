@@ -887,7 +887,8 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
         }
 
         public void defaultAction(Node n, Object arg) {
-            if (n instanceof Expression e) {
+            if (n instanceof StringLiteralExpr || n instanceof BinaryExpr) {
+                final Expression e = (Expression) n;
                 ConstantExpressionEvaluator cee = services.getConstantEvaluator();
                 try {
                     var expType = e.calculateResolvedType();
@@ -897,13 +898,15 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
                                 "java.lang.String")) {
                         try {
                             var expression = cee.evaluate(e);
-                            e.replace(expression);
+                            if (e != expression) {
+                                e.replace(expression);
+                            }
                         } catch (EvaluationException t) {
                             //
                         }
                     }
                 } catch (Throwable exc) {
-                    // hapens in taclets
+                    // happens in taclets
                 }
             }
         }
