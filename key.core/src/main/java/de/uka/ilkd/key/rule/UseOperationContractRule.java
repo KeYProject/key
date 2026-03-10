@@ -158,8 +158,14 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             for (Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
+
+            // null should only happen for .key files with a problem section or tests
+            final TypeReference invocationContext = ec == null || ec.getTypeReference() == null
+                    ? services.getJavaInfo().getDefaultExecutionContext().getTypeReference()
+                    : ec.getTypeReference();
+
             result = services.getJavaInfo().getConstructor(staticType, sig,
-                ec.getMethodContext().getContainerType());
+                invocationContext.getKeYJavaType());
             assert result != null;
         }
         return result;
