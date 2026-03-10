@@ -1295,14 +1295,14 @@ public final class JavaInfo {
         // only functions from namespace here. No lazy creation to ensure that all proofs of the
         // same proof environment have the same <$inv> symbols.
         ObserverFunction inv = staticInvs.get(target);
-        if (inv == null) {
+        if (inv == null || inv.argSorts().size() != 1) {
             inv = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<$inv>", target));
-            if (inv == null) {
+            if (inv == null || inv.argSorts().size() != 1) {
                 inv = new ObserverFunction("<$inv>", JavaDLTheory.FORMULA, null,
-                    services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                    new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
-                    1);
+                        services.getTypeConverter().getHeapLDT().targetSort(), target, true,
+                        new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
+                        1);
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
