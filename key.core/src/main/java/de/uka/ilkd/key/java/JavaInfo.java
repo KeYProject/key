@@ -15,11 +15,10 @@ import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
@@ -82,19 +81,9 @@ public final class JavaInfo {
     private LocationVariable length;
 
     /**
-     * caches the program variable for {@code <inv>}
-     */
-    private ProgramVariable invProgVar;
-
-    /**
      * caches the observer for {@code <inv>}
      */
     private ObserverFunction inv;
-
-    /**
-     * caches the program variable for {@code <inv_free>}
-     */
-    private ProgramVariable invFreeProgVar;
 
     /**
      * caches the observer for {@code <inv_free>}
@@ -907,8 +896,7 @@ public final class JavaInfo {
                 return res;
             } else {
                 for (Field field : kpmi.getAllFieldsLocallyDeclaredIn(classType)) {
-                    if (field.getName().equals(name)
-                            || field.getProgramName().equals(name)) {
+                    if (field.getName().equals(name) || field.getProgramName().equals(name)) {
                         return (ProgramVariable) field.getProgramVariable();
                     }
                 }
@@ -1205,8 +1193,6 @@ public final class JavaInfo {
     /**
      * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of
      * an object.
-     *
-     * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
         // TODO: Create function when source code is parsed and register it in namespace. Return
@@ -1216,75 +1202,32 @@ public final class JavaInfo {
         if (inv == null
                 || inv.getHeapCount(services) != HeapContext.getModifiableHeaps(services, false)
                         .size()) {
-            inv = (ObserverFunction) services.getNamespaces().functions()
-                    .lookup(ObserverFunction.createName("<$inv>", getJavaLangObject()));
-            if (inv == null) {
-                inv = new ObserverFunction("<$inv>", JavaDLTheory.FORMULA, null,
-                    services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                    false, new ImmutableArray<>(),
-                    HeapContext.getModifiableHeaps(services, false).size(),
-                    1);
-                services.getNamespaces().functions().add(inv);
-            }
+            inv =
+                (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                    (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
+                        PipelineConstants.IMPLICIT_OBJECT_INVARIANT, getJavaLangObject()),
+                    services);
         }
         return inv;
     }
 
-    /**
-     * Returns the special program variable symbol <code>&lt;inv&gt;</code> which stands for the
-     * class invariant of an object.
-     *
-     * @see #getInv()
-     */
-    public ProgramVariable getInvProgramVar() {
-        if (invProgVar == null) {
-            ProgramElementName pen = new ProgramElementName("<$inv>", "java.lang.Object");
-            invProgVar =
-                new LocationVariable(pen, getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
-                    getJavaLangObject(), false, true);
-        }
-        return invProgVar;
-    }
 
     /**
      * Returns the special symbol <code>&lt;inv_free&gt;</code> which stands for the free
      * class invariant of an object.
-     *
-     * @see #getInvProgramVar()
      */
     public IObserverFunction getInvFree() {
         if (invFree == null || invFree.getHeapCount(services) != HeapContext
                 .getModifiableHeaps(services, false).size()) {
-            invFree = (ObserverFunction) services.getNamespaces().functions()
-                    .lookup(ObserverFunction.createName("<$inv_free>", getJavaLangObject()));
-            if (invFree == null) {
-                invFree = new ObserverFunction("<$inv_free>", JavaDLTheory.FORMULA, null,
-                    services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                    false, new ImmutableArray<>(),
-                    HeapContext.getModifiableHeaps(services, false).size(),
-                    1);
-                services.getNamespaces().functions().add(invFree);
-            }
+            invFree =
+                (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                    (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
+                        PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT, getJavaLangObject()),
+                    services);
         }
         return invFree;
     }
 
-    /**
-     * Returns the special program variable symbol <code>&lt;inv_free&gt;</code> which stands for
-     * the free class
-     * invariant of an object.
-     *
-     * @see #getInvFree()
-     */
-    public ProgramVariable getFreeInvProgramVar() {
-        if (invFreeProgVar == null) {
-            ProgramElementName pen = new ProgramElementName("<$inv_free>", "java.lang.Object");
-            invFreeProgVar = new LocationVariable(pen,
-                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN), getJavaLangObject(),
-                false, true);
-        }
-        return invFreeProgVar;
-    }
 
     /**
      * Returns the special symbol <code>&lt;$inv&gt;</code> which stands for the static
@@ -1295,16 +1238,11 @@ public final class JavaInfo {
         // only functions from namespace here. No lazy creation to ensure that all proofs of the
         // same proof environment have the same <$inv> symbols.
         ObserverFunction inv = staticInvs.get(target);
-        if (inv == null || inv.argSorts().size() != 1) {
-            inv = (ObserverFunction) services.getNamespaces().functions()
-                    .lookup(ObserverFunction.createName("<$inv>", target));
-            if (inv == null || inv.argSorts().size() != 1) {
-                inv = new ObserverFunction("<$inv>", JavaDLTheory.FORMULA, null,
-                        services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                        new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
-                        1);
-                services.getNamespaces().functions().add(inv);
-            }
+        if (inv == null) {
+            inv = (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
+                    PipelineConstants.IMPLICIT_CLASS_INVARIANT, target),
+                services);
             staticInvs.put(target, inv);
         }
         return inv;
@@ -1317,15 +1255,10 @@ public final class JavaInfo {
     public IObserverFunction getStaticInvFree(KeYJavaType target) {
         ObserverFunction inv = staticFreeInvs.get(target);
         if (inv == null) {
-            inv = (ObserverFunction) services.getNamespaces().functions()
-                    .lookup(ObserverFunction.createName("<$inv_free>", target));
-            if (inv == null) {
-                inv = new ObserverFunction("<$inv_free>", JavaDLTheory.FORMULA, null,
-                    services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                    new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
-                    1);
-                services.getNamespaces().functions().add(inv);
-            }
+            inv = (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
+                    PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT, target),
+                services);
             staticFreeInvs.put(target, inv);
         }
         return inv;

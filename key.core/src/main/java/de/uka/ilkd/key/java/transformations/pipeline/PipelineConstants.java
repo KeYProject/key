@@ -27,4 +27,10 @@ public interface PipelineConstants {
     String IMPLICIT_OBJECT_PREPARE = IMPLICIT_NAME_PREFIX + "prepare";
     String IMPLICIT_OBJECT_PREPARE_ENTER = IMPLICIT_NAME_PREFIX + "prepareEnter";
     String IMPLICIT_INSTANCE_ALLOCATE = IMPLICIT_NAME_PREFIX + "allocate";
+
+    // model fields
+    String IMPLICIT_OBJECT_INVARIANT = "<" + IMPLICIT_NAME_PREFIX + "inv" + ">";
+    String IMPLICIT_OBJECT_FREE_INVARIANT = "<" + IMPLICIT_NAME_PREFIX + "inv_free" + ">";
+    String IMPLICIT_CLASS_INVARIANT = "<" + IMPLICIT_NAME_PREFIX + "staticInv" + ">";
+    String IMPLICIT_CLASS_FREE_INVARIANT = "<" + IMPLICIT_NAME_PREFIX + "staticInv_free" + ">";
 }

@@ -59,8 +59,9 @@ public class ImplicitFieldAdder extends JavaTransformer {
         super(services);
     }
 
+
     /**
-     * creates an implicit field of the given type and name
+     * creates an implicit non-model field of the given type and name
      *
      * @param typeName
      *        the name of the type of the new field to create
@@ -73,11 +74,31 @@ public class ImplicitFieldAdder extends JavaTransformer {
      */
     public static FieldDeclaration createImplicitField(
             Type typeName, String fieldName, boolean isStatic, boolean isPrivate) {
-        return createImplicitField(typeName, fieldName, isStatic, isPrivate, false);
+        return createImplicitField(typeName, fieldName, isStatic, isPrivate, false, false);
+    }
+
+    /**
+     * creates an implicit field of the given type and name
+     *
+     * @param typeName
+     *        the name of the type of the new field to create
+     * @param fieldName
+     *        the name of the field
+     * @param isStatic
+     *        a boolean that is true if the field has to be
+     *        created as static (class) field
+     * @param isModel
+     *        a boolean that is true if the field is a model field
+     * @return the new created field declaration
+     */
+    public static FieldDeclaration createImplicitField(
+            Type typeName, String fieldName, boolean isStatic, boolean isPrivate, boolean isModel) {
+        return createImplicitField(typeName, fieldName, isStatic, isPrivate, false, isModel);
     }
 
     public static FieldDeclaration createImplicitField(
-            Type type, String fieldName, boolean isStatic, boolean isPrivate, boolean isFinal) {
+            Type type, String fieldName, boolean isStatic, boolean isPrivate, boolean isFinal,
+            boolean isModel) {
         NodeList<Modifier> modifiers = new NodeList<>();
         if (isStatic) {
             modifiers.add(new Modifier(Modifier.DefaultKeyword.STATIC));
@@ -90,6 +111,10 @@ public class ImplicitFieldAdder extends JavaTransformer {
 
         if (isFinal) {
             modifiers.add(new Modifier(Modifier.DefaultKeyword.FINAL));
+        }
+
+        if (isModel) {
+            modifiers.add(new Modifier(Modifier.DefaultKeyword.JML_MODEL));
         }
 
         VariableDeclarator variable = new VariableDeclarator(type, fieldName);
@@ -114,6 +139,12 @@ public class ImplicitFieldAdder extends JavaTransformer {
             PipelineConstants.IMPLICIT_TRANSIENT, false, false));
         td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
             PipelineConstants.IMPLICIT_TRANSACTION_UPDATED, false, false));
+
+        // boolean model field
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+            PipelineConstants.IMPLICIT_OBJECT_INVARIANT, false, false, true));
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+            PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT, false, false, true));
     }
 
 
@@ -150,6 +181,13 @@ public class ImplicitFieldAdder extends JavaTransformer {
             td.addField(new ClassOrInterfaceType(null, id),
                 PipelineConstants.IMPLICIT_ENCLOSING_THIS, Modifier.DefaultKeyword.PRIVATE);
         }
+
+        // boolean model field
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+            PipelineConstants.IMPLICIT_CLASS_INVARIANT, true, false, true));
+        td.addMember(createImplicitField(new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+            PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT, true, false, true));
+
     }
 
     protected void addClassInitializerStatusFields(TypeDeclaration<?> td) {

@@ -81,10 +81,10 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         // <inv> and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
-        if (name.equals("<inv>") && receiver.isTerm()) {
+        if (name.equals("<$inv>") && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
-        if (name.equals("<inv_free>") && receiver.isTerm()) {
+        if (name.equals("<$inv_free>") && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
         }
 

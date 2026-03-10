@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.TermServices;
@@ -444,9 +448,26 @@ public final class HeapLDT extends LDT {
                         }
                         heapCount++;
                     }
-                    result = new ObserverFunction(kind.toString(), fieldPV.sort(),
-                        fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
-                        fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
+
+                    final HashSet<String> invariantFieldNames = new HashSet<>();
+                    invariantFieldNames
+                            .addAll(Arrays.asList(PipelineConstants.IMPLICIT_OBJECT_INVARIANT,
+                                PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT,
+                                PipelineConstants.IMPLICIT_CLASS_INVARIANT,
+                                PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT));
+
+                    // special treatment for invariant
+                    if (fieldPV.isModel() &&
+                            invariantFieldNames
+                                    .contains(fieldPV.getProgramElementName().getProgramName())) {
+                        result = new ObserverFunction(kind.toString(), JavaDLTheory.FORMULA,
+                            null, targetSort(), fieldPV.getContainerType(),
+                            fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
+                    } else {
+                        result = new ObserverFunction(kind.toString(), fieldPV.sort(),
+                            fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
+                            fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
+                    }
                 } else {
                     result = new JFunction(name, fieldSort, new Sort[0], null, true);
                 }

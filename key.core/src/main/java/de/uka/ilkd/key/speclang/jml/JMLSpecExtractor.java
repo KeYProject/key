@@ -377,8 +377,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if (!isHelper && pm.getStateCount() > 0 && (!pm.isStatic() || addInvariant)) {
                     // for a static method translate \inv once again, otherwise use
                     // the internal symbol
-                    final String invString = pm.isStatic() ? "\\inv" : "<inv>";
-                    final String invFreeString = pm.isStatic() ? "\\inv_free" : "<inv_free>";
+                    final String invString = pm.isStatic() ? "\\inv" : "<$inv>";
+                    final String invFreeString = pm.isStatic() ? "\\inv_free" : "<$inv_free>";
 
                     KeYJavaType classType = pm.getContainerType();
                     boolean hasFreeInvariant = services.getSpecificationRepository()

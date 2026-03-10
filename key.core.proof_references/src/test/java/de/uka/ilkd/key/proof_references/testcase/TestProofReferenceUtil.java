@@ -39,7 +39,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
             new ExpectedProofReferences(IProofReference.INLINE_METHOD,
                 "UseOperationContractTest::main"),
             new ExpectedProofReferences(IProofReference.USE_CONTRACT,
-                "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result_magic42,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}free post: {heap=true, savedHeap=null}; modifiable: {heap=allLocs, savedHeap=null}; hasModifiable: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
+                "pre: {heap=java.lang.Object::<$inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result_magic42,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<$inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}free post: {heap=true, savedHeap=null}; modifiable: {heap=allLocs, savedHeap=null}; hasModifiable: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
     }
 
     /**
@@ -84,7 +84,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
         doAPITest(TESTCASE_DIRECTORY, "/proofReferences/MethodBodyExpand/MethodBodyExpand.java",
             "MethodBodyExpand", "main", false, null,
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equiv(java.lang.Object::<inv>(heap,self),true)"),
+                "equiv(java.lang.Object::<$inv>(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"),
             new ExpectedProofReferences(IProofReference.CALL_METHOD, "MethodBodyExpand::magic42"),
             new ExpectedProofReferences(IProofReference.INLINE_METHOD,

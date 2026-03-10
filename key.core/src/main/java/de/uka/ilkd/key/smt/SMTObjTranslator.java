@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.op.*;
@@ -1475,7 +1476,11 @@ public class SMTObjTranslator implements SMTTranslator {
                 }
                 function = getCastFunction(source, target);
             }
-        } else if (name.endsWith("::<inv>")) { // TODO: should this be $inv?
+        } else if (name.endsWith("::" + PipelineConstants.IMPLICIT_OBJECT_INVARIANT)) { // is the
+                                                                                        // static
+            // invariant
+            // supposed to
+            // be here?
             if (functions.containsKey(CLASS_INVARIANT)) {
                 function = functions.get(CLASS_INVARIANT);
             } else {

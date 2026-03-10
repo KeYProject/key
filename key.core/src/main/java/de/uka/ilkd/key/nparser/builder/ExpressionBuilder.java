@@ -698,12 +698,6 @@ public class ExpressionBuilder extends DefaultBuilder {
             } catch (Exception ex) {
                 throw new BuildingException(ex);
             }
-        } else if (attributeName.equals("<$inv>")) {
-            // The invariant observer "<$inv>" is implicit and not part of the class declaration
-            // A special case is needed, hence.
-            result = javaInfo.getInvProgramVar();
-        } else if (attributeName.equals("<$inv_free>")) {
-            result = javaInfo.getFreeInvProgramVar();
         } else {
             final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
             if (prefixKJT == null) {

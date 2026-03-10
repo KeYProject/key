@@ -137,7 +137,7 @@ public final class HTMLReport {
             }
         });
 
-        // StringRenderer to escape special HTML chars, for example in java.lang.Object::<inv>
+        // StringRenderer to escape special HTML chars, for example in java.lang.Object::<$inv>
         group.registerRenderer(String.class, new StringRenderer());
         // NumberRenderer to allow for format strings such as %02d
         group.registerRenderer(Number.class, new NumberRenderer());

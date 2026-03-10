@@ -108,7 +108,7 @@ public class BaseConfigCache {
         Path bootclasspath = envInput.readBootClassPath();
         Collection<Path> classpath = envInput.readClassPath();
 
-        if (classpath.isEmpty() && bootclasspath == null) {
+        if ((classpath == null || classpath.isEmpty()) && bootclasspath == null) {
             return VALUE_FOR_EMPTY;
         }
 

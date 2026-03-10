@@ -106,14 +106,14 @@ public abstract class TextualJMLConstruct {
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
             @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
-        if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
+        if (!t.startsWith("<") || t.startsWith("<$inv>") || t.startsWith("<$inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
             l = l.append(ps);
             item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
             return;
         }
         List<String> hs = new ArrayList<>();
-        while (t.startsWith("<") && !t.startsWith("<inv>") && !t.startsWith("<inv_free>")) {
+        while (t.startsWith("<") && !t.startsWith("<$inv>") && !t.startsWith("<$inv_free>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
                 for (String hName : new String[] { heapName.toString(),
                     heapName + "AtPre" }) {

@@ -327,7 +327,7 @@ public class OracleGenerator {
         } else if (name.equals("length")) {
             OracleTerm o = generateOracle(term.sub(0), initialSelect);
             return new OracleConstant(o + ".length", term.sort());
-        } else if (name.endsWith("::<inv>")) {
+        } else if (name.endsWith("::<$inv>")) {
             if (fun instanceof IObserverFunction obs) {
 
                 Sort s = obs.getContainerType().getSort();
