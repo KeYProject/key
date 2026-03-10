@@ -4,12 +4,6 @@ public final class String extends java.lang.Object implements java.io.Serializab
 {
    // public final static java.util.Comparator CASE_INSENSITIVE_ORDER;
 
-   /*@ normal_behavior
-       ensures \result == \dl_seqLen(\dl_strContent(this));
-    */
-   public /*@pure*/ int length();
-
-
    /*@
    public normal_behavior
       requires true;
