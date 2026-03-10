@@ -148,9 +148,11 @@ public final class JavaModel {
     /// directive
     /// if necessary.
     public String asKeyString() {
-        return (bootClassPath != null && !Objects.equals(bootClassPath.toAbsolutePath(), Services.getReduxPath() )
-                ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
-                : "") +
+        return (bootClassPath != null
+                && !Objects.equals(bootClassPath.toAbsolutePath(), Services.getReduxPath())
+                        ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
+                        : "")
+                +
                 (classPath != null && !classPath.isEmpty() ? "\n\\classpath %s;".formatted(
                     classPath.stream().map(IOUtil::safePath)
                             .map("\"%s\""::formatted)

@@ -307,7 +307,7 @@ public final class JMLTransformer extends JavaTransformer {
         // TODO Copy position from textual jml field decl
         var expr = new VariableDeclarationExpr(type, name);
         expr.setModifiers(modifiers);
-        if(decl.getDecl().initialiser()!=null) {
+        if (decl.getDecl().initialiser() != null) {
             var init = decl.getDecl().initialiser().expression().getText();
             expr.getVariables().getFirst().setInitializer(StaticJavaParser.parseExpression(init));
         }

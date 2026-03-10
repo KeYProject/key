@@ -9,14 +9,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import com.github.javaparser.ast.body.TypeDeclaration;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.key.sv.KeyContextStatementBlock;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.resolution.Navigator;
@@ -27,7 +28,6 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -240,7 +240,8 @@ public class JavaParserFactory {
                     if (cname.isPresent() && cname.get().equals(name)) {
                         TypeDeclaration<?> typeDeclaration = primaryType.get();
                         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(getRoot());
-                        ResolvedReferenceTypeDeclaration solved = symbolSolver.toTypeDeclaration(typeDeclaration);
+                        ResolvedReferenceTypeDeclaration solved =
+                            symbolSolver.toTypeDeclaration(typeDeclaration);
                         return SymbolReference.solved(solved);
                     }
                 }
@@ -255,11 +256,13 @@ public class JavaParserFactory {
                 int packageNameStart = packageName.isEmpty() ? 0 : packageName.length() + 1;
                 String localName =
                     name.substring(Math.min(name.length(), packageNameStart));
-                Optional<TypeDeclaration<?>> astTypeDeclaration = Navigator.findType(unit, localName);
+                Optional<TypeDeclaration<?>> astTypeDeclaration =
+                    Navigator.findType(unit, localName);
                 if (astTypeDeclaration.isPresent()) {
                     final var typeDeclaration = astTypeDeclaration.get();
                     JavaSymbolSolver symbolSolver = new JavaSymbolSolver(getRoot());
-                    ResolvedReferenceTypeDeclaration solved = symbolSolver.toTypeDeclaration(typeDeclaration);
+                    ResolvedReferenceTypeDeclaration solved =
+                        symbolSolver.toTypeDeclaration(typeDeclaration);
                     return SymbolReference.solved(solved);
                 }
             }
