@@ -118,14 +118,16 @@ public class KeYProgModelInfo {
     }
 
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
-        var type = new ClassOrInterfaceType(null, shortName);
-        var rt = getCompilationUnit(context).orElseThrow();
+        final ClassOrInterfaceType type = new ClassOrInterfaceType(null, shortName);
+        Node contextTypeDeclaration = getReferenceType(context)
+                .flatMap(ResolvedReferenceType::getTypeDeclaration).orElseThrow().toAst()
+                .orElseThrow();
         try {
-            type.setParentNode(rt);
+            type.setParentNode(contextTypeDeclaration);
             var rtype = type.resolve();
             return typeConverter.getKeYJavaType(rtype);
         } finally {
-            rt.remove(type);
+            contextTypeDeclaration.remove(type);
         }
     }
 
