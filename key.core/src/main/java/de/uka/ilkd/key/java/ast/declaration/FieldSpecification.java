@@ -181,4 +181,19 @@ public class FieldSpecification extends VariableSpecification implements Field {
                 && ((ProgramVariable) programVariable).isImplicit();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        FieldSpecification other = (FieldSpecification) o;
+        if (programVariable instanceof ProgramVariable thisPV) {
+            if (!(other.programVariable instanceof ProgramVariable otherPV) ||
+                    !thisPV.getContainerType().equals(otherPV.getContainerType())) {
+                return false;
+            }
+        }
+        return super.equals(o);
+    }
 }

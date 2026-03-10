@@ -68,4 +68,15 @@ public abstract class Modifier extends JavaProgramElement {
     public SyntaxElement getChild(int n) {
         throw new IndexOutOfBoundsException(getClass() + " " + this + " has no children");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Modifier other = (Modifier) o;
+        return other.getSymbol().equals(getSymbol()) && super.equals(other);
+    }
+
 }

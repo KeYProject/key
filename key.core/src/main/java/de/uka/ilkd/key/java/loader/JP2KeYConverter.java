@@ -650,7 +650,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         try {
             ResolvedValueDeclaration target = n.resolve();
             var rtype = n.calculateResolvedType();
-            var kjt = getKeYJavaType(rtype);
 
             var descriptor = "L%s/%s;".formatted(
                 n.getScope().toString().replace(".", "/"),
@@ -662,8 +661,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 ReferencePrefix prefix = accept(n.getScope());
                 return new FieldReference(pi, c, services.getJavaInfo().getArrayLength(), prefix);
             }
-
-            var containerClass = target.asField().declaringType();
 
             boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
 
@@ -694,6 +691,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var isGhost = fldDecl.hasModifier(JML_GHOST);
 
             final FullVariableDeclarator decl = new FullVariableDeclarator(varDecl,
+                varDecl.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null),
                 fldDecl.isFinal(), fldDecl.isStatic(),
                 isModel, isGhost);
             final ProgramVariable variable = getProgramVariableForFieldSpecification(decl);
@@ -790,7 +788,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             boolean isFinal = n.hasModifier(FINAL) || (isInInterface && !isInstance);
             boolean isModel = n.hasModifier(JML_MODEL);
             boolean isGhost = n.hasModifier(JML_GHOST);
-            var decl = new FullVariableDeclarator(v, isFinal, isStatic, isModel, isGhost);
+            var decl = new FullVariableDeclarator(v,
+                v.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null), isFinal, isStatic,
+                isModel, isGhost);
             final var fs = visitFieldSpecification(decl);
             varsList.add(fs);
             mapping.put(v, fs);
@@ -2250,7 +2250,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private record FullVariableDeclarator(
-            VariableDeclarator decl, boolean isFinal,
+            VariableDeclarator decl, ClassOrInterfaceDeclaration container, boolean isFinal,
             boolean isStatic, boolean isModel, boolean isGhost) {
     }
 
