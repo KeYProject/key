@@ -158,7 +158,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             for (Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
-            result = services.getJavaInfo().getConstructor(staticType, sig);
+            result = services.getJavaInfo().getConstructor(staticType, sig,
+                ec.getMethodContext().getContainerType());
             assert result != null;
         }
         return result;

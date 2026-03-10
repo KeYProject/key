@@ -33,7 +33,9 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.*;
+import com.github.javaparser.resolution.logic.ConstructorResolutionLogic;
 import com.github.javaparser.resolution.logic.MethodResolutionCapability;
 import com.github.javaparser.resolution.logic.MethodResolutionLogic;
 import com.github.javaparser.resolution.model.SymbolReference;
@@ -251,6 +253,7 @@ public class KeYProgModelInfo {
                 // TODO javaparser this node is only returned by
                 // ResolvedReferenceTypeDeclaration::getConstructors
                 // and neither implements hashCode nor equals
+                // and neither implements hashCode nor equals
                 continue;
             }
             var m = mapping.resolvedDeclarationToKeY(decl);
@@ -270,36 +273,60 @@ public class KeYProgModelInfo {
      * @return the most specific constructor declared in the given type
      */
     @Nullable
-    public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature) {
+    public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature,
+            KeYJavaType context,
+            TypeSolver typeSolver) {
         var rt = getJavaParserType(ct).asReferenceType().getTypeDeclaration();
         if (rt.isPresent()) {
             List<ResolvedType> sig = signature.stream().map(this::getJavaParserType).toList();
 
             List<ResolvedConstructorDeclaration> constructors = rt.get().getConstructors();
-            constr: for (var constructor : constructors) {
-                if (sig.size() != constructor.getNumberOfParams()) {
-                    continue;
-                }
 
-                if (sig.isEmpty()) { // fast track for default constructor calls!
-                    var ast = constructor.toAst().get();
-                    return (IProgramMethod) mapping.nodeToKeY(ast);
-                }
+            SymbolReference<ResolvedConstructorDeclaration> constructor =
+                ConstructorResolutionLogic.findMostApplicable(filterVisible(constructors, context),
+                    sig, typeSolver);
+            Optional<ResolvedConstructorDeclaration> resolvedConstructorDeclaration =
+                constructor.getDeclaration();
 
-                // compare types of the parameters
-                List<ResolvedType> types = constructor.formalParameterTypes();
-                for (int i = 0; i < types.size(); i++) {
-                    if (!types.get(i).equals(sig.get(i))) {
-                        break constr;
-                    }
-                }
-                var ast = constructor.toAst().get();
-                return (IProgramMethod) mapping.nodeToKeY(ast);
+
+
+            if (resolvedConstructorDeclaration.isPresent()) {
+                return (IProgramMethod) mapping
+                        .nodeToKeY(resolvedConstructorDeclaration.get().toAst().get());
+            } else {
+                return null;
             }
-            // ((ClassOrInterfaceDeclaration)
-            // rt.get().toAst().get()).getConstructorByParameterTypes()
         }
         return null;
+    }
+
+    private List<ResolvedConstructorDeclaration> filterVisible(
+            List<ResolvedConstructorDeclaration> constructors,
+            KeYJavaType context) {
+        final ResolvedReferenceTypeDeclaration invocationContext =
+            getJavaParserType(context).asReferenceType().getTypeDeclaration().get();
+        ArrayList<ResolvedConstructorDeclaration> result = new ArrayList<>(constructors);
+        for (ResolvedConstructorDeclaration cons : constructors) {
+            ResolvedReferenceTypeDeclaration containerType = cons.declaringType();
+            if (containerType.internalTypes().stream().noneMatch(
+                (internalType) -> internalType.getQualifiedName().equals(context.getFullName()))) {
+                AccessSpecifier constructorVisibility = cons.accessSpecifier();
+                if (constructorVisibility == AccessSpecifier.PRIVATE
+                        && !context.getFullName().equals(containerType.getQualifiedName())) {
+                    result.remove(cons);
+                } else {
+                    boolean samePackage =
+                        containerType.getPackageName().equals(invocationContext.getPackageName());
+                    if (constructorVisibility == AccessSpecifier.PROTECTED
+                            && !containerType.isAssignableBy(invocationContext) && !samePackage) {
+                        result.remove(cons);
+                    } else if (constructorVisibility == AccessSpecifier.NONE && !samePackage) {
+                        result.remove(cons);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**

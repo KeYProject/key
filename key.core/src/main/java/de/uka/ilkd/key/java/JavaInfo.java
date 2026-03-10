@@ -469,8 +469,10 @@ public final class JavaInfo {
         return kpmi.getConstructors(kjt);
     }
 
-    public IProgramMethod getConstructor(KeYJavaType kjt, ImmutableList<KeYJavaType> signature) {
-        return kpmi.getConstructor(kjt, signature);
+    public IProgramMethod getConstructor(KeYJavaType kjt, ImmutableList<KeYJavaType> signature,
+            KeYJavaType invocationContext) {
+        return kpmi.getConstructor(kjt, signature, invocationContext,
+            services.getJavaService().getProgramFactory().getTypeSolver());
     }
 
     /**
