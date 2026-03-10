@@ -57,14 +57,16 @@ public class MatchGenericSortInstruction implements MatchInstruction {
     @Override
     public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
-        if (actualElement instanceof GenericArgument(Sort sort)) {
-            return matchSorts(sort, mc, services);
+        Sort sort;
+        if (actualElement instanceof GenericArgument(Sort s)) {
+            sort = s;
+        } else if (actualElement instanceof QualifierWrapper<?> w
+                && w.getQualifier() instanceof Sort s) {
+            sort = s;
+        } else {
+            return null;
         }
-        if (actualElement instanceof QualifierWrapper<?> w
-                && w.getQualifier() instanceof Sort sort) {
-            return matchSorts(sort, mc, services);
-        }
-        return null;
+        return matchSorts(sort, mc, services);
     }
 
 }
