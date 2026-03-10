@@ -292,7 +292,7 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(StringLiteralExpr n, Void arg) {
-            return n.asString();
+            return '"' + n.asString() + '"';
         }
 
         @Override
