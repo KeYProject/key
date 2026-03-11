@@ -1,6 +1,5 @@
 package object;
 
-
 /**
  *
  * @author christoph
@@ -13,7 +12,7 @@ public class Naumann {
                     (\seq_def int i; 0; m_result.length; m_result[i].val)
                \by  x;
      */
-    void /*@ helper @*/ Pair_m(int x, int secret) {
+    /*@ helper @*/ void Pair_m(int x, int secret) {
         /*@ normal_behavior
             ensures     m_result != null && m_result.length == 10;
             ensures     \typeof(m_result) == \type(Node[]);
