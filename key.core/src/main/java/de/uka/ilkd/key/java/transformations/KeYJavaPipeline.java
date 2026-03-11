@@ -39,6 +39,7 @@ public class KeYJavaPipeline {
     public static KeYJavaPipeline createDefault(TransformationPipelineServices pipelineServices) {
         KeYJavaPipeline p = new KeYJavaPipeline(pipelineServices);
         p.add(new EnumClassBuilder(pipelineServices));
+        p.add(new RecordClassBuilder(pipelineServices));
         p.add(new JMLTransformer(pipelineServices));
         p.add(new JmlDocRemoval(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));
