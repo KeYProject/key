@@ -535,6 +535,7 @@ public class KeYProgModelInfo {
                 res.add(resolved);
             }
         }
+        res.remove(rtAsTypeDecl);
         // TODO weigl
         return res;
     }
