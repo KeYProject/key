@@ -303,13 +303,10 @@ public final class SLEnvInput extends AbstractEnvInput {
                 // contracts
                 final List<SpecificationElement> methodSpecs =
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
-                ImmutableList<LocationVariable> params;
-                try {
+                ImmutableList<LocationVariable> params = null;
+                if (!methodSpecs.isEmpty()) {
                     params = ((Contract) methodSpecs.getFirst()).getOrigVars().params;
-                } catch (NoSuchElementException e) {
-                    params = null;
                 }
-
                 specRepos.addSpecs(DefaultImmutableSet.fromCollection(methodSpecs));
 
                 Type declaringType = pm.getContainerType().getJavaType();
