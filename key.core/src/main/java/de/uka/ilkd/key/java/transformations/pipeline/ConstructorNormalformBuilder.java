@@ -16,6 +16,7 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         return cd.getFieldByName(PipelineConstants.IMPLICIT_ENCLOSING_THIS);
     }
 
-    private void attachDefaultConstructor(ClassOrInterfaceDeclaration cd) {
+    private ConstructorDeclaration attachDefaultConstructor(ClassOrInterfaceDeclaration cd) {
         // attach Java original
         if (!cd.isInterface() && cd.getConstructors().isEmpty()) {
             cd.addConstructor(Modifier.DefaultKeyword.PUBLIC);
@@ -60,10 +61,10 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
         body.addStatement(new MethodCallExpr(new SuperExpr(),
             PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER));
         addInitializers(cd, body, 0);
-        MethodDeclaration def =
-            cd.addMethod(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
-                Modifier.DefaultKeyword.PUBLIC);
-        def.setBody(body);
+        final ConstructorDeclaration constructor = new ConstructorDeclaration();
+        constructor.setModifiers(Modifier.DefaultKeyword.PUBLIC);
+        constructor.setBody(body);
+        return constructor;
     }
 
     /**
@@ -282,7 +283,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
             if (cd.isInterface()) {
                 return;
             }
-            var constructors = td.getConstructors();
+            var constructors = new ArrayList<>(td.getConstructors());
             ConstructorDeclaration anonConstr = null;
             if (cd.getName() == null) {
                 anonConstr = attachConstructorDecl(td);
@@ -291,7 +292,8 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
                 constructors.add(anonConstr);
 
             if (constructors.isEmpty()) {
-                attachDefaultConstructor(cd);
+                final ConstructorDeclaration defaultConstructor = attachDefaultConstructor(cd);
+                constructors.add(defaultConstructor);
             }
 
             for (ConstructorDeclaration constructor : constructors) {
