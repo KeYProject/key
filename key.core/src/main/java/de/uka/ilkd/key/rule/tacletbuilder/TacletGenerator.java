@@ -185,6 +185,8 @@ public class TacletGenerator {
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         for (SchemaVariable heapSV : heapSVs) {
             tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV);
         }
