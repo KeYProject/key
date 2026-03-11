@@ -433,9 +433,11 @@ public final class KeYFacade {
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            /* We need to respect included .key files from project.key (for dl_ escapes). The
+            /*
+             * We need to respect included .key files from project.key (for dl_ escapes). The
              * easiest way to do this is to add the top-level project.key as include and let
-             * SLEnvInput take care about the includes from there. */
+             * SLEnvInput take care about the includes from there.
+             */
             List<Path> includePaths = List.of();
             Path projectFile = pbh.getTopLevelProjectFile();
             if (projectFile != null) {
