@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,16 +68,16 @@ public class KeYJavaPipeline {
 
     public void apply(Collection<CompilationUnit> compilationUnits) {
         for (CompilationUnit compilationUnit : compilationUnits) {
+            URI resource = compilationUnit.getStorage()
+                    .map(it -> it.getPath().toUri())
+                    .orElse(null);
+
             for (JavaTransformer step : steps) {
                 long start = System.currentTimeMillis();
                 step.apply(compilationUnit);
                 long stop = System.currentTimeMillis();
-                if (compilationUnit.getStorage().isPresent()) {
-                    LOGGER.debug("Processed {} on {} ms: {}",
-                        step.getClass().getSimpleName(),
-                        compilationUnit.getStorage().get().getPath(),
-                        stop - start);
-                }
+                LOGGER.debug("Processed {} on {} ms: {}",
+                        step.getClass().getSimpleName(), resource, stop - start);
             }
         }
     }
