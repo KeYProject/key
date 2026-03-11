@@ -376,6 +376,7 @@ jmlprimary
   | SUBSET LPAREN storeref COMMA storeref RPAREN                                     #primarySubset
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
+  | KEY_TERM                                                                         #keyTerm
   ;
 
 sequence
@@ -409,4 +410,3 @@ referencetype: name;
 builtintype: BYTE | SHORT | INT | LONG | BOOLEAN | VOID | BIGINT | REAL | LOCSET | SEQ | FREE;
 name: ident (DOT ident)*;
 quantifiedvariabledeclarator: IDENT dims?;
-

@@ -157,7 +157,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         public String showInInput(String[] lines) {
-            String line = lines[this.line];
+            String line;
+            try {
+                line = lines[this.line];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                line = "";
+            }
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
                 + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }

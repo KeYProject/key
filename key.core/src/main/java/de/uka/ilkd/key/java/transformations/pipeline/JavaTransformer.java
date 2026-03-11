@@ -4,9 +4,13 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 
+import javax.annotation.processing.Generated;
+
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -41,5 +45,21 @@ public interface JavaTransformer {
                 }
             }
         }
+    }
+
+    static RuntimeException reportError(Node node, String message, Object... args) {
+        var path = node.findCompilationUnit().flatMap(CompilationUnit::getStorage)
+                .map(it -> it.getPath().toString())
+                .orElse("<unknown>");
+        var line = node.getRange().map(it -> it.begin.line).orElse(-1);
+        var col = node.getRange().map(it -> it.begin.column).orElse(-1);
+        var pos = " at " + path + ":" + line + ":" + col;
+        return new IllegalStateException(String.format(message + pos, args));
+    }
+
+    default void addGenerated(NodeWithAnnotations<?> node) {
+        node.addSingleMemberAnnotation(
+            Generated.class.getName(),
+            new StringLiteralExpr(this.getClass().getSimpleName()));
     }
 }

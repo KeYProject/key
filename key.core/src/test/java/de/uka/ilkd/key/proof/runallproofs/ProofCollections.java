@@ -1021,6 +1021,9 @@ public class ProofCollections {
         g = c.group("JavaFeatures");
         g.loadable("Java/TextBlockLiterals/project.key");
 
+        g.loadable("Java/Records/Use.key");
+        g.loadable("Java/Records/Constructor.key");
+
         // use for debugging purposes.
         // c.keep("VSTTE10");
         String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);

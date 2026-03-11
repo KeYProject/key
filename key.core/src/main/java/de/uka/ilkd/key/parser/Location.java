@@ -66,8 +66,7 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
                 .map(it -> it.getPath().toUri())
                 .orElse(null);
 
-        var pos = n.getRange().map(it -> it.begin).orElseThrow();
-
+        var pos = n.getRange().map(it -> it.begin).orElse(null);
         return new Location(fileUri, Position.fromJPPosition(pos));
     }
 

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SpecialJavaPrinter;
 import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformerAbstract;
@@ -22,12 +23,9 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
-import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
 import com.github.javaparser.printer.Printer;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
-import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
@@ -52,11 +50,11 @@ class KeyJavaPipelineTest {
         assertNotNull(nss.sorts().lookup("int"));
         assertNotNull(nss.sorts().lookup("boolean"));
         var inputFolder = testFolder.resolve("input");
-        var js = services.activateJava(null, Collections.singleton(inputFolder), null);
+        var js = services.activateJava(null, Collections.emptyList(), null);
         js.parseSpecialClasses();
 
         final var jp = js.getProgramFactory().createJavaParser();
-        try (var files = Files.list(inputFolder);) {
+        try (var files = Files.list(inputFolder)) {
             var cu = new ArrayList<CompilationUnit>();
             files.forEach(it -> {
                 try {
@@ -92,6 +90,11 @@ class KeyJavaPipelineTest {
     @TestFactory
     Stream<DynamicTest> simple() throws IOException {
         return generatePipelineTests(Paths.get("pipelineTests/simple").toAbsolutePath());
+    }
+
+    @TestFactory
+    Stream<DynamicTest> records() throws IOException {
+        return generatePipelineTests(Paths.get("pipelineTests/records").toAbsolutePath());
     }
 
     @TestFactory
@@ -134,7 +137,7 @@ class KeyJavaPipelineTest {
         final Set<Path> alreadyWritten = new HashSet<>();
         private static final Logger LOGGER = LoggerFactory.getLogger(DebugOutputTransformer.class);
         private final Printer myPrinter = new DefaultPrettyPrinter(
-            MyPrintVisitor::new,
+            SpecialJavaPrinter::new,
             new DefaultPrinterConfiguration());
 
 
@@ -144,31 +147,21 @@ class KeyJavaPipelineTest {
         }
 
         @Override
-        public void apply(TypeDeclaration<?> td) {
+        public void apply(CompilationUnit unit) {
             try {
                 Files.createDirectories(outputFolder);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            for (CompilationUnit unit : services.getCache().getUnits()) {
-                var name = unit.getPrimaryTypeName().get();
-                var file = outputFolder.resolve(name + ".java");
-                if (!alreadyWritten.contains(file)) {
-                    alreadyWritten.add(file);
-                    try {
-                        unit.printer(myPrinter);
-                        Files.writeString(file, unit.toString());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
+            var name = unit.getStorage().get().getFileName();
+            var file = outputFolder.resolve(name);
+            try {
+                unit.printer(myPrinter);
+                Files.writeString(file, unit.toString());
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
 
-    private static class MyPrintVisitor extends DefaultPrettyPrinterVisitor {
-        public MyPrintVisitor(PrinterConfiguration configuration) {
-            super(configuration);
-        }
-    }
 }
