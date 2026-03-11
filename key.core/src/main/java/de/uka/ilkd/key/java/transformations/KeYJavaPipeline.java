@@ -40,6 +40,7 @@ public class KeYJavaPipeline {
         KeYJavaPipeline p = new KeYJavaPipeline(pipelineServices);
         p.add(new EnumClassBuilder(pipelineServices));
         p.add(new JMLTransformer(pipelineServices));
+        p.add(new LambdaReplacer(pipelineServices));
         p.add(new JmlDocRemoval(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));
         p.add(new InstanceAllocationMethodBuilder(pipelineServices));
