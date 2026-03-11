@@ -107,6 +107,15 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
+    public Path getTopLevelProjectFile() {
+        Path projectFile = rootPath.resolve(Paths.get("project.key"));
+        if (Files.isRegularFile(projectFile)) {
+            return projectFile;
+        }
+        return null;
+    }
+
+    @Override
     public PathNode getFileTree() throws IOException {
         PathNode root = new PathNode(null, rootPath);
         Files.walkFileTree(rootPath, new TreeFileVisitor(root));

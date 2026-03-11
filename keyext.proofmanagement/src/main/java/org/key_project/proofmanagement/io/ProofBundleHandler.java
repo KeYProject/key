@@ -118,6 +118,14 @@ public abstract class ProofBundleHandler implements Closeable {
     public abstract Path getBootclasspath() throws IOException;
 
     /**
+     * Returns the path to the top-level `project.key` file in the bundle, if existing, otherwise
+     * null.
+     *
+     * @return the path to the top-level project file or null
+     */
+    public abstract Path getTopLevelProjectFile();
+
+    /**
      * Returns a tree of the complete file hierarchy inside the bundle.
      *
      * @return the file tree of the bundle
