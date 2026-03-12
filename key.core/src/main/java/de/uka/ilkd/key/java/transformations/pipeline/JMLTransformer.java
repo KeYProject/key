@@ -425,7 +425,11 @@ public final class JMLTransformer extends JavaTransformer {
      * @throws SLTranslationException
      */
     private void transformClassLevelComments(TypeDeclaration<?> td) throws SLTranslationException {
-        URI fileName = td.findCompilationUnit().get().getStorage().get().getPath().toUri();
+        URI fileName = null;
+        if (td.findCompilationUnit().isPresent()
+                && td.findCompilationUnit().get().getStorage().isPresent()) {
+            fileName = td.findCompilationUnit().get().getStorage().get().getPath().toUri();
+        }
 
         ArrayList<BodyDeclaration<?>> members = new ArrayList<>(td.getMembers());
         ArrayList<TextualJMLSpecCase> specCases = new ArrayList<>();
