@@ -149,6 +149,10 @@ public final class ArraySort extends SortImpl {
         return sk.elemSort;
     }
 
+    @Override
+    public boolean containsGenericSort() {
+        return elementSort().containsGenericSort();
+    }
 
     private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
             Sort javaLangCloneable,

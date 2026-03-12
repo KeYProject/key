@@ -82,7 +82,7 @@ public abstract class GenericSortCondition {
             s1 = ((ArraySort) s1).elementSort();
         }
 
-        if (!(s0 instanceof GenericSort || s0 instanceof ParametricSortInstance)
+        if (!s0.containsGenericSort()
                 || s1 == JavaDLTheory.FORMULA
                 || s1 == JavaDLTheory.UPDATE) {
             return null;

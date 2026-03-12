@@ -230,6 +230,7 @@ public final class ParametricSortInstance extends AbstractSort {
     }
 
     /// Whether this sort contains generic sorts.
+    @Override
     public boolean containsGenericSort() {
         for (GenericArgument arg : args) {
             if (arg.sort() instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
