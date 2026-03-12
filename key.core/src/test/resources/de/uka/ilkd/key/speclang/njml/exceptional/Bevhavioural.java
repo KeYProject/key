@@ -1,4 +1,4 @@
-// exceptionClass: PosConvertException
+// exceptionClass: ParserException
 // msgContains: no viable alternative at input 'normal_bevhaviour
 // verbose: true
 // broken: false
