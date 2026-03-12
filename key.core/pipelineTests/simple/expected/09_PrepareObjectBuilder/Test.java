@@ -25,47 +25,87 @@ public class Test {
     @javax.annotation.processing.Generated()
     static private boolean $classPrepared;
 
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv>;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv_free>;
+
+    public static Test $allocate();
+
+    public Test() {
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 42;
+    }
+
+    public void $init() {
+        super.$init();
+        $objectInitializer0();
+        super.$init();
+        $objectInitializer0();
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 42;
+    }
+
     static private void $clprepare() {
     }
 
     static public void $clinit() {
         if (!@($classInitialized)) {
             if (!@($classInitializationInProgress)) {
-                if (!@(this.$classPrepared)) {
+                if (!@($classPrepared)) {
+                    //Created by ClassInitializeMethodBuilder.java:219
                     @($clprepare());
                 }
                 if (@($classErroneous)) {
                     throw new java.lang.NoClassDefFoundError();
                 }
+                //Created by ClassInitializeMethodBuilder.java:243
                 @($classInitializationInProgress) = true;
                 try {
                     @(java.lang.Object.$clinit());
-                } catch (java.lang.Error err) {
+                    {
+                        // should be resolved to 2
+                        abc = 1 + 1;
+                    }
+                }//Created by ClassInitializeMethodBuilder.java:194
+                 catch (java.lang.Error err) {
+                    //Created by ClassInitializeMethodBuilder.java:154
                     @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:155
                     @($classErroneous) = true;
                     throw err;
                 } catch (java.lang.Throwable twa) {
+                    //Created by ClassInitializeMethodBuilder.java:154
                     @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:155
                     @($classErroneous) = true;
                     throw new java.lang.ExceptionInInitializerError(twa);
                 }
+                //Created by ClassInitializeMethodBuilder.java:249
                 @($classInitializationInProgress) = false;
+                //Created by ClassInitializeMethodBuilder.java:251
                 @($classErroneous) = false;
+                //Created by ClassInitializeMethodBuilder.java:253
                 @($classInitialized) = true;
             }
         }
     }
 
     protected void $prepare() {
+        super.$prepare();
+        //Created by PrepareObjectBuilder.java:94
+        this.memberVar = 0;
     }
 
     private void $prepareEnter() {
-    }
-
-    public Test $create() {
-        this.$initialized = false;
-        $prepareEnter();
-        return this;
+        super.$prepare();
+        //Created by PrepareObjectBuilder.java:94
+        this.memberVar = 0;
     }
 }
 
@@ -89,46 +129,82 @@ public class SubClass extends Test {
     @javax.annotation.processing.Generated()
     static private boolean $classPrepared;
 
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv>;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv_free>;
+
+    public static SubClass $allocate();
+
+    public SubClass() {
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 41;
+    }
+
+    public void $init() {
+        super.$init();
+        $objectInitializer0();
+        super.$init();
+        $objectInitializer0();
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 41;
+    }
+
     static private void $clprepare() {
     }
 
     static public void $clinit() {
         if (!@($classInitialized)) {
             if (!@($classInitializationInProgress)) {
-                if (!@(this.$classPrepared)) {
+                if (!@($classPrepared)) {
+                    //Created by ClassInitializeMethodBuilder.java:219
                     @($clprepare());
                 }
                 if (@($classErroneous)) {
                     throw new java.lang.NoClassDefFoundError();
                 }
+                //Created by ClassInitializeMethodBuilder.java:243
                 @($classInitializationInProgress) = true;
                 try {
                     @(Test.$clinit());
-                } catch (java.lang.Error err) {
+                }//Created by ClassInitializeMethodBuilder.java:194
+                 catch (java.lang.Error err) {
+                    //Created by ClassInitializeMethodBuilder.java:154
                     @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:155
                     @($classErroneous) = true;
                     throw err;
                 } catch (java.lang.Throwable twa) {
+                    //Created by ClassInitializeMethodBuilder.java:154
                     @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:155
                     @($classErroneous) = true;
                     throw new java.lang.ExceptionInInitializerError(twa);
                 }
+                //Created by ClassInitializeMethodBuilder.java:249
                 @($classInitializationInProgress) = false;
+                //Created by ClassInitializeMethodBuilder.java:251
                 @($classErroneous) = false;
+                //Created by ClassInitializeMethodBuilder.java:253
                 @($classInitialized) = true;
             }
         }
     }
 
     protected void $prepare() {
+        super.$prepare();
+        //Created by PrepareObjectBuilder.java:94
+        this.memberVar = 0;
     }
 
     private void $prepareEnter() {
-    }
-
-    public SubClass $create() {
-        this.$initialized = false;
-        $prepareEnter();
-        return this;
+        super.$prepare();
+        //Created by PrepareObjectBuilder.java:94
+        this.memberVar = 0;
     }
 }

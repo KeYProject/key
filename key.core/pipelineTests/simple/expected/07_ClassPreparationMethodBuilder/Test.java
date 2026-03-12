@@ -1,0 +1,106 @@
+public class Test {
+
+    public static int abc;
+
+    static {
+        // should be resolved to 2
+        abc = 1 + 1;
+    }
+
+    public int memberVar;
+
+    {
+        memberVar = 42;
+    }
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classInitializationInProgress;
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classErroneous;
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classInitialized;
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classPrepared;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv>;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv_free>;
+
+    public static Test $allocate();
+
+    public Test() {
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 42;
+    }
+
+    public void $init() {
+        super.$init();
+        $objectInitializer0();
+        super.$init();
+        $objectInitializer0();
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 42;
+    }
+
+    static private void $clprepare() {
+    }
+}
+
+public class SubClass extends Test {
+
+    public int memberVar;
+
+    {
+        memberVar = 41;
+    }
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classInitializationInProgress;
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classErroneous;
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classInitialized;
+
+    @javax.annotation.processing.Generated()
+    static private boolean $classPrepared;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv>;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv_free>;
+
+    public static SubClass $allocate();
+
+    public SubClass() {
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 41;
+    }
+
+    public void $init() {
+        super.$init();
+        $objectInitializer0();
+        super.$init();
+        $objectInitializer0();
+    }
+
+    private void $objectInitializer0() {
+        memberVar = 41;
+    }
+
+    static private void $clprepare() {
+    }
+}

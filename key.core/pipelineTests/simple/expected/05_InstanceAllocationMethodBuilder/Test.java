@@ -25,8 +25,13 @@ public class Test {
     @javax.annotation.processing.Generated()
     static private boolean $classPrepared;
 
-    static private void $clprepare() {
-    }
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv>;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv_free>;
+
+    public static Test $allocate();
 }
 
 public class SubClass extends Test {
@@ -49,6 +54,11 @@ public class SubClass extends Test {
     @javax.annotation.processing.Generated()
     static private boolean $classPrepared;
 
-    static private void $clprepare() {
-    }
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv>;
+
+    @javax.annotation.processing.Generated()
+    static public model boolean <$staticInv_free>;
+
+    public static SubClass $allocate();
 }
