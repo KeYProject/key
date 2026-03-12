@@ -130,7 +130,7 @@ public class JavaService {
         this.libraryPath = libraryPath;
         programFactory = new JavaParserFactory(services);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
-        converter = new JP2KeYConverter(services, mapping, new Namespace<>());
+        converter = new JP2KeYConverter(services, new Namespace<>());
     }
 
     private JavaService(JavaService o, Services services) {
@@ -140,7 +140,7 @@ public class JavaService {
         this.mapping = o.mapping.copy();
         programFactory = o.programFactory.copy(services);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
-        converter = new JP2KeYConverter(services, mapping, new Namespace<>());
+        converter = new JP2KeYConverter(services, new Namespace<>());
     }
 
     public JavaService copy(Services services) {
@@ -153,7 +153,7 @@ public class JavaService {
      * @return not null
      */
     public JP2KeYConverter getConverter(Namespace<SchemaVariable> schemaVariables) {
-        return new JP2KeYConverter(services, mapping, schemaVariables);
+        return new JP2KeYConverter(services, schemaVariables);
     }
 
     /**

@@ -83,8 +83,7 @@ import static java.lang.String.format;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
-public record JP2KeYConverter(Services services, KeYJPMapping mapping,
-         Namespace<SchemaVariable> schemaVariables) {
+public record JP2KeYConverter(Services services, Namespace<SchemaVariable> schemaVariables) {
 
     public CompilationUnit processCompilationUnit(
             com.github.javaparser.ast.CompilationUnit cu) {
@@ -100,8 +99,8 @@ public record JP2KeYConverter(Services services, KeYJPMapping mapping,
             var compUnit = block.findCompilationUnit();
             compUnit.ifPresent(it -> it.setData(Node.SYMBOL_RESOLVER_KEY, symbolSolver));
         }
-        return block.accept(new JP2KeYVisitor(services, mapping, schemaVariables),
-            null);
+        return block.accept(new JP2KeYVisitor(services, services.getJavaService().getMapping(),
+            schemaVariables), null);
     }
 }
 
@@ -127,7 +126,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             @NonNull KeYJPMapping mapping,
             @NonNull Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
-        this.mapping = mapping;
+        this.mapping = services.getJavaService().getMapping();
         this.typeConverter = services.getJavaService().getTypeConverter();
         schemaVariableNamespace = schemaVariables;
         this.evaluator = new ConstantExpressionEvaluator();

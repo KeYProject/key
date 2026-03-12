@@ -293,7 +293,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
      * copy the {@link InitConfig} via {@link InitConfig#deepCopy()} or one of the other copy
      * methods first.
      *
-     * @param p_proof the Proof to which this {@link Services} instance belongs
+     * @param proof the Proof to which this {@link Services} instance belongs
      */
     public void setProof(Proof proof) {
         if (this.proof != null) {
