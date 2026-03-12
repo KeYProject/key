@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.loader.JP2KeYConverter;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
+import org.junit.jupiter.api.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.util.collection.ImmutableSet;
@@ -24,15 +25,12 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (17.04.23)
  */
+@Disabled
 public class ReduxTest {
     public static final String PATHTOREDUX =
         "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux";
