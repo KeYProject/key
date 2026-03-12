@@ -302,8 +302,8 @@ public class JP2KeYTypeConverter {
 
     public KeYJavaType addReferenceType(ResolvedReferenceType type) {
         var ref = type.asReferenceType().getTypeDeclaration().get();
-        if (ref instanceof ResolvedLogicalType) {
-            final var kjt = ((ResolvedLogicalType) ref).getKeYJavaType();
+        if (ref instanceof ResolvedLogicalType resolvedRef) {
+            final var kjt = resolvedRef.getKeYJavaType();
             storeInCache(type, kjt);
             return kjt;
         }
@@ -325,14 +325,6 @@ public class JP2KeYTypeConverter {
         final var kjt = new KeYJavaType(sort);
         storeInCache(type, kjt);
         return kjt;
-
-        // TODO javaparser has no default constructor
-        // var cl = ref.getConstructors();
-        // if (cl.size() == 1
-        // && (cl.get(0) instanceof recoder.abstraction.DefaultConstructor)) {
-        // getRecoder2KeYConverter().processDefaultConstructor(
-        // (recoder.abstraction.DefaultConstructor) cl.get(0));
-        // }
     }
 
 
