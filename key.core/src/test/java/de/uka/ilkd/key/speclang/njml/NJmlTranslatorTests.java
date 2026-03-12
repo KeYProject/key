@@ -54,34 +54,6 @@ public class NJmlTranslatorTests {
         assertEquals(1, result.size(), "Too many invariants found.");
     }
 
-    // weigl: ignored since fix #1640, due to interface change
-    // @Test
-    // public void testModelMethodWithAtSignInBody() {
-    // ImmutableList<TextualJMLConstruct> result =
-    // jmlIO.parseClassLevel("/*@ model int f(int x) { \n" +
-    // "@ return x+1; " +
-    // "@ }*/", "Test.java", Position.newOneBased(0, 0));
-    // assertNotNull(result);
-    // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
-    // assertEquals("int f (int x);", decl.getParsableDeclaration().trim());
-    // String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
-    // assertEquals("f(x) == (x+1)", eqString);
-    // }
-    //
-    // @Test
-    // public void testModelMethodWithAtSignInBody2() {
-    // ImmutableList<TextualJMLConstruct> result =
-    // jmlIO.parseClassLevel("/*@ model int f(int[] arr) { \n" +
-    // "@ //this is a comment \n" +
-    // "@ return arr[1]; //comment\n" +
-    // "@ }*/", "Test.java", Position.newOneBased(0, 0));
-    // assertNotNull(result);
-    // TextualJMLMethodDecl decl = (TextualJMLMethodDecl) result.head();
-    // assertEquals("int f (int[] arr);", decl.getParsableDeclaration().trim());
-    // String eqString = Translator.getEqualityExpressionOfModelMethod(decl.getDecl());
-    // assertEquals("f(arr) == (arr[1])", eqString);
-    // }
-
     @Test
     void testWarnRequires() throws URISyntaxException {
         preParser.clearWarnings();
@@ -94,7 +66,7 @@ public class NJmlTranslatorTests {
         assertEquals(
             "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
                 + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
-                + Path.of("Test.java").toUri() + ", 5/38)",
+                + Path.of("Test.java").toUri() + ", 1/34)",
             message.toString());
     }
 
