@@ -19,6 +19,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
  * @author Alexander Weigl
  * @version 1 (15.04.23)
  */
+
 public class AstFactory {
     /**
      * creates the package reference java.lang

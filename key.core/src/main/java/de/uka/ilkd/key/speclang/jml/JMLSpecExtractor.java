@@ -4,10 +4,8 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.*;
@@ -20,7 +18,6 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
-import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -40,7 +37,6 @@ import org.key_project.util.collection.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -82,56 +78,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
         this.jsf = new JMLSpecFactory(services);
     }
 
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
-    /**
-     * Concatenates the passed comments in a position-preserving way. (see also
-     * JMLTransformer::concatenate(), which does the same thing for Recoder ASTs)
-     * <p>
-     * TODO weigl: The same functionality also exists in the jmlparser,
-     * hence this is not needed after the migration to jmlparser.
-     */
-    private String concatenate(Comment[] comments) {
-        if (comments.length == 0) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(comments[0].getText());
-
-        Position last = comments[0].getEndPosition();
-        for (int i = 1; i < comments.length; i++) {
-            var comment = comments[i];
-            int lineOffset;
-            int columnOffset;
-            var pos = comment.getPositionInfo().getStartPosition();
-            if (last.line() == pos.line()) {
-                lineOffset = 0;
-                columnOffset = pos.column() - last.column();
-            } else {
-                lineOffset = pos.line() - last.line();
-                columnOffset = pos.column();
-            }
-            StringUtil.appendRepeated(sb, '\n', Math.max(0, lineOffset));
-            StringUtil.appendRepeated(sb, ' ', Math.max(0, columnOffset));
-            sb.append(" ".repeat(Math.max(0, columnOffset)));
-            sb.append(comment.getText());
-            last = comment.getEndPosition();
-        }
-        return sb.toString();
-    }
-
-    private int getIndexOfMethodDecl(IProgramMethod pm, TextualJMLConstruct[] constructsArray) {
-        for (int i = 0; i < constructsArray.length; i++) {
-            if (constructsArray[i] instanceof TextualJMLMethodDecl methodDecl) {
-                if (methodDecl.getMethodName().equals(pm.getName())) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     // includes unchecked exceptions (instances of Error or RuntimeException)
     // (see resolution to issue #1379)
     private ParserRuleContext getDefaultSignalsOnly(IProgramMethod pm) {
@@ -155,7 +101,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
         }
 
-        if (b.length() == 0) {
+        if (b.isEmpty()) {
             b.append("\\nothing");
         }
         return JmlFacade.parseClause("signals_only " + b + ";");
@@ -278,22 +224,29 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // create class invs out of textual constructs, add them to result
         for (TextualJMLConstruct c : constructs) {
             try {
-                if (c instanceof TextualJMLClassInv textualInv) {
-                    ClassInvariant inv = jsf.createJMLClassInvariant(kjt, textualInv);
-                    result = result.add(inv);
-                } else if (c instanceof TextualJMLInitially textualRep) {
-                    InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, textualRep);
-                    result = result.add(inc);
-                } else if (c instanceof TextualJMLRepresents textualRep) {
-                    ClassAxiom rep = jsf.createJMLRepresents(kjt, textualRep);
-                    result = result.add(rep);
-                } else if (c instanceof TextualJMLDepends textualDep) {
-                    Contract depContract = jsf.createJMLDependencyContract(kjt, textualDep);
-                    result = result.add(depContract);
-                } else if (c instanceof TextualJMLClassAxiom) {
-                    ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom) c);
-                    result = result.add(ax);
-                } else {
+                switch (c) {
+                    case TextualJMLClassInv textualInv -> {
+                        ClassInvariant inv = jsf.createJMLClassInvariant(kjt, textualInv);
+                        result = result.add(inv);
+                    }
+                    case TextualJMLInitially textualRep -> {
+                        InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, textualRep);
+                        result = result.add(inc);
+                    }
+                    case TextualJMLRepresents textualRep -> {
+                        ClassAxiom rep = jsf.createJMLRepresents(kjt, textualRep);
+                        result = result.add(rep);
+                    }
+                    case TextualJMLDepends textualDep -> {
+                        Contract depContract = jsf.createJMLDependencyContract(kjt, textualDep);
+                        result = result.add(depContract);
+                    }
+                    case TextualJMLClassAxiom textualJMLClassAxiom -> {
+                        ClassAxiom ax = jsf.createJMLClassAxiom(kjt, textualJMLClassAxiom);
+                        result = result.add(ax);
+                    }
+                    case null, default -> {
+                    }
                     // DO NOTHING
                     // There may be other kinds of JML constructs which are
                     // not specifications.
@@ -605,49 +558,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    private URI getFileName(final IProgramMethod method) {
-        final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
-        if (type != null) {
-            return type.getPositionInfo().getURI().orElse(null);
-        } else {
-            try {
-                return new URI(null, null, null);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /*
-     * private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
-     * final URI fileName) {
-     * if (comments.length == 0) {
-     * return new TextualJMLConstruct[0];
-     * }
-     * final String concatenatedComment = concatenate(comments);
-     * final Position position = comments[0].getStartPosition();
-     * final var parser = new PreParser(services.getOriginFactory() != null);
-     * final ImmutableList<TextualJMLConstruct> constructs =
-     * parser.parseMethodLevel(concatenatedComment, fileName, position);
-     * warnings = warnings.append(parser.getWarnings());
-     * return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
-     * }
-     */
-
-    /*
-     * private Comment[] removeDuplicates(final Comment[] comments) {
-     * final Set<Comment> uniqueComments = new LinkedHashSet<>(Arrays.asList(comments));
-     * return uniqueComments.toArray(new Comment[0]);
-     * }
-     */
-
     @Override
     public LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop) {
         LoopSpecification result = null;
-
-        // get type declaration, file name
-        TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
-        URI fileName = td.getPositionInfo().getURI().orElse(null);
 
         ImmutableList<TextualJMLConstruct> constructs =
             ImmutableList.fromList(loop.getAttachedJml());
@@ -675,7 +588,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableList<PositionedString> getWarnings() {
-        return warnings.append(JMLTransformer.getWarningsOfLastInstance());
+        return warnings;
     }
 
     @Override

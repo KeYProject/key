@@ -8,7 +8,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The JavaDL requires some implicit fields, that are available in each
@@ -29,11 +29,11 @@ import org.jspecify.annotations.NonNull;
  * all instances of a transformation set has been outsourced to a transformation
  * cache.
  */
+@NullMarked
 public abstract class JavaTransformer {
     /**
      * Further services and helper function for this pipeline step.
      */
-    @NonNull
     protected final TransformationPipelineServices services;
 
     /**
@@ -42,7 +42,7 @@ public abstract class JavaTransformer {
      * compilation units, the declared classes, and information
      * for local classes.
      */
-    protected final TransformationPipelineServices.@NonNull TransformerCache cache;
+    protected final TransformationPipelineServices.TransformerCache cache;
 
     /**
      * creates a transformer for the recoder model
@@ -51,7 +51,7 @@ public abstract class JavaTransformer {
      *        the CrossReferenceServiceConfiguration to access
      *        model information
      */
-    public JavaTransformer(@NonNull TransformationPipelineServices services) {
+    public JavaTransformer(TransformationPipelineServices services) {
         this.services = services;
         this.cache = services.getCache();
     }

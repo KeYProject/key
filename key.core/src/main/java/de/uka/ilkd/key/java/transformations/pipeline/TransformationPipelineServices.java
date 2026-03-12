@@ -3,14 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import de.uka.ilkd.key.java.loader.JavaParserFactory;
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.EvaluationException;
-
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.Position;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
@@ -25,33 +19,48 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
+import de.uka.ilkd.key.java.loader.JavaParserFactory;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+import de.uka.ilkd.key.speclang.PositionedString;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
  * @version 1 (11/2/21)
  */
+@NullMarked
 public class TransformationPipelineServices {
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(TransformationPipelineServices.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransformationPipelineServices.class);
 
-    @NonNull
     private final TransformerCache cache;
 
-    @NonNull
     private final JavaParserFactory javaParserFactory;
 
+    private List<PositionedString> warnings = new ArrayList<>(8);
 
-    public TransformationPipelineServices(@NonNull JavaParserFactory javaParserFactory,
-            @NonNull TransformerCache cache) {
+    public TransformationPipelineServices(JavaParserFactory javaParserFactory, TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
     }
 
-    @NonNull
+    public void addWarning(PositionedString warning) {
+        warnings.add(warning);
+    }
+
+    public void addWarnings(@MonotonicNonNull ImmutableList<PositionedString> w) {
+        warnings.addAll(w.toList());
+    }
+
+
     public TransformerCache getCache() {
         return cache;
     }
@@ -60,31 +69,8 @@ public class TransformationPipelineServices {
         return new ConstantExpressionEvaluator();
     }
 
-
-    /*
-     * protected TypeDeclaration<?> containingClass(TypeDeclaration<?> td) {
-     * Node container = td.getContainingReferenceType();
-     * if (container == null) {
-     * container = td.getParentNode().get();
-     * }
-     * while (!(container instanceof TypeDeclaration<?>)) {
-     * container = container.getParentNode().get();
-     * }
-     * return (TypeDeclaration<?>) container;
-     * }
-     */
-
-
     public String getId(TypeDeclaration<?> td) {
         return td.getNameAsString();
-    }
-
-    protected MethodDeclaration containingMethod(TypeDeclaration<?> td) {
-        Node container = td.getParentNode().get();
-        while (container != null && !(container instanceof MethodDeclaration)) {
-            container = container.getParentNode().get();
-        }
-        return (MethodDeclaration) container;
     }
 
     /**
@@ -92,13 +78,12 @@ public class TransformationPipelineServices {
      * according to JLS Sect. 4.5.5
      *
      * @return the default value of the given type
-     *         according to JLS Sect. 4.5.5
+     * according to JLS Sect. 4.5.5
      */
     public Expression getDefaultValue(Type type) {
         if (type instanceof ReferenceType) {
             return new NullLiteralExpr();
-        } else if (type instanceof PrimitiveType) {
-            PrimitiveType ptype = (PrimitiveType) type;
+        } else if (type instanceof PrimitiveType ptype) {
             switch (ptype.getType()) {
                 case BOOLEAN:
                     return new BooleanLiteralExpr(false);
@@ -116,10 +101,6 @@ public class TransformationPipelineServices {
             }
         }
         LOGGER.error("makeImplicitMembersExplicit: unknown primitive type: {}", type);
-        return null;
-    }
-
-    public Type getType(Expression n) {
         return null;
     }
 
@@ -154,7 +135,7 @@ public class TransformationPipelineServices {
         try {
             return ce.isCompileTimeConstant(expr);
         } catch (EvaluationException e) {
-            e.printStackTrace();
+            LOGGER.error("Evaluation of {} resulted in exception", expr);
             return false;
         }
     }
@@ -167,13 +148,7 @@ public class TransformationPipelineServices {
         return new ClassOrInterfaceType(null, decl.getName(), null);
     }
 
-    /*
-     * public ResolvedTypeDeclaration getJavaLangObject() {
-     * return javaService.getTypeSolver().getSolvedJavaLangObject();
-     * }
-     */
-
-    public Type getType(ResolvedType type) {
+    public @Nullable Type getType(ResolvedType type) {
         if (type.isArray()) {
             // TODO weigl type.arrayLevel()
             return new ArrayType(getType(type.asArrayType().getComponentType()));
@@ -193,52 +168,47 @@ public class TransformationPipelineServices {
     public List<SymbolReference<? extends ResolvedValueDeclaration>> getUsages(
             ResolvedValueDeclaration v, Node node) {
         // TODO
-        return Collections.emptyList();// ;resolver.solveSymbol(v.getName(), node);
+        return Collections.emptyList();
     }
 
-    /**
-     * The list of statements is the smallest list that contains a copy
-     * assignment for each instance field initializer of class cd,
-     * e.g. <code> i = 0; </code> for <code> public int i = 0; </code> or
-     * a reference to the private method
-     * <code>&lt;objectInitializer&gt;<i>i</i> refering to the i-th object
-     * initializer of cd. These private declared methods are created on
-     * the fly. Example for
-     * <code><pre>
-     * class C {
-     * int i = 0;
-     * {
-     * int j = 3;
-     * i = j + 5;
-     * }
-     * <p>
-     * public C () {} ...
-     * }</pre>
-     * </code> the following list of size two is returned
-     * <code><pre>
-     * [ i = 0;,  &lt;objectInitializer&gt;0(); ]
-     * </pre></code>
-     * where <code><pre>
-     * private &lt;objectInitializer&gt;0() {
-     * int j = 3;
-     * i = j + 5;
-     * }</pre>
-     * </code>
-     *
-     * @param cd
-     *        the TypeDeclaration<?> of which the initilizers have to
-     *        be collected
-     * @return the list of copy assignments and method references
-     *         realising the initializers.
-     */
+    /// The list of statements is the smallest list that contains a copy
+    /// assignment for each instance field initializer of class cd,
+    /// e.g. ` i = 0; ` for ` public int i = 0; ` or
+    /// a reference to the private method
+    /// `<objectInitializer>_i_ refering to the i-th object
+    /// initializer of cd. These private declared methods are created on
+    /// the fly. Example for
+    /// ```
+    /// class C {
+    ///   int i = 0;
+    ///   {
+    ///      int j = 3;
+    ///      i = j + 5;
+    ///   }
+    ///    public C () {} ...
+    /// }
+    /// ```
+    /// the following list of size two is returned
+    /// ```
+    /// [ i = 0;,  &lt;objectInitializer&gt;0(); ]
+    /// ```
+    /// where `
+    /// ```
+    /// private &lt;objectInitializer&gt;0() {
+    /// int j = 3;
+    /// i = j + 5;
+    /// }
+    /// ```
+    /// @param cd the TypeDeclaration of which the initializers have to be collected
+    /// @return the list of copy assignments and method references realizing the initializers.`
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
         NodeList<Statement> result = new NodeList<>();
         int objectInitializerCount = 0;
-        for (BodyDeclaration member : cd.getMembers().toArray(new BodyDeclaration[0])) {
+        for (BodyDeclaration<?> member : cd.getMembers().toArray(new BodyDeclaration[0])) {
             if (member instanceof InitializerDeclaration init &&
                     !init.isStatic()) {
                 String name =
-                    PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + objectInitializerCount;
+                        PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + objectInitializerCount;
                 var initializerMethod = cd.addMethod(name, Modifier.DefaultKeyword.PRIVATE);
                 initializerMethod.setBody(init.getBody().clone());
                 initializerMethod.setParentNode(cd);
@@ -250,9 +220,9 @@ public class TransformationPipelineServices {
                     if (variable.getInitializer().isPresent()) {
                         Expression fieldInit = variable.getInitializer().get();
                         final var access = new FieldAccessExpr(
-                            new ThisExpr(), new NodeList<>(), variable.getName());
+                                new ThisExpr(), new NodeList<>(), variable.getName());
                         var fieldCopy =
-                            new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
+                                new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
                         result.add(new ExpressionStmt(fieldCopy));
                     }
                 }
@@ -285,8 +255,7 @@ public class TransformationPipelineServices {
                 case "int", "byte", "short" -> new IntegerLiteralExpr("0");
                 case "char" -> new CharLiteralExpr("0");
                 case "float", "double" -> new DoubleLiteralExpr("0.0");
-                default ->
-                    throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
+                default -> throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
             };
         }
 
@@ -307,6 +276,13 @@ public class TransformationPipelineServices {
         return javaParserFactory.createJavaParser();
     }
 
+
+    public String getFreshName(String generated, Position position) {
+        //TODO
+        return generated;
+    }
+
+
     /**
      * Cache of important data. This is done mainly for performance reasons.
      * It contains the following info:
@@ -321,8 +297,6 @@ public class TransformationPipelineServices {
     public static class TransformerCache {
         private final NodeList<CompilationUnit> cUnits = new NodeList<>();
         private Set<TypeDeclaration<?>> classDeclarations;
-        // private HashMap<ReferenceType, List<Name>> localClass2FinalVar;
-        // private HashMap<TypeDeclaration, List<ReferenceType>> typeDeclaration2allSupertypes;
 
         public TransformerCache(List<CompilationUnit> cUnits) {
             this.cUnits.addAll(cUnits);

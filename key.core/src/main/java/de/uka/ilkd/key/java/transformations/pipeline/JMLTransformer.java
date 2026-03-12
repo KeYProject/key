@@ -1,44 +1,25 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-// Universitaet Koblenz-Landau, Germany
-// Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-// Technical University Darmstadt, Germany
-// Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.github.javaparser.ast.Modifier.DefaultKeyword;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.StringUtil;
 
 import com.github.javaparser.*;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
-import com.github.javaparser.ast.comments.BlockComment;
-import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
@@ -47,8 +28,6 @@ import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.Type;
 import com.google.common.base.Strings;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -56,26 +35,50 @@ import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 
-// TODO: update class JavaDoc
-
-/**
- * RecodeR transformation that parses JML comments, and attaches code-like
- * specifications (ghost fields, set statements, model methods) directly to the
- * RecodeR AST. Note that internally, this class is highly similar to the class
- * speclang.jml.SpecExtractor; if you change one of these classes, you probably
- * need to change the other as well.
- */
+/// JMLTransformer translates the JML annotation comments into parse trees that are attached
+/// to the Java AST nodes.
+/// This class handles JML annotations at three different levels:
+///
+///   * Type level / Compilation Unit
+///
+///     Currently the support is limited for JML modifiers on classes
+///
+///   * Class level / Body Declarations
+///
+///     On this level, type-internal declaration can appear like class invariants,
+///     model methods and ghost fields. But also modifiers are captured
+///
+///   * Method level / Statements
+///
+///     Support for ghost statements.
+///
+/// After execution this {@link JavaTransformer}, contracts are attached to {@link MethodDeclaration}, or {@link BlockStmt},
+/// {@link FieldDeclaration} and {@link MethodDeclaration} were introduced for ghost and model declarations,
+/// JML statements (assume, assert, ...) are inserted into the bodies using {@link KeYMarkerStatement}.
+///
+/// You can access attached JML information using the {@link DataKey} in [KEY_SPEC_CASE], [KEY_CLASS_SPEC], and [KEY_LOOP_SPEC].
+///
+/// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
 public final class JMLTransformer extends JavaTransformer {
     public static final EnumSet<JMLModifier> JAVA_MODS =
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
-            JMLModifier.PROTECTED,
-            JMLModifier.PUBLIC, JMLModifier.STATIC);
+            JMLModifier.PROTECTED, JMLModifier.PUBLIC, JMLModifier.STATIC);
 
-    public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
+
+    private final JmlDocSanitizer sanitizer = new JmlDocSanitizer(Set.of("key"));
+
+    /// KEY for contracts
+    public static final DataKey<List<TextualJMLConstruct>> KEY_SPEC_CASE = new DataKey<>() {
+    };
+    /// KEY for class level specification
+    public static final DataKey<List<TextualJMLConstruct>> KEY_CLASS_SPEC = new DataKey<>() {
     };
 
-    private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
-    private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
+    ///KEY for loop specifications
+    public static final DataKey<List<TextualJMLLoopSpec>> KEY_LOOP_SPEC = new DataKey<>() {
+    };
+
 
     /**
      * Creates a transformation that adds JML specific elements, for example
@@ -86,160 +89,6 @@ public final class JMLTransformer extends JavaTransformer {
      */
     public JMLTransformer(TransformationPipelineServices services) {
         super(services);
-        warnings = ImmutableSLList.nil();
-    }
-
-    // -------------------------------------------------------------------------
-    // private helper methods
-    // -------------------------------------------------------------------------
-
-    public static String getFullText(ParserRuleContext context) {
-        if (context.start == null || context.stop == null
-                || context.start.getStartIndex() < 0 || context.stop.getStopIndex() < 0)
-            return context.getText(); // Fallback
-        return context.start.getInputStream()
-                .getText(Interval.of(context.start.getStartIndex(), context.stop.getStopIndex()));
-    }
-
-    public static ImmutableList<PositionedString> getWarningsOfLastInstance() {
-        return warnings;
-    }
-
-    /**
-     * Concatenates the passed comments in a position-preserving way. (see also
-     * JMLSpecExtractor::concatenate(), which does the same thing for KeY ASTs)
-     */
-    private String concatenate(Iterable<Comment> comments) {
-        StringBuilder sb = new StringBuilder();
-        Iterator<Comment> iter = comments.iterator();
-        if (!iter.hasNext()) {
-            return sb.toString();
-        }
-        Comment first = iter.next();
-        if (first instanceof BlockComment || first instanceof JavadocComment) {
-            sb.append("/*").append(first.getContent()).append("*/");
-        } else {
-            sb.append("//").append(first.getContent());
-        }
-        Position last = first.getRange().get().end;
-        while (iter.hasNext()) {
-            Comment comment = iter.next();
-            int line;
-            int column;
-            Position pos = comment.getRange().get().begin;
-            if (last.line == pos.line) {
-                line = 0;
-                column = pos.column - last.column;
-            } else {
-                line = pos.line - last.line;
-                column = pos.column;
-            }
-            StringUtil.appendRepeated(sb, '\n', Math.max(0, line));
-            StringUtil.appendRepeated(sb, ' ', Math.max(0, column));
-            if (comment instanceof BlockComment) {
-                sb.append("/*").append(comment.getContent()).append("*/");
-            } else {
-                sb.append("//").append(comment.getContent());
-            }
-        }
-        iter.forEachRemaining(comment -> {
-
-        });
-        return sb.toString();
-    }
-
-    /**
-     * Prepends the Java (i.e., non-JML) modifiers from the passed list to the
-     * passed PositionedString. Inserts whitespace in place of the JML modifiers
-     * (in order to preserve position information).
-     */
-    private PositionedString convertToString(ImmutableList<JMLModifier> mods,
-            ParserRuleContext ctx) {
-        StringBuilder sb = new StringBuilder();
-        for (JMLModifier mod : mods) {
-            if (JAVA_MODS.contains(mod)) {
-                sb.append(mod);
-            } else {
-                sb.append(StringUtil.repeat(" ", mod.name().length()));
-            }
-            sb.append(" ");
-        }
-        sb.append(getFullText(ctx));
-        // TODO this is garbage, see Throwable::cause, protected is not contained in ctx
-        int column = ctx.start.getCharPositionInLine() - sb.toString().length();
-        if (column <= 0) {
-            column = 1;
-        }
-        de.uka.ilkd.key.java.Position pos =
-            de.uka.ilkd.key.java.Position.newOneBased(ctx.start.getLine(), column);
-        Location location = new Location(
-            MiscTools.getURIFromTokenSource(ctx.start.getTokenSource().getSourceName()), pos);
-        return new PositionedString(sb.toString(), location);
-    }
-
-    /**
-     * Puts the JML modifiers from the passed list into a string enclosed in JML
-     * markers.
-     */
-    private BlockComment getJMLModComment(ImmutableList<JMLModifier> mods) {
-        StringBuilder sb = new StringBuilder("@");
-        for (JMLModifier mod : mods) {
-            if (!JAVA_MODS.contains(mod)) {
-                sb.append(mod.toString()).append(" ");
-            }
-        }
-        sb.append("@");
-        return new BlockComment(sb.toString());
-    }
-
-    /**
-     * Recursively adds the passed position to the starting positions of the
-     * passed program element and its children.
-     */
-    private void updatePositionInformation(Node pe, de.uka.ilkd.key.java.Position pos) {
-        if (pe.getRange().isPresent()) {
-            final Range range = pe.getRange().get();
-            Position oldStartPosition = range.begin;
-            int line = Math.max(0, pos.line() + oldStartPosition.line - 1);
-            int column = Math.max(0, pos.column() + oldStartPosition.column - 1);
-            Position newPos = oldStartPosition.withColumn(column).withLine(line);
-            pe.setRange(range.withBegin(newPos));
-
-            // recurse to children
-            for (Node childNode : pe.getChildNodes()) {
-                updatePositionInformation(childNode, pos);
-            }
-        }
-    }
-
-    /**
-     * Returns the children of the passed program element.
-     */
-    private List<Node> getChildren(Node pe) {
-        return pe.getChildNodes();
-    }
-
-    private static void insertAtSourceNodeOffsetInParent(Statement node, List<Comment> comments) {
-        assert !comments.isEmpty();
-
-        // determine parent, child index
-        BlockStmt astParent =
-            (BlockStmt) comments.get(0).getParentNode().orElseThrow().getParentNode().orElseThrow();
-        int childIndex =
-            astParent.getChildNodes().indexOf(comments.get(0).getParentNode().get());
-        astParent.addStatement(childIndex, node);
-    }
-
-    private static Modifier.@NonNull Keyword getModifier(TextualJMLFieldDecl decl)
-            throws SLTranslationException {
-        // ghost or model?
-        boolean isGhost = decl.getModifiers().contains(JMLModifier.GHOST);
-        boolean isModel = decl.getModifiers().contains(JMLModifier.MODEL);
-        if (isGhost == isModel) {
-            throw new SLTranslationException(
-                "JML field declaration must be either ghost or model!", decl.getLocation());
-        }
-        return isGhost ? Modifier.DefaultKeyword.JML_GHOST : Modifier.DefaultKeyword.JML_MODEL;
     }
 
     /**
@@ -313,14 +162,6 @@ public final class JMLTransformer extends JavaTransformer {
         return new ExpressionStmt(expr);
     }
 
-    private String fillWithWhitespaces(de.uka.ilkd.key.java.Position pos, String s) {
-        int line = Math.max(0, pos.line() - 1);
-        int column = Math.max(0, pos.column() - 1);
-        return "\n".repeat(line) +
-                " ".repeat(column) +
-                s;
-    }
-
     /**
      * Transform the given model method declaration into a "real" method declaration.
      *
@@ -355,21 +196,11 @@ public final class JMLTransformer extends JavaTransformer {
                 "could not parse", declWithMods.location);
         }
         methodDecl = md.getResult().get();
-        updatePositionInformation(methodDecl, declWithMods.location.getPosition());
 
         // add model modifier
-        // methodDecl.addModifier(Modifier.DefaultKeyword.JML_MODEL);
         for (var modifier : modifiers) {
             methodDecl.addModifier(modifier.getParserKeyword());
         }
-        /*
-         * if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) {
-         * methodDecl.addModifier(Modifier.DefaultKeyword.JML_TWO_STATE);
-         * }
-         * if (decl.getModifiers().contains(JMLModifier.NO_STATE)) {
-         * methodDecl.addModifier(Modifier.DefaultKeyword.JML_NO_STATE);
-         * }
-         */
         addSpec(methodDecl, decl);
         return methodDecl;
     }
@@ -403,17 +234,6 @@ public final class JMLTransformer extends JavaTransformer {
         mps.setData(KEY_MERGE_POINT, stat);
         return mps;
     }
-
-
-    private final JmlDocSanitizer sanitizer = new JmlDocSanitizer(Set.of("key"));
-
-    // keys to associate data to nodes at runtime
-    public static final DataKey<List<TextualJMLConstruct>> KEY_SPEC_CASE = new DataKey<>() {
-    };
-    public static final DataKey<List<TextualJMLConstruct>> KEY_CLASS_SPEC = new DataKey<>() {
-    };
-    public static final DataKey<List<TextualJMLLoopSpec>> KEY_LOOP_SPEC = new DataKey<>() {
-    };
 
     /**
      * Transform all class level JML comments (such as class invariants, represents clauses,
@@ -450,7 +270,7 @@ public final class JMLTransformer extends JavaTransformer {
                 // contain multiple JML entities (e.g. method contract and ghost field declaration)
                 ImmutableList<TextualJMLConstruct> constructs =
                     pp.parseClassLevel(concatenatedComment, fileName, pos);
-                warnings = warnings.append(pp.getWarnings());
+                services.addWarnings(pp.getWarnings());
 
                 // handle model and ghost declarations in textual constructs
                 for (TextualJMLConstruct c : constructs) {
@@ -596,7 +416,7 @@ public final class JMLTransformer extends JavaTransformer {
                 String concat = sanitizer.asString(doc.getJmlDocs());
                 ImmutableList<TextualJMLConstruct> constructs =
                     io.parseMethodLevel(concat, null, pos);
-                warnings = warnings.append(io.getWarnings());
+                services.addWarnings(io.getWarnings());
 
                 // handle ghost declarations and set assignments in textual constructs
                 for (TextualJMLConstruct c : constructs) {
@@ -709,7 +529,7 @@ public final class JMLTransformer extends JavaTransformer {
      */
     private void transformModifiers(NodeWithModifiers<?> hasMods) {
         PreParser pp = getPreParser();
-        warnings = warnings.append(pp.getWarnings());
+        services.addWarnings(pp.getWarnings());
 
         for (Modifier mod : hasMods.getModifiers()) {
             var kw = mod.getKeyword();

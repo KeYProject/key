@@ -15,7 +15,7 @@ import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
 /**
- * An evaluator for constant expression based.
+ * An evaluator for constant expression in Java.
  *
  * @author Alexander Weigl
  * @version 1 (11/2/21)
@@ -73,7 +73,7 @@ public class ConstantExpressionEvaluator {
         return evaluate(StaticJavaParser.parseExpression(string));
     }
 
-    private class ConstantExpressionEvaluatorVisitor extends GenericVisitorAdapter<Object, Void> {
+    private static class ConstantExpressionEvaluatorVisitor extends GenericVisitorAdapter<Object, Void> {
         @Override
         public Object visit(ArrayAccessExpr n, Void arg) {
             return super.visit(n, arg);
@@ -98,85 +98,95 @@ public class ConstantExpressionEvaluator {
         public Object visit(BinaryExpr n, Void arg) {
             Object left = n.getLeft().accept(this, arg);
             Object right = n.getRight().accept(this, arg);
-            switch (n.getOperator()) {
-                case OR:
+            return switch (n.getOperator()) {
+                case OR -> {
                     if (left instanceof Boolean && right instanceof Boolean)
-                        return ((Boolean) left) || (Boolean) right;
+                        yield ((Boolean) left) || (Boolean) right;
                     throw new RuntimeException();
-
-                case AND:
+                }
+                case AND -> {
                     if (left instanceof Boolean && right instanceof Boolean)
-                        return ((Boolean) left) && (Boolean) right;
+                        yield ((Boolean) left) && (Boolean) right;
                     throw new RuntimeException();
-
-                case BINARY_OR:
+                }
+                case BINARY_OR -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) | (Integer) right;
+                        yield ((Integer) left) | (Integer) right;
                     throw new RuntimeException();
-
-                case BINARY_AND:
+                }
+                case BINARY_AND -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) & (Integer) right;
+                        yield ((Integer) left) & (Integer) right;
                     throw new RuntimeException();
-
-                case XOR:
+                }
+                case XOR -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) ^ (Integer) right;
+                        yield ((Integer) left) ^ (Integer) right;
                     throw new RuntimeException();
-                case EQUALS:
-                    return left.equals(right);
-                case NOT_EQUALS:
-                    return !left.equals(right);
-                case LESS:
+                }
+                case EQUALS -> left.equals(right);
+                case NOT_EQUALS -> !left.equals(right);
+                case LESS -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) < (Integer) right;
+                        yield ((Integer) left) < (Integer) right;
                     throw new RuntimeException();
-                case GREATER:
+                }
+                case GREATER -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) > (Integer) right;
+                        yield ((Integer) left) > (Integer) right;
                     throw new RuntimeException();
-                case LESS_EQUALS:
+                }
+                case LESS_EQUALS -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) <= (Integer) right;
+                        yield ((Integer) left) <= (Integer) right;
                     throw new RuntimeException();
-                case GREATER_EQUALS:
+                }
+                case GREATER_EQUALS -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) >= (Integer) right;
+                        yield ((Integer) left) >= (Integer) right;
                     throw new RuntimeException();
-                case LEFT_SHIFT:
+                }
+                case LEFT_SHIFT -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) << (Integer) right;
+                        yield ((Integer) left) << (Integer) right;
                     throw new RuntimeException();
-                case SIGNED_RIGHT_SHIFT:
+                }
+                case SIGNED_RIGHT_SHIFT -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) >> (Integer) right;
+                        yield ((Integer) left) >> (Integer) right;
                     throw new RuntimeException();
-                case UNSIGNED_RIGHT_SHIFT:
+                }
+                case UNSIGNED_RIGHT_SHIFT -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) >>> (Integer) right;
+                        yield ((Integer) left) >>> (Integer) right;
                     throw new RuntimeException();
-                case PLUS:
+                }
+                case PLUS -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) + (Integer) right;
+                        yield ((Integer) left) + (Integer) right;
                     throw new RuntimeException();
-                case MINUS:
+                }
+                case MINUS -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) - (Integer) right;
+                        yield ((Integer) left) - (Integer) right;
                     throw new RuntimeException();
-                case MULTIPLY:
+                }
+                case MULTIPLY -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) * (Integer) right;
+                        yield ((Integer) left) * (Integer) right;
                     throw new RuntimeException();
-                case DIVIDE:
+                }
+                case DIVIDE -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) / (Integer) right;
+                        yield ((Integer) left) / (Integer) right;
                     throw new RuntimeException();
-                case REMAINDER:
+                }
+                case REMAINDER -> {
                     if (left instanceof Integer && right instanceof Integer)
-                        return ((Integer) left) % (Integer) right;
+                        yield ((Integer) left) % (Integer) right;
                     throw new RuntimeException();
-            }
-            throw new RuntimeException();
+                }
+            };
         }
 
         @Override
@@ -221,8 +231,7 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(FieldAccessExpr n, Void arg) {
-            final FieldDeclaration fd =
-                (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
+            final FieldDeclaration fd = (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
             if (fd.isFinal() && fd.isStatic()) {
                 return visit(fd, arg);
             } else {
