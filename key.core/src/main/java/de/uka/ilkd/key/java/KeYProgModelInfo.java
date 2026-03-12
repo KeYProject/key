@@ -405,10 +405,6 @@ public class KeYProgModelInfo {
             return getImplicitMethod(ct, name);
         }
 
-        if (context.getJavaType() instanceof ArrayType) {
-            return getImplicitMethod(ct, name);
-        }
-
         var type = getJavaParserType(ct);
         if (!type.isReferenceType()) {
             return null;
