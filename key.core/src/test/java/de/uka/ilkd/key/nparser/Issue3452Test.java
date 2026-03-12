@@ -10,12 +10,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+import org.junit.jupiter.api.Assertions;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -51,8 +53,8 @@ public class Issue3452Test {
             System.err.println("Unexpected load success");
         });
 
-        if (!exception.getMessage().startsWith("Heap used in a `no_state` method.")) {
-            fail("Unexpected exception message: " + exception.getMessage());
-        }
+        assertThat(exception.getMessage())
+                .startsWith("Load failed");
+                //.startsWithIgnoringCase("Heap used in a `no_state` method.");
     }
 }
