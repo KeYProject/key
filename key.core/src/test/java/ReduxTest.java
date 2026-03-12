@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.loader.JP2KeYConverter;
-import de.uka.ilkd.key.java.loader.JP2KeYTypeConverter;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
@@ -56,9 +55,8 @@ public class ReduxTest {
         sorts.add(new SortImpl(new Name("double"), ImmutableSet.empty(), false));
         sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
         services.activateJava(null);
-        mapping = services.getJavaService().getMapping();;
-        converter = new JP2KeYConverter(services, mapping,
-            new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));;
+        mapping = services.getJavaService().getMapping();
+        converter = new JP2KeYConverter(services, new Namespace<>());;
     }
 
     @Test
