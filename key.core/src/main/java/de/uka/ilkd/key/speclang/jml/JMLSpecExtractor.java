@@ -492,9 +492,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // merge_point and a block contract / loop invariant), it might happen
         // that we're passed multiple constructs here. Therefore, we filter the
         // merge point specific parts here
-        final TextualJMLConstruct[] constructs =
-            mps.getAttachedJml().toArray(new TextualJMLConstruct[0]);
-        return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0]);
+        var constructs = mps.getAttachedJml();
+        for (var construct : constructs) {
+            if(construct instanceof TextualJMLMergePointDecl m) {
+                return jsf.createJMLMergeContracts(method, mps, m);
+            }
+        }
+        return ImmutableSet.empty();
     }
 
     private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
