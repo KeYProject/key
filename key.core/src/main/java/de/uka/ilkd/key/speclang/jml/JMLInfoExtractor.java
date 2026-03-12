@@ -320,8 +320,8 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type
      */
-    public static @Nullable SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
-        if (!(t.getJavaType() instanceof TypeDeclaration)) {
+    public static @Nullable SpecMathMode getSpecMathMode(KeYJavaType t) {
+        if (t == null || !(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {
             return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode();
