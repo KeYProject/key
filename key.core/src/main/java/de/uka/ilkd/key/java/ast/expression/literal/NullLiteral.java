@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.Name;
@@ -17,7 +18,7 @@ import org.key_project.logic.Name;
  * Null literal. Is used as singleton.
  */
 
-public non-sealed class NullLiteral extends Literal {
+public final class NullLiteral extends Literal implements ReferencePrefix {
 
     public static final NullLiteral NULL = new NullLiteral();
 
@@ -34,12 +35,12 @@ public non-sealed class NullLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        return o == this;
+        return o != null && o.getClass() == this.getClass();
     }
 
     @Override
     protected int computeHashCode() {
-        return System.identityHashCode(this);
+        return 13 + 7 * getClass().hashCode();
     }
 
     /**
@@ -62,4 +63,8 @@ public non-sealed class NullLiteral extends Literal {
         throw new UnsupportedOperationException("No LDT is linked to the null literal.");
     }
 
+    @Override
+    public ReferencePrefix getReferencePrefix() {
+        return this;
+    }
 }
