@@ -86,7 +86,7 @@ public class SMTCommand extends AbstractCommand {
         for (SMTProblem problem : probList) {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = SMTRuleApp.RULE.createApp(args.solver);
+                IBuiltInRuleApp app = SMTRule.INSTANCE.createApp(args.solver);
                 app = app.tryToInstantiate(problem.getGoal());
                 problem.getGoal().apply(app);
             }
