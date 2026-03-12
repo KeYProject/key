@@ -16,6 +16,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ModifiersTest {
     private static JavaService java = null;
 
@@ -30,12 +34,11 @@ public class ModifiersTest {
         """
                 package test;
 
-                /*@ nullable_by_default @*/
-                public class A {}
+                public /*@ nullable_by_default @*/ class A {}
 
-                public /*@ nullable_by_default @*/ class B {}
+                /*@ nullable_by_default @*/ class B {}
 
-                /*@ nullable_by_default @*/ class C {}
+                public /*@ pure @*/ class C {}
                 """;
 
     private static final String METHODS =
@@ -69,11 +72,9 @@ public class ModifiersTest {
         var b = decls.get(1);
         var c = decls.get(2);
         var expected = new TypeDeclaration.JMLModifiers(false, false, true, null);
-        Assertions.assertEquals(expected, a.getJmlModifiers(), "Jml modifiers of class A");
-        // TODO Javaparser: This does not work currently
-        // To fix this, JmlCommentTransformer has to visit comments of class names
-        // Assertions.assertEquals(expected, b.getJmlModifiers(), "Jml modifiers of class B");
-        Assertions.assertEquals(expected, c.getJmlModifiers(), "Jml modifiers of class C");
+        assertEquals(expected, a.getJmlModifiers());
+        //assertEquals(expected, b.getJmlModifiers());
+        assertTrue(c.getJmlModifiers().pure());
     }
 
     @Test
@@ -85,11 +86,11 @@ public class ModifiersTest {
         var b = ((ProgramMethod) members.get(2)).getMethodDeclaration();
         var modelB = ((ProgramMethod) members.get(4)).getMethodDeclaration();
         var expected = new MethodDeclaration.JMLModifiers(false, false, true, null);
-        Assertions.assertEquals(expected, a.getJmlModifiers(), "Jml modifiers of method D::a");
-        Assertions.assertEquals(expected, b.getJmlModifiers(), "Jml modifiers of method D::b");
-        Assertions.assertEquals(expected, modelA.getJmlModifiers(),
+        assertEquals(expected, a.getJmlModifiers(), "Jml modifiers of method D::a");
+        assertEquals(expected, b.getJmlModifiers(), "Jml modifiers of method D::b");
+        assertEquals(expected, modelA.getJmlModifiers(),
             "Jml modifiers of method D::modelA");
-        Assertions.assertEquals(expected, modelB.getJmlModifiers(),
+        assertEquals(expected, modelB.getJmlModifiers(),
             "Jml modifiers of method D::modelB");
     }
 }

@@ -1581,7 +1581,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case JML_STRICTLY_PURE -> new Modifiers.JML_STRICTLY_PURE(pi, c);
             case JML_HELPER -> new Modifiers.JML_HELPER(pi, c);
             case JML_INSTANCE -> new Modifiers.JML_INSTANCE(pi, c);
-            case JML_NULLABLE_BY_DEFAULT -> new Modifiers.SEALED(pi, c);
+            case JML_NULLABLE_BY_DEFAULT -> new Modifiers.JML_NULLABLE_BY_DEFAULT(pi, c);
             case JML_NON_NULL -> new Modifiers.JML_NON_NULL(pi, c);
             case JML_NULLABLE -> new Modifiers.JML_NULLABLE(pi, c);
             case JML_GHOST -> new Ghost(pi, c);
