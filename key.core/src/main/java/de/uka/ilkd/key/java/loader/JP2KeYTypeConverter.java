@@ -121,6 +121,10 @@ public class JP2KeYTypeConverter {
         return services.getTypeConverter();
     }
 
+    public Services getServices() {
+        return services;
+    }
+
     private Namespace<Sort> getSortsNamespace() {
         return services.getNamespaces().sorts();
     }
@@ -149,7 +153,8 @@ public class JP2KeYTypeConverter {
 
     public KeYJavaType getKeYJavaType(String typeName, boolean forceInit) {
         var resolved = typeSolver.solveType(typeName);
-        return jp2KeY.resolvedTypeToKeY(new ReferenceTypeImpl(resolved), forceInit);
+        return jp2KeY.resolvedTypeToKeY(new ReferenceTypeImpl(resolved), forceInit,
+            services.getJavaService());
     }
 
 
@@ -181,7 +186,7 @@ public class JP2KeYTypeConverter {
 
         {
             // lookup in the cache
-            var kjt = jp2KeY.resolvedTypeToKeY(type);
+            var kjt = jp2KeY.resolvedTypeToKeY(type, services.getJavaService());
             if (kjt != null) {
                 return kjt;
             }
@@ -211,7 +216,7 @@ public class JP2KeYTypeConverter {
         // usually this equals what was just added in the methods above
         // sometimes however, there is a 'legacy' type in the mapping,
         // which has priority
-        return Objects.requireNonNull(jp2KeY.resolvedTypeToKeY(type));
+        return Objects.requireNonNull(jp2KeY.resolvedTypeToKeY(type, services.getJavaService()));
     }
 
     private void addPrimitiveType(ResolvedType type) {
@@ -255,7 +260,7 @@ public class JP2KeYTypeConverter {
         }
 
         // delayed creation of virtual array declarations to avoid cycles
-        var arrayKJT = jp2KeY.resolvedTypeToKeY(type);
+        var arrayKJT = jp2KeY.resolvedTypeToKeY(type, services.getJavaService());
         if (arrayKJT == null) {
             arrayKJT = result;
         }
@@ -289,7 +294,7 @@ public class JP2KeYTypeConverter {
                 ref.asReferenceType()
                         .getTypeDeclaration()
                         .flatMap(AssociableToAST::toAst)
-                        .ifPresent(jp2KeY.getJavaServices().getConverter(null)::process);
+                        .ifPresent(services.getJavaService().getConverter(null)::process);
             }
         }
         return __objectType;

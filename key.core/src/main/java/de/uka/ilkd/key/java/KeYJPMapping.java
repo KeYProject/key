@@ -60,10 +60,7 @@ public class KeYJPMapping {
 
     private final Set<String> packageNames;
 
-    private final JavaService converter;
-
-    public KeYJPMapping(JavaService converter) {
-        this.converter = converter;
+    public KeYJPMapping() {
 
         this.map = new IdentityHashMap<>(4096);
         this.revMap = new IdentityHashMap<>(4096);
@@ -88,11 +85,10 @@ public class KeYJPMapping {
         this.superArrayType = o.superArrayType;
         this.parsedSpecial = o.parsedSpecial;
         this.parsingLibraries = o.parsingLibraries;
-        this.converter = o.converter;
     }
 
-    public KeYJavaType resolvedTypeToKeY(ResolvedType pe) {
-        return resolvedTypeToKeY(pe, false);
+    public KeYJavaType resolvedTypeToKeY(ResolvedType pe, JavaService converter) {
+        return resolvedTypeToKeY(pe, false, converter);
     }
 
     /**
@@ -101,7 +97,8 @@ public class KeYJPMapping {
      * @param pe a recoder.ModelElement
      */
     @Nullable
-    public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand) {
+    public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand,
+            JavaService converter) {
         var type = typeMap.get(pe);
 
         if (processOnDemand && type == null && pe.isReferenceType()) {
@@ -115,10 +112,6 @@ public class KeYJPMapping {
             }
         }
         return type;
-    }
-
-    public JavaService getJavaServices() {
-        return converter;
     }
 
     public ResolvedType resolveType(KeYJavaType pe) {

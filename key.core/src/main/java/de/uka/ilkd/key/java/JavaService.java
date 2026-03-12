@@ -125,7 +125,7 @@ public class JavaService {
     public JavaService(Services services, @NonNull Path bootClassPath,
             @NonNull Collection<Path> libraryPath) {
         this.services = services;
-        this.mapping = new KeYJPMapping(this);
+        this.mapping = new KeYJPMapping();
         this.bootClassPath = bootClassPath;
         this.libraryPath = libraryPath;
         programFactory = new JavaParserFactory(services);

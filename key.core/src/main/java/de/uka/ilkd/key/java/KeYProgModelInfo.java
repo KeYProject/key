@@ -565,7 +565,8 @@ public class KeYProgModelInfo {
             final Stream<ResolvedReferenceTypeDeclaration> rctl) {
         return rctl
                 .map(it -> Objects
-                        .requireNonNull(rec2key().resolvedTypeToKeY(new ReferenceTypeImpl(it))))
+                        .requireNonNull(rec2key().resolvedTypeToKeY(new ReferenceTypeImpl(it),
+                            typeConverter.getServices().getJavaService())))
                 .collect(Collectors.toList());
     }
 
