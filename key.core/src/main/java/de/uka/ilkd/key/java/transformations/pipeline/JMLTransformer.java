@@ -39,18 +39,18 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// to the Java AST nodes.
 /// This class handles JML annotations at three different levels:
 ///
-///   * Type level / Compilation Unit
+/// * Type level / Compilation Unit
 ///
 /// Currently, the support is limited for JML modifiers on classes
 ///
-///   * Class level / Body Declarations
+/// * Class level / Body Declarations
 ///
-///     On this level, type-internal declaration can appear like class invariants,
-///     model methods and ghost fields. But also modifiers are captured
+/// On this level, type-internal declaration can appear like class invariants,
+/// model methods and ghost fields. But also modifiers are captured
 ///
-///   * Method level / Statements
+/// * Method level / Statements
 ///
-///     Support for ghost statements.
+/// Support for ghost statements.
 ///
 /// After execution this {@link JavaTransformer}, contracts are attached to
 /// {@link MethodDeclaration}, or {@link BlockStmt}, {@link FieldDeclaration} and
@@ -78,7 +78,7 @@ public final class JMLTransformer extends JavaTransformer {
     public static final DataKey<List<TextualJMLConstruct>> KEY_CLASS_SPEC = new DataKey<>() {
     };
 
-    ///KEY for loop specifications
+    /// KEY for loop specifications
     public static final DataKey<List<TextualJMLLoopSpec>> KEY_LOOP_SPEC = new DataKey<>() {
     };
 

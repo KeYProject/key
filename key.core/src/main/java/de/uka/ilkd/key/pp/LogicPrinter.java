@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -1173,26 +1172,39 @@ public class LogicPrinter {
             }
 
             // Print class name if the field is static.
-            String fieldName = obs.isStatic() ? HeapLDT.getClassName((Function) t.op()) + "." : "";
-            fieldName += HeapLDT.getPrettyFieldName(t.op());
+            final String typeNamePrefix =
+                obs.isStatic() ? HeapLDT.getClassName((Function) t.op()) + "." : "";
+            String symbolName = HeapLDT.getPrettyFieldName(t.op());
+            if (symbolName.contains(JavaDLFieldNames.SEPARATOR)) {
+                // pretty name was not found (may e.g. be not be a field but a query)
+                symbolName = typeNamePrefix
+                        + symbolName.substring(symbolName.indexOf(JavaDLFieldNames.SEPARATOR) +
+                                JavaDLFieldNames.SEPARATOR.length());
+            }
+
             boolean isKeyword = false;
             if (services != null) {
                 isKeyword = (obs == services.getJavaInfo().getInv());
             }
 
             if (obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
-                JavaInfo javaInfo = services.getJavaInfo();
                 if (t.arity() > 1) {
-                    // in case arity > 1 we assume fieldName refers to a query (method call)
+                    // in case arity > 1 we assume symbolName refers to a query (method call)
                     JTerm object = t.sub(1);
-                    KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     String p;
                     try {
-                        boolean canonical =
-                            obs.isStatic() || ((obs instanceof IProgramMethod) && javaInfo
-                                    .isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType));
+                        boolean canonical = false;
+                        if (services != null) {
+                            final KeYJavaType keYJavaType =
+                                services.getJavaInfo().getKeYJavaType(object.sort());
+                            canonical =
+                                obs.isStatic() || ((obs instanceof IProgramMethod)
+                                        && services.getJavaInfo()
+                                                .isCanonicalProgramMethod((IProgramMethod) obs,
+                                                    keYJavaType));
+                        }
                         if (canonical) {
-                            p = fieldName;
+                            p = symbolName;
                         } else {
                             p = "(" + t.op() + ")";
                         }
@@ -1204,8 +1216,8 @@ public class LogicPrinter {
                     }
                     layouter.print(p);
                 } else {
-                    // in case arity == 1 we assume fieldName refers to an array
-                    layouter.print(fieldName);
+                    // in case arity == 1 we assume symbolName refers to an array
+                    layouter.print(symbolName);
                 }
 
                 layouter.print("(").beginC(0);
@@ -1223,7 +1235,7 @@ public class LogicPrinter {
                 if (isKeyword) {
                     layouter.markStartKeyword();
                 }
-                layouter.print(fieldName);
+                layouter.print(symbolName);
                 if (isKeyword) {
                     layouter.markEndKeyword();
                 }
