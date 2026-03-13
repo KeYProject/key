@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -288,6 +289,12 @@ public class HelperClassForTests {
     public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment()
             throws ProblemLoaderException {
         return KeYEnvironment.load(DUMMY_KEY_FILE);
+    }
+
+    public static Field getPrivateField(Object o, String fieldName) throws NoSuchFieldException {
+        final Field field = o.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field;
     }
 
 }

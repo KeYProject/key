@@ -13,6 +13,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.helper.FindResources;
 
@@ -40,8 +41,8 @@ class TestCopyingReplayer {
         }
 
         try {
-            final Field countersField = proof.getServices().getClass().getDeclaredField("counters");
-            countersField.setAccessible(true);
+            final Field countersField =
+                HelperClassForTests.getPrivateField(proof.getServices(), "counters");
             // noinspection unchecked
             ((HashMap<String, Counter>) countersField.get(proof.getServices())).clear();
         } catch (NoSuchFieldException | IllegalAccessException e) {
