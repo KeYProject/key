@@ -941,11 +941,12 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction op) {
-                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
-                    layouter.print(op.getSortDependingOn().declarationString());
-                    layouter.print("::");
-                    layouter.keyWord(op.getKind().toString());
+            if (t.op() instanceof ParametricFunctionInstance op) {
+                if (op.getBase() == services.getJavaDLTheory().getExactInstanceofSymbol(services)) {
+                    layouter.keyWord(op.getBase().name().toString());
+                    layouter.print("<[");
+                    layouter.print(op.getArgs().head().sort().declarationString());
+                    layouter.print("]>");
                     alreadyPrinted = true;
                 }
             }
@@ -980,11 +981,11 @@ public class LogicPrinter {
     }
 
     public void printCast(String pre, String post, JTerm t, int ass) {
-        final SortDependingFunction cast = (SortDependingFunction) t.op();
+        final var cast = (ParametricFunctionInstance) t.op();
 
         layouter.startTerm(t.arity());
         layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
+        layouter.print(cast.getArgs().head().sort().toString());
         layouter.print(post);
         maybeParens(t.sub(0), ass);
     }

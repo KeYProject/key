@@ -569,11 +569,11 @@ public final class TypeConverter {
 
     private Expression translateJavaCast(JTerm term, ExtList children) {
         if (term.op() instanceof Function function) {
-            if (function instanceof SortDependingFunction sdf) {
-                SortDependingFunction castFunction =
-                    SortDependingFunction.getFirstInstance(JavaDLTheory.CAST_NAME, services);
-                if (sdf.isSimilar(castFunction)) {
-                    Sort s = sdf.getSortDependingOn();
+            if (function instanceof ParametricFunctionInstance pfi) {
+                ParametricFunctionDecl castFunction =
+                    services.getJavaDLTheory().getCastSymbol(services);
+                if (pfi.getBase() == (castFunction)) {
+                    Sort s = pfi.getArgs().head().sort();
                     KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
                     if (kjt != null) {
                         children.add(new TypeRef(kjt));

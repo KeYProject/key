@@ -15,8 +15,8 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -632,7 +632,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "stringsSimplify", longConst(-5000));
 
         final TermFeature charOrIntLiteral = or(tf.charLiteral, tf.literal,
-            or(add(OperatorClassTF.create(SortDependingFunction.class), // XXX:
+            or(add(OperatorClassTF.create(ParametricFunctionInstance.class), // XXX:
                 // was CastFunctionSymbol.class
                 sub(tf.literal)), inftyTermConst()));
 

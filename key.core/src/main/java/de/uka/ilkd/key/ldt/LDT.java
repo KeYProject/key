@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -40,6 +40,8 @@ public abstract class LDT implements Named {
 
     /** the namespace of functions this LDT feels responsible for */
     private final Namespace<Function> functions = new Namespace<>();
+    /// the namespace of parametric functions this LDT feels responsible for
+    private final Namespace<ParametricFunctionDecl> parametricFunctions = new Namespace<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -79,6 +81,16 @@ public abstract class LDT implements Named {
     }
 
     /**
+     * adds a parametric function to the LDT
+     *
+     * @return the added parametric function (for convenience reasons)
+     */
+    protected final ParametricFunctionDecl addParametricFunction(ParametricFunctionDecl f) {
+        parametricFunctions.addSafely(f);
+        return f;
+    }
+
+    /**
      * looks up a function in the namespace and adds it to the LDT
      *
      * @param funcName the String with the name of the function to look up
@@ -94,13 +106,12 @@ public abstract class LDT implements Named {
         return (F) addFunction(f);
     }
 
-    protected final SortDependingFunction addSortDependingFunction(TermServices services,
-            String kind) {
-        final SortDependingFunction f =
-            SortDependingFunction.getFirstInstance(new Name(kind), services);
-        assert f != null : "LDT: Sort depending function " + kind + " not found";
-        addFunction(f);
-        return f;
+    protected final ParametricFunctionDecl addParametricFunction(TermServices services,
+            String name) {
+        final ParametricFunctionDecl f =
+            services.getNamespaces().parametricFunctions().lookup(name);
+        assert f != null : "LDT: Sort depending function " + name + " not found";
+        return addParametricFunction(f);
     }
 
     /**

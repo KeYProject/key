@@ -363,21 +363,14 @@ public class OracleGenerator {
 
                 return new OracleMethodCall(m, args);
             }
-        } else if (name.endsWith("::instance")) {
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getInstanceofSymbol(services)) {
+            Sort s = pfi.getArgs().head().sort();
 
-            if (fun instanceof SortDependingFunction sdf) {
-                Sort s = sdf.getSortDependingOn();
+            OracleTerm arg = generateOracle(term.sub(0), initialSelect);
+            OracleType type = new OracleType(s);
 
-
-                OracleTerm arg = generateOracle(term.sub(0), initialSelect);
-                OracleType type = new OracleType(s);
-
-                return new OracleBinTerm("instanceof", arg, type);
-
-
-            }
-
-
+            return new OracleBinTerm("instanceof", arg, type);
         } else if (op instanceof ProgramMethod) {
 
             return translateQuery(term, initialSelect, op);

@@ -31,7 +31,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -286,9 +285,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
         Operator instantiatedOp = p_operatorToBeInstantiated;
-        if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
-            instantiatedOp = handleSortDependingSymbol(sortDependingFunction);
-        } else if (p_operatorToBeInstantiated instanceof ParametricFunctionInstance pfi) {
+        if (p_operatorToBeInstantiated instanceof ParametricFunctionInstance pfi) {
             instantiatedOp = handleParametricFunction(pfi);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
             instantiatedOp = instantiateElementaryUpdate(elementaryUpdate);
@@ -400,19 +397,6 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
-    }
-
-    private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
-        final Sort depSort = depOp.getSortDependingOn();
-
-        final Sort realDepSort =
-            svInst.getGenericSortInstantiations().getRealSort(depSort, services);
-
-
-        final Operator res = depOp.getInstanceFor(realDepSort, services);
-        assert res != null
-                : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
-        return res;
     }
 
     private Operator handleParametricFunction(ParametricFunctionInstance pfi) {

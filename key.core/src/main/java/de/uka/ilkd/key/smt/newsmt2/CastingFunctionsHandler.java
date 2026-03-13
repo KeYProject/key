@@ -7,7 +7,8 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import org.key_project.logic.Term;
@@ -15,11 +16,11 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 /**
- * This SMT translation handler takes care of those sort-depending functions f whose return type is
+ * This SMT translation handler takes care of those parametric functions f whose return type is
  * coerced, i.e.
  *
  * <pre>
- *     T::f(params) = T::cast(any::f(params))
+ *     f<[T]>(params) = cast<[T]>(f<[any]>(params))
  * </pre>
  *
  * Currently these are: seqGet and (heap-) select.
@@ -29,22 +30,22 @@ import org.key_project.logic.sort.Sort;
  */
 public class CastingFunctionsHandler implements SMTHandler {
 
-    private SortDependingFunction seqGet;
-    private SortDependingFunction select;
+    private ParametricFunctionDecl seqGet;
+    private ParametricFunctionDecl select;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
-        this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(JavaDLTheory.ANY, services);
+        this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet();
         this.select =
-            services.getTypeConverter().getHeapLDT().getSelect(JavaDLTheory.ANY, services);
+            services.getTypeConverter().getHeapLDT().getSelect();
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        if (op instanceof SortDependingFunction sdf) {
-            return seqGet.isSimilar(sdf) || select.isSimilar(sdf);
+        if (op instanceof ParametricFunctionInstance pfi) {
+            return seqGet == (pfi.getBase()) || select == (pfi.getBase());
         }
         return false;
     }
@@ -52,12 +53,12 @@ public class CastingFunctionsHandler implements SMTHandler {
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
-        SortDependingFunction sdf = (SortDependingFunction) op;
-        String name = sdf.getKind().toString();
+        var sdf = (ParametricFunctionInstance) op;
+        String name = sdf.getBase().toString();
         String prefixedName = DefinedSymbolsHandler.PREFIX + name;
         trans.introduceSymbol(name);
         SExpr result = trans.handleAsFunctionCall(prefixedName, term);
-        Sort dep = sdf.getSortDependingOn();
+        Sort dep = sdf.getArgs().head().sort();
         if (dep == JavaDLTheory.ANY) {
             return result;
         } else {

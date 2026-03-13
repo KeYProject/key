@@ -8,16 +8,16 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 /**
- * Handles translation of sort depending functions
+ * Handles translation of parametric functions
  */
-public class SortDependingFunctionHandler implements IsabelleHandler {
+public class ParametricFunctionHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
@@ -27,14 +27,15 @@ public class SortDependingFunctionHandler implements IsabelleHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return (op instanceof SortDependingFunction);
+        return (op instanceof ParametricFunctionInstance);
     }
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        assert term.op() instanceof SortDependingFunction;
-        SortDependingFunction op = (SortDependingFunction) term.op();
-        Sort dependentSort = op.getSortDependingOn();
+        assert term.op() instanceof ParametricFunctionInstance;
+        var op = (ParametricFunctionInstance) term.op();
+        // TODO(DD): Handle more complex parametric functions
+        Sort dependentSort = op.getArgs().head().sort();
 
         if (trans.isNewSort(dependentSort)) {
             trans.addGenericSort(dependentSort);
@@ -48,20 +49,20 @@ public class SortDependingFunctionHandler implements IsabelleHandler {
             name = trans.getKnownSymbol(term);
         }
 
-        return getSortDependingFunctionRef(trans, term, op, name.toString());
+        return getParametricFunctionRef(trans, term, op, name.toString());
     }
 
     /**
-     * Creates a reference to a sort depending function
+     * Creates a reference to a parametric function
      *
      * @param trans master handler used for translation
      * @param term term the function occurs in
      * @param op the function
      * @param name the name of the function in translation
-     * @return reference to a sort depending function for use in translation
+     * @return reference to a parametric function for use in translation
      */
-    static StringBuilder getSortDependingFunctionRef(IsabelleMasterHandler trans, Term term,
-            SortDependingFunction op, String name) {
+    static StringBuilder getParametricFunctionRef(IsabelleMasterHandler trans, Term term,
+            ParametricFunctionInstance op, String name) {
         StringBuilder ref = new StringBuilder("(").append(name).append("::");
         String parameterTypesDecl =
             op.argSorts().stream().map(trans::translateSortName).collect(Collectors.joining("=>"));

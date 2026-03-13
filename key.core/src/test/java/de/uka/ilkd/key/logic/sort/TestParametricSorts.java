@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -64,48 +63,6 @@ class TestParametricSorts {
             params, "", "");
         nss.parametricSorts().add(psd);
         return psd;
-    }
-
-
-    @Test
-    public void testParametricSortIdentical() {
-        ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
-        var sdf = SortDependingFunction.createFirstInstance(g1, new Name("someConst"), g1,
-            new Sort[0], false, services);
-        nss.functions().add(sdf);
-
-        var term = io.parseExpression("List<[int]>::someConst = List<[int]>::someConst");
-        assertEquals(term.sub(0), term.sub(1));
-        assertSame(term.sub(0).sort(), term.sub(1).sort());
-    }
-
-    @Test
-    public void testParametricSortDependentFunctionInstantiation() {
-        ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
-        Sort intSort = nss.sorts().lookup("int");
-
-        var someConst = SortDependingFunction.createFirstInstance(g1, new Name("someConst"), g1,
-            new Sort[0], false, services);
-        nss.functions().add(someConst);
-
-        var listOfInt =
-            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(intSort)),
-                services);
-        var listOfG1 =
-            ParametricSortInstance.get(psd, ImmutableList.of(new GenericArgument(g1)), services);
-        var sdf = SortDependingFunction.createFirstInstance(g1, new Name("head"), g1,
-            new Sort[] { listOfG1 }, false, services);
-        nss.functions().add(sdf);
-
-        SortDependingFunction sdfInst = sdf.getInstanceFor(intSort, services);
-        assertEquals(intSort, sdfInst.sort());
-        assertEquals(listOfInt, sdfInst.argSort(0));
-
-        var term = io.parseExpression("int::head(List<[int]>::someConst) = int::someConst");
-        assertEquals("List<[int]>", term.sub(0).sub(0).sort().toString());
-        assertEquals("List<[int]>", ((JFunction) term.sub(0).op()).argSorts().get(0).toString());
-        assertEquals("int", term.sub(0).op().sort(new Sort[0]).toString());
-        assertSame(term.sub(0).sort(), term.sub(1).sort());
     }
 
     @Test

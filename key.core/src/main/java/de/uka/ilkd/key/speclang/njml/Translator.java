@@ -630,7 +630,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = accept(ctx.shiftexpr());
         KeYJavaType rtype = accept(ctx.typespec());
         assert rtype != null;
-        final SortDependingFunction f =
+        final ParametricFunctionInstance f =
             services.getJavaDLTheory().getInstanceofSymbol(rtype.getSort(), services);
         // instanceof-expression
         assert result != null;

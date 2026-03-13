@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
@@ -902,8 +903,10 @@ public class SMTObjTranslator implements SMTTranslator {
      */
     private void findSorts(Set<Sort> sorts, Term term) {
         addSingleSort(sorts, term.sort());
-        if (term.op() instanceof SortDependingFunction sdf) {
-            addSingleSort(sorts, sdf.getSortDependingOn());
+        if (term.op() instanceof ParametricFunctionInstance pfi) {
+            for (GenericArgument a : pfi.getArgs()) {
+                addSingleSort(sorts, a.sort());
+            }
         }
         for (Term sub : term.subs()) {
             findSorts(sorts, sub);
@@ -1451,20 +1454,22 @@ public class SMTObjTranslator implements SMTTranslator {
             function = wellformedFunction;
         } else if (name.equals(ELEMENTOF)) {
             function = elementOfFunction;
-        } else if (name.endsWith("::exactInstance")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            Sort depSort = sdf.getSortDependingOn();
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getExactInstanceofSymbol(services)) {
+            Sort depSort = pfi.getArgs().head().sort();
             function = getExactInstanceFunction(depSort);
-        } else if (name.endsWith("::instance")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            Sort depSort = sdf.getSortDependingOn();
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getInstanceofSymbol(services)) {
+            Sort sort = pfi.getArgs().head().sort();
+            Sort depSort = sort;
             addTypePredicate(depSort);
-            function = getTypePredicate(sdf.getSortDependingOn().name().toString());
-        } else if (name.endsWith("::cast")) {
-            SortDependingFunction sdf = (SortDependingFunction) fun;
-            SMTSort target = translateSort(sdf.getSortDependingOn());
+            function = getTypePredicate(sort.name().toString());
+        } else if (fun instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getJavaDLTheory().getCastSymbol(services)) {
+            Sort sort = pfi.getArgs().head().sort();
+            SMTSort target = translateSort(sort);
             if (target.getId().equals(OBJECT_SORT)) {
-                function = getCastFunction(sdf.getSortDependingOn());
+                function = getCastFunction(sort);
             } else {
                 Sort s = subs.get(0).sort();
                 SMTSort source = translateSort(s);

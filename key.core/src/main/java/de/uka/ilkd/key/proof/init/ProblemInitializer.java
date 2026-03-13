@@ -305,8 +305,8 @@ public final class ProblemInitializer {
             }
         }
         for (Function n : initConfig.funcNS().allElements()) {
-            if (!(n instanceof SortDependingFunction
-                    && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
+            if (!(n instanceof ParametricFunctionInstance pfi
+                    && pfi.getArgs().stream().anyMatch(a -> a.sort() instanceof GenericSort))) {
                 newFuncNS.addSafely(n);
             }
         }

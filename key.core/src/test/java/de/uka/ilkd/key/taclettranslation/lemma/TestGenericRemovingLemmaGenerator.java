@@ -6,8 +6,9 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -53,8 +54,8 @@ public class TestGenericRemovingLemmaGenerator {
 
         sorts.add(term.sort());
 
-        if (term.op() instanceof SortDependingFunction sdf) {
-            sorts.add(sdf.getSortDependingOn());
+        if (term.op() instanceof ParametricFunctionInstance pfi) {
+            sorts.addAll(pfi.getArgs().stream().map(GenericArgument::sort).toList());
         }
 
         for (QuantifiableVariable v : term.boundVars()) {

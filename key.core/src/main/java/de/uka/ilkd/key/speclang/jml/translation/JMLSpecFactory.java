@@ -1603,7 +1603,7 @@ public class JMLSpecFactory {
      */
     private JTerm resolveFinalAssignee(JTerm assignee) {
         if (services.getTypeConverter().getHeapLDT().isFinalOp(assignee.op())) {
-            SortDependingFunction finalOp = assignee.op(SortDependingFunction.class);
+            ParametricFunctionInstance finalOp = assignee.op(ParametricFunctionInstance.class);
             return tb.select(
                 finalOp.sort(),
                 tb.getBaseHeap(),

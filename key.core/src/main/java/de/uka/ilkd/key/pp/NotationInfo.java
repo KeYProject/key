@@ -489,13 +489,6 @@ public final class NotationInfo {
             }
         }
 
-        if (op instanceof SortDependingFunction) {
-            result = notationTable.get(((SortDependingFunction) op).getKind());
-            if (result != null) {
-                return result;
-            }
-        }
-
         if (op instanceof ParametricFunctionInstance pfi) {
             result = notationTable.get(pfi.getBase());
             if (result != null) {

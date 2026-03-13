@@ -10,32 +10,36 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.operator.Subtype;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 
 public final class SortLDT extends LDT {
 
     public static final Name NAME = new Name("SORT");
 
-    private final SortDependingFunction ssort;
+    private final ParametricFunctionDecl ssort;
     private final Function ssubsort;
 
     public SortLDT(TermServices services) {
         super(NAME, services);
-        ssort = addSortDependingFunction(services, "ssort");
+        ssort = addParametricFunction((Services) services, "ssort");
         ssubsort = addFunction(services, "ssubsort");
     }
 
-    public SortDependingFunction getSsort(Sort instanceSort, TermServices services) {
-        return ssort.getInstanceFor(instanceSort, services);
+    public ParametricFunctionInstance getSsort(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(ssort,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
     public Function getSsubsort() {
@@ -78,12 +82,12 @@ public final class SortLDT extends LDT {
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-        return f instanceof SortDependingFunction sf && sf.isSimilar(ssort);
+        return f instanceof ParametricFunctionInstance sf && sf.getBase() == ssort;
     }
 
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
-        if (t.op() instanceof SortDependingFunction sf && sf.isSimilar(ssort)) {
+        if (t.op() instanceof ParametricFunctionInstance sf && sf.getBase() == ssort) {
             // TODO
         }
 

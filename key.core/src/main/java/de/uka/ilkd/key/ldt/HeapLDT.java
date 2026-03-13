@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
@@ -56,8 +57,8 @@ public final class HeapLDT extends LDT {
     private final Sort fieldSort;
 
     // select/store
-    private final SortDependingFunction select;
-    private final SortDependingFunction finalFunction;
+    private final ParametricFunctionDecl select;
+    private final ParametricFunctionDecl finalFunction;
     private final Function store;
     private final Function create;
     private final Function anon;
@@ -67,10 +68,10 @@ public final class HeapLDT extends LDT {
     private final Function arr;
     private final Function created;
     private final Function initialized;
-    private final SortDependingFunction classPrepared;
-    private final SortDependingFunction classInitialized;
-    private final SortDependingFunction classInitializationInProgress;
-    private final SortDependingFunction classErroneous;
+    private final ParametricFunctionDecl classPrepared;
+    private final ParametricFunctionDecl classInitialized;
+    private final ParametricFunctionDecl classInitializationInProgress;
+    private final ParametricFunctionDecl classErroneous;
 
     // length
     private final Function length;
@@ -100,8 +101,8 @@ public final class HeapLDT extends LDT {
             services.getNamespaces().programVariables();
 
         fieldSort = sorts.lookup(new Name("Field"));
-        select = addSortDependingFunction(services, SELECT_NAME.toString());
-        finalFunction = addSortDependingFunction(services, FINAL_NAME.toString());
+        select = addParametricFunction(services, SELECT_NAME.toString());
+        finalFunction = addParametricFunction(services, FINAL_NAME.toString());
         store = addFunction(services, STORE_NAME.toString());
         create = addFunction(services, "create");
         anon = addFunction(services, "anon");
@@ -109,11 +110,11 @@ public final class HeapLDT extends LDT {
         arr = addFunction(services, "arr");
         created = addFunction(services, "java.lang.Object::<created>");
         initialized = addFunction(services, "java.lang.Object::<initialized>");
-        classPrepared = addSortDependingFunction(services, "<classPrepared>");
-        classInitialized = addSortDependingFunction(services, "<classInitialized>");
+        classPrepared = addParametricFunction(services, "<classPrepared>");
+        classInitialized = addParametricFunction(services, "<classInitialized>");
         classInitializationInProgress =
-            addSortDependingFunction(services, "<classInitializationInProgress>");
-        classErroneous = addSortDependingFunction(services, "<classErroneous>");
+            addParametricFunction(services, "<classInitializationInProgress>");
+        classErroneous = addParametricFunction(services, "<classErroneous>");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
         acc = addFunction(services, "acc");
@@ -233,11 +234,16 @@ public final class HeapLDT extends LDT {
     }
 
 
+    public ParametricFunctionDecl getSelect() {
+        return select;
+    }
+
     /**
      * Returns the select function for the given sort.
      */
-    public SortDependingFunction getSelect(Sort instanceSort, TermServices services) {
-        return select.getInstanceFor(instanceSort, services);
+    public ParametricFunctionInstance getSelect(Sort instanceSort, TermServices services) {
+        return ParametricFunctionInstance.get(select,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
     /**
@@ -247,20 +253,21 @@ public final class HeapLDT extends LDT {
      * @param services the services to find/create the sort-depending function
      * @return the function symbol to access final fields for the given instance sort
      */
-    public @NonNull SortDependingFunction getFinal(@NonNull Sort instanceSort,
+    public @NonNull ParametricFunctionInstance getFinal(@NonNull Sort instanceSort,
             @NonNull Services services) {
-        return finalFunction.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(finalFunction,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
     /**
      * Check if the given operator is an instance of the "final" function to access final fields.
      *
      * @param op the operator to check
-     * @return true if the operator is an instance of the "X::final" srot-depending function
+     * @return true if the operator is an instance of the {@code final<[X]>} parametric function
      */
     public boolean isFinalOp(Operator op) {
-        return op instanceof SortDependingFunction
-                && ((SortDependingFunction) op).isSimilar(finalFunction);
+        return op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == finalFunction;
     }
 
 
@@ -270,15 +277,15 @@ public final class HeapLDT extends LDT {
      */
     public Sort getSortOfSelect(Operator op) {
         if (isSelectOp(op)) {
-            return ((SortDependingFunction) op).getSortDependingOn();
+            return ((ParametricFunctionInstance) op).getArgs().head().sort();
         } else {
             return null;
         }
     }
 
     public boolean isSelectOp(Operator op) {
-        return op instanceof SortDependingFunction
-                && ((SortDependingFunction) op).isSimilar(select);
+        return op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == (select);
     }
 
 
@@ -318,23 +325,27 @@ public final class HeapLDT extends LDT {
 
 
     public Function getClassPrepared(Sort instanceSort, TermServices services) {
-        return classPrepared.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classPrepared,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
     public Function getClassInitialized(Sort instanceSort, TermServices services) {
-        return classInitialized.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classInitialized,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
     public Function getClassInitializationInProgress(Sort instanceSort,
             TermServices services) {
-        return classInitializationInProgress.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classInitializationInProgress,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
     public Function getClassErroneous(Sort instanceSort, TermServices services) {
-        return classErroneous.getInstanceFor(instanceSort, services);
+        return ParametricFunctionInstance.get(classErroneous,
+            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
 
@@ -411,11 +422,11 @@ public final class HeapLDT extends LDT {
             assert index > 0;
             final Name kind = new Name(name.toString().substring(index + 2));
 
-            SortDependingFunction firstInstance =
-                SortDependingFunction.getFirstInstance(kind, services);
+            var firstInstance = services.getNamespaces().parametricFunctions().lookup(kind);
             if (firstInstance != null) {
                 Sort sortDependingOn = fieldPV.getContainerType().getSort();
-                result = firstInstance.getInstanceFor(sortDependingOn, services);
+                result = ParametricFunctionInstance.get(firstInstance,
+                    ImmutableList.of(new GenericArgument(sortDependingOn)), services);
             } else {
                 if (fieldPV.isModel()) {
                     int heapCount = 0;
@@ -451,8 +462,8 @@ public final class HeapLDT extends LDT {
         if (super.containsFunction(op)) {
             return true;
         }
-        if (op instanceof SortDependingFunction) {
-            return ((SortDependingFunction) op).isSimilar(select);
+        if (op instanceof ParametricFunctionInstance pfi) {
+            return pfi.getBase() == (select);
         }
         return op.isUnique() && op.sort() == getFieldSort();
     }
@@ -502,8 +513,8 @@ public final class HeapLDT extends LDT {
 
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
-        if (t.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) t.op()).isSimilar(select)) {
+        if (t.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == (select)) {
             ProgramVariable heap = (ProgramVariable) children.removeFirst();
             if (heap != getHeap()) {
                 throw new IllegalArgumentException("Can only translate field access to base heap.");
@@ -530,6 +541,4 @@ public final class HeapLDT extends LDT {
         assert false;
         return null;
     }
-
-
 }

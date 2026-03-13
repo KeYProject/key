@@ -813,7 +813,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 + ". Casts between primitive and reference types are not allowed. ");
         }
         assert s != null;
-        SortDependingFunction castSymbol =
+        ParametricFunctionInstance castSymbol =
             getServices().getJavaDLTheory().getCastSymbol(s, services);
         return getTermFactory().createTerm(castSymbol, result);
     }

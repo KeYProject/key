@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
@@ -39,7 +39,7 @@ public class InstanceOperatorHandler implements IsabelleHandler {
         definedSortDependingFunctions.put("exactInstance", "exactInstance");
 
         for (Function function : functionNamespace.elements()) {
-            if (!(function instanceof SortDependingFunction))
+            if (!(function instanceof ParametricFunctionInstance))
                 continue;
             String funName = function.name().toString().split("::")[1];
             for (String name : definedSortDependingFunctions.keySet()) {
@@ -57,9 +57,10 @@ public class InstanceOperatorHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        SortDependingFunction op = (SortDependingFunction) term.op();
+        var op = (ParametricFunctionInstance) term.op();
         String functionName = supportedOperators.get(op);
-        String dependingSortTypeName = trans.translateSortName(op.getSortDependingOn()) + "_type";
+        String dependingSortTypeName =
+            trans.translateSortName(op.getArgs().head().sort()) + "_type";
 
         StringBuilder result = new StringBuilder("(");
         result.append("(").append(functionName).append(") ");
