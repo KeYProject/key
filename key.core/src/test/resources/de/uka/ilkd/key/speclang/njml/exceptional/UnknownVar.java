@@ -5,7 +5,7 @@
 
 class UnknownVar {
 
-    /*@ public normal_bevhaviour
+    /*@ public normal_behaviour
       @  ensures true;
       @*/
     public void m() {

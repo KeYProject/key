@@ -88,7 +88,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
     /**
      * Throws an exception if an error has occured.
      *
-     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
+     * @throws de.uka.ilkd.key.parser.ParserException
      * @see #hasErrors()
      */
     public void throwException() {
@@ -102,7 +102,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * Throws an exception if an error has occured, like {@link #throwException()}, but with an
      * beautiful exception message based on input {@code lines}.
      *
-     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
+     * @throws de.uka.ilkd.key.parser.ParserException
      * @see #hasErrors()
      */
     public void throwException(String[] lines) {
@@ -117,7 +117,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * Throws an exception if an error has occured, like {@link #throwException()}, but with an
      * beautiful exception message based on input {@code lines}.
      *
-     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
+     * @throws de.uka.ilkd.key.parser.ParserException
      * @see #hasErrors()
      */
     public void throwException(Supplier<String[]> lines) {

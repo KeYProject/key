@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -306,8 +307,22 @@ public final class JMLTransformer extends JavaTransformer {
                                 : "There seems to be more than one set of dangling modifiers";
                         jmlModifiers = newModifiers;
                     } else {
-                        throw new AssertionError(
-                            "Unknown subclass of TextualJMLSpecCase: " + c.getClass());
+                        String errorMessage = "";
+                        if (c instanceof TextualJMLSetStatement) {
+                            errorMessage = "A set assignment only allowed inside of a method body";
+                        } else if (c instanceof TextualJMLMergePointDecl) {
+                            errorMessage = "Merge points are only allowed inside of a method body";
+                        } else if (c instanceof TextualJMLLoopSpec) {
+                            errorMessage =
+                                "Loop specifications are only allowed inside of a method body or initializers";
+                        } else if (c instanceof TextualJMLAssertStatement) {
+                            errorMessage =
+                                "Assert statements are only allowed inside of a method body or initializers";
+                        } else {
+                            errorMessage =
+                                "Unknown subclass of TextualJMLSpecCase: " + c.getClass();
+                        }
+                        throw new ConvertException(errorMessage, c.getLocation());
                     }
                 }
             } else if (jmlModifiers != null) {

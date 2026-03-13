@@ -270,7 +270,7 @@ public final class ProblemInitializer {
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
             } catch (BuildingExceptions e) {
-                new ProofInputException("Failed to parse file", e);
+                throw new ProofInputException("Failed to parse file", e);
             }
         }
         Path initialFile = envInput.getInitialFile();
