@@ -318,17 +318,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
     /**
-     * Reset all counters associated with this service.
-     * Only use this method if the proof is empty!
-     */
-    public void resetCounters() {
-        if (proof.root().childrenCount() > 0) {
-            throw new IllegalStateException("tried to reset counters on non-empty proof");
-        }
-        counters.clear();
-    }
-
-    /**
      * returns the namespaces for functions, predicates etc.
      *
      * @return the proof specific namespaces

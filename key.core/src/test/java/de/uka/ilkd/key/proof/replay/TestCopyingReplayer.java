@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -26,6 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TestCopyingReplayer {
     public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
+
+    /**
+     * Reset all counters associated with this service.
+     * Only use this method if the proof is empty!
+     */
+    public void resetCounters(Proof proof) {
+        if (proof.root().childrenCount() > 0) {
+            throw new IllegalStateException("tried to reset counters on non-empty proof");
+        }
+
+        try {
+            final Field countersField = proof.getServices().getClass().getDeclaredField("counters");
+            countersField.setAccessible(true);
+            // noinspection unchecked
+            ((HashMap<String, Counter>) countersField.get(proof.getServices())).clear();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     void testJavaProof() throws Exception {
@@ -48,7 +70,7 @@ class TestCopyingReplayer {
 
             // clear proof2, replay proof1 on top
             proof2.pruneProof(proof2.root());
-            proof2.getServices().resetCounters();
+            resetCounters(proof2);
             new CopyingProofReplayer(proof1, proof2).copy(proof1.root(),
                 proof2.getOpenGoal(proof2.root()), new HashSet<>());
 
