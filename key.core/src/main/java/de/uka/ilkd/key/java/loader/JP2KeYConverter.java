@@ -32,7 +32,6 @@ import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
@@ -1858,10 +1857,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         IProgramVariable resultVar = accepto(n.getName());
         StatementBlock body = accept(n.getBlock());
         IExecutionContext execContext = accept(n.getContext());
-        PosInProgram firstActiveChildPos = null;
-        // TODO weigl
-        return new MethodFrame(pi, c, resultVar, body, execContext, firstActiveChildPos,
-            0, null);
+        return new MethodFrame(resultVar, execContext, body, pi, c);
     }
 
     @Override
@@ -1872,8 +1868,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Nullable
     private IProgramMethod resolveMethodSignature(KeYJavaType type, KeyMethodSignature sig,
             KeYJavaType context) {
-        var name = sig.getName().asString();
-        ImmutableArray<TypeReference> params = map(sig.getParamTypes());
+        final String name = sig.getName().asString();
+        final ImmutableArray<TypeReference> params = map(sig.getParamTypes());
         var paramTypes = params.stream().map(TypeReference::getKeYJavaType).toList();
         return services.getJavaInfo().getProgramMethod(type, name, paramTypes, context);
     }

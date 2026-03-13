@@ -41,8 +41,6 @@ public class MethodFrame extends JavaStatement
 
     private final MethodFrame innerMostMethodFrame;
 
-
-
     /**
      * Labeled statement.
      *
@@ -67,7 +65,6 @@ public class MethodFrame extends JavaStatement
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-
     }
 
     /**
@@ -75,12 +72,34 @@ public class MethodFrame extends JavaStatement
      *
      * @param resultVar
      *        the ProgramVariable the return value is assigned to
+     * @param execContext the IExecutionContext with information about the type in whose scope the
+     *        body is executed as
+     *        well as the reference to the `this` instance (if not static)
      * @param body
      *        a Statement containing the method body of the called method
+     * @param pos the PositionInfo where the frame was parsed
      */
     public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body, PositionInfo pos) {
-        super(pos);
+        this(resultVar, execContext, body, pos, null);
+    }
+
+    /**
+     * Labeled statement.
+     *
+     * @param resultVar
+     *        the ProgramVariable the return value is assigned to
+     * @param execContext the IExecutionContext with information about the type in whose scope the
+     *        body is executed as
+     *        well as the reference to the `this` instance (if not static)
+     * @param body
+     *        a Statement containing the method body of the called method
+     * @param pi the PositionInfo where the frame was parsed
+     * @param c list of comments associated with the method frame
+     */
+    public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
+            StatementBlock body, PositionInfo pi, List<Comment> c) {
+        super(pi, c);
         this.resultVar = resultVar;
         this.body = body;
         this.execContext = execContext;
@@ -89,27 +108,12 @@ public class MethodFrame extends JavaStatement
             body.isEmpty() ? PosInProgram.TOP
                     : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
-
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");
         Debug.assertTrue(body != null, "methodframe: body missing");
 
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-
-    }
-
-    public MethodFrame(PositionInfo pi, List<Comment> c, IProgramVariable resultVar,
-            StatementBlock body,
-            IExecutionContext execContext, PosInProgram firstActiveChildPos, int prefixLength,
-            MethodFrame o) {
-        super(pi, c);
-        this.resultVar = resultVar;
-        this.body = body;
-        this.execContext = execContext;
-        this.firstActiveChildPos = firstActiveChildPos;
-        this.prefixLength = prefixLength;
-        this.innerMostMethodFrame = o;
     }
 
     @Override
