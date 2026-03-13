@@ -15,10 +15,8 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.sort.Sort;

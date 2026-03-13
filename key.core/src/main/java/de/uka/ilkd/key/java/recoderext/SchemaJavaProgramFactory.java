@@ -246,7 +246,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public SwitchBranchSVWrapper getSwitchBranchSV(String s) throws ParseException {
-        SchemaVariable sv = lookupSchemaVariable(s);
+        JOperatorSV sv = lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV)) {
             throwSortInvalid(sv, "SwitchCase");
         }

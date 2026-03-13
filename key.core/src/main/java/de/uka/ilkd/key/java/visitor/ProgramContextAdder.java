@@ -7,12 +7,7 @@ import java.rmi.UnexpectedException;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.statement.Exec;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 

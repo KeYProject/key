@@ -31,10 +31,9 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -1779,7 +1778,7 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnActiveCase(ActiveCase x) {
         if (!x.isPrefix())
             markStart(x);
-        l.keyWord("active-case").print(":");
+        layouter.keyWord("active-case").print(":");
         printCaseBody(x.getBody());
         if (!x.isPrefix())
             markEnd(x);

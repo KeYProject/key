@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -24,7 +25,6 @@ public class SwitchBranchSVWrapper extends SwitchBranch implements KeYRecoderExt
      *
      * @param sv the SchemaVariable
      */
-    @Override
     public void setSV(SchemaVariable sv) {
         this.sv = (ProgramSV) sv;
     }
