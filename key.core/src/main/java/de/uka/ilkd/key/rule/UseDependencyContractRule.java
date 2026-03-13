@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -38,11 +39,12 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
-public final class UseDependencyContractRule implements BuiltInRule {
+public final class UseDependencyContractRule implements BuiltInRule, ComplexJustificationable {
 
     public static final UseDependencyContractRule INSTANCE = new UseDependencyContractRule();
 
@@ -311,9 +313,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     }
 
 
-    public static PosInOccurrence findStepInIfInsts(
-            List<PosInOccurrence> steps,
-            UseDependencyContractApp app, TermServices services) {
+    public static @Nullable PosInOccurrence findStepInIfInsts(List<PosInOccurrence> steps,
+            UseDependencyContractApp<?> app) {
         for (PosInOccurrence pio : app.assumesInsts()) {
             if (steps.contains(pio)) {
                 return pio;

@@ -58,8 +58,8 @@ public abstract class AbstractProfile implements Profile {
     }
 
     protected AbstractProfile(String standardRuleFilename) {
-        standardRules = new RuleCollection(
-            RuleSourceFactory.fromDefaultLocation(standardRuleFilename), initBuiltInRules());
+        final var ruleSource = RuleSourceFactory.fromDefaultLocation(standardRuleFilename);
+        standardRules = new RuleCollection(ImmutableList.of(ruleSource), initBuiltInRules());
         strategies = getStrategyFactories();
         this.supportedGCB = computeSupportedGoalChooserBuilder();
         this.supportedGC = extractNames(supportedGCB);

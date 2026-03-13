@@ -61,7 +61,7 @@ jobs:
         run: ./gradlew --continue -DjacocoEnabled=true :${{ matrix.modules }}:test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.modules }}
@@ -80,7 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs ]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs ]
         os: [ ubuntu-latest ]
         java: [ 21 ]
     runs-on: ${{ matrix.os }}
@@ -102,7 +102,7 @@ jobs:
         run: ./gradlew --continue ${{ matrix.test }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results-${{ matrix.test }}
