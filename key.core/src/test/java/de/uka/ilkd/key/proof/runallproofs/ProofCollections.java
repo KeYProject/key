@@ -999,6 +999,10 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_list_appnil.proof");
         g.loadable("standard_key/adt/dt_color.proof");
         g.loadable("standard_key/adt/dt_list_deconstruct.key");
+        g.loadable("standard_key/adt/dt_polymorphic.proof");
+
+        g = c.group("PolymorphicSorts");
+        g.loadable("standard_key/polymorphic/pseq.key");
 
         // use for debugging purposes.
         // c.keep("VSTTE10");

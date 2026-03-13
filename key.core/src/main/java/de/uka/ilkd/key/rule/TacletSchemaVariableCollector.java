@@ -44,7 +44,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /** collects all found variables */
     protected @NonNull ImmutableList<SchemaVariable> varList;
     /** the instantiations needed for unwind loop constructs */
-    private @NonNull SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    protected @NonNull SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
 
     public TacletSchemaVariableCollector() {

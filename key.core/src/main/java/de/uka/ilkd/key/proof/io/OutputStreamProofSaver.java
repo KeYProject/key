@@ -14,6 +14,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -735,6 +737,12 @@ public class OutputStreamProofSaver {
 
             String singleInstantiation =
                 var.name() + "=" + printAnything(value, proof.getServices(), false);
+            if ((var.sort() instanceof GenericSort
+                    || var.sort() instanceof ParametricSortInstance psi
+                            && psi.containsGenericSort())) {
+                var t = (JTerm) value;
+                singleInstantiation += ":" + t.sort().name();
+            }
             s.add(singleInstantiation);
         }
 

@@ -97,4 +97,9 @@ public class SortImpl extends AbstractSort {
     public @Nullable String getOrigin() {
         return origin;
     }
+
+    @Override
+    public boolean containsGenericSort() {
+        return false;
+    }
 }
