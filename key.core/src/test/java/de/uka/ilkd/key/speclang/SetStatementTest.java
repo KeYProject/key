@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
@@ -136,6 +137,6 @@ public class SetStatementTest {
         var fields = cu.getDeclarations().get(0).getAllFields(env.getServices());
         var fieldX = fields.stream().filter(it -> "Foo::x".equals(it.getName())).findFirst().get();
 
-        Assertions.assertTrue(fieldX.getProgramVariable().isRigid());
+        Assertions.assertTrue(((ProgramVariable) fieldX.getProgramVariable()).isGhost());
     }
 }
