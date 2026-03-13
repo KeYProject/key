@@ -20,7 +20,6 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -394,7 +393,7 @@ public class TestTacletParser {
         // buggy { find(==>b) replacewith(==>b,z=z) }
 
         String brokenTacletString = "buggy { \\find(==>b)" + "\\replacewith(==>b,z=z) }";
-        Assertions.assertThrows(BuildingException.class, () -> {
+        Assertions.assertThrows(TacletBuilder.TacletBuilderException.class, () -> {
             parseTaclet(brokenTacletString);
         });
     }
