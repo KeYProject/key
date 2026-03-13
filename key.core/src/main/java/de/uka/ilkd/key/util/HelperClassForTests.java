@@ -291,10 +291,16 @@ public class HelperClassForTests {
         return KeYEnvironment.load(DUMMY_KEY_FILE);
     }
 
-    public static Field getPrivateField(Object o, String fieldName) throws NoSuchFieldException {
+    public static Field field(Object o, String fieldName) throws NoSuchFieldException {
         final Field field = o.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         return field;
+    }
+
+    public static <T> T get(Object o, String fieldName)
+            throws NoSuchFieldException, IllegalAccessException {
+        final Field field = field(o, fieldName);
+        return (T) field.get(o);
     }
 
 }

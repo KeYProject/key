@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -41,10 +40,9 @@ class TestCopyingReplayer {
         }
 
         try {
-            final Field countersField =
-                HelperClassForTests.getPrivateField(proof.getServices(), "counters");
-            // noinspection unchecked
-            ((HashMap<String, Counter>) countersField.get(proof.getServices())).clear();
+            final HashMap<String, Counter> counters =
+                HelperClassForTests.get(proof.getServices(), "counters");
+            counters.clear();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
