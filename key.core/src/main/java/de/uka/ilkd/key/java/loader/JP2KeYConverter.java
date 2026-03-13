@@ -602,7 +602,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var pi = createPositionInfo(n);
         var c = createComments(n);
         ImmutableArray<Expression> args = map(n.getArguments());
-        return new SuperConstructorReference(args, pi, c);
+        return n.isThis() ? new ThisConstructorReference(args, pi, c)
+                : new SuperConstructorReference(args, pi, c);
     }
 
     @Override

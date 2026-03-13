@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
+import java.util.List;
+
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
@@ -42,6 +46,17 @@ public class ThisConstructorReference extends SpecialConstructorReference {
      */
     public ThisConstructorReference(ImmutableArray<Expression> arguments) {
         super(arguments);
+    }
+
+    /**
+     * This constructor reference.
+     *
+     * @param arguments
+     *        an expression mutable list.
+     */
+    public ThisConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,
+            List<Comment> comments) {
+        super(arguments, pi, comments);
     }
 
 
