@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.*;
@@ -75,6 +78,9 @@ public class ConstantExpressionEvaluator {
 
     private static class ConstantExpressionEvaluatorVisitor
             extends GenericVisitorAdapter<Object, Void> {
+
+        private Queue<FieldDeclaration> path = new LinkedList<FieldDeclaration>();
+
         @Override
         public Object visit(ArrayAccessExpr n, Void arg) {
             return super.visit(n, arg);
@@ -234,8 +240,11 @@ public class ConstantExpressionEvaluator {
         public Object visit(FieldAccessExpr n, Void arg) {
             final FieldDeclaration fd =
                 (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
-            if (fd.isFinal() && fd.isStatic()) {
-                return visit(fd, arg);
+            if (fd.isFinal() && fd.isStatic() && !path.contains(fd)) {
+                path.add(fd);
+                var result = super.visit(fd, arg);
+                path.remove(fd);
+                return result;
             } else {
                 return null;
             }
