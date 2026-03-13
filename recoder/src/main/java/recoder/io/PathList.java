@@ -122,7 +122,7 @@ public class PathList {
     /**
      * Returns a set of file names in the given directory.
      */
-    protected Set getContents(File directory) {
+    protected Set<String> getContents(File directory) {
         Set<String> result = dirContents.get(directory);
         if (result == null) {
             dirContents.put(directory, result = new HashSet<>());
@@ -255,9 +255,9 @@ public class PathList {
         List<DataLocation> res = new ArrayList<>();
         for (Object f : paths) {
             if (f instanceof ZipFile zf) {
-                Enumeration enum2 = zf.entries();
+                Enumeration<? extends ZipEntry> enum2 = zf.entries();
                 while (enum2.hasMoreElements()) {
-                    ZipEntry e = (ZipEntry) enum2.nextElement();
+                    ZipEntry e = enum2.nextElement();
                     String name = e.getName();
                     if (filter.accept(null, name)) {
                         DataLocation loc = locations.get(name);

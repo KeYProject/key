@@ -10,15 +10,16 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
 
 import org.jspecify.annotations.NonNull;
 
@@ -54,6 +55,9 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractConditionBuilder ABSTRACT_OR_INTERFACE =
         new ConstructorBasedBuilder("isAbstractOrInterface", AbstractOrInterfaceType.class, TR);
+
+    public static final AbstractConditionBuilder FINAL_TYPE =
+        new ConstructorBasedBuilder("isFinal", FinalTypeVarCond.class, TR);
 
     /**
      *
@@ -160,6 +164,8 @@ public class TacletBuilderManipulators {
             }
         };
 
+    public static final TacletBuilderCommand NEW_LOCAL_VARS = new ConstructorBasedBuilder(
+        "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
@@ -304,7 +310,7 @@ public class TacletBuilderManipulators {
         @Override
         public VariableCondition build(Object[] arguments, List<String> parameters,
                 boolean negated) {
-            SchemaVariable v = (SchemaVariable) arguments[0];
+            var v = (JOperatorSV) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
                 throw new IllegalArgumentException("Generic sort is expected. Got: " + s);
@@ -330,7 +336,8 @@ public class TacletBuilderManipulators {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                return new StoreTermInCondition((SchemaVariable) arguments[0], (Term) arguments[1]);
+                return new StoreTermInCondition((SchemaVariable) arguments[0],
+                    (JTerm) arguments[1]);
             }
         };
 
@@ -366,7 +373,8 @@ public class TacletBuilderManipulators {
     // region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE, ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
-            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, FREE_1, FREE_2, FREE_3, FREE_4,
+            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, NEW_LOCAL_VARS, FREE_1, FREE_2,
+            FREE_3, FREE_4, FINAL_TYPE,
             FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON, FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL,
             ENUM_CONST, LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
             MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,

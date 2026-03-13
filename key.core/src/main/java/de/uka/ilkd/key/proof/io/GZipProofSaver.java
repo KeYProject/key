@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.GZIPOutputStream;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -35,7 +35,9 @@ public class GZipProofSaver extends ProofSaver {
      * This subclass wraps the file stream into a {@link GZIPOutputStream}.
      */
     @Override
-    protected void save(File file) throws IOException {
-        super.save(new GZIPOutputStream(new FileOutputStream(file)));
+    protected void save(Path file) throws IOException {
+        try (var out = new GZIPOutputStream(Files.newOutputStream(file))) {
+            save(out);
+        }
     }
 }

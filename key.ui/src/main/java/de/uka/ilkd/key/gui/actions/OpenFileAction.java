@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.nio.file.Path;
 import javax.swing.*;
 
@@ -35,15 +34,15 @@ public class OpenFileAction extends MainWindowAction {
         int result = fc.showOpenDialog(mainWindow);
 
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+            Path file = fc.getSelectedFile().toPath();
 
             // special case proof bundles -> allow to select the proof to load
-            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+            if (ProofSelectionDialog.isProofBundle(file)) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
                 if (proofPath == null) {
                     // canceled by user!
                 } else {
-                    mainWindow.loadProofFromBundle(file, proofPath.toFile());
+                    mainWindow.loadProofFromBundle(file, proofPath);
                 }
                 return;
             }

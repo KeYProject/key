@@ -81,38 +81,40 @@ public class ProofReplayer {
         while (true) {
             int type = stream.LA(1); // current token type
             switch (type) {
-            case KeYLexer.LPAREN -> {
-                // expected "(" <id> ["string"]
-                stream.consume(); // consume the "("
-                Token idToken = stream.LT(1); // element id
-                IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
-                if (cur == null) {
-                    Location loc =
-                        new Location(source, Position.fromToken(idToken).offsetLine(startLine - 1));
-                    throw new LocatableException("Unknown proof element: " + idToken.getText(),
-                        loc);
+                case KeYLexer.LPAREN -> {
+                    // expected "(" <id> ["string"]
+                    stream.consume(); // consume the "("
+                    Token idToken = stream.LT(1); // element id
+                    IProofFileParser.ProofElementID cur =
+                        proofSymbolElementId.get(idToken.getText());
+                    if (cur == null) {
+                        Location loc =
+                            new Location(source,
+                                Position.fromToken(idToken).offsetLine(startLine - 1));
+                        throw new LocatableException("Unknown proof element: " + idToken.getText(),
+                            loc);
+                    }
+                    stream.consume();
+                    String arg = null;
+                    int pos = idToken.getLine() + startLine;
+                    if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
+                        // argument was given
+                        arg = stream.LT(1).getText();
+                        arg = unescape(arg.substring(1, arg.length() - 1));
+                        stream.consume();// throw string away
+                    }
+                    prl.beginExpr(cur, arg);
+                    stack.push(cur);
+                    posStack.push(pos);
                 }
-                stream.consume();
-                String arg = null;
-                int pos = idToken.getLine() + startLine;
-                if (stream.LA(1) == KeYLexer.STRING_LITERAL) {
-                    // argument was given
-                    arg = stream.LT(1).getText();
-                    arg = unescape(arg.substring(1, arg.length() - 1));
-                    stream.consume();// throw string away
+                case KeYLexer.RPAREN -> {
+                    prl.endExpr(stack.pop(), posStack.pop());
+                    stream.consume();
                 }
-                prl.beginExpr(cur, arg);
-                stack.push(cur);
-                posStack.push(pos);
-            }
-            case KeYLexer.RPAREN -> {
-                prl.endExpr(stack.pop(), posStack.pop());
-                stream.consume();
-            }
-            case KeYLexer.EOF -> {
-                return;
-            }
-            default -> stream.consume();
+                case KeYLexer.EOF -> {
+                    return;
+                }
+                default -> stream.consume();
             }
         }
     }

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import javax.swing.*;
 
@@ -38,8 +38,8 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
 
 
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            mainWindow.addRecentFile(file.getAbsolutePath());
+            Path file = fc.getSelectedFile().toPath();
+            mainWindow.addRecentFile(file.toAbsolutePath().toString());
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
             ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -44,6 +46,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * EnvInput for standalone specification language front ends.
@@ -55,17 +59,16 @@ public final class SLEnvInput extends AbstractEnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLEnvInput(String javaPath, List<File> classPath, File bootClassPath, Profile profile,
-            List<File> includes) {
+    public SLEnvInput(@Nullable Path javaPath, List<Path> classPath, @Nullable Path bootClassPath,
+            Profile profile, List<Path> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
     }
 
 
-    public SLEnvInput(String javaPath, Profile profile) {
+    public SLEnvInput(@Nullable Path javaPath, Profile profile) {
         this(javaPath, null, null, profile, null);
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -92,18 +95,21 @@ public final class SLEnvInput extends AbstractEnvInput {
 
 
     private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
-            String path) throws ProofInputException {
+            Path path) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : allKJTs) {
             if (kjt.getJavaType() instanceof TypeDeclaration
                     && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
                 final String filePath =
-                    String.format("%s/%s.key", path, kjt.getFullName().replace(".", "/"));
+                    String.format("%s/%s.key", path,
+                        kjt.getFullName().replace(".", "/")
+                                .replace('<', '_')
+                                .replace('>', '_'));
                 RuleSource rs = null;
 
                 // external or internal path?
-                File file = new File(filePath);
-                if (file.isFile()) {
+                var file = Paths.get(filePath);
+                if (Files.isRegularFile(file)) {
                     rs = RuleSourceFactory.initRuleFile(file);
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
@@ -115,7 +121,8 @@ public final class SLEnvInput extends AbstractEnvInput {
 
                 // rule source found? -> read
                 if (rs != null) {
-                    final KeYFile keyFile = new KeYFile(path, rs, null, getProfile());
+                    final KeYFile keyFile = new KeYFile(path.getFileName().toString(),
+                        rs, null, getProfile());
                     keyFile.setInitConfig(initConfig);
                     warnings = warnings.union(keyFile.read());
                 }
@@ -136,20 +143,20 @@ public final class SLEnvInput extends AbstractEnvInput {
         // either boot class path or JavaRedux
         if (bootClassPath != null) {
             warnings = warnings
-                    .union(createDLLibrarySpecsHelper(allKJTs, bootClassPath.getAbsolutePath()));
+                    .union(createDLLibrarySpecsHelper(allKJTs, bootClassPath.toAbsolutePath()));
         } else {
-            String path = JavaReduxFileCollection.JAVA_SRC_DIR;
+            Path path = JavaReduxFileCollection.JAVA_SRC_DIR;
             if (!initConfig.getProfile().getInternalClassDirectory().isEmpty()) {
-                path += "/" + initConfig.getProfile().getInternalClassDirectory();
+                path = path.resolve(initConfig.getProfile().getInternalClassDirectory());
             }
             warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, path));
         }
 
         // if applicable: class path
         if (classPath != null) {
-            for (File file : classPath) {
+            for (Path file : classPath) {
                 warnings =
-                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath()));
+                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
             }
         }
         return warnings;
@@ -257,18 +264,32 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
-    private void transformJmlAsserts(final IProgramMethod pm) {
+    private void transformProgramElements(final IProgramMethod pm) throws ProofInputException {
         Services services = initConfig.getServices();
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        JavaASTWalker walker = new JavaASTWalker(pm.getBody()) {
+        var walker = new JavaASTWalker(pm.getBody()) {
+            public ProofInputException exception = null;
+
             @Override
             protected void doAction(final ProgramElement node) {
-                if (node instanceof JmlAssert) {
-                    jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                try {
+                    if (node instanceof JmlAssert) {
+                        jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                    } else if (node instanceof SetStatement) {
+                        jsf.translateSetStatement((SetStatement) node, pm);
+                    }
+                } catch (ProofInputException e) {
+                    // Store the first exception that occurred
+                    if (this.exception == null) {
+                        this.exception = e;
+                    }
                 }
             }
         };
         walker.start();
+        if (walker.exception != null) {
+            throw walker.exception;
+        }
     }
 
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
@@ -317,13 +338,28 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
 
+                Type declaringType = pm.getContainerType().getJavaType();
+
+                // Create default contracts for all methods except KeY default methods (like <init>)
+                // and Object methods.
+                if (methodSpecs.isEmpty()
+                        && (declaringType instanceof TypeDeclaration decl && decl.isLibraryClass())
+                        && !declaringType.getFullName().equals("java.lang.Object")
+                        && !pm.isImplicit()) {
+                    specRepos.addContract(specExtractor.createDefaultContract(pm,
+                        initConfig.getActivatedChoices().exists(
+                            choice -> choice.category().equals("soundDefaultContracts")
+                                    && choice.name().toString()
+                                            .equals("soundDefaultContracts:on"))));
+                }
+
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
                 addLoopContracts(specExtractor, specRepos, kjt, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
-                transformJmlAsserts(pm);
+                transformProgramElements(pm);
             }
 
             // constructor contracts
@@ -361,14 +397,14 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         if (gs.isUseJML()) {
-            return createSpecs(new JMLSpecExtractor(initConfig.getServices()));
+            return createSpecs(new JMLSpecExtractor(initConfig));
         } else {
             return null;
         }
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return null;
     }
 }

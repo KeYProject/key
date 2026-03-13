@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -177,7 +177,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             instPanel.setBorder(indents);
             tabContent.add(instPanel);
 
-            if (!model[i].application().taclet().ifSequent().isEmpty()) {
+            if (!model[i].application().taclet().assumesSequent().isEmpty()) {
 
                 TacletIfSelectionDialog ifSelection = new TacletIfSelectionDialog(model[i], this);
                 dataTable[i].setIfSelectionPanel(ifSelection);
@@ -403,7 +403,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
 
-                                Term term = pis.getPosInOccurrence().subTerm();
+                                JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
 
                                 // Reactivate this when the parser is fully capable again.
                                 // droppedString = LogicPrinter.quickPrintTerm(term,
@@ -501,6 +501,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             return getIfSelectionPanel() != null;
         }
 
+        @Override
         public void modelChanged(ModelEvent me) {
             if (me.getSource() instanceof TacletInstantiationModel) {
                 setModel(((TacletInstantiationModel) me.getSource()).tableModel());
@@ -593,7 +594,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-                                Term term = pis.getPosInOccurrence().subTerm();
+                                JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
                                 // Reactivate this when the parser is fully capable again.
                                 // String droppedString = LogicPrinter.quickPrintTerm(term,
                                 // mediator.getServices(),
@@ -701,11 +702,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         }
     }
 
-    private static String printTerm(KeYMediator mediator, Term term) {
+    private static String printTerm(KeYMediator mediator, JTerm term) {
         final NotationInfo ni = new NotationInfo();
 
         Services services = mediator.getServices();
-        final Term t = TermLabelManager.removeIrrelevantLabels(term, services);
+        final JTerm t = TermLabelManager.removeIrrelevantLabels(term, services);
         LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);

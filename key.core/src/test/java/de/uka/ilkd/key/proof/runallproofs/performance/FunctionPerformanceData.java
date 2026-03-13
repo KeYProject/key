@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 public class FunctionPerformanceData {
 
@@ -56,12 +57,12 @@ public class FunctionPerformanceData {
         if (table == null) {
             try {
                 File ruleDataLocation = new File(dataDir, ruleName + ".data");
-                String[] columns = new String[] { "nodeId", "astCount", "proofTreeDepth",
+                String[] columns = { "nodeId", "astCount", "proofTreeDepth",
                     "numberInvocations", "         duration", "averageTimePerInvocation" };
                 String description = "Profiling data for rule " + ruleName;
                 table = new DataRecordingTable(ruleDataLocation, columns, description);
                 tables.put(ruleName, table);
-                table.writeComment("# " + dataRecordingTestFile.getKeYFile().getName() + "\n");
+                table.writeComment("# " + dataRecordingTestFile.getKeYFile().getFileName() + "\n");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

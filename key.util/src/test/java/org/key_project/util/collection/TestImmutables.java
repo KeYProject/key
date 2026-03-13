@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,17 +35,20 @@ public class TestImmutables {
     @Test
     public void testRemoveDuplicates() {
 
+        @Nullable
         String[][] a = { { "a", "b", "a", "c", "d", "d", "a", "e" }, { null, "a", null },
             { "1", "1", "1", "1", "1" } };
 
+        @Nullable
         String[][] expected = { { "a", "b", "c", "d", "e" }, { null, "a" }, { "1" } };
 
         for (int i = 0; i < a.length; i++) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(a[i]).reverse();
+            ImmutableList<@Nullable String> l =
+                ImmutableSLList.<@Nullable String>nil().prepend(a[i]).reverse();
 
             assertFalse(Immutables.isDuplicateFree(l));
 
-            ImmutableList<String> cleaned = Immutables.removeDuplicates(l);
+            ImmutableList<@Nullable String> cleaned = Immutables.removeDuplicates(l);
             String[] a2 = cleaned.reverse().toArray(String.class);
 
 
@@ -65,25 +69,31 @@ public class TestImmutables {
 
     @Test
     public void testIsDuplicateFree() {
+        @Nullable
         String[][] a = { { "a", "b", "c", "d", "e" }, {}, { "a" }, { null }, { null, "a" } };
 
-        for (String[] strings : a) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);
+        for (@Nullable
+        String[] strings : a) {
+            ImmutableList<@Nullable String> l =
+                ImmutableSLList.<@Nullable String>nil().prepend(strings);
             assertTrue(Immutables.isDuplicateFree(l));
         }
 
+        @Nullable
         String[][] b = { { "a", "a" }, { "a", "b", "c", "d", "a" }, { "a", "b", "a", "d", "e" },
             { "a", "b", "d", "d", "e" }, { "a", "b", "c", "d", "d" }, { null, "a", null } };
 
-        for (String[] strings : b) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);
+        for (@Nullable
+        String[] strings : b) {
+            ImmutableList<@Nullable String> l =
+                ImmutableSLList.<@Nullable String>nil().prepend(strings);
             assertFalse(Immutables.isDuplicateFree(l));
         }
 
 
     }
 
-    private static void assertDeepEquals(Object[] expected, Object[] array) {
+    private static void assertDeepEquals(@Nullable Object[] expected, @Nullable Object[] array) {
         assertEquals(expected.length, array.length);
         for (int i = 0; i < array.length; i++) {
             assertEquals(expected[i], array[i]);
@@ -138,11 +148,11 @@ public class TestImmutables {
 
     @Test
     public void testIntersectEmpty() {
-        ImmutableSet<Object> s0 = DefaultImmutableSet.nil();
-        ImmutableSet<Object> s1 = DefaultImmutableSet.nil().add("1");
-        ImmutableSet<Object> s2 = DefaultImmutableSet.nil().add("2");
+        var s0 = DefaultImmutableSet.nil();
+        var s1 = DefaultImmutableSet.nil().add("1");
+        var s2 = DefaultImmutableSet.nil().add("2");
 
-        ImmutableSet<Object> sIntersect = s1.intersect(s2);
+        var sIntersect = s1.intersect(s2);
         assertEquals(0, sIntersect.size());
         assertEquals(s0, sIntersect);
     }
@@ -150,8 +160,8 @@ public class TestImmutables {
     @Test
     public void testHashCodes() {
 
-        ImmutableSet<Object> s1 = DefaultImmutableSet.nil().add("one").add("two");
-        ImmutableSet<Object> s2 = DefaultImmutableSet.nil().add("two").add("one");
+        var s1 = DefaultImmutableSet.nil().add("one").add("two");
+        var s2 = DefaultImmutableSet.nil().add("two").add("one");
 
         assertEquals(s1, s2);
         int hash1 = s1.hashCode();

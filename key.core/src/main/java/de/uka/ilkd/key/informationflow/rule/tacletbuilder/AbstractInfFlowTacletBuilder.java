@@ -9,12 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilderSchemaVarCollector;
@@ -22,9 +19,13 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -45,22 +46,22 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      */
     private static final Name EQUAL_LOCS_POST = new Name("__EQUALS__LOCS__POST__");
 
-    public AbstractInfFlowTacletBuilder(final Services services) {
+    protected AbstractInfFlowTacletBuilder(final Services services) {
         super(services.getTermFactory(), services);
     }
 
 
-    ImmutableList<Term> createTermSV(ImmutableList<Term> ts, String schemaPrefix,
+    ImmutableList<JTerm> createTermSV(ImmutableList<JTerm> ts, String schemaPrefix,
             Services services) {
-        ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term t : ts) {
+        ImmutableList<JTerm> result = ImmutableSLList.nil();
+        for (JTerm t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
         }
         return result;
     }
 
 
-    Term createTermSV(Term t, String schemaPrefix, Services services) {
+    JTerm createTermSV(JTerm t, String schemaPrefix, Services services) {
         if (t == null) {
             return null;
         }
@@ -72,7 +73,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    SchemaVariable createVariableSV(QuantifiableVariable v, String schemaPrefix,
+    VariableSV createVariableSV(QuantifiableVariable v, String schemaPrefix,
             Services services) {
         if (v == null) {
             return null;
@@ -86,7 +87,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
     void addVarconds(RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
-            Iterable<SchemaVariable> quantifiableSVs) throws IllegalArgumentException {
+            Iterable<? extends SchemaVariable> quantifiableSVs) throws IllegalArgumentException {
         RewriteTacletBuilderSchemaVarCollector svCollector =
             new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
         Set<SchemaVariable> schemaVars = svCollector.collectSchemaVariables();
@@ -100,12 +101,12 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
-    Map<QuantifiableVariable, SchemaVariable> collectQuantifiableVariables(Term replaceWithTerm,
+    Map<QuantifiableVariable, VariableSV> collectQuantifiableVariables(JTerm replaceWithTerm,
             Services services) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         replaceWithTerm.execPreOrder(qvVisitor);
         LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
-        final Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+        final Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             new LinkedHashMap<>();
         for (QuantifiableVariable qv : quantifiableVariables) {
             quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
@@ -127,7 +128,8 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      * @param locset2 the first location set term.
      * @return The eqAtLocs function term.
      */
-    public Term eqAtLocs(Services services, Term heap1, Term locset1, Term heap2, Term locset2) {
+    public JTerm eqAtLocs(Services services, JTerm heap1, JTerm locset1, JTerm heap2,
+            JTerm locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
                 : func(services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
                     locset1, heap2, locset2);
@@ -145,24 +147,24 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      * @param locset2 the second location set term.
      * @return The eqAtLocsPost function term.
      */
-    public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post, Term locset1,
-            Term heap2Pre, Term heap2Post, Term locset2) {
+    public JTerm eqAtLocsPost(Services services, JTerm heap1Pre, JTerm heap1Post, JTerm locset1,
+            JTerm heap2Pre, JTerm heap2Post, JTerm locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
                 : func(services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor<Term> {
+    static class QuantifiableVariableVisitor implements Visitor<@NonNull JTerm> {
 
         private final LinkedList<QuantifiableVariable> vars = new LinkedList<>();
 
         @Override
-        public boolean visitSubtree(Term visited) {
+        public boolean visitSubtree(JTerm visited) {
             return true;
         }
 
         @Override
-        public void visit(Term visited) {
+        public void visit(JTerm visited) {
             for (var boundVar : visited.boundVars()) {
                 vars.add(boundVar);
             }
@@ -170,13 +172,13 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
         @Override
-        public void subtreeEntered(Term subtreeRoot) {
+        public void subtreeEntered(JTerm subtreeRoot) {
             // nothing to do
         }
 
 
         @Override
-        public void subtreeLeft(Term subtreeRoot) {
+        public void subtreeLeft(JTerm subtreeRoot) {
             // nothing to do
         }
 

@@ -167,7 +167,7 @@ public class HelpFacade {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e != null && e.getSource() != null) {
-                HelpFacade.openHelp((JComponent) e.getSource());
+                openHelp((JComponent) e.getSource());
             }
         }
     }

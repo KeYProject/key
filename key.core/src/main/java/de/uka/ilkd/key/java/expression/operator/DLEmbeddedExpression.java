@@ -10,26 +10,26 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 public class DLEmbeddedExpression extends Operator {
 
-    private final JFunction functionSymbol;
+    private final Function functionSymbol;
 
     /**
      * @return the functionSymbol
      */
-    public JFunction getFunctionSymbol() {
+    public Function getFunctionSymbol() {
         return functionSymbol;
     }
 
-    public DLEmbeddedExpression(JFunction f, ExtList children) {
+    public DLEmbeddedExpression(Function f, ExtList children) {
         super(children);
         this.functionSymbol = f;
     }
@@ -143,17 +143,15 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
-        JFunction f = getFunctionSymbol();
+    public JTerm makeTerm(LocationVariable heap, JTerm[] subs, Services services) {
         // we silently assume that check has been called earlier
-
-        if (f.arity() == subs.length) {
-            return services.getTermFactory().createTerm(f, subs);
+        if (functionSymbol.arity() == subs.length) {
+            return services.getTermFactory().createTerm(functionSymbol, subs);
         } else {
-            Term[] extSubs = new Term[subs.length + 1];
+            JTerm[] extSubs = new JTerm[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);
             extSubs[0] = services.getTermBuilder().var(heap);
-            return services.getTermFactory().createTerm(f, extSubs);
+            return services.getTermFactory().createTerm(functionSymbol, extSubs);
         }
     }
 }

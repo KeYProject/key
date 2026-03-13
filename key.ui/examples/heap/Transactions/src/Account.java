@@ -1,15 +1,15 @@
 final class Account {
     /*@nullable*/ Transaction transactions;
-    
+
     //@ ghost int balance;
     //@ ghost \locset footprint;
 
-    /*@ invariant transactions == null || 
-           (transactions.\inv && 
+    /*@ invariant transactions == null ||
+           (transactions.\inv &&
            \disjoint(this.*, transactions.footprint));
     */
-    
-    /*@ invariant balance == 
+
+    /*@ invariant balance ==
         (transactions == null ? 0 : transactions.total);
     */
 
@@ -23,7 +23,7 @@ final class Account {
 
     /*@ requires true;
       @ ensures transactions == null && balance == 0;
-      @ modifies \nothing;
+      @ assignable \nothing;
       @*/
     Account() {
         /*@ set footprint = \all_fields(this); */
@@ -32,7 +32,7 @@ final class Account {
 
     /*@ requires 0 <= amount;
       @ ensures balance == \old(balance) + amount;
-      @ modifies this.*;
+      @ assignable this.*;
       @*/
     void deposit(int amount) {
         Transaction t = new Transaction(transactions, amount);
@@ -45,7 +45,7 @@ final class Account {
 
     /*@ requires 0 <= amount && amount <= balance;
       @ ensures balance == \old(balance) - amount;
-      @ modifies this.*;
+      @ assignable this.*;
       @*/
     void withdraw(int amount) {
         Transaction t = new Transaction(transactions, -amount);
@@ -56,12 +56,12 @@ final class Account {
         */;
     }
 
-    /*@ requires 0 <= amount && amount <= balance && 
+    /*@ requires 0 <= amount && amount <= balance &&
       @     to.\inv && to != this;
-      @ ensures balance == \old(balance) - amount && 
-      @     to.balance == \old(to.balance) + amount && 
+      @ ensures balance == \old(balance) - amount &&
+      @     to.balance == \old(to.balance) + amount &&
       @     to.\inv;
-      @ modifies this.*, to.*;
+      @ assignable this.*, to.*;
       @*/
     void transfer(Account to, int amount) {
         withdraw(amount);
@@ -71,7 +71,7 @@ final class Account {
 
     /*@ requires true;
       @ ensures \result == balance;
-      @ modifies \nothing;
+      @ assignable \nothing;
       @*/
     int getTotal() {
         if(transactions == null) {
@@ -95,7 +95,7 @@ class Main {
 
         a2.deposit(200);
         a1.transfer(a2, 50);
-        
+
         if(a2.getTotal() != 250)
             throw new Error();
 

@@ -7,12 +7,11 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -65,9 +64,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
@@ -99,21 +98,21 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>, where the cI
      *         are the path conditions of stateI.
      */
-    public static Term createIfThenElseTerm(final SymbolicExecutionState state1,
-            final SymbolicExecutionState state2, final Term ifTerm, final Term elseTerm,
-            Term distinguishingFormula, final Services services) {
+    public static JTerm createIfThenElseTerm(final SymbolicExecutionState state1,
+            final SymbolicExecutionState state2, final JTerm ifTerm, final JTerm elseTerm,
+            JTerm distinguishingFormula, final Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term cond, ifForm, elseForm;
+        JTerm cond, ifForm, elseForm;
 
         if (distinguishingFormula == null) {
-            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first();
-            ifForm = distFormAndRightSidesForITEUpd.second();
-            elseForm = distFormAndRightSidesForITEUpd.third();
+            cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            elseForm = distFormAndRightSidesForITEUpd.elseTerm();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -147,14 +146,14 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
             LocationVariable v, SymbolicExecutionState state1, SymbolicExecutionState state2,
             Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-        Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+        JTerm rightSide1 = getUpdateRightSideFor(state1.first, v);
+        JTerm rightSide2 = getUpdateRightSideFor(state2.first, v);
 
         if (rightSide1 == null) {
             rightSide1 = tb.var(v);
@@ -169,7 +168,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     /**
-     * Creates the input for an if-then-else update. The elements of the resulting quadruple can be
+     * Creates the input for an if-then-else update. The elements of the resulting
+     * {@link DistanceFormRightSide} can be
      * used to construct an elementary update corresponding to
      * <code>{ v := \if (c1) \then (ifTerm) \else (elseTerm) }</code>, where c1 is the path
      * condition of state1. However, the method also tries an optimization: The path condition c2 of
@@ -190,23 +190,23 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
-            SymbolicExecutionState state1, SymbolicExecutionState state2, Term ifTerm,
-            Term elseTerm, Services services) {
+    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
+            SymbolicExecutionState state1, SymbolicExecutionState state2, JTerm ifTerm,
+            JTerm elseTerm, Services services) {
 
         // We only need the distinguishing subformula; the equal part
         // is not needed. For soundness, it suffices that the "distinguishing"
         // formula is implied by the original path condition; for completeness,
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+        Optional<Pair<JTerm, JTerm>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(state1.second, state2.second, services);
-        Term distinguishingFormula = distinguishingAndEqualFormula1
+        JTerm distinguishingFormula = distinguishingAndEqualFormula1
                 .map(termTermPair -> termTermPair.first).orElse(null);
 
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+        Optional<Pair<JTerm, JTerm>> distinguishingAndEqualFormula2 =
             getDistinguishingFormula(state2.second, state1.second, services);
-        Term distinguishingFormula2 = distinguishingAndEqualFormula2
+        JTerm distinguishingFormula2 = distinguishingAndEqualFormula2
                 .map(termTermPair -> termTermPair.first).orElse(null);
 
         // NOTE (DS): This assertion does not prevent the merging of states with
@@ -246,7 +246,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
             SIMPLIFICATION_TIMEOUT_MS);
 
-        return new Quadruple<>(distinguishingFormula,
+        return new DistanceFormRightSide(distinguishingFormula,
             commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
 
     }
@@ -254,5 +254,28 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     @Override
     public String toString() {
         return DISPLAY_NAME;
+    }
+
+    /**
+     * Represents the distance between formulas for an if-then-else update.
+     * Input to construct an elementary update like
+     * <code>{ v := \if (distinguishingFormula) \then (ifTerm) \else (elseTerm) }</code>, where
+     * distinguishingFormula, ifTerm
+     * and elseTerm are the respective components of the returned triple. The sideCommuted component
+     * indicates whether the path condition of the distinguishingFormula (sideCommuted component =
+     * false) or the
+     * ifTerm (sideCommuted component = true) state was used as a basis for the condition
+     * (distinguishingFormula
+     * component).
+     *
+     * @param distinguishingFormula a formula
+     * @param ifTerm a term
+     * @param elseTerm a term
+     * @param sideCommuted true if ifTerm and elseTerm have been swapped.
+     * @see #createDistFormAndRightSidesForITEUpd(SymbolicExecutionState, SymbolicExecutionState,
+     *      JTerm, JTerm, Services)
+     */
+    public record DistanceFormRightSide(JTerm distinguishingFormula, JTerm ifTerm, JTerm elseTerm,
+            boolean sideCommuted) {
     }
 }

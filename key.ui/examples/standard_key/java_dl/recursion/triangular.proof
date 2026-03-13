@@ -39,12 +39,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Sep 25 13:37:22 CEST 2015
-name=Triangular[Triangular\\:\\:tria(int)].JML normal_behavior operation contract.0
-contract=Triangular[Triangular\\:\\:tria(int)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "Triangular[Triangular::tria(int)].JML normal_behavior operation contract.0",
+	"contract": "Triangular[Triangular::tria(int)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "daniel" ) (keyVersion "eff963a736c991e023578259348f159cd5643230"))

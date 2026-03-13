@@ -4,15 +4,15 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
 
 
 /**
  * A schema variable that is used as placeholder for formulas.
  */
-public final class FormulaSV extends AbstractSV {
+public final class FormulaSV extends JOperatorSV implements TerminalSyntaxElement {
 
     /**
      * @param name the name of the SchemaVariable
@@ -28,7 +28,8 @@ public final class FormulaSV extends AbstractSV {
     }
 
     @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\formula ").print(name().toString());
+    public boolean isFormula() {
+        return true;
     }
+
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -17,8 +18,8 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
@@ -111,6 +112,10 @@ public final class TypeConverter {
         return (SeqLDT) getLDT(SeqLDT.NAME);
     }
 
+    public SortLDT getSortLDT() {
+        return (SortLDT) getLDT(SortLDT.NAME);
+    }
+
     public MapLDT getMapLDT() {
         return (MapLDT) getLDT(MapLDT.NAME);
     }
@@ -123,10 +128,10 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op,
+    private JTerm translateOperator(Operator op,
             ExecutionContext ec) {
 
-        final Term[] subs = new Term[op.getArity()];
+        final JTerm[] subs = new JTerm[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
             subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
         }
@@ -163,17 +168,21 @@ public final class TypeConverter {
     }
 
 
-    private Term convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
+    private JTerm convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
-        } else if (prefix instanceof MetaClassReference) {
+        } else if (prefix instanceof VariableReference vr) {
+            prefix = vr.getProgramVariable();
+        }
+        if (prefix instanceof MetaClassReference) {
             LOGGER.warn("WARNING: metaclass references not supported yet");
             throw new IllegalArgumentException("TypeConverter could not handle" + " this");
-        } else if (prefix instanceof ProgramVariable) {
+        } else if (prefix instanceof ProgramConstant c) {
             // the base case: the leftmost item is a local variable
-            return tb.var((ProgramVariable) prefix);
-        } else if (prefix instanceof VariableReference) {
-            return tb.var(((VariableReference) prefix).getProgramVariable());
+            return tb.var(c);
+        } else if (prefix instanceof LocationVariable lv) {
+            // the base case: the leftmost item is a local variable
+            return tb.var(lv);
         } else if (prefix instanceof ArrayReference) {
             return convertArrayReference((ArrayReference) prefix, ec);
         } else if (prefix instanceof ThisReference) {
@@ -191,48 +200,48 @@ public final class TypeConverter {
     }
 
 
-    public Term findThisForSortExact(Sort s, ExecutionContext ec) {
+    public JTerm findThisForSortExact(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
         if (pe == null) {
             return null;
         }
-        Term inst = convertToLogicElement(pe, ec);
+        JTerm inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
 
     }
 
-    public Term findThisForSort(Sort s, ExecutionContext ec) {
+    public JTerm findThisForSort(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
         if (pe == null) {
             return null;
         }
-        Term inst = convertToLogicElement(pe, ec);
+        JTerm inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
 
 
-    public Term findThisForSort(Sort s, Term self, KeYJavaType context, boolean exact) {
-        Term result = self;
+    public JTerm findThisForSort(Sort s, JTerm self, KeYJavaType context, boolean exact) {
+        JTerm result = self;
         LocationVariable inst;
         while (!exact && !context.getSort().extendsTrans(s)
                 || exact && !context.getSort().equals(s)) {
             inst = (LocationVariable) services.getJavaInfo()
                     .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
-            final JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
+            final Function fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
         return result;
     }
 
-    public Term convertMethodReference(MethodReference mr, ExecutionContext ec) {
+    public JTerm convertMethodReference(MethodReference mr, ExecutionContext ec) {
         // FIXME this needs to handle two state?
         final ReferencePrefix prefix = mr.getReferencePrefix();
-        Term p = convertReferencePrefix(prefix, ec);
+        JTerm p = convertReferencePrefix(prefix, ec);
         IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
         if (pm.isModel()) {
             ImmutableArray<? extends Expression> args = mr.getArguments();
-            Term[] argTerms = new Term[args.size() + 2]; // heap, self,
+            JTerm[] argTerms = new JTerm[args.size() + 2]; // heap, self,
             int index = 0;
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
@@ -249,20 +258,20 @@ public final class TypeConverter {
         throw new IllegalArgumentException("TypeConverter could not handle this");
     }
 
-    public Term convertVariableReference(VariableReference fr, ExecutionContext ec) {
+    public JTerm convertVariableReference(VariableReference fr, ExecutionContext ec) {
         final ReferencePrefix prefix = fr.getReferencePrefix();
         final ProgramVariable var = fr.getProgramVariable();
-        if (var instanceof ProgramConstant) {
-            return tb.var(var);
+        if (var instanceof ProgramConstant pc) {
+            return tb.var(pc);
         } else if (var == services.getJavaInfo().getArrayLength()) {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
-            final JFunction fieldSymbol =
+            final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
-                final JFunction fieldSymbol =
+                final Function fieldSymbol =
                     heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
                     fieldSymbol);
@@ -270,7 +279,7 @@ public final class TypeConverter {
                 return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
-            final JFunction fieldSymbol =
+            final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
@@ -279,9 +288,9 @@ public final class TypeConverter {
     }
 
 
-    public Term convertArrayReference(ArrayReference ar, ExecutionContext ec) {
-        final Term[] index = new Term[ar.getDimensionExpressions().size()];
-        final Term t = convertToLogicElement(ar.getReferencePrefix(), ec);
+    public JTerm convertArrayReference(ArrayReference ar, ExecutionContext ec) {
+        final JTerm[] index = new JTerm[ar.getDimensionExpressions().size()];
+        final JTerm t = convertToLogicElement(ar.getReferencePrefix(), ec);
         for (int i = 0; i < index.length; i++) {
             index[i] = convertToLogicElement(ar.getDimensionExpressions().get(i), ec);
         }
@@ -289,10 +298,10 @@ public final class TypeConverter {
         return tb.dotArr(t, index[0]);
     }
 
-    private Term convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
+    private JTerm convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
         final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
-        final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-        final JFunction instanceOfSymbol =
+        final JTerm obj = convertToLogicElement(io.getChildAt(0), ec);
+        final Function instanceOfSymbol =
             getJavaDLTheory().getInstanceofSymbol(type.getSort(), services);
 
         // in JavaDL S::instance(o) is also true if o (for reference types S)
@@ -302,14 +311,16 @@ public final class TypeConverter {
     }
 
 
-    public Term convertToLogicElement(ProgramElement pe) {
+    public JTerm convertToLogicElement(ProgramElement pe) {
         return convertToLogicElement(pe, null);
     }
 
 
-    public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
-        if (pe instanceof ProgramVariable) {
-            return tb.var((ProgramVariable) pe);
+    public JTerm convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
+        if (pe instanceof ProgramConstant pc) {
+            return tb.var(pc);
+        } else if (pe instanceof LocationVariable lv) {
+            return tb.var(lv);
         } else if (pe instanceof FieldReference) {
             return convertVariableReference((FieldReference) pe, ec);
         } else if (pe instanceof MethodReference) {
@@ -326,8 +337,8 @@ public final class TypeConverter {
             return convertToLogicElement(((ParenthesizedExpression) pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
             return convertToInstanceofTerm((Instanceof) pe, ec);
-        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
-            return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
+        } else if (pe instanceof Operator) {
+            return translateOperator((Operator) pe, ec);
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
                 "TypeConverter could not handle" + " this primitive type");
@@ -346,7 +357,7 @@ public final class TypeConverter {
      * @param lit the Literal to be converted
      * @return the Term representing <tt>lit</tt> in the logic
      */
-    private Term convertLiteralExpression(Literal lit) {
+    private JTerm convertLiteralExpression(Literal lit) {
         if (lit instanceof NullLiteral) {
             return tb.NULL();
         } else {
@@ -360,7 +371,7 @@ public final class TypeConverter {
         }
     }
 
-    public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
+    public static boolean isArithmeticOperator(Operator op) {
         return op instanceof Divide || op instanceof Times || op instanceof Plus
                 || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
@@ -521,11 +532,11 @@ public final class TypeConverter {
      * @return the Term as a program AST node of type expression
      * @throws RuntimeException iff a conversion is not possible
      */
-    public Expression convertToProgramElement(Term term) {
+    public Expression convertToProgramElement(JTerm term) {
         assert term != null;
         if (term.op() == heapLDT.getNull()) {
             return NullLiteral.NULL;
-        } else if (term.op() instanceof JFunction function) {
+        } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);
@@ -556,7 +567,7 @@ public final class TypeConverter {
     }
 
 
-    private Expression translateJavaCast(Term term, ExtList children) {
+    private Expression translateJavaCast(JTerm term, ExtList children) {
         if (term.op() instanceof Function function) {
             if (function instanceof SortDependingFunction sdf) {
                 SortDependingFunction castFunction =
@@ -575,11 +586,11 @@ public final class TypeConverter {
     }
 
 
-    public KeYJavaType getKeYJavaType(Term t) {
+    public KeYJavaType getKeYJavaType(JTerm t) {
         KeYJavaType result = null;
         if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             result = services.getJavaInfo().getKeYJavaType(t.sort());
-        } else if (t.op() instanceof JFunction) {
+        } else if (t.op() instanceof Function) {
             for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
                     Type type = ldt.getType(t);
@@ -952,7 +963,7 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    private LDT getResponsibleLDT(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

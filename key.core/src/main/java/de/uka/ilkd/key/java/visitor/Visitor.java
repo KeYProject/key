@@ -14,19 +14,19 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method
@@ -79,6 +79,8 @@ public interface Visitor {
     void performActionOnSeqSub(SeqSub x);
 
     void performActionOnSeqReverse(SeqReverse x);
+
+    void performActionOnSeqPut(SeqPut seqPut);
 
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
@@ -183,6 +185,8 @@ public interface Visitor {
     void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x);
 
     void performActionOnCopyAssignment(CopyAssignment x);
+
+    void performActionOnSetStatement(SetStatement x);
 
     void performActionOnDivideAssignment(DivideAssignment x);
 
@@ -405,14 +409,5 @@ public interface Visitor {
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 
-    /**
-     * Performs action on the condition of a JML assert statement.
-     *
-     * Note: if you don't extend JavaASTVisitor or something else that calls this methode for you,
-     * you have to call it yourself, e.g. in {@link #performActionOnJmlAssert} if needed.
-     *
-     * @param cond the condition to perform an action on (may be {@code null} if the JML assert
-     *        wasn't finished)
-     */
-    void performActionOnJmlAssertCondition(final Term cond);
+    void performActionOnSubtype(Subtype subtype);
 }

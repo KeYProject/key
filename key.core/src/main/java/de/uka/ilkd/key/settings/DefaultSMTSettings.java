@@ -15,6 +15,7 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
+
 /**
  * The default implementation of {@link SMTSettings}.
  */

@@ -7,11 +7,9 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This class completes the instantiation for a dependency contract applications. The user is
@@ -36,7 +36,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         final List<PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
-        PosInOccurrence step = letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
+        PosInOccurrence step =
+            letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
         if (step == null) {
             return null;
         }
@@ -52,8 +53,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @param services
      * @return
      */
-    private static PosInOccurrence letUserChooseStep(List<LocationVariable> heapContext,
-            List<PosInOccurrence> steps, boolean forced, Services services) {
+    private static PosInOccurrence letUserChooseStep(
+            List<LocationVariable> heapContext,
+            List<PosInOccurrence> steps, boolean forced,
+            Services services) {
         assert heapContext != null;
 
         if (steps.size() == 0) {
@@ -67,7 +70,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         extractHeaps(heapContext, steps, heaps, lp);
 
-        final Term[] resultHeaps;
+        final JTerm[] resultHeaps;
         if (!forced) {
             // open dialog
             final TermStringWrapper heapWrapper =
@@ -86,8 +89,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
 
-    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps,
-            Term[] resultHeaps) {
+    public static PosInOccurrence findCorrespondingStep(
+            List<PosInOccurrence> steps,
+            JTerm[] resultHeaps) {
         // find corresponding step
         for (PosInOccurrence step : steps) {
             boolean match = true;
@@ -105,22 +109,23 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return null;
     }
 
-    public static void extractHeaps(List<LocationVariable> heapContext, List<PosInOccurrence> steps,
+    public static void extractHeaps(List<LocationVariable> heapContext,
+            List<PosInOccurrence> steps,
             final TermStringWrapper[] heaps, final LogicPrinter lp) {
         int i = 0;
         for (PosInOccurrence step : steps) {
-            Operator op = step.subTerm().op();
+            var op = step.subTerm().op();
             // necessary distinction (see bug #1232)
             // subterm may either be an observer or a heap term already
-            int size = (op instanceof IObserverFunction)
-                    ? ((IObserverFunction) op).getStateCount() * heapContext.size()
+            int size = (op instanceof IObserverFunction iof)
+                    ? iof.getStateCount() * heapContext.size()
                     : 1;
-            final Term[] heapTerms = new Term[size];
+            final JTerm[] heapTerms = new JTerm[size];
             StringBuilder prettyPrint = new StringBuilder("<html><tt>").append(size > 1 ? "[" : "");
             for (int j = 0; j < size; j++) {
                 // TODO: there may still be work to do
                 // what if we have a heap term, where the base heap lies deeper?
-                final Term heap = step.subTerm().sub(j);
+                final JTerm heap = (JTerm) step.subTerm().sub(j);
                 heapTerms[j] = heap;
                 lp.reset();
                 lp.printTerm(heap);
@@ -133,10 +138,10 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     }
 
     public static final class TermStringWrapper {
-        public final Term[] terms;
+        public final JTerm[] terms;
         final String string;
 
-        public TermStringWrapper(Term[] terms, String string) {
+        public TermStringWrapper(JTerm[] terms, String string) {
             this.terms = terms;
             this.string = string;
         }

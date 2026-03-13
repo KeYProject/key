@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 
@@ -266,16 +266,13 @@ public final class ProgramMethod extends ObserverFunction
         return null;
     }
 
-    /**
-     * equals modulo renaming is described in class SourceElement.
-     */
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof IProgramMethod)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IProgramMethod ipm)) {
             return false;
         }
 
-        return method == ((IProgramMethod) se).getMethodDeclaration();
+        return method == ipm.getMethodDeclaration();
     }
 
     @Deprecated
@@ -294,7 +291,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public Expression convertToProgram(Term t, ExtList l) {
+    public Expression convertToProgram(JTerm t, ExtList l) {
         ProgramElement called;
         if (isStatic()) {
             called = new TypeRef(getContainerType());

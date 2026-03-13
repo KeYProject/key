@@ -3,33 +3,31 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.logic.op.JFunction;
-
 import org.key_project.logic.op.Function;
 
 public interface FloatingPointLDT {
 
-    JFunction getLessThan();
+    Function getLessThan();
 
-    JFunction getGreaterThan();
+    Function getGreaterThan();
 
-    JFunction getLessOrEquals();
+    Function getLessOrEquals();
 
-    JFunction getGreaterOrEquals();
+    Function getGreaterOrEquals();
 
-    JFunction getEquals();
+    Function getEquals();
 
-    JFunction getJavaUnaryMinus();
+    Function getJavaUnaryMinus();
 
-    JFunction getJavaAdd();
+    Function getJavaAdd();
 
-    JFunction getJavaSub();
+    Function getJavaSub();
 
-    JFunction getJavaMul();
+    Function getJavaMul();
 
-    JFunction getJavaDiv();
+    Function getJavaDiv();
 
-    JFunction getJavaMod();
+    Function getJavaMod();
 
     Function getJavaMin();
 
@@ -51,13 +49,13 @@ public interface FloatingPointLDT {
 
     Function getIsNegative();
 
-    JFunction getAdd();
+    Function getAdd();
 
-    JFunction getSub();
+    Function getSub();
 
-    JFunction getMul();
+    Function getMul();
 
-    JFunction getDiv();
+    Function getDiv();
 
     Function getAbs();
 }

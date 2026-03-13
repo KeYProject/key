@@ -50,7 +50,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      *        transformations. it includes the compilation units, the declared classes, and
      *        information for local classes.
      */
-    public RecoderModelTransformer(CrossReferenceServiceConfiguration services,
+    protected RecoderModelTransformer(CrossReferenceServiceConfiguration services,
             TransformerCache cache) {
         super(services);
         this.services = services;
@@ -78,15 +78,17 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 case "\\locset" -> EmptySetLiteral.INSTANCE;
                 case "\\seq" -> EmptySeqLiteral.INSTANCE;
                 case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
+                case "\\TYPE" -> new DLEmbeddedExpression("any::ssort", Collections.emptyList());
                 case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
                 case "\\map" -> EmptyMapLiteral.INSTANCE;
                 default -> {
                     if (type.getName().startsWith("\\dl_")) {
-                        // The default value of a type is resolved later, then we know the Sort of the
+                        // The default value of a type is resolved later, then we know the Sort of
+                        // the
                         // type
-                        yield  new DLEmbeddedExpression(
-                                "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
-                                Collections.emptyList());
+                        yield new DLEmbeddedExpression(
+                            "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
+                            Collections.emptyList());
                     }
                     Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
                     yield null;

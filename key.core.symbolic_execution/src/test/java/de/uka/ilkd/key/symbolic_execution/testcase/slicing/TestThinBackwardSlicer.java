@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.slicing;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.SourceElement;
@@ -51,74 +52,74 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestThinBackwardSlicer.class);
 
     /**
-     * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
+     * Tests slicing on the example {@code blockContractModifiableLocationNotRequested}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testBlockContractAssignableLocationNotRequested() throws Exception {
+    public void testBlockContractModifiableLocationNotRequested() throws Exception {
         doSlicingTest(
-            "/slicing/blockContractAssignableLocationNotRequested/BlockContractAssignableLocationNotRequested.proof",
+            "/slicing/blockContractModifiableLocationNotRequested/BlockContractModifiableLocationNotRequested.proof",
             new ReturnSelector(122), true, 109, 14, 12);
     }
 
     /**
-     * Tests slicing on the example {@code blockContractAssignableRequestedLocation}.
+     * Tests slicing on the example {@code blockContractModifiableRequestedLocation}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testBlockContractAssignableRequestedLocation() throws Exception {
+    public void testBlockContractModifiableRequestedLocation() throws Exception {
         doSlicingTest(
-            "/slicing/blockContractAssignableRequestedLocation/BlockContractAssignableRequestedLocation.proof",
+            "/slicing/blockContractModifiableRequestedLocation/BlockContractModifiableRequestedLocation.proof",
             new ReturnSelector(111), true, 23);
     }
 
     /**
-     * Tests slicing on the example {@code blockContractAssignableEverything}.
+     * Tests slicing on the example {@code blockContractModifiableEverything}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testBlockContractAssignableEverything() throws Exception {
+    public void testBlockContractModifiableEverything() throws Exception {
         doSlicingTest(
-            "/slicing/blockContractAssignableEverything/BlockContractAssignableEverything.proof",
+            "/slicing/blockContractModifiableEverything/BlockContractModifiableEverything.proof",
             new ReturnSelector(97), true, 23);
     }
 
     /**
-     * Tests slicing on the example {@code methodContractAssignableLocationNotRequested}.
+     * Tests slicing on the example {@code methodContractModifiableLocationNotRequested}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testMethodContractAssignableLocationNotRequested() throws Exception {
+    public void testMethodContractModifiableLocationNotRequested() throws Exception {
         doSlicingTest(
-            "/slicing/methodContractAssignableLocationNotRequested/MethodContractAssignableLocationNotRequested.proof",
+            "/slicing/methodContractModifiableLocationNotRequested/MethodContractModifiableLocationNotRequested.proof",
             new ReturnSelector(29), true, 14, 12);
     }
 
     /**
-     * Tests slicing on the example {@code methodContractAssignableRequestedLocation}.
+     * Tests slicing on the example {@code methodContractModifiableRequestedLocation}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testMethodContractAssignableRequestedLocation() throws Exception {
+    public void testMethodContractModifiableRequestedLocation() throws Exception {
         doSlicingTest(
-            "/slicing/methodContractAssignableRequestedLocation/MethodContractAssignableRequestedLocation.proof",
+            "/slicing/methodContractModifiableRequestedLocation/MethodContractModifiableRequestedLocation.proof",
             new ReturnSelector(29), true, 23);
     }
 
     /**
-     * Tests slicing on the example {@code methodContractAssignableEverything}.
+     * Tests slicing on the example {@code methodContractModifiableEverything}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testMethodContractAssignableEverything() throws Exception {
+    public void testMethodContractModifiableEverything() throws Exception {
         doSlicingTest(
-            "/slicing/methodContractAssignableEverything/MethodContractAssignableExample.proof",
+            "/slicing/methodContractModifiableEverything/MethodContractModifiableExample.proof",
             new ReturnSelector(29), true, 23);
     }
 
@@ -580,8 +581,8 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             IEquivalenceClassSelector eqSelector, boolean fullSlize, int... expectedSlice)
             throws Exception {
         // Load proof
-        File proofFile = new File(testCaseDirectory, proofFileInRepository);
-        Assertions.assertTrue(proofFile.exists());
+        Path proofFile = testCaseDirectory.resolve(proofFileInRepository);
+        Assertions.assertTrue(Files.exists(proofFile));
         KeYEnvironment<?> environment = KeYEnvironment.load(
             SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, null, true);
         try {
@@ -741,10 +742,10 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(seedNode);
             // Get seed location
             SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
-            Assertions.assertTrue(activeStatemt instanceof VariableDeclaration);
+            Assertions.assertInstanceOf(VariableDeclaration.class, activeStatemt);
             VariableDeclaration variableDeclaration = (VariableDeclaration) activeStatemt;
             SourceElement seedLocation = variableDeclaration.getChildAt(1);
-            Assertions.assertTrue(seedLocation instanceof VariableSpecification);
+            Assertions.assertInstanceOf(VariableSpecification.class, seedLocation);
             return new Pair<>(seedNode,
                 (ReferencePrefix) ((VariableSpecification) seedLocation).getInitializer());
         }
@@ -780,7 +781,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(seedNode);
             // Get seed location
             SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
-            Assertions.assertTrue(activeStatemt instanceof CopyAssignment);
+            Assertions.assertInstanceOf(CopyAssignment.class, activeStatemt);
             CopyAssignment assignment = (CopyAssignment) activeStatemt;
             SourceElement seedLocation = assignment.getChildAt(1);
             return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
@@ -817,7 +818,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(seedNode);
             // Get seed location
             SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
-            Assertions.assertTrue(activeStatemt instanceof CopyAssignment);
+            Assertions.assertInstanceOf(CopyAssignment.class, activeStatemt);
             CopyAssignment assignment = (CopyAssignment) activeStatemt;
             SourceElement seedLocation = assignment.getChildAt(0);
             return new Pair<>(seedNode, (ReferencePrefix) seedLocation);
@@ -854,7 +855,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(seedNode);
             // Get seed location
             SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
-            Assertions.assertTrue(activeStatemt instanceof Return);
+            Assertions.assertInstanceOf(Return.class, activeStatemt);
             Return returnStatement = (Return) activeStatemt;
             SourceElement seedLocation = returnStatement.getExpression();
             return new Pair<>(seedNode, (ReferencePrefix) seedLocation);

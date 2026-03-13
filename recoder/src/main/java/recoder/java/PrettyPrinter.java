@@ -663,42 +663,42 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
                 print('(');
             }
             switch (x.getArity()) {
-            case 2:
-                printElement(0, children.get(0));
-                if (getBooleanProperty(GLUE_INFIX_OPERATORS)) {
-                    printElementIndentation(0, x);
-                    print(symbol);
-                    printElement(children.get(1));
-                } else {
-                    printElementIndentation(1, x);
-                    print(symbol);
-                    printElement(1, children.get(1));
-                }
-                break;
-            case 1:
-                switch (x.getNotation()) {
-                case Operator.PREFIX:
-                    printElementIndentation(x);
-                    print(symbol);
-                    if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
-                        printElement(0, children.get(0));
-                    } else {
-                        printElement(1, children.get(0));
-                    }
-                    break;
-                case Operator.POSTFIX:
+                case 2:
                     printElement(0, children.get(0));
-                    if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
-                        printElementIndentation(x);
+                    if (getBooleanProperty(GLUE_INFIX_OPERATORS)) {
+                        printElementIndentation(0, x);
                         print(symbol);
+                        printElement(children.get(1));
                     } else {
                         printElementIndentation(1, x);
                         print(symbol);
+                        printElement(1, children.get(1));
                     }
                     break;
-                default:
-                    break;
-                }
+                case 1:
+                    switch (x.getNotation()) {
+                        case Operator.PREFIX:
+                            printElementIndentation(x);
+                            print(symbol);
+                            if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
+                                printElement(0, children.get(0));
+                            } else {
+                                printElement(1, children.get(0));
+                            }
+                            break;
+                        case Operator.POSTFIX:
+                            printElement(0, children.get(0));
+                            if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
+                                printElementIndentation(x);
+                                print(symbol);
+                            } else {
+                                printElementIndentation(1, x);
+                                print(symbol);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
             }
             if (addParentheses) {
                 print(')');
@@ -2321,17 +2321,17 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     public void visitTypeArgument(TypeArgumentDeclaration x) {
         printHeader(x);
         switch (x.getWildcardMode()) {
-        case None:
-            break;
-        case Any:
-            print("?");
-            break;
-        case Extends:
-            print("? extends ");
-            break;
-        case Super:
-            print("? super ");
-            break;
+            case None:
+                break;
+            case Any:
+                print("?");
+                break;
+            case Extends:
+                print("? extends ");
+                break;
+            case Super:
+                print("? super ");
+                break;
         }
         if (x.getTypeReferenceCount() == 1) {
             printElement(x.getTypeReferenceAt(0));

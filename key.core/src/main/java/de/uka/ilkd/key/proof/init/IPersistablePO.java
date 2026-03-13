@@ -6,8 +6,10 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.Configuration;
+
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * <p>
@@ -16,7 +18,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  * files.
  * </p>
  * <p>
- * During save process the {@link ProofSaver} calls method {@link #fillSaveProperties(Properties)}.
+ * During save process the {@link ProofSaver} calls method {@link #createLoaderConfig()}.
  * This proof obligation has to store all information in the given {@link Properties} which are
  * required to reconstruct it. The class ({@link Object#getClass()}) of this class must be stored in
  * the
@@ -68,10 +70,10 @@ public interface IPersistablePO extends ProofOblInput {
      * instantiate the proof obligation again and this instance should create the same
      * {@link Sequent} (if code and specifications are unchanged).
      *
-     * @param properties The {@link Properties} to fill with the proof obligation specific settings.
+     * @return
      * @throws IOException Occurred Exception.
      */
-    void fillSaveProperties(Properties properties) throws IOException;
+    Configuration createLoaderConfig() throws IOException;
 
     /**
      * The class stored in a {@link Properties} instance via key must provide the static method with

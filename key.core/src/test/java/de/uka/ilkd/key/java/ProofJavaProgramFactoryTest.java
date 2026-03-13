@@ -5,10 +5,15 @@ package de.uka.ilkd.key.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.recoderext.Ghost;
+import de.uka.ilkd.key.java.recoderext.SetStatement;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.helper.FindResources;
@@ -32,8 +37,6 @@ import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
@@ -50,9 +53,9 @@ public class ProofJavaProgramFactoryTest {
 
     @Test
     public void testAttachCommentsCompilationUnit_AssertsFalse() throws IOException {
-        File inputFile = new File(FindResources.getTestResourcesDirectory(),
-            "de/uka/ilkd/key/java/recoderext/AssertsFalse.java");
-        final CompilationUnit cu = getCompilationUnit(inputFile);
+        var inputFile = FindResources.getTestResourcesDirectory()
+                .resolve("de/uka/ilkd/key/java/recoderext/AssertsFalse.java");
+        final CompilationUnit cu = getCompilationUnit(inputFile.toFile());
 
         Optional<Method> om = findMethod(cu, "AssertsFalse", "m");
         LOGGER.debug("{}", cu);
@@ -68,9 +71,9 @@ public class ProofJavaProgramFactoryTest {
 
     @Test
     public void testAttachCommentsCompilationUnit_Steinhofel1() throws IOException {
-        File inputFile = new File(FindResources.getTestResourcesDirectory(),
-            "de/uka/ilkd/key/java/recoderext/Steinhoefel1.java");
-        final CompilationUnit cu = getCompilationUnit(inputFile);
+        var inputFile = FindResources.getTestResourcesDirectory()
+                .resolve("de/uka/ilkd/key/java/recoderext/Steinhoefel1.java");
+        final CompilationUnit cu = getCompilationUnit(inputFile.toFile());
 
         Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
         LOGGER.debug("{}", cu);
@@ -93,13 +96,11 @@ public class ProofJavaProgramFactoryTest {
 
         StatementBlock loopBody = (StatementBlock) forLoop.getBody();
 
-        CopyAssignment ghost3 = (CopyAssignment) loopBody.getStatementAt(3);
-        VariableReference var3 = (VariableReference) ghost3.getChildAt(0);
-        Assertions.assertEquals("k0_old", var3.getName());
+        var ghost3 = (SetStatement) loopBody.getStatementAt(3);
+        Assertions.assertEquals("set k0_old = k0;", ghost3.getParserContext().getText());
 
-        CopyAssignment ghost4 = (CopyAssignment) loopBody.getStatementAt(5);
-        VariableReference var4 = (VariableReference) ghost4.getChildAt(0);
-        Assertions.assertEquals("k1_old", var4.getName());
+        var ghost4 = (SetStatement) loopBody.getStatementAt(5);
+        Assertions.assertEquals("set k1_old = k1;", ghost4.getParserContext().getText());
 
         EmptyStatement empty1 = (EmptyStatement) loopBody.getStatementAt(4);
         EmptyStatement lastStatementInForLoop =
@@ -111,9 +112,9 @@ public class ProofJavaProgramFactoryTest {
 
     @Test
     public void testAttachCommentsCompilationUnit_SetStatements() throws IOException {
-        File inputFile = new File(FindResources.getTestResourcesDirectory(),
+        var inputFile = FindResources.getTestResourcesDirectory().resolve(
             "de/uka/ilkd/key/java/recoderext/SetInMethodBody.java");
-        final CompilationUnit cu = getCompilationUnit(inputFile);
+        final CompilationUnit cu = getCompilationUnit(inputFile.toFile());
 
         Optional<Method> ofib = findMethod(cu, "SetInMethodBody", "foo");
         LOGGER.debug("{}", cu);
@@ -121,16 +122,16 @@ public class ProofJavaProgramFactoryTest {
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
 
-        CopyAssignment assign1 = (CopyAssignment) m.getBody().getStatementAt(0);
-        VariableReference var1 = (VariableReference) assign1.getChildAt(0);
-        Assertions.assertEquals("message", var1.getName());
+        var assign1 = (SetStatement) m.getBody().getStatementAt(0);
+        var var1 = assign1.getParserContext();
+        Assertions.assertEquals("set message = arg0;", var1.getText());
 
         EmptyStatement empty1 = (EmptyStatement) m.getBody().getStatementAt(1);
         assertContainsComment(empty1, it -> it.equals("//@ set message = arg0;"));
 
-        CopyAssignment assign2 = (CopyAssignment) m.getBody().getStatementAt(2);
-        VariableReference var2 = (VariableReference) assign2.getChildAt(0);
-        Assertions.assertEquals("cause", var2.getName());
+        var assign2 = (SetStatement) m.getBody().getStatementAt(2);
+        var var2 = assign2.getParserContext();
+        Assertions.assertEquals("set cause = arg1;", var2.getText());
 
         EmptyStatement empty2 = (EmptyStatement) m.getBody().getStatementAt(3);
         assertContainsComment(empty2, it -> it.equals("//@ set cause = arg1;"));
@@ -140,12 +141,12 @@ public class ProofJavaProgramFactoryTest {
 
     @Test
     public void testAttachCommentsCompilationUnit_SmansEtAlArrayList() throws IOException {
-        File inputFile = new File("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
+        Path inputFile = Paths.get("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
         // Regenerate this file by copying the console output
-        File expectedFile = new File(FindResources.getTestResourcesDirectory(),
+        Path expectedFile = FindResources.getTestResourcesDirectory().resolve(
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
-        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
-        final CompilationUnit cu = getCompilationUnit(inputFile);
+        String expected = StringUtil.replaceNewlines(Files.readString(expectedFile), "\n");
+        final CompilationUnit cu = getCompilationUnit(inputFile.toFile());
 
         // Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
 
@@ -157,12 +158,13 @@ public class ProofJavaProgramFactoryTest {
 
     @Test
     public void testAttachCommentsCompilationUnit_LockSpec() throws IOException {
-        File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
+        Path inputFile =
+            Paths.get("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
         // Regenerate this file by copying the console output
-        File expectedFile = new File(FindResources.getTestResourcesDirectory(),
-            "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
-        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
-        final CompilationUnit cu = getCompilationUnit(inputFile);
+        Path expectedFile = FindResources.getTestResourcesDirectory()
+                .resolve("de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
+        String expected = StringUtil.replaceNewlines(Files.readString(expectedFile), "\n");
+        final CompilationUnit cu = getCompilationUnit(inputFile.toFile());
 
         String out = getActualResult(cu);
         LOGGER.debug("{}", out);
@@ -214,14 +216,14 @@ public class ProofJavaProgramFactoryTest {
         Assumptions.assumeTrue(inputFile.exists(),
             "Required input file " + inputFile + " does not exists!");
         String content = IOUtil.readFrom(inputFile);
-        return r2k.recoderCompilationUnits(new String[] { content }).get(0);
+        return r2k.recoderCompilationUnits(new String[] { content }).getFirst();
     }
 
     private Optional<Method> findMethod(CompilationUnit cu, String className, String methodName) {
         for (int i = 0; i < cu.getTypeDeclarationCount(); i++) {
             TypeDeclaration td = cu.getTypeDeclarationAt(i);
             if (td instanceof ClassDeclaration clazz) {
-                if (clazz.getName().equals(className)) {
+                if (Objects.equals(clazz.getName(), className)) {
                     return clazz.getMethods().stream().filter(it -> it.getName().equals(methodName))
                             .findFirst();
                 }

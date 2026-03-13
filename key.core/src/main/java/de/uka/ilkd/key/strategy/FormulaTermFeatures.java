@@ -7,8 +7,10 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.logic.op.Function;
+import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 class FormulaTermFeatures extends StaticFeatureCollection {
 
@@ -43,7 +45,7 @@ class FormulaTermFeatures extends StaticFeatureCollection {
 
         elemUpdate = OperatorClassTF.create(ElementaryUpdate.class);
         update = OperatorClassTF.create(UpdateApplication.class);
-        program = OperatorClassTF.create(Modality.class);
+        program = OperatorClassTF.create(JModality.class);
         modalOperator = or(update, program);
 
         // directCutAllowed = add ( atom, not ( modalOperator ) );
@@ -52,14 +54,17 @@ class FormulaTermFeatures extends StaticFeatureCollection {
         notContainsExecutable = not(ContainsExecutableCodeTermFeature.PROGRAMS);
 
         cutAllowed = add(notContainsExecutable, tf.notContainsProduct,
-            or(tf.eqF, OperatorClassTF.create(JFunction.class),
-                OperatorClassTF.create(ParsableVariable.class))); // XXX
+            or(tf.eqF, OperatorClassTF.create(Function.class),
+                OperatorClassTF.create(ProgramVariable.class),
+                OperatorClassTF.create(LogicVariable.class))); // XXX
         cutAllowedBelowQuantifier = add(not(propJunctor), notContainsExecutable);
         cutPriority = add(
             ifZero(tf.intInEquation, longTermConst(0),
                 ifZero(tf.eqF, longTermConst(100), longTermConst(200))),
             rec(any(), longTermConst(1)));
         // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
+
+
 
     }
 

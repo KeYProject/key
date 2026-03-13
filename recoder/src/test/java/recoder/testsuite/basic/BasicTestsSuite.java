@@ -19,16 +19,14 @@ public class BasicTestsSuite {
     private static CrossReferenceServiceConfiguration config;
     private static File projectFile;
 
-    @NonNull
-    public static File getProjectFile() {
+    public static @NonNull File getProjectFile() {
         if (projectFile == null) {
             init();
         }
         return projectFile;
     }
 
-    @NonNull
-    public static CrossReferenceServiceConfiguration getConfig() {
+    public static @NonNull CrossReferenceServiceConfiguration getConfig() {
         if (config == null) {
             init();
         }

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
@@ -31,14 +31,14 @@ public class Bottom extends SignAnalysisDomainElem {
     }
 
     @Override
-    public Term getDefiningAxiom(Term varOrConst, Services services) {
+    public JTerm getDefiningAxiom(JTerm varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         final Name freshVarName = new Name(tb.newName(varOrConst.sort()));
         LogicVariable freshVar = new LogicVariable(freshVarName, varOrConst.sort());
         services.getNamespaces().variables().add(freshVar);
 
-        Term axiom = tb.equals(varOrConst, tb.var(freshVar));
+        JTerm axiom = tb.equals(varOrConst, tb.var(freshVar));
         axiom = tb.not(axiom);
         axiom = tb.all(freshVar, axiom);
 

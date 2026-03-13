@@ -47,11 +47,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Apr 12 13:25:49 CEST 2023
-name=logPowIdentityConcrete
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "logPowIdentityConcrete",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))

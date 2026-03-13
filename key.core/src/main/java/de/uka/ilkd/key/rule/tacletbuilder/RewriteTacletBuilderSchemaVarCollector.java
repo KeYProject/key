@@ -6,14 +6,16 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 
 /**
@@ -39,28 +41,36 @@ public class RewriteTacletBuilderSchemaVarCollector {
             result.addAll(collectSchemaVariables(rtb.getFind()));
         }
 
-        for (TacletGoalTemplate tgt : rtb.goalTemplates()) {
+        for (var tgt : rtb.goalTemplates()) {
             result.addAll(collectSchemaVariables(tgt));
-            for (Taclet tacletInAddrules : tgt.rules()) {
-                result.addAll(tacletInAddrules.collectSchemaVars());
+            for (var tacletInAddrules : tgt.rules()) {
+                result.addAll(((Taclet) tacletInAddrules).collectSchemaVars());
             }
         }
 
         return result;
     }
 
+    private Set<SchemaVariable> collectSchemaVariables(SyntaxElement se) {
+        if (se instanceof JTerm t)
+            return collectSchemaVariables(t);
+        else if (se instanceof Sequent s)
+            return collectSchemaVariables(s);
+        else
+            throw new IllegalArgumentException("Unhandled syntax element: " + se);
+    }
 
-    private Set<SchemaVariable> collectSchemaVariables(Term t) {
+    private Set<SchemaVariable> collectSchemaVariables(JTerm t) {
         final Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        t.execPreOrder(new Visitor<Term>() {
+        t.execPreOrder(new Visitor<JTerm>() {
             @Override
-            public boolean visitSubtree(Term visited) {
+            public boolean visitSubtree(JTerm visited) {
                 return true;
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(JTerm visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());
                 }
@@ -68,13 +78,13 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
             @Override
-            public void subtreeEntered(Term subtreeRoot) {
+            public void subtreeEntered(JTerm subtreeRoot) {
                 // nothing to do
             }
 
 
             @Override
-            public void subtreeLeft(Term subtreeRoot) {
+            public void subtreeLeft(JTerm subtreeRoot) {
                 // nothing to do
             }
         });
@@ -87,7 +97,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
         Set<SchemaVariable> result = new LinkedHashSet<>();
 
         for (final SequentFormula cf : s) {
-            result.addAll(collectSchemaVariables(cf.formula()));
+            result.addAll(collectSchemaVariables((JTerm) cf.formula()));
         }
 
         return result;

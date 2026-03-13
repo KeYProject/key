@@ -12,9 +12,9 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.*;
 
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -48,6 +48,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     private boolean attentive = true;
 
     private boolean batchGoalStateChange = false;
+    private boolean linearizedMode = false;
 
     /**
      * construct a GUIProofTreeModel that mirrors the given Proof.
@@ -254,6 +255,14 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 .anyMatch(ProofTreeViewFilter::isActive);
     }
 
+    public boolean linearizedModeActive() {
+        return linearizedMode;
+    }
+
+    public void setLinearizedMode(boolean active) {
+        this.linearizedMode = active;
+    }
+
     /**
      * Set filters active or inactive and update tree if necessary.
      * Always updates the filter and the tree.
@@ -431,13 +440,18 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         workingList.push(n);
         while (!workingList.isEmpty()) {
             Node node = workingList.pop();
-            final GUIBranchNode treeNode = findBranch(node);
+            GUIAbstractTreeNode treeNode = findBranch(node);
             if (treeNode == null) {
-                continue;
+                // in linearized mode, the main branch does not have a BranchNode
+                treeNode = linearizedModeActive() ? find(node) : null;
+                if (treeNode == null) {
+                    continue;
+                }
             }
             treeNode.flushCache();
             while (true) {
-                final Node nextN = treeNode.findChild(node);
+                List<Node> nextList = treeNode.findChild(node);
+                Node nextN = nextList.size() == 1 ? nextList.get(0) : null;
                 if (nextN == null) {
                     break;
                 }

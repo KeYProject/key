@@ -7,12 +7,13 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -24,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars1,
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars1,
             ProofObligationVars poVars2) throws UnsupportedOperationException {
         // get information flow specification terms
         if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
@@ -48,7 +49,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             replace(origInfFlowSpecs, d.origVars, poVars2.post, d.tb);
 
         // create input-output-relations
-        final Term[] relations = new Term[infFlowSpecsAtPre1.length];
+        final JTerm[] relations = new JTerm[infFlowSpecsAtPre1.length];
         for (int i = 0; i < infFlowSpecsAtPre1.length; i++) {
             relations[i] = buildInputOutputRelation(d, poVars1, poVars2, infFlowSpecsAtPre1[i],
                 infFlowSpecsAtPre2[i], infFlowSpecsAtPost1[i], infFlowSpecsAtPost2[i]);
@@ -58,11 +59,11 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private Term buildInputOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
+    private JTerm buildInputOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, InfFlowSpec infFlowSpecAtPre1, InfFlowSpec infFlowSpecAtPre2,
             InfFlowSpec infFlowSpecAtPost1, InfFlowSpec infFlowSpecAtPost2) {
-        Term inputRelation = buildInputRelation(d, vs1, vs2, infFlowSpecAtPre1, infFlowSpecAtPre2);
-        Term outputRelation =
+        JTerm inputRelation = buildInputRelation(d, vs1, vs2, infFlowSpecAtPre1, infFlowSpecAtPre2);
+        JTerm outputRelation =
             buildOutputRelation(d, vs1, vs2, infFlowSpecAtPost1, infFlowSpecAtPost2);
 
         return d.tb.imp(inputRelation,
@@ -70,15 +71,15 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private Term buildInputRelation(BasicSnippetData d, ProofObligationVars vs1,
+    private JTerm buildInputRelation(BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
-        Term[] eqAtLocs = new Term[infFlowSpec1.preExpressions.size()];
+        JTerm[] eqAtLocs = new JTerm[infFlowSpec1.preExpressions.size()];
 
-        Iterator<Term> preExp1It = infFlowSpec1.preExpressions.iterator();
-        Iterator<Term> preExp2It = infFlowSpec2.preExpressions.iterator();
+        Iterator<JTerm> preExp1It = infFlowSpec1.preExpressions.iterator();
+        Iterator<JTerm> preExp2It = infFlowSpec2.preExpressions.iterator();
         for (int i = 0; i < infFlowSpec1.preExpressions.size(); i++) {
-            Term preExp1Term = preExp1It.next();
-            Term preExp2Term = preExp2It.next();
+            JTerm preExp1Term = preExp1It.next();
+            JTerm preExp2Term = preExp2It.next();
             SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
             preExp1Term.execPreOrder(search);
             if (!search.termFound) {
@@ -93,19 +94,19 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         return d.tb.and(eqAtLocs);
     }
 
-    private Term buildOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
+    private JTerm buildOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         // build equalities for post expressions
-        ImmutableList<Term> eqAtLocs = ImmutableSLList.nil();
+        ImmutableList<JTerm> eqAtLocs = ImmutableSLList.nil();
 
-        Iterator<Term> postExp1It = infFlowSpec1.postExpressions.iterator();
-        Iterator<Term> postExp2It = infFlowSpec2.postExpressions.iterator();
+        Iterator<JTerm> postExp1It = infFlowSpec1.postExpressions.iterator();
+        Iterator<JTerm> postExp2It = infFlowSpec2.postExpressions.iterator();
         for (int i = 0; i < infFlowSpec1.postExpressions.size(); i++) {
-            Term postExp1Term = postExp1It.next();
-            Term postExp2Term = postExp2It.next();
+            JTerm postExp1Term = postExp1It.next();
+            JTerm postExp2Term = postExp2It.next();
             eqAtLocs = eqAtLocs.append(d.tb.equals(postExp1Term, postExp2Term));
         }
-        final Term eqAtLocsTerm = d.tb.and(eqAtLocs);
+        final JTerm eqAtLocsTerm = d.tb.and(eqAtLocs);
 
         if (infFlowSpec1.newObjects.isEmpty()) {
             // object insensitive case
@@ -118,38 +119,38 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
+    protected JTerm buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
             InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
-            ProofObligationVars vs2, Term eqAtLocsTerm) {
+            ProofObligationVars vs2, JTerm eqAtLocsTerm) {
         // build equalities for newObjects terms
-        ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
-        Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
-        Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
+        ImmutableList<JTerm> newObjEqs = ImmutableSLList.nil();
+        Iterator<JTerm> newObjects1It = infFlowSpec1.newObjects.iterator();
+        Iterator<JTerm> newObjects2It = infFlowSpec2.newObjects.iterator();
         for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
-            Term newObject1Term = newObjects1It.next();
-            Term newObject2Term = newObjects2It.next();
+            JTerm newObject1Term = newObjects1It.next();
+            JTerm newObject2Term = newObjects2It.next();
             newObjEqs = newObjEqs.append(d.tb.equals(newObject1Term, newObject2Term));
         }
-        final Term newObjEqsTerm = d.tb.and(newObjEqs);
+        final JTerm newObjEqsTerm = d.tb.and(newObjEqs);
 
         // build isomorphism term for newObjects
-        final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
-        final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
-        final JFunction newObjectsIso =
+        final JTerm newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
+        final JTerm newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
+        final Function newObjectsIso =
             d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
-        final Term isoTerm =
+        final JTerm isoTerm =
             d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap, newObjsSeq2, vs2.pre.heap);
 
         // build object oriented post-relation (object sensitive case)
-        final Term ooPostRelation = d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, eqAtLocsTerm));
+        final JTerm ooPostRelation = d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, eqAtLocsTerm));
         if (vs1.pre.guard != null && vs1.post.guard != null && vs2.pre.guard != null
                 && vs2.post.guard != null) {
             // Case of loop invariants.
             // In this case newObjecs is only considered in case the
             // loop body is entered. Otherwise no code is executed an
             // hence also no objects can be created.
-            final Term preGuardFalse1 = d.tb.equals(vs1.pre.guard, d.tb.FALSE());
-            final Term preGuardFalse2 = d.tb.equals(vs2.pre.guard, d.tb.FALSE());
+            final JTerm preGuardFalse1 = d.tb.equals(vs1.pre.guard, d.tb.FALSE());
+            final JTerm preGuardFalse2 = d.tb.equals(vs2.pre.guard, d.tb.FALSE());
             return d.tb.ife(d.tb.and(preGuardFalse1, preGuardFalse2), eqAtLocsTerm, ooPostRelation);
         } else {
             // Normal case.
@@ -161,9 +162,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     private static class SearchVisitor implements DefaultVisitor {
 
         private boolean termFound = false;
-        private final Term[] searchTerms;
+        private final JTerm[] searchTerms;
 
-        public SearchVisitor(Term... searchTerms) {
+        public SearchVisitor(JTerm... searchTerms) {
             this.searchTerms = searchTerms;
         }
 

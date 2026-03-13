@@ -5,7 +5,7 @@ package de.uka.ilkd.key.informationflow.po;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -18,11 +18,12 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  */
 public abstract class AbstractInfFlowPO extends AbstractOperationPO implements InfFlowPO {
 
-    public AbstractInfFlowPO(InitConfig initConfig, String name) {
+    protected AbstractInfFlowPO(InitConfig initConfig, String name) {
         super(initConfig, name);
     }
 
-    public Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
+    @Override
+    public Proof createProof(String proofName, JTerm poTerm, InitConfig proofConfig) {
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
         StrategyInfoUndoMethod undo =
             strategyInfos -> strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
@@ -32,7 +33,8 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         return proof;
     }
 
-    public InfFlowProof createProofObject(String proofName, String proofHeader, Term poTerm,
+    @Override
+    public InfFlowProof createProofObject(String proofName, String proofHeader, JTerm poTerm,
             InitConfig proofConfig) {
         final InfFlowProof proof = new InfFlowProof(proofName, poTerm, proofHeader, proofConfig);
 

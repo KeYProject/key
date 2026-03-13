@@ -38,7 +38,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -102,7 +104,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final ProgramElementName name,
             final KeYJavaType type) {
-        final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(name, null, type);
+        final LocalVariableDeclaration declaration = declare(name, null, type);
 
         return declaration;
     }
@@ -133,7 +135,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(IProgramVariable var, Expression init,
             KeYJavaType type) {
-        return KeYJavaASTFactory.declare(new Modifier[0], var, init, type);
+        return declare(new Modifier[0], var, init, type);
     }
 
     /**
@@ -156,7 +158,7 @@ public abstract class KeYJavaASTFactory {
         final ProgramElementName uniqueName =
             services.getVariableNamer().getTemporaryNameProposal(name);
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(uniqueName, initializer, type);
+            declare(uniqueName, initializer, type);
 
         return declaration;
     }
@@ -174,7 +176,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code>
      */
     public static LocalVariableDeclaration declare(IProgramVariable var, KeYJavaType type) {
-        return KeYJavaASTFactory.declare(var, null, type);
+        return declare(var, null, type);
     }
 
     /**
@@ -258,7 +260,7 @@ public abstract class KeYJavaASTFactory {
     /**
      * create a local variable
      */
-    public static ProgramVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
+    public static LocationVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
         return new LocationVariable(name, kjt);
     }
 
@@ -273,9 +275,18 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(final Services services, final String name,
             final KeYJavaType type) {
+        // first check for a saved name for this variable
+        final NameRecorder nameRecorder = services.getNameRecorder();
+        for (var prop : nameRecorder.getSetProposals()) {
+            if (prop.toString().startsWith(name + VariableNamer.TEMP_INDEX_SEPARATOR)) {
+                return localVariable(new ProgramElementName(prop.toString()),
+                    type);
+            }
+        }
         final ProgramElementName uniqueName =
             services.getVariableNamer().getTemporaryNameProposal(name);
-        final ProgramVariable variable = KeYJavaASTFactory.localVariable(uniqueName, type);
+        nameRecorder.addProposal(new Name(uniqueName.getProgramName()));
+        final ProgramVariable variable = localVariable(uniqueName, type);
 
         return variable;
     }
@@ -351,8 +362,8 @@ public abstract class KeYJavaASTFactory {
      */
     public static Catch catchClause(final ParameterDeclaration parameter,
             final Statement[] statements) {
-        final StatementBlock body = KeYJavaASTFactory.block(statements);
-        final Catch clause = KeYJavaASTFactory.catchClause(parameter, body);
+        final StatementBlock body = block(statements);
+        final Catch clause = catchClause(parameter, body);
 
         return clause;
     }
@@ -503,7 +514,7 @@ public abstract class KeYJavaASTFactory {
      * @return an {@link If} with expression <code>guard</code> and then branch <code>then</code>
      */
     public static If ifThen(Expression guard, Statement then) {
-        final If statement = KeYJavaASTFactory.ifThen(guard, new Then(then));
+        final If statement = ifThen(guard, new Then(then));
 
         return statement;
     }
@@ -523,8 +534,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>statements</code>
      */
     public static If ifThen(final Expression guard, final Statement... statements) {
-        final StatementBlock block = KeYJavaASTFactory.block(statements);
-        final If statement = KeYJavaASTFactory.ifThen(guard, block);
+        final StatementBlock block = block(statements);
+        final If statement = ifThen(guard, block);
 
         return statement;
     }
@@ -602,7 +613,7 @@ public abstract class KeYJavaASTFactory {
             final Statement elseStatement) {
         final Then then = new Then(thenStatement);
         final Else els = new Else(elseStatement);
-        final If ifElse = KeYJavaASTFactory.ifElse(guard, then, els);
+        final If ifElse = ifElse(guard, then, els);
 
         return ifElse;
     }
@@ -650,8 +661,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>expression</code>
      */
     public static Case caseBlock(final Expression expression, final Statement statement) {
-        final Statement[] statements = new Statement[] { statement };
-        final Case block = KeYJavaASTFactory.caseBlock(expression, statements);
+        final Statement[] statements = { statement };
+        final Case block = caseBlock(expression, statements);
 
         return block;
     }
@@ -697,9 +708,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link For} as defined by <code>parameters</code>
      */
     public static EnhancedFor enhancedForLoop(final ExtList parameters) {
-        final EnhancedFor loop = new EnhancedFor(parameters);
-
-        return loop;
+        return new EnhancedFor(parameters);
     }
 
     /**
@@ -713,7 +722,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Equals} that compares <code>expression</code> against <code>null</code>
      */
     public static Equals equalsNullOperator(final Expression expression) {
-        final Equals operator = KeYJavaASTFactory.equalsOperator(expression, NullLiteral.NULL);
+        final Equals operator = equalsOperator(expression, NullLiteral.NULL);
 
         return operator;
     }
@@ -778,9 +787,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock insertStatementInBlock(final Statement statement,
             final StatementBlock block) {
-        final Statement[] statements = new Statement[] { statement };
+        final Statement[] statements = { statement };
         final StatementBlock statementBlock =
-            KeYJavaASTFactory.insertStatementInBlock(statements, block);
+            insertStatementInBlock(statements, block);
 
         return statementBlock;
     }
@@ -828,9 +837,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock insertStatementInBlock(final StatementBlock block,
             Statement[] statements) {
-        final StatementBlock blockEnd = KeYJavaASTFactory.block(statements);
+        final StatementBlock blockEnd = block(statements);
         final StatementBlock blockComplete =
-            KeYJavaASTFactory.insertStatementInBlock(block, blockEnd);
+            insertStatementInBlock(block, blockEnd);
 
         return blockComplete;
     }
@@ -868,9 +877,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declareZero(final KeYJavaType type,
             final IProgramVariable variable) {
-        final IntLiteral zeroLiteral = KeYJavaASTFactory.zeroLiteral();
+        final IntLiteral zeroLiteral = zeroLiteral();
 
-        return KeYJavaASTFactory.declare(variable, zeroLiteral, type);
+        return declare(variable, zeroLiteral, type);
     }
 
     /**
@@ -889,9 +898,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declareMethodCall(final KeYJavaType type,
             final IProgramVariable variable, final ReferencePrefix reference, final String method) {
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, method);
+        final MethodReference call = methodCall(reference, method);
 
-        return KeYJavaASTFactory.declare(variable, call, type);
+        return declare(variable, call, type);
     }
 
     /**
@@ -912,9 +921,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declareMethodCall(final IProgramVariable variable,
             final ReferencePrefix reference, final String method) {
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, method);
+        final MethodReference call = methodCall(reference, method);
 
-        return KeYJavaASTFactory.declare(variable, call);
+        return declare(variable, call);
     }
 
     /**
@@ -941,8 +950,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Default} that contains <code>statement</code>
      */
     public static Default defaultBlock(final Statement statement) {
-        final Statement[] statements = new Statement[] { statement };
-        final Default block = KeYJavaASTFactory.defaultBlock(statements);
+        final Statement[] statements = { statement };
+        final Default block = defaultBlock(statements);
 
         return block;
     }
@@ -1029,8 +1038,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Else} block consisting of <code>statements</code> solely
      */
     public static Else elseBlock(final Statement[] statements) {
-        final StatementBlock statement = KeYJavaASTFactory.block(statements);
-        final Else block = KeYJavaASTFactory.elseBlock(statement);
+        final StatementBlock statement = block(statements);
+        final Else block = elseBlock(statement);
 
         return block;
     }
@@ -1064,9 +1073,9 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code> and initial value zero
      */
     public static ILoopInit loopInitZero(final KeYJavaType type, final IProgramVariable variable) {
-        final LoopInitializer initializer = KeYJavaASTFactory.declareZero(type, variable);
+        final LoopInitializer initializer = declareZero(type, variable);
 
-        return KeYJavaASTFactory.loopInit(initializer);
+        return loopInit(initializer);
     }
 
     /**
@@ -1148,8 +1157,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link LessThan} that compares <code>expression</code> less than <code>0</code>
      */
     public static LessThan lessThanZeroOperator(final Expression expression) {
-        final IntLiteral zeroLiteral = KeYJavaASTFactory.zeroLiteral();
-        final LessThan operator = KeYJavaASTFactory.lessThanOperator(expression, zeroLiteral);
+        final IntLiteral zeroLiteral = zeroLiteral();
+        final LessThan operator = lessThanOperator(expression, zeroLiteral);
 
         return operator;
     }
@@ -1171,8 +1180,8 @@ public abstract class KeYJavaASTFactory {
      */
     public static IGuard lessThanArrayLengthGuard(final JavaInfo model,
             final ProgramVariable variable, final ReferencePrefix array) {
-        final FieldReference length = KeYJavaASTFactory.arrayLength(model, array);
-        final IGuard guard = KeYJavaASTFactory.lessThanGuard(variable, length);
+        final FieldReference length = arrayLength(model, array);
+        final IGuard guard = lessThanGuard(variable, length);
 
         return guard;
     }
@@ -1205,7 +1214,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static IForUpdates postIncrementForUpdates(final ProgramVariable variable) {
         final Expression update = new PostIncrement(variable);
-        final IForUpdates forUpdates = KeYJavaASTFactory.forUpdates(update);
+        final IForUpdates forUpdates = forUpdates(update);
 
         return forUpdates;
     }
@@ -1223,7 +1232,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static ArrayReference arrayFieldAccess(final ReferencePrefix array,
             final Expression index) {
-        final Expression[] indices = new Expression[] { index };
+        final Expression[] indices = { index };
         final ArrayReference access = new ArrayReference(array, indices);
 
         return access;
@@ -1275,7 +1284,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock block(final List<Statement> statements) {
         final Statement[] s = new Statement[statements.size()];
-        final StatementBlock block = KeYJavaASTFactory.block(statements.toArray(s));
+        final StatementBlock block = block(statements.toArray(s));
 
         return block;
     }
@@ -1311,7 +1320,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static For forLoop(final ILoopInit init, final IGuard guard, final IForUpdates updates,
             final Statement... statements) {
-        final StatementBlock body = KeYJavaASTFactory.block(statements);
+        final StatementBlock body = block(statements);
 
         return new For(init, guard, updates, body);
     }
@@ -1331,7 +1340,7 @@ public abstract class KeYJavaASTFactory {
      *         body <code>body</code>
      */
     public static For forLoop(final IGuard guard, final IForUpdates updates, final Statement body) {
-        final For loop = KeYJavaASTFactory.forLoop(null, guard, updates, body);
+        final For loop = forLoop(null, guard, updates, body);
 
         return loop;
     }
@@ -1352,7 +1361,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static For forLoop(final IGuard guard, final IForUpdates updates,
             final Statement[] body) {
-        final For loop = KeYJavaASTFactory.forLoop(null, guard, updates, body);
+        final For loop = forLoop(null, guard, updates, body);
 
         return loop;
     }
@@ -1372,8 +1381,8 @@ public abstract class KeYJavaASTFactory {
      */
     public static CopyAssignment assignArrayField(final ProgramVariable variable,
             final ReferencePrefix array, final Expression index) {
-        final ArrayReference element = KeYJavaASTFactory.arrayFieldAccess(array, index);
-        final CopyAssignment assignment = KeYJavaASTFactory.assign(variable, element);
+        final ArrayReference element = arrayFieldAccess(array, index);
+        final CopyAssignment assignment = assign(variable, element);
 
         return assignment;
     }
@@ -1406,7 +1415,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final IProgramVariable variable) {
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(variable, (Expression) null);
+            declare(variable, (Expression) null);
 
         return declaration;
     }
@@ -1429,7 +1438,7 @@ public abstract class KeYJavaASTFactory {
             final Expression init) {
         final KeYJavaType type = variable.getKeYJavaType();
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(variable, init, type);
+            declare(variable, init, type);
 
         return declaration;
     }
@@ -1452,7 +1461,7 @@ public abstract class KeYJavaASTFactory {
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final ImmutableArray<Modifier> modifiers = new ImmutableArray<>(modifier);
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, variable, init, type);
+            declare(modifiers, variable, init, type);
 
         return declaration;
     }
@@ -1475,7 +1484,7 @@ public abstract class KeYJavaASTFactory {
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final ImmutableArray<Modifier> m = new ImmutableArray<>(modifiers);
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(m, variable, init, type);
+            declare(m, variable, init, type);
 
         return declaration;
     }
@@ -1498,7 +1507,7 @@ public abstract class KeYJavaASTFactory {
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final TypeRef typeRef = new TypeRef(type);
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
+            declare(modifiers, variable, init, typeRef);
 
         return declaration;
     }
@@ -1520,9 +1529,9 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final IProgramVariable variable, final Expression init, final TypeReference typeRef) {
         final VariableSpecification varSpec =
-            KeYJavaASTFactory.variableSpecification(variable, init, typeRef.getKeYJavaType());
+            variableSpecification(variable, init, typeRef.getKeYJavaType());
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, typeRef, varSpec);
+            declare(modifiers, typeRef, varSpec);
 
         return declaration;
     }
@@ -1585,7 +1594,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodReference methodCall(final ReferencePrefix reference, final String name,
             final ImmutableArray<? extends Expression> args) {
         final ProgramElementName method = new ProgramElementName(name);
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, method, args);
+        final MethodReference call = methodCall(reference, method, args);
 
         return call;
     }
@@ -1606,7 +1615,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodReference methodCall(final KeYJavaType type, final String name,
             final ImmutableArray<? extends Expression> args) {
         final TypeReference typeRef = new TypeRef(type);
-        final MethodReference call = KeYJavaASTFactory.methodCall(typeRef, name, args);
+        final MethodReference call = methodCall(typeRef, name, args);
 
         return call;
     }
@@ -1627,7 +1636,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodReference methodCall(final KeYJavaType type, final String name,
             final Expression... args) {
         final TypeReference typeRef = new TypeRef(type);
-        final MethodReference call = KeYJavaASTFactory.methodCall(typeRef, name, args);
+        final MethodReference call = methodCall(typeRef, name, args);
 
         return call;
     }
@@ -1646,7 +1655,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference methodCall(final KeYJavaType type, final String name) {
         final ImmutableArray<? extends Expression> args = new ImmutableArray<>();
-        final MethodReference call = KeYJavaASTFactory.methodCall(type, name, args);
+        final MethodReference call = methodCall(type, name, args);
 
         return call;
     }
@@ -1665,7 +1674,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name) {
         final ImmutableArray<Expression> args = new ImmutableArray<>();
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, args);
+        final MethodReference call = methodCall(reference, name, args);
 
         return call;
     }
@@ -1686,7 +1695,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodReference methodCall(final ReferencePrefix reference, final String name,
             final Expression... args) {
         final ImmutableArray<? extends Expression> a = new ImmutableArray<>(args);
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
+        final MethodReference call = methodCall(reference, name, a);
 
         return call;
     }
@@ -1707,7 +1716,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodReference methodCall(final ReferencePrefix reference, final MethodName name,
             final Expression... args) {
         final ImmutableArray<Expression> a = new ImmutableArray<>(args);
-        final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
+        final MethodReference call = methodCall(reference, name, a);
 
         return call;
     }
@@ -1753,7 +1762,7 @@ public abstract class KeYJavaASTFactory {
         final KeYJavaType classType = expression.getKeYJavaType(services, context);
         final ProgramVariable field = services.getJavaInfo().getAttribute(name, classType);
         final FieldReference reference =
-            KeYJavaASTFactory.fieldReference(new ParenthesizedExpression(expression), field);
+            fieldReference(new ParenthesizedExpression(expression), field);
 
         return reference;
     }
@@ -1800,8 +1809,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Finally} block consisting of <code>statement</code> solely
      */
     public static Finally finallyBlock(final Statement statement) {
-        final StatementBlock body = KeYJavaASTFactory.block(statement);
-        final Finally block = KeYJavaASTFactory.finallyBlock(body);
+        final StatementBlock body = block(statement);
+        final Finally block = finallyBlock(body);
 
         return block;
     }
@@ -1819,8 +1828,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Finally} block consisting of <code>statements</code> solely
      */
     public static Finally finallyBlock(final Statement[] statements) {
-        final StatementBlock body = KeYJavaASTFactory.block(statements);
-        final Finally block = KeYJavaASTFactory.finallyBlock(body);
+        final StatementBlock body = block(statements);
+        final Finally block = finallyBlock(body);
 
         return block;
     }
@@ -1865,7 +1874,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix typePrefix, final KeYJavaType baseType) {
         final TypeRef typeRef = new TypeRef(typeName, dimensions, typePrefix, baseType);
         final LocalVariableDeclaration declaration =
-            KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
+            declare(modifiers, variable, init, typeRef);
 
         return declaration;
     }
@@ -1895,7 +1904,7 @@ public abstract class KeYJavaASTFactory {
         MethodBodyStatement methodBody = null;
 
         if (method != null) {
-            methodBody = KeYJavaASTFactory.methodBody(result, reference, method, arguments);
+            methodBody = methodBody(result, reference, method, arguments);
         }
 
         return methodBody;
@@ -1916,7 +1925,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodBodyStatement methodBody(final ProgramVariable result,
             final ReferencePrefix reference, final IProgramMethod method,
             final Expression[] arguments) {
-        final MethodBodyStatement methodBody = KeYJavaASTFactory.methodBody(result, reference,
+        final MethodBodyStatement methodBody = methodBody(result, reference,
             method, new ImmutableArray<>(arguments));
 
         return methodBody;
@@ -1953,7 +1962,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodFrame methodFrame(final IExecutionContext executionContext,
             final StatementBlock block) {
-        final MethodFrame frame = KeYJavaASTFactory.methodFrame(null, executionContext, block);
+        final MethodFrame frame = methodFrame(null, executionContext, block);
 
         return frame;
     }
@@ -1970,7 +1979,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodFrame methodFrame(final IExecutionContext executionContext,
             final StatementBlock block, final PositionInfo position) {
         final MethodFrame frame =
-            KeYJavaASTFactory.methodFrame(null, executionContext, block, position);
+            methodFrame(null, executionContext, block, position);
 
         return frame;
     }
@@ -2072,8 +2081,8 @@ public abstract class KeYJavaASTFactory {
      */
     public static Statement labeledStatement(final Label label, final Statement[] statements,
             PositionInfo pos) {
-        final StatementBlock block = KeYJavaASTFactory.block(statements);
-        final LabeledStatement labeled = KeYJavaASTFactory.labeledStatement(label, block, pos);
+        final StatementBlock block = block(statements);
+        final LabeledStatement labeled = labeledStatement(label, block, pos);
 
         return labeled;
     }
@@ -2119,7 +2128,7 @@ public abstract class KeYJavaASTFactory {
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression[] sizes, final KeYJavaType keyJavaType) {
         final NewArray newArray =
-            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
+            newArray(typeRef, dimensions, sizes, null, keyJavaType);
 
         return newArray;
     }
@@ -2140,9 +2149,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression size, final KeYJavaType keyJavaType) {
-        final Expression[] sizes = new Expression[] { size };
+        final Expression[] sizes = { size };
         final NewArray newArray =
-            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
+            newArray(typeRef, dimensions, sizes, null, keyJavaType);
 
         return newArray;
     }
@@ -2165,7 +2174,7 @@ public abstract class KeYJavaASTFactory {
             final ArrayInitializer initializer, final KeYJavaType keyJavaType) {
         final Expression[] sizes = new Expression[0];
         final NewArray newArray =
-            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, initializer, keyJavaType);
+            newArray(typeRef, dimensions, sizes, initializer, keyJavaType);
 
         return newArray;
     }
@@ -2206,7 +2215,7 @@ public abstract class KeYJavaASTFactory {
     public static New newOperator(final ReferencePrefix referencePrefix, final KeYJavaType type,
             final Expression[] args) {
         final TypeReference typeRef = new TypeRef(type);
-        final New operator = KeYJavaASTFactory.newOperator(referencePrefix, typeRef, args);
+        final New operator = newOperator(referencePrefix, typeRef, args);
 
         return operator;
     }
@@ -2224,7 +2233,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static New newOperator(final ReferencePrefix referencePrefix, final KeYJavaType type) {
         final Expression[] args = new Expression[0];
-        final New operator = KeYJavaASTFactory.newOperator(referencePrefix, type, args);
+        final New operator = newOperator(referencePrefix, type, args);
 
         return operator;
     }
@@ -2240,7 +2249,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link New} operator that allocates a new instance of <code>type</code>
      */
     public static New newOperator(final KeYJavaType type) {
-        final New operator = KeYJavaASTFactory.newOperator(null, type);
+        final New operator = newOperator(null, type);
 
         return operator;
     }
@@ -2376,8 +2385,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Then} block that consists of <code>statements</code> solely
      */
     public static Then thenBlock(final Statement[] statements) {
-        final StatementBlock statement = KeYJavaASTFactory.block(statements);
-        final Then block = KeYJavaASTFactory.thenBlock(statement);
+        final StatementBlock statement = block(statements);
+        final Then block = thenBlock(statement);
 
         return block;
     }
@@ -2465,8 +2474,8 @@ public abstract class KeYJavaASTFactory {
      *         events during the execution of <code>statement</code>
      */
     public static Try tryBlock(final Statement statement, final Branch[] branches) {
-        final StatementBlock body = KeYJavaASTFactory.block(statement);
-        final Try tryBlock = KeYJavaASTFactory.tryBlock(body, branches);
+        final StatementBlock body = block(statement);
+        final Try tryBlock = tryBlock(body, branches);
 
         return tryBlock;
     }
@@ -2486,8 +2495,8 @@ public abstract class KeYJavaASTFactory {
      *         events during the execution of <code>statement</code>
      */
     public static Try tryBlock(final Statement statement, final Branch branch) {
-        final Branch[] branches = new Branch[] { branch };
-        final Try tryBlock = KeYJavaASTFactory.tryBlock(statement, branches);
+        final Branch[] branches = { branch };
+        final Try tryBlock = tryBlock(statement, branches);
 
         return tryBlock;
     }
@@ -2579,7 +2588,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link IntLiteral} that represents the integer value <code>0</code>
      */
     public static IntLiteral zeroLiteral() {
-        final IntLiteral literal = KeYJavaASTFactory.intLiteral(0);
+        final IntLiteral literal = intLiteral(0);
 
         return literal;
     }

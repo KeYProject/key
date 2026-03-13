@@ -8,9 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -22,6 +20,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * The default implementation of {@link IExecutionBaseMethodReturn}.
@@ -43,7 +44,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     /**
      * The method return condition to reach this node from its calling {@link IExecutionMethodCall}.
      */
-    private Term methodReturnCondition;
+    private JTerm methodReturnCondition;
 
     /**
      * The human-readable method return condition to reach this node from its calling
@@ -64,7 +65,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      *        {@link IExecutionNode}.
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
-    public AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
+    protected AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {
         super(settings, proofNode);
         assert methodCall != null;
@@ -104,7 +105,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public Term getMethodReturnCondition() throws ProofInputException {
+    public JTerm getMethodReturnCondition() throws ProofInputException {
         if (methodReturnCondition == null) {
             lazyComputeMethodReturnCondition();
         }
@@ -133,7 +134,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         if (initConfig != null) { // Otherwise Proof is disposed.
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<>();
+            List<JTerm> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != methodCall) {
                 if (parent instanceof IExecutionBranchCondition) {
@@ -180,8 +181,10 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         assert proofNode.childrenCount() == 1;
         PosInOccurrence originalPIO = methodCall.getModalityPIO();
         int index = originalPIO.isInAntec()
-                ? proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula())
-                : proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
+                ? proofNode.sequent().antecedent()
+                        .indexOf(originalPIO.sequentFormula())
+                : proofNode.sequent().succedent()
+                        .indexOf(originalPIO.sequentFormula());
         // Search relevant position in child node
         Node childNode = proofNode.child(0);
         SequentFormula nodeSF =
@@ -189,7 +192,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
                     : childNode.sequent().succedent().get(index);
         PosInOccurrence modalityPIO =
             new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
-        Term modalityTerm = modalityPIO.subTerm();
+        var modalityTerm = modalityPIO.subTerm();
         while (modalityTerm.op() instanceof UpdateApplication) {
             modalityPIO = modalityPIO.down(1);
             modalityTerm = modalityPIO.subTerm();

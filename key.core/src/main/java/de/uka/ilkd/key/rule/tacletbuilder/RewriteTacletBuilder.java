@@ -3,32 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
+
+import org.key_project.prover.rules.TacletApplPart;
 
 /** class builds RewriteTaclet objects. */
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
-
-
-    /**
-     * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
-     * to
-     * <ul>
-     * <li>{@link RewriteTaclet#NONE} no state restrictions are posed</li>
-     * <li>{@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code> must match on a
-     * formula within the same state as <code>\find</code> rsp. <code>\add</code>. For efficiency no
-     * modalities are allowed above the <code>\find</code> position</li>
-     * <li>{@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is only allowed to
-     * match on formulas which are evaluated in the same state as the sequent</li>
-     * </ul>
-     */
-    protected int applicationRestriction;
-
-    public RewriteTacletBuilder<T> setApplicationRestriction(int p_applicationRestriction) {
-        applicationRestriction = p_applicationRestriction;
-        return this;
-    }
 
 
     /* for information flow purposes; TODO: find better solution */
@@ -44,7 +25,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      *
      * @return this RewriteTacletBuilder
      */
-    public RewriteTacletBuilder<T> setFind(Term findTerm) {
+    public RewriteTacletBuilder<T> setFind(JTerm findTerm) {
         checkContainsFreeVarSV(findTerm, this.getName(), "find term");
         find = findTerm;
         return this;
@@ -69,9 +50,10 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         RewriteTaclet t = new RewriteTaclet(name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
+                varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+            goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),
             choices, surviveSmbExec, tacletAnnotations);
         t.setOrigin(origin);
         return (T) t;
@@ -93,7 +75,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     }
 
 
-    public void addGoalTerm(Term goalTerm) {
+    public void addGoalTerm(JTerm goalTerm) {
         final TacletGoalTemplate axiomTemplate = new RewriteTacletGoalTemplate(goalTerm);
         addTacletGoalTemplate(axiomTemplate);
     }

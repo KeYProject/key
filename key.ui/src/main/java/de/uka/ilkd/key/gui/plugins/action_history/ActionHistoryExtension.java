@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -131,12 +132,12 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         // ignored
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         Proof p = e.getSource().getSelectedProof();
         currentProof = p;
         if (p == null || registeredProofs.contains(p)) {

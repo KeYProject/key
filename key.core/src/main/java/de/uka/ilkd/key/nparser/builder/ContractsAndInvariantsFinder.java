@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -20,6 +18,9 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
+
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.QuantifiableVariable;
 
 import org.jspecify.annotations.NonNull;
 
@@ -35,7 +36,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final List<ClassInvariant> invariants = new ArrayList<>();
 
 
-    private ParsableVariable selfVar;
+    private LocationVariable selfVar;
 
     public ContractsAndInvariantsFinder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -69,12 +70,12 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
-        Term fma = accept(ctx.fma);
-        Term modifiesClause = accept(ctx.modifiesClause);
+        JTerm fma = accept(ctx.fma);
+        JTerm modifiableClause = accept(ctx.modifiableClause);
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
-                dsf.createDLOperationContract(contractName, fma, modifiesClause);
+                dsf.createDLOperationContract(contractName, fma, modifiableClause);
             contracts.add(dlOperationContract);
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());
@@ -88,7 +89,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitInvariants(KeYParser.InvariantsContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
-        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
+        selfVar = (LocationVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
         unbindVars(orig);
         return null;
@@ -97,7 +98,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
-        Term fma = accept(ctx.fma);
+        JTerm fma = accept(ctx.fma);
         String displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {

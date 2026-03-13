@@ -36,10 +36,10 @@ public class SMTTermMultOp extends SMTTerm {
 
         public SMTTerm getIdem() {
             return switch (this) {
-            case AND -> SMTTerm.TRUE;
-            case OR -> SMTTerm.FALSE;
-            default -> throw new RuntimeException(
-                "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
+                case AND -> TRUE;
+                case OR -> FALSE;
+                default -> throw new RuntimeException(
+                    "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
             };
         }
 
@@ -47,7 +47,7 @@ public class SMTTermMultOp extends SMTTerm {
             return switch (this) {
                 case AND -> {
                     if (pol) {
-                        yield  this;
+                        yield this;
                     }
                     yield OR;
                 }
@@ -58,21 +58,21 @@ public class SMTTermMultOp extends SMTTerm {
                     yield AND;
                 }
                 default -> throw new RuntimeException(
-                        "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
-                                + this);
+                    "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
+                        + this);
             };
         }
     }
 
     public static OpProperty getProperty(SMTTermMultOp.Op op) {
         return switch (op) {
-        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
-        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
-        case IMPLIES -> OpProperty.RIGHTASSOC;
-        case IFF, EQUALS ->
-            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
-        case DISTINCT -> OpProperty.PAIRWISE;
-        default -> OpProperty.NONE;
+            case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+            case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+            case IMPLIES -> OpProperty.RIGHTASSOC;
+            case IFF, EQUALS ->
+                /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+            case DISTINCT -> OpProperty.PAIRWISE;
+            default -> OpProperty.NONE;
         };
     }
 
@@ -495,7 +495,7 @@ public class SMTTermMultOp extends SMTTerm {
     }
 
     public SMTTerm mkChain() {
-        SMTTerm ret = SMTTerm.TRUE;
+        SMTTerm ret = TRUE;
         for (int i = 0; i < subs.size() - 1; i++) {
             SMTTerm subi = subs.get(i);
             SMTTerm subiPlus1 = subs.get(i + 1);

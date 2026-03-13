@@ -8,12 +8,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -60,14 +59,13 @@ public class ClausesGraph {
         do {
             changed = false;
 
-            for (Term clause : clauses) {
-                final Term formula = clause;
-                final ImmutableSet<Term> oldConnections = getConnections(formula);
+            for (final Term clause : clauses) {
+                final ImmutableSet<Term> oldConnections = getConnections(clause);
                 final ImmutableSet<Term> newConnections = getTransitiveConnections(oldConnections);
 
                 if (newConnections.size() > oldConnections.size()) {
                     changed = true;
-                    connections.put(formula, newConnections);
+                    connections.put(clause, newConnections);
                 }
             }
 
@@ -89,8 +87,8 @@ public class ClausesGraph {
      */
     boolean connected(Term formula0, Term formula1) {
         final ImmutableSet<Term> subFormulas1 = computeClauses(formula1);
-        for (Term term : computeClauses(formula0)) {
-            if (intersect(getConnections(term), subFormulas1).size() > 0) {
+        for (final Term term : computeClauses(formula0)) {
+            if (!intersect(getConnections(term), subFormulas1).isEmpty()) {
                 return true;
             }
         }
@@ -119,8 +117,7 @@ public class ClausesGraph {
      *
      */
     private void buildInitialGraph() {
-        for (Term clause1 : clauses) {
-            final Term clause = clause1;
+        for (final Term clause : clauses) {
             connections.put(clause, directConnections(clause));
         }
     }
@@ -132,8 +129,7 @@ public class ClausesGraph {
      */
     private ImmutableSet<Term> directConnections(Term formula) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
-        for (Term clause1 : clauses) {
-            final Term clause = clause1;
+        for (final Term clause : clauses) {
             if (directlyConnected(clause, formula)) {
                 res = res.add(clause);
             }
@@ -146,8 +142,9 @@ public class ClausesGraph {
      * @param set
      * @return ture if set contains one or more exists varaible that are also in exVars
      */
-    private boolean containsExistentialVariables(ImmutableSet<QuantifiableVariable> set) {
-        return intersectQV(set, exVars).size() > 0;
+    private boolean containsExistentialVariables(
+            ImmutableSet<? extends QuantifiableVariable> set) {
+        return !TriggerUtils.intersect(set, exVars).isEmpty();
     }
 
     /**
@@ -156,7 +153,8 @@ public class ClausesGraph {
      * @return true if formula0 and formula1 have one or more exists varaible that are the same.
      */
     private boolean directlyConnected(Term formula0, Term formula1) {
-        return containsExistentialVariables(intersectQV(formula0.freeVars(), formula1.freeVars()));
+        return containsExistentialVariables(
+            TriggerUtils.intersect(formula0.freeVars(), formula1.freeVars()));
     }
 
     /**
@@ -165,7 +163,7 @@ public class ClausesGraph {
      */
 
     private ImmutableSet<Term> computeClauses(Term formula) {
-        final Operator op = formula.op();
+        final var op = formula.op();
         if (op == Junctor.NOT) {
             return computeClauses(formula.sub(0));
         } else if (op == Junctor.AND) {
@@ -179,24 +177,16 @@ public class ClausesGraph {
      * return the exists variables bound in the top level of a given cnf formula.
      */
     private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
-        final Operator op = formula.op();
+        final var op = formula.op();
         if (op == Quantifier.ALL) {
             return existentialVars(formula.sub(0));
         }
         if (op == Quantifier.EX) {
-            return existentialVars(formula.sub(0)).add(formula.varsBoundHere(0).last());
+            return existentialVars(formula.sub(0))
+                    .add(formula.varsBoundHere(0).last());
         }
         return DefaultImmutableSet.nil();
     }
-
-    /**
-     * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
-     */
-    private ImmutableSet<QuantifiableVariable> intersectQV(ImmutableSet<QuantifiableVariable> set0,
-            ImmutableSet<QuantifiableVariable> set1) {
-        return TriggerUtils.intersect(set0, set1);
-    }
-
 
     /**
      *

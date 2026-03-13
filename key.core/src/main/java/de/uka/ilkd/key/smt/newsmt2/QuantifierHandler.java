@@ -10,13 +10,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -59,7 +60,7 @@ public class QuantifierHandler implements SMTHandler {
         SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
         List<SExpr> vars = new ArrayList<>();
         List<SExpr> typeGuards = new ArrayList<>();
-        for (QuantifiableVariable bv : term.boundVars()) {
+        for (var bv : term.boundVars()) {
             Sort sort = bv.sort();
             String name = bv.name().toString();
             vars.add(LogicalVariableHandler.makeVarDecl(name, sort));
@@ -91,27 +92,29 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     private void collectTriggers(Term term, Set<Term> triggers) {
-        if (term.containsLabel(DefinedSymbolsHandler.TRIGGER_LABEL)) {
+        if (((JTerm) term)
+                .containsLabel(DefinedSymbolsHandler.TRIGGER_LABEL)) {
             triggers.add(term);
         }
         term.subs().forEach(x -> collectTriggers(x, triggers));
     }
 
     private Term collectQuantifications(Term term) {
-        Operator type = term.op();
+        final var type = term.op();
         assert type == Quantifier.ALL || type == Quantifier.EX;
-        Term current = term.sub(0);
+        var current = (JTerm) term.sub(0);
         if (current.op() != type) {
             return term;
         }
 
-        List<QuantifiableVariable> boundVars = term.boundVars().toList();
+        List<QuantifiableVariable> boundVars =
+            (List<QuantifiableVariable>) term.boundVars().toList();
         while (current.op() == type) {
             boundVars.addAll(current.boundVars().toList());
             current = current.sub(0);
         }
 
-        ImmutableArray<Term> subs = new ImmutableArray<>(current);
+        ImmutableArray<JTerm> subs = new ImmutableArray<>(current);
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
         return services.getTermFactory().createTerm(type, subs, bvars, null);
     }

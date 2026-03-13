@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData.Key;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -16,18 +16,19 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
         implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(d, poVars);
 
         // precondition
-        final Term pre;
+        final JTerm pre;
 
-        final Term freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
-        final Term contractPre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        final JTerm freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
+        final JTerm contractPre =
+            symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
 
-        Term freeReq = (Term) d.get(Key.FREE_PRECONDITION);
+        JTerm freeReq = (JTerm) d.get(Key.FREE_PRECONDITION);
         if (freeReq != null) {
             freeReq = replace(freeReq, d.origVars, poVars.pre, d.tb);
             pre = d.tb.and(freePre, freeReq, contractPre);
@@ -36,7 +37,7 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
         }
 
         // symbolic execution
-        final Term symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
+        final JTerm symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
 
         // final symbolic execution term
         return d.tb.and(pre, symExec);

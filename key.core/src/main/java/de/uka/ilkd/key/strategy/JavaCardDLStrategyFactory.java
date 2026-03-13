@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  *
@@ -450,7 +453,8 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             -1, props.toArray(new AbstractStrategyPropertyDefinition[0]));
     }
 
-    public Strategy create(Proof proof, StrategyProperties strategyProperties) {
+    @Override
+    public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties) {
         return new JavaCardDLStrategy(proof, strategyProperties);
     }
 

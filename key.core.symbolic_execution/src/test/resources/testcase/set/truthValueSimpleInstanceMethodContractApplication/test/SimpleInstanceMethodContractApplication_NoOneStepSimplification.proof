@@ -44,14 +44,13 @@
 
 \javaSource ".";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Oct 22 15:04:52 CEST 2021
-addSymbolicExecutionLabel=true
-contract=SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication\\:\\:main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0
-name=SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication\\:\\:main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-addUninterpretedPredicate=true
-";
+\proofObligation {
+	"addSymbolicExecutionLabel": true,
+	"contract": "SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication::main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0",
+	"name": "SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication::main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+	"addUninterpretedPredicate": true,
+ }
 
 \proof {
 (keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

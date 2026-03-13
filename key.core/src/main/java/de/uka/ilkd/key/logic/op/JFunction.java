@@ -4,14 +4,15 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -21,11 +22,10 @@ import org.key_project.util.collection.ImmutableArray;
  * variables are a
  * separate syntactic category, and not a type of function.
  * <br>
- * <strong>As soon as there is a solution for
- * {@link org.key_project.util.EqualsModProofIrrelevancy}, this class
+ * <strong>As soon as {@link AbstractTermTransformer#METASORT} is generalized, this class
  * may be deleted.</strong>
  */
-public class JFunction extends Function implements Operator, Sorted {
+public class JFunction extends Function implements Sorted, Operator {
 
 
     // -------------------------------------------------------------------------
@@ -95,11 +95,11 @@ public class JFunction extends Function implements Operator, Sorted {
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at theposition of the term where this method should check the validity.
-     * @param possibleSub the subterm to be ckecked.
+     * @param at the position of the term where this method should check the validity.
+     * @param possibleSub the subterm to be checked.
      * @return true iff the given term can be subterm at the indicated position
      */
-    private boolean possibleSub(int at, Term possibleSub) {
+    private boolean possibleSub(int at, JTerm possibleSub) {
         final Sort s = possibleSub.sort();
 
         return s == AbstractTermTransformer.METASORT || s instanceof ProgramSVSort
@@ -122,7 +122,7 @@ public class JFunction extends Function implements Operator, Sorted {
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, (Term) term.sub(i))) {
+            if (!possibleSub(i, (JTerm) term.sub(i))) {
                 throw new TermCreationException(this, term);
             }
         }

@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
 import de.uka.ilkd.key.java.recoderext.EscapeExpression;
@@ -70,13 +71,14 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
-    private HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
+    private HashMap<String, VariableSpecification> names2vars = null;
     private PrimitiveType locsetType;
     private PrimitiveType seqType;
     private PrimitiveType freeType;
     private PrimitiveType mapType;
     private PrimitiveType bigintType;
     private PrimitiveType realType;
+    private PrimitiveType typeType;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
@@ -84,7 +86,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     }
 
     public void setNames2Vars(
-            HashMap<String, recoder.java.declaration.VariableSpecification> names2vars) {
+            HashMap<String, VariableSpecification> names2vars) {
         this.names2vars = names2vars;
     }
 
@@ -106,6 +108,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         mapType = new PrimitiveType("\\map", this);
         bigintType = new PrimitiveType("\\bigint", this);
         realType = new PrimitiveType("\\real", this);
+        typeType = new PrimitiveType("\\TYPE", this);
 
         // HEAP
         name2primitiveType.put(locsetType.getName(), locsetType);
@@ -118,6 +121,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         // JML's primitive types
         name2primitiveType.put(bigintType.getName(), bigintType);
         name2primitiveType.put(realType.getName(), realType);
+        name2primitiveType.put(typeType.getName(), typeType);
     }
 
     @Override
@@ -277,7 +281,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
              */
             EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
                 ((Case) context.getASTParent()).getParent().getExpression()))
-                        .getVariableInScope(name);
+                    .getVariableInScope(name);
             // must not resolve! qualifying enum constant in case-statements is forbidden!
             return ecs;
         }
@@ -627,7 +631,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             throw new IllegalStateException("try to resolve an unknown type twice");
         }
 
-        recoder.abstraction.Type ty;
+        Type ty;
 
         try {
             ty = ni.getType(typeString);
@@ -643,13 +647,13 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     tyref);
             }
 
-            recoder.java.CompilationUnit cu;
+            CompilationUnit cu;
             try {
                 cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(
                     serviceConfiguration.getProgramFactory(), typeString);
                 cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
-                throw new de.uka.ilkd.key.java.ConvertException(e);
+                throw new ConvertException(e);
             }
 
             ChangeHistory changeHistory = serviceConfiguration.getChangeHistory();

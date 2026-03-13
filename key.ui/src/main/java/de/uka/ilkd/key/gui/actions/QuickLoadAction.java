@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -37,7 +37,7 @@ public class QuickLoadAction extends MainWindowAction {
      */
     public static void quickLoad(MainWindow mainWindow) {
         final String filename = QuickSaveAction.QUICK_SAVE_PATH;
-        mainWindow.loadProblem(new File(filename));
+        mainWindow.loadProblem(Paths.get(filename));
     }
 
     @Override

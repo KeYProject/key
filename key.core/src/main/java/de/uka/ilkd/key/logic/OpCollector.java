@@ -9,7 +9,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Operator;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 
 /**
  * Collects all operators occurring in the traversed term.

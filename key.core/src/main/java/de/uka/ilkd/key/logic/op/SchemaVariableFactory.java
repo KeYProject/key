@@ -51,7 +51,7 @@ public class SchemaVariableFactory {
      * @return the SchemaVariable
      */
     public static ModalOperatorSV createModalOperatorSV(Name name, Sort sort,
-            ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
+            ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
         return new ModalOperatorSV(name, modalityKinds);
     }
 

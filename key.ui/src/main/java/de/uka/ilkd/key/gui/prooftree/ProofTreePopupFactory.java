@@ -26,21 +26,25 @@ import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.key_project.prover.engine.TaskStartedInfo;
+
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
-public class ProofTreePopupFactory {
+/**
+ * Factory for popup menus on proof nodes in the {@link ProofTreeView}.
+ */
+public final class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
     public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
         createFeature("DELAY_CUT", "Activates the delayed cut rule.");
@@ -56,9 +60,7 @@ public class ProofTreePopupFactory {
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
         if (o instanceof GUIProofTreeNode n) {
-            if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                return false;
-            }
+            return !(n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp);
         }
         return true;
     }
@@ -455,7 +457,7 @@ public class ProofTreePopupFactory {
                     return false;
                 }
 
-                Term formula =
+                JTerm formula =
                     InspectorForDecisionPredicates.translate(proof.getServices(), result);
 
                 DelayedCutProcessor processor = new DelayedCutProcessor(proof, invokedNode,

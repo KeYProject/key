@@ -21,13 +21,13 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
@@ -106,16 +106,15 @@ public class SlicingExtension implements KeYGuiExtension,
         }
     };
 
-    @NonNull
     @Override
-    public List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind,
             @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
         createTrackerForProof(e.getSource().getSelectedProof());
     }
 
@@ -145,9 +144,8 @@ public class SlicingExtension implements KeYGuiExtension,
         });
     }
 
-    @NonNull
     @Override
-    public Collection<TabPanel> getPanels(
+    public @NonNull Collection<TabPanel> getPanels(
             @NonNull MainWindow window, @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             leftPanel = new SlicingLeftPanel(mediator, this);

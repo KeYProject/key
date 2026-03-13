@@ -800,7 +800,7 @@ public class MethodDeclaration extends JavaDeclaration
             updateModel();
         }
         // return service.getTypes(this);
-        return getBody() == null ? new ArrayList(0) : getBody().getTypesInScope();
+        return getBody() == null ? new ArrayList<>(0) : getBody().getTypesInScope();
     }
 
     public String getFullName() {

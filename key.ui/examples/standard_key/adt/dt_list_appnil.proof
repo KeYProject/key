@@ -95,7 +95,7 @@
 (autoModeTime "105")
 
 (branch "dummy ID"
-(rule "List_Ind" (inst "phi=(app(l, Nil) = l)<<origin(\"User_Interaction @ node 0 (Induction_for_List)\",\"[]\")>>") (inst "x=l") (userinteraction))
+(rule "DT_List_Induction" (inst "phi=(app(l, Nil) = l)<<origin(\"User_Interaction @ node 0 (Induction_for_List)\",\"[]\")>>") (inst "x=l") (userinteraction))
 (branch "Nil"
    (rule "concat_base" (formula "1") (term "0") (userinteraction))
     (builtin "One Step Simplification" (formula "1"))

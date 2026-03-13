@@ -44,12 +44,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Jan 12 15:37:29 CET 2023
-contract=Perm[Perm\\:\\:foo()].JML normal_behavior operation contract.0
-name=Perm[Perm\\:\\:foo()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"contract": "Perm[Perm::foo()].JML normal_behavior operation contract.0",
+	"name": "Perm[Perm::foo()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "008f011f15"))
@@ -102,6 +101,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
      (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_1") (userinteraction))
      (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_2") (userinteraction))
      (rule "variableDeclaration" (formula "9") (term "1") (newnames "x") (userinteraction))
+     (rule "variableDeclaration" (formula "9") (term "1") (newnames "s_before") (userinteraction))
      (rule "emptyModality" (formula "9") (term "1") (userinteraction))
    (builtin "One Step Simplification" (formula "9") (userinteraction))
    (rule "impRight" (formula "9"))

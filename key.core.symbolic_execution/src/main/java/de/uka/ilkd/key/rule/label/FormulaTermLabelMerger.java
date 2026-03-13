@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * The {@link TermLabelMerger} used to merge {@link FormulaTermLabel}s.
@@ -22,8 +23,9 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
      * {@inheritDoc}
      */
     @Override
-    public boolean mergeLabels(SequentFormula existingSF, Term existingTerm,
-            TermLabel existingLabel, SequentFormula rejectedSF, Term rejectedTerm,
+    public boolean mergeLabels(SequentFormula existingSF,
+            JTerm existingTerm,
+            TermLabel existingLabel, SequentFormula rejectedSF, JTerm rejectedTerm,
             TermLabel rejectedLabel, List<TermLabel> mergedLabels) {
         if (existingLabel != null) {
             FormulaTermLabel fExisting = (FormulaTermLabel) existingLabel;

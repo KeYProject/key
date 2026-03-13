@@ -6,8 +6,11 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -33,7 +36,7 @@ public final class IfExThenElse extends AbstractOperator implements Operator {
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+    public <T extends Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
         final Sort s0 = term.sub(0).sort();
@@ -43,5 +46,15 @@ public final class IfExThenElse extends AbstractOperator implements Operator {
         if (!(s0 == JavaDLTheory.FORMULA && s1.equals(s2))) {
             throw new TermCreationException(this, term);
         }
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(name() + " has no children");
     }
 }

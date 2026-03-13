@@ -13,18 +13,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -37,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -261,14 +262,15 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             mbs.getBodySourceAsTypeReference(), mbs.getProgramMethod(services),
                             mbs.getDesignatedContext(), methodReturnNode, getProofNode(),
                             resultVar);
-                    ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(
-                        getProof(), sideProofEnv, input.getSequentToProve(),
-                        StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                        StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
+                    ApplyStrategyInfo<Proof, Goal> info =
+                        SymbolicExecutionSideProofUtil.startSideProof(
+                            getProof(), sideProofEnv, input.getSequentToProve(),
+                            StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
+                            StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
                     try {
                         if (info.getProof().openGoals().size() == 1) {
                             Goal goal = info.getProof().openGoals().head();
-                            Term returnValue = SymbolicExecutionSideProofUtil
+                            JTerm returnValue = SymbolicExecutionSideProofUtil
                                     .extractOperatorValue(goal, input.getOperator());
                             assert returnValue != null;
                             returnValue = SymbolicExecutionUtil
@@ -278,10 +280,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                     getModalityPIO(), returnValue, null) };
                         } else {
                             // Group equal values of different branches
-                            Map<Term, List<Node>> valueNodeMap =
+                            Map<JTerm, List<Node>> valueNodeMap =
                                 new LinkedHashMap<>();
                             for (Goal goal : info.getProof().openGoals()) {
-                                Term returnValue = SymbolicExecutionSideProofUtil
+                                JTerm returnValue = SymbolicExecutionSideProofUtil
                                         .extractOperatorValue(goal, input.getOperator());
                                 assert returnValue != null;
                                 returnValue = SymbolicExecutionUtil.replaceSkolemConstants(
@@ -292,7 +294,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             }
                             // Create result
                             if (valueNodeMap.size() == 1) {
-                                Term returnValue = valueNodeMap.keySet().iterator().next();
+                                JTerm returnValue = valueNodeMap.keySet().iterator().next();
                                 return new IExecutionMethodReturnValue[] {
                                     new ExecutionMethodReturnValue(getSettings(), getProofNode(),
                                         getModalityPIO(), returnValue, null) };
@@ -300,14 +302,15 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                 IExecutionMethodReturnValue[] result =
                                     new IExecutionMethodReturnValue[valueNodeMap.size()];
                                 int i = 0;
-                                for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
-                                    List<Term> conditions = new LinkedList<>();
+                                for (Entry<JTerm, List<Node>> entry : valueNodeMap.entrySet()) {
+                                    List<JTerm> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
-                                        Term condition = SymbolicExecutionUtil.computePathCondition(
-                                            node, getSettings().simplifyConditions(), false);
+                                        JTerm condition =
+                                            SymbolicExecutionUtil.computePathCondition(
+                                                node, getSettings().simplifyConditions(), false);
                                         conditions.add(condition);
                                     }
-                                    Term condition = services.getTermBuilder().or(conditions);
+                                    JTerm condition = services.getTermBuilder().or(conditions);
                                     if (conditions.size() >= 2) {
                                         if (getSettings().simplifyConditions()) {
                                             condition = SymbolicExecutionUtil.simplify(initConfig,

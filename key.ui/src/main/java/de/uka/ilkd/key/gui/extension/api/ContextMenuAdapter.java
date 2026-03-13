@@ -20,16 +20,16 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (16.04.19)
  */
 public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu {
-    @NonNull
+
     @Override
-    public final List<Action> getContextActions(@NonNull KeYMediator mediator,
+    public final @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
             @NonNull ContextMenuKind kind,
             @NonNull Object underlyingObject) {
         return switch ((DefaultContextMenuKind) kind) {
-        case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
-        case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
-        case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
-        case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
+            case PROOF_LIST -> getContextActions(mediator, kind, (Proof) underlyingObject);
+            case PROOF_TREE -> getContextActions(mediator, kind, (Node) underlyingObject);
+            case TACLET_INFO -> getContextActions(mediator, kind, (Rule) underlyingObject);
+            case SEQUENT_VIEW -> getContextActions(mediator, kind, (PosInSequent) underlyingObject);
         };
     }
 

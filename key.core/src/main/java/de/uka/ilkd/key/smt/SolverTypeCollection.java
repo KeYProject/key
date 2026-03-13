@@ -86,7 +86,6 @@ public class SolverTypeCollection implements Iterable<SolverType> {
                 usableCount++;
             }
         }
-
         return usableCount >= minUsableSolver;
     }
 

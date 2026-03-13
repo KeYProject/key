@@ -6,7 +6,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -23,19 +23,19 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
     // assume the identity on the newly created objects, as opposed to the
     // proof obligation where we have to show that there is an isomorphism.
     @Override
-    protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
+    protected JTerm buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
             InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
-            ProofObligationVars vs2, Term eqAtLocsTerm) {
+            ProofObligationVars vs2, JTerm eqAtLocsTerm) {
         // build equalities for newObjects terms
-        ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
-        Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
-        Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
+        ImmutableList<JTerm> newObjEqs = ImmutableSLList.nil();
+        Iterator<JTerm> newObjects1It = infFlowSpec1.newObjects.iterator();
+        Iterator<JTerm> newObjects2It = infFlowSpec2.newObjects.iterator();
         for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
-            Term newObject1Term = newObjects1It.next();
-            Term newObject2Term = newObjects2It.next();
+            JTerm newObject1Term = newObjects1It.next();
+            JTerm newObject2Term = newObjects2It.next();
             newObjEqs = newObjEqs.append(d.tb.equals(newObject1Term, newObject2Term));
         }
-        final Term newObjEqsTerm = d.tb.and(newObjEqs);
+        final JTerm newObjEqsTerm = d.tb.and(newObjEqs);
 
         // build object oriented post-relation for contract applications
         return d.tb.and(eqAtLocsTerm, newObjEqsTerm);

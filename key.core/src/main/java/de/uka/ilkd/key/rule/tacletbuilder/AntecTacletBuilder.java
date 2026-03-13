@@ -3,30 +3,39 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
+
+import org.key_project.prover.rules.ApplicationRestriction;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * class builds Schematic Theory Specific Rules (Taclets) with find part int antecedent.
  */
 public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
-
-    private boolean ignoreTopLevelUpdates = true;
-
     /**
-     * sets the <I>find</I> of the Taclet that is to build to the given term, if the sort of the
-     * given term is of Sort.FORMULA otherwise nothing happens.
+     * sets the <I>find</I> of the Taclet that is to build to the given sequent.
      *
      * @return this AntecTacletBuilder
      */
-    public AntecTacletBuilder setFind(Term findTerm) {
-        if (findTerm.sort() == JavaDLTheory.FORMULA) {
-            find = findTerm;
-        }
-        checkContainsFreeVarSV(findTerm, getName(), "find term");
+    public AntecTacletBuilder setFind(Sequent findSeq) {
+        find = findSeq;
+        checkContainsFreeVarSV(findSeq, getName(), "find sequent");
         return this;
+    }
+
+    /**
+     * sets the <I>find</I> of the Taclet that is to build to the sequent {@code findTerm ==>}.
+     *
+     * @return this AntecTacletBuilder
+     */
+    public AntecTacletBuilder setFind(JTerm findTerm) {
+        return setFind(
+            JavaDLSequentKit.createAnteSequent(ImmutableList.of(new SequentFormula(findTerm))));
     }
 
     /**
@@ -76,15 +85,14 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
         prefixBuilder.build();
 
         AntecTaclet t = new AntecTaclet(name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq,
+                applicationRestriction.combine(ApplicationRestriction.ANTECEDENT_POLARITY), varsNew,
+                varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
+            goals, ruleSets, attrs, (Sequent) find,
+            prefixBuilder.getPrefixMap(),
             choices, tacletAnnotations);
         t.setOrigin(origin);
         return t;
-    }
-
-    public void setIgnoreTopLevelUpdates(boolean ignore) {
-        ignoreTopLevelUpdates = ignore;
     }
 }

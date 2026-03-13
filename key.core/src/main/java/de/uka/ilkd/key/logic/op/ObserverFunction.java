@@ -54,7 +54,6 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     }
 
 
-
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
@@ -82,7 +81,6 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
 
         return result;
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -168,5 +166,4 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     public final ImmutableArray<KeYJavaType> getParamTypes() {
         return paramTypes;
     }
-
 }

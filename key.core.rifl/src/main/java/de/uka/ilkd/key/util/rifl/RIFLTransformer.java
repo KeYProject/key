@@ -5,6 +5,9 @@ package de.uka.ilkd.key.util.rifl;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -44,7 +47,7 @@ import static org.key_project.util.Strings.*;
 public class RIFLTransformer {
     private static final Logger LOGGER = LoggerFactory.getLogger(RIFLTransformer.class);
 
-    private final List<File> result = new ArrayList<>();
+    private final List<Path> result = new ArrayList<>();
 
     public RIFLTransformer() throws ParserConfigurationException, SAXException {
         JPF.initialize(new CrossReferenceServiceConfiguration());
@@ -65,7 +68,7 @@ public class RIFLTransformer {
         } else {
             final File riflFilename = new File(args[0]);
             final File javaFilename = new File(args[1]);
-            RIFLTransformer.transform(riflFilename, javaFilename);
+            transform(riflFilename.toPath(), javaFilename.toPath());
         }
     }
 
@@ -77,7 +80,7 @@ public class RIFLTransformer {
      * @param savePath custom save path
      * @param kexh
      */
-    public static boolean transform(File riflFilename, File javaSource, File savePath,
+    public static boolean transform(Path riflFilename, Path javaSource, Path savePath,
             KeYRecoderExcHandler kexh) {
         if (riflFilename == null || javaSource == null || savePath == null || kexh == null) {
             throw new IllegalArgumentException("A parameter is null");
@@ -95,11 +98,11 @@ public class RIFLTransformer {
         return false;
     }
 
-    public static boolean transform(File riflFilename, File javaSource, KeYRecoderExcHandler kexh) {
+    public static boolean transform(Path riflFilename, Path javaSource, KeYRecoderExcHandler kexh) {
         return transform(riflFilename, javaSource, getDefaultSavePath(javaSource), kexh);
     }
 
-    public static boolean transform(File riflFilename, File javaSource) {
+    public static boolean transform(Path riflFilename, Path javaSource) {
         return transform(riflFilename, javaSource, SimpleRIFLExceptionHandler.INSTANCE);
     }
 
@@ -109,32 +112,32 @@ public class RIFLTransformer {
      * @param origSourcePath path to a directory or single Java file
      * @return path to the transformed directory
      */
-    public static File getDefaultSavePath(File origSourcePath) {
+    public static Path getDefaultSavePath(Path origSourcePath) {
         // TODO weigl: Shouldn't we use the old directory, because of reference to other java files?
         origSourcePath = getBaseDirPath(origSourcePath);
-        return new File(origSourcePath.getParentFile(), origSourcePath.getName() + "_RIFL");
+        return origSourcePath.resolveSibling(origSourcePath.getFileName() + "_RIFL");
     }
 
-    private static File getBaseDirPath(File origSourcePath) {
-        if (origSourcePath.isFile()) {
-            return origSourcePath.getParentFile();
+    private static Path getBaseDirPath(Path origSourcePath) {
+        if (Files.isRegularFile(origSourcePath)) {
+            return origSourcePath.getParent();
         } else {
             return origSourcePath;
         }
     }
 
-    private Map<CompilationUnit, File> readJava(File root) throws IOException, ParserException {
-        assert root.exists() : "source dir must exist";
-        assert root.isDirectory() : "source must be directory";
+    private Map<CompilationUnit, Path> readJava(Path root) throws IOException, ParserException {
+        assert Files.exists(root) : "source dir must exist";
+        assert Files.isDirectory(root) : "source must be directory";
         final DirectoryFileCollection files = new DirectoryFileCollection(root);
         final Walker walker = files.createWalker(".java");
 
         final ServiceConfiguration serviceConfiguration = JPF.getServiceConfiguration();
-        Map<CompilationUnit, File> javaCUs = new HashMap<>();
+        Map<CompilationUnit, Path> javaCUs = new HashMap<>();
 
         // parse
         while (walker.step()) {
-            final File javaFile = new File(walker.getCurrentName());
+            final Path javaFile = Paths.get(walker.getCurrentName());
             // debug
             if (Debug.ENABLE_DEBUG) {
                 LOGGER.info("[RIFL] Read file: {}", javaFile);
@@ -142,24 +145,24 @@ public class RIFLTransformer {
 
             final CompilationUnit cu;
 
-            try (Reader fr = new BufferedReader(new FileReader(javaFile, StandardCharsets.UTF_8))) {
+            try (Reader fr = Files.newBufferedReader(javaFile, StandardCharsets.UTF_8)) {
                 cu = JPF.parseCompilationUnit(fr);
 
                 // crud relative
-                File relative = relative(root, javaFile);
+                Path relative = relative(root, javaFile);
                 javaCUs.put(cu, relative); // relative path
                 serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in
-                                                                       // recoder
+                // recoder
             }
         }
         return javaCUs;
     }
 
-    private File relative(File root, File javaFile) {
-        return new File(javaFile.getAbsolutePath().substring(root.getAbsolutePath().length()));
+    private Path relative(Path root, Path javaFile) {
+        return javaFile.relativize(root);
     }
 
-    private SpecificationContainer readRIFL(File fileName)
+    private SpecificationContainer readRIFL(Path fileName)
             throws IOException, SAXException, ParserConfigurationException {
         // TODO: validate input file
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -172,18 +175,18 @@ public class RIFLTransformer {
         // xmlReader.setFeature("http://xml.org/sax/features/validation", true);
         xmlReader.setContentHandler(new RIFLHandler());
         xmlReader.setErrorHandler(new RIFLHandler.ErrorHandler());
-        xmlReader.parse(fileName.toURI().toString());
+        xmlReader.parse(fileName.toUri().toString());
         return ((RIFLHandler) xmlReader.getContentHandler()).getSpecification();
     }
 
-    public void doTransform(final File riflFilename, final File source, final File savePath)
+    public void doTransform(final Path riflFilename, final Path source, final Path savePath)
             throws IOException, SAXException, ParserException, ParserConfigurationException {
         ensureTargetDirExists(savePath);
-        final File javaRoot = getBaseDirPath(source);
+        final Path javaRoot = getBaseDirPath(source);
 
         // step 1: read files
         SpecificationContainer sc = readRIFL(riflFilename);
-        Map<CompilationUnit, File> javaCUs = readJava(javaRoot);
+        Map<CompilationUnit, Path> javaCUs = readJava(javaRoot);
         int counter = 0;
         // step 2: inject specifications
         // TODO rename the public class in the compilation unit and reuse the old java folder,
@@ -201,10 +204,11 @@ public class RIFLTransformer {
                 String poname = clazz.getFullName() + "[" + clazz.getFullName() + "\\\\:\\\\:"
                     + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";
 
-                File problemFileName = new File(javaRoot.getParent(),
-                    riflFilename.getName() + "_" + counter++ + ".key");
+                Path problemFileName =
+                    javaRoot.resolveSibling(riflFilename.getFileName() + "_" + counter++ + ".key");
 
-                writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
+                writeProblemFile(problemFileName,
+                    getDefaultSavePath(javaRoot).getFileName().toString(), poname);
                 result.add(problemFileName);
 
             }
@@ -212,16 +216,16 @@ public class RIFLTransformer {
 
 
         // step 3: write modified Java files
-        for (Map.Entry<CompilationUnit, File> javaUnit : javaCUs.entrySet()) {
+        for (Map.Entry<CompilationUnit, Path> javaUnit : javaCUs.entrySet()) {
             CompilationUnit cu = javaUnit.getKey();
-            File relative = javaUnit.getValue();
-            writeJavaFile(new File(savePath, relative.toString()), cu);
+            Path relative = javaUnit.getValue();
+            writeJavaFile(savePath.resolve(relative), cu);
         }
 
     }
 
 
-    private void writeProblemFile(File problemFileName, String newJavaFolder, String poname) {
+    private void writeProblemFile(Path problemFileName, String newJavaFolder, String poname) {
         String tmp;
         StringBuilder blueprint = new StringBuilder();
 
@@ -230,8 +234,7 @@ public class RIFLTransformer {
 
         try (BufferedReader br =
             new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-                Writer fw =
-                    new BufferedWriter(new FileWriter(problemFileName, StandardCharsets.UTF_8))) {
+                Writer fw = Files.newBufferedWriter(problemFileName, StandardCharsets.UTF_8)) {
             while ((tmp = br.readLine()) != null) {
                 blueprint.append(tmp).append("\n");
             }
@@ -243,21 +246,21 @@ public class RIFLTransformer {
         }
     }
 
-    private void ensureTargetDirExists(File target) throws IOException {
-        if (target.exists()) {
-            if (!target.isDirectory() || !target.canWrite()) { // bad
+    private void ensureTargetDirExists(Path target) throws IOException {
+        if (Files.exists(target)) {
+            if (!Files.isDirectory(target) || !Files.isWritable(target)) { // bad
                 throw new IOException("target directory " + target + " not writable");
             }
         } else { // create directory
-            target.mkdirs();
+            Files.createDirectories(target);
         }
     }
 
     /**
      * Writes a single Java file.
      */
-    private void writeJavaFile(File target, CompilationUnit cu) throws IOException {
-        try (var writer = new BufferedWriter(new FileWriter(target, StandardCharsets.UTF_8))) {
+    private void writeJavaFile(Path target, CompilationUnit cu) throws IOException {
+        try (var writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8)) {
             LOGGER.debug("Trying to write file {}", target);
             final String source = cu.toSource();
 
@@ -270,7 +273,7 @@ public class RIFLTransformer {
     }
 
 
-    public List<File> getProblemFiles() {
+    public List<Path> getProblemFiles() {
         return result;
     }
 }

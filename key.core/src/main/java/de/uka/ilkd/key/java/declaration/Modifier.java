@@ -4,29 +4,29 @@
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.ExtList;
 
 /**
  * Modifier. taken from COMPOST and changed to achieve an immutable structure
  */
 
-public abstract class Modifier extends JavaProgramElement implements TerminalProgramElement {
+public abstract class Modifier extends JavaProgramElement {
 
     /**
      * Modifier.
      */
 
-    public Modifier() {}
+    protected Modifier() {}
 
     /**
      * Modifier.
      *
      * @param children May contain: some Comments
      */
-    public Modifier(ExtList children) {
+    protected Modifier(ExtList children) {
         super(children);
     }
 
@@ -55,5 +55,15 @@ public abstract class Modifier extends JavaProgramElement implements TerminalPro
      */
     public void visit(Visitor v) {
         v.performActionOnModifier(this);
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(getClass() + " " + this + " has no children");
     }
 }

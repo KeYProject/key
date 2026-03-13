@@ -31,13 +31,13 @@ public class LabeledTermImplTest {
 
     @Test
     public void testEqualsLabelOnTop() {
-        Term unlabeledTerm =
+        JTerm unlabeledTerm =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
 
         ImmutableArray<TermLabel> labels =
             new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        Term labeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
+        JTerm labeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
             tf.createTerm(Junctor.FALSE), labels);
 
         assertNotEquals(labeledTerm, unlabeledTerm,
@@ -47,23 +47,23 @@ public class LabeledTermImplTest {
     }
 
     /**
-     * Tests {@link Term#hasLabels()}, {@link Term#hasLabels()} and
-     * {@link Term#containsLabel(TermLabel)}.
+     * Tests {@link JTerm#hasLabels()}, {@link JTerm#hasLabels()} and
+     * {@link JTerm#containsLabel(TermLabel)}.
      */
     @Test
     public void testGetHasAndContainsLabels() {
         // Create terms
-        Term unlabeled = services.getTermBuilder().tt();
+        JTerm unlabeled = services.getTermBuilder().tt();
         SymbolicExecutionTermLabel sedLabel = new SymbolicExecutionTermLabel(1);
         SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
-        Term oneLabel = services.getTermBuilder().label(unlabeled, sedLabel);
-        Term oneLabelChanged =
+        JTerm oneLabel = services.getTermBuilder().label(unlabeled, sedLabel);
+        JTerm oneLabelChanged =
             services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
-        Term twoLabels = services.getTermBuilder().label(unlabeled,
+        JTerm twoLabels = services.getTermBuilder().label(unlabeled,
             new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
-        Term oneLabelAdded0 =
+        JTerm oneLabelAdded0 =
             services.getTermBuilder().addLabel(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
-        Term oneLabelAdded1 = services.getTermBuilder().addLabel(oneLabelAdded0,
+        JTerm oneLabelAdded1 = services.getTermBuilder().addLabel(oneLabelAdded0,
             ParameterlessTermLabel.ANON_HEAP_LABEL);
         // Test unlabeled
         Assertions.assertFalse(unlabeled.hasLabels());

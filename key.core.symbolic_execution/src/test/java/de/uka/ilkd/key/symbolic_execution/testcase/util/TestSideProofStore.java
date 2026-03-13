@@ -65,7 +65,7 @@ public class TestSideProofStore {
             p2.setEnv(pe);
             Proof p3 = new Proof("TestSideProofStore 3", ic.deepCopy());
             p3.setEnv(pe);
-            Proof[] allProofs = new Proof[] { p1, p2, p3 };
+            Proof[] allProofs = { p1, p2, p3 };
             // Test initial state
             assertEntries(allProofs, new Proof[0]);
             // Add proof p1

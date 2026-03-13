@@ -4,15 +4,21 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -31,7 +37,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *
      * @param caches TODO
      */
-    private static TermInfo termInfo(Term p_t, ServiceCaches caches) {
+    private static TermInfo termInfo(JTerm p_t, ServiceCaches caches) {
         TermInfo ti;
         synchronized (caches.getBetaCandidates()) {
             ti = caches.getBetaCandidates().get(p_t);
@@ -65,7 +71,7 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private abstract static class MaxPathHelper {
-        public int compute(Term p_t, boolean p_positive) {
+        public int compute(JTerm p_t, boolean p_positive) {
             if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR)) {
                 return compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), p_positive);
             } else if (p_t.op() == (p_positive ? Junctor.OR : Junctor.AND)) {
@@ -87,11 +93,12 @@ public abstract class AbstractBetaFeature implements Feature {
             return computeDefault(p_t, p_positive);
         }
 
-        protected abstract int computeDefault(Term p_t, boolean p_positive);
+        protected abstract int computeDefault(JTerm p_t, boolean p_positive);
     }
 
     private static class MaxPosPathHelper extends MaxPathHelper {
-        protected int computeDefault(Term p_t, boolean p_positive) {
+        @Override
+        protected int computeDefault(JTerm p_t, boolean p_positive) {
             if (alwaysReplace(p_t)) {
                 return 1;
             }
@@ -101,16 +108,17 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private static class MaxDPathHelper extends MaxPathHelper {
-        protected int computeDefault(Term p_t, boolean p_positive) {
+        @Override
+        protected int computeDefault(JTerm p_t, boolean p_positive) {
             return 1;
         }
     }
 
-    private static int maxPosPathHelp(Term p_t, boolean p_positive) {
+    private static int maxPosPathHelp(JTerm p_t, boolean p_positive) {
         return maxPosPathHelper.compute(p_t, p_positive);
     }
 
-    private static int maxDPathHelp(Term p_t, boolean p_positive) {
+    private static int maxDPathHelp(JTerm p_t, boolean p_positive) {
         return maxDPathHelper.compute(p_t, p_positive);
     }
 
@@ -121,7 +129,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *
      * @param caches TODO
      */
-    private static boolean hasPurePosPathHelp(Term p_t, boolean p_positive, ServiceCaches caches) {
+    private static boolean hasPurePosPathHelp(JTerm p_t, boolean p_positive, ServiceCaches caches) {
         if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR)) {
             return hasPurePosPath(p_t.sub(0), p_positive, caches)
                     && hasPurePosPath(p_t.sub(1), p_positive, caches);
@@ -153,7 +161,8 @@ public abstract class AbstractBetaFeature implements Feature {
         return !p_positive;
     }
 
-    private static boolean containsNegAtomHelp(Term p_t, boolean p_positive, ServiceCaches caches) {
+    private static boolean containsNegAtomHelp(JTerm p_t, boolean p_positive,
+            ServiceCaches caches) {
         if (p_t.op() == Junctor.AND || p_t.op() == Junctor.OR) {
             return containsNegAtom(p_t.sub(0), p_positive, caches)
                     || containsNegAtom(p_t.sub(1), p_positive, caches);
@@ -169,7 +178,7 @@ public abstract class AbstractBetaFeature implements Feature {
         return !p_positive;
     }
 
-    private static boolean containsQuantifierHelp(Term p_t, ServiceCaches caches) {
+    private static boolean containsQuantifierHelp(JTerm p_t, ServiceCaches caches) {
         if (p_t.op() == Junctor.AND || p_t.op() == Junctor.OR || p_t.op() == Junctor.IMP
                 || p_t.op() == Equality.EQV) {
             return containsQuantifier(p_t.sub(0), caches) || containsQuantifier(p_t.sub(1), caches);
@@ -180,7 +189,7 @@ public abstract class AbstractBetaFeature implements Feature {
         }
     }
 
-    private static TermInfo.Candidate candidateHelp(Term p_t, TermInfo p_ti) {
+    private static TermInfo.Candidate candidateHelp(JTerm p_t, TermInfo p_ti) {
         if (p_t.op() == Junctor.IMP || p_t.op() == Junctor.OR) {
             return isBetaCandidateHelp(p_ti, false) ? TermInfo.Candidate.CAND_LEFT
                     : TermInfo.Candidate.CAND_NEVER;
@@ -214,7 +223,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *
      * @param caches TODO
      */
-    protected static boolean hasPurePosPath(Term p_t, boolean p_positive, ServiceCaches caches) {
+    protected static boolean hasPurePosPath(JTerm p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
         return p_positive ? ti.purePosPath_positive : ti.purePosPath_negative;
     }
@@ -225,7 +234,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *
      * @param caches TODO
      */
-    protected static int maxPosPath(Term p_t, boolean p_positive, ServiceCaches caches) {
+    protected static int maxPosPath(JTerm p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
         return p_positive ? ti.maxPosPath_positive : ti.maxPosPath_negative;
     }
@@ -236,7 +245,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *
      * @param caches TODO
      */
-    protected static int maxDPath(Term p_t, boolean p_positive, ServiceCaches caches) {
+    protected static int maxDPath(JTerm p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
         return p_positive ? ti.maxDPath_positive : ti.maxDPath_negative;
     }
@@ -245,7 +254,7 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param caches TODO
      * @return true iff "p_t" contains a quantifier or a modality
      */
-    protected static boolean containsQuantifier(Term p_t, ServiceCaches caches) {
+    protected static boolean containsQuantifier(JTerm p_t, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
         return ti.containsQuantifier;
     }
@@ -254,7 +263,7 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param caches TODO
      * @return true iff the given formula contains a negated atom as a formula of the antecedent
      */
-    protected static boolean containsNegAtom(Term p_t, boolean p_positive, ServiceCaches caches) {
+    protected static boolean containsNegAtom(JTerm p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
         return p_positive ? ti.containsNegAtom_positive : ti.containsNegAtom_negative;
     }
@@ -263,15 +272,15 @@ public abstract class AbstractBetaFeature implements Feature {
      * @return true iff the sign of "p_t" is not relevant (quantifiers etc. could be positive or
      *         negative)
      */
-    public static boolean alwaysReplace(Term p_t) {
-        return p_t.op() instanceof Modality || p_t.op() instanceof Quantifier;
+    public static boolean alwaysReplace(JTerm p_t) {
+        return p_t.op() instanceof JModality || p_t.op() instanceof Quantifier;
     }
 
     /**
      * @param caches TODO
      * @return true iff the formula p_t could be splitted using the beta rule
      */
-    protected static boolean isBetaCandidate(Term p_t, boolean p_inAntec, ServiceCaches caches) {
+    protected static boolean isBetaCandidate(JTerm p_t, boolean p_inAntec, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
         return ti.candidate == TermInfo.Candidate.CAND_BOTH
                 || ti.candidate == (p_inAntec ? TermInfo.Candidate.CAND_LEFT
@@ -325,15 +334,18 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param mState
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final Term findTerm = pos.sequentFormula().formula();
+        final JTerm findTerm = (JTerm) pos.sequentFormula().formula();
 
-        return doComputation(pos, findTerm, goal.proof().getServices().getCaches());
+        return doComputation(pos, findTerm, ((Services) goal.proof().getServices()).getCaches());
     }
 
-    protected abstract RuleAppCost doComputation(PosInOccurrence pos, Term findTerm,
+    protected abstract RuleAppCost doComputation(PosInOccurrence pos,
+            JTerm findTerm,
             ServiceCaches caches);
 }

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -160,7 +161,7 @@ public class ClassFileDeclarationManager {
             new ClassFileDeclarationManager(JavaProgramFactory.getInstance());
         ByteCodeParser parser = new ByteCodeParser();
 
-        FileCollection fileColl = new DirectoryFileCollection(new File(args[0]));
+        FileCollection fileColl = new DirectoryFileCollection(Paths.get(args[0]));
         Walker walker = fileColl.createWalker(".class");
 
         while (walker.step()) {

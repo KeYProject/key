@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+import de.uka.ilkd.key.nparser.KeyAst;
 
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -13,17 +13,16 @@ import org.antlr.v4.runtime.RuleContext;
  * A JML assert/assume statement.
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
-
-    private final LabeledParserRuleContext context;
+    private final KeyAst.Expression context;
     private final Kind kind;
 
-    public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause) {
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
     }
 
-    public LabeledParserRuleContext getContext() {
+    public KeyAst.Expression getContext() {
         return context;
     }
 
@@ -52,9 +51,12 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     }
 
     public String getClauseText() {
-        var builder = new StringBuilder();
-        ruleContextToText(builder, context.first);
-        return builder.substring(kind.toString().length());
+        return context.getText();
+        /*
+         * var builder = new StringBuilder();
+         * ruleContextToText(builder, context);
+         * return builder.substring(kind.toString().length());
+         */
     }
 
     public Kind getKind() {

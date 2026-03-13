@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -79,15 +80,16 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        instantiation = new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
-            goal.proof().getServices()).instantiate();
+        instantiation =
+            new AbstractLoopContractRule.Instantiator((JTerm) pio.subTerm(), goal).instantiate();
 
         Services services = goal.proof().getServices();
 

@@ -6,14 +6,17 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -91,7 +94,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
 
-        Map<LocationVariable, Term> atPres = pamc.getAtPres();
+        Map<LocationVariable, JTerm> atPres = pamc.getAtPres();
 
         final ArrayList<AbstractionPredicate> preds =
             pamc.getAbstractionPredicates(atPres, services);
@@ -103,13 +106,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnLoopInvariant(LoopSpecification x) {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
-        Term selfTerm = x.getInternalSelfTerm();
+        JTerm selfTerm = x.getInternalSelfTerm();
 
-        Map<LocationVariable, Term> atPres = x.getInternalAtPres();
+        Map<LocationVariable, JTerm> atPres = x.getInternalAtPres();
 
         // invariants
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term inv = x.getInvariant(heap, selfTerm, atPres, services);
+            JTerm inv = x.getInvariant(heap, selfTerm, atPres, services);
             if (inv != null) {
                 inv.execPostOrder(tpvc);
             }
@@ -117,26 +120,26 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         // free invariants
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term inv = x.getFreeInvariant(heap, selfTerm, atPres, services);
+            JTerm inv = x.getFreeInvariant(heap, selfTerm, atPres, services);
             if (inv != null) {
                 inv.execPostOrder(tpvc);
             }
         }
 
-        // modifies
+        // modifiable
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term mod = x.getModifies(heap, selfTerm, atPres, services);
-            if (mod != null) {
-                mod.execPostOrder(tpvc);
+            JTerm modifiable = x.getModifiable(heap, selfTerm, atPres, services);
+            if (modifiable != null) {
+                modifiable.execPostOrder(tpvc);
             }
         }
 
-        // free modifies
+        // free modifiable
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
-            Term freeMod = x.getFreeModifies(heap, selfTerm, atPres, services);
-            if (freeMod != null) {
-                freeMod.execPostOrder(tpvc);
+            JTerm freeModifiable = x.getFreeModifiable(heap, selfTerm, atPres, services);
+            if (freeModifiable != null) {
+                freeModifiable.execPostOrder(tpvc);
             }
         }
 
@@ -146,13 +149,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 x.getInfFlowSpecs(heap, selfTerm, atPres, services);
             if (infFlowSpecs != null) {
                 for (InfFlowSpec infFlowSpec : infFlowSpecs) {
-                    for (Term t : infFlowSpec.preExpressions) {
+                    for (JTerm t : infFlowSpec.preExpressions) {
                         t.execPostOrder(tpvc);
                     }
-                    for (Term t : infFlowSpec.postExpressions) {
+                    for (JTerm t : infFlowSpec.postExpressions) {
                         t.execPostOrder(tpvc);
                     }
-                    for (Term t : infFlowSpec.newObjects) {
+                    for (JTerm t : infFlowSpec.newObjects) {
                         t.execPostOrder(tpvc);
                     }
                 }
@@ -160,7 +163,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         // variant
-        Term v = x.getVariant(selfTerm, atPres, services);
+        JTerm v = x.getVariant(selfTerm, atPres, services);
         if (v != null) {
             v.execPostOrder(tpvc);
         }
@@ -172,42 +175,42 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     public void performActionOnBlockContract(BlockContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term precondition = x.getPrecondition(heap, services);
+            JTerm precondition = x.getPrecondition(heap, services);
             if (precondition != null) {
                 precondition.execPostOrder(collector);
             }
 
-            Term freePrecondition = x.getFreePrecondition(heap, services);
+            JTerm freePrecondition = x.getFreePrecondition(heap, services);
             if (freePrecondition != null) {
                 freePrecondition.execPostOrder(collector);
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term postcondition = x.getPostcondition(heap, services);
+            JTerm postcondition = x.getPostcondition(heap, services);
             if (postcondition != null) {
                 postcondition.execPostOrder(collector);
             }
 
-            Term freePostcondition = x.getFreePostcondition(heap, services);
+            JTerm freePostcondition = x.getFreePostcondition(heap, services);
             if (freePostcondition != null) {
                 freePostcondition.execPostOrder(collector);
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesClause = x.getModifiesClause(heap, services);
-            if (modifiesClause != null) {
-                modifiesClause.execPostOrder(collector);
+            JTerm modifiableClause = x.getModifiableClause(heap, services);
+            if (modifiableClause != null) {
+                modifiableClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
         for (InfFlowSpec ts : infFlowSpecs) {
-            for (Term t : ts.preExpressions) {
+            for (JTerm t : ts.preExpressions) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.postExpressions) {
+            for (JTerm t : ts.postExpressions) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.newObjects) {
+            for (JTerm t : ts.newObjects) {
                 t.execPostOrder(collector);
             }
         }
@@ -218,68 +221,75 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     public void performActionOnLoopContract(LoopContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term precondition = x.getPrecondition(heap, services);
+            JTerm precondition = x.getPrecondition(heap, services);
             if (precondition != null) {
                 precondition.execPostOrder(collector);
             }
 
-            Term freePrecondition = x.getFreePrecondition(heap, services);
+            JTerm freePrecondition = x.getFreePrecondition(heap, services);
             if (freePrecondition != null) {
                 freePrecondition.execPostOrder(collector);
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term postcondition = x.getPostcondition(heap, services);
+            JTerm postcondition = x.getPostcondition(heap, services);
             if (postcondition != null) {
                 postcondition.execPostOrder(collector);
             }
 
-            Term freePostcondition = x.getFreePostcondition(heap, services);
+            JTerm freePostcondition = x.getFreePostcondition(heap, services);
             if (freePostcondition != null) {
                 freePostcondition.execPostOrder(collector);
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesClause = x.getModifiesClause(heap, services);
-            if (modifiesClause != null) {
-                modifiesClause.execPostOrder(collector);
+            JTerm modifiableClause = x.getModifiableClause(heap, services);
+            if (modifiableClause != null) {
+                modifiableClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
         for (InfFlowSpec ts : infFlowSpecs) {
-            for (Term t : ts.preExpressions) {
+            for (JTerm t : ts.preExpressions) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.postExpressions) {
+            for (JTerm t : ts.postExpressions) {
                 t.execPostOrder(collector);
             }
-            for (Term t : ts.newObjects) {
+            for (JTerm t : ts.newObjects) {
                 t.execPostOrder(collector);
             }
         }
         result.addAll(collector.result());
     }
 
-    @Override
-    public void performActionOnJmlAssertCondition(final Term x) {
-        if (x == null) {
-            throw new IllegalStateException("JML assert is incomplete");
-        }
-        TermProgramVariableCollector tpvc = services.getFactory().create(services);
-        x.execPostOrder(tpvc);
-        result.addAll(tpvc.result());
-    }
 
     @Override
     public void performActionOnJmlAssert(final JmlAssert x) {
+        handleJmlStatement(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
+        handleJmlStatement(x);
+    }
+
+    private void handleJmlStatement(Statement x) {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
-        for (Term v : x.getVars().atPres.values()) {
+        var spec =
+            Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+        for (JTerm v : spec.vars().atPres.values()) {
             v.execPostOrder(tpvc);
         }
-        for (Term v : x.getVars().atBefores.values()) {
+        for (JTerm v : spec.vars().atBefores.values()) {
             v.execPostOrder(tpvc);
+        }
+
+        for (JTerm term : spec.terms()) {
+            term.execPostOrder(tpvc);
         }
         result.addAll(tpvc.result());
-
     }
+
+
 }

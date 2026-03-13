@@ -46,6 +46,7 @@ firstTouch/05-ReverseArray/README.txt
 heap/saddleback_search/README.txt
 heap/permutedSum/README.txt
 heap/quicksort/README.txt
+heap/BoyerMoore/README.txt
 
 # Dynamic Frames
 ## Block & Loop Contracts

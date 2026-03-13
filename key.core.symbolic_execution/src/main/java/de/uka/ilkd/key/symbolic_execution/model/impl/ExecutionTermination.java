@@ -62,15 +62,15 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     @Override
     protected String lazyComputeName() {
         return switch (getTerminationKind()) {
-        case EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort
-            + INTERNAL_NODE_NAME_END;
-        case LOOP_BODY -> LOOP_BODY_TERMINATION_NODE_NAME;
-        case BLOCK_CONTRACT_NORMAL -> INTERNAL_NODE_NAME_START + "block contract end"
-            + INTERNAL_NODE_NAME_END;
-        case BLOCK_CONTRACT_EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "block contract uncaught "
-            + exceptionSort
-            + INTERNAL_NODE_NAME_END;
-        default -> NORMAL_TERMINATION_NODE_NAME;
+            case EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort
+                + INTERNAL_NODE_NAME_END;
+            case LOOP_BODY -> LOOP_BODY_TERMINATION_NODE_NAME;
+            case BLOCK_CONTRACT_NORMAL -> INTERNAL_NODE_NAME_START + "block contract end"
+                + INTERNAL_NODE_NAME_END;
+            case BLOCK_CONTRACT_EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "block contract uncaught "
+                + exceptionSort
+                + INTERNAL_NODE_NAME_END;
+            default -> NORMAL_TERMINATION_NODE_NAME;
         };
     }
 
@@ -145,11 +145,11 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     @Override
     public String getElementType() {
         return switch (getTerminationKind()) {
-        case EXCEPTIONAL -> "Exceptional Termination";
-        case LOOP_BODY -> "Loop Body Termination";
-        case BLOCK_CONTRACT_NORMAL -> "Block Contract Termination";
-        case BLOCK_CONTRACT_EXCEPTIONAL -> "Block Contract Exceptional Termination";
-        default -> "Termination";
+            case EXCEPTIONAL -> "Exceptional Termination";
+            case LOOP_BODY -> "Loop Body Termination";
+            case BLOCK_CONTRACT_NORMAL -> "Block Contract Termination";
+            case BLOCK_CONTRACT_EXCEPTIONAL -> "Block Contract Exceptional Termination";
+            default -> "Termination";
         };
     }
 

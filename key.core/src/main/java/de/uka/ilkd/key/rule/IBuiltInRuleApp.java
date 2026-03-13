@@ -5,16 +5,17 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 public interface IBuiltInRuleApp extends RuleApp {
 
     /**
-     * returns the built in rule of this rule application
+     * returns the built-in rule of this rule application
      */
     BuiltInRule rule();
 
@@ -33,15 +34,15 @@ public interface IBuiltInRuleApp extends RuleApp {
     List<LocationVariable> getHeapContext();
 
     /**
-     * returns true if tryToInstantiate may be able to complete the app
+     * returns true if tryToInstantiate is able to complete the app
      *
-     * @return
+     * @return true if tryToInstantiate is able to complete the app
      */
     boolean isSufficientlyComplete();
 
-    ImmutableList<PosInOccurrence> ifInsts();
+    ImmutableList<PosInOccurrence> assumesInsts();
 
-    IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     IBuiltInRuleApp replacePos(PosInOccurrence newPos);
 }

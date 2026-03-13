@@ -4,18 +4,19 @@
 package de.uka.ilkd.key.gui.colors;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,21 +30,24 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
-public class ColorSettings extends AbstractPropertiesSettings {
-    public static final File SETTINGS_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "colors.json");
+public class ColorSettings {
+    public static final Path SETTINGS_FILE_NEW =
+        PathConfig.getKeyConfigDir().resolve("colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
+
     private static ColorSettings INSTANCE;
+    private final Map<String, Object> properties = new TreeMap<>();
+    private final List<ColorProperty> propertyEntries = new ArrayList<>(64);
 
     public ColorSettings(Configuration load) {
-        super("");
-        readSettings(load);
+        // props.forEach((k, v) -> this.properties.put(k.toString(), v));
+        load.getEntries().forEach(entry -> properties.put(entry.getKey(), entry.getValue()));
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
     public static ColorSettings getInstance() {
         if (INSTANCE == null) {
-            if (SETTINGS_FILE_NEW.exists()) {
+            if (Files.exists(SETTINGS_FILE_NEW)) {
                 try {
                     LOGGER.info("Load color settings from file {}", SETTINGS_FILE_NEW);
                     INSTANCE = new ColorSettings(Configuration.load(SETTINGS_FILE_NEW));
@@ -59,7 +63,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static ColorProperty define(String key, String desc, Color color) {
-        return getInstance().createColorProperty(key, desc, color);
+        return getInstance().createColorProperty(key, desc, color, color);
+    }
+
+    public static ColorProperty define(String key, String desc, Color light, Color dark) {
+        return getInstance().createColorProperty(key, desc, light, dark);
     }
 
     public static String toHex(Color c) {
@@ -86,8 +94,8 @@ public class ColorSettings extends AbstractPropertiesSettings {
      * @see #SETTINGS_FILE_NEW
      */
     public void save() {
-        LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+        LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.toAbsolutePath());
+        try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
             config.save(writer, "KeY's Colors");
             writer.flush();
@@ -96,106 +104,152 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
     }
 
-    private ColorProperty createColorProperty(String key, String description, Color defaultValue) {
+    private ColorProperty createColorProperty(String key, String description,
+            Color defaultLight, Color defaultDark) {
         Optional<ColorProperty> item =
             getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {
             return item.get();
         }
 
-        ColorProperty pe = new ColorProperty(key, description, defaultValue);
+        ColorProperty pe = new ColorProperty(key, description, defaultLight, defaultDark);
         propertyEntries.add(pe);
         return pe;
     }
 
     public Stream<ColorProperty> getProperties() {
-        return propertyEntries.stream().map(ColorProperty.class::cast);
+        return propertyEntries.stream();
+    }
+
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
+        propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
     /**
      * A property for handling colors.
      */
-    public class ColorProperty implements PropertyEntry<Color> {
+    public class ColorProperty {
         private final String key;
         private final String description;
-        private Color currentValue;
+        private Color defaultLightValue;
+        private Color defaultDarkValue;
+
+        private Color lightValue;
+        private Color darkValue;
+
 
         public ColorProperty(String key, String description, Color defaultValue) {
+            this(key, description, defaultValue, defaultValue);
+        }
+
+        public ColorProperty(String key, String description, Color defaultLightValue,
+                Color defaultDarkValue) {
             this.key = key;
             this.description = description;
             if (!properties.containsKey(key)) {
-                set(defaultValue);
+                this.defaultLightValue = defaultLightValue;
+                this.defaultDarkValue = defaultDarkValue;
             }
         }
 
-        @Override
-        public String value() {
-            if (currentValue != null) {
-                return toHex(currentValue);
-            }
-
-            String v = properties.get(key).toString();
-
-            try {
-                return v;
-            } catch (NumberFormatException e) {
-                return toHex(Color.MAGENTA);
+        public Color getCurrentColor() {
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()) {
+                return getDarkValue();
+            } else {
+                return getLightValue();
             }
         }
 
-        @Override
+        public Color getLightValue() {
+            if (lightValue == null) {
+                update();
+            }
+            return lightValue;
+        }
+
+        public void setLightValue(Color lightValue) {
+            var old = this.lightValue;
+            this.lightValue = lightValue;
+            firePropertyChange(getKey(), old, lightValue);
+        }
+
+        public Color getDarkValue() {
+            if (darkValue == null) {
+                update();
+            }
+            return darkValue;
+        }
+
+        public void setDarkValue(Color darkValue) {
+            var old = this.darkValue;
+            this.darkValue = darkValue;
+            firePropertyChange(getKey(), old, lightValue);
+        }
+
+        public void update() {
+            Object v = properties.get(key);
+            if (v == null) {
+                setLightValue(defaultLightValue);
+                setDarkValue(defaultDarkValue);
+                return;
+            }
+
+            if (v instanceof Color c) {
+                setDarkValue(c);
+                setLightValue(c);
+            } else if (v instanceof String s) {
+                var c = fromHex(s);
+                setDarkValue(c);
+                setLightValue(c);
+            } else if (v instanceof List<?> seq) {
+                setLightValue(fromHex(seq.get(0).toString()));
+                setDarkValue(fromHex(seq.get(1).toString()));
+            } else {
+                throw new IllegalArgumentException(
+                    "Unexpected types for color " + key + " with value " + v);
+            }
+        }
+
         public Color fromObject(@Nullable Object o) {
             return fromHex(o.toString());
         }
 
-        @Override
-        public void parseFrom(String v) {
-            final var old = value();
-            if (!Objects.equals(old, v)) {
-                currentValue = fromHex(v);
-                properties.put(getKey(), v);
-                firePropertyChange(getKey(), old, currentValue);
-            }
-        }
-
-        @Override
         public String getKey() {
             return key;
-        }
-
-        @Override
-        public void set(Color value) {
-            if (currentValue != value) {
-                var old = currentValue;
-                currentValue = value;
-                properties.put(getKey(), toHex(value));
-                firePropertyChange(getKey(), old, value);
-            }
-        }
-
-        @Override
-        public Color get() {
-            if (currentValue != null) {
-                return currentValue;
-            }
-
-            String v = (String) properties.get(key);
-
-            try {
-                return currentValue = fromHex(v);
-            } catch (NumberFormatException e) {
-                LOGGER.error("Failed to parse color, using magenta", e);
-                return Color.MAGENTA;
-            }
         }
 
         public String getDescription() {
             return description;
         }
-    }
 
-    @Override
-    public void readSettings(Properties props) {
-        props.forEach((k, v) -> this.properties.put(k.toString(), v));
+        public Color get() {
+            return getCurrentColor();
+        }
     }
 }

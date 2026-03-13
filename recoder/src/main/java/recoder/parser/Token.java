@@ -60,12 +60,12 @@ public class Token {
      */
     public static final Token newToken(int ofKind) {
         switch (ofKind) {
-        default:
-            return new Token();
-        case JavaCCParserConstants.RUNSIGNEDSHIFT:
-        case JavaCCParserConstants.RSIGNEDSHIFT:
-        case JavaCCParserConstants.GT:
-            return new GTToken();
+            default:
+                return new Token();
+            case JavaCCParserConstants.RUNSIGNEDSHIFT:
+            case JavaCCParserConstants.RSIGNEDSHIFT:
+            case JavaCCParserConstants.GT:
+                return new GTToken();
         }
     }
 

@@ -2,7 +2,7 @@
 
 
 public class ArrayMax {
-    
+
     /*@
       @ public normal_behavior
       @ requires a != null;
@@ -22,7 +22,7 @@ public class ArrayMax {
 	  @      (\forall int j; j >= 0 && j < i; max >= a[j])
 	  @      &&
 	  @      (\exists int j; j >= 0 && j < i; max == a[j]);
-	  @ modifies \nothing;
+	  @ assignable \nothing;
 	  @ decreases a.length - i;
 	  @*/
 	while ( i < a.length ) {

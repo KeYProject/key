@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory,
             "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoalAndSubgoals.proof",
             "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and
-                                                                     // without weakening!
+            // without weakening!
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
     }
@@ -66,7 +65,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory,
             "/set/joinTest/test/JoinTestAfterBranchConditionWithWeakeningGoal.proof",
             "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and
-                                                                     // without weakening!
+            // without weakening!
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
     }
@@ -79,7 +78,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
         doSETTestAndDispose(testCaseDirectory,
             "/set/joinTest/test/JoinTestAfterBranchCondition.proof",
             "/set/joinTest/oracle/JoinTestAfterBranchCondition.xml", // Same result: with and
-                                                                     // without weakening!
+            // without weakening!
             false, false, false, false, false, false, false, false, false, false, false, false,
             false);
     }
@@ -186,37 +185,37 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     }
 
     /**
-     * Tests example: /set/blockContractAssignableEverything
+     * Tests example: /set/blockContractModifiableEverything
      */
     @Test
-    public void testBlockContractAssignableEverything() throws Exception {
+    public void testBlockContractModifiableEverything() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
-            "/set/blockContractAssignableEverything/oracle/BlockContractAssignableEverything.xml",
+            "/set/blockContractModifiableEverything/test/BlockContractModifiableEverything.proof",
+            "/set/blockContractModifiableEverything/oracle/BlockContractModifiableEverything.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableLocationNotRequested
+     * Tests example: /set/blockContractModifiableLocationNotRequested
      */
     @Test
-    public void testBlockContractAssignableLocationNotRequested() throws Exception {
+    public void testBlockContractModifiableLocationNotRequested() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
-            "/set/blockContractAssignableLocationNotRequested/oracle/BlockContractAssignableLocationNotRequested.xml",
+            "/set/blockContractModifiableLocationNotRequested/test/BlockContractModifiableLocationNotRequested.proof",
+            "/set/blockContractModifiableLocationNotRequested/oracle/BlockContractModifiableLocationNotRequested.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableRequestedLocation
+     * Tests example: /set/blockContractModifiableRequestedLocation
      */
     @Test
-    public void testBlockContractAssignableRequestedLocation() throws Exception {
+    public void testBlockContractModifiableRequestedLocation() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
-            "/set/blockContractAssignableRequestedLocation/oracle/BlockContractAssignableRequestedLocation.xml",
+            "/set/blockContractModifiableRequestedLocation/test/BlockContractModifiableRequestedLocation.proof",
+            "/set/blockContractModifiableRequestedLocation/oracle/BlockContractModifiableRequestedLocation.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
@@ -651,7 +650,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             throws Exception {
         // Ensure that JavaProfile was used before
         KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-            new File(testCaseDirectory, proofFilePathInBaseDir), null, null, null, true);
+            testCaseDirectory.resolve(proofFilePathInBaseDir), null, null, null, true);
         env.dispose();
         // Test symbolic execution
         doSETTestAndDispose(testCaseDirectory, proofFilePathInBaseDir, oraclePathInBaseDirFile,

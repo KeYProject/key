@@ -10,17 +10,15 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableSLList;
 
 
@@ -48,11 +46,11 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The original invariant from which the class invariant is derived.
      */
-    private final Term originalInv;
+    private final JTerm originalInv;
     /**
      * The original self variable of the receiver object.
      */
-    private final ParsableVariable originalSelfVar;
+    private final LocationVariable originalSelfVar;
     /**
      * Whether the class invariant is a static (i.e., &lt;$inv&gt;) or an instance invariant (i.e.,
      * &lt;inv&gt;).
@@ -79,7 +77,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, ParsableVariable selfVar) {
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -95,7 +93,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, ParsableVariable selfVar,
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
             boolean free) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -118,7 +116,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
+    private Map<Operator, Operator> getReplaceMap(JAbstractSortedOperator selfVar,
+            TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
@@ -136,7 +135,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // -------------------------------------------------------------------------
 
     @Override
-    public ClassInvariant map(UnaryOperator<Term> op, Services services) {
+    public ClassInvariant map(UnaryOperator<JTerm> op, Services services) {
         return new ClassInvariantImpl(name, displayName, kjt, visibility, op.apply(originalInv),
             originalSelfVar, isFree);
     }
@@ -160,17 +159,17 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public Term getInv(ParsableVariable selfVar, TermServices services) {
+    public JTerm getInv(JAbstractSortedOperator selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        Term res = or.replace(originalInv);
+        JTerm res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
 
 
     @Override
-    public Term getOriginalInv() {
+    public JTerm getOriginalInv() {
         return originalInv;
     }
 
@@ -207,14 +206,9 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public OriginalVariables getOrigVars() {
-        final ProgramVariable self;
-        if (this.originalSelfVar instanceof ProgramVariable) {
-            self = (ProgramVariable) this.originalSelfVar;
-        } else if (this.originalSelfVar != null) {
-            self = new LocationVariable(new ProgramElementName(originalSelfVar.toString()), kjt);
-        } else {
-            self = null;
-        }
+        final LocationVariable self;
+        // TODO: Is this a correct change?
+        self = this.originalSelfVar;
         return new OriginalVariables(self, null, null,
             new LinkedHashMap<>(),
             ImmutableSLList.nil());

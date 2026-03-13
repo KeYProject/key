@@ -11,8 +11,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -62,7 +62,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The variable value pairs of the current state under given conditions.
      */
-    private final Map<Term, IExecutionVariable[]> conditionalVariables =
+    private final Map<JTerm, IExecutionVariable[]> conditionalVariables =
         new HashMap<>();
 
     /**
@@ -83,7 +83,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The already computed block completion conditions.
      */
-    private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions =
+    private final Map<IExecutionBlockStartNode<?>, JTerm> blockCompletionConditions =
         new HashMap<>();
 
     /**
@@ -109,7 +109,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -161,9 +161,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public Term getPathCondition() throws ProofInputException {
+    public JTerm getPathCondition() throws ProofInputException {
         // Search path condition of the parent which is used by default.
-        Term result = null;
+        JTerm result = null;
         AbstractExecutionNode<?> parent = getParent();
         while (result == null && parent != null) {
             if (parent.isPathConditionChanged()) {
@@ -280,7 +280,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public IExecutionVariable[] getVariables(Term condition) throws ProofInputException {
+    public IExecutionVariable[] getVariables(JTerm condition) throws ProofInputException {
         synchronized (this) {
             IExecutionVariable[] result = conditionalVariables.get(condition);
             if (result == null) {
@@ -292,13 +292,14 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     }
 
     /**
-     * Computes the variables lazily when {@link #getVariables(Term)} is called the first time.
+     * Computes the variables lazily when {@link #getVariables(JTerm)} is called the first time.
      *
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param condition A {@link JTerm} specifying some additional constraints to consider.
      * @return The {@link IExecutionVariable}s of the current state under the given condition.
      * @throws ProofInputException
      */
-    protected IExecutionVariable[] lazyComputeVariables(Term condition) throws ProofInputException {
+    protected IExecutionVariable[] lazyComputeVariables(JTerm condition)
+            throws ProofInputException {
         return SymbolicExecutionUtil.createExecutionVariables(this, condition);
     }
 
@@ -383,10 +384,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @return The {@link PosInOccurrence}s of the modality or its updates.
      */
     protected PosInOccurrence lazyComputeModalityPIO() {
-        PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+        PosInOccurrence originalPio =
+            getProofNode().getAppliedRuleApp().posInOccurrence();
         // Try to go back to the parent which provides the updates
         PosInOccurrence pio = originalPio;
-        Term term = pio.subTerm();
+        var term = pio.subTerm();
         if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
             pio = pio.up();
             term = pio.subTerm();
@@ -432,11 +434,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+    public JTerm getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
-        Term result = blockCompletionConditions.get(completedNode);
+        JTerm result = blockCompletionConditions.get(completedNode);
         if (result == null) {
-            result = (Term) lazyComputeBlockCompletionCondition(completedNode, false);
+            result = (JTerm) lazyComputeBlockCompletionCondition(completedNode, false);
         }
         return result;
     }
@@ -461,7 +463,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param completedNode The completed {@link IExecutionNode} for which the condition is
      *        requested.
      * @param returnFormattedCondition {@code true} formatted condition is returned, {@code false}
-     *        {@link Term} is returned.
+     *        {@link JTerm} is returned.
      * @throws ProofInputException Occurred Exception
      */
     protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
@@ -471,11 +473,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
                 completedBlocks.contains(completedNode)) {
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<>();
+            List<JTerm> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != completedNode) {
                 if (parent instanceof IExecutionBranchCondition) {
-                    Term bc = ((IExecutionBranchCondition) parent).getBranchCondition();
+                    JTerm bc = ((IExecutionBranchCondition) parent).getBranchCondition();
                     if (bc == null) {
                         return null; // Proof disposed in between, computation not possible
                     }
@@ -484,7 +486,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
                 parent = parent.getParent();
             }
             // Add current branch condition to path
-            Term condition = services.getTermBuilder().and(bcs);
+            JTerm condition = services.getTermBuilder().and(bcs);
             // Simplify path condition
             if (getSettings().simplifyConditions()) {
                 condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);

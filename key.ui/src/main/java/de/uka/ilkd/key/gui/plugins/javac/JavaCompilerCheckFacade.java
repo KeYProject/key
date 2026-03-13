@@ -58,10 +58,9 @@ public class JavaCompilerCheckFacade {
      * @param javaPath the {@link String} with the path to the source of the target Java program
      * @return future providing the list of diagnostics
      */
-    @NonNull
-    public static CompletableFuture<List<PositionedIssueString>> check(
+    public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+            Path bootClassPath, List<Path> classPath, Path javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -86,32 +85,36 @@ public class JavaCompilerCheckFacade {
         List<String> classes = new ArrayList<>();
 
         // gather configured bootstrap classpath and regular classpath
-        List<File> paths = new ArrayList<>();
+        List<String> options = new ArrayList<>();
         if (bootClassPath != null) {
-            paths.add(bootClassPath);
+            options.add("-Xbootclasspath");
+            options.add(bootClassPath.toAbsolutePath().toString());
         }
         if (classPath != null && !classPath.isEmpty()) {
-            paths.addAll(classPath);
+            options.add("-classpath");
+            options.add(
+                classPath.stream().map(Path::toAbsolutePath)
+                        .map(Objects::toString)
+                        .collect(Collectors.joining(":")));
         }
-        paths.add(javaPath);
         ArrayList<Path> files = new ArrayList<>();
-        for (File path : paths) {
-            if (!path.isDirectory()) {
-                continue;
-            }
-            try (var s = Files.walk(path.toPath())) {
+        if (Files.isDirectory(javaPath)) {
+            try (var s = Files.walk(javaPath)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))
                         .forEachOrdered(files::add);
             } catch (IOException e) {
                 LOGGER.info("", e);
             }
+        } else {
+            files.add(javaPath);
         }
+
         Iterable<? extends JavaFileObject> compilationUnits =
             fileManager.getJavaFileObjects(files.toArray(new Path[0]));
 
         JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
-            new ArrayList<>(), classes, compilationUnits);
+            options, classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
@@ -125,8 +128,10 @@ public class JavaCompilerCheckFacade {
                     it.getMessage(Locale.ENGLISH),
                     new Location(
                         fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
-                        Position.newOneBased((int) it.getLineNumber(),
-                            (int) it.getColumnNumber())),
+                        it.getPosition() != Diagnostic.NOPOS
+                                ? Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())
+                                : Position.UNDEFINED),
                     it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });

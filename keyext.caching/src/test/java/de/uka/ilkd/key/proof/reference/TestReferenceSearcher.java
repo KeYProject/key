@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -22,7 +23,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestReferenceSearcher {
-    private static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final Path testCaseDirectory =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     @Test
     void testFindsReferenceInSameProof() throws Exception {
@@ -34,11 +36,11 @@ class TestReferenceSearcher {
         // This only verifies that an exactly equivalent branch is found.
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof"));
         Proof p2 = env2.getLoadedProof();
 
@@ -112,15 +114,15 @@ class TestReferenceSearcher {
         // Reference searcher should not find proof 1 when considering proof 2.
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "proofCaching/proofWithRule.proof"));
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "proofCaching/proofWithoutRule.proof"));
         Proof p2 = env2.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env3 =
-            KeYEnvironment.load(new File(testCaseDirectory,
+            KeYEnvironment.load(testCaseDirectory.resolve(
                 "proofCaching/proofWithRule.proof"));
         Proof p3 = env3.getLoadedProof();
 

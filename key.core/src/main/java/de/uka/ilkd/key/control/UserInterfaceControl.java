@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -17,13 +17,14 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.ProverTaskListener;
+
+import org.key_project.prover.engine.ProverTaskListener;
 
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
  * <li>Functionality to load files via
- * {@link #load(Profile, File, List, File, List, Properties, boolean, Consumer)}.</li>
+ * {@link #load(Profile, Path, List, Path, List, Properties, boolean, Consumer)}.</li>
  * <li>Functionality to instantiate new {@link Proof}s via
  * {@link #createProof(InitConfig, ProofOblInput)}.</li>
  * <li>Functionality to register existing {@link Proof}s in the user interface via
@@ -73,8 +74,8 @@ public interface UserInterfaceControl {
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(Profile profile, File file, List<File> classPaths,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
+    AbstractProblemLoader load(Profile profile, Path file, List<Path> classPaths,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
 

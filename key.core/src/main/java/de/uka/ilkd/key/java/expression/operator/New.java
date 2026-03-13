@@ -32,7 +32,7 @@ import org.key_project.util.ExtList;
  */
 
 public class New extends TypeOperator implements ConstructorReference, ExpressionStatement,
-        ReferencePrefix, ReferenceSuffix, TypeDeclarationContainer {
+        ReferenceSuffix, TypeDeclarationContainer {
 
 
     protected final ClassDeclaration anonymousClass;
@@ -99,7 +99,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 

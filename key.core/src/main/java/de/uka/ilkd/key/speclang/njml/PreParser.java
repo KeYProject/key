@@ -18,6 +18,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class PreParser {
     /** warnings */
@@ -92,7 +93,7 @@ public class PreParser {
      * Parse and interpret class level comments.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
-            URI fileName, Position pos) {
+            @Nullable URI fileName, Position pos) {
         return parseClassLevel(
             new PositionedString(concatenatedComment, new Location(fileName, pos)));
     }
@@ -109,7 +110,7 @@ public class PreParser {
      * Parse and interpret the given string as a method level construct.
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
-            URI fileName, Position position) {
+            @Nullable URI fileName, Position position) {
         return parseMethodLevel(
             new PositionedString(concatenatedComment, new Location(fileName, position)));
     }

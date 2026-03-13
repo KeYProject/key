@@ -44,12 +44,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Dec 08 19:30:36 CET 2022
-contract=ReverseArray[ReverseArray\\:\\:reverse()].JML normal_behavior operation contract.0
-name=ReverseArray[ReverseArray\\:\\:reverse()].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"contract": "ReverseArray[ReverseArray::reverse()].JML normal_behavior operation contract.0",
+	"name": "ReverseArray[ReverseArray::reverse()].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "008f011f15"))
@@ -360,6 +359,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
        (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_1") (userinteraction))
         (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_2") (userinteraction))
         (rule "variableDeclaration" (formula "9") (term "1") (newnames "x_1") (userinteraction))
+        (rule "variableDeclaration" (formula "9") (term "1") (newnames "i_before") (userinteraction))
         (rule "emptyModality" (formula "9") (term "1") (userinteraction))
          (rule "false_to_not_true" (formula "9") (term "0,1,0,1,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,1,1,1"))
@@ -367,6 +367,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
          (rule "concrete_and_3" (formula "9") (term "0,0,1,0,0,0,0,1,1,1"))
          (rule "expandInInt" (formula "9") (term "1,0,0,0,0,0,0,0,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,0,0,0,0,0,0,1,1,1"))
+         (rule "simplifyUpdate2" (formula "9") (term "1,0,1,1,0,1,1,1,1") (userinteraction))
          (rule "elementOfAllFields" (formula "9") (term "0,0,0,0,1,0,1,1,0,1,1,1,1"))
          (rule "expandInInt" (formula "9") (term "1,0,0,1,0,0,0,0,0,1,1,0,1,1,1,1"))
          (rule "concrete_and_3" (formula "9") (term "0,0,1,0,0,0,0,0,1,1,0,1,1,1,1"))

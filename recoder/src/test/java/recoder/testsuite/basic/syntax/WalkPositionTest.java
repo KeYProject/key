@@ -6,8 +6,7 @@ package recoder.testsuite.basic.syntax;
 
 import java.util.List;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import recoder.convenience.Format;
 import recoder.convenience.TreeWalker;
 import recoder.io.SourceFileRepository;
@@ -16,8 +15,11 @@ import recoder.java.ProgramElement;
 import recoder.java.SourceElement.Position;
 import recoder.testsuite.basic.BasicTestsSuite;
 
-public class WalkPositionTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.fail;
 
+public class WalkPositionTest {
+
+    @Test
     public void testWalkPosition() {
         SourceFileRepository sfr = BasicTestsSuite.getConfig().getSourceFileRepository();
         List<CompilationUnit> units = sfr.getCompilationUnits();
@@ -34,7 +36,7 @@ public class WalkPositionTest extends TestCase {
                 }
                 if (newPos.getLine() < oldPos.getLine() || (newPos.getLine() == oldPos.getLine()
                         && newPos.getColumn() < newPos.getColumn())) {
-                    Assert.fail("Position mismatch: " + Format.toString("%c @%p in %u", oldPe) + "/"
+                    fail("Position mismatch: " + Format.toString("%c @%p in %u", oldPe) + "/"
                         + Format.toString("%c @%p", pe));
                 }
                 oldPos = newPos;

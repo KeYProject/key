@@ -150,16 +150,17 @@ public final class ArraySort extends SortImpl {
     }
 
 
-    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
-                           Sort javaLangSerializable) {
+    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
+            Sort javaLangCloneable,
+            Sort javaLangSerializable) {
         public boolean equals(Object o) {
-            if (!(o instanceof SortKey sk)) {
+            if (!(o instanceof SortKey(Sort sort, Type type, Sort langObjectSort, Sort langCloneable, Sort langSerializable))) {
                 return false;
             }
-            return elemSort == sk.elemSort && elemType == sk.elemType
-                    && javaLangObjectSort == sk.javaLangObjectSort
-                    && javaLangSerializable == sk.javaLangSerializable
-                    && javaLangCloneable == sk.javaLangCloneable;
+            return elemSort == sort && elemType == type
+                    && javaLangObjectSort == langObjectSort
+                    && javaLangSerializable == langSerializable
+                    && javaLangCloneable == langCloneable;
         }
     }
 }

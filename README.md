@@ -20,7 +20,7 @@ The current version of KeY is 2.12.2, licensed under GPL v2.
 Feel free to use the project templates to get started using KeY:
 * [For Verification Projects](https://github.com/KeYProject/verification-project-template)
 * [Using as a Library](https://github.com/KeYProject/key-java-example)
-* [Using as a Symbolic Execution Backend](https://github.com/KeYProject/key-symbex-example)
+* [Using as a Symbolic Execution Backend](https://github.com/KeYProject/symbex-java-example)
 
 ## Requirements
 

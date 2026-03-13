@@ -4,17 +4,16 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.logic.Program;
-import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.logic.SyntaxElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
+public final class JavaBlock implements Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**
@@ -64,8 +63,8 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     public int size() {
-        if ((program() instanceof StatementBlock)) {
-            return ((StatementBlock) program()).getChildCount();
+        if (program() instanceof StatementBlock) {
+            return program().getChildCount();
         }
         return 0;
     }
@@ -92,31 +91,6 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     /**
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
-     */
-    public boolean equalsModRenaming(Object o, NameAbstractionTable nat) {
-        if (!(o instanceof JavaBlock)) {
-            return false;
-        }
-        return equalsModRenaming(((JavaBlock) o).program(), nat);
-    }
-
-
-    /**
-     * returns true if the given ProgramElement is equal to the one of the JavaBlock modulo renaming
-     * (see comment in SourceElement)
-     */
-    private boolean equalsModRenaming(JavaProgramElement pe, NameAbstractionTable nat) {
-        if (pe == null && program() == null) {
-            return true;
-        } else if (pe != null && program() != null) {
-            return program().equalsModRenaming(pe, nat);
-        }
-        return false;
-    }
-
-    /**
      * returns the java program
      *
      * @return the stored JavaProgramElement
@@ -133,25 +107,16 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof JavaBlock other)) {
-            return false;
-        }
-        if (this == obj) {
-            return true;
-        }
-        // quite inefficient, but sufficient
-        return toString().equals(other.toString());
+    public int getChildCount() {
+        if (prg == null || this == EMPTY_JAVABLOCK)
+            return 0;
+        return 1;
     }
 
     @Override
-    public int hashCodeModProofIrrelevancy() {
-        if (hashCode == -1) {
-            hashCode = toString().hashCode();
-            if (hashCode == -1) {
-                hashCode = 0;
-            }
-        }
-        return hashCode;
+    public SyntaxElement getChild(int n) {
+        if (n == 0)
+            return prg;
+        throw new IndexOutOfBoundsException("JavaBlock " + this + " has only one child");
     }
 }

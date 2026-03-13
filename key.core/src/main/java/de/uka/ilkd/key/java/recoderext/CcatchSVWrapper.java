@@ -3,27 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
+import recoder.java.Statement;
 
 public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWrapper {
     private static final long serialVersionUID = -1;
-    protected SchemaVariable sv;
+    protected final JOperatorSV sv;
 
-    public CcatchSVWrapper(SchemaVariable sv) {
-        this.sv = sv;
-    }
-
-    /**
-     * sets the schema variable of sort statement
-     *
-     * @param sv the SchemaVariable
-     */
-    @Override
-    public void setSV(SchemaVariable sv) {
+    public CcatchSVWrapper(JOperatorSV sv) {
         this.sv = sv;
     }
 
@@ -31,7 +22,7 @@ public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWr
      * returns a String name of this meta construct.
      */
     @Override
-    public SchemaVariable getSV() {
+    public JOperatorSV getSV() {
         return sv;
     }
 
@@ -56,12 +47,12 @@ public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWr
     }
 
     @Override
-    public int getChildPositionCode(recoder.java.ProgramElement pe) {
+    public int getChildPositionCode(ProgramElement pe) {
         throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override
-    public boolean replaceChild(recoder.java.ProgramElement p1, recoder.java.ProgramElement p2) {
+    public boolean replaceChild(ProgramElement p1, ProgramElement p2) {
         return false;
     }
 
@@ -71,7 +62,7 @@ public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWr
     }
 
     @Override
-    public recoder.java.Statement getStatementAt(int s) {
+    public Statement getStatementAt(int s) {
         throw new ArrayIndexOutOfBoundsException();
     }
 

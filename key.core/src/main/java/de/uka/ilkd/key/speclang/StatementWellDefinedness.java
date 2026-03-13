@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -40,9 +41,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
-            Term accessible, Condition ensures, Term mby, Term rep, TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, TermBuilder tb) {
+        super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
     }
 
@@ -54,7 +55,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, TermServices services);
+    abstract SequentFormula generateSequent(SequentTerms seqTerms,
+            TermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -64,21 +66,21 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param set a set of parameter variables
      * @return a list of the parameter variables
      */
-    final static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
-        ImmutableList<ProgramVariable> list = ImmutableSLList.nil();
-        for (ProgramVariable pv : set) {
+    final static ImmutableList<LocationVariable> convertParams(ImmutableSet<LocationVariable> set) {
+        ImmutableList<LocationVariable> list = ImmutableSLList.nil();
+        for (LocationVariable pv : set) {
             list = list.append(pv);
         }
         return list;
     }
 
     @Override
-    final JFunction generateMbyAtPreFunc(Services services) {
+    final Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 
     @Override
-    final ImmutableList<Term> getRest() {
+    final ImmutableList<JTerm> getRest() {
         return super.getRest();
     }
 
@@ -93,17 +95,17 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return the actual terms used in the well-definedness sequent
      */
-    final SequentTerms createSeqTerms(POTerms po, Variables vars, Term leadingUpdate,
-            Term localAnon, Services services) {
-        final Term pre =
-            getPre(po.pre(), vars.self, vars.heap, vars.params, false, services).term();
-        final Term post = getPost(po.post(), vars.result, services);
-        final ImmutableList<Term> wdRest = TB.wd(po.rest());
-        final Term updates = TB.parallel(localAnon,
-            getUpdates(po.mod(), vars.heap, vars.heap, vars.anonHeap, services));
-        final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
-        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod(), po.rest(), uPost,
-            services);
+    final SequentTerms createSeqTerms(POTerms po, Variables vars, JTerm leadingUpdate,
+            JTerm localAnon, Services services) {
+        final JTerm pre =
+            getPre(po.pre(), vars.self, vars.heap, vars.params, services).term();
+        final JTerm post = getPost(po.post(), vars.result, services);
+        final ImmutableList<JTerm> wdRest = TB.wd(po.rest());
+        final JTerm updates = TB.parallel(localAnon,
+            getUpdates(po.modifiable(), vars.heap, vars.heap, vars.anonHeap, services));
+        final JTerm uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
+        return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.modifiable(), po.rest(),
+            uPost, services);
     }
 
     /**
@@ -121,19 +123,21 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(ProgramVariable self, ProgramVariable exception,
-            ProgramVariable result, LocationVariable heap, ProgramVariable heapAtPre, Term anonHeap,
-            ImmutableSet<ProgramVariable> ps, Term leadingUpdate, Term localAnonUpdate,
+    public SequentFormula generateSequent(LocationVariable self,
+            LocationVariable exception,
+            LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
+            JTerm anonHeap,
+            ImmutableSet<LocationVariable> ps, JTerm leadingUpdate, JTerm localAnonUpdate,
             Services services) {
-        final ImmutableList<ProgramVariable> params = convertParams(ps);
-        final Map<LocationVariable, ProgramVariable> atPres =
+        final ImmutableList<LocationVariable> params = convertParams(ps);
+        final Map<LocationVariable, LocationVariable> atPres =
             new LinkedHashMap<>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
             new Variables(self, result, exception, atPres, params, heap, anonHeap);
         final POTerms po = replace(this.createPOTerms(), vars);
-        final Term update = replace(leadingUpdate, vars);
-        final Term localAnon = replace(localAnonUpdate, vars);
+        final JTerm update = replace(leadingUpdate, vars);
+        final JTerm localAnon = replace(localAnonUpdate, vars);
         final SequentTerms seqTerms = createSeqTerms(po, vars, update, localAnon, services);
         return generateSequent(seqTerms, services);
     }
@@ -152,15 +156,15 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(ProgramVariable self, LocationVariable heap,
-            Term anonHeap, ImmutableSet<ProgramVariable> ps, Term leadingUpdate,
-            Term localAnonUpdate, Services services) {
+    public SequentFormula generateSequent(LocationVariable self, LocationVariable heap,
+            JTerm anonHeap, ImmutableSet<LocationVariable> ps, JTerm leadingUpdate,
+            JTerm localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
             localAnonUpdate, services);
     }
 
     @Override
-    public abstract StatementWellDefinedness map(UnaryOperator<Term> op, Services services);
+    public abstract StatementWellDefinedness map(UnaryOperator<JTerm> op, Services services);
 
     @Override
     public final String getBehaviour() {
@@ -168,12 +172,12 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public final Term getGlobalDefs() {
+    public final JTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public final Term getAxiom() {
+    public final JTerm getAxiom() {
         return null;
     }
 
@@ -186,26 +190,26 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * A data structure to pass the needed terms for the well-definedness sequent of a jml
      * statement, including the context update, pre-condition for the statement, well-formedness
      * condition for the anonymous heap, well-definedness term for the statement's
-     * assignable-clause, well-definedness term for other clauses in the statement and the
+     * modifiable-clause, well-definedness term for other clauses in the statement and the
      * well-definedness term for the statement's post-condition with the according updates (heap of
      * pre-state becomes current heap and the current heap gets anonymised) applied to it.
      *
      * @author Michael Kirsten
      */
     final class SequentTerms {
-        final Term context;
-        final Term pre;
-        final Term wfAnon;
-        final Term wdMod;
-        final Term wdRest;
-        final Term anonWdPost;
+        final JTerm context;
+        final JTerm pre;
+        final JTerm wfAnon;
+        final JTerm wdModifiable;
+        final JTerm wdRest;
+        final JTerm anonWdPost;
 
-        private SequentTerms(Term context, Term pre, Term anonHeap, Term mod,
-                ImmutableList<Term> rest, Term anonWdPost, TermServices services) {
+        private SequentTerms(JTerm context, JTerm pre, JTerm anonHeap, JTerm modifiable,
+                ImmutableList<JTerm> rest, JTerm anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();
-            this.wdMod = TB.wd(mod);
+            this.wdModifiable = TB.wd(modifiable);
             this.wdRest = TB.and(TB.wd(rest));
             this.anonWdPost = anonWdPost;
         }

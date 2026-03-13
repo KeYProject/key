@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,7 +14,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,8 +44,8 @@ import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
 
-    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
-    public static final File DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY, "dummyTrue.key");
+    public static final Path TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
+    public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
     private static final Profile profile = new JavaProfile() {
@@ -63,10 +63,18 @@ public class HelperClassForTests {
     }
 
     public ProofAggregate parse(File file) {
-        return parse(file, profile);
+        return parse(file.toPath(), profile);
     }
 
     public ProofAggregate parse(File file, Profile profile) {
+        return parse(file.toPath(), profile);
+    }
+
+    public ProofAggregate parse(Path file) {
+        return parse(file, profile);
+    }
+
+    public ProofAggregate parse(Path file, Profile profile) {
         ProblemInitializer pi = null;
         ProofAggregate result = null;
 
@@ -82,20 +90,16 @@ public class HelperClassForTests {
         return result;
     }
 
-    public ProofAggregate parseThrowException(File file) throws ProofInputException {
+    public ProofAggregate parseThrowException(Path file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public ProofAggregate parseThrowException(File file, Profile profile)
+    public ProofAggregate parseThrowException(Path file, Profile profile)
             throws ProofInputException {
         KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
-    }
-
-    public Term extractProblemTerm(Proof p) {
-        return p.root().sequent().succedent().iterator().next().formula();
     }
 
     /**
@@ -154,12 +158,13 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+    public static Map<String, String> setDefaultTacletOptions(Path baseDir,
             String javaPathInBaseDir)
             throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Make sure that required files exists
-            File javaFile = new File(baseDir, javaPathInBaseDir);
+            Path javaFile = baseDir.resolve(javaPathInBaseDir);
+
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
@@ -191,7 +196,7 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+    public static Map<String, String> setDefaultTacletOptionsForTarget(Path javaFile,
             String containerTypeName,
             final String targetName) throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
@@ -297,7 +302,7 @@ public class HelperClassForTests {
         return pm;
     }
 
-    public static Services createServices(File keyFile) {
+    public static Services createServices(Path keyFile) {
         JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
         return javaInfo.getServices();
     }

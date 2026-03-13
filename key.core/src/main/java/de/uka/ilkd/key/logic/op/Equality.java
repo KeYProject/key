@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 
@@ -16,7 +17,7 @@ import org.key_project.logic.sort.Sort;
  * It also defines the formula equivalence operator {@code <->} (which could alternatively be seen
  * as a Junctor).
  */
-public final class Equality extends AbstractSortedOperator {
+public final class Equality extends JAbstractSortedOperator {
 
     /**
      * the usual 'equality' operator '='
@@ -33,5 +34,15 @@ public final class Equality extends AbstractSortedOperator {
 
     private Equality(Name name, Sort targetSort) {
         super(name, new Sort[] { targetSort, targetSort }, JavaDLTheory.FORMULA, true);
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(name() + " has no children");
     }
 }

@@ -335,33 +335,33 @@ public class JavaCCParser implements JavaCCParserConstants {
             ps = PackageDeclaration();
             label_1: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case IMPORT:
-                    break;
-                default:
-                    jj_la1[0] = jj_gen;
-                    break label_1;
+                    case IMPORT:
+                        break;
+                    default:
+                        jj_la1[0] = jj_gen;
+                        break label_1;
                 }
                 imp = ImportDeclaration();
                 il.add(imp);
             }
             label_2: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case ABSTRACT:
-                case AT:
-                case CLASS:
-                case ENUM:
-                case FINAL:
-                case INTERFACE:
-                case PRIVATE:
-                case PROTECTED:
-                case PUBLIC:
-                case STATIC:
-                case STRICTFP:
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[1] = jj_gen;
-                    break label_2;
+                    case ABSTRACT:
+                    case AT:
+                    case CLASS:
+                    case ENUM:
+                    case FINAL:
+                    case INTERFACE:
+                    case PRIVATE:
+                    case PROTECTED:
+                    case PUBLIC:
+                    case STATIC:
+                    case STRICTFP:
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[1] = jj_gen;
+                        break label_2;
                 }
                 td = TypeDeclaration();
                 if (td != null) {
@@ -371,33 +371,33 @@ public class JavaCCParser implements JavaCCParserConstants {
         } else {
             label_3: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case IMPORT:
-                    break;
-                default:
-                    jj_la1[2] = jj_gen;
-                    break label_3;
+                    case IMPORT:
+                        break;
+                    default:
+                        jj_la1[2] = jj_gen;
+                        break label_3;
                 }
                 imp = ImportDeclaration();
                 il.add(imp);
             }
             label_4: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case ABSTRACT:
-                case AT:
-                case CLASS:
-                case ENUM:
-                case FINAL:
-                case INTERFACE:
-                case PRIVATE:
-                case PROTECTED:
-                case PUBLIC:
-                case STATIC:
-                case STRICTFP:
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[3] = jj_gen;
-                    break label_4;
+                    case ABSTRACT:
+                    case AT:
+                    case CLASS:
+                    case ENUM:
+                    case FINAL:
+                    case INTERFACE:
+                    case PRIVATE:
+                    case PROTECTED:
+                    case PUBLIC:
+                    case STATIC:
+                    case STRICTFP:
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[3] = jj_gen;
+                        break label_4;
                 }
                 td = TypeDeclaration();
                 if (td != null) {
@@ -425,11 +425,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         AnnotationUseSpecification annot;
         label_5: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-                break;
-            default:
-                jj_la1[4] = jj_gen;
-                break label_5;
+                case AT:
+                    break;
+                default:
+                    jj_la1[4] = jj_gen;
+                    break label_5;
             }
             annot = AnnotationUse();
             annotations.add(annot);
@@ -461,22 +461,22 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createImport();
         setPrefixInfo(result);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case STATIC:
-            jj_consume_token(STATIC);
-            isStatic = true;
-            break;
-        default:
-            jj_la1[5] = jj_gen;
+            case STATIC:
+                jj_consume_token(STATIC);
+                isStatic = true;
+                break;
+            default:
+                jj_la1[5] = jj_gen;
         }
         qn = Name();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case DOT:
-            jj_consume_token(DOT);
-            jj_consume_token(STAR);
-            wildcard = true;
-            break;
-        default:
-            jj_la1[6] = jj_gen;
+            case DOT:
+                jj_consume_token(DOT);
+                jj_consume_token(STAR);
+                wildcard = true;
+                break;
+            default:
+                jj_la1[6] = jj_gen;
         }
         jj_consume_token(SEMICOLON);
         // "*" will be thrown away immediately since the package name is sufficient
@@ -518,13 +518,13 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = AnnotationTypeDeclaration();
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case SEMICOLON:
-                jj_consume_token(SEMICOLON);
-                break;
-            default:
-                jj_la1[7] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case SEMICOLON:
+                    jj_consume_token(SEMICOLON);
+                    break;
+                default:
+                    jj_la1[7] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         if (result != null) { // may be removed as soon as Recoder fully understands Java5
@@ -559,37 +559,37 @@ public class JavaCCParser implements JavaCCParserConstants {
                 break;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                ds = factory.createStrictFp();
-                break;
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                ds = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                ds = factory.createProtected();
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                ds = factory.createPrivate();
-                break;
-            case STATIC:
-                jj_consume_token(STATIC);
-                ds = factory.createStatic();
-                break;
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                ds = factory.createAbstract();
-                break;
-            case AT:
-                ds = AnnotationUse();
-                break;
-            default:
-                jj_la1[8] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    ds = factory.createStrictFp();
+                    break;
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    ds = factory.createPublic();
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    ds = factory.createProtected();
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    ds = factory.createPrivate();
+                    break;
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    ds = factory.createStatic();
+                    break;
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    ds = factory.createAbstract();
+                    break;
+                case AT:
+                    ds = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[8] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             declSpecs.add(ds);
         }
@@ -601,62 +601,62 @@ public class JavaCCParser implements JavaCCParserConstants {
         jj_consume_token(LBRACE);
         label_7: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case CLASS:
-            case DOUBLE:
-            case ENUM:
-            case FINAL:
-            case FLOAT:
-            case INT:
-            case INTERFACE:
-            case LONG:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case SHORT:
-            case STATIC:
-            case TRANSIENT:
-            case VOLATILE:
-            case STRICTFP:
-            case IDENTIFIER:
-            case SEMICOLON:
-                break;
-            default:
-                jj_la1[9] = jj_gen;
-                break label_7;
+                case ABSTRACT:
+                case AT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case CLASS:
+                case DOUBLE:
+                case ENUM:
+                case FINAL:
+                case FLOAT:
+                case INT:
+                case INTERFACE:
+                case LONG:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case SHORT:
+                case STATIC:
+                case TRANSIENT:
+                case VOLATILE:
+                case STRICTFP:
+                case IDENTIFIER:
+                case SEMICOLON:
+                    break;
+                default:
+                    jj_la1[9] = jj_gen;
+                    break label_7;
             }
             if (jj_2_7(2147483647)) {
                 methodDs = new ASTArrayList<>();
                 label_8: while (true) {
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                    case ABSTRACT:
-                    case AT:
-                    case PUBLIC:
-                        break;
-                    default:
-                        jj_la1[10] = jj_gen;
-                        break label_8;
+                        case ABSTRACT:
+                        case AT:
+                        case PUBLIC:
+                            break;
+                        default:
+                            jj_la1[10] = jj_gen;
+                            break label_8;
                     }
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                    case AT:
-                        ds = AnnotationUse();
-                        break;
-                    case PUBLIC:
-                        jj_consume_token(PUBLIC);
-                        ds = factory.createPublic();
-                        break;
-                    case ABSTRACT:
-                        jj_consume_token(ABSTRACT);
-                        ds = factory.createAbstract();
-                        break;
-                    default:
-                        jj_la1[11] = jj_gen;
-                        jj_consume_token(-1);
-                        throw new ParseException();
+                        case AT:
+                            ds = AnnotationUse();
+                            break;
+                        case PUBLIC:
+                            jj_consume_token(PUBLIC);
+                            ds = factory.createPublic();
+                            break;
+                        case ABSTRACT:
+                            jj_consume_token(ABSTRACT);
+                            ds = factory.createAbstract();
+                            break;
+                        default:
+                            jj_la1[11] = jj_gen;
+                            jj_consume_token(-1);
+                            throw new ParseException();
                     }
                     methodDs.add(ds);
                 }
@@ -667,12 +667,12 @@ public class JavaCCParser implements JavaCCParserConstants {
                 jj_consume_token(RPAREN);
                 methodDefExpr = null;
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case _DEFAULT:
-                    jj_consume_token(_DEFAULT);
-                    methodDefExpr = ElementValue();
-                    break;
-                default:
-                    jj_la1[12] = jj_gen;
+                    case _DEFAULT:
+                        jj_consume_token(_DEFAULT);
+                        methodDefExpr = ElementValue();
+                        break;
+                    default:
+                        jj_la1[12] = jj_gen;
                 }
                 md = factory.createAnnotationPropertyDeclaration(methodDs, methodRes, methodName,
                     methodDefExpr);
@@ -694,13 +694,13 @@ public class JavaCCParser implements JavaCCParserConstants {
                 members.add(td);
             } else {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    jj_consume_token(SEMICOLON);
-                    break;
-                default:
-                    jj_la1[13] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
+                    case SEMICOLON:
+                        jj_consume_token(SEMICOLON);
+                        break;
+                    default:
+                        jj_la1[13] = jj_gen;
+                        jj_consume_token(-1);
+                        throw new ParseException();
                 }
             }
         }
@@ -732,33 +732,33 @@ public class JavaCCParser implements JavaCCParserConstants {
                 break;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                ds = factory.createStrictFp();
-                break;
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                ds = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                ds = factory.createProtected();
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                ds = factory.createPrivate();
-                break;
-            case STATIC:
-                jj_consume_token(STATIC);
-                ds = factory.createStatic();
-                break;
-            case AT:
-                ds = AnnotationUse();
-                break;
-            default:
-                jj_la1[14] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    ds = factory.createStrictFp();
+                    break;
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    ds = factory.createPublic();
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    ds = factory.createProtected();
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    ds = factory.createPrivate();
+                    break;
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    ds = factory.createStatic();
+                    break;
+                case AT:
+                    ds = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[14] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(ds);
             setPostfixInfo(ds);
@@ -776,91 +776,91 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPostfixInfo(id);
         result.setIdentifier(id);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case IMPLEMENTS:
-            jj_consume_token(IMPLEMENTS);
-            im = factory.createImplements();
-            setPrefixInfo(im);
-            nl = TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<>();
-            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
-                TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
-                trl.add(tr);
-            }
-            im.setSupertypes(trl);
-            result.setImplementedTypes(im);
-            break;
-        default:
-            jj_la1[15] = jj_gen;
+            case IMPLEMENTS:
+                jj_consume_token(IMPLEMENTS);
+                im = factory.createImplements();
+                setPrefixInfo(im);
+                nl = TypedNameList();
+                ASTList<TypeReference> trl = new ASTArrayList<>();
+                for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                    TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
+                    trl.add(tr);
+                }
+                im.setSupertypes(trl);
+                result.setImplementedTypes(im);
+                break;
+            default:
+                jj_la1[15] = jj_gen;
         }
         jj_consume_token(LBRACE);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case AT:
-        case IDENTIFIER:
-            constant = EnumConstant();
-            members.add(constant);
-            while (true) {
-                if (jj_2_14(2)) {
-                } else {
-                    break;
-                }
-                jj_consume_token(COMMA);
+            case AT:
+            case IDENTIFIER:
                 constant = EnumConstant();
                 members.add(constant);
-            }
-            break;
-        default:
-            jj_la1[16] = jj_gen;
-        }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case COMMA:
-            jj_consume_token(COMMA);
-            break;
-        default:
-            jj_la1[17] = jj_gen;
-        }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case SEMICOLON:
-            jj_consume_token(SEMICOLON);
-            label_11: while (true) {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case ABSTRACT:
-                case AT:
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case CLASS:
-                case DOUBLE:
-                case ENUM:
-                case FINAL:
-                case FLOAT:
-                case INT:
-                case INTERFACE:
-                case LONG:
-                case NATIVE:
-                case PRIVATE:
-                case PROTECTED:
-                case PUBLIC:
-                case SHORT:
-                case STATIC:
-                case SYNCHRONIZED:
-                case TRANSIENT:
-                case VOID:
-                case VOLATILE:
-                case STRICTFP:
-                case IDENTIFIER:
-                case LBRACE:
-                case LT:
-                    break;
-                default:
-                    jj_la1[18] = jj_gen;
-                    break label_11;
+                while (true) {
+                    if (jj_2_14(2)) {
+                    } else {
+                        break;
+                    }
+                    jj_consume_token(COMMA);
+                    constant = EnumConstant();
+                    members.add(constant);
                 }
-                md = ClassBodyDeclaration();
-                members.add(md);
-            }
-            break;
-        default:
-            jj_la1[19] = jj_gen;
+                break;
+            default:
+                jj_la1[16] = jj_gen;
+        }
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case COMMA:
+                jj_consume_token(COMMA);
+                break;
+            default:
+                jj_la1[17] = jj_gen;
+        }
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case SEMICOLON:
+                jj_consume_token(SEMICOLON);
+                label_11: while (true) {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case ABSTRACT:
+                        case AT:
+                        case BOOLEAN:
+                        case BYTE:
+                        case CHAR:
+                        case CLASS:
+                        case DOUBLE:
+                        case ENUM:
+                        case FINAL:
+                        case FLOAT:
+                        case INT:
+                        case INTERFACE:
+                        case LONG:
+                        case NATIVE:
+                        case PRIVATE:
+                        case PROTECTED:
+                        case PUBLIC:
+                        case SHORT:
+                        case STATIC:
+                        case SYNCHRONIZED:
+                        case TRANSIENT:
+                        case VOID:
+                        case VOLATILE:
+                        case STRICTFP:
+                        case IDENTIFIER:
+                        case LBRACE:
+                        case LT:
+                            break;
+                        default:
+                            jj_la1[18] = jj_gen;
+                            break label_11;
+                    }
+                    md = ClassBodyDeclaration();
+                    members.add(md);
+                }
+                break;
+            default:
+                jj_la1[19] = jj_gen;
         }
         jj_consume_token(RBRACE);
         result.setMembers(members);
@@ -886,11 +886,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(result);
         label_12: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-                break;
-            default:
-                jj_la1[20] = jj_gen;
-                break label_12;
+                case AT:
+                    break;
+                default:
+                    jj_la1[20] = jj_gen;
+                    break label_12;
             }
             if (annotations == null) {
                 annotations = new ASTArrayList<>();
@@ -903,22 +903,22 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(id);
         setPostfixInfo(id);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LPAREN:
-            args = Arguments();
-            break;
-        default:
-            jj_la1[21] = jj_gen;
+            case LPAREN:
+                args = Arguments();
+                break;
+            default:
+                jj_la1[21] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LBRACE:
-            cd = factory.createClassDeclaration();
-            setPrefixInfo(cd);
-            body = ClassBody();
-            cd.setMembers(body);
-            setPostfixInfo(cd);
-            break;
-        default:
-            jj_la1[22] = jj_gen;
+            case LBRACE:
+                cd = factory.createClassDeclaration();
+                setPrefixInfo(cd);
+                body = ClassBody();
+                cd.setMembers(body);
+                setPostfixInfo(cd);
+                break;
+            default:
+                jj_la1[22] = jj_gen;
         }
         ref = new EnumConstructorReference(args, cd);
         setPrefixInfo(ref); // TODO this maybe too late ?!
@@ -943,40 +943,40 @@ public class JavaCCParser implements JavaCCParserConstants {
         DeclarationSpecifier m;
         label_13: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case FINAL:
-            case PUBLIC:
-            case STRICTFP:
-                break;
-            default:
-                jj_la1[23] = jj_gen;
-                break label_13;
+                case ABSTRACT:
+                case AT:
+                case FINAL:
+                case PUBLIC:
+                case STRICTFP:
+                    break;
+                default:
+                    jj_la1[23] = jj_gen;
+                    break label_13;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                m = factory.createAbstract();
-                break;
-            case FINAL:
-                jj_consume_token(FINAL);
-                m = factory.createFinal();
-                break;
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                m = factory.createStrictFp();
-                break;
-            case AT:
-                m = AnnotationUse();
-                break;
-            default:
-                jj_la1[24] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    m = factory.createAbstract();
+                    break;
+                case FINAL:
+                    jj_consume_token(FINAL);
+                    m = factory.createFinal();
+                    break;
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    m = factory.createPublic();
+                    break;
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    m = factory.createStrictFp();
+                    break;
+                case AT:
+                    m = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[24] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(m);
             setPostfixInfo(m);
@@ -1010,42 +1010,42 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPostfixInfo(id);
         result.setIdentifier(id);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LT:
-            typeParams = TypeParameters();
-            result.setTypeParameters(typeParams);
-            break;
-        default:
-            jj_la1[25] = jj_gen;
+            case LT:
+                typeParams = TypeParameters();
+                result.setTypeParameters(typeParams);
+                break;
+            default:
+                jj_la1[25] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case EXTENDS:
-            jj_consume_token(EXTENDS);
-            ex = factory.createExtends();
-            setPrefixInfo(ex);
-            qn = TypedName();
-            ex.setSupertypes(new ASTArrayList<>(1));
-            ex.getSupertypes().add(qn.toTypeReference());
-            result.setExtendedTypes(ex);
-            break;
-        default:
-            jj_la1[26] = jj_gen;
+            case EXTENDS:
+                jj_consume_token(EXTENDS);
+                ex = factory.createExtends();
+                setPrefixInfo(ex);
+                qn = TypedName();
+                ex.setSupertypes(new ASTArrayList<>(1));
+                ex.getSupertypes().add(qn.toTypeReference());
+                result.setExtendedTypes(ex);
+                break;
+            default:
+                jj_la1[26] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case IMPLEMENTS:
-            jj_consume_token(IMPLEMENTS);
-            im = factory.createImplements();
-            setPrefixInfo(im);
-            nl = TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<>();
-            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
-                TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
-                trl.add(tr);
-            }
-            im.setSupertypes(trl);
-            result.setImplementedTypes(im);
-            break;
-        default:
-            jj_la1[27] = jj_gen;
+            case IMPLEMENTS:
+                jj_consume_token(IMPLEMENTS);
+                im = factory.createImplements();
+                setPrefixInfo(im);
+                nl = TypedNameList();
+                ASTList<TypeReference> trl = new ASTArrayList<>();
+                for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                    TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
+                    trl.add(tr);
+                }
+                im.setSupertypes(trl);
+                result.setImplementedTypes(im);
+                break;
+            default:
+                jj_la1[27] = jj_gen;
         }
         mdl = ClassBody();
         result.setMembers(mdl);
@@ -1064,37 +1064,37 @@ public class JavaCCParser implements JavaCCParserConstants {
         jj_consume_token(LBRACE);
         label_14: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case CLASS:
-            case DOUBLE:
-            case ENUM:
-            case FINAL:
-            case FLOAT:
-            case INT:
-            case INTERFACE:
-            case LONG:
-            case NATIVE:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case SHORT:
-            case STATIC:
-            case SYNCHRONIZED:
-            case TRANSIENT:
-            case VOID:
-            case VOLATILE:
-            case STRICTFP:
-            case IDENTIFIER:
-            case LBRACE:
-            case LT:
-                break;
-            default:
-                jj_la1[28] = jj_gen;
-                break label_14;
+                case ABSTRACT:
+                case AT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case CLASS:
+                case DOUBLE:
+                case ENUM:
+                case FINAL:
+                case FLOAT:
+                case INT:
+                case INTERFACE:
+                case LONG:
+                case NATIVE:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case SHORT:
+                case STATIC:
+                case SYNCHRONIZED:
+                case TRANSIENT:
+                case VOID:
+                case VOLATILE:
+                case STRICTFP:
+                case IDENTIFIER:
+                case LBRACE:
+                case LT:
+                    break;
+                default:
+                    jj_la1[28] = jj_gen;
+                    break label_14;
             }
             md = ClassBodyDeclaration();
             result.add(md);
@@ -1114,55 +1114,55 @@ public class JavaCCParser implements JavaCCParserConstants {
         DeclarationSpecifier m;
         label_15: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case FINAL:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case STATIC:
-            case STRICTFP:
-                break;
-            default:
-                jj_la1[29] = jj_gen;
-                break label_15;
+                case ABSTRACT:
+                case AT:
+                case FINAL:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case STATIC:
+                case STRICTFP:
+                    break;
+                default:
+                    jj_la1[29] = jj_gen;
+                    break label_15;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case STATIC:
-                jj_consume_token(STATIC);
-                m = factory.createStatic();
-                break;
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                m = factory.createAbstract();
-                break;
-            case FINAL:
-                jj_consume_token(FINAL);
-                m = factory.createFinal();
-                break;
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                m = factory.createProtected();
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                m = factory.createPrivate();
-                break;
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                m = factory.createStrictFp();
-                break;
-            case AT:
-                m = AnnotationUse();
-                break;
-            default:
-                jj_la1[30] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    m = factory.createStatic();
+                    break;
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    m = factory.createAbstract();
+                    break;
+                case FINAL:
+                    jj_consume_token(FINAL);
+                    m = factory.createFinal();
+                    break;
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    m = factory.createPublic();
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    m = factory.createProtected();
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    m = factory.createPrivate();
+                    break;
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    m = factory.createStrictFp();
+                    break;
+                case AT:
+                    m = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[30] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(m);
             setPostfixInfo(m);
@@ -1185,11 +1185,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = Initializer();
             label_16: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[31] = jj_gen;
-                    break label_16;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[31] = jj_gen;
+                        break label_16;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1197,11 +1197,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = NestedClassDeclaration();
             label_17: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[32] = jj_gen;
-                    break label_17;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[32] = jj_gen;
+                        break label_17;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1209,11 +1209,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = NestedInterfaceDeclaration();
             label_18: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[33] = jj_gen;
-                    break label_18;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[33] = jj_gen;
+                        break label_18;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1221,11 +1221,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = ConstructorDeclaration();
             label_19: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[34] = jj_gen;
-                    break label_19;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[34] = jj_gen;
+                        break label_19;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1233,11 +1233,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = MethodDeclaration();
             label_20: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[35] = jj_gen;
-                    break label_20;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[35] = jj_gen;
+                        break label_20;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1245,11 +1245,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = EnumDeclaration();
             label_21: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[36] = jj_gen;
-                    break label_21;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[36] = jj_gen;
+                        break label_21;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1257,49 +1257,49 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = AnnotationTypeDeclaration();
             label_22: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[37] = jj_gen;
-                    break label_22;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[37] = jj_gen;
+                        break label_22;
                 }
                 jj_consume_token(SEMICOLON);
             }
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FINAL:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case SHORT:
-            case STATIC:
-            case TRANSIENT:
-            case VOLATILE:
-            case IDENTIFIER:
-                result = FieldDeclaration();
-                label_23: while (true) {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                    case SEMICOLON:
-                        break;
-                    default:
-                        jj_la1[38] = jj_gen;
-                        break label_23;
+                case AT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FINAL:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case SHORT:
+                case STATIC:
+                case TRANSIENT:
+                case VOLATILE:
+                case IDENTIFIER:
+                    result = FieldDeclaration();
+                    label_23: while (true) {
+                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            case SEMICOLON:
+                                break;
+                            default:
+                                jj_la1[38] = jj_gen;
+                                break label_23;
+                        }
+                        jj_consume_token(SEMICOLON);
                     }
-                    jj_consume_token(SEMICOLON);
-                }
-                break;
-            default:
-                jj_la1[39] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                    break;
+                default:
+                    jj_la1[39] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         setPostfixInfo(result);
@@ -1317,35 +1317,35 @@ public class JavaCCParser implements JavaCCParserConstants {
         DeclarationSpecifier m;
         label_24: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case PUBLIC:
-            case STRICTFP:
-                break;
-            default:
-                jj_la1[40] = jj_gen;
-                break label_24;
+                case ABSTRACT:
+                case AT:
+                case PUBLIC:
+                case STRICTFP:
+                    break;
+                default:
+                    jj_la1[40] = jj_gen;
+                    break label_24;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                m = factory.createAbstract();
-                break;
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                m = factory.createStrictFp();
-                break;
-            case AT:
-                m = AnnotationUse();
-                break;
-            default:
-                jj_la1[41] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    m = factory.createAbstract();
+                    break;
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    m = factory.createPublic();
+                    break;
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    m = factory.createStrictFp();
+                    break;
+                case AT:
+                    m = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[41] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(m);
             setPostfixInfo(m);
@@ -1368,55 +1368,55 @@ public class JavaCCParser implements JavaCCParserConstants {
         DeclarationSpecifier m;
         label_25: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case FINAL:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case STATIC:
-            case STRICTFP:
-                break;
-            default:
-                jj_la1[42] = jj_gen;
-                break label_25;
+                case ABSTRACT:
+                case AT:
+                case FINAL:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case STATIC:
+                case STRICTFP:
+                    break;
+                default:
+                    jj_la1[42] = jj_gen;
+                    break label_25;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case STATIC:
-                jj_consume_token(STATIC);
-                m = factory.createStatic();
-                break;
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                m = factory.createAbstract();
-                break;
-            case FINAL:
-                jj_consume_token(FINAL);
-                m = factory.createFinal();
-                break;
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                m = factory.createProtected();
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                m = factory.createPrivate();
-                break;
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                m = factory.createStrictFp();
-                break;
-            case AT:
-                m = AnnotationUse();
-                break;
-            default:
-                jj_la1[43] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    m = factory.createStatic();
+                    break;
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    m = factory.createAbstract();
+                    break;
+                case FINAL:
+                    jj_consume_token(FINAL);
+                    m = factory.createFinal();
+                    break;
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    m = factory.createPublic();
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    m = factory.createProtected();
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    m = factory.createPrivate();
+                    break;
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    m = factory.createStrictFp();
+                    break;
+                case AT:
+                    m = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[43] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(m);
             setPostfixInfo(m);
@@ -1450,63 +1450,63 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPostfixInfo(id);
         result.setIdentifier(id);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LT:
-            typeParams = TypeParameters();
-            result.setTypeParameters(typeParams);
-            break;
-        default:
-            jj_la1[44] = jj_gen;
+            case LT:
+                typeParams = TypeParameters();
+                result.setTypeParameters(typeParams);
+                break;
+            default:
+                jj_la1[44] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case EXTENDS:
-            jj_consume_token(EXTENDS);
-            ex = factory.createExtends();
-            setPrefixInfo(ex);
-            nl = TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<>();
-            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
-                TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
-                trl.add(tr);
-            }
-            ex.setSupertypes(trl);
-            result.setExtendedTypes(ex);
-            break;
-        default:
-            jj_la1[45] = jj_gen;
+            case EXTENDS:
+                jj_consume_token(EXTENDS);
+                ex = factory.createExtends();
+                setPrefixInfo(ex);
+                nl = TypedNameList();
+                ASTList<TypeReference> trl = new ASTArrayList<>();
+                for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                    TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
+                    trl.add(tr);
+                }
+                ex.setSupertypes(trl);
+                result.setExtendedTypes(ex);
+                break;
+            default:
+                jj_la1[45] = jj_gen;
         }
         jj_consume_token(LBRACE);
         label_26: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case CLASS:
-            case DOUBLE:
-            case ENUM:
-            case FINAL:
-            case FLOAT:
-            case INT:
-            case INTERFACE:
-            case LONG:
-            case NATIVE:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case SHORT:
-            case STATIC:
-            case SYNCHRONIZED:
-            case TRANSIENT:
-            case VOID:
-            case VOLATILE:
-            case STRICTFP:
-            case IDENTIFIER:
-            case LT:
-                break;
-            default:
-                jj_la1[46] = jj_gen;
-                break label_26;
+                case ABSTRACT:
+                case AT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case CLASS:
+                case DOUBLE:
+                case ENUM:
+                case FINAL:
+                case FLOAT:
+                case INT:
+                case INTERFACE:
+                case LONG:
+                case NATIVE:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case SHORT:
+                case STATIC:
+                case SYNCHRONIZED:
+                case TRANSIENT:
+                case VOID:
+                case VOLATILE:
+                case STRICTFP:
+                case IDENTIFIER:
+                case LT:
+                    break;
+                default:
+                    jj_la1[46] = jj_gen;
+                    break label_26;
             }
             md = InterfaceMemberDeclaration();
             mdl.add(md);
@@ -1528,11 +1528,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = NestedClassDeclaration();
             label_27: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[47] = jj_gen;
-                    break label_27;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[47] = jj_gen;
+                        break label_27;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1540,11 +1540,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = NestedInterfaceDeclaration();
             label_28: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[48] = jj_gen;
-                    break label_28;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[48] = jj_gen;
+                        break label_28;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1552,11 +1552,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = MethodDeclaration();
             label_29: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[49] = jj_gen;
-                    break label_29;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[49] = jj_gen;
+                        break label_29;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1564,11 +1564,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = EnumDeclaration();
             label_30: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[50] = jj_gen;
-                    break label_30;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[50] = jj_gen;
+                        break label_30;
                 }
                 jj_consume_token(SEMICOLON);
             }
@@ -1576,49 +1576,49 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = AnnotationTypeDeclaration();
             label_31: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case SEMICOLON:
-                    break;
-                default:
-                    jj_la1[51] = jj_gen;
-                    break label_31;
+                    case SEMICOLON:
+                        break;
+                    default:
+                        jj_la1[51] = jj_gen;
+                        break label_31;
                 }
                 jj_consume_token(SEMICOLON);
             }
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FINAL:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case SHORT:
-            case STATIC:
-            case TRANSIENT:
-            case VOLATILE:
-            case IDENTIFIER:
-                result = FieldDeclaration();
-                label_32: while (true) {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                    case SEMICOLON:
-                        break;
-                    default:
-                        jj_la1[52] = jj_gen;
-                        break label_32;
+                case AT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FINAL:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case SHORT:
+                case STATIC:
+                case TRANSIENT:
+                case VOLATILE:
+                case IDENTIFIER:
+                    result = FieldDeclaration();
+                    label_32: while (true) {
+                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            case SEMICOLON:
+                                break;
+                            default:
+                                jj_la1[52] = jj_gen;
+                                break label_32;
+                        }
+                        jj_consume_token(SEMICOLON);
                     }
-                    jj_consume_token(SEMICOLON);
-                }
-                break;
-            default:
-                jj_la1[53] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                    break;
+                default:
+                    jj_la1[53] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         setPostfixInfo(result);
@@ -1641,55 +1641,55 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createFieldDeclaration();
         label_33: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-            case FINAL:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case STATIC:
-            case TRANSIENT:
-            case VOLATILE:
-                break;
-            default:
-                jj_la1[54] = jj_gen;
-                break label_33;
+                case AT:
+                case FINAL:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case STATIC:
+                case TRANSIENT:
+                case VOLATILE:
+                    break;
+                default:
+                    jj_la1[54] = jj_gen;
+                    break label_33;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                m = factory.createProtected();
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                m = factory.createPrivate();
-                break;
-            case STATIC:
-                jj_consume_token(STATIC);
-                m = factory.createStatic();
-                break;
-            case FINAL:
-                jj_consume_token(FINAL);
-                m = factory.createFinal();
-                break;
-            case TRANSIENT:
-                jj_consume_token(TRANSIENT);
-                m = factory.createTransient();
-                break;
-            case VOLATILE:
-                jj_consume_token(VOLATILE);
-                m = factory.createVolatile();
-                break;
-            case AT:
-                m = AnnotationUse();
-                break;
-            default:
-                jj_la1[55] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    m = factory.createPublic();
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    m = factory.createProtected();
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    m = factory.createPrivate();
+                    break;
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    m = factory.createStatic();
+                    break;
+                case FINAL:
+                    jj_consume_token(FINAL);
+                    m = factory.createFinal();
+                    break;
+                case TRANSIENT:
+                    jj_consume_token(TRANSIENT);
+                    m = factory.createTransient();
+                    break;
+                case VOLATILE:
+                    jj_consume_token(VOLATILE);
+                    m = factory.createVolatile();
+                    break;
+                case AT:
+                    m = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[55] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(m);
             setPostfixInfo(m);
@@ -1709,11 +1709,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         vl.add((FieldSpecification) var);
         label_34: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case COMMA:
-                break;
-            default:
-                jj_la1[56] = jj_gen;
-                break label_34;
+                case COMMA:
+                    break;
+                default:
+                    jj_la1[56] = jj_gen;
+                    break label_34;
             }
             jj_consume_token(COMMA);
             var = VariableDeclarator(true);
@@ -1740,12 +1740,12 @@ public class JavaCCParser implements JavaCCParserConstants {
         id = VariableDeclaratorId();
         dim = tmpDimension;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case ASSIGN:
-            jj_consume_token(ASSIGN);
-            init = VariableInitializer();
-            break;
-        default:
-            jj_la1[57] = jj_gen;
+            case ASSIGN:
+                jj_consume_token(ASSIGN);
+                init = VariableInitializer();
+                break;
+            default:
+                jj_la1[57] = jj_gen;
         }
         if (isForField) {
             result = factory.createFieldSpecification(id, dim, init);
@@ -1771,11 +1771,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         tmpDimension = 0;
         label_35: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LBRACKET:
-                break;
-            default:
-                jj_la1[58] = jj_gen;
-                break label_35;
+                case LBRACKET:
+                    break;
+                default:
+                    jj_la1[58] = jj_gen;
+                    break label_35;
             }
             jj_consume_token(LBRACKET);
             jj_consume_token(RBRACKET);
@@ -1794,42 +1794,42 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public Expression VariableInitializer() throws ParseException {
         Expression result;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LBRACE:
-            result = ArrayInitializer();
-            break;
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-        case BANG:
-        case TILDE:
-        case INCR:
-        case DECR:
-        case PLUS:
-        case MINUS:
-            result = Expression();
-            break;
-        default:
-            jj_la1[59] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case LBRACE:
+                result = ArrayInitializer();
+                break;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FALSE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case NEW:
+            case NULL:
+            case SHORT:
+            case SUPER:
+            case THIS:
+            case TRUE:
+            case VOID:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+            case BANG:
+            case TILDE:
+            case INCR:
+            case DECR:
+            case PLUS:
+            case MINUS:
+                result = Expression();
+                break;
+            default:
+                jj_la1[59] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPostfixInfo(result);
         {
@@ -1848,55 +1848,55 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createArrayInitializer();
         setPrefixInfo(result);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-        case LBRACE:
-        case BANG:
-        case TILDE:
-        case INCR:
-        case DECR:
-        case PLUS:
-        case MINUS:
-            init = VariableInitializer();
-            el.add(init);
-            while (true) {
-                if (jj_2_27(2)) {
-                } else {
-                    break;
-                }
-                jj_consume_token(COMMA);
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FALSE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case NEW:
+            case NULL:
+            case SHORT:
+            case SUPER:
+            case THIS:
+            case TRUE:
+            case VOID:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+            case LBRACE:
+            case BANG:
+            case TILDE:
+            case INCR:
+            case DECR:
+            case PLUS:
+            case MINUS:
                 init = VariableInitializer();
                 el.add(init);
-            }
-            break;
-        default:
-            jj_la1[60] = jj_gen;
+                while (true) {
+                    if (jj_2_27(2)) {
+                    } else {
+                        break;
+                    }
+                    jj_consume_token(COMMA);
+                    init = VariableInitializer();
+                    el.add(init);
+                }
+                break;
+            default:
+                jj_la1[60] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case COMMA:
-            jj_consume_token(COMMA);
-            break;
-        default:
-            jj_la1[61] = jj_gen;
+            case COMMA:
+                jj_consume_token(COMMA);
+                break;
+            default:
+                jj_la1[61] = jj_gen;
         }
         jj_consume_token(RBRACE);
         result.setArguments(el);
@@ -1921,82 +1921,83 @@ public class JavaCCParser implements JavaCCParserConstants {
         SourceElement dummy = null;
         label_37: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case FINAL:
-            case NATIVE:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case STATIC:
-            case SYNCHRONIZED:
-            case STRICTFP:
-                break;
-            default:
-                jj_la1[62] = jj_gen;
-                break label_37;
+                case ABSTRACT:
+                case AT:
+                case FINAL:
+                case NATIVE:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case STATIC:
+                case SYNCHRONIZED:
+                case STRICTFP:
+                    break;
+                default:
+                    jj_la1[62] = jj_gen;
+                    break label_37;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                m = factory.createProtected();
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                m = factory.createPrivate();
-                break;
-            case STATIC:
-                jj_consume_token(STATIC);
-                m = factory.createStatic();
-                break;
-            case FINAL:
-                jj_consume_token(FINAL);
-                m = factory.createFinal();
-                break;
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                m = factory.createAbstract();
-                break;
-            case NATIVE:
-                jj_consume_token(NATIVE);
-                m = factory.createNative();
-                break;
-            case SYNCHRONIZED:
-                jj_consume_token(SYNCHRONIZED);
-                m = factory.createSynchronized();
-                break;
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                m = factory.createStrictFp();
-                break;
-            case AT:
-                m = AnnotationUse();
-                break;
-            default:
-                jj_la1[63] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    m = factory.createPublic();
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    m = factory.createProtected();
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    m = factory.createPrivate();
+                    break;
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    m = factory.createStatic();
+                    break;
+                case FINAL:
+                    jj_consume_token(FINAL);
+                    m = factory.createFinal();
+                    break;
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    m = factory.createAbstract();
+                    break;
+                case NATIVE:
+                    jj_consume_token(NATIVE);
+                    m = factory.createNative();
+                    break;
+                case SYNCHRONIZED:
+                    jj_consume_token(SYNCHRONIZED);
+                    m = factory.createSynchronized();
+                    break;
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    m = factory.createStrictFp();
+                    break;
+                case AT:
+                    m = AnnotationUse();
+                    break;
+                default:
+                    jj_la1[63] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             setPrefixInfo(m);
             setPostfixInfo(m);
             ml.add(m);
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LT:
-            jj_consume_token(LT);
-            if (ml.size() == 0) { // '<' of MethodDeclaration is first element then. Need to store
-                                  // the result somewhere...
-                dummy = factory.createPublic();
-                setPrefixInfo(dummy); /* HACK */
-            }
-            typeParams = TypeParametersNoLE();
-            break;
-        default:
-            jj_la1[64] = jj_gen;
+            case LT:
+                jj_consume_token(LT);
+                if (ml.size() == 0) { // '<' of MethodDeclaration is first element then. Need to
+                                      // store
+                                      // the result somewhere...
+                    dummy = factory.createPublic();
+                    setPrefixInfo(dummy); /* HACK */
+                }
+                typeParams = TypeParametersNoLE();
+                break;
+            default:
+                jj_la1[64] = jj_gen;
         }
         tr = ResultType();
         result = MethodDeclarator(tr);
@@ -2005,26 +2006,26 @@ public class JavaCCParser implements JavaCCParserConstants {
             dummy = null;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case THROWS:
-            jj_consume_token(THROWS);
-            th = factory.createThrows();
-            setPrefixInfo(th);
-            nl = TypedNameList();
-            break;
-        default:
-            jj_la1[65] = jj_gen;
+            case THROWS:
+                jj_consume_token(THROWS);
+                th = factory.createThrows();
+                setPrefixInfo(th);
+                nl = TypedNameList();
+                break;
+            default:
+                jj_la1[65] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LBRACE:
-            body = Block();
-            break;
-        case SEMICOLON:
-            jj_consume_token(SEMICOLON);
-            break;
-        default:
-            jj_la1[66] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case LBRACE:
+                body = Block();
+                break;
+            case SEMICOLON:
+                jj_consume_token(SEMICOLON);
+                break;
+            default:
+                jj_la1[66] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         if (nl != null) {
             ASTList<TypeReference> trl = new ASTArrayList<>();
@@ -2051,64 +2052,64 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public void MethodDeclarationLookahead() throws ParseException {
         label_38: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case AT:
-            case FINAL:
-            case NATIVE:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case STATIC:
-            case SYNCHRONIZED:
-            case STRICTFP:
-                break;
-            default:
-                jj_la1[67] = jj_gen;
-                break label_38;
+                case ABSTRACT:
+                case AT:
+                case FINAL:
+                case NATIVE:
+                case PRIVATE:
+                case PROTECTED:
+                case PUBLIC:
+                case STATIC:
+                case SYNCHRONIZED:
+                case STRICTFP:
+                    break;
+                default:
+                    jj_la1[67] = jj_gen;
+                    break label_38;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                break;
-            case PRIVATE:
-                jj_consume_token(PRIVATE);
-                break;
-            case STATIC:
-                jj_consume_token(STATIC);
-                break;
-            case ABSTRACT:
-                jj_consume_token(ABSTRACT);
-                break;
-            case FINAL:
-                jj_consume_token(FINAL);
-                break;
-            case NATIVE:
-                jj_consume_token(NATIVE);
-                break;
-            case SYNCHRONIZED:
-                jj_consume_token(SYNCHRONIZED);
-                break;
-            case STRICTFP:
-                jj_consume_token(STRICTFP);
-                break;
-            case AT:
-                AnnotationUse();
-                break;
-            default:
-                jj_la1[68] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case PUBLIC:
+                    jj_consume_token(PUBLIC);
+                    break;
+                case PROTECTED:
+                    jj_consume_token(PROTECTED);
+                    break;
+                case PRIVATE:
+                    jj_consume_token(PRIVATE);
+                    break;
+                case STATIC:
+                    jj_consume_token(STATIC);
+                    break;
+                case ABSTRACT:
+                    jj_consume_token(ABSTRACT);
+                    break;
+                case FINAL:
+                    jj_consume_token(FINAL);
+                    break;
+                case NATIVE:
+                    jj_consume_token(NATIVE);
+                    break;
+                case SYNCHRONIZED:
+                    jj_consume_token(SYNCHRONIZED);
+                    break;
+                case STRICTFP:
+                    jj_consume_token(STRICTFP);
+                    break;
+                case AT:
+                    AnnotationUse();
+                    break;
+                default:
+                    jj_la1[68] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LT:
-            TypeParameters();
-            break;
-        default:
-            jj_la1[69] = jj_gen;
+            case LT:
+                TypeParameters();
+                break;
+            default:
+                jj_la1[69] = jj_gen;
         }
         ResultType();
         jj_consume_token(IDENTIFIER);
@@ -2126,11 +2127,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         pdl = FormalParameters();
         label_39: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LBRACKET:
-                break;
-            default:
-                jj_la1[70] = jj_gen;
-                break label_39;
+                case LBRACKET:
+                    break;
+                default:
+                    jj_la1[70] = jj_gen;
+                    break label_39;
             }
             jj_consume_token(LBRACKET);
             jj_consume_token(RBRACKET);
@@ -2157,36 +2158,36 @@ public class JavaCCParser implements JavaCCParserConstants {
         ASTList<ParameterDeclaration> result = new ASTArrayList<>();
         jj_consume_token(LPAREN);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case AT:
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FINAL:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case SHORT:
-        case IDENTIFIER:
-            pd = FormalParameter();
-            result.add(pd);
-            label_40: while (true) {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case COMMA:
-                    break;
-                default:
-                    jj_la1[71] = jj_gen;
-                    break label_40;
-                }
-                jj_consume_token(COMMA);
+            case AT:
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FINAL:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case SHORT:
+            case IDENTIFIER:
                 pd = FormalParameter();
-                // check if more params are admissible (no more after a vararg) occurs in
-                // FormalParameter()
                 result.add(pd);
-            }
-            break;
-        default:
-            jj_la1[72] = jj_gen;
+                label_40: while (true) {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case COMMA:
+                            break;
+                        default:
+                            jj_la1[71] = jj_gen;
+                            break label_40;
+                    }
+                    jj_consume_token(COMMA);
+                    pd = FormalParameter();
+                    // check if more params are admissible (no more after a vararg) occurs in
+                    // FormalParameter()
+                    result.add(pd);
+                }
+                break;
+            default:
+                jj_la1[72] = jj_gen;
         }
         jj_consume_token(RPAREN);
         {
@@ -2208,11 +2209,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         boolean isVarArg = false;
         label_41: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-                break;
-            default:
-                jj_la1[73] = jj_gen;
-                break label_41;
+                case AT:
+                    break;
+                default:
+                    jj_la1[73] = jj_gen;
+                    break label_41;
             }
             mod = AnnotationUse();
             if (ml == null) {
@@ -2223,40 +2224,40 @@ public class JavaCCParser implements JavaCCParserConstants {
             ml.add(mod);
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case FINAL:
-            jj_consume_token(FINAL);
-            mod = factory.createFinal();
-            setPrefixInfo(mod);
-            setPostfixInfo(mod);
-            if (ml == null) {
-                ml = new ASTArrayList<>();
-            }
-            ml.add(mod);
-            label_42: while (true) {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case AT:
-                    break;
-                default:
-                    jj_la1[74] = jj_gen;
-                    break label_42;
-                }
-                mod = AnnotationUse();
+            case FINAL:
+                jj_consume_token(FINAL);
+                mod = factory.createFinal();
                 setPrefixInfo(mod);
                 setPostfixInfo(mod);
+                if (ml == null) {
+                    ml = new ASTArrayList<>();
+                }
                 ml.add(mod);
-            }
-            break;
-        default:
-            jj_la1[75] = jj_gen;
+                label_42: while (true) {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case AT:
+                            break;
+                        default:
+                            jj_la1[74] = jj_gen;
+                            break label_42;
+                    }
+                    mod = AnnotationUse();
+                    setPrefixInfo(mod);
+                    setPostfixInfo(mod);
+                    ml.add(mod);
+                }
+                break;
+            default:
+                jj_la1[75] = jj_gen;
         }
         tr = Type();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case VARARGDENOTER:
-            jj_consume_token(VARARGDENOTER);
-            isVarArg = true;
-            break;
-        default:
-            jj_la1[76] = jj_gen;
+            case VARARGDENOTER:
+                jj_consume_token(VARARGDENOTER);
+                isVarArg = true;
+                break;
+            default:
+                jj_la1[76] = jj_gen;
         }
         id = VariableDeclaratorId();
         dim = tmpDimension; /* if (varArgSpec != null) dim++; */
@@ -2291,11 +2292,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createConstructorDeclaration();
         label_43: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-                break;
-            default:
-                jj_la1[77] = jj_gen;
-                break label_43;
+                case AT:
+                    break;
+                default:
+                    jj_la1[77] = jj_gen;
+                    break label_43;
             }
             m = AnnotationUse();
             setPrefixInfo(m);
@@ -2303,53 +2304,53 @@ public class JavaCCParser implements JavaCCParserConstants {
             ml.add(m);
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case PRIVATE:
-        case PROTECTED:
-        case PUBLIC:
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case PUBLIC:
-                jj_consume_token(PUBLIC);
-                m = factory.createPublic();
-                break;
-            case PROTECTED:
-                jj_consume_token(PROTECTED);
-                m = factory.createProtected();
-                break;
             case PRIVATE:
-                jj_consume_token(PRIVATE);
-                m = factory.createPrivate();
-                break;
-            default:
-                jj_la1[78] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
-            }
-            setPrefixInfo(m);
-            setPostfixInfo(m);
-            ml.add(m);
-            label_44: while (true) {
+            case PROTECTED:
+            case PUBLIC:
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case AT:
-                    break;
-                default:
-                    jj_la1[79] = jj_gen;
-                    break label_44;
+                    case PUBLIC:
+                        jj_consume_token(PUBLIC);
+                        m = factory.createPublic();
+                        break;
+                    case PROTECTED:
+                        jj_consume_token(PROTECTED);
+                        m = factory.createProtected();
+                        break;
+                    case PRIVATE:
+                        jj_consume_token(PRIVATE);
+                        m = factory.createPrivate();
+                        break;
+                    default:
+                        jj_la1[78] = jj_gen;
+                        jj_consume_token(-1);
+                        throw new ParseException();
                 }
-                m = AnnotationUse();
                 setPrefixInfo(m);
                 setPostfixInfo(m);
                 ml.add(m);
-            }
-            break;
-        default:
-            jj_la1[80] = jj_gen;
+                label_44: while (true) {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case AT:
+                            break;
+                        default:
+                            jj_la1[79] = jj_gen;
+                            break label_44;
+                    }
+                    m = AnnotationUse();
+                    setPrefixInfo(m);
+                    setPostfixInfo(m);
+                    ml.add(m);
+                }
+                break;
+            default:
+                jj_la1[80] = jj_gen;
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LT:
-            TypeParameters();
-            break;
-        default:
-            jj_la1[81] = jj_gen;
+            case LT:
+                TypeParameters();
+                break;
+            default:
+                jj_la1[81] = jj_gen;
         }
         jj_consume_token(IDENTIFIER);
         id = factory.createIdentifier(token.image);
@@ -2358,12 +2359,12 @@ public class JavaCCParser implements JavaCCParserConstants {
         pdl = FormalParameters();
         setPrefixInfo(result);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case THROWS:
-            jj_consume_token(THROWS);
-            nl = TypedNameList();
-            break;
-        default:
-            jj_la1[82] = jj_gen;
+            case THROWS:
+                jj_consume_token(THROWS);
+                nl = TypedNameList();
+                break;
+            default:
+                jj_la1[82] = jj_gen;
         }
         jj_consume_token(LBRACE);
         body = factory.createStatementBlock();
@@ -2378,50 +2379,50 @@ public class JavaCCParser implements JavaCCParserConstants {
         setAllowSuper(true);
         label_45: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ASSERT:
-            case AT:
-            case BOOLEAN:
-            case BREAK:
-            case BYTE:
-            case CHAR:
-            case CLASS:
-            case CONTINUE:
-            case DO:
-            case DOUBLE:
-            case FALSE:
-            case FINAL:
-            case FLOAT:
-            case FOR:
-            case IF:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case RETURN:
-            case SHORT:
-            case SUPER:
-            case SWITCH:
-            case SYNCHRONIZED:
-            case THIS:
-            case THROW:
-            case TRUE:
-            case TRY:
-            case VOID:
-            case WHILE:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case LBRACE:
-            case SEMICOLON:
-            case INCR:
-            case DECR:
-                break;
-            default:
-                jj_la1[83] = jj_gen;
-                break label_45;
+                case ASSERT:
+                case AT:
+                case BOOLEAN:
+                case BREAK:
+                case BYTE:
+                case CHAR:
+                case CLASS:
+                case CONTINUE:
+                case DO:
+                case DOUBLE:
+                case FALSE:
+                case FINAL:
+                case FLOAT:
+                case FOR:
+                case IF:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case RETURN:
+                case SHORT:
+                case SUPER:
+                case SWITCH:
+                case SYNCHRONIZED:
+                case THIS:
+                case THROW:
+                case TRUE:
+                case TRY:
+                case VOID:
+                case WHILE:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case LBRACE:
+                case SEMICOLON:
+                case INCR:
+                case DECR:
+                    break;
+                default:
+                    jj_la1[83] = jj_gen;
+                    break label_45;
             }
             stat = BlockStatement();
             stats.add(stat);
@@ -2467,44 +2468,44 @@ public class JavaCCParser implements JavaCCParserConstants {
             result.setArguments(args);
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-                if (jj_2_29(2)) {
-                    expr = PrimaryExpression();
-                    jj_consume_token(DOT);
-                } else {
-                }
-                jj_consume_token(SUPER);
-                result = factory.createSuperConstructorReference();
-                setPrefixInfo(result);
-                args = Arguments();
-                jj_consume_token(SEMICOLON);
-                result.setArguments(args);
-                ((SuperConstructorReference) result).setReferencePrefix((ReferencePrefix) expr);
-                break;
-            default:
-                jj_la1[84] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FALSE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case SHORT:
+                case SUPER:
+                case THIS:
+                case TRUE:
+                case VOID:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                    if (jj_2_29(2)) {
+                        expr = PrimaryExpression();
+                        jj_consume_token(DOT);
+                    } else {
+                    }
+                    jj_consume_token(SUPER);
+                    result = factory.createSuperConstructorReference();
+                    setPrefixInfo(result);
+                    args = Arguments();
+                    jj_consume_token(SEMICOLON);
+                    result.setArguments(args);
+                    ((SuperConstructorReference) result).setReferencePrefix((ReferencePrefix) expr);
+                    break;
+                default:
+                    jj_la1[84] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         setPostfixInfo(result);
@@ -2521,16 +2522,16 @@ public class JavaCCParser implements JavaCCParserConstants {
         ASTList<DeclarationSpecifier> ml = null;
         StatementBlock block;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case STATIC:
-            jj_consume_token(STATIC);
-            ml = new ASTArrayList<>();
-            Static s = factory.createStatic();
-            setPrefixInfo(s);
-            setPostfixInfo(s);
-            ml.add(s);
-            break;
-        default:
-            jj_la1[85] = jj_gen;
+            case STATIC:
+                jj_consume_token(STATIC);
+                ml = new ASTArrayList<>();
+                Static s = factory.createStatic();
+                setPrefixInfo(s);
+                setPostfixInfo(s);
+                ml.add(s);
+                break;
+            default:
+                jj_la1[85] = jj_gen;
         }
         block = Block();
         result = factory.createClassInitializer(block);
@@ -2560,11 +2561,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = qn.toTypeReference();
             label_46: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case LBRACKET:
-                    break;
-                default:
-                    jj_la1[86] = jj_gen;
-                    break label_46;
+                    case LBRACKET:
+                        break;
+                    default:
+                        jj_la1[86] = jj_gen;
+                        break label_46;
                 }
                 jj_consume_token(LBRACKET);
                 jj_consume_token(RBRACKET);
@@ -2577,21 +2578,21 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPostfixInfo(result);
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case SHORT:
-            case IDENTIFIER:
-                result = RawType();
-                break;
-            default:
-                jj_la1[87] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case SHORT:
+                case IDENTIFIER:
+                    result = RawType();
+                    break;
+                default:
+                    jj_la1[87] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         {
@@ -2607,32 +2608,32 @@ public class JavaCCParser implements JavaCCParserConstants {
         UncollatedReferenceQualifier qn;
         int dimension = 0;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case SHORT:
-            result = PrimitiveType();
-            break;
-        case IDENTIFIER:
-            qn = Name();
-            result = qn.toTypeReference();
-            break;
-        default:
-            jj_la1[88] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case SHORT:
+                result = PrimitiveType();
+                break;
+            case IDENTIFIER:
+                qn = Name();
+                result = qn.toTypeReference();
+                break;
+            default:
+                jj_la1[88] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         label_47: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LBRACKET:
-                break;
-            default:
-                jj_la1[89] = jj_gen;
-                break label_47;
+                case LBRACKET:
+                    break;
+                default:
+                    jj_la1[89] = jj_gen;
+                    break label_47;
             }
             jj_consume_token(LBRACKET);
             jj_consume_token(RBRACKET);
@@ -2654,34 +2655,34 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public TypeReference PrimitiveType() throws ParseException {
         TypeReference result;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-            jj_consume_token(BOOLEAN);
-            break;
-        case CHAR:
-            jj_consume_token(CHAR);
-            break;
-        case BYTE:
-            jj_consume_token(BYTE);
-            break;
-        case SHORT:
-            jj_consume_token(SHORT);
-            break;
-        case INT:
-            jj_consume_token(INT);
-            break;
-        case LONG:
-            jj_consume_token(LONG);
-            break;
-        case FLOAT:
-            jj_consume_token(FLOAT);
-            break;
-        case DOUBLE:
-            jj_consume_token(DOUBLE);
-            break;
-        default:
-            jj_la1[90] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case BOOLEAN:
+                jj_consume_token(BOOLEAN);
+                break;
+            case CHAR:
+                jj_consume_token(CHAR);
+                break;
+            case BYTE:
+                jj_consume_token(BYTE);
+                break;
+            case SHORT:
+                jj_consume_token(SHORT);
+                break;
+            case INT:
+                jj_consume_token(INT);
+                break;
+            case LONG:
+                jj_consume_token(LONG);
+                break;
+            case FLOAT:
+                jj_consume_token(FLOAT);
+                break;
+            case DOUBLE:
+                jj_consume_token(DOUBLE);
+                break;
+            default:
+                jj_la1[90] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         Identifier id = factory.createIdentifier(token.image);
         setPrefixInfo(id);
@@ -2700,29 +2701,29 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public TypeReference ResultType() throws ParseException {
         TypeReference result;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case VOID:
-            jj_consume_token(VOID);
-            Identifier id = factory.createIdentifier(token.image);
-            setPrefixInfo(id);
-            setPostfixInfo(id);
-            result = factory.createTypeReference(id);
-            setPrefixInfo(result);
-            break;
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case SHORT:
-        case IDENTIFIER:
-            result = Type();
-            break;
-        default:
-            jj_la1[91] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case VOID:
+                jj_consume_token(VOID);
+                Identifier id = factory.createIdentifier(token.image);
+                setPrefixInfo(id);
+                setPostfixInfo(id);
+                result = factory.createTypeReference(id);
+                setPrefixInfo(result);
+                break;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case SHORT:
+            case IDENTIFIER:
+                result = Type();
+                break;
+            default:
+                jj_la1[91] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPostfixInfo(result);
         {
@@ -2816,11 +2817,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         args.add(ta);
         label_50: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case COMMA:
-                break;
-            default:
-                jj_la1[92] = jj_gen;
-                break label_50;
+                case COMMA:
+                    break;
+                default:
+                    jj_la1[92] = jj_gen;
+                    break label_50;
             }
             jj_consume_token(COMMA);
             ta = TypeArgument();
@@ -2840,49 +2841,49 @@ public class JavaCCParser implements JavaCCParserConstants {
         TypeReference t = null;
         TypeArgumentDeclaration result = new TypeArgumentDeclaration();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case SHORT:
-        case IDENTIFIER:
-            t = Type();
-            setPrefixInfo(result);
-            break;
-        case HOOK:
-            jj_consume_token(HOOK);
-            wm = WildcardMode.Any;
-            setPrefixInfo(result);
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case EXTENDS:
-            case SUPER:
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case EXTENDS:
-                    jj_consume_token(EXTENDS);
-                    wm = WildcardMode.Extends;
-                    break;
-                case SUPER:
-                    jj_consume_token(SUPER);
-                    wm = WildcardMode.Super;
-                    break;
-                default:
-                    jj_la1[93] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
-                }
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case SHORT:
+            case IDENTIFIER:
                 t = Type();
+                setPrefixInfo(result);
+                break;
+            case HOOK:
+                jj_consume_token(HOOK);
+                wm = WildcardMode.Any;
+                setPrefixInfo(result);
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case EXTENDS:
+                    case SUPER:
+                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            case EXTENDS:
+                                jj_consume_token(EXTENDS);
+                                wm = WildcardMode.Extends;
+                                break;
+                            case SUPER:
+                                jj_consume_token(SUPER);
+                                wm = WildcardMode.Super;
+                                break;
+                            default:
+                                jj_la1[93] = jj_gen;
+                                jj_consume_token(-1);
+                                throw new ParseException();
+                        }
+                        t = Type();
+                        break;
+                    default:
+                        jj_la1[94] = jj_gen;
+                }
                 break;
             default:
-                jj_la1[94] = jj_gen;
-            }
-            break;
-        default:
-            jj_la1[95] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+                jj_la1[95] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPostfixInfo(result);
         result.setWildcardMode(wm);
@@ -2910,11 +2911,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result.add(qn);
         label_51: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case COMMA:
-                break;
-            default:
-                jj_la1[96] = jj_gen;
-                break label_51;
+                case COMMA:
+                    break;
+                default:
+                    jj_la1[96] = jj_gen;
+                    break label_51;
             }
             jj_consume_token(COMMA);
             qn = TypedName();
@@ -2938,27 +2939,27 @@ public class JavaCCParser implements JavaCCParserConstants {
         ASTList<Expression> leftRight = new ASTArrayList<>();
         result = ConditionalExpression();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case ASSIGN:
-        case PLUSASSIGN:
-        case MINUSASSIGN:
-        case STARASSIGN:
-        case SLASHASSIGN:
-        case ANDASSIGN:
-        case ORASSIGN:
-        case XORASSIGN:
-        case REMASSIGN:
-        case LSHIFTASSIGN:
-        case RSIGNEDSHIFTASSIGN:
-        case RUNSIGNEDSHIFTASSIGN:
-            op = AssignmentOperator();
-            expr = Expression();
-            leftRight.add(result);
-            leftRight.add(expr);
-            op.setArguments(leftRight);
-            result = op;
-            break;
-        default:
-            jj_la1[97] = jj_gen;
+            case ASSIGN:
+            case PLUSASSIGN:
+            case MINUSASSIGN:
+            case STARASSIGN:
+            case SLASHASSIGN:
+            case ANDASSIGN:
+            case ORASSIGN:
+            case XORASSIGN:
+            case REMASSIGN:
+            case LSHIFTASSIGN:
+            case RSIGNEDSHIFTASSIGN:
+            case RUNSIGNEDSHIFTASSIGN:
+                op = AssignmentOperator();
+                expr = Expression();
+                leftRight.add(result);
+                leftRight.add(expr);
+                op.setArguments(leftRight);
+                result = op;
+                break;
+            default:
+                jj_la1[97] = jj_gen;
         }
         setPostfixInfo(result);
         {
@@ -2972,58 +2973,58 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public Assignment AssignmentOperator() throws ParseException {
         Assignment result;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case ASSIGN:
-            jj_consume_token(ASSIGN);
-            result = factory.createCopyAssignment();
-            break;
-        case STARASSIGN:
-            jj_consume_token(STARASSIGN);
-            result = factory.createTimesAssignment();
-            break;
-        case SLASHASSIGN:
-            jj_consume_token(SLASHASSIGN);
-            result = factory.createDivideAssignment();
-            break;
-        case REMASSIGN:
-            jj_consume_token(REMASSIGN);
-            result = factory.createModuloAssignment();
-            break;
-        case PLUSASSIGN:
-            jj_consume_token(PLUSASSIGN);
-            result = factory.createPlusAssignment();
-            break;
-        case MINUSASSIGN:
-            jj_consume_token(MINUSASSIGN);
-            result = factory.createMinusAssignment();
-            break;
-        case LSHIFTASSIGN:
-            jj_consume_token(LSHIFTASSIGN);
-            result = factory.createShiftLeftAssignment();
-            break;
-        case RSIGNEDSHIFTASSIGN:
-            jj_consume_token(RSIGNEDSHIFTASSIGN);
-            result = factory.createShiftRightAssignment();
-            break;
-        case RUNSIGNEDSHIFTASSIGN:
-            jj_consume_token(RUNSIGNEDSHIFTASSIGN);
-            result = factory.createUnsignedShiftRightAssignment();
-            break;
-        case ANDASSIGN:
-            jj_consume_token(ANDASSIGN);
-            result = factory.createBinaryAndAssignment();
-            break;
-        case XORASSIGN:
-            jj_consume_token(XORASSIGN);
-            result = factory.createBinaryXOrAssignment();
-            break;
-        case ORASSIGN:
-            jj_consume_token(ORASSIGN);
-            result = factory.createBinaryOrAssignment();
-            break;
-        default:
-            jj_la1[98] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case ASSIGN:
+                jj_consume_token(ASSIGN);
+                result = factory.createCopyAssignment();
+                break;
+            case STARASSIGN:
+                jj_consume_token(STARASSIGN);
+                result = factory.createTimesAssignment();
+                break;
+            case SLASHASSIGN:
+                jj_consume_token(SLASHASSIGN);
+                result = factory.createDivideAssignment();
+                break;
+            case REMASSIGN:
+                jj_consume_token(REMASSIGN);
+                result = factory.createModuloAssignment();
+                break;
+            case PLUSASSIGN:
+                jj_consume_token(PLUSASSIGN);
+                result = factory.createPlusAssignment();
+                break;
+            case MINUSASSIGN:
+                jj_consume_token(MINUSASSIGN);
+                result = factory.createMinusAssignment();
+                break;
+            case LSHIFTASSIGN:
+                jj_consume_token(LSHIFTASSIGN);
+                result = factory.createShiftLeftAssignment();
+                break;
+            case RSIGNEDSHIFTASSIGN:
+                jj_consume_token(RSIGNEDSHIFTASSIGN);
+                result = factory.createShiftRightAssignment();
+                break;
+            case RUNSIGNEDSHIFTASSIGN:
+                jj_consume_token(RUNSIGNEDSHIFTASSIGN);
+                result = factory.createUnsignedShiftRightAssignment();
+                break;
+            case ANDASSIGN:
+                jj_consume_token(ANDASSIGN);
+                result = factory.createBinaryAndAssignment();
+                break;
+            case XORASSIGN:
+                jj_consume_token(XORASSIGN);
+                result = factory.createBinaryXOrAssignment();
+                break;
+            case ORASSIGN:
+                jj_consume_token(ORASSIGN);
+                result = factory.createBinaryOrAssignment();
+                break;
+            default:
+                jj_la1[98] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPostfixInfo(result);
         setPrefixInfo(result);
@@ -3042,22 +3043,22 @@ public class JavaCCParser implements JavaCCParserConstants {
         Operator op;
         result = ConditionalOrExpression();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case HOOK:
-            jj_consume_token(HOOK);
-            op = factory.createConditional();
-            setPrefixInfo(op);
-            expr1 = Expression();
-            jj_consume_token(COLON);
-            expr2 = ConditionalExpression();
-            ASTList<Expression> args = new ASTArrayList<>(3);
-            args.add(result);
-            args.add(expr1);
-            args.add(expr2);
-            op.setArguments(args);
-            result = op;
-            break;
-        default:
-            jj_la1[99] = jj_gen;
+            case HOOK:
+                jj_consume_token(HOOK);
+                op = factory.createConditional();
+                setPrefixInfo(op);
+                expr1 = Expression();
+                jj_consume_token(COLON);
+                expr2 = ConditionalExpression();
+                ASTList<Expression> args = new ASTArrayList<>(3);
+                args.add(result);
+                args.add(expr1);
+                args.add(expr2);
+                op.setArguments(args);
+                result = op;
+                break;
+            default:
+                jj_la1[99] = jj_gen;
         }
         setPostfixInfo(result);
         {
@@ -3075,11 +3076,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = ConditionalAndExpression();
         label_52: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case SC_OR:
-                break;
-            default:
-                jj_la1[100] = jj_gen;
-                break label_52;
+                case SC_OR:
+                    break;
+                default:
+                    jj_la1[100] = jj_gen;
+                    break label_52;
             }
             jj_consume_token(SC_OR);
             op = factory.createLogicalOr();
@@ -3107,11 +3108,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = InclusiveOrExpression();
         label_53: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case SC_AND:
-                break;
-            default:
-                jj_la1[101] = jj_gen;
-                break label_53;
+                case SC_AND:
+                    break;
+                default:
+                    jj_la1[101] = jj_gen;
+                    break label_53;
             }
             jj_consume_token(SC_AND);
             op = factory.createLogicalAnd();
@@ -3139,11 +3140,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = ExclusiveOrExpression();
         label_54: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BIT_OR:
-                break;
-            default:
-                jj_la1[102] = jj_gen;
-                break label_54;
+                case BIT_OR:
+                    break;
+                default:
+                    jj_la1[102] = jj_gen;
+                    break label_54;
             }
             jj_consume_token(BIT_OR);
             op = factory.createBinaryOr();
@@ -3171,11 +3172,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = AndExpression();
         label_55: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case XOR:
-                break;
-            default:
-                jj_la1[103] = jj_gen;
-                break label_55;
+                case XOR:
+                    break;
+                default:
+                    jj_la1[103] = jj_gen;
+                    break label_55;
             }
             jj_consume_token(XOR);
             op = factory.createBinaryXOr();
@@ -3203,11 +3204,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = EqualityExpression();
         label_56: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BIT_AND:
-                break;
-            default:
-                jj_la1[104] = jj_gen;
-                break label_56;
+                case BIT_AND:
+                    break;
+                default:
+                    jj_la1[104] = jj_gen;
+                    break label_56;
             }
             jj_consume_token(BIT_AND);
             op = factory.createBinaryAnd();
@@ -3235,28 +3236,28 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = InstanceOfExpression();
         label_57: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case EQ:
-            case NE:
-                break;
-            default:
-                jj_la1[105] = jj_gen;
-                break label_57;
+                case EQ:
+                case NE:
+                    break;
+                default:
+                    jj_la1[105] = jj_gen;
+                    break label_57;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case EQ:
-                jj_consume_token(EQ);
-                cmp = factory.createEquals();
-                setPrefixInfo(cmp);
-                break;
-            case NE:
-                jj_consume_token(NE);
-                cmp = factory.createNotEquals();
-                setPrefixInfo(cmp);
-                break;
-            default:
-                jj_la1[106] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case EQ:
+                    jj_consume_token(EQ);
+                    cmp = factory.createEquals();
+                    setPrefixInfo(cmp);
+                    break;
+                case NE:
+                    jj_consume_token(NE);
+                    cmp = factory.createNotEquals();
+                    setPrefixInfo(cmp);
+                    break;
+                default:
+                    jj_la1[106] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             expr = InstanceOfExpression();
             ASTList<Expression> args = new ASTArrayList<>(2);
@@ -3279,14 +3280,14 @@ public class JavaCCParser implements JavaCCParserConstants {
         TypeReference tr;
         result = RelationalExpression();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case INSTANCEOF:
-            jj_consume_token(INSTANCEOF);
-            tr = Type();
-            result = factory.createInstanceof(result, tr);
-            setPrefixInfo(result);
-            break;
-        default:
-            jj_la1[107] = jj_gen;
+            case INSTANCEOF:
+                jj_consume_token(INSTANCEOF);
+                tr = Type();
+                result = factory.createInstanceof(result, tr);
+                setPrefixInfo(result);
+                break;
+            default:
+                jj_la1[107] = jj_gen;
         }
         setPostfixInfo(result);
         {
@@ -3304,40 +3305,40 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = ShiftExpression();
         label_58: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LT:
-            case LE:
-            case GE:
-            case GT:
-                break;
-            default:
-                jj_la1[108] = jj_gen;
-                break label_58;
+                case LT:
+                case LE:
+                case GE:
+                case GT:
+                    break;
+                default:
+                    jj_la1[108] = jj_gen;
+                    break label_58;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LT:
-                jj_consume_token(LT);
-                cmp = factory.createLessThan();
-                setPrefixInfo(cmp);
-                break;
-            case GT:
-                jj_consume_token(GT);
-                cmp = factory.createGreaterThan();
-                setPrefixInfo(cmp);
-                break;
-            case LE:
-                jj_consume_token(LE);
-                cmp = factory.createLessOrEquals();
-                setPrefixInfo(cmp);
-                break;
-            case GE:
-                jj_consume_token(GE);
-                cmp = factory.createGreaterOrEquals();
-                setPrefixInfo(cmp);
-                break;
-            default:
-                jj_la1[109] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case LT:
+                    jj_consume_token(LT);
+                    cmp = factory.createLessThan();
+                    setPrefixInfo(cmp);
+                    break;
+                case GT:
+                    jj_consume_token(GT);
+                    cmp = factory.createGreaterThan();
+                    setPrefixInfo(cmp);
+                    break;
+                case LE:
+                    jj_consume_token(LE);
+                    cmp = factory.createLessOrEquals();
+                    setPrefixInfo(cmp);
+                    break;
+                case GE:
+                    jj_consume_token(GE);
+                    cmp = factory.createGreaterOrEquals();
+                    setPrefixInfo(cmp);
+                    break;
+                default:
+                    jj_la1[109] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             expr = ShiftExpression();
             ASTList<Expression> args = new ASTArrayList<>(2);
@@ -3366,25 +3367,25 @@ public class JavaCCParser implements JavaCCParserConstants {
                 break;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LSHIFT:
-                jj_consume_token(LSHIFT);
-                shift = factory.createShiftLeft();
-                setPrefixInfo(shift);
-                break;
-            default:
-                jj_la1[110] = jj_gen;
-                if (jj_2_37(1)) {
-                    RSIGNEDSHIFT();
-                    shift = factory.createShiftRight();
+                case LSHIFT:
+                    jj_consume_token(LSHIFT);
+                    shift = factory.createShiftLeft();
                     setPrefixInfo(shift);
-                } else if (jj_2_38(1)) {
-                    RUNSIGNEDSHIFT();
-                    shift = factory.createUnsignedShiftRight();
-                    setPrefixInfo(shift);
-                } else {
-                    jj_consume_token(-1);
-                    throw new ParseException();
-                }
+                    break;
+                default:
+                    jj_la1[110] = jj_gen;
+                    if (jj_2_37(1)) {
+                        RSIGNEDSHIFT();
+                        shift = factory.createShiftRight();
+                        setPrefixInfo(shift);
+                    } else if (jj_2_38(1)) {
+                        RUNSIGNEDSHIFT();
+                        shift = factory.createUnsignedShiftRight();
+                        setPrefixInfo(shift);
+                    } else {
+                        jj_consume_token(-1);
+                        throw new ParseException();
+                    }
             }
             expr = AdditiveExpression();
             ASTList<Expression> args = new ASTArrayList<>(2);
@@ -3409,28 +3410,28 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = MultiplicativeExpression();
         label_60: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case PLUS:
-            case MINUS:
-                break;
-            default:
-                jj_la1[111] = jj_gen;
-                break label_60;
+                case PLUS:
+                case MINUS:
+                    break;
+                default:
+                    jj_la1[111] = jj_gen;
+                    break label_60;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case PLUS:
-                jj_consume_token(PLUS);
-                add = factory.createPlus();
-                setPrefixInfo(add);
-                break;
-            case MINUS:
-                jj_consume_token(MINUS);
-                add = factory.createMinus();
-                setPrefixInfo(add);
-                break;
-            default:
-                jj_la1[112] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case PLUS:
+                    jj_consume_token(PLUS);
+                    add = factory.createPlus();
+                    setPrefixInfo(add);
+                    break;
+                case MINUS:
+                    jj_consume_token(MINUS);
+                    add = factory.createMinus();
+                    setPrefixInfo(add);
+                    break;
+                default:
+                    jj_la1[112] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             expr = MultiplicativeExpression();
             ASTList<Expression> args = new ASTArrayList<>(2);
@@ -3455,34 +3456,34 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = UnaryExpression();
         label_61: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case STAR:
-            case SLASH:
-            case REM:
-                break;
-            default:
-                jj_la1[113] = jj_gen;
-                break label_61;
+                case STAR:
+                case SLASH:
+                case REM:
+                    break;
+                default:
+                    jj_la1[113] = jj_gen;
+                    break label_61;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case STAR:
-                jj_consume_token(STAR);
-                mult = factory.createTimes();
-                setPrefixInfo(mult);
-                break;
-            case SLASH:
-                jj_consume_token(SLASH);
-                mult = factory.createDivide();
-                setPrefixInfo(mult);
-                break;
-            case REM:
-                jj_consume_token(REM);
-                mult = factory.createModulo();
-                setPrefixInfo(mult);
-                break;
-            default:
-                jj_la1[114] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case STAR:
+                    jj_consume_token(STAR);
+                    mult = factory.createTimes();
+                    setPrefixInfo(mult);
+                    break;
+                case SLASH:
+                    jj_consume_token(SLASH);
+                    mult = factory.createDivide();
+                    setPrefixInfo(mult);
+                    break;
+                case REM:
+                    jj_consume_token(REM);
+                    mult = factory.createModulo();
+                    setPrefixInfo(mult);
+                    break;
+                default:
+                    jj_la1[114] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
             expr = UnaryExpression();
             ASTList<Expression> args = new ASTArrayList<>(2);
@@ -3505,62 +3506,62 @@ public class JavaCCParser implements JavaCCParserConstants {
         Expression expr;
         boolean negative = false;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case PLUS:
-        case MINUS:
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case PLUS:
-                jj_consume_token(PLUS);
-                result = factory.createPositive();
-                setPrefixInfo(result);
-                break;
             case MINUS:
-                jj_consume_token(MINUS);
-                result = factory.createNegative();
-                setPrefixInfo(result);
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case PLUS:
+                        jj_consume_token(PLUS);
+                        result = factory.createPositive();
+                        setPrefixInfo(result);
+                        break;
+                    case MINUS:
+                        jj_consume_token(MINUS);
+                        result = factory.createNegative();
+                        setPrefixInfo(result);
+                        break;
+                    default:
+                        jj_la1[115] = jj_gen;
+                        jj_consume_token(-1);
+                        throw new ParseException();
+                }
+                expr = UnaryExpression();
+                ((Operator) result).setArguments(new ASTArrayList<>(expr));
+                break;
+            case INCR:
+                result = PreIncrementExpression();
+                break;
+            case DECR:
+                result = PreDecrementExpression();
+                break;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FALSE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case NEW:
+            case NULL:
+            case SHORT:
+            case SUPER:
+            case THIS:
+            case TRUE:
+            case VOID:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+            case BANG:
+            case TILDE:
+                result = UnaryExpressionNotPlusMinus();
                 break;
             default:
-                jj_la1[115] = jj_gen;
+                jj_la1[116] = jj_gen;
                 jj_consume_token(-1);
                 throw new ParseException();
-            }
-            expr = UnaryExpression();
-            ((Operator) result).setArguments(new ASTArrayList<>(expr));
-            break;
-        case INCR:
-            result = PreIncrementExpression();
-            break;
-        case DECR:
-            result = PreDecrementExpression();
-            break;
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-        case BANG:
-        case TILDE:
-            result = UnaryExpressionNotPlusMinus();
-            break;
-        default:
-            jj_la1[116] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
         }
         setPostfixInfo(result);
         {
@@ -3610,62 +3611,62 @@ public class JavaCCParser implements JavaCCParserConstants {
         Expression expr;
         boolean not = false;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BANG:
-        case TILDE:
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case TILDE:
-                jj_consume_token(TILDE);
-                result = factory.createBinaryNot();
-                setPrefixInfo(result);
-                break;
             case BANG:
-                jj_consume_token(BANG);
-                result = factory.createLogicalNot();
-                setPrefixInfo(result);
+            case TILDE:
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case TILDE:
+                        jj_consume_token(TILDE);
+                        result = factory.createBinaryNot();
+                        setPrefixInfo(result);
+                        break;
+                    case BANG:
+                        jj_consume_token(BANG);
+                        result = factory.createLogicalNot();
+                        setPrefixInfo(result);
+                        break;
+                    default:
+                        jj_la1[117] = jj_gen;
+                        jj_consume_token(-1);
+                        throw new ParseException();
+                }
+                expr = UnaryExpression();
+                ((Operator) result).setArguments(new ASTArrayList<>(expr));
                 break;
             default:
-                jj_la1[117] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
-            }
-            expr = UnaryExpression();
-            ((Operator) result).setArguments(new ASTArrayList<>(expr));
-            break;
-        default:
-            jj_la1[118] = jj_gen;
-            if (jj_2_39(2147483647)) {
-                result = CastExpression();
-            } else {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case DOUBLE:
-                case FALSE:
-                case FLOAT:
-                case INT:
-                case LONG:
-                case NEW:
-                case NULL:
-                case SHORT:
-                case SUPER:
-                case THIS:
-                case TRUE:
-                case VOID:
-                case INTEGER_LITERAL:
-                case FLOATING_POINT_LITERAL:
-                case CHARACTER_LITERAL:
-                case STRING_LITERAL:
-                case IDENTIFIER:
-                case LPAREN:
-                    result = PostfixExpression();
-                    break;
-                default:
-                    jj_la1[119] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
+                jj_la1[118] = jj_gen;
+                if (jj_2_39(2147483647)) {
+                    result = CastExpression();
+                } else {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case BOOLEAN:
+                        case BYTE:
+                        case CHAR:
+                        case DOUBLE:
+                        case FALSE:
+                        case FLOAT:
+                        case INT:
+                        case LONG:
+                        case NEW:
+                        case NULL:
+                        case SHORT:
+                        case SUPER:
+                        case THIS:
+                        case TRUE:
+                        case VOID:
+                        case INTEGER_LITERAL:
+                        case FLOATING_POINT_LITERAL:
+                        case CHARACTER_LITERAL:
+                        case STRING_LITERAL:
+                        case IDENTIFIER:
+                        case LPAREN:
+                            result = PostfixExpression();
+                            break;
+                        default:
+                            jj_la1[119] = jj_gen;
+                            jj_consume_token(-1);
+                            throw new ParseException();
+                    }
                 }
-            }
         }
         setPostfixInfo(result);
         {
@@ -3685,11 +3686,11 @@ public class JavaCCParser implements JavaCCParserConstants {
             PrimitiveType();
             label_62: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case LBRACKET:
-                    break;
-                default:
-                    jj_la1[120] = jj_gen;
-                    break label_62;
+                    case LBRACKET:
+                        break;
+                    default:
+                        jj_la1[120] = jj_gen;
+                        break label_62;
                 }
                 jj_consume_token(LBRACKET);
                 jj_consume_token(RBRACKET);
@@ -3702,51 +3703,51 @@ public class JavaCCParser implements JavaCCParserConstants {
             jj_consume_token(RBRACKET);
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LPAREN:
-                jj_consume_token(LPAREN);
-                TypedName();
-                jj_consume_token(RPAREN);
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case TILDE:
-                    jj_consume_token(TILDE);
-                    break;
-                case BANG:
-                    jj_consume_token(BANG);
-                    break;
                 case LPAREN:
                     jj_consume_token(LPAREN);
-                    break;
-                case IDENTIFIER:
-                    jj_consume_token(IDENTIFIER);
-                    break;
-                case THIS:
-                    jj_consume_token(THIS);
-                    break;
-                case SUPER:
-                    jj_consume_token(SUPER);
-                    break;
-                case NEW:
-                    jj_consume_token(NEW);
-                    break;
-                case FALSE:
-                case NULL:
-                case TRUE:
-                case INTEGER_LITERAL:
-                case FLOATING_POINT_LITERAL:
-                case CHARACTER_LITERAL:
-                case STRING_LITERAL:
-                    Literal();
+                    TypedName();
+                    jj_consume_token(RPAREN);
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case TILDE:
+                            jj_consume_token(TILDE);
+                            break;
+                        case BANG:
+                            jj_consume_token(BANG);
+                            break;
+                        case LPAREN:
+                            jj_consume_token(LPAREN);
+                            break;
+                        case IDENTIFIER:
+                            jj_consume_token(IDENTIFIER);
+                            break;
+                        case THIS:
+                            jj_consume_token(THIS);
+                            break;
+                        case SUPER:
+                            jj_consume_token(SUPER);
+                            break;
+                        case NEW:
+                            jj_consume_token(NEW);
+                            break;
+                        case FALSE:
+                        case NULL:
+                        case TRUE:
+                        case INTEGER_LITERAL:
+                        case FLOATING_POINT_LITERAL:
+                        case CHARACTER_LITERAL:
+                        case STRING_LITERAL:
+                            Literal();
+                            break;
+                        default:
+                            jj_la1[121] = jj_gen;
+                            jj_consume_token(-1);
+                            throw new ParseException();
+                    }
                     break;
                 default:
-                    jj_la1[121] = jj_gen;
+                    jj_la1[122] = jj_gen;
                     jj_consume_token(-1);
                     throw new ParseException();
-                }
-                break;
-            default:
-                jj_la1[122] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
             }
         }
     }
@@ -3755,27 +3756,27 @@ public class JavaCCParser implements JavaCCParserConstants {
         Expression result;
         result = PrimaryExpression();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case INCR:
-        case DECR:
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case INCR:
-                jj_consume_token(INCR);
-                result = factory.createPostIncrement(result);
-                setPrefixInfo(result);
-                break;
             case DECR:
-                jj_consume_token(DECR);
-                result = factory.createPostDecrement(result);
-                setPrefixInfo(result);
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case INCR:
+                        jj_consume_token(INCR);
+                        result = factory.createPostIncrement(result);
+                        setPrefixInfo(result);
+                        break;
+                    case DECR:
+                        jj_consume_token(DECR);
+                        result = factory.createPostDecrement(result);
+                        setPrefixInfo(result);
+                        break;
+                    default:
+                        jj_la1[123] = jj_gen;
+                        jj_consume_token(-1);
+                        throw new ParseException();
+                }
                 break;
             default:
-                jj_la1[123] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
-            }
-            break;
-        default:
-            jj_la1[124] = jj_gen;
+                jj_la1[124] = jj_gen;
         }
         setPostfixInfo(result);
         {
@@ -3799,17 +3800,17 @@ public class JavaCCParser implements JavaCCParserConstants {
             expr = UnaryExpression();
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LPAREN:
-                jj_consume_token(LPAREN);
-                setPrefixInfo(result);
-                tr = Type();
-                jj_consume_token(RPAREN);
-                expr = UnaryExpressionNotPlusMinus();
-                break;
-            default:
-                jj_la1[125] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case LPAREN:
+                    jj_consume_token(LPAREN);
+                    setPrefixInfo(result);
+                    tr = Type();
+                    jj_consume_token(RPAREN);
+                    expr = UnaryExpressionNotPlusMinus();
+                    break;
+                default:
+                    jj_la1[125] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         result.setTypeReference(tr);
@@ -3829,47 +3830,47 @@ public class JavaCCParser implements JavaCCParserConstants {
         prefix = PrimaryPrefix();
         // create initial AST construct from prefix only
         switch (prefix.type) {
-        case PrimaryPrefixReturnValue.LITERAL:
-            if (prefix.literal instanceof StringLiteral) {
-                tmpResult = (StringLiteral) prefix.literal;
-            } else {
-                result = prefix.literal;
-                setPostfixInfo(result);
-                {
-                    if (true) {
-                        return result;
+            case PrimaryPrefixReturnValue.LITERAL:
+                if (prefix.literal instanceof StringLiteral) {
+                    tmpResult = (StringLiteral) prefix.literal;
+                } else {
+                    result = prefix.literal;
+                    setPostfixInfo(result);
+                    {
+                        if (true) {
+                            return result;
+                        }
                     }
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                break;
+            case PrimaryPrefixReturnValue.THIS:
+                tmpResult = factory.createThisReference();
+                setPrefixInfo(tmpResult);
+                setPostfixInfo(tmpResult);
+                break;
+            case PrimaryPrefixReturnValue.SUPER_MEMBER:
+                tmpResult = prefix.name;
+                break;
+            case PrimaryPrefixReturnValue.PARENTHESIZED_EXPR:
+                tmpResult = (ParenthesizedExpression) prefix.expr;
+                break;
+            case PrimaryPrefixReturnValue.ALLOCATION_EXPR:
+                tmpResult = (ReferencePrefix) prefix.expr;
+                break;
+            case PrimaryPrefixReturnValue.CLASS_REF:
+                tmpResult = factory.createMetaClassReference(prefix.typeref);
+                setPrefixInfo(tmpResult);
+                setPostfixInfo(tmpResult);
+                break;
+            case PrimaryPrefixReturnValue.QUALIFIED_NAME:
+                tmpResult = prefix.name;
+                break;
+            default: {
+                if (true) {
+                    throw new ParseException("Unknown prefix");
+                }
             }
-            break;
-        case PrimaryPrefixReturnValue.THIS:
-            tmpResult = factory.createThisReference();
-            setPrefixInfo(tmpResult);
-            setPostfixInfo(tmpResult);
-            break;
-        case PrimaryPrefixReturnValue.SUPER_MEMBER:
-            tmpResult = prefix.name;
-            break;
-        case PrimaryPrefixReturnValue.PARENTHESIZED_EXPR:
-            tmpResult = (ParenthesizedExpression) prefix.expr;
-            break;
-        case PrimaryPrefixReturnValue.ALLOCATION_EXPR:
-            tmpResult = (ReferencePrefix) prefix.expr;
-            break;
-        case PrimaryPrefixReturnValue.CLASS_REF:
-            tmpResult = factory.createMetaClassReference(prefix.typeref);
-            setPrefixInfo(tmpResult);
-            setPostfixInfo(tmpResult);
-            break;
-        case PrimaryPrefixReturnValue.QUALIFIED_NAME:
-            tmpResult = prefix.name;
-            break;
-        default: {
-            if (true) {
-                throw new ParseException("Unknown prefix");
-            }
-        }
         }
         while (true) {
             if (jj_2_43(2)) {
@@ -3878,121 +3879,121 @@ public class JavaCCParser implements JavaCCParserConstants {
             }
             suffix = PrimarySuffix();
             switch (suffix.type) {
-            case PrimarySuffixReturnValue.THIS:
-                // the prefix MUST be a type expression!!!!!
-                // we currently only create UncollatedReferenceQualifiers
-                if (tmpResult instanceof TypeReference) {
-                    tmpResult = factory.createThisReference((TypeReference) tmpResult);
-                    setPrefixInfo(tmpResult);
-                    setPostfixInfo(tmpResult);
-                } else if (tmpResult instanceof UncollatedReferenceQualifier) {
-                    tmpResult = factory.createThisReference(
-                        ((UncollatedReferenceQualifier) tmpResult).toTypeReference());
-                    setPrefixInfo(tmpResult);
-                    setPostfixInfo(tmpResult);
-                } else {
-                    {
-                        if (true) {
-                            throw new ParseException("No type as prefix of `this'");
+                case PrimarySuffixReturnValue.THIS:
+                    // the prefix MUST be a type expression!!!!!
+                    // we currently only create UncollatedReferenceQualifiers
+                    if (tmpResult instanceof TypeReference) {
+                        tmpResult = factory.createThisReference((TypeReference) tmpResult);
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else if (tmpResult instanceof UncollatedReferenceQualifier) {
+                        tmpResult = factory.createThisReference(
+                            ((UncollatedReferenceQualifier) tmpResult).toTypeReference());
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else {
+                        {
+                            if (true) {
+                                throw new ParseException("No type as prefix of `this'");
+                            }
                         }
                     }
-                }
-                break;
-            case PrimarySuffixReturnValue.SUPER:
-                // the prefix MUST be a type expression!!!!!
-                // we currently only create UncollatedReferenceQualifiers
-                if (tmpResult instanceof TypeReference) {
-                    tmpResult = factory.createSuperReference(tmpResult);
-                    setPrefixInfo(tmpResult);
-                    setPostfixInfo(tmpResult);
-                } else if (tmpResult instanceof UncollatedReferenceQualifier) {
-                    tmpResult = factory.createSuperReference(
-                        ((UncollatedReferenceQualifier) tmpResult).toTypeReference());
-                    setPrefixInfo(tmpResult);
-                    setPostfixInfo(tmpResult);
-                } else if (tmpResult instanceof ThisReference) {
-                    tmpResult = factory.createSuperReference(tmpResult);
-                    setPrefixInfo(tmpResult);
-                    setPostfixInfo(tmpResult);
-                } else {
-                    {
-                        if (true) {
-                            throw new ParseException(
-                                "No type as prefix of `super', was " + tmpResult.getClass());
+                    break;
+                case PrimarySuffixReturnValue.SUPER:
+                    // the prefix MUST be a type expression!!!!!
+                    // we currently only create UncollatedReferenceQualifiers
+                    if (tmpResult instanceof TypeReference) {
+                        tmpResult = factory.createSuperReference(tmpResult);
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else if (tmpResult instanceof UncollatedReferenceQualifier) {
+                        tmpResult = factory.createSuperReference(
+                            ((UncollatedReferenceQualifier) tmpResult).toTypeReference());
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else if (tmpResult instanceof ThisReference) {
+                        tmpResult = factory.createSuperReference(tmpResult);
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else {
+                        {
+                            if (true) {
+                                throw new ParseException(
+                                    "No type as prefix of `super', was " + tmpResult.getClass());
+                            }
                         }
                     }
-                }
-                break;
-            case PrimarySuffixReturnValue.ALLOCATION_EXPR:
-                if (suffix.expr instanceof New) {
-                    ((New) suffix.expr).setReferencePrefix(tmpResult);
-                    tmpResult = (New) suffix.expr;
-                } else {
-                    {
-                        if (true) {
-                            throw new ParseException("Allocation without new?");
+                    break;
+                case PrimarySuffixReturnValue.ALLOCATION_EXPR:
+                    if (suffix.expr instanceof New) {
+                        ((New) suffix.expr).setReferencePrefix(tmpResult);
+                        tmpResult = (New) suffix.expr;
+                    } else {
+                        {
+                            if (true) {
+                                throw new ParseException("Allocation without new?");
+                            }
                         }
                     }
-                }
-                break;
-            case PrimarySuffixReturnValue.INDEX_EXPR:
-                if (tmpResult instanceof UncollatedReferenceQualifier
-                        || tmpResult instanceof MethodReference
-                        || tmpResult instanceof ParenthesizedExpression
-                        || tmpResult instanceof VariableReference) {
-                    // Now we know that this is an array reference
-                    ASTList<Expression> indicees = new ASTArrayList<>(1);
-                    indicees.add(suffix.expr);
-                    tmpResult = factory.createArrayReference(tmpResult, indicees);
+                    break;
+                case PrimarySuffixReturnValue.INDEX_EXPR:
+                    if (tmpResult instanceof UncollatedReferenceQualifier
+                            || tmpResult instanceof MethodReference
+                            || tmpResult instanceof ParenthesizedExpression
+                            || tmpResult instanceof VariableReference) {
+                        // Now we know that this is an array reference
+                        ASTList<Expression> indicees = new ASTArrayList<>(1);
+                        indicees.add(suffix.expr);
+                        tmpResult = factory.createArrayReference(tmpResult, indicees);
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else if (tmpResult instanceof ArrayReference) {
+                        // we need to add another access dimension
+                        ((ArrayReference) tmpResult).getDimensionExpressions().add(suffix.expr);
+                    } else {
+                        {
+                            if (true) {
+                                throw new ParseException(
+                                    "Bad index context - " + tmpResult.getClass().getName() + "?!");
+                            }
+                        }
+                        /*
+                         * e.g. StringLiteral, TypeReference, NewArray (would have to be in
+                         * parentheses), SuperReference, ...
+                         */
+                    }
+                    break;
+                case PrimarySuffixReturnValue.IDENTIFIER:
+                    tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
+                    ((UncollatedReferenceQualifier) tmpResult).setTypeArguments(suffix.typeArgs);
+                    suffix.typeArgs = null;
                     setPrefixInfo(tmpResult);
                     setPostfixInfo(tmpResult);
-                } else if (tmpResult instanceof ArrayReference) {
-                    // we need to add another access dimension
-                    ((ArrayReference) tmpResult).getDimensionExpressions().add(suffix.expr);
-                } else {
-                    {
-                        if (true) {
-                            throw new ParseException(
-                                "Bad index context - " + tmpResult.getClass().getName() + "?!");
-                        }
-                    }
-                    /*
-                     * e.g. StringLiteral, TypeReference, NewArray (would have to be in
-                     * parentheses), SuperReference, ...
-                     */
-                }
-                break;
-            case PrimarySuffixReturnValue.IDENTIFIER:
-                tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
-                ((UncollatedReferenceQualifier) tmpResult).setTypeArguments(suffix.typeArgs);
-                suffix.typeArgs = null;
-                setPrefixInfo(tmpResult);
-                setPostfixInfo(tmpResult);
-                break;
-            case PrimarySuffixReturnValue.ARGUMENTS:
-                // method call -determine the kind of method
-                if (tmpResult instanceof UncollatedReferenceQualifier) {
-                    // this is a normal method call
-                    tmpResult = factory.createMethodReference(
-                        ((UncollatedReferenceQualifier) tmpResult).getReferencePrefix(),
-                        ((UncollatedReferenceQualifier) tmpResult).getIdentifier(), suffix.args,
-                        ((UncollatedReferenceQualifier) tmpResult).getTypeArguments());
+                    break;
+                case PrimarySuffixReturnValue.ARGUMENTS:
+                    // method call -determine the kind of method
+                    if (tmpResult instanceof UncollatedReferenceQualifier) {
+                        // this is a normal method call
+                        tmpResult = factory.createMethodReference(
+                            ((UncollatedReferenceQualifier) tmpResult).getReferencePrefix(),
+                            ((UncollatedReferenceQualifier) tmpResult).getIdentifier(), suffix.args,
+                            ((UncollatedReferenceQualifier) tmpResult).getTypeArguments());
 
-                    setPrefixInfo(tmpResult);
-                    setPostfixInfo(tmpResult);
-                } else {
-                    {
-                        if (true) {
-                            throw new ParseException("Arguments without method name?");
+                        setPrefixInfo(tmpResult);
+                        setPostfixInfo(tmpResult);
+                    } else {
+                        {
+                            if (true) {
+                                throw new ParseException("Arguments without method name?");
+                            }
                         }
                     }
+                    break;
+                default: {
+                    if (true) {
+                        throw new ParseException("Unknown primary suffix type");
+                    }
                 }
-                break;
-            default: {
-                if (true) {
-                    throw new ParseException("Unknown primary suffix type");
-                }
-            }
             }
         }
         if (tmpResult instanceof UncollatedReferenceQualifier) {
@@ -4020,78 +4021,78 @@ public class JavaCCParser implements JavaCCParserConstants {
         ParenthesizedExpression parExpr = null;
         Identifier id = null;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case FALSE:
-        case NULL:
-        case TRUE:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-            // LOOKAHEAD(NonWildcardTypeArguments() "this" Arguments())
-            // NonWildcardTypeArguments() "this" /* Arguments() is a mandatory suffix here!*/
-            // {
-            // prefix.type = prefix.THIS;
-            // System.err.println("Ignoring NonWildcardTypeArguments!");
-            // }
-            // |
-            lit = Literal();
-            prefix.type = PrimaryPrefixReturnValue.LITERAL;
-            prefix.literal = lit;
-            break;
-        case THIS:
-            jj_consume_token(THIS);
-            prefix.type = PrimaryPrefixReturnValue.THIS;
-            break;
-        case SUPER:
-            jj_consume_token(SUPER);
-            supRef = factory.createSuperReference();
-            setPrefixInfo(supRef);
-            setPostfixInfo(supRef);
-            jj_consume_token(DOT);
-            jj_consume_token(IDENTIFIER);
-            id = factory.createIdentifier(token.image);
-            setPrefixInfo(id);
-            setPostfixInfo(id);
-            prefix.name = factory.createUncollatedReferenceQualifier(supRef, id);
-            prefix.type = PrimaryPrefixReturnValue.SUPER_MEMBER;
-            break;
-        case LPAREN:
-            jj_consume_token(LPAREN);
-            parExpr = factory.createParenthesizedExpression();
-            setPrefixInfo(parExpr);
-            expr = Expression();
-            jj_consume_token(RPAREN);
-            setPostfixInfo(parExpr);
-            parExpr.setArguments(new ASTArrayList<>(expr));
-            prefix.expr = parExpr;
-            prefix.type = PrimaryPrefixReturnValue.PARENTHESIZED_EXPR;
-            break;
-        case NEW:
-            expr = AllocationExpression();
-            prefix.type = PrimaryPrefixReturnValue.ALLOCATION_EXPR;
-            prefix.expr = expr;
-            break;
-        default:
-            jj_la1[126] = jj_gen;
-            if (jj_2_44(2147483647)) {
-                tr = ResultType();
+            case FALSE:
+            case NULL:
+            case TRUE:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+                // LOOKAHEAD(NonWildcardTypeArguments() "this" Arguments())
+                // NonWildcardTypeArguments() "this" /* Arguments() is a mandatory suffix here!*/
+                // {
+                // prefix.type = prefix.THIS;
+                // System.err.println("Ignoring NonWildcardTypeArguments!");
+                // }
+                // |
+                lit = Literal();
+                prefix.type = PrimaryPrefixReturnValue.LITERAL;
+                prefix.literal = lit;
+                break;
+            case THIS:
+                jj_consume_token(THIS);
+                prefix.type = PrimaryPrefixReturnValue.THIS;
+                break;
+            case SUPER:
+                jj_consume_token(SUPER);
+                supRef = factory.createSuperReference();
+                setPrefixInfo(supRef);
+                setPostfixInfo(supRef);
                 jj_consume_token(DOT);
-                jj_consume_token(CLASS);
-                prefix.type = PrimaryPrefixReturnValue.CLASS_REF;
-                prefix.typeref = tr;
-            } else {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case IDENTIFIER:
-                    qn = Name();
-                    prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
-                    prefix.name = qn;
-                    break;
-                default:
-                    jj_la1[127] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
+                jj_consume_token(IDENTIFIER);
+                id = factory.createIdentifier(token.image);
+                setPrefixInfo(id);
+                setPostfixInfo(id);
+                prefix.name = factory.createUncollatedReferenceQualifier(supRef, id);
+                prefix.type = PrimaryPrefixReturnValue.SUPER_MEMBER;
+                break;
+            case LPAREN:
+                jj_consume_token(LPAREN);
+                parExpr = factory.createParenthesizedExpression();
+                setPrefixInfo(parExpr);
+                expr = Expression();
+                jj_consume_token(RPAREN);
+                setPostfixInfo(parExpr);
+                parExpr.setArguments(new ASTArrayList<>(expr));
+                prefix.expr = parExpr;
+                prefix.type = PrimaryPrefixReturnValue.PARENTHESIZED_EXPR;
+                break;
+            case NEW:
+                expr = AllocationExpression();
+                prefix.type = PrimaryPrefixReturnValue.ALLOCATION_EXPR;
+                prefix.expr = expr;
+                break;
+            default:
+                jj_la1[126] = jj_gen;
+                if (jj_2_44(2147483647)) {
+                    tr = ResultType();
+                    jj_consume_token(DOT);
+                    jj_consume_token(CLASS);
+                    prefix.type = PrimaryPrefixReturnValue.CLASS_REF;
+                    prefix.typeref = tr;
+                } else {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case IDENTIFIER:
+                            qn = Name();
+                            prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
+                            prefix.name = qn;
+                            break;
+                        default:
+                            jj_la1[127] = jj_gen;
+                            jj_consume_token(-1);
+                            throw new ParseException();
+                    }
                 }
-            }
         }
         {
             if (true) {
@@ -4130,30 +4131,30 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPostfixInfo(suffix.id);
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LBRACKET:
-                jj_consume_token(LBRACKET);
-                expr = Expression();
-                jj_consume_token(RBRACKET);
-                suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
-                suffix.expr = expr;
-                break;
-            case DOT:
-                jj_consume_token(DOT);
-                jj_consume_token(IDENTIFIER);
-                suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
-                suffix.id = factory.createIdentifier(token.image);
-                setPrefixInfo(suffix.id);
-                setPostfixInfo(suffix.id);
-                break;
-            case LPAREN:
-                args = Arguments();
-                suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
-                suffix.args = args;
-                break;
-            default:
-                jj_la1[128] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case LBRACKET:
+                    jj_consume_token(LBRACKET);
+                    expr = Expression();
+                    jj_consume_token(RBRACKET);
+                    suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
+                    suffix.expr = expr;
+                    break;
+                case DOT:
+                    jj_consume_token(DOT);
+                    jj_consume_token(IDENTIFIER);
+                    suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
+                    suffix.id = factory.createIdentifier(token.image);
+                    setPrefixInfo(suffix.id);
+                    setPostfixInfo(suffix.id);
+                    break;
+                case LPAREN:
+                    args = Arguments();
+                    suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
+                    suffix.args = args;
+                    break;
+                default:
+                    jj_la1[128] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         {
@@ -4167,45 +4168,45 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public Literal Literal() throws ParseException {
         Literal result;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case INTEGER_LITERAL:
-            jj_consume_token(INTEGER_LITERAL);
-            if (token.image.endsWith("L") || token.image.endsWith("l")) {
-                result = factory.createLongLiteral(token.image);
-            } else {
-                result = factory.createIntLiteral(token.image);
-            }
-            setPrefixInfo(result);
-            break;
-        case FLOATING_POINT_LITERAL:
-            jj_consume_token(FLOATING_POINT_LITERAL);
-            if (token.image.endsWith("F") || token.image.endsWith("f")) {
-                result = factory.createFloatLiteral(token.image);
-            } else {
-                result = factory.createDoubleLiteral(token.image);
-            }
-            setPrefixInfo(result);
-            break;
-        case CHARACTER_LITERAL:
-            jj_consume_token(CHARACTER_LITERAL);
-            result = factory.createCharLiteral(token.image);
-            setPrefixInfo(result);
-            break;
-        case STRING_LITERAL:
-            jj_consume_token(STRING_LITERAL);
-            result = factory.createStringLiteral(token.image);
-            setPrefixInfo(result);
-            break;
-        case FALSE:
-        case TRUE:
-            result = BooleanLiteral();
-            break;
-        case NULL:
-            result = NullLiteral();
-            break;
-        default:
-            jj_la1[129] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case INTEGER_LITERAL:
+                jj_consume_token(INTEGER_LITERAL);
+                if (token.image.endsWith("L") || token.image.endsWith("l")) {
+                    result = factory.createLongLiteral(token.image);
+                } else {
+                    result = factory.createIntLiteral(token.image);
+                }
+                setPrefixInfo(result);
+                break;
+            case FLOATING_POINT_LITERAL:
+                jj_consume_token(FLOATING_POINT_LITERAL);
+                if (token.image.endsWith("F") || token.image.endsWith("f")) {
+                    result = factory.createFloatLiteral(token.image);
+                } else {
+                    result = factory.createDoubleLiteral(token.image);
+                }
+                setPrefixInfo(result);
+                break;
+            case CHARACTER_LITERAL:
+                jj_consume_token(CHARACTER_LITERAL);
+                result = factory.createCharLiteral(token.image);
+                setPrefixInfo(result);
+                break;
+            case STRING_LITERAL:
+                jj_consume_token(STRING_LITERAL);
+                result = factory.createStringLiteral(token.image);
+                setPrefixInfo(result);
+                break;
+            case FALSE:
+            case TRUE:
+                result = BooleanLiteral();
+                break;
+            case NULL:
+                result = NullLiteral();
+                break;
+            default:
+                jj_la1[129] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPostfixInfo(result);
         {
@@ -4219,18 +4220,18 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public BooleanLiteral BooleanLiteral() throws ParseException {
         BooleanLiteral result;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case TRUE:
-            jj_consume_token(TRUE);
-            result = factory.createBooleanLiteral(true);
-            break;
-        case FALSE:
-            jj_consume_token(FALSE);
-            result = factory.createBooleanLiteral(false);
-            break;
-        default:
-            jj_la1[130] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case TRUE:
+                jj_consume_token(TRUE);
+                result = factory.createBooleanLiteral(true);
+                break;
+            case FALSE:
+                jj_consume_token(FALSE);
+                result = factory.createBooleanLiteral(false);
+                break;
+            default:
+                jj_la1[130] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPrefixInfo(result);
         setPostfixInfo(result);
@@ -4259,37 +4260,37 @@ public class JavaCCParser implements JavaCCParserConstants {
         ASTList<Expression> result = null;
         jj_consume_token(LPAREN);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-        case BANG:
-        case TILDE:
-        case INCR:
-        case DECR:
-        case PLUS:
-        case MINUS:
-            result = ArgumentList();
-            break;
-        default:
-            jj_la1[131] = jj_gen;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FALSE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case NEW:
+            case NULL:
+            case SHORT:
+            case SUPER:
+            case THIS:
+            case TRUE:
+            case VOID:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+            case BANG:
+            case TILDE:
+            case INCR:
+            case DECR:
+            case PLUS:
+            case MINUS:
+                result = ArgumentList();
+                break;
+            default:
+                jj_la1[131] = jj_gen;
         }
         jj_consume_token(RPAREN);
         // !!! should set end coordinates to parent, possibly
@@ -4341,55 +4342,55 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = ArrayDimsAndInits(na);
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case NEW:
-                jj_consume_token(NEW);
-                result = factory.createNew();
-                setPrefixInfo(result);
-                qn = TypedName();
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case LT:
-                    typeArgs = NonWildcardTypeArguments();
-                    qn.setTypeArguments(typeArgs);
-                    break;
-                default:
-                    jj_la1[132] = jj_gen;
-                }
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case LPAREN:
-                    args = Arguments();
+                case NEW:
+                    jj_consume_token(NEW);
+                    result = factory.createNew();
+                    setPrefixInfo(result);
+                    qn = TypedName();
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                    case LBRACE:
-                        cd = factory.createClassDeclaration();
-                        setPrefixInfo(cd);
-                        body = ClassBody();
-                        cd.setMembers(body);
-                        setPostfixInfo(cd);
-                        break;
-                    default:
-                        jj_la1[133] = jj_gen;
+                        case LT:
+                            typeArgs = NonWildcardTypeArguments();
+                            qn.setTypeArguments(typeArgs);
+                            break;
+                        default:
+                            jj_la1[132] = jj_gen;
                     }
-                    result.setTypeReference(qn.toTypeReference());
-                    result.setArguments(args);
-                    if (cd != null) {
-                        ((New) result).setClassDeclaration(cd);
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case LPAREN:
+                            args = Arguments();
+                            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                                case LBRACE:
+                                    cd = factory.createClassDeclaration();
+                                    setPrefixInfo(cd);
+                                    body = ClassBody();
+                                    cd.setMembers(body);
+                                    setPostfixInfo(cd);
+                                    break;
+                                default:
+                                    jj_la1[133] = jj_gen;
+                            }
+                            result.setTypeReference(qn.toTypeReference());
+                            result.setArguments(args);
+                            if (cd != null) {
+                                ((New) result).setClassDeclaration(cd);
+                            }
+                            break;
+                        case LBRACKET:
+                            na = factory.createNewArray();
+                            copyPrefixInfo(result, na);
+                            na.setTypeReference(qn.toTypeReference());
+                            result = ArrayDimsAndInits(na);
+                            break;
+                        default:
+                            jj_la1[134] = jj_gen;
+                            jj_consume_token(-1);
+                            throw new ParseException();
                     }
-                    break;
-                case LBRACKET:
-                    na = factory.createNewArray();
-                    copyPrefixInfo(result, na);
-                    na.setTypeReference(qn.toTypeReference());
-                    result = ArrayDimsAndInits(na);
                     break;
                 default:
-                    jj_la1[134] = jj_gen;
+                    jj_la1[135] = jj_gen;
                     jj_consume_token(-1);
                     throw new ParseException();
-                }
-                break;
-            default:
-                jj_la1[135] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
             }
         }
         setPostfixInfo(result);
@@ -4434,25 +4435,25 @@ public class JavaCCParser implements JavaCCParserConstants {
             }
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LBRACKET:
-                label_67: while (true) {
-                    jj_consume_token(LBRACKET);
-                    jj_consume_token(RBRACKET);
-                    dimensions++;
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                    case LBRACKET:
-                        break;
-                    default:
-                        jj_la1[136] = jj_gen;
-                        break label_67;
+                case LBRACKET:
+                    label_67: while (true) {
+                        jj_consume_token(LBRACKET);
+                        jj_consume_token(RBRACKET);
+                        dimensions++;
+                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            case LBRACKET:
+                                break;
+                            default:
+                                jj_la1[136] = jj_gen;
+                                break label_67;
+                        }
                     }
-                }
-                init = ArrayInitializer();
-                break;
-            default:
-                jj_la1[137] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                    init = ArrayInitializer();
+                    break;
+                default:
+                    jj_la1[137] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         // setPrefixInfo(result);
@@ -4480,90 +4481,90 @@ public class JavaCCParser implements JavaCCParserConstants {
             result = LabeledStatement();
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case LBRACE:
-                result = Block();
-                break;
-            case SEMICOLON:
-                result = EmptyStatement();
-                break;
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case INCR:
-            case DECR:
-                expr = StatementExpression();
-                jj_consume_token(SEMICOLON);
-                try {
-                    result = (ExpressionStatement) expr;
-                } catch (ClassCastException cce) {
-                    // this is a semantical error!!!
-                    {
-                        if (true) {
-                            throw new ParseException(
-                                "Class cast error: ExpressionStatement expected - found "
-                                    + recoder.convenience.Format.toString("%c @%p %s", expr));
+                case LBRACE:
+                    result = Block();
+                    break;
+                case SEMICOLON:
+                    result = EmptyStatement();
+                    break;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FALSE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case SHORT:
+                case SUPER:
+                case THIS:
+                case TRUE:
+                case VOID:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case INCR:
+                case DECR:
+                    expr = StatementExpression();
+                    jj_consume_token(SEMICOLON);
+                    try {
+                        result = (ExpressionStatement) expr;
+                    } catch (ClassCastException cce) {
+                        // this is a semantical error!!!
+                        {
+                            if (true) {
+                                throw new ParseException(
+                                    "Class cast error: ExpressionStatement expected - found "
+                                        + recoder.convenience.Format.toString("%c @%p %s", expr));
+                            }
                         }
                     }
-                }
-                break;
-            case SWITCH:
-                result = SwitchStatement();
-                break;
-            case IF:
-                result = IfStatement();
-                break;
-            case WHILE:
-                result = WhileStatement();
-                break;
-            case DO:
-                result = DoStatement();
-                break;
-            case FOR:
-                result = ForStatement();
-                break;
-            case BREAK:
-                result = BreakStatement();
-                break;
-            case CONTINUE:
-                result = ContinueStatement();
-                break;
-            case RETURN:
-                result = ReturnStatement();
-                break;
-            case THROW:
-                result = ThrowStatement();
-                break;
-            case SYNCHRONIZED:
-                result = SynchronizedStatement();
-                break;
-            case TRY:
-                result = TryStatement();
-                break;
-            case ASSERT:
-                result = AssertStatement();
-                break;
-            default:
-                jj_la1[138] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                    break;
+                case SWITCH:
+                    result = SwitchStatement();
+                    break;
+                case IF:
+                    result = IfStatement();
+                    break;
+                case WHILE:
+                    result = WhileStatement();
+                    break;
+                case DO:
+                    result = DoStatement();
+                    break;
+                case FOR:
+                    result = ForStatement();
+                    break;
+                case BREAK:
+                    result = BreakStatement();
+                    break;
+                case CONTINUE:
+                    result = ContinueStatement();
+                    break;
+                case RETURN:
+                    result = ReturnStatement();
+                    break;
+                case THROW:
+                    result = ThrowStatement();
+                    break;
+                case SYNCHRONIZED:
+                    result = SynchronizedStatement();
+                    break;
+                case TRY:
+                    result = TryStatement();
+                    break;
+                case ASSERT:
+                    result = AssertStatement();
+                    break;
+                default:
+                    jj_la1[138] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         setPostfixInfo(result);
@@ -4607,345 +4608,6 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(result);
         label_68: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ASSERT:
-            case AT:
-            case BOOLEAN:
-            case BREAK:
-            case BYTE:
-            case CHAR:
-            case CLASS:
-            case CONTINUE:
-            case DO:
-            case DOUBLE:
-            case FALSE:
-            case FINAL:
-            case FLOAT:
-            case FOR:
-            case IF:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case RETURN:
-            case SHORT:
-            case SUPER:
-            case SWITCH:
-            case SYNCHRONIZED:
-            case THIS:
-            case THROW:
-            case TRUE:
-            case TRY:
-            case VOID:
-            case WHILE:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case LBRACE:
-            case SEMICOLON:
-            case INCR:
-            case DECR:
-                break;
-            default:
-                jj_la1[139] = jj_gen;
-                break label_68;
-            }
-            stat = BlockStatement();
-            sl.add(stat);
-        }
-        jj_consume_token(RBRACE);
-        result.setBody(sl);
-        setPostfixInfo(result);
-        {
-            if (true) {
-                return result;
-            }
-        }
-        throw new Error("Missing return statement in function");
-    }
-
-    static final public Statement BlockStatement() throws ParseException {
-        Statement result;
-        if (jj_2_55(2147483647)) {
-            result = LocalVariableDeclaration();
-            jj_consume_token(SEMICOLON);
-        } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ASSERT:
-            case BOOLEAN:
-            case BREAK:
-            case BYTE:
-            case CHAR:
-            case CONTINUE:
-            case DO:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case FOR:
-            case IF:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case RETURN:
-            case SHORT:
-            case SUPER:
-            case SWITCH:
-            case SYNCHRONIZED:
-            case THIS:
-            case THROW:
-            case TRUE:
-            case TRY:
-            case VOID:
-            case WHILE:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case LBRACE:
-            case SEMICOLON:
-            case INCR:
-            case DECR:
-                result = Statement();
-                break;
-            case CLASS:
-                result = UnmodifiedClassDeclaration();
-                break;
-            default:
-                jj_la1[140] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
-            }
-        }
-        setPostfixInfo(result);
-        {
-            if (true) {
-                return result;
-            }
-        }
-        throw new Error("Missing return statement in function");
-    }
-
-    static final public LocalVariableDeclaration LocalVariableDeclaration() throws ParseException {
-        LocalVariableDeclaration result;
-        ASTList<VariableSpecification> vl = new ASTArrayList<>(1);
-        TypeReference tr;
-        VariableSpecification var;
-        ASTArrayList<DeclarationSpecifier> declSpecs = new ASTArrayList<>();
-        AnnotationUseSpecification annot;
-        result = factory.createLocalVariableDeclaration();
-        setPrefixInfo(result);
-        label_69: while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-                break;
-            default:
-                jj_la1[141] = jj_gen;
-                break label_69;
-            }
-            annot = AnnotationUse();
-            declSpecs.add(annot);
-        }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case FINAL:
-            jj_consume_token(FINAL);
-            Final fi = factory.createFinal();
-            setPrefixInfo(fi);
-            setPostfixInfo(fi);
-            declSpecs.add(fi);
-            label_70: while (true) {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case AT:
-                    break;
-                default:
-                    jj_la1[142] = jj_gen;
-                    break label_70;
-                }
-                annot = AnnotationUse();
-                declSpecs.add(annot);
-            }
-            break;
-        default:
-            jj_la1[143] = jj_gen;
-        }
-        if (declSpecs.size() != 0) {
-            result.setDeclarationSpecifiers(declSpecs);
-        }
-        tr = Type();
-        var = VariableDeclarator(false);
-        vl.add(var);
-        label_71: while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case COMMA:
-                break;
-            default:
-                jj_la1[144] = jj_gen;
-                break label_71;
-            }
-            jj_consume_token(COMMA);
-            var = VariableDeclarator(false);
-            vl.add(var);
-        }
-        result.setTypeReference(tr);
-        result.setVariableSpecifications(vl);
-        setPostfixInfo(result);
-        {
-            if (true) {
-                return result;
-            }
-        }
-        throw new Error("Missing return statement in function");
-    }
-
-    static final public EmptyStatement EmptyStatement() throws ParseException {
-        EmptyStatement result;
-        jj_consume_token(SEMICOLON);
-        result = factory.createEmptyStatement();
-        setPrefixInfo(result);
-        setPostfixInfo(result);
-        {
-            if (true) {
-                return result;
-            }
-        }
-        throw new Error("Missing return statement in function");
-    }
-
-    static final public Expression StatementExpression() throws ParseException {
-        Expression result;
-        Expression expr;
-        Assignment op;
-        ASTList<Expression> leftRight;
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case INCR:
-            result = PreIncrementExpression();
-            break;
-        case DECR:
-            result = PreDecrementExpression();
-            break;
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-            result = PrimaryExpression();
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ASSIGN:
-            case INCR:
-            case DECR:
-            case PLUSASSIGN:
-            case MINUSASSIGN:
-            case STARASSIGN:
-            case SLASHASSIGN:
-            case ANDASSIGN:
-            case ORASSIGN:
-            case XORASSIGN:
-            case REMASSIGN:
-            case LSHIFTASSIGN:
-            case RSIGNEDSHIFTASSIGN:
-            case RUNSIGNEDSHIFTASSIGN:
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case INCR:
-                    jj_consume_token(INCR);
-                    result = factory.createPostIncrement(result);
-                    setPrefixInfo(result);
-                    break;
-                case DECR:
-                    jj_consume_token(DECR);
-                    result = factory.createPostDecrement(result);
-                    setPrefixInfo(result);
-                    break;
-                case ASSIGN:
-                case PLUSASSIGN:
-                case MINUSASSIGN:
-                case STARASSIGN:
-                case SLASHASSIGN:
-                case ANDASSIGN:
-                case ORASSIGN:
-                case XORASSIGN:
-                case REMASSIGN:
-                case LSHIFTASSIGN:
-                case RSIGNEDSHIFTASSIGN:
-                case RUNSIGNEDSHIFTASSIGN:
-                    op = AssignmentOperator();
-                    expr = Expression();
-                    leftRight = new ASTArrayList<>(2);
-                    leftRight.add(result);
-                    leftRight.add(expr);
-                    op.setArguments(leftRight);
-                    result = op;
-                    break;
-                default:
-                    jj_la1[145] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
-                }
-                break;
-            default:
-                jj_la1[146] = jj_gen;
-            }
-            break;
-        default:
-            jj_la1[147] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-        }
-        setPostfixInfo(result);
-        {
-            if (true) {
-                return result;
-            }
-        }
-        throw new Error("Missing return statement in function");
-    }
-
-    static final public Switch SwitchStatement() throws ParseException {
-        Switch result;
-        Expression expr;
-        ASTList<Branch> branches = new ASTArrayList<>(2);
-        Branch branch;
-        ASTList<Statement> stats;
-        Statement stat;
-        jj_consume_token(SWITCH);
-        result = factory.createSwitch();
-        setPrefixInfo(result);
-        jj_consume_token(LPAREN);
-        expr = Expression();
-        jj_consume_token(RPAREN);
-        jj_consume_token(LBRACE);
-        label_72: while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case CASE:
-            case _DEFAULT:
-                break;
-            default:
-                jj_la1[148] = jj_gen;
-                break label_72;
-            }
-            branch = SwitchLabel();
-            stats = new ASTArrayList<>();
-            label_73: while (true) {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                 case ASSERT:
                 case AT:
                 case BOOLEAN:
@@ -4988,8 +4650,347 @@ public class JavaCCParser implements JavaCCParserConstants {
                 case DECR:
                     break;
                 default:
-                    jj_la1[149] = jj_gen;
-                    break label_73;
+                    jj_la1[139] = jj_gen;
+                    break label_68;
+            }
+            stat = BlockStatement();
+            sl.add(stat);
+        }
+        jj_consume_token(RBRACE);
+        result.setBody(sl);
+        setPostfixInfo(result);
+        {
+            if (true) {
+                return result;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    static final public Statement BlockStatement() throws ParseException {
+        Statement result;
+        if (jj_2_55(2147483647)) {
+            result = LocalVariableDeclaration();
+            jj_consume_token(SEMICOLON);
+        } else {
+            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                case ASSERT:
+                case BOOLEAN:
+                case BREAK:
+                case BYTE:
+                case CHAR:
+                case CONTINUE:
+                case DO:
+                case DOUBLE:
+                case FALSE:
+                case FLOAT:
+                case FOR:
+                case IF:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case RETURN:
+                case SHORT:
+                case SUPER:
+                case SWITCH:
+                case SYNCHRONIZED:
+                case THIS:
+                case THROW:
+                case TRUE:
+                case TRY:
+                case VOID:
+                case WHILE:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case LBRACE:
+                case SEMICOLON:
+                case INCR:
+                case DECR:
+                    result = Statement();
+                    break;
+                case CLASS:
+                    result = UnmodifiedClassDeclaration();
+                    break;
+                default:
+                    jj_la1[140] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
+            }
+        }
+        setPostfixInfo(result);
+        {
+            if (true) {
+                return result;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    static final public LocalVariableDeclaration LocalVariableDeclaration() throws ParseException {
+        LocalVariableDeclaration result;
+        ASTList<VariableSpecification> vl = new ASTArrayList<>(1);
+        TypeReference tr;
+        VariableSpecification var;
+        ASTArrayList<DeclarationSpecifier> declSpecs = new ASTArrayList<>();
+        AnnotationUseSpecification annot;
+        result = factory.createLocalVariableDeclaration();
+        setPrefixInfo(result);
+        label_69: while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                case AT:
+                    break;
+                default:
+                    jj_la1[141] = jj_gen;
+                    break label_69;
+            }
+            annot = AnnotationUse();
+            declSpecs.add(annot);
+        }
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case FINAL:
+                jj_consume_token(FINAL);
+                Final fi = factory.createFinal();
+                setPrefixInfo(fi);
+                setPostfixInfo(fi);
+                declSpecs.add(fi);
+                label_70: while (true) {
+                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        case AT:
+                            break;
+                        default:
+                            jj_la1[142] = jj_gen;
+                            break label_70;
+                    }
+                    annot = AnnotationUse();
+                    declSpecs.add(annot);
+                }
+                break;
+            default:
+                jj_la1[143] = jj_gen;
+        }
+        if (declSpecs.size() != 0) {
+            result.setDeclarationSpecifiers(declSpecs);
+        }
+        tr = Type();
+        var = VariableDeclarator(false);
+        vl.add(var);
+        label_71: while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                case COMMA:
+                    break;
+                default:
+                    jj_la1[144] = jj_gen;
+                    break label_71;
+            }
+            jj_consume_token(COMMA);
+            var = VariableDeclarator(false);
+            vl.add(var);
+        }
+        result.setTypeReference(tr);
+        result.setVariableSpecifications(vl);
+        setPostfixInfo(result);
+        {
+            if (true) {
+                return result;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    static final public EmptyStatement EmptyStatement() throws ParseException {
+        EmptyStatement result;
+        jj_consume_token(SEMICOLON);
+        result = factory.createEmptyStatement();
+        setPrefixInfo(result);
+        setPostfixInfo(result);
+        {
+            if (true) {
+                return result;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    static final public Expression StatementExpression() throws ParseException {
+        Expression result;
+        Expression expr;
+        Assignment op;
+        ASTList<Expression> leftRight;
+        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            case INCR:
+                result = PreIncrementExpression();
+                break;
+            case DECR:
+                result = PreDecrementExpression();
+                break;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FALSE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case NEW:
+            case NULL:
+            case SHORT:
+            case SUPER:
+            case THIS:
+            case TRUE:
+            case VOID:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+                result = PrimaryExpression();
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case ASSIGN:
+                    case INCR:
+                    case DECR:
+                    case PLUSASSIGN:
+                    case MINUSASSIGN:
+                    case STARASSIGN:
+                    case SLASHASSIGN:
+                    case ANDASSIGN:
+                    case ORASSIGN:
+                    case XORASSIGN:
+                    case REMASSIGN:
+                    case LSHIFTASSIGN:
+                    case RSIGNEDSHIFTASSIGN:
+                    case RUNSIGNEDSHIFTASSIGN:
+                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            case INCR:
+                                jj_consume_token(INCR);
+                                result = factory.createPostIncrement(result);
+                                setPrefixInfo(result);
+                                break;
+                            case DECR:
+                                jj_consume_token(DECR);
+                                result = factory.createPostDecrement(result);
+                                setPrefixInfo(result);
+                                break;
+                            case ASSIGN:
+                            case PLUSASSIGN:
+                            case MINUSASSIGN:
+                            case STARASSIGN:
+                            case SLASHASSIGN:
+                            case ANDASSIGN:
+                            case ORASSIGN:
+                            case XORASSIGN:
+                            case REMASSIGN:
+                            case LSHIFTASSIGN:
+                            case RSIGNEDSHIFTASSIGN:
+                            case RUNSIGNEDSHIFTASSIGN:
+                                op = AssignmentOperator();
+                                expr = Expression();
+                                leftRight = new ASTArrayList<>(2);
+                                leftRight.add(result);
+                                leftRight.add(expr);
+                                op.setArguments(leftRight);
+                                result = op;
+                                break;
+                            default:
+                                jj_la1[145] = jj_gen;
+                                jj_consume_token(-1);
+                                throw new ParseException();
+                        }
+                        break;
+                    default:
+                        jj_la1[146] = jj_gen;
+                }
+                break;
+            default:
+                jj_la1[147] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        setPostfixInfo(result);
+        {
+            if (true) {
+                return result;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    static final public Switch SwitchStatement() throws ParseException {
+        Switch result;
+        Expression expr;
+        ASTList<Branch> branches = new ASTArrayList<>(2);
+        Branch branch;
+        ASTList<Statement> stats;
+        Statement stat;
+        jj_consume_token(SWITCH);
+        result = factory.createSwitch();
+        setPrefixInfo(result);
+        jj_consume_token(LPAREN);
+        expr = Expression();
+        jj_consume_token(RPAREN);
+        jj_consume_token(LBRACE);
+        label_72: while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                case CASE:
+                case _DEFAULT:
+                    break;
+                default:
+                    jj_la1[148] = jj_gen;
+                    break label_72;
+            }
+            branch = SwitchLabel();
+            stats = new ASTArrayList<>();
+            label_73: while (true) {
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case ASSERT:
+                    case AT:
+                    case BOOLEAN:
+                    case BREAK:
+                    case BYTE:
+                    case CHAR:
+                    case CLASS:
+                    case CONTINUE:
+                    case DO:
+                    case DOUBLE:
+                    case FALSE:
+                    case FINAL:
+                    case FLOAT:
+                    case FOR:
+                    case IF:
+                    case INT:
+                    case LONG:
+                    case NEW:
+                    case NULL:
+                    case RETURN:
+                    case SHORT:
+                    case SUPER:
+                    case SWITCH:
+                    case SYNCHRONIZED:
+                    case THIS:
+                    case THROW:
+                    case TRUE:
+                    case TRY:
+                    case VOID:
+                    case WHILE:
+                    case INTEGER_LITERAL:
+                    case FLOATING_POINT_LITERAL:
+                    case CHARACTER_LITERAL:
+                    case STRING_LITERAL:
+                    case IDENTIFIER:
+                    case LPAREN:
+                    case LBRACE:
+                    case SEMICOLON:
+                    case INCR:
+                    case DECR:
+                        break;
+                    default:
+                        jj_la1[149] = jj_gen;
+                        break label_73;
                 }
                 stat = BlockStatement();
                 stats.add(stat);
@@ -5017,24 +5018,24 @@ public class JavaCCParser implements JavaCCParserConstants {
         Branch result;
         Expression expr;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case CASE:
-            jj_consume_token(CASE);
-            result = factory.createCase();
-            setPrefixInfo(result);
-            expr = Expression();
-            jj_consume_token(COLON);
-            ((Case) result).setExpression(expr);
-            break;
-        case _DEFAULT:
-            jj_consume_token(_DEFAULT);
-            result = factory.createDefault();
-            setPrefixInfo(result);
-            jj_consume_token(COLON);
-            break;
-        default:
-            jj_la1[150] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+            case CASE:
+                jj_consume_token(CASE);
+                result = factory.createCase();
+                setPrefixInfo(result);
+                expr = Expression();
+                jj_consume_token(COLON);
+                ((Case) result).setExpression(expr);
+                break;
+            case _DEFAULT:
+                jj_consume_token(_DEFAULT);
+                result = factory.createDefault();
+                setPrefixInfo(result);
+                jj_consume_token(COLON);
+                break;
+            default:
+                jj_la1[150] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         setPostfixInfo(result);
         {
@@ -5054,12 +5055,12 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(result);
         cond = Expression();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case COLON:
-            jj_consume_token(COLON);
-            msg = Expression();
-            break;
-        default:
-            jj_la1[151] = jj_gen;
+            case COLON:
+                jj_consume_token(COLON);
+                msg = Expression();
+                break;
+            default:
+                jj_la1[151] = jj_gen;
         }
         jj_consume_token(SEMICOLON);
         result.setCondition(cond);
@@ -5091,15 +5092,15 @@ public class JavaCCParser implements JavaCCParserConstants {
         trueStat = Statement();
         thenStat.setBody(trueStat);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case ELSE:
-            jj_consume_token(ELSE);
-            elseStat = factory.createElse();
-            setPrefixInfo(elseStat);
-            falseStat = Statement();
-            elseStat.setBody(falseStat);
-            break;
-        default:
-            jj_la1[152] = jj_gen;
+            case ELSE:
+                jj_consume_token(ELSE);
+                elseStat = factory.createElse();
+                setPrefixInfo(elseStat);
+                falseStat = Statement();
+                elseStat.setBody(falseStat);
+                break;
+            default:
+                jj_la1[152] = jj_gen;
         }
         result.setExpression(cond);
         result.setThen(thenStat);
@@ -5173,99 +5174,99 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPrefixInfo(result);
             jj_consume_token(LPAREN);
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FINAL:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case INCR:
-            case DECR:
-                init = ForInit();
-                break;
-            default:
-                jj_la1[153] = jj_gen;
+                case AT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FALSE:
+                case FINAL:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case SHORT:
+                case SUPER:
+                case THIS:
+                case TRUE:
+                case VOID:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case INCR:
+                case DECR:
+                    init = ForInit();
+                    break;
+                default:
+                    jj_la1[153] = jj_gen;
             }
             jj_consume_token(SEMICOLON);
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case BANG:
-            case TILDE:
-            case INCR:
-            case DECR:
-            case PLUS:
-            case MINUS:
-                guard = Expression();
-                break;
-            default:
-                jj_la1[154] = jj_gen;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FALSE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case SHORT:
+                case SUPER:
+                case THIS:
+                case TRUE:
+                case VOID:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case BANG:
+                case TILDE:
+                case INCR:
+                case DECR:
+                case PLUS:
+                case MINUS:
+                    guard = Expression();
+                    break;
+                default:
+                    jj_la1[154] = jj_gen;
             }
             jj_consume_token(SEMICOLON);
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case INCR:
-            case DECR:
-                update = ForUpdate();
-                break;
-            default:
-                jj_la1[155] = jj_gen;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FALSE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case SHORT:
+                case SUPER:
+                case THIS:
+                case TRUE:
+                case VOID:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case INCR:
+                case DECR:
+                    update = ForUpdate();
+                    break;
+                default:
+                    jj_la1[155] = jj_gen;
             }
         } else if (jj_2_57(2147483647)) {
             result = factory.createEnhancedFor();
@@ -5301,35 +5302,35 @@ public class JavaCCParser implements JavaCCParserConstants {
             varDecl = LocalVariableDeclaration();
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case INCR:
-            case DECR:
-                exprs = StatementExpressionList();
-                break;
-            default:
-                jj_la1[156] = jj_gen;
-                jj_consume_token(-1);
-                throw new ParseException();
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FALSE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case SHORT:
+                case SUPER:
+                case THIS:
+                case TRUE:
+                case VOID:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case INCR:
+                case DECR:
+                    exprs = StatementExpressionList();
+                    break;
+                default:
+                    jj_la1[156] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
             }
         }
         if (varDecl != null) {
@@ -5354,11 +5355,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result.add(expr);
         label_74: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case COMMA:
-                break;
-            default:
-                jj_la1[157] = jj_gen;
-                break label_74;
+                case COMMA:
+                    break;
+                default:
+                    jj_la1[157] = jj_gen;
+                    break label_74;
             }
             jj_consume_token(COMMA);
             expr = StatementExpression();
@@ -5390,15 +5391,15 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createBreak();
         setPrefixInfo(result);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case IDENTIFIER:
-            jj_consume_token(IDENTIFIER);
-            id = factory.createIdentifier(token.image);
-            setPrefixInfo(id);
-            setPostfixInfo(id);
-            result.setIdentifier(id);
-            break;
-        default:
-            jj_la1[158] = jj_gen;
+            case IDENTIFIER:
+                jj_consume_token(IDENTIFIER);
+                id = factory.createIdentifier(token.image);
+                setPrefixInfo(id);
+                setPostfixInfo(id);
+                result.setIdentifier(id);
+                break;
+            default:
+                jj_la1[158] = jj_gen;
         }
         jj_consume_token(SEMICOLON);
         setPostfixInfo(result);
@@ -5417,15 +5418,15 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createContinue();
         setPrefixInfo(result);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case IDENTIFIER:
-            jj_consume_token(IDENTIFIER);
-            id = factory.createIdentifier(token.image);
-            setPrefixInfo(id);
-            setPostfixInfo(id);
-            result.setIdentifier(id);
-            break;
-        default:
-            jj_la1[159] = jj_gen;
+            case IDENTIFIER:
+                jj_consume_token(IDENTIFIER);
+                id = factory.createIdentifier(token.image);
+                setPrefixInfo(id);
+                setPostfixInfo(id);
+                result.setIdentifier(id);
+                break;
+            default:
+                jj_la1[159] = jj_gen;
         }
         jj_consume_token(SEMICOLON);
         setPostfixInfo(result);
@@ -5444,38 +5445,38 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createReturn();
         setPrefixInfo(result);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-        case BANG:
-        case TILDE:
-        case INCR:
-        case DECR:
-        case PLUS:
-        case MINUS:
-            expr = Expression();
-            result.setExpression(expr);
-            break;
-        default:
-            jj_la1[160] = jj_gen;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FALSE:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case NEW:
+            case NULL:
+            case SHORT:
+            case SUPER:
+            case THIS:
+            case TRUE:
+            case VOID:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+            case BANG:
+            case TILDE:
+            case INCR:
+            case DECR:
+            case PLUS:
+            case MINUS:
+                expr = Expression();
+                result.setExpression(expr);
+                break;
+            default:
+                jj_la1[160] = jj_gen;
         }
         jj_consume_token(SEMICOLON);
         setPostfixInfo(result);
@@ -5541,11 +5542,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         result.setBody(block);
         label_75: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case CATCH:
-                break;
-            default:
-                jj_la1[161] = jj_gen;
-                break label_75;
+                case CATCH:
+                    break;
+                default:
+                    jj_la1[161] = jj_gen;
+                    break label_75;
             }
             jj_consume_token(CATCH);
             cat = factory.createCatch();
@@ -5559,16 +5560,16 @@ public class JavaCCParser implements JavaCCParserConstants {
             branches.add(cat);
         }
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case FINALLY:
-            jj_consume_token(FINALLY);
-            fin = factory.createFinally();
-            setPrefixInfo(fin);
-            block = Block();
-            fin.setBody(block);
-            branches.add(fin);
-            break;
-        default:
-            jj_la1[162] = jj_gen;
+            case FINALLY:
+                jj_consume_token(FINALLY);
+                fin = factory.createFinally();
+                setPrefixInfo(fin);
+                block = Block();
+                fin.setBody(block);
+                branches.add(fin);
+                break;
+            default:
+                jj_la1[162] = jj_gen;
         }
         result.setBranchList(branches);
         setPostfixInfo(result);
@@ -5594,50 +5595,50 @@ public class JavaCCParser implements JavaCCParserConstants {
         }
         label_76: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ASSERT:
-            case AT:
-            case BOOLEAN:
-            case BREAK:
-            case BYTE:
-            case CHAR:
-            case CLASS:
-            case CONTINUE:
-            case DO:
-            case DOUBLE:
-            case FALSE:
-            case FINAL:
-            case FLOAT:
-            case FOR:
-            case IF:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case RETURN:
-            case SHORT:
-            case SUPER:
-            case SWITCH:
-            case SYNCHRONIZED:
-            case THIS:
-            case THROW:
-            case TRUE:
-            case TRY:
-            case VOID:
-            case WHILE:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
-            case LPAREN:
-            case LBRACE:
-            case SEMICOLON:
-            case INCR:
-            case DECR:
-                break;
-            default:
-                jj_la1[163] = jj_gen;
-                break label_76;
+                case ASSERT:
+                case AT:
+                case BOOLEAN:
+                case BREAK:
+                case BYTE:
+                case CHAR:
+                case CLASS:
+                case CONTINUE:
+                case DO:
+                case DOUBLE:
+                case FALSE:
+                case FINAL:
+                case FLOAT:
+                case FOR:
+                case IF:
+                case INT:
+                case LONG:
+                case NEW:
+                case NULL:
+                case RETURN:
+                case SHORT:
+                case SUPER:
+                case SWITCH:
+                case SYNCHRONIZED:
+                case THIS:
+                case THROW:
+                case TRUE:
+                case TRY:
+                case VOID:
+                case WHILE:
+                case INTEGER_LITERAL:
+                case FLOATING_POINT_LITERAL:
+                case CHARACTER_LITERAL:
+                case STRING_LITERAL:
+                case IDENTIFIER:
+                case LPAREN:
+                case LBRACE:
+                case SEMICOLON:
+                case INCR:
+                case DECR:
+                    break;
+                default:
+                    jj_la1[163] = jj_gen;
+                    break label_76;
             }
             stat = BlockStatement();
             result.add(stat);
@@ -5663,94 +5664,94 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(result);
         tr = Type();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case LPAREN:
-            jj_consume_token(LPAREN);
-            list = new ASTArrayList<>();
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
-            case BOOLEAN:
-            case BYTE:
-            case CHAR:
-            case DOUBLE:
-            case FALSE:
-            case FLOAT:
-            case INT:
-            case LONG:
-            case NEW:
-            case NULL:
-            case SHORT:
-            case SUPER:
-            case THIS:
-            case TRUE:
-            case VOID:
-            case INTEGER_LITERAL:
-            case FLOATING_POINT_LITERAL:
-            case CHARACTER_LITERAL:
-            case STRING_LITERAL:
-            case IDENTIFIER:
             case LPAREN:
-            case LBRACE:
-            case BANG:
-            case TILDE:
-            case INCR:
-            case DECR:
-            case PLUS:
-            case MINUS:
-                if (jj_2_60(2147483647)) {
-                    jj_consume_token(IDENTIFIER);
-                    ident = factory.createIdentifier(token.image);
-                    setPrefixInfo(ident);
-                    setPostfixInfo(ident);
-                    id = factory.createAnnotationPropertyReference(ident);
-                    copyPrefixInfo(ident, id);
-                    setPostfixInfo(id);
-                    jj_consume_token(ASSIGN);
-                    ev = ElementValue();
-                    evp = new AnnotationElementValuePair(id, ev);
-                    copyPrefixInfo(ident, evp);
-                    setPostfixInfo(evp);
-                    list.add(evp);
-                    label_77: while (true) {
-                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                        case COMMA:
-                            break;
-                        default:
-                            jj_la1[164] = jj_gen;
-                            break label_77;
+                jj_consume_token(LPAREN);
+                list = new ASTArrayList<>();
+                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    case AT:
+                    case BOOLEAN:
+                    case BYTE:
+                    case CHAR:
+                    case DOUBLE:
+                    case FALSE:
+                    case FLOAT:
+                    case INT:
+                    case LONG:
+                    case NEW:
+                    case NULL:
+                    case SHORT:
+                    case SUPER:
+                    case THIS:
+                    case TRUE:
+                    case VOID:
+                    case INTEGER_LITERAL:
+                    case FLOATING_POINT_LITERAL:
+                    case CHARACTER_LITERAL:
+                    case STRING_LITERAL:
+                    case IDENTIFIER:
+                    case LPAREN:
+                    case LBRACE:
+                    case BANG:
+                    case TILDE:
+                    case INCR:
+                    case DECR:
+                    case PLUS:
+                    case MINUS:
+                        if (jj_2_60(2147483647)) {
+                            jj_consume_token(IDENTIFIER);
+                            ident = factory.createIdentifier(token.image);
+                            setPrefixInfo(ident);
+                            setPostfixInfo(ident);
+                            id = factory.createAnnotationPropertyReference(ident);
+                            copyPrefixInfo(ident, id);
+                            setPostfixInfo(id);
+                            jj_consume_token(ASSIGN);
+                            ev = ElementValue();
+                            evp = new AnnotationElementValuePair(id, ev);
+                            copyPrefixInfo(ident, evp);
+                            setPostfixInfo(evp);
+                            list.add(evp);
+                            label_77: while (true) {
+                                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                                    case COMMA:
+                                        break;
+                                    default:
+                                        jj_la1[164] = jj_gen;
+                                        break label_77;
+                                }
+                                jj_consume_token(COMMA);
+                                jj_consume_token(IDENTIFIER);
+                                ident = factory.createIdentifier(token.image);
+                                setPrefixInfo(ident);
+                                setPostfixInfo(ident);
+                                id = factory.createAnnotationPropertyReference(ident);
+                                copyPrefixInfo(ident, id);
+                                setPostfixInfo(id);
+                                jj_consume_token(ASSIGN);
+                                ev = ElementValue();
+                                evp = new AnnotationElementValuePair(id, ev);
+                                copyPrefixInfo(ident, evp);
+                                setPostfixInfo(evp);
+                                list.add(evp);
+                            }
+                        } else if (jj_2_61(2147483647)) {
+                            ev = ElementValue();
+                            evp = new AnnotationElementValuePair(null, ev);
+                            copyPrefixInfo(ev, evp);
+                            setPostfixInfo(evp);
+                            list.add(evp);
+                        } else {
+                            jj_consume_token(-1);
+                            throw new ParseException();
                         }
-                        jj_consume_token(COMMA);
-                        jj_consume_token(IDENTIFIER);
-                        ident = factory.createIdentifier(token.image);
-                        setPrefixInfo(ident);
-                        setPostfixInfo(ident);
-                        id = factory.createAnnotationPropertyReference(ident);
-                        copyPrefixInfo(ident, id);
-                        setPostfixInfo(id);
-                        jj_consume_token(ASSIGN);
-                        ev = ElementValue();
-                        evp = new AnnotationElementValuePair(id, ev);
-                        copyPrefixInfo(ident, evp);
-                        setPostfixInfo(evp);
-                        list.add(evp);
-                    }
-                } else if (jj_2_61(2147483647)) {
-                    ev = ElementValue();
-                    evp = new AnnotationElementValuePair(null, ev);
-                    copyPrefixInfo(ev, evp);
-                    setPostfixInfo(evp);
-                    list.add(evp);
-                } else {
-                    jj_consume_token(-1);
-                    throw new ParseException();
+                        break;
+                    default:
+                        jj_la1[165] = jj_gen;
                 }
+                jj_consume_token(RPAREN);
                 break;
             default:
-                jj_la1[165] = jj_gen;
-            }
-            jj_consume_token(RPAREN);
-            break;
-        default:
-            jj_la1[166] = jj_gen;
+                jj_la1[166] = jj_gen;
         }
         result.setTypeReference(tr);
         if (list != null) {
@@ -5770,44 +5771,6 @@ public class JavaCCParser implements JavaCCParserConstants {
         Expression tmp;
         ASTList<Expression> elist = null;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FALSE:
-        case FLOAT:
-        case INT:
-        case LONG:
-        case NEW:
-        case NULL:
-        case SHORT:
-        case SUPER:
-        case THIS:
-        case TRUE:
-        case VOID:
-        case INTEGER_LITERAL:
-        case FLOATING_POINT_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
-        case IDENTIFIER:
-        case LPAREN:
-        case BANG:
-        case TILDE:
-        case INCR:
-        case DECR:
-        case PLUS:
-        case MINUS:
-            res = Expression();
-            break;
-        case AT:
-            res = AnnotationUse();
-            break;
-        case LBRACE:
-            jj_consume_token(LBRACE);
-            res = new ElementValueArrayInitializer();
-            setPrefixInfo(res);
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case AT:
             case BOOLEAN:
             case BYTE:
             case CHAR:
@@ -5829,44 +5792,82 @@ public class JavaCCParser implements JavaCCParserConstants {
             case STRING_LITERAL:
             case IDENTIFIER:
             case LPAREN:
-            case LBRACE:
             case BANG:
             case TILDE:
             case INCR:
             case DECR:
             case PLUS:
             case MINUS:
-                tmp = ElementValue();
-                elist = new ASTArrayList<>();
-                elist.add(tmp);
-                while (true) {
-                    if (jj_2_62(2)) {
-                    } else {
-                        break;
-                    }
-                    jj_consume_token(COMMA);
-                    tmp = ElementValue();
-                    elist.add(tmp);
-                }
+                res = Expression();
+                break;
+            case AT:
+                res = AnnotationUse();
+                break;
+            case LBRACE:
+                jj_consume_token(LBRACE);
+                res = new ElementValueArrayInitializer();
+                setPrefixInfo(res);
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case COMMA:
-                    jj_consume_token(COMMA);
-                    break;
-                default:
-                    jj_la1[167] = jj_gen;
+                    case AT:
+                    case BOOLEAN:
+                    case BYTE:
+                    case CHAR:
+                    case DOUBLE:
+                    case FALSE:
+                    case FLOAT:
+                    case INT:
+                    case LONG:
+                    case NEW:
+                    case NULL:
+                    case SHORT:
+                    case SUPER:
+                    case THIS:
+                    case TRUE:
+                    case VOID:
+                    case INTEGER_LITERAL:
+                    case FLOATING_POINT_LITERAL:
+                    case CHARACTER_LITERAL:
+                    case STRING_LITERAL:
+                    case IDENTIFIER:
+                    case LPAREN:
+                    case LBRACE:
+                    case BANG:
+                    case TILDE:
+                    case INCR:
+                    case DECR:
+                    case PLUS:
+                    case MINUS:
+                        tmp = ElementValue();
+                        elist = new ASTArrayList<>();
+                        elist.add(tmp);
+                        while (true) {
+                            if (jj_2_62(2)) {
+                            } else {
+                                break;
+                            }
+                            jj_consume_token(COMMA);
+                            tmp = ElementValue();
+                            elist.add(tmp);
+                        }
+                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            case COMMA:
+                                jj_consume_token(COMMA);
+                                break;
+                            default:
+                                jj_la1[167] = jj_gen;
+                        }
+                        break;
+                    default:
+                        jj_la1[168] = jj_gen;
                 }
+                jj_consume_token(RBRACE);
+                setPostfixInfo(res);
+                ((ElementValueArrayInitializer) res).setElementValues(elist);
                 break;
             default:
-                jj_la1[168] = jj_gen;
-            }
-            jj_consume_token(RBRACE);
-            setPostfixInfo(res);
-            ((ElementValueArrayInitializer) res).setElementValues(elist);
-            break;
-        default:
-            jj_la1[169] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
+                jj_la1[169] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
         {
             if (true) {
@@ -5905,11 +5906,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         res.add(tp);
         label_79: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case COMMA:
-                break;
-            default:
-                jj_la1[170] = jj_gen;
-                break label_79;
+                case COMMA:
+                    break;
+                default:
+                    jj_la1[170] = jj_gen;
+                    break label_79;
             }
             jj_consume_token(COMMA);
             tp = TypeParameter();
@@ -5945,12 +5946,12 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(id);
         setPostfixInfo(id);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-        case EXTENDS:
-            jj_consume_token(EXTENDS);
-            bound = Bound();
-            break;
-        default:
-            jj_la1[171] = jj_gen;
+            case EXTENDS:
+                jj_consume_token(EXTENDS);
+                bound = Bound();
+                break;
+            default:
+                jj_la1[171] = jj_gen;
         }
         res.setIdentifier(id);
         res.setBound(bound);
@@ -5969,11 +5970,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         res.add(tr);
         label_80: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case BIT_AND:
-                break;
-            default:
-                jj_la1[172] = jj_gen;
-                break label_80;
+                case BIT_AND:
+                    break;
+                default:
+                    jj_la1[172] = jj_gen;
+                    break label_80;
             }
             jj_consume_token(BIT_AND);
             tr = Type();
@@ -11564,192 +11565,192 @@ public class JavaCCParser implements JavaCCParserConstants {
                         jj_la = p.arg;
                         jj_lastpos = jj_scanpos = p.first;
                         switch (i) {
-                        case 0:
-                            jj_3_1();
-                            break;
-                        case 1:
-                            jj_3_2();
-                            break;
-                        case 2:
-                            jj_3_3();
-                            break;
-                        case 3:
-                            jj_3_4();
-                            break;
-                        case 4:
-                            jj_3_5();
-                            break;
-                        case 5:
-                            jj_3_6();
-                            break;
-                        case 6:
-                            jj_3_7();
-                            break;
-                        case 7:
-                            jj_3_8();
-                            break;
-                        case 8:
-                            jj_3_9();
-                            break;
-                        case 9:
-                            jj_3_10();
-                            break;
-                        case 10:
-                            jj_3_11();
-                            break;
-                        case 11:
-                            jj_3_12();
-                            break;
-                        case 12:
-                            jj_3_13();
-                            break;
-                        case 13:
-                            jj_3_14();
-                            break;
-                        case 14:
-                            jj_3_15();
-                            break;
-                        case 15:
-                            jj_3_16();
-                            break;
-                        case 16:
-                            jj_3_17();
-                            break;
-                        case 17:
-                            jj_3_18();
-                            break;
-                        case 18:
-                            jj_3_19();
-                            break;
-                        case 19:
-                            jj_3_20();
-                            break;
-                        case 20:
-                            jj_3_21();
-                            break;
-                        case 21:
-                            jj_3_22();
-                            break;
-                        case 22:
-                            jj_3_23();
-                            break;
-                        case 23:
-                            jj_3_24();
-                            break;
-                        case 24:
-                            jj_3_25();
-                            break;
-                        case 25:
-                            jj_3_26();
-                            break;
-                        case 26:
-                            jj_3_27();
-                            break;
-                        case 27:
-                            jj_3_28();
-                            break;
-                        case 28:
-                            jj_3_29();
-                            break;
-                        case 29:
-                            jj_3_30();
-                            break;
-                        case 30:
-                            jj_3_31();
-                            break;
-                        case 31:
-                            jj_3_32();
-                            break;
-                        case 32:
-                            jj_3_33();
-                            break;
-                        case 33:
-                            jj_3_34();
-                            break;
-                        case 34:
-                            jj_3_35();
-                            break;
-                        case 35:
-                            jj_3_36();
-                            break;
-                        case 36:
-                            jj_3_37();
-                            break;
-                        case 37:
-                            jj_3_38();
-                            break;
-                        case 38:
-                            jj_3_39();
-                            break;
-                        case 39:
-                            jj_3_40();
-                            break;
-                        case 40:
-                            jj_3_41();
-                            break;
-                        case 41:
-                            jj_3_42();
-                            break;
-                        case 42:
-                            jj_3_43();
-                            break;
-                        case 43:
-                            jj_3_44();
-                            break;
-                        case 44:
-                            jj_3_45();
-                            break;
-                        case 45:
-                            jj_3_46();
-                            break;
-                        case 46:
-                            jj_3_47();
-                            break;
-                        case 47:
-                            jj_3_48();
-                            break;
-                        case 48:
-                            jj_3_49();
-                            break;
-                        case 49:
-                            jj_3_50();
-                            break;
-                        case 50:
-                            jj_3_51();
-                            break;
-                        case 51:
-                            jj_3_52();
-                            break;
-                        case 52:
-                            jj_3_53();
-                            break;
-                        case 53:
-                            jj_3_54();
-                            break;
-                        case 54:
-                            jj_3_55();
-                            break;
-                        case 55:
-                            jj_3_56();
-                            break;
-                        case 56:
-                            jj_3_57();
-                            break;
-                        case 57:
-                            jj_3_58();
-                            break;
-                        case 58:
-                            jj_3_59();
-                            break;
-                        case 59:
-                            jj_3_60();
-                            break;
-                        case 60:
-                            jj_3_61();
-                            break;
-                        case 61:
-                            jj_3_62();
-                            break;
+                            case 0:
+                                jj_3_1();
+                                break;
+                            case 1:
+                                jj_3_2();
+                                break;
+                            case 2:
+                                jj_3_3();
+                                break;
+                            case 3:
+                                jj_3_4();
+                                break;
+                            case 4:
+                                jj_3_5();
+                                break;
+                            case 5:
+                                jj_3_6();
+                                break;
+                            case 6:
+                                jj_3_7();
+                                break;
+                            case 7:
+                                jj_3_8();
+                                break;
+                            case 8:
+                                jj_3_9();
+                                break;
+                            case 9:
+                                jj_3_10();
+                                break;
+                            case 10:
+                                jj_3_11();
+                                break;
+                            case 11:
+                                jj_3_12();
+                                break;
+                            case 12:
+                                jj_3_13();
+                                break;
+                            case 13:
+                                jj_3_14();
+                                break;
+                            case 14:
+                                jj_3_15();
+                                break;
+                            case 15:
+                                jj_3_16();
+                                break;
+                            case 16:
+                                jj_3_17();
+                                break;
+                            case 17:
+                                jj_3_18();
+                                break;
+                            case 18:
+                                jj_3_19();
+                                break;
+                            case 19:
+                                jj_3_20();
+                                break;
+                            case 20:
+                                jj_3_21();
+                                break;
+                            case 21:
+                                jj_3_22();
+                                break;
+                            case 22:
+                                jj_3_23();
+                                break;
+                            case 23:
+                                jj_3_24();
+                                break;
+                            case 24:
+                                jj_3_25();
+                                break;
+                            case 25:
+                                jj_3_26();
+                                break;
+                            case 26:
+                                jj_3_27();
+                                break;
+                            case 27:
+                                jj_3_28();
+                                break;
+                            case 28:
+                                jj_3_29();
+                                break;
+                            case 29:
+                                jj_3_30();
+                                break;
+                            case 30:
+                                jj_3_31();
+                                break;
+                            case 31:
+                                jj_3_32();
+                                break;
+                            case 32:
+                                jj_3_33();
+                                break;
+                            case 33:
+                                jj_3_34();
+                                break;
+                            case 34:
+                                jj_3_35();
+                                break;
+                            case 35:
+                                jj_3_36();
+                                break;
+                            case 36:
+                                jj_3_37();
+                                break;
+                            case 37:
+                                jj_3_38();
+                                break;
+                            case 38:
+                                jj_3_39();
+                                break;
+                            case 39:
+                                jj_3_40();
+                                break;
+                            case 40:
+                                jj_3_41();
+                                break;
+                            case 41:
+                                jj_3_42();
+                                break;
+                            case 42:
+                                jj_3_43();
+                                break;
+                            case 43:
+                                jj_3_44();
+                                break;
+                            case 44:
+                                jj_3_45();
+                                break;
+                            case 45:
+                                jj_3_46();
+                                break;
+                            case 46:
+                                jj_3_47();
+                                break;
+                            case 47:
+                                jj_3_48();
+                                break;
+                            case 48:
+                                jj_3_49();
+                                break;
+                            case 49:
+                                jj_3_50();
+                                break;
+                            case 50:
+                                jj_3_51();
+                                break;
+                            case 51:
+                                jj_3_52();
+                                break;
+                            case 52:
+                                jj_3_53();
+                                break;
+                            case 53:
+                                jj_3_54();
+                                break;
+                            case 54:
+                                jj_3_55();
+                                break;
+                            case 55:
+                                jj_3_56();
+                                break;
+                            case 56:
+                                jj_3_57();
+                                break;
+                            case 57:
+                                jj_3_58();
+                                break;
+                            case 58:
+                                jj_3_59();
+                                break;
+                            case 59:
+                                jj_3_60();
+                                break;
+                            case 60:
+                                jj_3_61();
+                                break;
+                            case 61:
+                                jj_3_62();
+                                break;
                         }
                     }
                     p = p.next;

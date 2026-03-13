@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 
 public final class CharListNotation extends Notation {
@@ -12,7 +12,7 @@ public final class CharListNotation extends Notation {
     }
 
     @Override
-    public void print(Term t, LogicPrinter sp) {
+    public void print(JTerm t, LogicPrinter sp) {
         if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
             sp.printTerm(t);
         } else {
@@ -24,15 +24,15 @@ public final class CharListNotation extends Notation {
         }
     }
 
-    private StringBuffer printlastfirst(Term t) {
+    private StringBuffer printlastfirst(JTerm t) {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printlastfirst(t.sub(0)).append(t.op().name().toString());
+            return printlastfirst(t.sub(0)).append(t.op().name());
         }
     }
 
-    private String translateCharTerm(Term t) {
+    private String translateCharTerm(JTerm t) {
         char charVal = 0;
         int intVal = 0;
         if (t.op().arity() == 0) {
@@ -56,9 +56,9 @@ public final class CharListNotation extends Notation {
      * translates a term that represents a string literal into a string that is enclosed by
      * quotation marks
      */
-    private String translateTerm(Term t) {
+    private String translateTerm(JTerm t) {
         final StringBuilder result = new StringBuilder();
-        Term term = t;
+        JTerm term = t;
         while (!term.op().name().toString().equals("clEmpty")) {
             if (!term.op().name().toString().equals("clCons")) {
                 throw new IllegalArgumentException("Term does not represent a String Literal!");

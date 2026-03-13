@@ -4,20 +4,24 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.MouseEvent;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Listener for an {@link InnerNodeView}
- *
- * Reacts on mouse events to highlight the selected part of the sequent and it pops up a menu
+ * <p>
+ * Reacts on mouse events to highlight the selected part of the sequent, and it pops up a menu
  * showing all applicable actions at the highlighted position.
  */
 public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
 
-    /** The menu shown on a mouse click. */
-    private InnerNodeViewMenu menu;
+    /**
+     * The menu shown on a mouse click.
+     */
+    private @Nullable JMenu menu;
 
     /**
      * Creates a new listener.
@@ -26,7 +30,6 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
      */
     InnerNodeViewListener(final InnerNodeView innerNodeView) {
         super(innerNodeView);
-        menu = new InnerNodeViewMenu();
     }
 
     @Override
@@ -36,7 +39,7 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
             if (mousePos != null) {
                 if (!me.isShiftDown() && !me.isControlDown()
                         && SwingUtilities.isLeftMouseButton(me)) {
-                    menu = new InnerNodeViewMenu(getSequentView(), mousePos);
+                    menu = new SequentViewMenu<>(this.getSequentView(), mousePos);
                     showPopup(me, menu);
                 }
             } else {
@@ -49,14 +52,18 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
     }
 
     @Override
-    public void mouseExited(MouseEvent me) {}
+    public void mouseExited(MouseEvent me) {
+    }
 
     @Override
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+    }
 
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+    }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 }

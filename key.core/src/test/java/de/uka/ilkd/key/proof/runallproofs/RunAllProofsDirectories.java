@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.key_project.util.helper.FindResources;
 
@@ -24,14 +26,14 @@ import org.key_project.util.helper.FindResources;
  */
 @SuppressWarnings("serial")
 public class RunAllProofsDirectories implements Serializable {
-    public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
-    public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
+    public static final Path EXAMPLE_DIR = FindResources.getExampleDirectory();
+    public static final Path RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
 
-    public RunAllProofsDirectories() {
+    public RunAllProofsDirectories() throws IOException {
         init();
     }
 
-    public static void init() {
-        RUNALLPROOFS_DIR.mkdirs();
+    public static void init() throws IOException {
+        Files.createDirectories(RUNALLPROOFS_DIR);
     }
 }

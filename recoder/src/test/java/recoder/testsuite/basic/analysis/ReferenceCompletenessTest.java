@@ -6,8 +6,8 @@ package recoder.testsuite.basic.analysis;
 
 import java.util.List;
 
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.*;
 import recoder.abstraction.Package;
 import recoder.convenience.Format;
@@ -42,14 +42,14 @@ public class ReferenceCompletenessTest {
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
                 if (pe instanceof Reference) {
-                    Assert.assertFalse("Uncollated reference detected",
-                        pe instanceof UncollatedReferenceQualifier);
+                    Assertions.assertFalse(pe instanceof UncollatedReferenceQualifier,
+                        "Uncollated reference detected");
                     if (pe instanceof VariableReference) {
                         VariableReference r = (VariableReference) pe;
                         Variable x = xrsi.getVariable(r);
                         List<? extends VariableReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
-                            Assert.fail(makeReferenceError(r, x));
+                            Assertions.fail(makeReferenceError(r, x));
                         }
                     } else if (pe instanceof TypeReference) {
                         TypeReference r = (TypeReference) pe;
@@ -58,7 +58,7 @@ public class ReferenceCompletenessTest {
                         if (x != null) {
                             List<TypeReference> list = xrsi.getReferences(x);
                             if (!list.contains(r)) {
-                                Assert.fail(makeReferenceError(r, x));
+                                Assertions.fail(makeReferenceError(r, x));
                             }
                         }
                     } else if (pe instanceof MethodReference) {
@@ -66,21 +66,21 @@ public class ReferenceCompletenessTest {
                         Method x = xrsi.getMethod(r);
                         List<? extends MemberReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
-                            Assert.fail(makeReferenceError(r, x));
+                            Assertions.fail(makeReferenceError(r, x));
                         }
                     } else if (pe instanceof ConstructorReference) {
                         ConstructorReference r = (ConstructorReference) pe;
                         Constructor x = xrsi.getConstructor(r);
                         List<ConstructorReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
-                            Assert.fail(makeReferenceError(r, x));
+                            Assertions.fail(makeReferenceError(r, x));
                         }
                     } else if (pe instanceof PackageReference) {
                         PackageReference r = (PackageReference) pe;
                         Package x = xrsi.getPackage(r);
                         List<PackageReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
-                            Assert.fail(makeReferenceError(r, x));
+                            Assertions.fail(makeReferenceError(r, x));
                         }
                     }
                 }

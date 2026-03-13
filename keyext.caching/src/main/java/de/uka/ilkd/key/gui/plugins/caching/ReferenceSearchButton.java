@@ -13,6 +13,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
@@ -70,7 +71,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
         Proof p = e.getSource().getSelectedProof();
         updateState(p);
     }

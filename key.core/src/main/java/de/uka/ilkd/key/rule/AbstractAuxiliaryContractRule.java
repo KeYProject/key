@@ -27,6 +27,9 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -84,7 +87,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      *
      * @return the term on which the rule was last applied.
      */
-    public abstract Term getLastFocusTerm();
+    public abstract JTerm getLastFocusTerm();
 
     /**
      *
@@ -98,7 +101,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param formula the last focus term.
      * @see #getLastFocusTerm()
      */
-    protected abstract void setLastFocusTerm(Term formula);
+    protected abstract void setLastFocusTerm(JTerm formula);
 
     @Override
     public String displayName() {
@@ -121,15 +124,15 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return an anonymizing update for the specified variables.
      */
-    protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    protected static JTerm createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
-        Term anonUpdate = null;
+        JTerm anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
+        for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final JTerm elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;
             } else {
@@ -147,7 +150,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return a new local variable with the specified base name of the specified type.
      */
-    protected static ProgramVariable createLocalVariable(final String nameBase,
+    protected static LocationVariable createLocalVariable(final String nameBase,
             final KeYJavaType type, final Services services) {
         return KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
@@ -156,17 +159,18 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
-     * @param update    The context update.
-     * @param formula   The update target.
-     * @param modality  The contract's modality.
-     * @param self      The self variable.
+     * @param update The context update.
+     * @param formula The update target.
+     * @param modality The contract's modality.
+     * @param self The self variable.
      * @param statement The statement the contract belongs to.
-     * @param context   The execution context in which the block occurs.
+     * @param context The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
-                                    @NonNull JavaStatement statement,
-                                    ExecutionContext context) {
+    public record Instantiation(@NonNull JTerm update, @NonNull JTerm formula,
+            @NonNull JModality modality, JTerm self,
+            @NonNull JavaStatement statement,
+            ExecutionContext context) {
         public Instantiation {
             assert update != null;
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -176,13 +180,13 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             assert statement != null;
         }
 
-            /**
-             * @return {@code true} iff the modality is transactional.
-             */
-            public boolean isTransactional() {
-                return modality.transaction();
-            }
+        /**
+         * @return {@code true} iff the modality is transactional.
+         */
+        public boolean isTransactional() {
+            return modality.transaction();
         }
+    }
 
     /**
      * A builder for {@link Instantiation}s.
@@ -192,7 +196,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         /**
          * The formula on which the rule is to be applied.
          */
-        private final Term formula;
+        private final JTerm formula;
 
         /**
          * The current goal.
@@ -205,15 +209,13 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         private final Services services;
 
         /**
-         *
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
-         * @param services services.
          */
-        public Instantiator(final Term formula, final Goal goal, final Services services) {
+        protected Instantiator(final JTerm formula, final Goal goal) {
             this.formula = formula;
             this.goal = goal;
-            this.services = services;
+            this.services = goal.getOverlayServices();
         }
 
         /**
@@ -221,9 +223,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @return a new instantiation.
          */
         public Instantiation instantiate() {
-            final Term update = extractUpdate();
-            final Term target = extractUpdateTarget();
-            if (!(target.op() instanceof Modality modality)) {
+            final JTerm update = extractUpdate();
+            final JTerm target = extractUpdateTarget();
+            if (!(target.op() instanceof JModality modality)) {
                 return null;
             }
             final JavaStatement statement =
@@ -234,7 +236,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             }
             final MethodFrame frame =
                 JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
-            final Term self = extractSelf(frame);
+            final JTerm self = extractSelf(frame);
             final ExecutionContext context = extractExecutionContext(frame);
             return new Instantiation(update, target, modality, self, statement, context);
         }
@@ -243,7 +245,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          *
          * @return the update if {@link #formula} is an update application, {@code null} otherwise.
          */
-        private Term extractUpdate() {
+        private JTerm extractUpdate() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getUpdate(formula);
             } else {
@@ -256,7 +258,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @return the update target if {@link #formula} is an update application, {@code formula}
          *         otherwise.
          */
-        private Term extractUpdateTarget() {
+        private JTerm extractUpdateTarget() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getTarget(formula);
             } else {
@@ -269,7 +271,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @param frame the outermost method-frame used in the formula.
          * @return the self term.
          */
-        private Term extractSelf(final MethodFrame frame) {
+        private JTerm extractSelf(final MethodFrame frame) {
             if (frame == null) {
                 return null;
             }
@@ -294,10 +296,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @return the first block in the java block's prefix with at least one applicable contract.
          */
         private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
-                final Modality modality, final Goal goal) {
-            SourceElement element = modality.program().program().getFirstElement();
-            while ((element instanceof PossibleProgramPrefix pre && pre.isPrefix())
-                    || element instanceof CatchAllStatement) {
+                final JModality modality, final Goal goal) {
+            SourceElement element = modality.programBlock().program().getFirstElement();
+            while ((element instanceof PossibleProgramPrefix pre && pre.isPrefix() || element instanceof CatchAllStatement)) {
                 if (element instanceof StatementBlock && hasApplicableContracts(services,
                     (StatementBlock) element, modality.kind(), goal)) {
                     return (StatementBlock) element;
@@ -326,7 +327,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @return {@code true} iff the block has applicable contracts.
          */
         protected abstract boolean hasApplicableContracts(final Services services,
-                final JavaStatement element, final Modality.JavaModalityKind modalityKind,
+                final JavaStatement element, final JModality.JavaModalityKind modalityKind,
                 Goal goal);
     }
 

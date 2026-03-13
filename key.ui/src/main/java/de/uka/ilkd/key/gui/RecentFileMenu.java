@@ -5,7 +5,9 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,6 +19,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,15 +75,15 @@ public class RecentFileMenu {
         this.menu = new JMenu("Recent Files");
         this.lissy = e -> {
             String absPath = getAbsolutePath((JMenuItem) e.getSource());
-            File file = new File(absPath);
+            Path file = Paths.get(absPath);
 
             // special case proof bundles -> allow to select the proof to load
-            if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+            if (ProofSelectionDialog.isProofBundle(file)) {
+                Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
                 if (proofPath == null) {
                     // canceled by user!
                 } else {
-                    mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
+                    mediator.getUI().loadProofFromBundle(file, proofPath);
                 }
             } else {
                 mediator.getUI().loadProblem(file);
@@ -199,9 +202,9 @@ public class RecentFileMenu {
     /**
      * read the recent files from the given properties file
      */
-    public final void loadFrom(String filename) {
+    public final void loadFrom(Path filename) {
         try {
-            var c = Configuration.load(new File(filename));
+            var c = Configuration.load(filename);
             c.getStringList("recentFiles").forEach(this::addRecentFileNoSave);
         } catch (FileNotFoundException ex) {
             LOGGER.debug("Could not read RecentFileList. Did not find file {}", filename);
@@ -213,6 +216,7 @@ public class RecentFileMenu {
     /**
      * @return the absolute path to the most recently opened file (maybe null)
      */
+    @Nullable
     public String getMostRecent() {
         return mostRecentFile != null ? mostRecentFile.getAbsolutePath() : null;
     }
@@ -221,15 +225,14 @@ public class RecentFileMenu {
      * write the recent file names to the given properties file. the file will be read (if it
      * exists) and then re-written so no information will be lost.
      */
-    public void store(String filename) {
-        File localRecentFiles = new File(filename);
+    public void store(Path filename) {
         Configuration c = new Configuration();
         var seq = menuItemToRecentFile.values().stream()
                 .map(RecentFileEntry::getAbsolutePath)
                 .collect(Collectors.toList());
         c.set("recentFiles", seq);
 
-        try (var fin = new BufferedWriter(new FileWriter(localRecentFiles))) {
+        try (var fin = Files.newBufferedWriter(filename)) {
             c.save(fin, "");
         } catch (IOException ex) {
             LOGGER.info("Could not write recent files list ", ex);

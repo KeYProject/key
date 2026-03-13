@@ -180,26 +180,26 @@ public interface ConstantEvaluator extends Service {
 
         public String toString() {
             switch (type) {
-            case BOOLEAN_TYPE:
-                return String.valueOf(booleanValue);
-            case BYTE_TYPE:
-                return String.valueOf(byteValue);
-            case SHORT_TYPE:
-                return String.valueOf(shortValue);
-            case CHAR_TYPE:
-                return String.valueOf(charValue);
-            case INT_TYPE:
-                return String.valueOf(intValue);
-            case LONG_TYPE:
-                return String.valueOf(longValue);
-            case FLOAT_TYPE:
-                return String.valueOf(floatValue);
-            case DOUBLE_TYPE:
-                return String.valueOf(doubleValue);
-            case STRING_TYPE:
-                return "\"" + stringValue + "\"";
-            default:
-                return "Unknown type";
+                case BOOLEAN_TYPE:
+                    return String.valueOf(booleanValue);
+                case BYTE_TYPE:
+                    return String.valueOf(byteValue);
+                case SHORT_TYPE:
+                    return String.valueOf(shortValue);
+                case CHAR_TYPE:
+                    return String.valueOf(charValue);
+                case INT_TYPE:
+                    return String.valueOf(intValue);
+                case LONG_TYPE:
+                    return String.valueOf(longValue);
+                case FLOAT_TYPE:
+                    return String.valueOf(floatValue);
+                case DOUBLE_TYPE:
+                    return String.valueOf(doubleValue);
+                case STRING_TYPE:
+                    return "\"" + stringValue + "\"";
+                default:
+                    return "Unknown type";
             }
         }
     }

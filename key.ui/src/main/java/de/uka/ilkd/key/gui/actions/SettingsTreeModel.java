@@ -3,22 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Properties;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.Settings;
+
+import org.key_project.logic.Choice;
 
 /**
  *
@@ -34,6 +33,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private final ProofSettings proofSettings;
 
     private final ProofIndependentSettings independentSettings;
+    private OptionContentNode tacletOptionsItem;
 
     public SettingsTreeModel(ProofSettings proofSettings,
             ProofIndependentSettings independentSettings) {
@@ -46,19 +46,27 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private void generateTree() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getRoot();
 
-        OptionContentNode proofSettingsNode =
-            generateOptionContentNode("Proof Settings", "These are the proof dependent settings.");
-        root.add(proofSettingsNode);
+        if (proofSettings == null) {
+            OptionContentNode proofSettingsNode =
+                generateOptionContentNode("Proof Settings", "There is currently no proof loaded!");
+            root.add(proofSettingsNode);
+        } else {
+            OptionContentNode proofSettingsNode =
+                generateOptionContentNode("Proof Settings",
+                    "These are the proof dependent settings.");
+            root.add(proofSettingsNode);
 
-        // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
-        ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        proofSettingsNode.add(generateTableNode("Taclets", choiceSettings));
+            // ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
+            ChoiceSettings choiceSettings = proofSettings.getChoiceSettings();
+            tacletOptionsItem = generateTableNode("Taclet Options", choiceSettings);
+            proofSettingsNode.add(tacletOptionsItem);
 
-        Settings strategySettings = proofSettings.getStrategySettings();
-        proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
+            Settings strategySettings = proofSettings.getStrategySettings();
+            proofSettingsNode.add(generateTableNode("Strategy", strategySettings));
 
-        Settings smtSettings = proofSettings.getSMTSettings();
-        proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+            Settings smtSettings = proofSettings.getSMTSettings();
+            proofSettingsNode.add(generateTableNode("SMT", smtSettings));
+        }
 
         OptionContentNode independentSettingsNode = generateOptionContentNode(
             "Proof-Independent Settings", "These are the proof independent settings.");
@@ -75,7 +83,10 @@ public class SettingsTreeModel extends DefaultTreeModel {
         Settings viewSettings = independentSettings.getViewSettings();
         independentSettingsNode.add(generateTableNode("View", viewSettings));
         Settings termLabelSettings = independentSettings.getTermLabelSettings();
-        proofSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
+        // Previously, the termLabelSettings were added to the proofSettingsNode, but judging by the
+        // previous line,
+        // it should really be added to the independentSettingsNode
+        independentSettingsNode.add(generateTableNode("Term Labels", termLabelSettings));
     }
 
 
@@ -115,13 +126,14 @@ public class SettingsTreeModel extends DefaultTreeModel {
         JTextArea ta = new JTextArea(5, 20);
         ta.append(text);
         ta.setEditable(false);
+        ta.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JScrollPane scrollpane = new JScrollPane(ta);
         return scrollpane;
     }
 
     private JComponent generateJTable(Properties properties) {
         String[] columnNames = { "Name", "Value" };
-        Object[][] data = new Object[properties.entrySet().size()][2];
+        Object[][] data = new Object[properties.size()][2];
 
         int i = 0;
         for (Entry<Object, Object> entry : properties.entrySet()) {
@@ -129,6 +141,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
             data[i][1] = entry.getValue();
             i++;
         }
+
+        Arrays.sort(data, (a, b) -> a[0].toString().compareToIgnoreCase(b[0].toString()));
 
         JTable table = new JTable();
 
@@ -143,9 +157,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
         };
 
         tableModel.setDataVector(data, columnNames);
-
         table.setModel(tableModel);
-
+        table.setRowHeight(table.getRowHeight() + 10);
 
         JScrollPane scrollpane = new JScrollPane(table);
         return scrollpane;
@@ -157,6 +170,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         return new OptionContentNode(title, generateScrollPane(text));
     }
 
-
-
+    public OptionContentNode getTacletOptionsItem() {
+        return tacletOptionsItem;
+    }
 }

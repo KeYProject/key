@@ -86,24 +86,24 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         ForkMode forkMode = settings.getForkMode();
         switch (forkMode) {
-        case PERGROUP -> testResults =
-            ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
-        case NOFORK -> {
-            testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                TestResult testResult = testFile.runKey();
-                testResults.add(testResult);
+            case PERGROUP -> testResults =
+                ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
+            case NOFORK -> {
+                testResults = new ArrayList<>();
+                for (TestFile testFile : testFiles) {
+                    TestResult testResult = testFile.runKey();
+                    testResults.add(testResult);
+                }
             }
-        }
-        case PERFILE -> {
-            testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                TestResult testResult =
-                    ForkedTestFileRunner.processTestFile(testFile, getTempDir());
-                testResults.add(testResult);
+            case PERFILE -> {
+                testResults = new ArrayList<>();
+                for (TestFile testFile : testFiles) {
+                    TestResult testResult =
+                        ForkedTestFileRunner.processTestFile(testFile, getTempDir());
+                    testResults.add(testResult);
+                }
             }
-        }
-        default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
+            default -> throw new RuntimeException("Unexpected value for fork mode: " + forkMode);
         }
 
         if (verbose) {
@@ -121,19 +121,25 @@ public final class RunAllProofsTestUnit implements Serializable {
 
         boolean success = true;
         StringBuilder message = new StringBuilder("group " + testName + ":\n");
+        StringBuilder summary = new StringBuilder("Summary of test results:\n");
         for (int i = 0; i < testResults.size(); i++) {
             var start = System.currentTimeMillis();
             TestFile file = testFiles.get(i);
             var time = System.currentTimeMillis() - start;
             TestResult testResult = testResults.get(i);
-            xml.addTestcase(file.getKeYFile().getName(), this.testName,
+            xml.addTestcase(file.getKeYFile().getFileName().toString(), this.testName,
                 (testResult.success() ? JunitXmlWriter.TestCaseState.SUCCESS
                         : JunitXmlWriter.TestCaseState.FAILED),
                 "",
                 !testResult.success() ? "error" : "", testResult.message(), "", time / 1000.0);
             success &= testResult.success();
             message.append(testResult.message()).append("\n");
+            summary.append(String.format("  %s (%s): %s%n",
+                file.getKeYFile().getFileName().toString(),
+                file.getTestProperty(),
+                testResult.success() ? "success" : "FAILURE"));
         }
+        message.insert(0, summary);
         return new TestResult(message.toString(), success);
     }
 

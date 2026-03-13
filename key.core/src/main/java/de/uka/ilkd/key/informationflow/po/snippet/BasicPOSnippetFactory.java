@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  *
@@ -27,8 +27,8 @@ public interface BasicPOSnippetFactory {
         // postcondition of the contract
         CONTRACT_POST(BasicPostconditionSnippet.class),
 
-        // modifies of the contract
-        CONTRACT_MOD(BasicModifiesSnippet.class),
+        // modifiable of the contract
+        CONTRACT_MODIFIABLE(BasicModifiableSnippet.class),
 
         // dependencies of the contract
         CONTRACT_DEP(BasicDependsSnippet.class),
@@ -92,6 +92,6 @@ public interface BasicPOSnippetFactory {
     }
 
 
-    Term create(Snippet snippet) throws UnsupportedOperationException;
+    JTerm create(Snippet snippet) throws UnsupportedOperationException;
 
 }

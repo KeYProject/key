@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,18 +22,20 @@ import recoder.io.DataLocation;
 /**
  * This class is used to describe a directory structure as a repository for files to read in. A
  * directory is read recursively.
- *
+ * <p>
  * All files are enumerated when the walker is created. Any file added afterwards will not looked at
  * when iterating.
- *
+ * <p>
  * For more info see {@link FileCollection}
  *
  * @author MU
  */
 public class DirectoryFileCollection implements FileCollection {
 
-    /** directory under inspection */
-    private final File directory;
+    /**
+     * directory under inspection
+     */
+    private final Path directory;
 
     /**
      * create a new File collection for a given directory The argument may be a single file also. A
@@ -39,26 +43,22 @@ public class DirectoryFileCollection implements FileCollection {
      *
      * @param directory directory to iterate through,
      */
-    public DirectoryFileCollection(File directory) {
+    public DirectoryFileCollection(Path directory) {
         this.directory = directory;
     }
 
-    /*
+    /**
      * add all files in or under dir to a file list. Extension is tested
      */
-    private static void addAllFiles(File dir, String extension, List<File> files) {
-        File[] listFiles = dir.listFiles();
-
-        if (listFiles == null) {
-            throw new IllegalArgumentException(dir + " is not a directory or cannot be read!");
-        }
-
-        for (File file : listFiles) {
-            if (file.isDirectory()) {
-                addAllFiles(file, extension, files);
-            } else if (extension == null || file.getName().toLowerCase().endsWith(extension)) {
-                files.add(file);
-            }
+    private static void addAllFiles(Path dir, String extension, List<File> files) {
+        try (var walker = Files.walk(dir)) {
+            List<File> listFiles = walker
+                    .filter(it -> it.getFileName().toString().toLowerCase().endsWith(extension))
+                    .map(Path::toFile)
+                    .toList();
+            files.addAll(listFiles);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(dir + " is not a directory or cannot be read!", e);
         }
     }
 

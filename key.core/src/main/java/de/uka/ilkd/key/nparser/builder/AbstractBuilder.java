@@ -29,10 +29,9 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressWarnings("unchecked")
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
-    @Nullable
-    private List<BuildingIssue> buildingIssues = null;
-    @Nullable
-    private Stack<Object> parameters = null;
+
+    private @Nullable List<BuildingIssue> buildingIssues = null;
+    private @Nullable Stack<Object> parameters = null;
 
     /**
      * Helper function for avoiding cast.

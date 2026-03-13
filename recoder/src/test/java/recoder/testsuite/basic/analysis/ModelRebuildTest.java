@@ -6,9 +6,9 @@ package recoder.testsuite.basic.analysis;
 
 import java.util.List;
 
-import junit.framework.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.ClassType;
 import recoder.java.CompilationUnit;
 import recoder.java.declaration.TypeDeclaration;
@@ -24,7 +24,7 @@ import recoder.testsuite.basic.BasicTestsSuite;
  * @author AL
  * @since 0.72
  */
-@Ignore
+@Disabled
 public class ModelRebuildTest extends AnalysisReportTest {
 
     @Test
@@ -46,13 +46,13 @@ public class ModelRebuildTest extends AnalysisReportTest {
 
         // model should be cleared now except for byte code and implicitly
         // defined stuff
-        Assert.assertEquals(
+        Assertions.assertEquals(
             BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(),
             0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
-            Assert.assertFalse("Syntax tree left in an emptied model",
-                ctl.get(i) instanceof TypeDeclaration);
+            Assertions.assertFalse(ctl.get(i) instanceof TypeDeclaration,
+                "Syntax tree left in an emptied model");
         }
 
         ch.rollback(clearAll);

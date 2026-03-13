@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
 
 /**
  * A composite structure for prover task listeners. For the moment, this is only used for the

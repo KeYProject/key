@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,17 +11,22 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.gui.sourceview.JavaDocument.JML_COLOR;
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 /**
@@ -121,13 +127,84 @@ public class HTMLSyntaxHighlighter {
     private static final String PROGVAR_REPLACEMENT =
         "$1<span class=\"progvar_highlight\">$2</span>$3";
 
-    private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//.*?)<br>");
+    private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//[^@].*?)<br>");
+
+    private static final Pattern SINGLE_LINE_JML_PATTERN = Pattern.compile("(//@.*?)<br>");
+
     private static final String SINGLE_LINE_COMMENT_REPLACEMENT =
         "<span class=\"comment_highlight\">$1</span><br>";
 
+    private static final String SINGLE_LINE_JML_REPLACEMENT =
+        "<span class=\"jml_highlight\">$1</span><br>";
     private static final Pattern SEQUENT_ARROW_PATTERN = Pattern.compile("(==>|⟹)");
     private static final String SEQUENT_ARROW_REPLACEMENT =
         "<span class=\"sequent_arrow_highlight\">$1</span>";
+
+
+    private static final StyleSheet light = new StyleSheet();
+    private static final StyleSheet dark = new StyleSheet();
+
+    private static final ColorSettings.ColorProperty PROP_LOGIC_COLOR =
+        ColorSettings.define("[sequentView]prop_logic_color", "",
+            Color.black, Color.white);
+
+    private static final ColorSettings.ColorProperty DYN_LOGIC_COLOR =
+        ColorSettings.define("[sequentView]dyn_logic_color", "",
+            new Color(0, 0, 16 * 13),
+            new Color(150, 150, 250));
+
+    private static final ColorSettings.ColorProperty JAVA_COLOR = JavaDocument.JAVA_KEYWORD_COLOR;
+    private static final ColorSettings.ColorProperty COMMENT_COLOR = JavaDocument.COMMENT_COLOR;
+    private static final ColorSettings.ColorProperty JML_COLOR = JavaDocument.JML_KEYWORD_COLOR;
+
+    private static final ColorSettings.ColorProperty PROG_VAR_COLOR =
+        ColorSettings.define("[sequentView]prog_var_color", "",
+            new Color(0x6A, 0x3E, 0x3E),
+            new Color(100, 100, 250));
+
+    private static final ColorSettings.ColorProperty SEQUENT_ARROW_COLOR =
+        ColorSettings.define("[sequentView]sequent_arrow_color", "",
+            new Color(0x6A, 0x3E, 0x3E),
+            new Color(100, 100, 250));
+
+
+    static {
+        final var lightString = """
+                .prop_logic_highlight { color: #%06X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%06X; font-weight: bold; }
+                .java_highlight { color: #%06X; font-weight: bold; }
+                .progvar_highlight { color: #%06X; }
+                .comment_highlight { color: #%06X; }
+                .jml_highlight { color: #%06X; }
+                .sequent_arrow_highlight { color: #%06X; font-size: 1.7em }
+                """.formatted(
+            PROP_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            DYN_LOGIC_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            JAVA_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            PROG_VAR_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            COMMENT_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            JML_COLOR.getLightValue().getRGB() & 0xFFFFFF,
+            SEQUENT_ARROW_COLOR.getLightValue().getRGB() & 0xFFFFFF);
+        light.addRule(lightString);
+
+        final var darkString = """
+                .prop_logic_highlight { color: #%06X; font-weight: bold; }
+                .dynamic_logic_highlight { color: #%06X; font-weight: bold; }
+                .java_highlight { color: #%06X; font-weight: bold; }
+                .progvar_highlight { color: #%06X; }
+                .comment_highlight { color: #%06X; }
+                .jml_highlight { color: #%06X; }
+                .sequent_arrow_highlight { color: #%06X; font-size: 1.7em }
+                """.formatted(
+            PROP_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            DYN_LOGIC_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            JAVA_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            PROG_VAR_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            COMMENT_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            JML_COLOR.getDarkValue().getRGB() & 0xFFFFFF,
+            SEQUENT_ARROW_COLOR.getDarkValue().getRGB() & 0xFFFFFF);
+        dark.addRule(darkString);
+    }
 
 
     /**
@@ -136,22 +213,13 @@ public class HTMLSyntaxHighlighter {
      * @param document The {@link HTMLDocument}
      */
     public static void addCSSRulesTo(HTMLDocument document) {
-        final String propLogicHighlightRule =
-            ".prop_logic_highlight { color: #000000; font-weight: bold; }";
-        final String foLogicHighlightRule =
-            ".dynamic_logic_highlight { color: #0000C0; font-weight: bold; }";
-        final String javaHighlightRule = ".java_highlight { color: #7F0055; font-weight: bold; }";
-        final String progVarHighlightRule = ".progvar_highlight { color: #6A3E3E; }";
-        final String commentHighlightRule = ".comment_highlight { color: #3F7F5F; }";
-        final String sequentArrowHighlightRule =
-            ".sequent_arrow_highlight { color: #000000; font-size: 1.7em }";
-
-        document.getStyleSheet().addRule(propLogicHighlightRule);
-        document.getStyleSheet().addRule(progVarHighlightRule);
-        document.getStyleSheet().addRule(javaHighlightRule);
-        document.getStyleSheet().addRule(foLogicHighlightRule);
-        document.getStyleSheet().addRule(commentHighlightRule);
-        document.getStyleSheet().addRule(sequentArrowHighlightRule);
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()) {
+            document.getStyleSheet().removeStyleSheet(light);
+            document.getStyleSheet().addStyleSheet(dark);
+        } else {
+            document.getStyleSheet().removeStyleSheet(dark);
+            document.getStyleSheet().addStyleSheet(light);
+        }
     }
 
     /**
@@ -234,6 +302,9 @@ public class HTMLSyntaxHighlighter {
 
             modality = SINGLE_LINE_COMMENT_PATTERN.matcher(modality)
                     .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
+
+            modality = SINGLE_LINE_JML_PATTERN.matcher(modality)
+                    .replaceAll(SINGLE_LINE_JML_REPLACEMENT);
 
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }
@@ -354,9 +425,9 @@ public class HTMLSyntaxHighlighter {
         public String run() {
             var ref = node.get();
             if (useHtml && ref != null) {
-                return HTMLSyntaxHighlighter.process(text, ref);
+                return process(text, ref);
             } else {
-                return HTMLSyntaxHighlighter.toHTML(text);
+                return toHTML(text);
             }
         }
     }

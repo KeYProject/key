@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.TermServices;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -28,7 +27,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
      * PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
      */
     @Override
-    protected MatchConditions setupMatchConditions(PosInOccurrence pos, TermServices services) {
+    protected MatchConditions setupMatchConditions(PosInOccurrence pos) {
         if (taclet() instanceof RewriteTaclet) {
             return ((RewriteTaclet) taclet()).checkPrefix(pos,
                 MatchConditions.EMPTY_MATCHCONDITIONS);

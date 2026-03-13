@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -48,8 +47,7 @@ public class TestProofBundleIO {
      */
     @BeforeAll
     public static void prepare() {
-        testDir =
-            Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
+        testDir = HelperClassForTests.TESTCASE_DIRECTORY.resolve("proofBundle");
 
         // remember settings to be able to reset after the test
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
@@ -137,7 +135,7 @@ public class TestProofBundleIO {
         Path base = testDir.resolve("simpleBundleGeneration");
 
         simple.setBaseDir(base);
-        simple.setJavaPath(base.resolve("src").toString());
+        simple.setJavaPath(base.resolve("src"));
 
         Path src = base.resolve("src");
         InputStream is1 = simple.getInputStream(base.resolve("test.key"));
@@ -167,7 +165,7 @@ public class TestProofBundleIO {
      * @throws ProblemLoaderException if loading fails
      */
     private Proof loadBundle(Path p) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p);
         AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
         if (replayResult.hasErrors()) {
             LOGGER.debug("Error(s) while loading");
@@ -203,7 +201,7 @@ public class TestProofBundleIO {
         Path path = testDir.resolve(dirName).resolve("test.key");
 
         // load *.key file
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path);
         assertNotNull(env);
 
         Proof proof = env.getLoadedProof();
@@ -216,7 +214,7 @@ public class TestProofBundleIO {
 
         // save (closed) proof as a bundle
         Path target = testDir.resolve(dirName).resolve("test.zproof");
-        ProofBundleSaver saver = new ProofBundleSaver(proof, target.toFile());
+        ProofBundleSaver saver = new ProofBundleSaver(proof, target);
         saver.save();
 
         // check if target file exists and has minimum size

@@ -4,16 +4,22 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the type of a field
@@ -27,13 +33,13 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
 
-    public FieldTypeToSortCondition(final SchemaVariable exprOrTypeSV, final GenericSort sort) {
+    public FieldTypeToSortCondition(final JOperatorSV exprOrTypeSV, final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         assert checkSortedSV(exprOrTypeSV);
     }
 
-    public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
+    public static boolean checkSortedSV(final JOperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
@@ -41,45 +47,27 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute svSubst,
-            MatchConditions matchCond, Services services) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
+            MatchResultInfo matchCond, LogicServices services) {
 
         if (var != exprOrTypeSV) {
             return matchCond;
         }
 
-        final SVInstantiations inst = matchCond.getInstantiations();
+        final SVInstantiations inst =
+            (SVInstantiations) matchCond.getInstantiations();
 
-        if (svSubst instanceof Term) {
-            Operator op = ((Term) svSubst).op();
-            if (op instanceof JFunction) {
-                String name = op.name().toString();
-
-                String className;
-                String attributeName;
-
-                // check for normal attribute
-                int endOfClassName = name.indexOf("::$");
-
-                int startAttributeName = endOfClassName + 3;
-
-
-                if (endOfClassName < 0) {
-                    // not a normal attribute, maybe an implicit attribute like <created>?
-                    endOfClassName = name.indexOf("::<");
-                    startAttributeName = endOfClassName + 2;
-                }
-
-                if (endOfClassName < 0) {
+        if (svSubst instanceof JTerm) {
+            Operator op = ((JTerm) svSubst).op();
+            if (op instanceof Function) {
+                HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
+                if (split == null) {
                     return null;
                 }
 
-
-                className = name.substring(0, endOfClassName);
-                attributeName = name.substring(startAttributeName);
-
                 ProgramVariable attribute =
-                    services.getJavaInfo().getAttribute(attributeName, className);
+                    ((Services) services).getJavaInfo().getAttribute(split.attributeName(),
+                        split.className());
 
                 if (attribute == null) {
                     return null;

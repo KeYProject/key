@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -35,7 +35,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
         for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {
-                final Term term = expr.getTerm();
+                final JTerm term = expr.getTerm();
                 if (term != null) {
                     if (term.sort() == JavaDLTheory.FORMULA) {
                         type = services.getTypeConverter().getBooleanType();
@@ -47,8 +47,6 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
         return result;
     }
 
-    public String toString() {
-        return parameters == null ? "" : parameters.toString();
-    }
+    public String toString() { return parameters == null ? "" : parameters.toString(); }
 
 }

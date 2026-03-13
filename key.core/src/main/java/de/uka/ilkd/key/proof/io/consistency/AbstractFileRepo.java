@@ -388,17 +388,17 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void setBootClassPath(File path) throws IllegalStateException {
+    public void setBootClassPath(Path path) throws IllegalStateException {
         if (bootclasspath != null) {
             throw new IllegalStateException("Bootclasspath is already set!");
         }
         if (path != null) {
-            bootclasspath = path.toPath().toAbsolutePath().normalize();
+            bootclasspath = path.toAbsolutePath().normalize();
         }
     }
 
     @Override
-    public void setClassPath(List<File> paths) throws IllegalStateException {
+    public void setClassPath(List<Path> paths) throws IllegalStateException {
         if (classpath != null) {
             throw new IllegalStateException("Classpath is already set!");
         }
@@ -407,17 +407,17 @@ public abstract class AbstractFileRepo implements FileRepo {
                                                                 // elements
                                                                 // convert Files to Paths and
                                                                 // normalize
-                    .map(p -> p.toPath().toAbsolutePath().normalize()).collect(Collectors.toList());
+                    .map(p -> p.toAbsolutePath().normalize()).collect(Collectors.toList());
         }
     }
 
     @Override
-    public void setJavaPath(String path) throws IllegalStateException {
+    public void setJavaPath(Path path) throws IllegalStateException {
         if (javaPath != null) {
             throw new IllegalStateException("JavaPath is already set!");
         }
         if (path != null) {
-            javaPath = Paths.get(path).toAbsolutePath().normalize();
+            javaPath = path.toAbsolutePath().normalize();
         }
     }
 

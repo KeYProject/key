@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
@@ -27,17 +27,17 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     /**
      * The array index.
      */
-    private final Term arrayIndex;
+    private final JTerm arrayIndex;
 
     /**
      * The array start index or {@code null} if not used.
      */
-    private final Term arrayStartIndex;
+    private final JTerm arrayStartIndex;
 
     /**
      * The array end index or {@code null} if not used.
      */
-    private final Term arrayEndIndex;
+    private final JTerm arrayEndIndex;
 
     /**
      * The {@link IProgramVariable}.
@@ -45,25 +45,25 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     private final IProgramVariable programVariable;
 
     /**
-     * The value {@link Term}.
+     * The value {@link JTerm}.
      */
-    private final Term value;
+    private final JTerm value;
 
     /**
      * The optional condition under which this value is valid.
      */
-    private final Term condition;
+    private final JTerm condition;
 
     /**
      * Constructor.
      *
      * @param services The {@link Services} to use.
      * @param arrayIndex The array index.
-     * @param value The value {@link Term}.
+     * @param value The value {@link JTerm}.
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(Services services, Term arrayIndex, Term value, Term condition,
+    public SymbolicValue(Services services, JTerm arrayIndex, JTerm value, JTerm condition,
             IModelSettings settings) {
         super(settings);
         assert services != null;
@@ -84,12 +84,12 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param arrayIndex The array index.
      * @param arrayStartIndex The array start index or {@code null} if not used.
      * @param arrayEndIndex The array end index or {@code null} if not used.
-     * @param value The value {@link Term}.
+     * @param value The value {@link JTerm}.
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(Services services, Term arrayIndex, Term arrayStartIndex,
-            Term arrayEndIndex, Term value, Term condition, IModelSettings settings) {
+    public SymbolicValue(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
+            JTerm arrayEndIndex, JTerm value, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert arrayIndex != null;
@@ -107,12 +107,12 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @param services The {@link Services} to use.
      * @param programVariable The {@link IProgramVariable}.
-     * @param value The value {@link Term}.
+     * @param value The value {@link JTerm}.
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(Services services, IProgramVariable programVariable, Term value,
-            Term condition, IModelSettings settings) {
+    public SymbolicValue(Services services, IProgramVariable programVariable, JTerm value,
+            JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;
@@ -184,7 +184,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public Term getArrayIndex() {
+    public JTerm getArrayIndex() {
         return arrayIndex;
     }
 
@@ -208,7 +208,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public Term getValue() {
+    public JTerm getValue() {
         return value;
     }
 
@@ -249,7 +249,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * {@inheritDoc}
      */
     @Override
-    public Term getCondition() {
+    public JTerm getCondition() {
         return condition;
     }
 
@@ -274,7 +274,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @return The array start index.
      */
-    public Term getArrayStartIndex() {
+    public JTerm getArrayStartIndex() {
         return arrayStartIndex;
     }
 
@@ -292,7 +292,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      *
      * @return The array end index.
      */
-    public Term getArrayEndIndex() {
+    public JTerm getArrayEndIndex() {
         return arrayEndIndex;
     }
 

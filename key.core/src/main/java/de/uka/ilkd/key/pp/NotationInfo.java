@@ -11,13 +11,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
+
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 
 /**
  * <p>
  * Stores the mapping from operators to {@link Notation}s. Each {@link Notation} represents the
- * concrete syntax for some {@link de.uka.ilkd.key.logic.op.Operator}. The {@link LogicPrinter} asks
+ * concrete syntax for some {@link Operator}. The {@link LogicPrinter} asks
  * the NotationInfo to find out which Notation to use for a given term.
  * <p>
  * The Notation associated with an operator might change. New Notations can be added.
@@ -73,9 +78,6 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * </ul>
  */
 public final class NotationInfo {
-
-
-
     // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
     static final int PRIORITY_TOP = 0;
     static final int PRIORITY_EQUIVALENCE = 20;
@@ -108,6 +110,14 @@ public final class NotationInfo {
     public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
 
     /**
+     * Whether the final field special treatment is on. If on, then select(heap, o, f) is not
+     * pretty-printed as o.f.
+     * To be on the safe side, it is on by default.
+     */
+    public static boolean DEFAULT_FINAL_IMMUTABLE = true;
+
+
+    /**
      * This maps operators and classes of operators to {@link Notation}s. The idea is that we first
      * look whether the operator has a Notation registered. Otherwise, we see if there is one for
      * the <em>class</em> of the operator.
@@ -125,6 +135,8 @@ public final class NotationInfo {
     private boolean unicodeEnabled = DEFAULT_UNICODE_ENABLED;
 
     private boolean hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+
+    private boolean finalImmutable = DEFAULT_FINAL_IMMUTABLE;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -161,22 +173,22 @@ public final class NotationInfo {
             new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX,
             new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Modality.JavaModalityKind.DIA,
+        tbl.put(JModality.JavaModalityKind.DIA,
             new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.BOX,
+        tbl.put(JModality.JavaModalityKind.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(ModalOperatorSV.class,
             new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.TOUT,
+        tbl.put(JModality.JavaModalityKind.TOUT,
             new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
                 PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.DIA_TRANSACTION,
+        tbl.put(JModality.JavaModalityKind.DIA_TRANSACTION,
             new Notation.ModalityNotation("\\diamond_transaction",
                 "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.BOX_TRANSACTION,
+        tbl.put(JModality.JavaModalityKind.BOX_TRANSACTION,
             new Notation.ModalityNotation("\\box_transaction",
                 "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.JavaModalityKind.TOUT_TRANSACTION,
+        tbl.put(JModality.JavaModalityKind.TOUT_TRANSACTION,
             new Notation.ModalityNotation("\\throughout_transaction",
                 "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
@@ -282,6 +294,7 @@ public final class NotationInfo {
         // heap operators
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+        tbl.put(HeapLDT.FINAL_NAME, new Notation.FinalNotation());
         tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
         tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
         tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
@@ -408,6 +421,11 @@ public final class NotationInfo {
             this.notationTable = createDefaultNotation();
         }
         hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+
+        if (services != null && services.getProof() != null) {
+            ProofSettings settings = services.getProof().getSettings();
+            finalImmutable = FinalHeapResolution.isFinalEnabled(settings);
+        }
     }
 
     public AbbrevMap getAbbrevMap() {
@@ -495,6 +513,10 @@ public final class NotationInfo {
 
     public void setHidePackagePrefix(boolean b) {
         hidePackagePrefix = b;
+    }
+
+    public boolean isFinalImmutable() {
+        return finalImmutable;
     }
 
     public Map<Object, Notation> getNotationTable() {

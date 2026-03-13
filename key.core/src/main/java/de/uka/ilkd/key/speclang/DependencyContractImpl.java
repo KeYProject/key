@@ -11,11 +11,9 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -23,6 +21,7 @@ import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
@@ -35,13 +34,13 @@ public final class DependencyContractImpl implements DependencyContract {
     final KeYJavaType kjt;
     final IObserverFunction target;
     final KeYJavaType specifiedIn;
-    final Map<LocationVariable, Term> originalPres;
-    final Term originalMby;
-    final Map<ProgramVariable, Term> originalDeps;
-    final ProgramVariable originalSelfVar;
-    final ImmutableList<ProgramVariable> originalParamVars;
-    final Map<LocationVariable, ? extends ProgramVariable> originalAtPreVars;
-    final Term globalDefs;
+    final Map<LocationVariable, JTerm> originalPres;
+    final JTerm originalMby;
+    final Map<LocationVariable, JTerm> originalDeps;
+    final LocationVariable originalSelfVar;
+    final ImmutableList<LocationVariable> originalParamVars;
+    final Map<LocationVariable, LocationVariable> originalAtPreVars;
+    final JTerm globalDefs;
     final int id;
 
 
@@ -50,10 +49,10 @@ public final class DependencyContractImpl implements DependencyContract {
     // -------------------------------------------------------------------------
 
     DependencyContractImpl(String baseName, String name, KeYJavaType kjt, IObserverFunction target,
-            KeYJavaType specifiedIn, Map<LocationVariable, Term> pres, Term mby,
-            Map<ProgramVariable, Term> deps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Term globalDefs, int id) {
+            KeYJavaType specifiedIn, Map<LocationVariable, JTerm> pres, JTerm mby,
+            Map<LocationVariable, JTerm> deps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, JTerm globalDefs, int id) {
         assert baseName != null;
         assert kjt != null;
         assert target != null;
@@ -84,10 +83,10 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Deprecated
     DependencyContractImpl(String baseName, KeYJavaType kjt, IObserverFunction target,
-            KeYJavaType specifiedIn, Map<LocationVariable, Term> pres, Term mby,
-            Map<ProgramVariable, Term> deps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars) {
+            KeYJavaType specifiedIn, Map<LocationVariable, JTerm> pres, JTerm mby,
+            Map<LocationVariable, JTerm> deps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars) {
         this(baseName, null, kjt, target, specifiedIn, pres, mby, deps, selfVar, paramVars,
             atPreVars, null, INVALID_ID);
     }
@@ -97,11 +96,11 @@ public final class DependencyContractImpl implements DependencyContract {
     // -------------------------------------------------------------------------
 
     @Override
-    public DependencyContract map(UnaryOperator<Term> op, Services services) {
-        Map<LocationVariable, Term> newPres = originalPres.entrySet().stream()
+    public DependencyContract map(UnaryOperator<JTerm> op, Services services) {
+        Map<LocationVariable, JTerm> newPres = originalPres.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Term newMby = op.apply(originalMby);
-        Map<ProgramVariable, Term> newDeps = originalDeps.entrySet().stream()
+        JTerm newMby = op.apply(originalMby);
+        Map<LocationVariable, JTerm> newDeps = originalDeps.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
         return new DependencyContractImpl(baseName, name, kjt, target, specifiedIn, newPres, newMby,
@@ -139,24 +138,24 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public JTerm getPre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
-        for (ProgramVariable originalParamVar : originalParamVars) {
+        for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
             paramVars = paramVars.tail();
         }
         if (atPreVars != null && originalAtPreVars != null) {
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                LocationVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar),
                         services.getTermBuilder().var(atPreVars.get(h)));
@@ -169,12 +168,12 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
-        Term result = null;
+    public JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+        JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
+            final JTerm p = getPre(heap, selfVar, paramVars, atPreVars, services);
             if (result == null) {
                 result = p;
             } else {
@@ -186,25 +185,26 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
         }
-        for (ProgramVariable originalParamVar : originalParamVars) {
+        for (LocationVariable originalParamVar : originalParamVars) {
             map.put(services.getTermBuilder().var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
         }
         if (atPres != null && originalAtPreVars != null) {
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                LocationVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (atPres.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
                 }
@@ -216,12 +216,12 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
-            Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
+    public JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
-        Term result = null;
+        JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final Term p =
+            final JTerm p =
                 getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
             if (result == null) {
                 result = p;
@@ -233,38 +233,38 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public Term getRequires(LocationVariable heap) {
+    public JTerm getRequires(LocationVariable heap) {
         return originalPres.get(heap);
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public JTerm getModifiable(LocationVariable heap) {
         throw new UnsupportedOperationException("Not applicable for dependency contracts.");
     }
 
     @Override
-    public Term getAccessible(ProgramVariable heap) {
+    public JTerm getAccessible(LocationVariable heap) {
         return originalDeps.get(heap);
     }
 
     @Override
-    public Term getMby() {
+    public JTerm getMby() {
         return this.originalMby;
     }
 
     @Override
-    public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    public JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         assert hasMby();
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
-        for (ProgramVariable originalParamVar : originalParamVars) {
+        for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
             paramVars = paramVars.tail();
         }
@@ -274,28 +274,29 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert hasMby();
         assert heapTerms != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         for (LocationVariable heap : heapTerms.keySet()) {
             map.put(services.getTermBuilder().var(heap), heapTerms.get(heap));
         }
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
         }
-        for (ProgramVariable originalParamVar : originalParamVars) {
+        for (LocationVariable originalParamVar : originalParamVars) {
             map.put(services.getTermBuilder().var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
         }
         if (atPres != null && originalAtPreVars != null) {
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                LocationVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (atPres.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
                 }
@@ -319,18 +320,18 @@ public final class DependencyContractImpl implements DependencyContract {
     private String getText(boolean includeHtmlMarkup, Services services) {
         StringBuilder pres = new StringBuilder();
         for (LocationVariable h : originalPres.keySet()) {
-            Term originalPre = originalPres.get(h);
+            JTerm originalPre = originalPres.get(h);
             if (originalPre != null) {
                 pres.append("<b>pre[").append(h).append("]</b> ").append(LogicPrinter.escapeHTML(
                     LogicPrinter.quickPrintTerm(originalPre, services), false)).append("<br>");
             }
         }
         StringBuilder deps = new StringBuilder();
-        for (ProgramVariable h : originalDeps.keySet()) {
+        for (LocationVariable h : originalDeps.keySet()) {
             if (h.name().toString().endsWith("AtPre") && target.getStateCount() == 1) {
                 continue;
             }
-            Term originalDep = originalDeps.get(h);
+            JTerm originalDep = originalDeps.get(h);
             if (originalDep != null) {
                 deps.append("<b>dep[").append(h).append("]</b> ").append(LogicPrinter.escapeHTML(
                     LogicPrinter.quickPrintTerm(originalDep, services), false)).append("<br>");
@@ -364,24 +365,24 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
-        for (ProgramVariable originalParamVar : originalParamVars) {
+        for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
             paramVars = paramVars.tail();
         }
         if (atPreVars != null && originalAtPreVars != null) {
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                LocationVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(atPre ? h : originalAtPreVar),
                         services.getTermBuilder().var(atPreVars.get(h)));
@@ -394,25 +395,26 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
+    public JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
+        Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
         }
-        for (ProgramVariable originalParamVar : originalParamVars) {
+        for (LocationVariable originalParamVar : originalParamVars) {
             map.put(services.getTermBuilder().var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
         }
         if (atPres != null && originalAtPreVars != null) {
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                LocationVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (originalAtPreVar != null && atPres.get(h) != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar), atPres.get(h));
                 }
@@ -424,13 +426,13 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public Term getGlobalDefs() {
+    public JTerm getGlobalDefs() {
         return this.globalDefs;
     }
 
     @Override
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    public JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         assert false : "old clauses are not yet supported for dependency contracts";
         return null;
     }
@@ -515,7 +517,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public OriginalVariables getOrigVars() {
-        Map<LocationVariable, ProgramVariable> atPreVars =
+        Map<LocationVariable, LocationVariable> atPreVars =
             new LinkedHashMap<>();
         if (originalAtPreVars != null) {
             for (LocationVariable h : originalAtPreVars.keySet()) {

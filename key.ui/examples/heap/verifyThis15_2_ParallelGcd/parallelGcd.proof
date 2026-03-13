@@ -49,12 +49,11 @@
 
 \javaSource "src";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Mar 16 12:59:23 CET 2023
-contract=ParallelGcd[ParallelGcd\\:\\:parallelGcd(int,int,[Z)].JML behavior operation contract.0
-name=ParallelGcd[ParallelGcd\\:\\:parallelGcd(int,int,[Z)].JML behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"contract": "ParallelGcd[ParallelGcd::parallelGcd(int,int,[Z)].JML behavior operation contract.0",
+	"name": "ParallelGcd[ParallelGcd::parallelGcd(int,int,[Z)].JML behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "kirsten" ) (keyVersion "c2a4d52c2ad58a473b8d4f6ce4c8d074ffe247f6"))

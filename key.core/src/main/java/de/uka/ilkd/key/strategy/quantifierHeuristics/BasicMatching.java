@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
@@ -35,8 +34,8 @@ class BasicMatching {
         if (subst != null) {
             allsubs = allsubs.add(subst);
         }
-        final Operator op = targetTerm.op();
-        if (!(op instanceof Modality || op instanceof UpdateApplication)) {
+        final var op = targetTerm.op();
+        if (!(op instanceof JModality || op instanceof UpdateApplication)) {
             for (int i = 0; i < targetTerm.arity(); i++) {
                 allsubs = allsubs.union(getSubstitutions(trigger, targetTerm.sub(i)));
             }
@@ -64,7 +63,7 @@ class BasicMatching {
      */
     private static ImmutableMap<QuantifiableVariable, Term> matchRec(
             ImmutableMap<QuantifiableVariable, Term> varMap, Term pattern, Term instance) {
-        final Operator patternOp = pattern.op();
+        final var patternOp = pattern.op();
 
         if (patternOp instanceof QuantifiableVariable) {
             return mapVarWithCheck(varMap, (QuantifiableVariable) patternOp, instance);

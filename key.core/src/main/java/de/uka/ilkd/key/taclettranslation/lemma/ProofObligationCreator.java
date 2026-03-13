@@ -6,11 +6,9 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.Collection;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -19,7 +17,10 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -34,7 +35,6 @@ public class ProofObligationCreator {
     private String createName(ProofAggregate[] singleProofs) {
         return "Side proofs for " + singleProofs.length + " taclets.";
     }
-
 
     /**
      * Creates for each taclet in <code>taclets</code> a proof obligation containing the
@@ -105,39 +105,38 @@ public class ProofObligationCreator {
 
 
 
-    private void collectUserDefinedSymbols(Term term, UserDefinedSymbols userDefinedSymbols) {
-        for (Term sub : term.subs()) {
+    private void collectUserDefinedSymbols(Term term,
+            UserDefinedSymbols userDefinedSymbols) {
+        for (var sub : term.subs()) {
             collectUserDefinedSymbols(sub, userDefinedSymbols);
         }
         if (term.op() instanceof final SortedOperator op) {
             final Sort sort = op.sort();
             userDefinedSymbols.addSort(sort);
 
-            if (term.op() instanceof JFunction) {
+            if (term.op() instanceof Function) {
                 if (sort == JavaDLTheory.FORMULA) {
-                    userDefinedSymbols.addPredicate((JFunction) term.op());
+                    userDefinedSymbols.addPredicate((Function) term.op());
                 } else {
-                    userDefinedSymbols.addFunction((JFunction) term.op());
+                    userDefinedSymbols.addFunction((Function) term.op());
                 }
             }
             if (term.op() instanceof LogicVariable) {
                 userDefinedSymbols.addVariable((LogicVariable) term.op());
             }
-            if (term.op() instanceof SchemaVariable) {
-                userDefinedSymbols.addSchemaVariable((SchemaVariable) term.op());
+            if (term.op() instanceof SchemaVariable sv) {
+                userDefinedSymbols.addSchemaVariable(sv);
             }
 
         }
     }
 
-
-
     private ProofAggregate create(Taclet taclet, InitConfig initConfig,
             UserDefinedSymbols symbolsForAxioms) {
         LemmaGenerator generator = new GenericRemovingLemmaGenerator();
         TacletFormula tacletFormula = generator.translate(taclet, initConfig.getServices());
-        Term formula = tacletFormula.getFormula(initConfig.getServices());
-        String name = "Taclet: " + taclet.name().toString();
+        JTerm formula = tacletFormula.getFormula(initConfig.getServices());
+        String name = "Taclet: " + taclet.name();
 
         UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms);
 

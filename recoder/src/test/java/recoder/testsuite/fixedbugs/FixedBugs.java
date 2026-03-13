@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.fixedbugs;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -19,9 +20,6 @@ import recoder.java.declaration.MethodDeclaration;
 import recoder.java.expression.Assignment;
 import recoder.java.reference.TypeReference;
 import recoder.kit.TypeKit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Tobias Gutzmann created on 19.10.2007
@@ -42,7 +40,7 @@ public class FixedBugs {
                     }
                     }""");
         sc.getChangeHistory().attached(cu);
-        assertEquals(4, ((ConstructorDeclaration) sc.getNameInfo().getClassType("Test")
+        Assertions.assertEquals(4, ((ConstructorDeclaration) sc.getNameInfo().getClassType("Test")
                 .getConstructors().get(0)).getStartPosition().getLine());
 
     }
@@ -69,7 +67,7 @@ public class FixedBugs {
         fd.replaceChild(oldType, newType);
         sc.getChangeHistory().replaced(oldType, newType);
         String s = cu.toSource().replaceAll(" ", "");
-        assertEquals("classA{\n\n\n//somecomment\nBa;\n}classB{\n}\n", s);
+        Assertions.assertEquals("classA{\n\n\n//somecomment\nBa;\n}classB{\n}\n", s);
     }
 
     /**
@@ -92,7 +90,7 @@ public class FixedBugs {
         Expression rhs = (Expression) assignment.getChildAt(1);
         Type rhsType = sc.getSourceInfo().getType(rhs);
 
-        assertEquals(rhsType, classB);
+        Assertions.assertEquals(rhsType, classB);
     }
 
     @Test
@@ -107,17 +105,15 @@ public class FixedBugs {
         CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
         ProgramFactory f = sc.getProgramFactory();
         StringBuilder cuText = new StringBuilder("class B { }//");
-        for (int i = 0; i < 4081; i++) {
-            cuText.append(" ");
-        }
+        cuText.append(" ".repeat(4081));
         for (int i = 4081; i < 4087; i++) {
             // that's around the critical part, where the
             // size of the CU matches the JavaCCParser buffer
             try {
-                CompilationUnit cu = f.parseCompilationUnit(cuText.toString());
+                f.parseCompilationUnit(cuText.toString());
                 cuText.append(" ");
             } catch (ParserException pe) {
-                fail();
+                Assertions.fail();
             }
         }
     }

@@ -52,7 +52,7 @@ public class ExpressionTranslatorTest {
         JmlLexer lexer = JmlFacade.createLexer(expr);
         lexer._mode = JmlLexer.expr;
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
-        JmlParser.ExpressionContext ctx = parser.expression();
+        JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
         Assertions.assertEquals(0, parser.getNumberOfSyntaxErrors());
         Translator et = new Translator(services, kjt, self, SpecMathMode.defaultMode(),
             ImmutableSLList.nil(), result, exc, new HashMap<>(), new HashMap<>());

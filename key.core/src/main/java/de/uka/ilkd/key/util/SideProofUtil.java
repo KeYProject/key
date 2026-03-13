@@ -5,8 +5,6 @@ package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -21,6 +19,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Choice;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableSet;
 
 public final class SideProofUtil {
@@ -42,9 +42,8 @@ public final class SideProofUtil {
      *         {@link Proof} but with its own {@link OneStepSimplifier} instance.
      */
     @SuppressWarnings("unchecked")
-    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source,
-            final Choice... enableChoices) {
-        assert source != null;
+    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(
+            final Proof source, final Choice... enableChoices) {
         assert !source.isDisposed();
         // Get required source instances
         final InitConfig sourceInitConfig = source.getInitConfig();
@@ -124,7 +123,6 @@ public final class SideProofUtil {
     public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
             Sequent sequentToProve, String proofName) throws ProofInputException {
         // Make sure that valid parameters are given
-        assert sequentToProve != null;
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);
         // Configure ProofStarter

@@ -117,18 +117,18 @@ public class CharLiteral extends AbstractIntegerLiteral {
          */
         if (valStr.charAt(0) == '\\') {
             return switch (valStr.charAt(1)) {
-            case 'b' -> '\b';
-            case 't' -> '\t';
-            case 'n' -> '\n';
-            case 'f' -> '\f';
-            case 'r' -> '\r';
-            case '\"' -> '\"';
-            case '\'' -> '\'';
-            case '\\' -> '\\';
-            case '0', '1', '2', '3', '4', '5', '6', '7' -> (char) Integer
-                    .parseInt(valStr.substring(1), 8);
-            case 'u' -> (char) Integer.parseInt(valStr.substring(2), 16);
-            default -> throw new NumberFormatException("Invalid char: " + sourceStr);
+                case 'b' -> '\b';
+                case 't' -> '\t';
+                case 'n' -> '\n';
+                case 'f' -> '\f';
+                case 'r' -> '\r';
+                case '\"' -> '\"';
+                case '\'' -> '\'';
+                case '\\' -> '\\';
+                case '0', '1', '2', '3', '4', '5', '6', '7' -> (char) Integer
+                        .parseInt(valStr.substring(1), 8);
+                case 'u' -> (char) Integer.parseInt(valStr.substring(2), 16);
+                default -> throw new NumberFormatException("Invalid char: " + sourceStr);
             };
         } else {
             return valStr.charAt(0);

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
 import org.key_project.logic.Name;
@@ -26,10 +27,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
     private ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
-    @Nullable
-    private TextualJMLSpecCase methodContract;
-    @Nullable
-    private TextualJMLLoopSpec loopContract;
+    private @Nullable TextualJMLSpecCase methodContract;
+    private @Nullable TextualJMLLoopSpec loopContract;
 
     /**
      * Translates a token to a JMLModifier
@@ -43,32 +42,32 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         }
 
         return switch (token.getType()) {
-        case JmlLexer.ABSTRACT -> JMLModifier.ABSTRACT;
-        case JmlLexer.FINAL -> JMLModifier.FINAL;
-        case JmlLexer.GHOST -> JMLModifier.GHOST;
-        case JmlLexer.HELPER -> JMLModifier.HELPER;
-        case JmlLexer.INSTANCE -> JMLModifier.INSTANCE;
-        case JmlLexer.MODEL -> JMLModifier.MODEL;
-        case JmlLexer.NON_NULL -> JMLModifier.NON_NULL;
-        case JmlLexer.NULLABLE -> JMLModifier.NULLABLE;
-        case JmlLexer.NULLABLE_BY_DEFAULT -> JMLModifier.NULLABLE_BY_DEFAULT;
-        case JmlLexer.PRIVATE -> JMLModifier.PRIVATE;
-        case JmlLexer.PROTECTED -> JMLModifier.PROTECTED;
-        case JmlLexer.PUBLIC -> JMLModifier.PUBLIC;
-        case JmlLexer.PURE -> JMLModifier.PURE;
-        case JmlLexer.STRICTLY_PURE -> JMLModifier.STRICTLY_PURE;
-        case JmlLexer.SPEC_PROTECTED -> JMLModifier.SPEC_PROTECTED;
-        case JmlLexer.SPEC_PUBLIC -> JMLModifier.SPEC_PUBLIC;
-        case JmlLexer.STATIC -> JMLModifier.STATIC;
-        case JmlLexer.TWO_STATE -> JMLModifier.TWO_STATE;
-        case JmlLexer.NO_STATE -> JMLModifier.NO_STATE;
-        case JmlLexer.SPEC_JAVA_MATH -> JMLModifier.SPEC_JAVA_MATH;
-        case JmlLexer.SPEC_SAFE_MATH -> JMLModifier.SPEC_SAFE_MATH;
-        case JmlLexer.SPEC_BIGINT_MATH -> JMLModifier.SPEC_BIGINT_MATH;
-        case JmlLexer.CODE_JAVA_MATH -> JMLModifier.CODE_JAVA_MATH;
-        case JmlLexer.CODE_SAFE_MATH -> JMLModifier.CODE_SAFE_MATH;
-        case JmlLexer.CODE_BIGINT_MATH -> JMLModifier.CODE_BIGINT_MATH;
-        default -> throw new IllegalStateException("Illegal token is given");
+            case JmlLexer.ABSTRACT -> JMLModifier.ABSTRACT;
+            case JmlLexer.FINAL -> JMLModifier.FINAL;
+            case JmlLexer.GHOST -> JMLModifier.GHOST;
+            case JmlLexer.HELPER -> JMLModifier.HELPER;
+            case JmlLexer.INSTANCE -> JMLModifier.INSTANCE;
+            case JmlLexer.MODEL -> JMLModifier.MODEL;
+            case JmlLexer.NON_NULL -> JMLModifier.NON_NULL;
+            case JmlLexer.NULLABLE -> JMLModifier.NULLABLE;
+            case JmlLexer.NULLABLE_BY_DEFAULT -> JMLModifier.NULLABLE_BY_DEFAULT;
+            case JmlLexer.PRIVATE -> JMLModifier.PRIVATE;
+            case JmlLexer.PROTECTED -> JMLModifier.PROTECTED;
+            case JmlLexer.PUBLIC -> JMLModifier.PUBLIC;
+            case JmlLexer.PURE -> JMLModifier.PURE;
+            case JmlLexer.STRICTLY_PURE -> JMLModifier.STRICTLY_PURE;
+            case JmlLexer.SPEC_PROTECTED -> JMLModifier.SPEC_PROTECTED;
+            case JmlLexer.SPEC_PUBLIC -> JMLModifier.SPEC_PUBLIC;
+            case JmlLexer.STATIC -> JMLModifier.STATIC;
+            case JmlLexer.TWO_STATE -> JMLModifier.TWO_STATE;
+            case JmlLexer.NO_STATE -> JMLModifier.NO_STATE;
+            case JmlLexer.SPEC_JAVA_MATH -> JMLModifier.SPEC_JAVA_MATH;
+            case JmlLexer.SPEC_SAFE_MATH -> JMLModifier.SPEC_SAFE_MATH;
+            case JmlLexer.SPEC_BIGINT_MATH -> JMLModifier.SPEC_BIGINT_MATH;
+            case JmlLexer.CODE_JAVA_MATH -> JMLModifier.CODE_JAVA_MATH;
+            case JmlLexer.CODE_SAFE_MATH -> JMLModifier.CODE_SAFE_MATH;
+            case JmlLexer.CODE_BIGINT_MATH -> JMLModifier.CODE_BIGINT_MATH;
+            default -> throw new IllegalStateException("Illegal token is given");
         };
     }
 
@@ -111,14 +110,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             return Behavior.NONE; // lightweight specification
         }
         return switch (behavior.getType()) {
-        case JmlLexer.BEHAVIOR -> Behavior.BEHAVIOR;
-        case JmlLexer.NORMAL_BEHAVIOR -> Behavior.NORMAL_BEHAVIOR;
-        case JmlLexer.BREAK_BEHAVIOR -> Behavior.BREAK_BEHAVIOR;
-        case JmlLexer.EXCEPTIONAL_BEHAVIOUR -> Behavior.EXCEPTIONAL_BEHAVIOR;
-        case JmlLexer.MODEL_BEHAVIOUR -> Behavior.MODEL_BEHAVIOR;
-        case JmlLexer.RETURN_BEHAVIOR -> Behavior.RETURN_BEHAVIOR;
-        case JmlLexer.CONTINUE_BEHAVIOR -> Behavior.CONTINUE_BEHAVIOR;
-        default -> throw new IllegalStateException("No behavior is given");
+            case JmlLexer.BEHAVIOR -> Behavior.BEHAVIOR;
+            case JmlLexer.NORMAL_BEHAVIOR -> Behavior.NORMAL_BEHAVIOR;
+            case JmlLexer.BREAK_BEHAVIOR -> Behavior.BREAK_BEHAVIOR;
+            case JmlLexer.EXCEPTIONAL_BEHAVIOUR -> Behavior.EXCEPTIONAL_BEHAVIOR;
+            case JmlLexer.MODEL_BEHAVIOUR -> Behavior.MODEL_BEHAVIOR;
+            case JmlLexer.RETURN_BEHAVIOR -> Behavior.RETURN_BEHAVIOR;
+            case JmlLexer.CONTINUE_BEHAVIOR -> Behavior.CONTINUE_BEHAVIOR;
+            default -> throw new IllegalStateException("No behavior is given");
         };
     }
 
@@ -255,8 +254,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
-            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free")
-                    || ctx.MODIFIES() != null && ctx.MODIFIES().getText().endsWith("_free");
+            ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
                     ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
@@ -266,6 +264,28 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             if (methodContract != null) {
                 methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
             }
+            if (loopContract != null) {
+                loopContract.addClause(
+                    isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
+                            : TextualJMLLoopSpec.ClauseHd.ASSIGNABLE,
+                    heap, ctx2);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        final boolean isFree =
+            (ctx.LOOP_ASSIGNABLE() != null && ctx.LOOP_ASSIGNABLE().getText().endsWith("_free"))
+                    || (ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free"));
+        final LabeledParserRuleContext ctx2 =
+            LabeledParserRuleContext.createLabeledParserRuleContext(ctx, isFree
+                    ? OriginTermLabel.SpecType.ASSIGNABLE_FREE
+                    : OriginTermLabel.SpecType.ASSIGNABLE,
+                attachOriginLabel);
+        for (Name heap : heaps) {
             if (loopContract != null) {
                 loopContract.addClause(
                     isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
@@ -492,8 +512,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
-                LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSUME, attachOriginLabel));
+                new KeyAst.Expression(ctx.expression()));
         constructs = constructs.append(b);
         return null;
     }
@@ -501,10 +520,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TextualJMLAssertStatement b =
-            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
-                LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
-                    OriginTermLabel.SpecType.ASSERT, attachOriginLabel));
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+            TextualJMLAssertStatement.Kind.ASSERT, new KeyAst.Expression(ctx.expression()));
         constructs = constructs.append(b);
         return null;
     }

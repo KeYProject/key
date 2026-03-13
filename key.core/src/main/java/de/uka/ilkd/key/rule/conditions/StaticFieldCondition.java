@@ -4,10 +4,16 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This variable condition checks if the instantiation of a schemavariable (of type Field) refers to
@@ -15,7 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *
  * The negated condition is true if the instantiation refers to an instance (non-static) field.
  *
- * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
+ * Inspired by {@link FieldTypeToSortCondition}.
  *
  * @author Michael Kirsten
  */
@@ -30,37 +36,21 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
-        if (!(o instanceof Term f)) {
+        if (!(o instanceof JTerm f)) {
             return false;
         }
         final Operator op = f.op();
-        if (op instanceof JFunction) {
-            final String name = op.name().toString();
-
-            // check for normal attribute
-            int endOfClassName = name.indexOf("::$");
-
-            int startAttributeName = endOfClassName + 3;
-
-
-            if (endOfClassName < 0) {
-                // not a normal attribute, maybe an implicit attribute like <created>?
-                endOfClassName = name.indexOf("::<");
-                startAttributeName = endOfClassName + 2;
-            }
-
-            if (endOfClassName < 0) {
+        if (op instanceof Function) {
+            HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
+            if (split == null) {
                 return false;
             }
 
-            final String className = name.substring(0, endOfClassName);
-            final String attributeName = name.substring(startAttributeName);
-
             final ProgramVariable attribute =
-                services.getJavaInfo().getAttribute(attributeName, className);
+                services.getJavaInfo().getAttribute(split.attributeName(), split.className());
 
             if (attribute == null) {
                 return false;

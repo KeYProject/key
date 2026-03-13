@@ -52,12 +52,16 @@ class CheckConfigDialog extends JDialog {
                 }
             }
 
-            Main.check(missingProofsCheck.isSelected(),
-                settingsCheck.isSelected(),
-                replayCheck.isSelected(),
-                dependencyCheck.isSelected(),
-                Paths.get(bundleFileField.getText()),
-                reportPath);
+
+            var c = new Main.CheckCommand();
+            c.missing = missingProofsCheck.isSelected();
+            c.settings = settingsCheck.isSelected();
+            c.replay = replayCheck.isSelected();
+            c.dependency = dependencyCheck.isSelected();
+            c.bundlePath = Paths.get(bundleFileField.getText());
+            c.reportPath = reportPath;
+            c.call();
+
             if (reportPath != null) {
                 // automatically open the report in browser
                 Desktop.getDesktop().open(reportPath.toFile());
@@ -67,7 +71,7 @@ class CheckConfigDialog extends JDialog {
 
         @Override
         protected void done() {
-            CheckConfigDialog.this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            CheckConfigDialog.this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             glassPane.setVisible(false);
             cancelButton.setEnabled(true);
             runButton.setText("Run checkers");
@@ -170,7 +174,7 @@ class CheckConfigDialog extends JDialog {
     public CheckConfigDialog(Frame parent, String title, boolean modal) {
         super(parent, title, modal);
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         setLayout(new BorderLayout());
 
@@ -269,7 +273,7 @@ class CheckConfigDialog extends JDialog {
             glassPane.setVisible(true);
             runButton.setText("Stop");
             cancelButton.setEnabled(false);
-            CheckConfigDialog.this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            CheckConfigDialog.this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             checkWorker = new ProofManagementCheckWorker();
             checkWorker.execute();
         });

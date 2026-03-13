@@ -59,7 +59,7 @@ public class Index implements Cloneable {
         return count == 0;
     }
 
-    public Enumeration keys() {
+    public Enumeration<Object> keys() {
         return new Enumerator(table);
     }
 
@@ -198,7 +198,7 @@ public class Index implements Cloneable {
     public String toString() {
         int max = size() - 1;
         StringBuilder buf = new StringBuilder();
-        Enumeration k = keys();
+        Enumeration<Object> k = keys();
         buf.append("{");
         for (int i = 0; i <= max; i++) {
             Object key = k.nextElement();
@@ -232,7 +232,7 @@ public class Index implements Cloneable {
         }
     }
 
-    private static class Enumerator implements Enumeration {
+    private static class Enumerator implements Enumeration<Object> {
         int index;
 
         final Entry[] table;

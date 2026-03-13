@@ -10,9 +10,11 @@ import org.key_project.logic.Name;
 /**
  * Label attached to the modality of the validity branch of a block contract.
  *
- * @param exceptionVariable The name of the exception variable to distinguish normal from exceptional termination.
+ * @param exceptionVariable The name of the exception variable to distinguish normal from
+ *        exceptional termination.
  */
-public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) implements TermLabel {
+public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable)
+        implements TermLabel {
     /**
      * The unique name of this label.
      */
@@ -21,9 +23,7 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) 
     /**
      * {@inheritDoc}
      */
-    public String toString() {
-        return NAME + "(" + exceptionVariable() + ")";
-    }
+    public String toString() { return NAME + "(" + exceptionVariable() + ")"; }
 
     /**
      * retrieves the original exception variable as found in the local variable declaration
@@ -32,15 +32,13 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) 
      * @return the original exception variable
      */
     @Override
-    public ProgramVariable exceptionVariable() {
-        return exceptionVariable;
-    }
+    public ProgramVariable exceptionVariable() { return exceptionVariable; }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ProgramVariable getChild(int i) {
+    public ProgramVariable getTLChild(int i) {
         if (i == 0) {
             return exceptionVariable();
         }
@@ -51,17 +49,13 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable) 
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
-        return 1;
-    }
+    public int getTLChildCount() { return 1; }
 
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
-        return NAME;
-    }
+    public Name name() { return NAME; }
 
 }

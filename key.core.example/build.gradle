@@ -1,5 +1,14 @@
-description "Example project to use KeY's APIs"
+plugins {
+    id 'application'
+}
+
+description = "Example project to use KeY's APIs"
+
+application {
+    mainClass = "org.key_project.Main"
+}
 
 dependencies {
     implementation project(":key.core")
+    implementation 'ch.qos.logback:logback-classic:1.5.23'
 }

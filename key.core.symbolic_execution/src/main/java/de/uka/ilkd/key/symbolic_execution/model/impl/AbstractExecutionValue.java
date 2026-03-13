@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Provides a basic implementation of {@link IExecutionValue}.
@@ -33,7 +34,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
     /**
      * The condition under which the variable has this value.
      */
-    private final Term condition;
+    private final JTerm condition;
 
     /**
      * The {@link IExecutionConstraint}s.
@@ -43,7 +44,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
     /**
      * The value.
      */
-    private final Term value;
+    private final JTerm value;
 
     /**
      * Constructor.
@@ -55,8 +56,8 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param condition The condition.
      * @param value The value.
      */
-    public AbstractExecutionValue(ITreeSettings settings, Node proofNode,
-            IExecutionVariable variable, Term condition, Term value) {
+    protected AbstractExecutionValue(ITreeSettings settings, Node proofNode,
+            IExecutionVariable variable, JTerm condition, JTerm value) {
         super(settings, proofNode);
         this.variable = variable;
         this.condition = condition;
@@ -87,7 +88,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
         if (!isDisposed() && !isValueUnknown()) {
             List<IExecutionConstraint> constraints = new LinkedList<>();
             IExecutionConstraint[] allConstraints = getNodeConstraints();
-            Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
+            Set<JTerm> relevantTerms = collectRelevantTerms(getServices(), getValue());
             for (IExecutionConstraint constraint : allConstraints) {
                 if (containsTerm(constraint.getTerm(), relevantTerms)) {
                     constraints.add(constraint);
@@ -108,26 +109,26 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
     protected abstract IExecutionConstraint[] getNodeConstraints();
 
     /**
-     * Collects all {@link Term}s contained in relevant constraints.
+     * Collects all {@link JTerm}s contained in relevant constraints.
      *
      * @param services The {@link Services} to use.
-     * @param term The initial {@link Term}.
-     * @return The relevant {@link Term}s.
+     * @param term The initial {@link JTerm}.
+     * @return The relevant {@link JTerm}s.
      */
-    protected Set<Term> collectRelevantTerms(Services services, Term term) {
-        final Set<Term> terms = new HashSet<>();
+    protected Set<JTerm> collectRelevantTerms(Services services, JTerm term) {
+        final Set<JTerm> terms = new HashSet<>();
         fillRelevantTerms(services, term, terms);
         return terms;
     }
 
     /**
-     * Utility method used by {@link #collectRelevantTerms(Services, Term)}.
+     * Utility method used by {@link #collectRelevantTerms(Services, JTerm)}.
      *
      * @param services The {@link Services} to use.
-     * @param term The initial {@link Term}.
-     * @param toFill The {@link Set} of relevant {@link Term}s to fill.
+     * @param term The initial {@link JTerm}.
+     * @param toFill The {@link Set} of relevant {@link JTerm}s to fill.
      */
-    protected void fillRelevantTerms(Services services, Term term, Set<Term> toFill) {
+    protected void fillRelevantTerms(Services services, JTerm term, Set<JTerm> toFill) {
         if (term != null) {
             if (term.op() instanceof ProgramVariable
                     || SymbolicExecutionUtil.isSelect(services, term)) {
@@ -141,14 +142,14 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
     }
 
     /**
-     * Checks if the given {@link Term} contains at least one of the given once.
+     * Checks if the given {@link JTerm} contains at least one of the given once.
      *
-     * @param term The {@link Term} to search in.
-     * @param toSearch The {@link Term}s to search.
-     * @return {@code true} at least one {@link Term} is contained, {@code false} none of the
-     *         {@link Term}s is contained.
+     * @param term The {@link JTerm} to search in.
+     * @param toSearch The {@link JTerm}s to search.
+     * @return {@code true} at least one {@link JTerm} is contained, {@code false} none of the
+     *         {@link JTerm}s is contained.
      */
-    protected boolean containsTerm(Term term, Set<Term> toSearch) {
+    protected boolean containsTerm(JTerm term, Set<JTerm> toSearch) {
         if (toSearch.contains(OriginTermLabel.removeOriginLabels(term, getServices()))) {
             return true;
         } else {
@@ -203,7 +204,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public Term getCondition() throws ProofInputException {
+    public JTerm getCondition() throws ProofInputException {
         return condition;
     }
 
@@ -211,7 +212,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public Term getValue() throws ProofInputException {
+    public JTerm getValue() throws ProofInputException {
         return value;
     }
 
@@ -223,7 +224,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
         if (isValueUnknown()) {
             return false;
         } else {
-            Term value = getValue();
+            JTerm value = getValue();
             return SymbolicExecutionUtil.hasReferenceSort(getServices(), value);
         }
     }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class TestParallelParsing {
      * @param locations The locations to load.
      * @throws Exception Occurred Exception.
      */
-    protected void doParallelTest(File baseDir, int numOfThreadsPerLocation, String... locations)
+    protected void doParallelTest(Path baseDir, int numOfThreadsPerLocation, String... locations)
             throws Exception {
         boolean originalOneStepSimplification =
             HelperClassForTests.isOneStepSimplificationEnabled(null);
@@ -53,7 +53,7 @@ public class TestParallelParsing {
             List<LoadThread> threads = new LinkedList<>();
             for (String path : locations) {
                 for (int i = 0; i < numOfThreadsPerLocation; i++) {
-                    final File location = new File(baseDir, path);
+                    final Path location = baseDir.resolve(path);
                     threads.add(new LoadThread(location));
                 }
             }
@@ -83,7 +83,7 @@ public class TestParallelParsing {
 
     /**
      * Helper {@link Thread} used by
-     * {@link TestParallelParsing#doParallelTest(File, int, String...)} to load a location in KeY.
+     * {@link TestParallelParsing#doParallelTest(Path, int, String...)} to load a location in KeY.
      *
      * @author Martin Hentschel
      */
@@ -91,7 +91,7 @@ public class TestParallelParsing {
         /**
          * The location to load.
          */
-        private final File location;
+        private final Path location;
 
         /**
          * Occurred {@link Exception}.
@@ -103,7 +103,7 @@ public class TestParallelParsing {
          *
          * @param location The location to load.
          */
-        public LoadThread(File location) {
+        public LoadThread(Path location) {
             this.location = location;
         }
 

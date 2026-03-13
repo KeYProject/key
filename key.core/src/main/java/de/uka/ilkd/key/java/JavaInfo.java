@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.*;
@@ -167,7 +168,7 @@ public final class JavaInfo {
     // ------------------- common services ----------------------
 
     /**
-     * returns the full name of a given {@link de.uka.ilkd.key.java.abstraction.KeYJavaType}.
+     * returns the full name of a given {@link KeYJavaType}.
      *
      * @param t the KeYJavaType including the package prefix
      * @return the full name
@@ -624,22 +625,23 @@ public final class JavaInfo {
         return getToplevelPM(kjt, methodName, sig);
     }
 
-    private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
+    private List<List<KeYJavaType>> termArrayToSignature(JTerm[] args) {
         List<List<KeYJavaType>> signature = new LinkedList<>();
-        for (Term arg : args) {
+        for (JTerm arg : args) {
             signature.add(lookupSort2KJTCache(arg.sort()));
         }
         return signature;
     }
 
-    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+    public JTerm getStaticProgramMethodTerm(String methodName, JTerm[] args, String className) {
         List<List<KeYJavaType>> signature = termArrayToSignature(args);
         KeYJavaType classKJT = getTypeByClassName(className);
         IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
-    public Term getProgramMethodTerm(Term prefix, String methodName, Term[] args, String className,
+    public JTerm getProgramMethodTerm(JTerm prefix, String methodName, JTerm[] args,
+            String className,
             boolean traverseHierarchy) {
 
         /*
@@ -683,16 +685,16 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    public Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
-            Term[] args, Term prefix) throws IllegalArgumentException {
+    public JTerm getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
+            JTerm[] args, JTerm prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException(
                 "Program method " + methodName + " in " + className + " not found.");
         }
-        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length
+        JTerm[] subs = new JTerm[pm.getHeapCount(services) * pm.getStateCount() + args.length
                 + (pm.isStatic() ? 0 : 1)];
         int offset = 0;
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (offset >= pm.getHeapCount(services)) {
                 break;
             }
@@ -1061,7 +1063,9 @@ public final class JavaInfo {
      */
     public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
         ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
-        if (kjt.getJavaType() instanceof ArrayType) {
+        if (allAttributes.isEmpty()) {
+            return null;
+        } else if (kjt.getJavaType() instanceof ArrayType) {
             return allAttributes.head();
         } else {
             return allAttributes.reverse().head();
@@ -1137,7 +1141,7 @@ public final class JavaInfo {
         }
 
         final String[] fullNames =
-            new String[] { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
+            { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
 
         for (int i = 0; i < fullNames.length; i++) {
             commonTypes[i] = getTypeByClassName(fullNames[i]);
@@ -1378,13 +1382,15 @@ public final class JavaInfo {
         // proof environment have the same <inv> symbol.
         // TODO: Why is the initial check with the heaps needed?
         if (inv == null
-                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
+                || inv.getHeapCount(services) != HeapContext.getModifiableHeaps(services, false)
+                        .size()) {
             inv = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
             if (inv == null) {
                 inv = new ObserverFunction("<inv>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    false, new ImmutableArray<>(),
+                    HeapContext.getModifiableHeaps(services, false).size(),
                     1);
                 services.getNamespaces().functions().add(inv);
             }
@@ -1416,13 +1422,14 @@ public final class JavaInfo {
      */
     public IObserverFunction getInvFree() {
         if (invFree == null || invFree.getHeapCount(services) != HeapContext
-                .getModHeaps(services, false).size()) {
+                .getModifiableHeaps(services, false).size()) {
             invFree = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<inv_free>", getJavaLangObject()));
             if (invFree == null) {
                 invFree = new ObserverFunction("<inv_free>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    false, new ImmutableArray<>(),
+                    HeapContext.getModifiableHeaps(services, false).size(),
                     1);
                 services.getNamespaces().functions().add(invFree);
             }
@@ -1462,7 +1469,8 @@ public final class JavaInfo {
             if (inv == null) {
                 inv = new ObserverFunction("<$inv>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                    new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
+                    1);
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
@@ -1482,7 +1490,8 @@ public final class JavaInfo {
             if (inv == null) {
                 inv = new ObserverFunction("<$inv_free>", JavaDLTheory.FORMULA, null,
                     services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                    new ImmutableArray<>(), HeapContext.getModifiableHeaps(services, false).size(),
+                    1);
                 services.getNamespaces().functions().add(inv);
             }
             staticFreeInvs.put(target, inv);

@@ -5,11 +5,11 @@ package de.uka.ilkd.key.gui.keyshortcuts;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -48,10 +48,10 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * path of the properties file
      */
-    public static final File SETTINGS_FILE =
-        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
-    private static final File SETTINGS_FILE_NEW =
-        new File(PathConfig.getKeyConfigDir(), "keystrokes.json");
+    public static final Path SETTINGS_FILE =
+        PathConfig.getKeyConfigDir().resolve(SETTINGS_FILENAME);
+    private static final Path SETTINGS_FILE_NEW =
+        PathConfig.getKeyConfigDir().resolve("keystrokes.json");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
@@ -108,7 +108,8 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         defineDefault(SaveBundleAction.class, KeyEvent.VK_B, SHORTCUT_KEY_MASK);
         defineDefault(SaveFileAction.class, KeyEvent.VK_S, SHORTCUT_KEY_MASK);
         defineDefault(SettingsManager.ShowSettingsAction.class, KeyEvent.VK_N, SHORTCUT_KEY_MASK);
-        defineDefault(TacletOptionsAction.class, KeyEvent.VK_T, SHORTCUT_KEY_MASK);
+        // remove as the old menu should not be accessible anymore
+        // defineDefault(TacletOptionsAction.class, KeyEvent.VK_T, SHORTCUT_KEY_MASK);
         defineDefault(OpenFileAction.class, KeyEvent.VK_O, SHORTCUT_KEY_MASK);
         defineDefault(SearchInSequentAction.class, KeyEvent.VK_F, SHORTCUT_KEY_MASK);
 
@@ -162,13 +163,13 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     private static KeyStrokeSettings loadFromConfig() {
-        return new KeyStrokeSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+        return new KeyStrokeSettings(SettingsManager.loadProperties(SETTINGS_FILE.toFile()));
     }
 
     public static KeyStrokeSettings getInstance() {
 
         if (INSTANCE == null) {
-            if (SETTINGS_FILE.exists()) {
+            if (Files.exists(SETTINGS_FILE)) {
                 try {
                     LOGGER.info("Use new configuration format at {}", SETTINGS_FILE_NEW);
                     return INSTANCE = new KeyStrokeSettings(Configuration.load(SETTINGS_FILE_NEW));
@@ -176,7 +177,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
                     LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
                 }
             }
-            return INSTANCE = KeyStrokeSettings.loadFromConfig();
+            return INSTANCE = loadFromConfig();
         }
         return INSTANCE;
     }
@@ -206,21 +207,22 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public void save() {
-        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.getAbsolutePath());
-        SETTINGS_FILE.getParentFile().mkdirs();
-        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
-            Properties props = new Properties();
-            for (Map.Entry<String, Object> entry : properties.entrySet()) {
-                props.setProperty(entry.getKey(), entry.getValue().toString());
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
+        try {
+            Files.createDirectories(SETTINGS_FILE.getParent());
+            try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
+                Properties props = new Properties();
+                for (Map.Entry<String, Object> entry : properties.entrySet()) {
+                    props.setProperty(entry.getKey(), entry.getValue().toString());
+                }
+                props.store(writer, "KeY's KeyStrokes");
             }
-            props.store(writer, "KeY's KeyStrokes");
-            writer.flush();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+        LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE_NEW.toAbsolutePath());
+        try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE_NEW)) {
             var config = new Configuration(properties);
             config.save(writer, "KeY's KeyStrokes");
             writer.flush();

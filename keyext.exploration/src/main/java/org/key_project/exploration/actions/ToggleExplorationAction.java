@@ -9,6 +9,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
@@ -39,7 +40,7 @@ public class ToggleExplorationAction extends KeyAction {
                 .addKeYSelectionListener(new KeYSelectionListener() {
 
                     @Override
-                    public void selectedProofChanged(KeYSelectionEvent e) {
+                    public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                         updateEnable(mainWindow);
                     }
 
@@ -49,7 +50,7 @@ public class ToggleExplorationAction extends KeyAction {
     }
 
     private void updateEnable(MainWindow mainWindow) {
-        // Only enable if a proof is loaded. Otherwise the buttons may become out of sync
+        // Only enable if a proof is loaded. Otherwise, the buttons may become out of sync
         // with the actual settings which are loaded along with the proof.
         setEnabled(mainWindow.getProofTreeView().getDelegateModel() != null);
     }

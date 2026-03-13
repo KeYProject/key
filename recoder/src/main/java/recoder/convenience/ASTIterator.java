@@ -87,24 +87,24 @@ public class ASTIterator {
             if (pe instanceof NonTerminalProgramElement ntpe) {
                 int childCount;
                 switch (listener.enterChildren(this, ntpe)) {
-                case ASTIterator.ENTER_NONE:
-                    break;
-                case ASTIterator.ENTER_SOME:
-                    childCount = ntpe.getChildCount();
-                    for (int i = 0; i < childCount; i++) {
-                        ProgramElement child = ntpe.getChildAt(i);
-                        if (listener.enterChildNode(this, ntpe, child)) {
-                            recurse(child);
-                            listener.returnedFromChildNode(this, ntpe, child);
+                    case ASTIterator.ENTER_NONE:
+                        break;
+                    case ASTIterator.ENTER_SOME:
+                        childCount = ntpe.getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            ProgramElement child = ntpe.getChildAt(i);
+                            if (listener.enterChildNode(this, ntpe, child)) {
+                                recurse(child);
+                                listener.returnedFromChildNode(this, ntpe, child);
+                            }
                         }
-                    }
-                    break;
-                case ASTIterator.ENTER_ALL:
-                    childCount = ntpe.getChildCount();
-                    for (int i = 0; i < childCount; i++) {
-                        ProgramElement child = ntpe.getChildAt(i);
-                        recurse(child);
-                    }
+                        break;
+                    case ASTIterator.ENTER_ALL:
+                        childCount = ntpe.getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            ProgramElement child = ntpe.getChildAt(i);
+                            recurse(child);
+                        }
                 }
             }
             listener.leavingNode(this, pe);

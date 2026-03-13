@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Triple;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A symbolic execution state with program counter is a triple of a symbolic state in form of a
@@ -15,76 +16,40 @@ import de.uka.ilkd.key.util.Triple;
  * JavaDL formula with non-empty Java Block (and a possible post condition as first, and only, sub
  * term).
  *
+ * @param symbolicState The symbolic state (parallel update).
+ * @param pathCondition The path condition (formula).
+ * @param programCounter The program counter: Formula with non-empty Java block and post
+ *        condition as only sub term.
+ * @param correspondingNode The node corresponding to this SE state.
  * @author Dominic Scheurer
  */
-public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> {
-
-    private Node correspondingNode = null;
-
-    /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param programCounter The program counter: Formula with non-empty Java block and post
-     *        condition as only sub term.
-     */
-    public SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition,
-            Term programCounter) {
-        super(symbolicState, pathCondition, programCounter);
-    }
-
-    /**
-     * @param symbolicState The symbolic state (parallel update).
-     * @param pathCondition The path condition (formula).
-     * @param programCounter The program counter: Formula with non-empty Java block and post
-     *        condition as only sub term.
-     * @param correspondingNode The node corresponding to this SE state.
-     */
-    public SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition,
-            Term programCounter, Node correspondingNode) {
-        this(symbolicState, pathCondition, programCounter);
-        this.correspondingNode = correspondingNode;
-    }
-
+public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathCondition,
+        JTerm programCounter, @Nullable Node correspondingNode) {
     /**
      * @return The symbolic state.
      */
-    public Term getSymbolicState() {
-        return first;
-    }
+    public JTerm getSymbolicState() { return symbolicState; }
 
     /**
      * @return The path condition.
      */
-    public Term getPathCondition() {
-        return second;
-    }
+    public JTerm getPathCondition() { return pathCondition; }
 
     /**
      * @return The program counter (and post condition).
      */
-    public Term getProgramCounter() {
-        return third;
-    }
+    public JTerm getProgramCounter() { return programCounter; }
 
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() {
-        return correspondingNode;
-    }
-
-    /**
-     * @param correspondingNode The node corresponding to this SE state.
-     */
-    public void setCorrespondingNode(Node correspondingNode) {
-        this.correspondingNode = correspondingNode;
-    }
+    public Node getCorrespondingNode() { return correspondingNode; }
 
     /**
      * @return The corresponding SE state (without the program counter).
      */
     public SymbolicExecutionState toSymbolicExecutionState() {
-        return new SymbolicExecutionState(first, second);
+        return new SymbolicExecutionState(symbolicState, pathCondition);
     }
 
     @Override

@@ -29,12 +29,13 @@ public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var file = new File(PathConfig.getProofIndependentSettings().replace(".props", ".json"));
+        var file = new File(PathConfig.getProofIndependentSettings().toString()
+                .replace(".props", ".json"));
         if (file.exists()) {
             DEFAULT_INSTANCE = new ProofIndependentSettings(file);
         } else {
-            var old = new File(PathConfig.getProofIndependentSettings());
-            DEFAULT_INSTANCE = new ProofIndependentSettings(old);
+            var old = PathConfig.getProofIndependentSettings();
+            DEFAULT_INSTANCE = new ProofIndependentSettings(old.toFile());
         }
     }
 
@@ -109,7 +110,7 @@ public class ProofIndependentSettings {
                 lastReadedProperties = properties;
             }
         } else {
-            this.lastReadedConfiguration = Configuration.load(file);
+            this.lastReadedConfiguration = Configuration.load(file.toPath());
             for (Settings settings : settings) {
                 settings.readSettings(lastReadedConfiguration);
             }
@@ -179,7 +180,7 @@ public class ProofIndependentSettings {
      * @return {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
      */
     public static boolean isUsePrettyPrinting() {
-        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        return DEFAULT_INSTANCE.getViewSettings().isUsePretty();
     }
 
     /**
@@ -189,7 +190,7 @@ public class ProofIndependentSettings {
      *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+        DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
         NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
     }
 }

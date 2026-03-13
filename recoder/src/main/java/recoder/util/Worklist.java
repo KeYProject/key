@@ -103,7 +103,7 @@ public class Worklist {
     }
 
     /**
-     * determines whether or not the worklist contains some element
+     * determines whether the worklist contains some element
      *
      * @return true if there is at least one element in the list
      */
@@ -116,7 +116,7 @@ public class Worklist {
      *
      * @return a java.util.Enumeration object
      */
-    public Enumeration elements() {
+    public Enumeration<Object> elements() {
         return impl.elements();
     }
 

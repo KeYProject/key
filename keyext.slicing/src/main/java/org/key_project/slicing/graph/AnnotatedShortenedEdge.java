@@ -4,7 +4,8 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * An annotated edge representing a chain of real proof nodes.

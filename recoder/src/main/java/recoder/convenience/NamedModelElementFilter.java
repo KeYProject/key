@@ -14,7 +14,7 @@ import recoder.NamedModelElement;
  */
 public class NamedModelElementFilter implements ModelElementFilter {
 
-    private final Class type;
+    private final Class<?> type;
 
     private final String name;
 
@@ -36,7 +36,7 @@ public class NamedModelElementFilter implements ModelElementFilter {
      * @throws IllegalArgumentException if the type is not a subtype of
      *         {@link recoder.NamedModelElement}.
      */
-    public NamedModelElementFilter(Class type, String name) {
+    public NamedModelElementFilter(Class<?> type, String name) {
         if (!NamedModelElement.class.isAssignableFrom(type)) {
             throw new IllegalArgumentException("Given type is no subtype of NamedModelElement");
         }

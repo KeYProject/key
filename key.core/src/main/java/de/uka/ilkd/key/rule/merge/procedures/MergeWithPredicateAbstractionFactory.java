@@ -9,7 +9,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
@@ -42,9 +42,9 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
         throw new UnsupportedOperationException(
             "You need to create an instance of MergeWithPredicateAbstraction.");
     }

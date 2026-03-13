@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -22,16 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestJMLParserAssociativity extends AbstractTestTermParser {
 
     @Override
-    public Term parseTerm(String s) throws Exception {
+    public JTerm parseTerm(String s) throws Exception {
         PositionedString p = new PositionedString(s);
         /*
          * containerType and self variable are not relevant for the tests currently and can be
          * changed if needed.
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self =
-            services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO().services(getServices()).classType(containerType)
+        var self = (LocationVariable) services.getJavaInfo()
+                .getCanonicalFieldProgramVariable("next", containerType);
+        JmlIO io = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
         return io.parseExpression(p);
     }
