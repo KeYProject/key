@@ -1,5 +1,4 @@
-
-package test;
+package sub1;
 
 public class TestJavaCardDLExtensions {
 
