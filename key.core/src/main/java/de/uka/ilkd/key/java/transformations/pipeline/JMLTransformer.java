@@ -58,8 +58,9 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// JML statements (assume, assert, ...) are inserted into the bodies using
 /// {@link KeYMarkerStatement}.
 ///
-/// You can access attached JML information using the {@link DataKey} in [KEY_SPEC_CASE],
-/// [KEY_CLASS_SPEC], and [KEY_LOOP_SPEC].
+/// You can access attached JML information using the {@link DataKey} in
+/// [JMLTransformer#KEY_SPEC_CASE],
+/// [JMLTransformer#KEY_SPEC_CASE], and [JMLTransformer#KEY_SPEC_CASE].
 ///
 /// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
 public final class JMLTransformer extends JavaTransformer {
