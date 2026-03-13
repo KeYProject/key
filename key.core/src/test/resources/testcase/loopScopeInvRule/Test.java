@@ -5,12 +5,11 @@ public class Test {
     @*/
   public static int loopScopeRuleBenchmark(int i, boolean flag) {
     k: {
-      l:
       /*@ loop_invariant
         @   i >= 0 && i <= \old(i);
         @ decreases i;
         @*/
-      while (i > 0) {
+      l: while (i > 0) {
         if (i == 17) {
           i = 0;
           continue l; // have to prove the invariant
