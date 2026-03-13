@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -16,7 +15,6 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -59,7 +57,7 @@ public class TestJMLTranslator {
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = Objects.requireNonNull(
-                    javaInfo.getKeYJavaType("testPackage.TestClass"));
+                javaInfo.getKeYJavaType("testPackage.TestClass"));
 
             atPres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                 TB.var(TB.heapAtPreVar("heapAtPre", false)));

@@ -3,6 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.java.loader.JavaParserFactory;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.ImmutableList;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.CompilationUnit;
@@ -19,19 +29,11 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import de.uka.ilkd.key.java.loader.JavaParserFactory;
-import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.EvaluationException;
-import de.uka.ilkd.key.speclang.PositionedString;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -39,7 +41,8 @@ import java.util.stream.Collectors;
  */
 @NullMarked
 public class TransformationPipelineServices {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransformationPipelineServices.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(TransformationPipelineServices.class);
 
     private final TransformerCache cache;
 
@@ -47,7 +50,8 @@ public class TransformationPipelineServices {
 
     private List<PositionedString> warnings = new ArrayList<>(8);
 
-    public TransformationPipelineServices(JavaParserFactory javaParserFactory, TransformerCache cache) {
+    public TransformationPipelineServices(JavaParserFactory javaParserFactory,
+            TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
     }
@@ -78,7 +82,7 @@ public class TransformationPipelineServices {
      * according to JLS Sect. 4.5.5
      *
      * @return the default value of the given type
-     * according to JLS Sect. 4.5.5
+     *         according to JLS Sect. 4.5.5
      */
     public Expression getDefaultValue(Type type) {
         if (type instanceof ReferenceType) {
@@ -180,17 +184,17 @@ public class TransformationPipelineServices {
     /// the fly. Example for
     /// ```
     /// class C {
-    ///   int i = 0;
-    ///   {
-    ///      int j = 3;
-    ///      i = j + 5;
-    ///   }
-    ///    public C () {} ...
+    /// int i = 0;
+    /// {
+    /// int j = 3;
+    /// i = j + 5;
+    /// }
+    /// public C () {} ...
     /// }
     /// ```
     /// the following list of size two is returned
     /// ```
-    /// [ i = 0;,  &lt;objectInitializer&gt;0(); ]
+    /// [ i = 0;, &lt;objectInitializer&gt;0(); ]
     /// ```
     /// where `
     /// ```
@@ -208,7 +212,7 @@ public class TransformationPipelineServices {
             if (member instanceof InitializerDeclaration init &&
                     !init.isStatic()) {
                 String name =
-                        PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + objectInitializerCount;
+                    PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + objectInitializerCount;
                 var initializerMethod = cd.addMethod(name, Modifier.DefaultKeyword.PRIVATE);
                 initializerMethod.setBody(init.getBody().clone());
                 initializerMethod.setParentNode(cd);
@@ -220,9 +224,9 @@ public class TransformationPipelineServices {
                     if (variable.getInitializer().isPresent()) {
                         Expression fieldInit = variable.getInitializer().get();
                         final var access = new FieldAccessExpr(
-                                new ThisExpr(), new NodeList<>(), variable.getName());
+                            new ThisExpr(), new NodeList<>(), variable.getName());
                         var fieldCopy =
-                                new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
+                            new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
                         result.add(new ExpressionStmt(fieldCopy));
                     }
                 }
@@ -255,7 +259,8 @@ public class TransformationPipelineServices {
                 case "int", "byte", "short" -> new IntegerLiteralExpr("0");
                 case "char" -> new CharLiteralExpr("0");
                 case "float", "double" -> new DoubleLiteralExpr("0.0");
-                default -> throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
+                default ->
+                    throw new IllegalStateException("Unexpected value: " + name.toLowerCase());
             };
         }
 
@@ -278,7 +283,7 @@ public class TransformationPipelineServices {
 
 
     public String getFreshName(String generated, Position position) {
-        //TODO
+        // TODO
         return generated;
     }
 

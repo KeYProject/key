@@ -73,7 +73,8 @@ public class ConstantExpressionEvaluator {
         return evaluate(StaticJavaParser.parseExpression(string));
     }
 
-    private static class ConstantExpressionEvaluatorVisitor extends GenericVisitorAdapter<Object, Void> {
+    private static class ConstantExpressionEvaluatorVisitor
+            extends GenericVisitorAdapter<Object, Void> {
         @Override
         public Object visit(ArrayAccessExpr n, Void arg) {
             return super.visit(n, arg);
@@ -231,7 +232,8 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(FieldAccessExpr n, Void arg) {
-            final FieldDeclaration fd = (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
+            final FieldDeclaration fd =
+                (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
             if (fd.isFinal() && fd.isStatic()) {
                 return visit(fd, arg);
             } else {

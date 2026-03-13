@@ -12,11 +12,9 @@ import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -73,7 +71,7 @@ public class ModifiersTest {
         var c = decls.get(2);
         var expected = new TypeDeclaration.JMLModifiers(false, false, true, null);
         assertEquals(expected, a.getJmlModifiers());
-        //assertEquals(expected, b.getJmlModifiers());
+        // assertEquals(expected, b.getJmlModifiers());
         assertTrue(c.getJmlModifiers().pure());
     }
 

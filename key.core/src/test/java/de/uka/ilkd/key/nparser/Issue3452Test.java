@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
-import org.junit.jupiter.api.Assertions;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 
@@ -55,6 +54,6 @@ public class Issue3452Test {
 
         assertThat(exception.getMessage())
                 .startsWith("Load failed");
-                //.startsWithIgnoringCase("Heap used in a `no_state` method.");
+        // .startsWithIgnoringCase("Heap used in a `no_state` method.");
     }
 }

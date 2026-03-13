@@ -494,7 +494,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // merge point specific parts here
         var constructs = mps.getAttachedJml();
         for (var construct : constructs) {
-            if(construct instanceof TextualJMLMergePointDecl m) {
+            if (construct instanceof TextualJMLMergePointDecl m) {
                 return jsf.createJMLMergeContracts(method, mps, m);
             }
         }

@@ -7,7 +7,6 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import com.github.javaparser.ast.Modifier.DefaultKeyword;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -19,6 +18,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.*;
 import com.github.javaparser.ast.*;
+import com.github.javaparser.ast.Modifier.DefaultKeyword;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.key.*;
@@ -41,7 +41,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 ///
 ///   * Type level / Compilation Unit
 ///
-///     Currently the support is limited for JML modifiers on classes
+/// Currently, the support is limited for JML modifiers on classes
 ///
 ///   * Class level / Body Declarations
 ///
@@ -52,11 +52,14 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 ///
 ///     Support for ghost statements.
 ///
-/// After execution this {@link JavaTransformer}, contracts are attached to {@link MethodDeclaration}, or {@link BlockStmt},
-/// {@link FieldDeclaration} and {@link MethodDeclaration} were introduced for ghost and model declarations,
-/// JML statements (assume, assert, ...) are inserted into the bodies using {@link KeYMarkerStatement}.
+/// After execution this {@link JavaTransformer}, contracts are attached to
+/// {@link MethodDeclaration}, or {@link BlockStmt}, {@link FieldDeclaration} and
+/// {@link MethodDeclaration} were introduced for ghost and model declarations,
+/// JML statements (assume, assert, ...) are inserted into the bodies using
+/// {@link KeYMarkerStatement}.
 ///
-/// You can access attached JML information using the {@link DataKey} in [KEY_SPEC_CASE], [KEY_CLASS_SPEC], and [KEY_LOOP_SPEC].
+/// You can access attached JML information using the {@link DataKey} in [KEY_SPEC_CASE],
+/// [KEY_CLASS_SPEC], and [KEY_LOOP_SPEC].
 ///
 /// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
 public final class JMLTransformer extends JavaTransformer {
