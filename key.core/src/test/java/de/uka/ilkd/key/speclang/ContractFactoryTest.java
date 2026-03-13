@@ -146,7 +146,7 @@ public class ContractFactoryTest {
                 @*/""";
         JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
+            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::#l),"
             + "allLocs))",
             woLabels.toString());
     }
