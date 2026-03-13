@@ -10,12 +10,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.ast.statement.Exec;
-import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
-import de.uka.ilkd.key.java.ast.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.ast.statement.MethodFrame;
-import de.uka.ilkd.key.java.ast.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.ast.statement.Try;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 

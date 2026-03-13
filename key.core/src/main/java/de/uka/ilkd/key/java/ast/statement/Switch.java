@@ -5,8 +5,11 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.MetaClassReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
@@ -118,6 +121,9 @@ public class Switch extends BranchStatement
         super(pi, c);
         this.expression = expr;
         this.branches = branches;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
 
@@ -292,7 +298,7 @@ public class Switch extends BranchStatement
 
     @Override
     public ImmutableArray<PossibleProgramPrefix> getPrefixElements() {
-        return StatementBlock.computePrefixElements(this);
+        return StatementBlock.computePrefixElements();
     }
 
     /**

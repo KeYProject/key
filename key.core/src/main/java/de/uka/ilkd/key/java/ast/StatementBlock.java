@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
@@ -143,7 +144,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * computes the prefix elements for the given array of statment block
      */
     public static ImmutableArray<PossibleProgramPrefix> computePrefixElements(
-            ImmutableArray<? extends Statement> b,
             PossibleProgramPrefix current) {
         final ArrayList<PossibleProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
@@ -155,7 +155,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
         return new ImmutableArray<>(prefix);
     }
-
 
     /**
      * Get body.

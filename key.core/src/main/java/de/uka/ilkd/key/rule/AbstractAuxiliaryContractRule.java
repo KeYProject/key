@@ -11,10 +11,8 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PossibleProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
@@ -293,7 +291,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
                 final JModality modality, final Goal goal) {
             SourceElement element = modality.programBlock().program().getFirstElement();
-            while ((element instanceof PossibleProgramPrefix pre && pre.isPrefix() || element instanceof CatchAllStatement)
+            while ((element instanceof PossibleProgramPrefix pre && pre.isPrefix()
+                    || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock
                             && ((StatementBlock) element).isEmpty())) {
                 if (element instanceof StatementBlock && hasApplicableContracts(services,

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.PossibleProgramPrefix;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.LocationVariable;
