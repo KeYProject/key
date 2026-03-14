@@ -224,16 +224,16 @@ public class OutputStreamProofSaver {
     /// @see de.uka.ilkd.key.proof.init.KeYUserProblemFile#getProblemHeader()
     /// @see de.uka.ilkd.key.proof.init.InitConfig#getProblemHeader()
     private String makePathsRelative(Path basePath, KeyAst.@Nullable Declarations header) {
-        if (header == null) {
-            return "";
-        }
         StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw, true);
 
-        header.printDefinitions(out);
+        if (header != null) {
+            header.printDefinitions(out);
+        }
+
+        out.println();
 
         JavaModel jm = proof.getServices().getJavaModel();
-
         Path bootClassPath = jm.getBootClassPath();
         if (bootClassPath != null) {
             out.printf("\\bootclasspath \"%s\";\n", safePathRelativeTo(bootClassPath, basePath));
@@ -259,7 +259,7 @@ public class OutputStreamProofSaver {
             }
         }
 
-        return sw.toString();
+        return sw.toString()+"\n";
     }
 
     private String newNames2Proof(Node n) {
