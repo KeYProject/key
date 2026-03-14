@@ -50,10 +50,10 @@ class KeyJavaPipelineTest {
         assertNotNull(nss.sorts().lookup("boolean"));
         assertNotNull(nss.sorts().lookup("int"));
         assertNotNull(nss.sorts().lookup("boolean"));
-        var js = services.activateJava(null, Collections.singleton(testFolder));
+        var inputFolder = testFolder.resolve("input");
+        var js = services.activateJava(null, Collections.singleton(inputFolder));
         js.parseSpecialClasses();
 
-        var inputFolder = testFolder.resolve("input");
         final var jp = js.getProgramFactory().createJavaParser();
         try (var files = Files.list(inputFolder);) {
             var cu = new ArrayList<CompilationUnit>();
