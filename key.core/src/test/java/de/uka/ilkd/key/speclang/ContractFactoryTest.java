@@ -64,7 +64,7 @@ public class ContractFactoryTest {
             services.setOriginFactory(new OriginTermLabelFactory());
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
-        preParser = new PreParser(services.getOriginFactory() != null);
+        preParser = new PreParser();
     }
 
     /**

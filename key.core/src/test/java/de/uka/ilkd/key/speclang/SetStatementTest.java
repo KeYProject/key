@@ -112,7 +112,7 @@ public class SetStatementTest {
     private String parseAndCheck(String statementText) {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs =
-            new de.uka.ilkd.key.speclang.njml.PreParser(true).parseMethodLevel(statementText, null,
+            new de.uka.ilkd.key.speclang.njml.PreParser().parseMethodLevel(statementText, null,
                 Position.newOneBased(1, 1));
         assertEquals(1, constructs.size());
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());

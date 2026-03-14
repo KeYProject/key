@@ -7,6 +7,7 @@ package de.uka.ilkd.key.util.parsing;
 import de.uka.ilkd.key.parser.Location;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface simply states, that an exception has locational information.
@@ -20,6 +21,5 @@ public interface HasLocation {
      *
      * @return the location of the exception
      */
-    @NonNull
-    Location getLocation();
+    @Nullable Location getLocation();
 }

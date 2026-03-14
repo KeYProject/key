@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.njml;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.List;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
@@ -41,7 +42,7 @@ public class NJmlTranslatorTests {
         Services services = javaInfo.getServices();
         services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        preParser = new PreParser(services.getOriginFactory() != null);
+        preParser = new PreParser();
     }
 
     @Test
@@ -61,8 +62,8 @@ public class NJmlTranslatorTests {
         ImmutableList<TextualJMLConstruct> result =
             preParser.parseClassLevel(contract, new URI("Test.java"), Position.newOneBased(5, 5));
         assertNotNull(result);
-        ImmutableList<PositionedString> warnings = preParser.getWarnings();
-        PositionedString message = warnings.head();
+        List<PositionedString> warnings = preParser.getWarnings();
+        PositionedString message = warnings.getFirst();
         assertEquals(
             "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
                 + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("

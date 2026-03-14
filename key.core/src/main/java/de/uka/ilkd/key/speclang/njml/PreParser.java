@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -14,34 +10,25 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModifierList;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableList;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Transforms pure text comments into {@link TextualJMLConstruct}s.
  */
 public class PreParser {
-    /** warnings */
-    private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
-
-    private boolean attachOrigin;
-
-    /** constructor */
-    public PreParser(boolean attachOrigin) {
-        this.attachOrigin = attachOrigin;
-    }
+    private final List<PositionedString> warnings = new ArrayList<>(8);
 
     /**
      * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
      * parse tree.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
-        @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         p.getErrorReporter().throwException();
@@ -61,12 +48,10 @@ public class PreParser {
     }
 
     private void jmlCheck(ParserRuleContext ctx) {
-        List<PositionedString> warn = new ArrayList<>();
         for (JmlCheck check : JmlChecks.getJmlChecks()) {
             List<PositionedString> w = check.check(ctx);
-            warn.addAll(w);
+            this.warnings.addAll(w);
         }
-        this.warnings = warnings.prepend(ImmutableList.fromList(warn));
     }
 
 
@@ -91,7 +76,6 @@ public class PreParser {
      * parse tree.
      */
     private ImmutableList<TextualJMLConstruct> parseMethodLevel(JmlLexer lexer) {
-        @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         p.getErrorReporter().throwException();
@@ -135,12 +119,12 @@ public class PreParser {
     /**
      * returns the gathered interpretation warnings, e.g., deprecated constructs.
      */
-    public ImmutableList<PositionedString> getWarnings() {
+    public List<PositionedString> getWarnings() {
         return warnings;
     }
 
     public void clearWarnings() {
-        warnings = ImmutableSLList.nil();
+        warnings.clear();
     }
 
     public ImmutableList<JMLModifier> parseModifiers(String modifiers) {

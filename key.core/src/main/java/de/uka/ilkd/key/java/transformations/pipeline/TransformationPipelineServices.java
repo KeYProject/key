@@ -60,8 +60,12 @@ public class TransformationPipelineServices {
         warnings.add(warning);
     }
 
-    public void addWarnings(@MonotonicNonNull ImmutableList<PositionedString> w) {
+    public void addWarnings(ImmutableList<PositionedString> w) {
         warnings.addAll(w.toList());
+    }
+
+    public void addWarnings(List<PositionedString> warnings) {
+        this.warnings.addAll(warnings);
     }
 
 
@@ -279,12 +283,6 @@ public class TransformationPipelineServices {
 
     public JavaParser getParser() {
         return javaParserFactory.createJavaParser();
-    }
-
-
-    public String getFreshName(String generated, Position position) {
-        // TODO
-        return generated;
     }
 
 

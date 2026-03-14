@@ -10,6 +10,8 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -57,6 +59,16 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     public static Location fromToken(Token token) {
         return new Location(MiscTools.getURIFromTokenSource(token.getTokenSource()),
             Position.fromToken(token));
+    }
+
+    public static Location fromNode(Node n) {
+        var fileUri = n.findCompilationUnit().flatMap(CompilationUnit::getStorage)
+                .map(it -> it.getPath().toUri())
+                .orElse(null);
+
+        var pos = n.getRange().map(it -> it.begin).orElseThrow();
+
+        return new Location(fileUri, Position.fromJPPosition(pos));
     }
 
     public URI getFileUri() { return fileUri; }

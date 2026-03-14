@@ -15,6 +15,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.*;
@@ -64,6 +65,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// [JMLTransformer#KEY_SPEC_CASE], and [JMLTransformer#KEY_SPEC_CASE].
 ///
 /// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public final class JMLTransformer extends JavaTransformer {
     public static final EnumSet<JMLModifier> JAVA_MODS =
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
@@ -145,9 +147,14 @@ public final class JMLTransformer extends JavaTransformer {
             throws SLTranslationException {
         NodeList<Modifier> modifiers = new NodeList<>();
         for (JMLModifier m : decl.getModifiers()) {
+            if(m.equals(JMLModifier.MODEL)) {
+                throw new BuildingException(decl.getDecl(), "Model modifier on variable declaration detected, only model fields are allowed");
+            }
+
             Modifier mod = new Modifier(m.getParserKeyword());
             modifiers.add(mod);
         }
+
         final var dims = decl.getDecl().typespec().dims();
 
         // for cases like `int[] a[]`, which are allowed in Java (a is 2d here)
@@ -250,11 +257,9 @@ public final class JMLTransformer extends JavaTransformer {
      * @throws SLTranslationException
      */
     private void transformClassLevelComments(TypeDeclaration<?> td) throws SLTranslationException {
-        URI fileName = null;
-        if (td.findCompilationUnit().isPresent()
-                && td.findCompilationUnit().get().getStorage().isPresent()) {
-            fileName = td.findCompilationUnit().get().getStorage().get().getPath().toUri();
-        }
+        URI fileName = td.findCompilationUnit().flatMap(it -> it.getStorage())
+                .map(it -> it.getPath().toUri())
+                .orElse(null);
 
         ArrayList<BodyDeclaration<?>> members = new ArrayList<>(td.getMembers());
         ArrayList<TextualJMLSpecCase> specCases = new ArrayList<>();
@@ -264,15 +269,14 @@ public final class JMLTransformer extends JavaTransformer {
             // JMLDocsBodyDeclaration: JML comments inside a class/interface/... body
             if (member instanceof JmlDocsBodyDeclaration bd) {
                 String concatenatedComment = sanitizer.asString(bd.jmlDocs());
-                Position astPos = bd.getRange().get().begin;
-                de.uka.ilkd.key.java.Position pos =
-                    de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
 
                 // The preparser split along the grammar rules in KeYParser.g4, and gives you a list
                 // of JML entities.
                 PreParser pp = getPreParser();
                 // We might have multiple textual constructs now, because the single comment could
                 // contain multiple JML entities (e.g. method contract and ghost field declaration)
+
+                de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
                 ImmutableList<TextualJMLConstruct> constructs =
                     pp.parseClassLevel(concatenatedComment, fileName, pos);
                 services.addWarnings(pp.getWarnings());
@@ -353,7 +357,7 @@ public final class JMLTransformer extends JavaTransformer {
             // attach anything that should be inside a method
             if (member instanceof NodeWithOptionalBlockStmt<?> call
                     && call.getBody().isPresent()) {
-                transformMethodLevelCommentsAt(call.getBody().get());
+                transformMethodLevelCommentsAt(call.getBody().get(), fileName);
             }
 
             // modifiers (such as pure, spec_public, model, ghost, ...)
@@ -369,8 +373,7 @@ public final class JMLTransformer extends JavaTransformer {
 
     private static @NonNull PreParser getPreParser() {
         return new PreParser(
-            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                    .getUseOriginLabels());
+        );
     }
 
     private void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
@@ -397,44 +400,32 @@ public final class JMLTransformer extends JavaTransformer {
         specList.add(spec);
     }
 
-    private static Optional<BlockStmt> findInnermostBlock(Node node) {
-        while (true) {
-            node = node.getParentNode().get();
-            if (node instanceof BlockStmt) {
-                return Optional.of((BlockStmt) node);
-            }
-            if (node.getParentNode().isEmpty()) {
-                return Optional.empty();
-            }
-        }
-    }
-
-    private void transformMethodLevelCommentsAt(BlockStmt blockStmt) throws SLTranslationException {
+    private void transformMethodLevelCommentsAt(BlockStmt blockStmt, URI fileName) throws SLTranslationException {
         PreParser io = getPreParser();
         var stmts = new ArrayList<>(blockStmt.getStatements());
         var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size() * 2);
+
+        final de.uka.ilkd.key.java.Position pos =
+                de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
 
         for (int i = 0; i < stmts.size(); i++) {
             var stmt = stmts.get(i);
             newStmts.add(stmt);
             if (stmt instanceof BlockStmt bs) {
-                transformMethodLevelCommentsAt(bs);
+                transformMethodLevelCommentsAt(bs, fileName);
             } else if (stmt instanceof IfStmt is) {
                 if (is.thenStmt().isBlockStmt()) {
-                    transformMethodLevelCommentsAt(is.thenStmt().asBlockStmt());
+                    transformMethodLevelCommentsAt(is.thenStmt().asBlockStmt(), fileName);
                 }
                 if (is.elseStmt() != null && is.elseStmt().isBlockStmt()) {
-                    transformMethodLevelCommentsAt(is.elseStmt().asBlockStmt());
+                    transformMethodLevelCommentsAt(is.elseStmt().asBlockStmt(), fileName);
                 }
             } else if (stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
-                transformMethodLevelCommentsAt(b.getBody().asBlockStmt());
+                transformMethodLevelCommentsAt(b.getBody().asBlockStmt(), fileName);
             } else if (stmt instanceof JmlDocsStatements doc) {
-                Position astPos = doc.getRange().get().begin;
-                de.uka.ilkd.key.java.Position pos =
-                    de.uka.ilkd.key.java.Position.fromJPPosition(astPos);
                 String concat = sanitizer.asString(doc.getJmlDocs());
                 ImmutableList<TextualJMLConstruct> constructs =
-                    io.parseMethodLevel(concat, null, pos);
+                    io.parseMethodLevel(concat, fileName, pos);
                 services.addWarnings(io.getWarnings());
 
                 // handle ghost declarations and set assignments in textual constructs
@@ -450,7 +441,7 @@ public final class JMLTransformer extends JavaTransformer {
                             statement = transformAssertStatement(assertStatement);
                         case TextualJMLSpecCase spec -> {
                             var specifiedStmt = stmts.get(i + 1);
-                            if (specifiedStmt instanceof BlockStmt bs
+                            if (specifiedStmt instanceof BlockStmt
                                     || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
                                     || specifiedStmt instanceof LabeledStmt) {
                                 addSpec(specifiedStmt, spec);
@@ -464,7 +455,7 @@ public final class JMLTransformer extends JavaTransformer {
                         }
                         case TextualJMLLoopSpec spec -> {
                             var specifiedStmt = stmts.get(i + 1);
-                            if (specifiedStmt instanceof BlockStmt bs
+                            if (specifiedStmt instanceof BlockStmt
                                     || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
                                     || specifiedStmt instanceof LabeledStmt) {
                                 addLoopSpec(specifiedStmt, spec);
@@ -496,7 +487,7 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     @Override
-    public void apply(CompilationUnit cu) {
+    public void apply(@NonNull CompilationUnit cu) {
         // abort if JML is disabled
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) {
             return;

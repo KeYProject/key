@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
  * @author Hubert Schmid
  */
 
-public final class ParserException extends Exception implements HasLocation {
+public final class ParserException extends RuntimeException implements HasLocation {
     /* --- constructors --- */
     /**
      * @param message

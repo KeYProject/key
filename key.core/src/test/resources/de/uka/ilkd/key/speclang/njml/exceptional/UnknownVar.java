@@ -1,5 +1,5 @@
 // exceptionClass: ParserException
-// msgContains: Could not resolve FieldReference "unknownVar"
+// msgContains: Name could not be resolved 'unknownVar'
 // position: 12/9
 
 
