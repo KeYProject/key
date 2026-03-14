@@ -50,11 +50,9 @@ public class KeYJavaPipeline {
         p.add(new CreateBuilder(pipelineServices));
         p.add(new CreateObjectBuilder(pipelineServices));
         p.add(new LocalClassTransformation(pipelineServices));
-        // commented below out
-        // - before it did nothing as visitor did not descend
-        // - with fix it creates literals with increasing quotation marks
-        // does not seem to be needed?
-        // p.add(new ConstantStringExpressionEvaluator(pipelineServices));
+        // Below is an expensive transformation as it has to traverse down
+        // to an expression level.
+        p.add(new ConstantStringExpressionEvaluator(pipelineServices));
         return p;
     }
 
