@@ -387,7 +387,7 @@ public class JavaService {
 
         List<CompilationUnit> rcuList = new ArrayList<>();
 
-        // -- read files --
+        // read files
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(new String[] { ".jml", ".java" });
             while (walker.step()) {
@@ -404,27 +404,6 @@ public class JavaService {
                 }
             }
         }
-
-        // -- read class files --
-        // TODO javaparser
-        /*
-         * ClassFileDeclarationManager manager = new ClassFileDeclarationManager(pf);
-         * ByteCodeParser parser = new ByteCodeParser();
-         * for (FileCollection fc : sources) {
-         * FileCollection.Walker walker = fc.createWalker(".class");
-         * while (walker.step()) {
-         * currentDataLocation = walker.getCurrentDataLocation();
-         * try (InputStream is = new BufferedInputStream(walker.openCurrent(fileRepo))) {
-         * ClassFile cf = parser.parseClassFile(is);
-         * manager.addClassFile(cf, currentDataLocation);
-         * } catch (Exception ex) {
-         * throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(),
-         * ex);
-         * }
-         * }
-         * }
-         * rcuList.addAll(manager.getCompilationUnits());
-         */
         return rcuList;
     }
 
