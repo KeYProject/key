@@ -175,7 +175,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private static boolean isSelectTerm(JTerm term) {
-        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+        return term.op() instanceof ParametricFunctionInstance pfi
+                && pfi.getBase().name().toString().equals("select") && term.arity() == 3;
     }
 
     @Override

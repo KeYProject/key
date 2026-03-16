@@ -246,6 +246,10 @@ public final class HeapLDT extends LDT {
             ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
+    public @NonNull ParametricFunctionDecl getFinal() {
+        return finalFunction;
+    }
+
     /**
      * Returns the function symbol to access final fields for the given instance sort.
      *
