@@ -362,7 +362,7 @@ id_declaration
 
 funcpred_name
 :
-  (name=simple_ident_dots|num=INT_LITERAL)
+  (sortId DOUBLECOLON)? (name=simple_ident_dots|num=INT_LITERAL)
 ;
 
 

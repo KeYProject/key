@@ -1501,6 +1501,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
+            if (ctx.sortId() != null) {
+                firstName = ctx.sortId().getText() + "::" + firstName;
+            }
             op = lookupVarfuncId(ctx, firstName,
                 genericArgsCtxt);
         }

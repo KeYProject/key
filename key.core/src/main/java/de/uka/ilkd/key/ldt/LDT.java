@@ -110,7 +110,7 @@ public abstract class LDT implements Named {
             String name) {
         final ParametricFunctionDecl f =
             services.getNamespaces().parametricFunctions().lookup(name);
-        assert f != null : "LDT: Sort depending function " + name + " not found";
+        assert f != null : "LDT: Parametric function " + name + " not found";
         return addParametricFunction(f);
     }
 
