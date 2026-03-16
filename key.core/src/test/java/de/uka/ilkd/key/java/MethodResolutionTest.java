@@ -14,8 +14,13 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled()
+/// @deprecated This test case does not make sense. First, the Java code is invalid. Inherited methods must have the
+///             access or publicler access. Second, there should not to primary types in one class.
+///             This test case only shows, that JavaParser can work on bogious code, producing reasonable results.
 public class MethodResolutionTest {
     private static final String CLASSES_A = """
             package a;
@@ -93,6 +98,6 @@ public class MethodResolutionTest {
             (ExpressionStmt) callFunction.getBody().orElseThrow().getStatements().get(0);
         var methodCallExpr = (MethodCallExpr) callStatement.getExpression();
         var method = methodCallExpr.resolve();
-        Assertions.assertEquals(method.accessSpecifier(), AccessSpecifier.PUBLIC);
+        Assertions.assertEquals(AccessSpecifier.PUBLIC, method.accessSpecifier());
     }
 }
