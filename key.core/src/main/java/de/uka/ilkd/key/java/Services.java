@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -473,19 +474,19 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
     private JavaService activateJavaPath(@NonNull Path bootClassPath,
-            @NonNull Collection<Path> libraryPaths) {
+            @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return javaService;
         }
         LOGGER.info("activate java with {} and {}", bootClassPath, libraryPaths);
-        javaService = new JavaService(this, bootClassPath, libraryPaths);
+        javaService = new JavaService(this, bootClassPath, libraryPaths, fileRepo);
         javaInfo = new JavaInfo(new KeYProgModelInfo(javaService), this);
         return javaService;
     }
 
     public JavaService activateJava(@Nullable Path bootClassPath,
-            @NonNull Collection<Path> libraryPaths) {
+            @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;
@@ -497,11 +498,11 @@ public class Services implements TermServices, LogicServices, ProofServices {
             libraryPaths = Collections.emptyList();
         }
 
-        return activateJavaPath(path, libraryPaths);
+        return activateJavaPath(path, libraryPaths, fileRepo);
     }
 
     public void activateJava(@Nullable Path bootClassPath) {
-        activateJava(bootClassPath, Collections.emptyList());
+        activateJava(bootClassPath, Collections.emptyList(), null);
     }
 
     public static Path getReduxPath() {

@@ -114,6 +114,7 @@ public class JavaService {
     @NonNull
     private final Path bootClassPath;
 
+    private final FileRepo fileRepo;
 
     /**
      * A list of {@link File} objects that describes the classpath to be searched
@@ -123,11 +124,12 @@ public class JavaService {
     private final Collection<Path> libraryPath;
 
     public JavaService(Services services, @NonNull Path bootClassPath,
-            @NonNull Collection<Path> libraryPath) {
+            @NonNull Collection<Path> libraryPath, FileRepo fileRepo) {
         this.services = services;
         this.mapping = new KeYJPMapping();
         this.bootClassPath = bootClassPath;
         this.libraryPath = libraryPath;
+        this.fileRepo = fileRepo;
         programFactory = new JavaParserFactory(services);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
         converter = new JP2KeYConverter(services, new Namespace<>());
@@ -137,6 +139,8 @@ public class JavaService {
         this.services = services;
         this.bootClassPath = o.bootClassPath;
         this.libraryPath = o.libraryPath;
+        // TODO: copy filerepo instead?
+        this.fileRepo = o.fileRepo;
         this.mapping = o.mapping.copy();
         programFactory = o.programFactory.copy(services);
         typeConverter = new JP2KeYTypeConverter(services, programFactory.getTypeSolver(), mapping);
@@ -238,7 +242,7 @@ public class JavaService {
             Path parent,
             Collection<Path> files, FileRepo repo)
             throws IOException, BuildingExceptions {
-        parseSpecialClasses();
+        parseSpecialClasses(repo);
         var cus = new ArrayList<CompilationUnit>(files.size());
         for (Path file : files) {
             var cu = unwrapParseResult(file.toString(), parseCompilationUnit(file, repo));
@@ -732,7 +736,9 @@ public class JavaService {
      * @return the parsed and resolved recoder statement block
      */
     Node parseBlock(String input, JPContext context) {
-        parseSpecialClasses();
+        // ensure bootclasspath/classpath are read (needed for resolution in modalities in taclets)
+        parseSpecialClasses(fileRepo);
+
         // TODO javaparser change grammar of the parser to allow blocks without context information
         // Context-block
         Node original;

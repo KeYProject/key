@@ -708,9 +708,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
             }
         } catch (UnsolvedSymbolException e) {
-            ResolvedType type = n.calculateResolvedType();
-            var keyType = getKeYJavaType(type);
-            return new TypeRef(keyType);
+            try {
+                ResolvedType type = n.calculateResolvedType();
+                var keyType = getKeYJavaType(type);
+                return new TypeRef(keyType);
+            } catch (UnsolvedSymbolException e1) {
+                throw new ParserException("Name could not be resolved '" + n + "'",
+                    Location.fromNode(n));
+            }
         }
     }
 

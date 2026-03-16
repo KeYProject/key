@@ -238,8 +238,9 @@ public final class ProblemInitializer {
         if (fileRepo != null) {
             // set the paths in the FileRepo (all three methods can deal with null parameters)
             fileRepo.setJavaPath(javaPath);
-            fileRepo.setClassPath(classPath);
-            fileRepo.setBootClassPath(bootClassPath);
+            // cp and bcp should have been set earlier (in activateJava)
+            //fileRepo.setClassPath(classPath);
+            //fileRepo.setBootClassPath(bootClassPath);
         }
 
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
@@ -406,11 +407,17 @@ public final class ProblemInitializer {
         }
     }
 
-    private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
+    private void activateInitConfigJava(InitConfig config, EnvInput envInput, FileRepo fileRepo) {
         var bootClassPath = envInput.readBootClassPath();
         var classPath = envInput.readClassPath();
         config.getServices().activateJava(bootClassPath,
-            classPath != null ? classPath : Collections.emptyList());
+            classPath != null ? classPath : Collections.emptyList(), fileRepo);
+
+        if (fileRepo != null) {
+            fileRepo.setClassPath(classPath);
+            fileRepo.setBootClassPath(bootClassPath);
+            config.setFileRepo(fileRepo);
+        }
     }
 
     /**
@@ -428,7 +435,7 @@ public final class ProblemInitializer {
         }
 
         InitConfig config = new InitConfig(services);
-        activateInitConfigJava(config, envInput);
+        activateInitConfigJava(config, envInput, fileRepo);
 
         // the first time, read in standard rules
         ImmutableList<RuleSource> tacletBases = profile.getStandardRules().getTacletBase();
