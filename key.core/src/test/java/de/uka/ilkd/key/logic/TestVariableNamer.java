@@ -143,7 +143,6 @@ public class TestVariableNamer {
     }
 
 
-    @Test
     private void testTemporaryNames(VariableNamer vn) {
         ProgramElementName name = vn.getTemporaryNameProposal("x");
         assertNotEquals("x", name.getProgramName());
