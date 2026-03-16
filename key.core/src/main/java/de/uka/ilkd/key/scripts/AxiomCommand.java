@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -25,6 +26,10 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  *             Use the {@link AssumeCommand} "assume" instead.
  */
 @Deprecated(forRemoval = true)
+@Documentation("""
+        This command is deprecated and should not be used in new scripts.
+        Use the equivalent `assume` command instead.
+        """)
 public class AxiomCommand extends AssumeCommand {
     private static final Name TACLET_NAME = new Name("cut");
 

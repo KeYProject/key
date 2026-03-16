@@ -33,6 +33,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class NodeInfo {
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;
 
-    private String branchLabel = null;
+    private @Nullable String branchLabel = null;
 
     /** flag true if the first and active statement have been determined */
     private boolean determinedFstAndActiveStatement = false;
@@ -265,7 +266,7 @@ public class NodeInfo {
      *
      * @return branch label
      */
-    public String getBranchLabel() {
+    public @Nullable String getBranchLabel() {
         return branchLabel;
     }
 

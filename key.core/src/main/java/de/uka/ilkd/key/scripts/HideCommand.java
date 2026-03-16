@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -25,7 +26,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 /**
- * Proof script command to hide a formula from the sequent.
+ * Proof script command to hide formulas from the sequent.
  *
  * Usage:
  *
@@ -99,9 +100,15 @@ public class HideCommand extends AbstractCommand {
         return "hide";
     }
 
+    @Documentation(category = "Control",
+        value = """
+                The hide command hides all formulas of the current proof goal that are in the given sequent.
+                The formulas in the given sequent are hidden using the taclets hide_left and hide_right.
+                """)
     public static class Parameters {
         @Argument
         @MonotonicNonNull
+        @Documentation("The sequent containing the formulas to hide. Placeholders are allowed.")
         public Sequent sequent;
     }
 

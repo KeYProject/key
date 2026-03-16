@@ -12,10 +12,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.scripts.meta.Documentation;
-import de.uka.ilkd.key.scripts.meta.Flag;
-import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.*;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProverCore;
@@ -49,11 +48,6 @@ public class AutoCommand extends AbstractCommand {
     }
 
     @Override
-    public String getDocumentation() {
-        return "The AutoCommand invokes the automatic strategy \"Auto\"";
-    }
-
-    @Override
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
         var arguments = state().getValueInjector().inject(new AutoCommand.Parameters(), args);
         final Services services = state().getProof().getServices();
@@ -69,7 +63,7 @@ public class AutoCommand extends AbstractCommand {
             goals = state().getProof().openGoals();
         } else {
             final Goal goal = state().getFirstOpenAutomaticGoal();
-            goals = ImmutableSLList.<Goal>nil().prepend(goal);
+            goals = ImmutableList.of(goal);
 
             if (arguments.matches != null || arguments.breakpoint != null) {
                 setupFocussedBreakpointStrategy( //
@@ -79,8 +73,8 @@ public class AutoCommand extends AbstractCommand {
 
         // set the max number of steps if given
         int oldNumberOfSteps = state().getMaxAutomaticSteps();
-        if (arguments.getSteps() > 0) {
-            state().setMaxAutomaticSteps(arguments.getSteps());
+        if (arguments.maxSteps > 0) {
+            state().setMaxAutomaticSteps(arguments.maxSteps);
         }
 
         // set model search if given
@@ -98,6 +92,16 @@ public class AutoCommand extends AbstractCommand {
         }
 
         SetCommand.updateStrategySettings(state(), activeStrategyProperties);
+
+        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        if (arguments.additionalRules != null) {
+            state.getProof().setActiveStrategy(
+                new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
+        }
+        if (arguments.onlyRules != null) {
+            state.getProof().setActiveStrategy(
+                new AdditionalRulesStrategy(originalStrategy, arguments.onlyRules, true));
+        }
 
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
@@ -120,6 +124,7 @@ public class AutoCommand extends AbstractCommand {
                     activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
                 }
             }
+            state.getProof().setActiveStrategy(originalStrategy);
             SetCommand.updateStrategySettings(state(), activeStrategyProperties);
         }
     }
@@ -134,7 +139,7 @@ public class AutoCommand extends AbstractCommand {
         res.put("classAxioms",
             new OriginalValue(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE, CLASS_AXIOM_OFF));
         res.put("dependencies", new OriginalValue(DEP_OPTIONS_KEY, DEP_ON, DEP_OFF));
-        // ... add further (boolean for the moment) setings here.
+        // ... add further (boolean for the moment) settings here.
         return res;
     }
 
@@ -168,50 +173,54 @@ public class AutoCommand extends AbstractCommand {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
-    @Documentation("""
-            The AutoCommand is a command that invokes the automatic strategy "Auto" of KeY.
-            It can be used to automatically prove a goal or a set of goals.
-            Use with care, as this command may leave the proof state in an unpredictable state
+    @Documentation(category = "Fundamental", value = """
+            The AutoCommand invokes the automatic strategy "Auto" of KeY (which is also launched by
+            when clicking the "Auto" button in the GUI).
+            It can be used to try to automatically prove the current goal.
+            Use with care, as this command may leave the proof in a incomprehensible state
             with many open goals.
 
             Use the command with "close" to make sure the command succeeds for fails without
             changes.""")
-    public static class Parameters {
+    public static class Parameters implements ValueInjector.VerifyableParameters {
         // @ TODO Deprecated with the higher order proof commands?
         @Flag(value = "all")
-        @Documentation("Apply the strategy on all open goals. There is a better syntax for that now.")
+        @Documentation("*Deprecated*. Apply the strategy on all open goals. There is a better syntax for that now.")
         public boolean onAllOpenGoals = false;
 
         @Option(value = "steps")
-        @Documentation("The maximum number of steps to be performed.")
-        public int maxSteps = -1;
+        @Documentation("The maximum number of proof steps to be performed.")
+        public @Nullable int maxSteps = -1;
 
         /**
          * Run on formula matching the given regex
          */
         @Option(value = "matches")
-        @Documentation("Run on formula matching the given regex.")
+        @Documentation("Run on the formula matching the given regex.")
         public @Nullable String matches = null;
 
         /**
          * Run on formula matching the given regex
          */
         @Option(value = "breakpoint")
-        @Documentation("Run on formula matching the given regex.")
+        @Documentation("When doing symbolic execution by auto, this option can be used to set a Java statement at which "
+            +
+            "symbolic execution has to stop.")
         public @Nullable String breakpoint = null;
 
         @Flag(value = "modelsearch")
-        @Documentation("Enable model search. Better for some types of arithmetic problems. Sometimes a lot worse")
+        @Documentation("Enable model search. Better for some (types of) arithmetic problems. Sometimes a lot worse.")
         public boolean modelSearch;
 
         @Flag(value = "expandQueries")
-        @Documentation("Expand queries by modalities.")
+        @Documentation("Automatically expand occurrences of query symbols using additional modalities on the sequent.")
         public boolean expandQueries;
 
         @Flag(value = "classAxioms")
         @Documentation("""
-                Enable class axioms. This expands model methods and fields and invariants quite eagerly. \
-                May lead to divergence.""")
+                Enable automatic and eager expansion of symbols. This expands class invariants, model methods and
+                fields and invariants quite eagerly. May be an enabler (if a few definitions need to expanded),
+                may be a showstopper (if expansion increases the complexity on the sequent too much).""")
         public boolean classAxioms;
 
         @Flag(value = "dependencies")
@@ -220,8 +229,30 @@ public class AutoCommand extends AbstractCommand {
                 without that its definition is known. May be an enabler, may be a showstopper.""")
         public boolean dependencies;
 
-        public int getSteps() {
-            return maxSteps;
+        @Option(value = "add")
+        @Documentation("""
+                Additional rules to be used by the auto strategy. The rules have to be given as a
+                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+                (high, low, medium or a natural number) using an equals sign.
+                Cannot be combined with the 'only' parameter.
+                """)
+        public @Nullable String additionalRules;
+
+        @Option(value = "only")
+        @Documentation("""
+                Limit the rules to be used by the auto strategy. The rules have to be given as a
+                comma-separated list of rule names and rule set names. Each entry can be assigned to a priority
+                (high, low, medium or a natural number) using an equals sign.
+                All rules application which do not match the given names will be disabled.
+                Cannot be combined with the 'add' parameter.
+                """)
+        public @Nullable String onlyRules;
+
+        @Override
+        public void verifyParameters() throws IllegalArgumentException, InjectionException {
+            if (onlyRules != null && additionalRules != null) {
+                throw new InjectionException("Parameters 'add' and 'only' are mutually exclusive.");
+            }
         }
     }
 
@@ -229,7 +260,7 @@ public class AutoCommand extends AbstractCommand {
         private final String settingName;
         private final String trueValue;
         private final String falseValue;
-        private String oldValue;
+        private @Nullable String oldValue;
 
         private OriginalValue(String settingName, String trueValue, String falseValue) {
             this.settingName = settingName;

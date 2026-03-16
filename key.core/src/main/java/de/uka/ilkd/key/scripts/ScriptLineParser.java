@@ -15,9 +15,10 @@ import de.uka.ilkd.key.parser.Location;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * This class was used to parse script lines before the parsing was integrated into the general
+ * ANTLR parser for KeY files.
  *
  * @author mattias ulbrich
- *
  */
 class ScriptLineParser {
 
@@ -248,7 +249,8 @@ class ScriptLineParser {
     }
 
     private Location getLocation() {
-        return new Location(fileURI, Position.newOneBased(line, col));
+        Position pos = line >= 1 ? Position.newOneBased(line, col) : Position.UNDEFINED;
+        return new Location(fileURI, pos);
     }
 
     public int getOffset() {

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.scripts.meta.Argument;
+import de.uka.ilkd.key.scripts.meta.Documentation;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -15,7 +16,11 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * complexity in a try-and-error manner, etc.).
  *
  * @author Dominic Steinhoefel
+ *
+ * @deprecated This should be merged in the {@link SetCommand} with a parameter like "failonclosed".
  */
+@Deprecated
+@Documentation(category = "Control", value = "")
 public class SetFailOnClosedCommand extends AbstractCommand {
     public SetFailOnClosedCommand() {
         super(Parameters.class);

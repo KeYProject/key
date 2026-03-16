@@ -1,0 +1,7 @@
+key: |  
+  \programVariables { int a; }
+  \problem { ==> 3 = (3+0)+0 & 3+0 = (3+0)+0 }
+script: |
+  rule add_zero_right on:(? & ?find(?focus(3+0)+0));
+goals:
+  - ==> 3 = 3 + 0 + 0 & 3 + 0 = 3 + 0
