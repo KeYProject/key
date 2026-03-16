@@ -14,6 +14,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * For.
@@ -52,12 +54,12 @@ public class For extends LoopStatement implements VariableScope {
 
     public For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
             IGuard guard, Statement body) {
-        super(pi, comments, inits, updates, guard, body);
+        super(pi, comments, inits, updates, guard, body, ImmutableSLList.nil());
     }
 
     public <T> For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
             IGuard guard, Statement body, List<TextualJMLConstruct> specs) {
-        super(pi, comments, inits, updates, guard, body, specs);
+        super(pi, comments, inits, updates, guard, body, ImmutableList.fromList(specs));
     }
 
     public SourceElement getLastElement() {

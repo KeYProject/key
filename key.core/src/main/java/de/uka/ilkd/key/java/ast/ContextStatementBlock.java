@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * In the DL-formulae description of Taclets the program part can have the following form
@@ -51,7 +52,7 @@ public class ContextStatementBlock extends StatementBlock {
             PositionInfo pi, List<Comment> c,
             ImmutableArray<? extends Statement> body,
             IExecutionContext execContext) {
-        super(pi, c, body);
+        super(pi, c, body, ImmutableSLList.nil());
         this.executionContext = execContext;
     }
 

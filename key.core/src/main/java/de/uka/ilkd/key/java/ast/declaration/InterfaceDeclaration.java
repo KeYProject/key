@@ -43,9 +43,10 @@ public class InterfaceDeclaration extends TypeDeclaration {
     public InterfaceDeclaration(PositionInfo pi, List<Comment> comments,
             @NonNull ImmutableArray<Modifier> modArray, ProgramElementName name,
             ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
-            boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending) {
+            boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending,
+            List<TextualJMLConstruct> spec) {
         super(pi, comments, modArray, name, fullName, members, parentIsInterfaceDeclaration,
-            isLibrary);
+            isLibrary, ImmutableList.fromList(spec));
         this.extending = extending;
     }
 
@@ -101,16 +102,6 @@ public class InterfaceDeclaration extends TypeDeclaration {
             new MemberDeclaration[] {},
             true);
     }
-
-    public InterfaceDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
-            ProgramElementName name, ProgramElementName fullName,
-            ImmutableArray<MemberDeclaration> members,
-            boolean parentIsInterface, boolean isLibrary, Extends extending,
-            List<TextualJMLConstruct> spec) {
-        this(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary, extending);
-        attachedJml.addAll(spec);
-    }
-
 
     /**
      * Returns the number of children of this node.

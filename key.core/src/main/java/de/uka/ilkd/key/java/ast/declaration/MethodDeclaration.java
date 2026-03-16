@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -92,8 +93,9 @@ public class MethodDeclaration extends JavaDeclaration
             TypeReference returnType,
             Comment[] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
-            StatementBlock body, boolean parentIsInterfaceDeclaration) {
-        super(pi, comments, modArray);
+            StatementBlock body, boolean parentIsInterfaceDeclaration,
+            ImmutableList<TextualJMLConstruct> attachedJml) {
+        super(pi, comments, modArray, attachedJml);
         this.returnType = returnType;
         this.voidComments = voidComments;
         this.name = name;
@@ -104,18 +106,6 @@ public class MethodDeclaration extends JavaDeclaration
         this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
     }
 
-    public MethodDeclaration(
-            PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
-            TypeReference returnType,
-            Comment[] voidComments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
-            StatementBlock body, boolean parentIsInterfaceDeclaration,
-            List<TextualJMLConstruct> specs) {
-        this(pi, comments, modArray, returnType, voidComments, name, parameters, exceptions,
-            body, parentIsInterfaceDeclaration);
-        attachedJml.addAll(specs);
-    }
 
     /**
      * Method declaration.

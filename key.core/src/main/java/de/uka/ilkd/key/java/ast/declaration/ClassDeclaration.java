@@ -121,8 +121,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
             boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
-            boolean localClassDeclaration, boolean isAnonymousClass) {
-        super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary);
+            boolean localClassDeclaration, boolean isAnonymousClass,
+            ImmutableList<TextualJMLConstruct> spec) {
+        super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary,
+            ImmutableList.fromList(spec));
         this.extending = extending;
         this.implementing = implementing;
         this.isInnerClass = innerClass;
@@ -130,18 +132,6 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         this.isAnonymousClass = isAnonymousClass;
     }
 
-    public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
-            ProgramElementName name, ProgramElementName fullName,
-            ImmutableArray<MemberDeclaration> members,
-            boolean parentIsInterface, boolean isLibrary, Extends extending,
-            Implements implementing,
-            boolean innerClass, boolean localClassDeclaration, boolean isAnonymousClass,
-            List<TextualJMLConstruct> spec) {
-        this(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary, extending,
-            implementing, innerClass,
-            localClassDeclaration, isAnonymousClass);
-        attachedJml.addAll(spec);
-    }
 
 
     /**

@@ -50,6 +50,7 @@ import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.Modifier;
@@ -356,7 +357,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else {
             td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
-                false, getClassSpec(n));
+                false, ImmutableList.fromList(getClassSpec(n)));
         }
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);
@@ -972,7 +973,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             map(n.getParameters()),
             thr,
             accepto(n.getBody()),
-            isInInterface, getSpec(n));
+            isInInterface, ImmutableList.fromList(getSpec(n)));
 
         var containing = getContainingClass(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
@@ -1082,7 +1083,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             ImmutableArray<MemberDeclaration> bodies = map(n.getAnonymousClassBody().get());
             decl = new ClassDeclaration(pi, c, new ImmutableArray<>(), null, null,
                 bodies, true, false, null, null,
-                true, false, true);
+                true, false, true, ImmutableList.of());
         }
         return new New(pi, c, args, type, decl);
     }

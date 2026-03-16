@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import java.util.List;
 
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -25,8 +27,8 @@ public interface ProgramElement extends SourceElement, ModelElement {
     Comment[] getComments();
 
     ///
-    default List<TextualJMLConstruct> getAttachedJml() {
-        return List.of();
+    default ImmutableList<TextualJMLConstruct> getAttachedJml() {
+        return ImmutableSLList.nil();
     }
 
 

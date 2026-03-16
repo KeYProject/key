@@ -16,8 +16,6 @@
 
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.Comment;
@@ -29,6 +27,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -38,17 +38,9 @@ import org.jspecify.annotations.NonNull;
  */
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
-    protected final List<TextualJMLConstruct> attachedJml = new ArrayList<>();
 
-    @Override
-    public List<TextualJMLConstruct> getAttachedJml() {
-        return Collections.unmodifiableList(attachedJml);
-    }
+    protected final ImmutableList<TextualJMLConstruct> attachedJml;
 
-    @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
-        return modArray;
-    }
 
     /**
      * Modifiers.
@@ -60,26 +52,28 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     protected final ImmutableArray<Modifier> modArray;
 
     public JavaDeclaration(PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray) {
+            @NonNull ImmutableArray<Modifier> modArray,
+            ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments);
         this.modArray = modArray;
+        this.attachedJml = attachedJml;
     }
 
     /**
      * Java declaration.
      */
     public JavaDeclaration() {
-        this(null, null, new ImmutableArray<>());
+        this(null, null, new ImmutableArray<>(), ImmutableSLList.nil());
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-        this(null, null, new ImmutableArray<>(mods));
+        this(null, null, new ImmutableArray<>(mods), ImmutableSLList.nil());
     }
 
 
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-        this(null, null, mods);
+        this(null, null, mods, ImmutableSLList.nil());
     }
 
 
@@ -94,6 +88,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     public JavaDeclaration(ExtList children) {
         super(children);
         modArray = new ImmutableArray<>(children.collect(Modifier.class));
+        this.attachedJml =
+            ImmutableList.fromList(List.of(children.collect(TextualJMLConstruct.class)));
     }
 
 
@@ -112,6 +108,16 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
         return null;
     }
 
+    @Override
+    public @NonNull ImmutableArray<Modifier> getModifiers() {
+        return modArray;
+    }
+
+
+    @Override
+    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
+        return attachedJml;
+    }
 
     public boolean containsModifier(Class<?> type) {
         int s = modArray.size();

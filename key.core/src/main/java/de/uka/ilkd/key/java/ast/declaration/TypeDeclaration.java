@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.abstraction.Package;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
@@ -62,8 +63,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
             @NonNull ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
-            boolean isLibrary) {
-        super(pi, comments, modArray);
+            boolean isLibrary, ImmutableList<TextualJMLConstruct> jmlAttachments) {
+        super(pi, comments, modArray, jmlAttachments);
         this.name = name;
         this.fullName = fullName;
         this.members = members;

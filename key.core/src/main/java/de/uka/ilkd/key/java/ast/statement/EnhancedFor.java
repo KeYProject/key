@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -28,17 +30,17 @@ import org.jspecify.annotations.NonNull;
 public class EnhancedFor extends LoopStatement implements VariableScope {
     private EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
             IForUpdates updates, IGuard guard, Statement body) {
-        super(pi, comments, inits, updates, guard, body);
+        super(pi, comments, inits, updates, guard, body, ImmutableSLList.nil());
     }
 
     public EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
             IGuard guard, Statement body) {
-        super(pi, comments, inits, null, guard, body);
+        super(pi, comments, inits, null, guard, body, ImmutableSLList.nil());
     }
 
     public EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
             IGuard guard, Statement body, List<TextualJMLConstruct> specs) {
-        super(pi, comments, inits, null, guard, body, specs);
+        super(pi, comments, inits, null, guard, body, ImmutableList.fromList(specs));
     }
 
 

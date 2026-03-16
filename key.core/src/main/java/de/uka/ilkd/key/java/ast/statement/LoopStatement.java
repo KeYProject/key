@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.*;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -50,12 +51,7 @@ public abstract class LoopStatement extends JavaStatement
     @NonNull
     protected final Statement body;
 
-    protected final List<TextualJMLConstruct> attachedJml = new ArrayList<>();
-
-    @Override
-    public List<TextualJMLConstruct> getAttachedJml() {
-        return attachedJml;
-    }
+    protected final ImmutableList<TextualJMLConstruct> attachedJml;
 
     /**
      * Loop statement.
@@ -69,6 +65,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
+        this.attachedJml = ImmutableSLList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
@@ -78,6 +75,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
+        this.attachedJml = ImmutableSLList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body) {
@@ -85,6 +83,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
+        this.attachedJml = ImmutableSLList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, PositionInfo pos) {
@@ -93,6 +92,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
+        this.attachedJml = ImmutableSLList.nil();
     }
 
 
@@ -118,6 +118,7 @@ public abstract class LoopStatement extends JavaStatement
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);
+        this.attachedJml = ImmutableSLList.nil();
     }
 
     /**
@@ -142,6 +143,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
+        this.attachedJml = ImmutableSLList.nil();
     }
 
 
@@ -153,6 +155,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
+        this.attachedJml = ImmutableSLList.nil();
     }
 
 
@@ -178,6 +181,7 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
+        this.attachedJml = ImmutableSLList.nil();
     }
 
 
@@ -199,28 +203,30 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
+        this.attachedJml = ImmutableSLList.nil();
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body) {
+            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
+            ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments);
         this.inits = inits;
         this.updates = updates;
         this.guard = guard;
         this.body = body;
-    }
-
-    public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
-            List<TextualJMLConstruct> specs) {
-        this(pi, comments, inits, updates, guard, body);
-        attachedJml.addAll(specs);
+        this.attachedJml = attachedJml;
     }
 
     static private ExtList add(ExtList e, Object o) {
         e.add(o);
         return e;
     }
+
+    @Override
+    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
+        return attachedJml;
+    }
+
 
     /**
      * Returns the number of children of this node.

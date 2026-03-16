@@ -16,6 +16,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -61,17 +62,10 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
             TypeReference o, Comment[] comments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> map1,
-            Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
-        super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration);
-    }
-
-    public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
-            TypeReference o, Comment[] comments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> map1,
             Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration,
             List<TextualJMLConstruct> specs) {
-        this(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration);
-        attachedJml.addAll(specs);
+        super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration,
+            ImmutableList.fromList(specs));
     }
 
     /**

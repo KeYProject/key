@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -101,7 +102,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
 
     public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
             TypeReference type, boolean parentIsInferface) {
-        super(pi, c, modArray);
+        super(pi, c, modArray, ImmutableSLList.nil());
         this.typeReference = type;
         this.parentIsInterfaceDeclaration = parentIsInferface;
     }

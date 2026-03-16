@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Position;
@@ -20,6 +21,8 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -40,22 +43,25 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Nullable
     private final MethodFrame innerMostMethodFrame;
-    private final List<TextualJMLConstruct> attachedJML = new ArrayList<>(0);
+    private final ImmutableList<TextualJMLConstruct> attachedJML;
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<? extends Statement> body) {
+            @NonNull ImmutableArray<? extends Statement> body,
+            ImmutableList<TextualJMLConstruct> attachedJML) {
         super(pi, comments);
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
+        this.attachedJML = attachedJML;
     }
 
     public StatementBlock() {
         body = new ImmutableArray<>();
         prefixLength = 1;
         innerMostMethodFrame = null;
+        attachedJML = ImmutableList.of();
     }
 
 
@@ -71,6 +77,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
+        attachedJML =
+            ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
     }
 
     public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
@@ -81,6 +89,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
+        attachedJML = ImmutableSLList.nil();
     }
 
 
@@ -94,12 +103,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body,
             List<TextualJMLConstruct> spec) {
-        this(pi, c, body);
-        attachedJML.addAll(spec);
+        this(pi, c, body, ImmutableList.fromList(spec));
     }
 
     @Override
-    public List<TextualJMLConstruct> getAttachedJml() {
+    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
         return attachedJML;
     }
 

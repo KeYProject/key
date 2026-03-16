@@ -285,7 +285,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
 
         // get textual JML constructs
-        var constructs = new ArrayList<>(pm.getMethodDeclaration().getAttachedJml());
+        ImmutableList<TextualJMLConstruct> constructs = pm.getMethodDeclaration().getAttachedJml();
 
         ParserRuleContext modelMethodDefinition = null;
         for (var c : constructs) {
@@ -302,7 +302,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if (modelMethodDefinition != null && constructs.size() == 1) {
             TextualJMLSpecCase specCase =
                 new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
-            constructs.add(specCase);
+            constructs = constructs.append(specCase);
         }
 
         for (var c : constructs) {
@@ -566,8 +566,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop) {
         LoopSpecification result = null;
 
-        ImmutableList<TextualJMLConstruct> constructs =
-            ImmutableList.fromList(loop.getAttachedJml());
+        ImmutableList<TextualJMLConstruct> constructs = loop.getAttachedJml();
 
         // create JML loop invariant out of last construct
         if (constructs.isEmpty()) {

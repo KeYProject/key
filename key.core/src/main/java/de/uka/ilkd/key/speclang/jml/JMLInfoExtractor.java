@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
-import java.util.List;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -80,7 +79,7 @@ public final class JMLInfoExtractor {
         return specMathMode;
     }
 
-    private static List<TextualJMLConstruct> getJMLComments(TypeDeclaration decl) {
+    private static ImmutableList<TextualJMLConstruct> getJMLComments(TypeDeclaration decl) {
         return decl.getAttachedJml();
     }
 
