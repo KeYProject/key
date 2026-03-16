@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -184,7 +185,7 @@ public class PrettyPrinter implements Visitor {
      *
      * @param list a program element list.
      */
-    protected void writeKeywordList(ImmutableArray<Modifier> list) {
+    protected <T extends Modifier> void writeKeywordList(ImmutableArray<T> list) {
         for (int i = 0; i < list.size(); i++) {
             if (i != 0) {
                 layouter.brk();
@@ -1451,6 +1452,14 @@ public class PrettyPrinter implements Visitor {
         if (addParentheses) {
             layouter.print("(");
         }
+
+        ImmutableArray<AnnotationUseSpecification> annots = x.getAnnotations();
+        boolean hasAnnots = annots != null && !annots.isEmpty();
+        if (hasAnnots) {
+            writeKeywordList(annots);
+            layouter.print(" ");
+        }
+
         layouter.print("new ");
 
         x.getTypeReference().visit(this);
@@ -1511,6 +1520,13 @@ public class PrettyPrinter implements Visitor {
         }
         printReferencePrefix(x.getReferencePrefix());
         layouter.keyWord("new").print(" ");
+
+        ImmutableArray<AnnotationUseSpecification> annots = x.getAnnotations();
+        boolean hasAnnots = annots != null && !annots.isEmpty();
+        if (hasAnnots) {
+            writeKeywordList(annots);
+            layouter.print(" ");
+        }
 
         x.getTypeReference().visit(this);
         printArguments(x.getArguments());
