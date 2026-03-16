@@ -126,4 +126,9 @@ public final class GenericSort extends SortImpl {
 
         return true;
     }
+
+    @Override
+    public boolean containsGenericSort() {
+        return true;
+    }
 }

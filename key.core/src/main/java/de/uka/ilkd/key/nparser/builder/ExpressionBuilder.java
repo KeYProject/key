@@ -1189,7 +1189,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
             op = lookupVarfuncId(ctx, varfuncid,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1201,7 +1201,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ctx.name == null ? ctx.INT_LITERAL().getText()
                         : ctx.name.simple_ident(0).getText();
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
             if (op instanceof ProgramVariable v && ctx.name.simple_ident().size() > 1) {
                 List<KeYParser.Simple_identContext> otherParts =
                     ctx.name.simple_ident().subList(1, ctx.name.simple_ident().size());
@@ -1440,6 +1440,10 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         ImmutableArray<QuantifiableVariable> boundVars = null;
         Namespace<QuantifiableVariable> orig = null;
+        KeYParser.Formal_sort_argsContext genericArgsCtxt = null;
+        if (ctx.formal_sort_args() != null) {
+            genericArgsCtxt = ctx.formal_sort_args();
+        }
         JTerm[] args = null;
         if (ctx.call() != null) {
             orig = variables();
@@ -1460,7 +1464,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1469,7 +1473,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         } else {
             op = lookupVarfuncId(ctx, firstName,
-                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId);
+                ctx.sortId() != null ? ctx.sortId().getText() : null, sortId, genericArgsCtxt);
         }
 
         JTerm current;

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -50,6 +51,9 @@ public abstract class TypeResolver {
         return new NonGenericSortResolver(s);
     }
 
+    public static TypeResolver createParametricSortResolver(ParametricSortInstance psi) {
+        return new ParametricSortResolver(psi);
+    }
 
     public abstract boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, TermServices services);
@@ -232,6 +236,31 @@ public abstract class TypeResolver {
         @Override
         public String toString() {
             return "\\containerType(" + memberSV + ")";
+        }
+    }
+
+    private static class ParametricSortResolver extends TypeResolver {
+        private final ParametricSortInstance psi;
+
+        public ParametricSortResolver(ParametricSortInstance psi) {
+            this.psi = psi;
+        }
+
+        @Override
+        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+                SVInstantiations instMap, TermServices services) {
+            return psi.isComplete(instMap);
+        }
+
+        @Override
+        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+                SVInstantiations instMap, Services services) {
+            return psi.resolveSort(instMap, services);
+        }
+
+        @Override
+        public String toString() {
+            return psi.toString();
         }
     }
 }

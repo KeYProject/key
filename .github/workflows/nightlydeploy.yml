@@ -57,13 +57,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Upload Javadoc
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: javadoc
           path: "javadoc.tar.xz"
 
       - name: Upload ShadowJar
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: shadowjars
           path: "*/build/libs/*-exe.jar"
