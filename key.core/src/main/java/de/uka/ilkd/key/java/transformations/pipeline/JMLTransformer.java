@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -65,6 +66,13 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// [JMLTransformer#KEY_SPEC_CASE], and [JMLTransformer#KEY_SPEC_CASE].
 ///
 /// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
+/// 
+/// @author weigl
+/// @author drodt
+/// @author lanzinger
+/// @author bubel
+/// @author pfeifer
+/// @author ulbrich
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public final class JMLTransformer extends JavaTransformer {
     public static final EnumSet<JMLModifier> JAVA_MODS =
@@ -142,10 +150,8 @@ public final class JMLTransformer extends JavaTransformer {
      * @param decl the given ghost/model declaration (TextualJMLFieldDecl is also used to represent
      *        local variable declarations!)
      * @return the newly created statement
-     * @throws SLTranslationException
      */
-    private @NonNull Statement transformVariableDecl(TextualJMLFieldDecl decl)
-            throws SLTranslationException {
+    private @NonNull Statement transformVariableDecl(TextualJMLFieldDecl decl) {
         NodeList<Modifier> modifiers = new NodeList<>();
         for (JMLModifier m : decl.getModifiers()) {
             if (m.equals(JMLModifier.MODEL)) {
@@ -220,8 +226,7 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
 
-    private Statement transformAssertStatement(TextualJMLAssertStatement stat)
-            throws SLTranslationException {
+    private Statement transformAssertStatement(TextualJMLAssertStatement stat) {
         KeyAst.Expression ctx = stat.getContext();
         de.uka.ilkd.key.java.Position pos = ctx.getStartLocation().getPosition();
         int kind = switch (stat.getKind()) {
@@ -259,7 +264,7 @@ public final class JMLTransformer extends JavaTransformer {
      * @throws SLTranslationException
      */
     private void transformClassLevelComments(TypeDeclaration<?> td) throws SLTranslationException {
-        URI fileName = td.findCompilationUnit().flatMap(it -> it.getStorage())
+        URI fileName = td.findCompilationUnit().flatMap(CompilationUnit::getStorage)
                 .map(it -> it.getPath().toUri())
                 .orElse(null);
 
@@ -310,25 +315,23 @@ public final class JMLTransformer extends JavaTransformer {
                         // in a later loop iteration to the model method declaration
                         specCases.add(specCase);
                     } else if (c instanceof TextualJMLModifierList newModifiers) {
-                        assert jmlModifiers == null
-                                : "There seems to be more than one set of dangling modifiers";
+                        if (jmlModifiers != null) {
+                            throw new SLTranslationException("There seems to be more than one set of dangling modifiers",
+                                    c.getLocation());
+                        }
                         jmlModifiers = newModifiers;
                     } else {
-                        String errorMessage = "";
-                        if (c instanceof TextualJMLSetStatement) {
-                            errorMessage = "A set assignment only allowed inside of a method body";
-                        } else if (c instanceof TextualJMLMergePointDecl) {
-                            errorMessage = "Merge points are only allowed inside of a method body";
-                        } else if (c instanceof TextualJMLLoopSpec) {
-                            errorMessage =
-                                "Loop specifications are only allowed inside of a method body or initializers";
-                        } else if (c instanceof TextualJMLAssertStatement) {
-                            errorMessage =
-                                "Assert statements are only allowed inside of a method body or initializers";
-                        } else {
-                            errorMessage =
-                                "Unknown subclass of TextualJMLSpecCase: " + c.getClass();
-                        }
+                        String errorMessage = switch (c) {
+                            case TextualJMLSetStatement a ->
+                                    "A set assignment only allowed inside of a method body";
+                            case TextualJMLMergePointDecl a ->
+                                    "Merge points are only allowed inside of a method body";
+                            case TextualJMLLoopSpec a ->
+                                    "Loop specifications are only allowed inside of a method body or initializers";
+                            case TextualJMLAssertStatement a ->
+                                    "Assert statements are only allowed inside of a method body or initializers";
+                            default -> "Unknown subclass of TextualJMLSpecCase: " + c.getClass();
+                        };
                         throw new ConvertException(errorMessage, c.getLocation());
                     }
                 }
@@ -414,6 +417,24 @@ public final class JMLTransformer extends JavaTransformer {
         for (int i = 0; i < stmts.size(); i++) {
             var stmt = stmts.get(i);
             newStmts.add(stmt);
+
+            while(stmt instanceof LabeledStmt labeledStmt) {
+                var inner = labeledStmt.getStatement();
+
+                if(inner instanceof JmlDocsStatements) {
+                    throw new SLTranslationException(("Here is something wrong. Your label '%s' is glued to a " +
+                            "JML annotation instead of a Java statement. Please consider the use of braces")
+                            .formatted(labeledStmt.getLabel()),
+                            Location.fromNode(inner));
+                }
+                // go into the labled statement
+                stmt =  inner;
+                // and treat it like a regular statement. Especially, that means
+                // the processing go into labled blocks `l:{}`, labled ifs `l:if(){}` or labled loops.
+                // It can not be a JML annotation statement by the exception above;
+            }
+
+
             if (stmt instanceof BlockStmt bs) {
                 transformMethodLevelCommentsAt(bs, fileName);
             } else if (stmt instanceof IfStmt is) {
@@ -458,6 +479,10 @@ public final class JMLTransformer extends JavaTransformer {
                         }
                         case TextualJMLLoopSpec spec -> {
                             var specifiedStmt = stmts.get(i + 1);
+                            // go into labled statements
+                            while(specifiedStmt instanceof LabeledStmt labeledStmt) {
+                                specifiedStmt = labeledStmt.getStatement();
+                            }
                             if (specifiedStmt instanceof BlockStmt
                                     || specifiedStmt instanceof NodeWithBody<?> /* aka loops */
                                     || specifiedStmt instanceof LabeledStmt) {
