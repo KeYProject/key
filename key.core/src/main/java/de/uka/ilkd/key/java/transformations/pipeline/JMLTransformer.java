@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
@@ -66,7 +67,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// [JMLTransformer#KEY_SPEC_CASE], and [JMLTransformer#KEY_SPEC_CASE].
 ///
 /// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
-/// 
+///
 /// @author weigl
 /// @author drodt
 /// @author lanzinger
@@ -355,6 +356,14 @@ public final class JMLTransformer extends JavaTransformer {
                     addSpec(c, specCase);
                 }
                 specCases.clear();
+            }
+
+            // on methods, constructor, ... also process the parameters.
+            if(member instanceof NodeWithParameters<?> nwp) {
+                NodeList<Parameter> params = nwp.getParameters();
+                for (var param : params) {
+                    transformModifiers(param);
+                }
             }
         }
 
