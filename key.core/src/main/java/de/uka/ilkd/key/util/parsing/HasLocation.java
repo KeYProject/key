@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,5 +20,6 @@ public interface HasLocation {
      *
      * @return the location of the exception
      */
-    @Nullable Location getLocation();
+    @Nullable
+    Location getLocation();
 }

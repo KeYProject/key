@@ -14,8 +14,8 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-
 import de.uka.ilkd.key.util.parsing.BuildingException;
+
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.*;
@@ -147,8 +147,9 @@ public final class JMLTransformer extends JavaTransformer {
             throws SLTranslationException {
         NodeList<Modifier> modifiers = new NodeList<>();
         for (JMLModifier m : decl.getModifiers()) {
-            if(m.equals(JMLModifier.MODEL)) {
-                throw new BuildingException(decl.getDecl(), "Model modifier on variable declaration detected, only model fields are allowed");
+            if (m.equals(JMLModifier.MODEL)) {
+                throw new BuildingException(decl.getDecl(),
+                    "Model modifier on variable declaration detected, only model fields are allowed");
             }
 
             Modifier mod = new Modifier(m.getParserKeyword());
@@ -276,7 +277,8 @@ public final class JMLTransformer extends JavaTransformer {
                 // We might have multiple textual constructs now, because the single comment could
                 // contain multiple JML entities (e.g. method contract and ghost field declaration)
 
-                de.uka.ilkd.key.java.Position pos = de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
+                de.uka.ilkd.key.java.Position pos =
+                    de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
                 ImmutableList<TextualJMLConstruct> constructs =
                     pp.parseClassLevel(concatenatedComment, fileName, pos);
                 services.addWarnings(pp.getWarnings());
@@ -372,8 +374,7 @@ public final class JMLTransformer extends JavaTransformer {
     }
 
     private static @NonNull PreParser getPreParser() {
-        return new PreParser(
-        );
+        return new PreParser();
     }
 
     private void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
@@ -400,13 +401,14 @@ public final class JMLTransformer extends JavaTransformer {
         specList.add(spec);
     }
 
-    private void transformMethodLevelCommentsAt(BlockStmt blockStmt, URI fileName) throws SLTranslationException {
+    private void transformMethodLevelCommentsAt(BlockStmt blockStmt, URI fileName)
+            throws SLTranslationException {
         PreParser io = getPreParser();
         var stmts = new ArrayList<>(blockStmt.getStatements());
         var newStmts = new ArrayList<Statement>(blockStmt.getStatements().size() * 2);
 
         final de.uka.ilkd.key.java.Position pos =
-                de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
+            de.uka.ilkd.key.java.Position.fromOneZeroBased(1, 0);
 
         for (int i = 0; i < stmts.size(); i++) {
             var stmt = stmts.get(i);

@@ -10,11 +10,11 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;

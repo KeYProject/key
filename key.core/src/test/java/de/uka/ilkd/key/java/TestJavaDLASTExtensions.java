@@ -63,10 +63,13 @@ public class TestJavaDLASTExtensions {
     public void testNestedMethodFrameRedirects() {
         try {
             HelperClassForTests.parseThrowException(
-                        testpath.resolve("typeResolutionInNestedMethodFrameResolvable.key"));
+                testpath.resolve("typeResolutionInNestedMethodFrameResolvable.key"));
         } catch (Throwable t) {
-            Assertions.fail("Resolution of type TestJavaCardDLExtensions should be successful as it is enclosed by the outer method frame " +
-                    "which redirects the scope to package sub1. Class Third should be resolvable (and visible) as the inner method-frame redirects to package sub2." +
+            Assertions.fail(
+                "Resolution of type TestJavaCardDLExtensions should be successful as it is enclosed by the outer method frame "
+                    +
+                    "which redirects the scope to package sub1. Class Third should be resolvable (and visible) as the inner method-frame redirects to package sub2."
+                    +
                     "\n\n" + t);
         }
 

@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -10,13 +14,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModifierList;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Transforms pure text comments into {@link TextualJMLConstruct}s.
