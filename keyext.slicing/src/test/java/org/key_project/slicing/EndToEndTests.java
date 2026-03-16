@@ -116,10 +116,10 @@ class EndToEndTests {
     void sliceJavaProof() throws Exception {
         sliceProof(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false).dispose();
+            5398, 3280, true, false).dispose();
         sliceProofOffline(
             "../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof",
-            3238, 1336, true, false).dispose();
+            5398, 3280, true, false).dispose();
     }
 
     /**
@@ -129,7 +129,7 @@ class EndToEndTests {
      */
     @Test
     void sliceCutExample() throws Exception {
-        sliceProof("cutExample.proof", 10, 7, true, false).dispose();
+        sliceProof("cutExample.proof", 11, 8, true, false).dispose();
     }
 
     /**
@@ -150,8 +150,8 @@ class EndToEndTests {
      */
     @Test
     void sliceWithOpenGoal() throws Exception {
-        sliceProof("openGoal1.proof", 10, 7, true, false).dispose();
-        sliceProof("openGoal2.proof", 10, 7, true, false).dispose();
+        sliceProof("openGoal1.proof", 11, 8, true, false).dispose();
+        sliceProof("openGoal2.proof", 11, 8, true, false).dispose();
     }
 
     /**
@@ -163,18 +163,18 @@ class EndToEndTests {
     @Test
     void sliceIfThenElseSplit() throws Exception {
         // dependency analysis: instantly remove irrelevant steps from one branch
-        sliceProof("ifThenElseSplit.proof", 12, 6, true, false);
+        sliceProof("ifThenElseSplit.proof", 14, 7, true, false);
 
         // duplicate analysis: merge duplicated steps (one at a time)
         Pair<Proof, Path> iteration1 = sliceProofFullFilename(
             testCaseDirectory.resolve("ifThenElseSplit.proof"),
-            12, 11, false, true, true);
+            14, 13, false, true, true);
         var iteration2 =
-            sliceProofFullFilename(iteration1.second, 11, 10, false, true, true);
+            sliceProofFullFilename(iteration1.second, 13, 12, false, true, true);
         var iteration3 =
-            sliceProofFullFilename(iteration2.second, 10, 9, false, true, true);
+            sliceProofFullFilename(iteration2.second, 12, 11, false, true, true);
         var iteration4 =
-            sliceProofFullFilename(iteration3.second, 9, 8, false, true, true);
+            sliceProofFullFilename(iteration3.second, 11, 10, false, true, true);
         assertEquals("w TRUE",
             iteration4.first.findAny(x -> x.serialNr() == 6).getNodeInfo().getBranchLabel());
         assertEquals("w FALSE",

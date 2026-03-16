@@ -46,7 +46,6 @@ import org.jspecify.annotations.Nullable;
 /// @see SequentChangeInfo
 /// @see PosInOccurrence
 public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement {
-
     private final Semisequent antecedent;
     private final Semisequent succedent;
 

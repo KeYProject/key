@@ -151,51 +151,43 @@ public class JavaDLTheory extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm[] subs, Services services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub, TermServices services,
             ExecutionContext ec) {
-        assert false;
         return false;
     }
 
     @Override
     public JTerm translateLiteral(Literal lit, Services services) {
-        assert false;
         return null;
     }
 
     @Override
     public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        assert false;
         return null;
     }
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-        assert false;
         return false;
     }
 
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
-        assert false;
         return null;
     }
 
     @Override
     public Type getType(JTerm t) {
-        assert false;
         return null;
     }
 }

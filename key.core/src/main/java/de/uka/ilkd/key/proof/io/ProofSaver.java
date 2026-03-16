@@ -50,7 +50,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @throws IOException on any I/O error
      */
     public static void saveProofObligationToFile(Path file, Proof proof) throws IOException {
-        ProofSaver saver = new ProofSaver(proof, file, false);
+        ProofSaver saver = new ProofSaver(proof, file, false, false);
         saver.save();
     }
 
@@ -88,9 +88,12 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @param proof proof to save
      * @param file file to save proof into
      * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     * @param expandOneStepSimplifier whether to expand
+     *        {@link de.uka.ilkd.key.rule.OneStepSimplifier} rule apps
      */
-    public ProofSaver(Proof proof, Path file, boolean saveProofSteps) {
-        this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
+    public ProofSaver(Proof proof, Path file, boolean saveProofSteps,
+            boolean expandOneStepSimplifier) {
+        this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps, expandOneStepSimplifier);
     }
 
     /**
@@ -100,9 +103,12 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @param file file to save proof into
      * @param internalVersion version of KeY to add to the proof log
      * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     * @param expandOneStepSimplifier whether to expand
+     *        {@link de.uka.ilkd.key.rule.OneStepSimplifier} rule apps
      */
-    public ProofSaver(Proof proof, Path file, String internalVersion, boolean saveProofSteps) {
-        super(proof, internalVersion, saveProofSteps);
+    public ProofSaver(Proof proof, Path file, String internalVersion, boolean saveProofSteps,
+            boolean expandOneStepSimplifier) {
+        super(proof, internalVersion, saveProofSteps, expandOneStepSimplifier);
         this.file = file;
     }
 
