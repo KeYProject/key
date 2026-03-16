@@ -73,7 +73,8 @@ public final class JMLTransformer extends JavaTransformer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
 
-    private final JmlDocSanitizer sanitizer = new JmlDocSanitizer(Set.of("key"));
+    private final JmlDocSanitizer sanitizer = new JmlDocSanitizer(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
 
     /// KEY for contracts
     public static final DataKey<List<TextualJMLConstruct>> KEY_SPEC_CASE = new DataKey<>() {
