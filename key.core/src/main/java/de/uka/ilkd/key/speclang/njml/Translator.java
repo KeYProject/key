@@ -228,7 +228,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError("\\permission expression used in a non-permission"
                 + " context and permissions not enabled.", ctx);
         }
-        if (!term.op().name().toString().endsWith("::select")) {
+        if (!(term.op() instanceof ParametricFunctionInstance pfi)
+                || pfi.getBase() != services.getTypeConverter().getHeapLDT().getSelect()) {
             raiseError("\\permission expression used with non store-ref" + " expression.", ctx);
         }
         return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(),
