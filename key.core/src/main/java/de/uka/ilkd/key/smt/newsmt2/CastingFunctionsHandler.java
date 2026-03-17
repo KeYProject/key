@@ -54,7 +54,7 @@ public class CastingFunctionsHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
         var sdf = (ParametricFunctionInstance) op;
-        String name = sdf.getBase().toString();
+        String name = sdf.getBase().name().toString();
         String prefixedName = DefinedSymbolsHandler.PREFIX + name;
         trans.introduceSymbol(name);
         SExpr result = trans.handleAsFunctionCall(prefixedName, term);
