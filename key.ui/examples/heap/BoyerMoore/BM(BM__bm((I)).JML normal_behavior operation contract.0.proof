@@ -1937,8 +1937,8 @@
                   (rule "arrayLengthIsAShort" (formula "19") (term "0"))
                    (builtin "One Step Simplification" (formula "19"))
                   (rule "true_left" (formula "19"))
-                  (rule "allLeft" (formula "22") (inst "t=int::select(heap,
-            IntOpt::final(null, IntOpt::$NONE),
+                  (rule "allLeft" (formula "22") (inst "t=select<[int]>(heap,
+            final<[IntOpt]>(null, IntOpt::$NONE),
             IntOpt::$value)"))
                   (rule "cut_direct" (formula "22") (term "1"))
                   (branch "CUT: self.count(a, k_0, IntOpt.NONE.value) * 2 <= k_0 TRUE"
@@ -4211,8 +4211,8 @@
                         (rule "arrayLengthIsAShort" (formula "15") (term "0"))
                          (builtin "One Step Simplification" (formula "15"))
                         (rule "true_left" (formula "15"))
-                        (rule "allLeft" (formula "19") (inst "t=int::select(heap,
-            IntOpt::final(null, IntOpt::$NONE),
+                        (rule "allLeft" (formula "19") (inst "t=select<[int]>(heap,
+            final<[IntOpt]>(null, IntOpt::$NONE),
             IntOpt::$value)"))
                         (rule "cut_direct" (formula "19") (term "1"))
                         (branch "CUT: self.count(a, k_0, IntOpt.NONE.value) * 2 <= k_0 + mc_0 * -1 TRUE"
