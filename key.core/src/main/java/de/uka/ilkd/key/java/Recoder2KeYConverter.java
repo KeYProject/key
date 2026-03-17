@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -794,7 +795,15 @@ public class Recoder2KeYConverter {
         }
 
 
-        final Function named = namespaceSet.functions().lookup(new Name(name));
+        Function named = namespaceSet.functions().lookup(new Name(name));
+
+        if (named == null && name.contains("<[")) {
+            int index = name.indexOf("<");
+            name = name.substring(0, index);
+            ParametricFunctionDecl base = namespaceSet.parametricFunctions().lookup(name);
+            named = ParametricFunctionInstance.get(base,
+                ImmutableList.of(new GenericArgument(JavaDLTheory.ANY)), services);
+        }
 
         if (named == null) {
             // TODO provide position information?!
