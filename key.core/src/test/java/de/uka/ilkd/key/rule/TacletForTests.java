@@ -110,7 +110,7 @@ public class TacletForTests {
         if (services == null) {
             parse();
         }
-        return services;
+        return services.copy(false);
     }
 
 
