@@ -942,7 +942,7 @@ public class LogicPrinter {
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
             if (t.op() instanceof ParametricFunctionInstance op) {
-                if (op.getBase() == services.getJavaDLTheory().getExactInstanceofSymbol(services)) {
+                if (op.getBase().name().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
                     layouter.keyWord(op.getBase().name().toString());
                     layouter.print("<[");
                     layouter.print(op.getArgs().head().sort().declarationString());
