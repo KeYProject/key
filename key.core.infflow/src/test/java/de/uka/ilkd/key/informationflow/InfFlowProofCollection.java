@@ -66,7 +66,7 @@ public class InfFlowProofCollection {
          *
          * Heap memory for subprocesses (like 500m or 2G)
          */
-        // forkMemory = 1000m
+        settings.setForkMemory("4g");
 
         /*
          * By default runAllProofs does not print a lot of information.
