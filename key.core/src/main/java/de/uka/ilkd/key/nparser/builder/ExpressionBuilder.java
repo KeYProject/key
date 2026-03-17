@@ -1493,7 +1493,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, firstName,
+            op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
                 null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()

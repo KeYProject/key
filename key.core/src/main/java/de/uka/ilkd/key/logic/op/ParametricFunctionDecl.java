@@ -76,4 +76,9 @@ public final class ParametricFunctionDecl implements Named, Sorted {
     public @NonNull Name name() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return name().toString();
+    }
 }
