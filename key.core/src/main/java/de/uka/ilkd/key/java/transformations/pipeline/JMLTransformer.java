@@ -7,7 +7,6 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
@@ -29,6 +28,7 @@ import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.ast.nodeTypes.NodeWithOptionalBlockStmt;
+import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.Type;
 import com.google.common.base.Strings;
@@ -83,7 +83,7 @@ public final class JMLTransformer extends JavaTransformer {
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
 
     private final JmlDocSanitizer sanitizer = new JmlDocSanitizer(
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
 
     /// KEY for contracts
     public static final DataKey<List<TextualJMLConstruct>> KEY_SPEC_CASE = new DataKey<>() {
@@ -317,20 +317,21 @@ public final class JMLTransformer extends JavaTransformer {
                         specCases.add(specCase);
                     } else if (c instanceof TextualJMLModifierList newModifiers) {
                         if (jmlModifiers != null) {
-                            throw new SLTranslationException("There seems to be more than one set of dangling modifiers",
-                                    c.getLocation());
+                            throw new SLTranslationException(
+                                "There seems to be more than one set of dangling modifiers",
+                                c.getLocation());
                         }
                         jmlModifiers = newModifiers;
                     } else {
                         String errorMessage = switch (c) {
                             case TextualJMLSetStatement a ->
-                                    "A set assignment only allowed inside of a method body";
+                                "A set assignment only allowed inside of a method body";
                             case TextualJMLMergePointDecl a ->
-                                    "Merge points are only allowed inside of a method body";
+                                "Merge points are only allowed inside of a method body";
                             case TextualJMLLoopSpec a ->
-                                    "Loop specifications are only allowed inside of a method body or initializers";
+                                "Loop specifications are only allowed inside of a method body or initializers";
                             case TextualJMLAssertStatement a ->
-                                    "Assert statements are only allowed inside of a method body or initializers";
+                                "Assert statements are only allowed inside of a method body or initializers";
                             default -> "Unknown subclass of TextualJMLSpecCase: " + c.getClass();
                         };
                         throw new ConvertException(errorMessage, c.getLocation());
@@ -359,7 +360,7 @@ public final class JMLTransformer extends JavaTransformer {
             }
 
             // on methods, constructor, ... also process the parameters.
-            if(member instanceof NodeWithParameters<?> nwp) {
+            if (member instanceof NodeWithParameters<?> nwp) {
                 NodeList<Parameter> params = nwp.getParameters();
                 for (var param : params) {
                     transformModifiers(param);
@@ -427,19 +428,21 @@ public final class JMLTransformer extends JavaTransformer {
             var stmt = stmts.get(i);
             newStmts.add(stmt);
 
-            while(stmt instanceof LabeledStmt labeledStmt) {
+            while (stmt instanceof LabeledStmt labeledStmt) {
                 var inner = labeledStmt.getStatement();
 
-                if(inner instanceof JmlDocsStatements) {
-                    throw new SLTranslationException(("Here is something wrong. Your label '%s' is glued to a " +
+                if (inner instanceof JmlDocsStatements) {
+                    throw new SLTranslationException(
+                        ("Here is something wrong. Your label '%s' is glued to a " +
                             "JML annotation instead of a Java statement. Please consider the use of braces")
-                            .formatted(labeledStmt.getLabel()),
-                            Location.fromNode(inner));
+                                .formatted(labeledStmt.getLabel()),
+                        Location.fromNode(inner));
                 }
                 // go into the labled statement
-                stmt =  inner;
+                stmt = inner;
                 // and treat it like a regular statement. Especially, that means
-                // the processing go into labled blocks `l:{}`, labled ifs `l:if(){}` or labled loops.
+                // the processing go into labled blocks `l:{}`, labled ifs `l:if(){}` or labled
+                // loops.
                 // It can not be a JML annotation statement by the exception above;
             }
 
@@ -489,7 +492,7 @@ public final class JMLTransformer extends JavaTransformer {
                         case TextualJMLLoopSpec spec -> {
                             var specifiedStmt = stmts.get(i + 1);
                             // go into labled statements
-                            while(specifiedStmt instanceof LabeledStmt labeledStmt) {
+                            while (specifiedStmt instanceof LabeledStmt labeledStmt) {
                                 specifiedStmt = labeledStmt.getStatement();
                             }
                             if (specifiedStmt instanceof BlockStmt

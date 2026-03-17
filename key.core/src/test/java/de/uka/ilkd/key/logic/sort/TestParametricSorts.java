@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TestJP2KeY;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.GenericParameter;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -15,10 +13,8 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.jspecify.annotations.NonNull;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
@@ -29,7 +25,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class TestParametricSorts {
     private NamespaceSet nss;

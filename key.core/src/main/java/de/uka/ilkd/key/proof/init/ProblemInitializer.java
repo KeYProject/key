@@ -239,8 +239,8 @@ public final class ProblemInitializer {
             // set the paths in the FileRepo (all three methods can deal with null parameters)
             fileRepo.setJavaPath(javaPath);
             // cp and bcp should have been set earlier (in activateJava)
-            //fileRepo.setClassPath(classPath);
-            //fileRepo.setBootClassPath(bootClassPath);
+            // fileRepo.setClassPath(classPath);
+            // fileRepo.setBootClassPath(bootClassPath);
         }
 
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,

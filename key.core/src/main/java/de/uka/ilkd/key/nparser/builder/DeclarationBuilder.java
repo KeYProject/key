@@ -21,13 +21,11 @@ import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 import org.key_project.util.java.CollectionUtil;
 
 import org.antlr.v4.runtime.Token;
-import org.key_project.util.java.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

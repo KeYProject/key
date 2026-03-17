@@ -11,11 +11,10 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
+
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
