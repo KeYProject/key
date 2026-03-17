@@ -407,8 +407,8 @@
             (rule "polySimp_elimOne" (formula "16") (term "1,1"))
             (rule "polySimp_mulComm0" (formula "16") (term "0,1"))
             (rule "newSym_eq" (formula "16") (inst "newSymDef=add(mul(result_next, Z(0(#))),
-    mul(int::seqGet(Seq::select(heap, self, Perm::$c),
-                    int::select(anon_heap_LOOP_0<<anonHeapFunction>>,
+    mul(seqGet<[int]>(select<[Seq]>(heap, self, Perm::$c),
+                    select<[int]>(anon_heap_LOOP_0<<anonHeapFunction>>,
                                 self,
                                 Perm::$pIdx)),
         Z(0(#))))") (inst "l=l_0"))
@@ -1004,10 +1004,10 @@
                    (builtin "One Step Simplification" (formula "1"))
                    (builtin "One Step Simplification" (formula "15"))
                   (rule "eqTermCut" (formula "2") (term "0") (inst "s=bsum{int i;}(Z(0(#)),
-             int::select(anon_heap_LOOP_0<<anonHeapFunction>>,
+             select<[int]>(anon_heap_LOOP_0<<anonHeapFunction>>,
                          self,
                          Perm::$pIdx),
-             (int)(any::seqGet(Seq::select(heap,
+             (int)(seqGet<[any]>(select<[Seq]>(heap,
                                            self,
                                            Perm::$c),
                                i)))") (userinteraction))
@@ -3065,7 +3065,7 @@
                                           (rule "closeFalse" (formula "1"))
                                        )
                                        (branch "Case 2"
-                                          (rule "eqTermCut" (formula "32") (term "1,0,1") (inst "s=int::select(anon_heap_LOOP_0<<anonHeapFunction>>,
+                                          (rule "eqTermCut" (formula "32") (term "1,0,1") (inst "s=select<[int]>(anon_heap_LOOP_0<<anonHeapFunction>>,
             self,
             Perm::$pIdx)") (userinteraction))
                                           (branch "Assume self.a@heap[anon({(self, Perm::$pIdx)}, anon_heap_LOOP_0<<anonHeapFunction>>)].length = self.pIdx@anon_heap_LOOP_0<<anonHeapFunction>>"
@@ -6723,9 +6723,9 @@
                            (rule "polySimp_mulLiterals" (formula "28") (term "0"))
                            (rule "mul_literals" (formula "28") (term "1"))
                            (rule "elimGcdEq" (formula "28") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
-             length(int[]::select(heap, self, Perm::$a)),
+             length(select<[int[]]>(heap, self, Perm::$a)),
              div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
-                     int::seqGet(Seq::select(heap,
+                     seqGet<[int]>(select<[Seq]>(heap,
                                              self,
                                              Perm::$c),
                                  i)),
@@ -6766,9 +6766,9 @@
                            (rule "replace_known_left" (formula "29") (term "0") (ifseqformula "13"))
                             (builtin "One Step Simplification" (formula "29"))
                            (rule "elimGcdEq" (formula "29") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
-             length(int[]::select(heap, self, Perm::$a)),
+             length(select<[int[]]>(heap, self, Perm::$a)),
              div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
-                     int::seqGet(Seq::select(heap,
+                     seqGet<[int]>(select<[Seq]>(heap,
                                              self,
                                              Perm::$c),
                                  i)),
@@ -6806,7 +6806,7 @@
                            (rule "polySimp_mulLiterals" (formula "2") (term "0"))
                            (rule "polySimp_elimOne" (formula "2") (term "0"))
                            (rule "elimGcdEq" (formula "31") (inst "elimGcdRightDiv=Z(0(#))") (inst "elimGcdLeftDiv=div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
-        int::seqGet(Seq::select(heap, self, Perm::$c),
+        seqGet<[int]>(select<[Seq]>(heap, self, Perm::$c),
                     i_1)),
     Z(6(9(2(7(6(9(4(9(2(4(#))))))))))))") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))"))
                             (builtin "One Step Simplification" (formula "31"))
@@ -7111,29 +7111,29 @@
                               (rule "qeq_literals" (formula "38") (term "0,0"))
                                (builtin "One Step Simplification" (formula "38"))
                               (rule "newSym_eq" (formula "38") (inst "l=l_0") (inst "newSymDef=add(add(quotient_2,
-        mul(int::seqGet(Seq::select(heap,
+        mul(seqGet<[int]>(select<[Seq]>(heap,
                                     self,
                                     Perm::$c),
                         j_0),
             Z(0(#)))),
-    mul(\\if (  geq(int::seqGet(Seq::select(heap,
+    mul(\\if (  geq(seqGet<[int]>(select<[Seq]>(heap,
                                            self,
                                            Perm::$perm),
                                j_0),
                    Z(0(#)))
-             & leq(int::seqGet(Seq::select(heap,
+             & leq(seqGet<[int]>(select<[Seq]>(heap,
                                            self,
                                            Perm::$perm),
                                j_0),
                    add(Z(neglit(1(#))),
-                       length(int[]::select(heap,
+                       length(select<[int[]]>(heap,
                                             self,
                                             Perm::$a)))))
-            \\then (int::select(heap,
-                               int[]::select(heap,
+            \\then (select<[int]>(heap,
+                               select<[int[]]>(heap,
                                              self,
                                              Perm::$a),
-                               arr(int::seqGet(Seq::select(heap,
+                               arr(seqGet<[int]>(select<[Seq]>(heap,
                                                            self,
                                                            Perm::$perm),
                                                j_0))))
@@ -7261,29 +7261,29 @@
                               (rule "qeq_literals" (formula "36") (term "0,0"))
                                (builtin "One Step Simplification" (formula "36"))
                               (rule "newSym_eq" (formula "36") (inst "l=l_1") (inst "newSymDef=add(add(quotient_0,
-        mul(int::seqGet(Seq::select(heap,
+        mul(seqGet<[int]>(select<[Seq]>(heap,
                                     self,
                                     Perm::$c),
                         i_0),
             Z(0(#)))),
-    mul(\\if (  geq(int::seqGet(Seq::select(heap,
+    mul(\\if (  geq(seqGet<[int]>(select<[Seq]>(heap,
                                            self,
                                            Perm::$perm),
                                i_0),
                    Z(0(#)))
-             & leq(int::seqGet(Seq::select(heap,
+             & leq(seqGet<[int]>(select<[Seq]>(heap,
                                            self,
                                            Perm::$perm),
                                i_0),
                    add(Z(neglit(1(#))),
-                       length(int[]::select(heap,
+                       length(select<[int[]]>(heap,
                                             self,
                                             Perm::$a)))))
-            \\then (int::select(heap,
-                               int[]::select(heap,
+            \\then (select<[int]>(heap,
+                               select<[int[]]>(heap,
                                              self,
                                              Perm::$a),
-                               arr(int::seqGet(Seq::select(heap,
+                               arr(seqGet<[int]>(select<[Seq]>(heap,
                                                            self,
                                                            Perm::$perm),
                                                i_0))))
@@ -7455,11 +7455,11 @@
                               (rule "add_literals" (formula "20") (term "0,0,0"))
                               (rule "leq_literals" (formula "20") (term "0,0"))
                                (builtin "One Step Simplification" (formula "20"))
-                              (rule "newSym_eq" (formula "20") (inst "l=l_2") (inst "newSymDef=add(mul(int::seqGet(Seq::select(heap, self, Perm::$c),
+                              (rule "newSym_eq" (formula "20") (inst "l=l_2") (inst "newSymDef=add(mul(seqGet<[int]>(select<[Seq]>(heap, self, Perm::$c),
                     j_0),
         Z(0(#))),
-    mul(int::seqGet(Seq::select(heap, self, Perm::$b),
-                    int::seqGet(Seq::select(heap,
+    mul(seqGet<[int]>(select<[Seq]>(heap, self, Perm::$b),
+                    seqGet<[int]>(select<[Seq]>(heap,
                                             self,
                                             Perm::$perm),
                                 j_0)),
@@ -7537,11 +7537,11 @@
                               (rule "add_literals" (formula "21") (term "0,0,0"))
                               (rule "leq_literals" (formula "21") (term "0,0"))
                                (builtin "One Step Simplification" (formula "21"))
-                              (rule "newSym_eq" (formula "21") (inst "l=l_3") (inst "newSymDef=add(mul(int::seqGet(Seq::select(heap, self, Perm::$c),
+                              (rule "newSym_eq" (formula "21") (inst "l=l_3") (inst "newSymDef=add(mul(seqGet<[int]>(select<[Seq]>(heap, self, Perm::$c),
                     i_0),
         Z(0(#))),
-    mul(int::seqGet(Seq::select(heap, self, Perm::$b),
-                    int::seqGet(Seq::select(heap,
+    mul(seqGet<[int]>(select<[Seq]>(heap, self, Perm::$b),
+                    seqGet<[int]>(select<[Seq]>(heap,
                                             self,
                                             Perm::$perm),
                                 i_0)),
@@ -7603,13 +7603,13 @@
                               (rule "qeq_literals" (formula "22") (term "0,0"))
                                (builtin "One Step Simplification" (formula "22"))
                               (rule "newSym_eq" (formula "22") (inst "l=l_4") (inst "newSymDef=add(add(quotient_1,
-        mul(int::seqGet(Seq::select(heap,
+        mul(seqGet<[int]>(select<[Seq]>(heap,
                                     self,
                                     Perm::$c),
                         i_1),
             Z(0(#)))),
-    mul(int::seqGet(Seq::select(heap, self, Perm::$b),
-                    int::seqGet(Seq::select(heap,
+    mul(seqGet<[int]>(select<[Seq]>(heap, self, Perm::$b),
+                    seqGet<[int]>(select<[Seq]>(heap,
                                             self,
                                             Perm::$perm),
                                 i_1)),
