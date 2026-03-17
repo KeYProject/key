@@ -198,6 +198,22 @@ public class TacletForTests {
         return getSorts().lookup(new Name(name));
     }
 
+    public static JTerm parseTerm(String termstr, Services services, NamespaceSet nss) {
+        if (termstr.isEmpty()) {
+            return null;
+        }
+
+        try {
+            KeyIO io = new KeyIO(services, nss);
+            // TacletForTests.getAbbrevs()
+            return io.parseExpression(termstr);
+        } catch (Exception e) {
+            fail("Exception occurred while parsing of " + termstr, e);
+            return null;
+        }
+
+    }
+
     public static JTerm parseTerm(String termstr, Services services) {
         if (termstr.isEmpty()) {
             return null;
