@@ -1,5 +1,5 @@
 <entry key="seqGetOutside.dl"><![CDATA[
-    \forall int i; \forall Seq s; ( i < 0 | i >= seqLen(s) -> any::seqGet(s, i)<<Trigger>> = seqGetOutside )
+    \forall int i; \forall Seq s; ( i < 0 | i >= seqLen(s) -> seqGet<[any]>(s, i)<<Trigger>> = seqGetOutside )
 ]]></entry>
 
 <entry key="seqLen.dl"><![CDATA[
@@ -8,8 +8,8 @@
 
 <entry key="seqConcat.dl"><![CDATA[
     \forall int i; \forall Seq s1; \forall Seq s2; ( 0 <= i & i < seqLen(s1) + seqLen(s2) ->
-        any::seqGet(seqConcat(s1, s2), i) =
-            \if (i < seqLen(s1)) \then (any::seqGet(s1, i)) \else (any::seqGet(s2, i-seqLen(s1))))
+        seqGet<[any]>(seqConcat(s1, s2), i) =
+            \if (i < seqLen(s1)) \then (seqGet<[any]>(s1, i)) \else (seqGet<[any]>(s2, i-seqLen(s1))))
 ]]>
 </entry>
 
@@ -24,7 +24,7 @@
 </entry>
 
 <entry key="seqSingleton.dl"><![CDATA[
-    \forall any x; any::seqGet(seqSingleton(x)<<Trigger>>, 0) = x
+    \forall any x; seqGet<[any]>(seqSingleton(x)<<Trigger>>, 0) = x
 ]]>
 </entry>
 
@@ -38,9 +38,9 @@
     \forall int from;
     \forall int to;
     \forall int idx;
-        any::seqGet(seqSub(seq, from, to)<<Trigger>>, idx)
+        seqGet<[any]>(seqSub(seq, from, to)<<Trigger>>, idx)
       = \if(0 <= idx & idx < (to - from))
-        \then(any::seqGet(seq, idx + from))
+        \then(seqGet<[any]>(seq, idx + from))
         \else(seqGetOutside)
 ]]></entry>
 

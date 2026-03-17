@@ -5,4 +5,4 @@ expected: IRRELEVANT
 keySrc: |-
   \functions { Field FF; Seq s; java.lang.Object o; }
 
-  \problem { int::select(heap, o, FF) = int::seqGet(s, 42) }
+  \problem { select<[int]>(heap, o, FF) = seqGet<[int]>(s, 42) }

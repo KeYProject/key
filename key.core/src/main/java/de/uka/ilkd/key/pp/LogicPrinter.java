@@ -1097,7 +1097,7 @@ public class LogicPrinter {
     }
 
     /*
-     * Print a term of the form: T::seqGet(Seq, int).
+     * Print a term of the form: seqGet<[T]>(Seq, int).
      */
     public void printSeqGet(JTerm t) {
         if (notationInfo.isPrettySyntax()) {

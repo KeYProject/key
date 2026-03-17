@@ -306,7 +306,7 @@ public final class NotationInfo {
         // sequence operators
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
-        tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
+        tbl.put(seqLDT.getSeqGet(), new Notation.SeqGetNotation());
         tbl.put(seqLDT.getSeqConcat(), new Notation.SeqConcatNotation(seqLDT.getSeqConcat(),
             seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
 

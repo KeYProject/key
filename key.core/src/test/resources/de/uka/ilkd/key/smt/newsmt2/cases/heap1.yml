@@ -6,4 +6,4 @@ state: EXTENDED
 keySrc: |-
   \functions { Field FF; java.lang.Object o; }
 
-  \problem { FF != java.lang.Object::<created> -> any::select(store(heap, o, FF, 42), o, FF) = 42 }
+  \problem { FF != java.lang.Object::<created> -> select<[any]>(store(heap, o, FF, 42), o, FF) = 42 }
