@@ -319,7 +319,8 @@ public class OracleGenerator {
             return OracleConstant.FALSE;
         } else if (term.arity() == 0) {
             return new OracleConstant(name, term.sort());
-        } else if (name.endsWith("select")) {
+        } else if (op instanceof ParametricFunctionInstance pfi
+                && pfi.getBase() == services.getTypeConverter().getHeapLDT().getSelect()) {
             return translateSelect(term, initialSelect);
         } else if (name.equals("arr")) {
             OracleTerm index = generateOracle(term.sub(0), initialSelect);
