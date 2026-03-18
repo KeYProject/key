@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Mar 17 08:13:22 CET 2026
+# Date: Wed Mar 18 15:21:04 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -9589,7 +9589,7 @@ Choices: true}
 == getAnyOfArray2seq (getAnyOfArray2seq) =========================================
 getAnyOfArray2seq {
 \find(seqGet<[any]>(array2seq(h,a),idx))
-\add []==>[and(leq(Z(0(#)),idx),lt(idx,length(a)))] ;
+\sameUpdateLevel\add []==>[and(leq(Z(0(#)),idx),lt(idx,length(a)))] ;
 \replacewith(select<[any]>(h,a,arr(idx))) 
 
 Choices: sequences:on}
@@ -9609,7 +9609,7 @@ Choices: (programRules:Java & JavaCard:on)}
 == getOfArray2seq (getOfArray2seq) =========================================
 getOfArray2seq {
 \find(seqGet<[alpha]>(array2seq(h,a),idx))
-\add []==>[and(leq(Z(0(#)),idx),lt(idx,length(a)))] ;
+\sameUpdateLevel\add []==>[and(leq(Z(0(#)),idx),lt(idx,length(a)))] ;
 \replacewith(select<[alpha]>(h,a,arr(idx))) 
 
 Choices: sequences:on}
@@ -15885,7 +15885,7 @@ Choices: sequences:on}
 == seqDef_one_summand (seqDef_one_summand) =========================================
 seqDef_one_summand {
 \find(seqDef{uSub (variable)}(from,idx,t))
-\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), idx (int term)), \notFreeIn(uSub (variable), from (int term)))
+\varcond(\notFreeIn(uSub (variable), idx (int term)), \notFreeIn(uSub (variable), from (int term)))
 \replacewith(if-then-else(equals(add(from,Z(1(#))),idx),seqSingleton(subst{uSub (variable)}(from,t)),seqDef{uSub (variable)}(from,idx,t))) 
 
 Choices: sequences:on}
@@ -16890,7 +16890,7 @@ Choices: sequences:on}
 subSeqConcatEQ {
 \assumes ([equals(seqConcat(s1,s2),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
-\replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1))))) 
+\sameUpdateLevel\replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1))))) 
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16912,7 +16912,7 @@ Choices: sequences:on}
 subSeqHeadSeqDefEQ {
 \assumes ([equals(seqDef{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
 \find(seqSub(seqConcat(EQ,seq),Z(0(#)),u))
-\replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
+\sameUpdateLevel\replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16934,7 +16934,7 @@ Choices: sequences:on}
 subSeqSingleton2EQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
-\replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
+\sameUpdateLevel\replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16942,7 +16942,7 @@ Choices: sequences:on}
 subSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,Z(0(#)),Z(1(#))))
-\replacewith(seqSingleton(x)) 
+\sameUpdateLevel\replacewith(seqSingleton(x)) 
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
