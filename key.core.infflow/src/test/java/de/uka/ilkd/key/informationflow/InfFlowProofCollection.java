@@ -37,7 +37,7 @@ public class InfFlowProofCollection {
          * perg = c.group("- one subprocess is created for each group
          * perFile-one subprocess is created for each file
          */
-        settings.setForkMode(ForkMode.NOFORK);
+        settings.setForkMode(ForkMode.PERGROUP);
 
         /*
          * Enable or disable proof reloading.
