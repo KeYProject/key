@@ -1003,6 +1003,7 @@ public class ProofCollections {
 
         g = c.group("PolymorphicSorts");
         g.loadable("standard_key/polymorphic/pseq.key");
+        g.provable("standard_key/polymorphic/setExample.key");
 
         // use for debugging purposes.
         // c.keep("VSTTE10");
