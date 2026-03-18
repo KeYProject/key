@@ -18,13 +18,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -53,8 +47,8 @@ public class HelperClassForTests {
         // library (HACK)
         @Override
         public RuleCollection getStandardRules() {
-            return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.nil());
+            final var ruleSource = RuleSourceFactory.fromDefaultLocation(ldtFile);
+            return new RuleCollection(ImmutableList.of(ruleSource), ImmutableSLList.nil());
         }
     };
 

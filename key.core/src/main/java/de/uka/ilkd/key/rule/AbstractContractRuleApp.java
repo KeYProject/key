@@ -14,21 +14,28 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
-public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-    protected final Contract instantiation;
+@NullMarked
+public abstract class AbstractContractRuleApp<T extends BuiltInRule>
+        extends AbstractBuiltInRuleApp<T> {
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    protected final @Nullable Contract instantiation;
+
+    protected AbstractContractRuleApp(T rule, @Nullable PosInOccurrence pio) {
         this(rule, pio, null);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
+    protected AbstractContractRuleApp(T rule, @Nullable PosInOccurrence pio,
+            @Nullable Contract contract) {
         this(rule, pio, ImmutableSLList.nil(), contract);
     }
 
-    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
+    protected AbstractContractRuleApp(T rule,
+            @Nullable PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts,
-            Contract contract) {
+            @Nullable Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;
     }
@@ -37,7 +44,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
         return instantiation;
     }
 
-    public AbstractContractRuleApp check(Services services) {
+    public @Nullable AbstractContractRuleApp<T> check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
             IObserverFunction target = instantiation.getTarget();
             IObserverFunction observerFunctionAtPos = getObserverFunction(services);
@@ -60,10 +67,10 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
+    public abstract AbstractContractRuleApp<T> tryToInstantiate(Goal goal);
 
 
-    public abstract AbstractContractRuleApp setContract(Contract contract);
+    public abstract AbstractContractRuleApp<T> setContract(@Nullable Contract contract);
 
     public boolean complete() {
         return super.complete() && pio != null && instantiation != null;

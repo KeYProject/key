@@ -101,23 +101,23 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             exceptionTerm = search.getExceptionEquality().sub(0);
             // Rename variables in contract to the current one
             List<LocationVariable> heapContext =
-                HeapContext.getModifiableHeaps(services, inst.transaction);
+                HeapContext.getModifiableHeaps(services, inst.transaction());
             Map<LocationVariable, LocationVariable> atPreVars =
                 UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
             Map<LocationVariable, JTerm> atPres = HeapContext.getAtPres(atPreVars, services);
             LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
             JTerm baseHeapTerm = services.getTermBuilder().getBaseHeap();
             if (contract.hasSelfVar()) {
-                if (inst.pm.isConstructor()) {
+                if (inst.pm().isConstructor()) {
                     selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(),
-                        inst.staticType, services);
+                        inst.staticType(), services);
                     if (selfTerm == null) {
                         throw new ProofInputException(
                             "Can't find self term, implementation of UseOperationContractRule might has changed!");
                     }
                     KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
-                    if (inst.staticType != selfType) {
-                        throw new ProofInputException("Type \"" + inst.staticType
+                    if (inst.staticType() != selfType) {
+                        throw new ProofInputException("Type \"" + inst.staticType()
                             + "\" expected but found \"" + selfType
                             + "\", implementation of UseOperationContractRule might has changed!");
                     }

@@ -433,7 +433,18 @@ public final class KeYFacade {
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
-            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, null);
+            /*
+             * We need to respect included .key files from project.key (for dl_ escapes). The
+             * easiest way to do this is to add the top-level project.key as include and let
+             * SLEnvInput take care about the includes from there.
+             */
+            List<Path> includePaths = List.of();
+            Path projectFile = pbh.getTopLevelProjectFile();
+            if (projectFile != null) {
+                includePaths = List.of(projectFile);
+            }
+
+            SLEnvInput slenv = new SLEnvInput(src, cp, bcp, profile, includePaths);
             data.setSlenv(slenv);
             data.setSrcLoadingState(CheckerData.LoadingState.SUCCESS);
             data.print(LogLevel.DEBUG, "Java sources successfully loaded!");
