@@ -37,7 +37,7 @@ public class InfFlowProofCollection {
          * perg = c.group("- one subprocess is created for each group
          * perFile-one subprocess is created for each file
          */
-        settings.setForkMode(ForkMode.PERGROUP);
+        settings.setForkMode(ForkMode.NOFORK);
 
         /*
          * Enable or disable proof reloading.
@@ -66,7 +66,7 @@ public class InfFlowProofCollection {
          *
          * Heap memory for subprocesses (like 500m or 2G)
          */
-        settings.setForkMemory("4g");
+        settings.setForkMemory("2g");
 
         /*
          * By default runAllProofs does not print a lot of information.
