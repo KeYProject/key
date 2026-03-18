@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.*;
 import com.github.javaparser.ast.*;
-import com.github.javaparser.ast.Modifier.DefaultKeyword;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.key.*;
@@ -66,7 +65,8 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// [JMLTransformer#KEY_SPEC_CASE],
 /// [JMLTransformer#KEY_SPEC_CASE], and [JMLTransformer#KEY_SPEC_CASE].
 ///
-/// JMLModifier are reduced to *normal* modifier of {@link DefaultKeyword}.
+/// JMLModifier are reduced to *normal* modifier of
+/// {@link com.github.javaparser.ast.Modifier.DefaultKeyword}.
 ///
 /// @author weigl
 /// @author drodt
