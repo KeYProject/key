@@ -231,35 +231,36 @@ public class OutputStreamProofSaver {
             header.printDefinitions(out);
         }
 
-        out.println();
-
         JavaModel jm = proof.getServices().getJavaModel();
-        Path bootClassPath = jm.getBootClassPath();
-        if (bootClassPath != null) {
-            out.printf("\\bootclasspath \"%s\";\n", safePathRelativeTo(bootClassPath, basePath));
-        }
+        if (jm != null) {
+            out.println();
+            Path bootClassPath = jm.getBootClassPath();
+            if (bootClassPath != null) {
+                out.printf("\\bootclasspath \"%s\";\n",
+                    safePathRelativeTo(bootClassPath, basePath));
+            }
 
-        List<Path> classPath = jm.getClassPath();
-        if (classPath != null && !classPath.isEmpty()) {
-            for (Path path : classPath) {
-                out.printf("\\classpath \"%s\";\n", safePathRelativeTo(path, basePath));
+            List<Path> classPath = jm.getClassPath();
+            if (classPath != null && !classPath.isEmpty()) {
+                for (Path path : classPath) {
+                    out.printf("\\classpath \"%s\";\n", safePathRelativeTo(path, basePath));
+                }
+            }
+
+            Path javaSource = jm.getModelDir();
+            if (javaSource != null) {
+                out.printf("\\javaSource \"%s\";\n", safePathRelativeTo(javaSource, basePath));
+            }
+
+            List<Path> includedFiles = jm.getIncludedFiles();
+            if (includedFiles != null && !includedFiles.isEmpty()) {
+                for (Path includedFile : includedFiles) {
+                    out.printf("\\include \"%s\";\n",
+                        safePathRelativeTo(includedFile, basePath));
+                }
             }
         }
-
-        Path javaSource = jm.getModelDir();
-        if (javaSource != null) {
-            out.printf("\\javaSource \"%s\";\n", safePathRelativeTo(javaSource, basePath));
-        }
-
-        List<Path> includedFiles = jm.getIncludedFiles();
-        if (includedFiles != null && !includedFiles.isEmpty()) {
-            for (Path includedFile : includedFiles) {
-                out.printf("\\include \"%s\";\n",
-                    safePathRelativeTo(includedFile, basePath));
-            }
-        }
-
-        return sw.toString()+"\n";
+        return sw + "\n";
     }
 
     private String newNames2Proof(Node n) {
