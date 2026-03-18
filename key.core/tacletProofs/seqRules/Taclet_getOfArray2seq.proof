@@ -60,8 +60,8 @@
 = store(f_h,
         f_a,
         arr(f_idx),
-        any::select(f_h, f_a, arr(f_idx)))") (userinteraction))
-(branch "CUT: f_h = f_h[f_a[f_idx] := any::select(f_h, f_a, arr(f_idx))] TRUE"
+        select<[any]>(f_h, f_a, arr(f_idx)))") (userinteraction))
+(branch "CUT: f_h = f_h[f_a[f_idx] := select<[any]>(f_h, f_a, arr(f_idx))] TRUE"
    (rule "applyEqRigid" (formula "3") (term "0,0,0") (ifseqformula "1") (userinteraction))
    (rule "applyEqRigid" (formula "3") (term "0,1") (ifseqformula "1") (userinteraction))
    (rule "selectOfStore" (formula "3") (term "1") (userinteraction))
@@ -83,7 +83,7 @@
     (builtin "One Step Simplification" (formula "4"))
    (rule "closeTrue" (formula "4"))
 )
-(branch "CUT: f_h = f_h[f_a[f_idx] := any::select(f_h, f_a, arr(f_idx))] FALSE"
+(branch "CUT: f_h = f_h[f_a[f_idx] := select<[any]>(f_h, f_a, arr(f_idx))] FALSE"
    (rule "equalityToSelect" (formula "2") (inst "ov=ov") (inst "fv=fv") (userinteraction))
    (rule "allRight" (formula "2") (inst "sk=ov_0") (userinteraction))
    (rule "allRight" (formula "2") (inst "sk=fv_0") (userinteraction))
