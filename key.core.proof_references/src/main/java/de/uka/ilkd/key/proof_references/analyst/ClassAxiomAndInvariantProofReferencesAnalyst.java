@@ -98,8 +98,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
     /**
      * Returns the {@link KeYJavaType} which provides the proof obligation of the current proof.
      *
-     * @param services
-     *        The {@link Services} to use.
+     * @param services The {@link Services} to use.
      * @return The {@link KeYJavaType} which provides the proof obligation or {@code null} if it was
      *         not possible to compute it.
      */

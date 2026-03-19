@@ -83,10 +83,8 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
     /**
      * Extracts the {@link ExecutionContext}.
      *
-     * @param node
-     *        The {@link Node} to extract {@link ExecutionContext} from.
-     * @param services
-     *        The {@link Services} to use.
+     * @param node The {@link Node} to extract {@link ExecutionContext} from.
+     * @param services The {@link Services} to use.
      * @return The found {@link ExecutionContext} or {@code null} if not available.
      */
     protected ExecutionContext extractContext(Node node, Services services) {

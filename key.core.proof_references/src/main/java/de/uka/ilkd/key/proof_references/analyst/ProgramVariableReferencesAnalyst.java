@@ -54,16 +54,11 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
     /**
      * Extracts the proof references recursive.
      *
-     * @param node
-     *        The node.
-     * @param pe
-     *        The current {@link ProgramElement}.
-     * @param arrayLength
-     *        The {@link ProgramVariable} used for array length which is ignored.
-     * @param toFill
-     *        The {@link LinkedHashSet} to fill.
-     * @param includeExpressionContainer
-     *        Include {@link ExpressionContainer}?
+     * @param node The node.
+     * @param pe The current {@link ProgramElement}.
+     * @param arrayLength The {@link ProgramVariable} used for array length which is ignored.
+     * @param toFill The {@link LinkedHashSet} to fill.
+     * @param includeExpressionContainer Include {@link ExpressionContainer}?
      */
     protected void listReferences(Node node, ProgramElement pe, ProgramVariable arrayLength,
             LinkedHashSet<IProofReference<?>> toFill, boolean includeExpressionContainer) {
