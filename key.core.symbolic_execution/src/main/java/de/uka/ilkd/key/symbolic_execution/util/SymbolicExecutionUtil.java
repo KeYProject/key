@@ -3949,7 +3949,7 @@ public final class SymbolicExecutionUtil {
         if ((useUnicode || usePrettyPrinting) && services != null) {
             NotationInfo ni = new NotationInfo();
             LogicPrinter logicPrinter = LogicPrinter.purePrinter(ni, services);
-            logicPrinter.getNotationInfo().refresh(services, usePrettyPrinting, useUnicode);
+            logicPrinter.getNotationInfo().refresh(services, usePrettyPrinting, useUnicode, false);
             logicPrinter.printTerm(term);
             return logicPrinter.result();
         } else {

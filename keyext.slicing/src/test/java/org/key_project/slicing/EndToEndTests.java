@@ -79,21 +79,22 @@ class EndToEndTests {
     @Test
     void sliceMultipleIterations() throws Exception {
         // simple Java proof
+        Path directory = testCaseDirectory
+                .getParent().getParent().getParent().getParent().getParent()
+                .resolve("key.ui")
+                .resolve("examples").resolve("firstTouch").resolve("05-ReverseArray")
+                .resolve("reverseArray.proof");
         Pair<Proof, Path> iteration1 = sliceProofFullFilename(
-            testCaseDirectory
-                    .getParent().getParent().getParent().getParent().getParent()
-                    .resolve("key.ui")
-                    .resolve("examples").resolve("firstTouch").resolve("05-ReverseArray")
-                    .resolve("reverseArray.proof"),
-            6537, 4236, true, true, true);
+            directory,
+            5138, 4127, true, true, true);
         var iteration2 =
-            sliceProofFullFilename(iteration1.second, 4236, 4229, true, true, true);
+            sliceProofFullFilename(iteration1.second, 4127, 4125, true, true, true);
         var iteration3 =
-            sliceProofFullFilename(iteration2.second, 4229, 4220, true, true, true);
+            sliceProofFullFilename(iteration2.second, 4125, 4123, true, true, true);
         var iteration4 =
-            sliceProofFullFilename(iteration3.second, 4220, 4209, true, true, true);
+            sliceProofFullFilename(iteration3.second, 4123, 4121, true, true, true);
         var iteration5 =
-            sliceProofFullFilename(iteration4.second, 4209, 4197, true, true, true);
+            sliceProofFullFilename(iteration4.second, 4121, 4119, true, true, true);
         iteration5.first.dispose();
         iteration4.first.dispose();
         iteration3.first.dispose();
