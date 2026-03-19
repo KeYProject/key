@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * A configurable pretty printer for Java source elements originally from COMPOST.
  *
  * @author AL
- *         <p>
+ *
  *         CHANGED FOR KeY. Comments are not printed!
  */
 @NullMarked
@@ -61,21 +61,21 @@ public class PrettyPrinter implements Visitor {
     private final @Nullable Services services;
     private final boolean usePrettyPrinting;
     private final boolean useUnicodeSymbols;
+    private final boolean hidePackagePrefix;
 
-    /**
-     * creates a new PrettyPrinter
-     */
+    /** creates a new PrettyPrinter */
     public PrettyPrinter(PosTableLayouter out) {
-        this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
+        this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true, true);
     }
 
     public PrettyPrinter(PosTableLayouter o, SVInstantiations svi, @Nullable Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         this.layouter = o;
         this.instantiations = svi;
         this.services = services;
         this.usePrettyPrinting = usePrettyPrinting;
         this.useUnicodeSymbols = useUnicodeSymbols;
+        this.hidePackagePrefix = hidePackagePrefix;
     }
 
     /**
@@ -1998,7 +1998,8 @@ public class PrettyPrinter implements Visitor {
     }
 
     public String printInLogicPrinter(JTerm t) {
-        var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+        var lp = LogicPrinter.quickPrinter(services, usePrettyPrinting, useUnicodeSymbols,
+            hidePackagePrefix);
         lp.printTerm(t);
         return lp.result();
     }

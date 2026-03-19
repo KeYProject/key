@@ -132,10 +132,11 @@ public class LogicPrinter {
     }
 
     public static SequentViewLogicPrinter quickPrinter(Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            boolean usePrettyPrinting, boolean useUnicodeSymbols,
+            boolean hidePackagePrefix) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         }
 
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
@@ -153,7 +154,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(JTerm t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
     /**
@@ -163,11 +164,12 @@ public class LogicPrinter {
      * @param services services.
      * @param usePrettyPrinting whether to use pretty-printing.
      * @param useUnicodeSymbols whether to use unicode symbols.
+     * @param hidePackagePrefix
      * @return the printed term.
      */
     public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
-        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
+            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
+        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         p.layouter().beginC();
         p.printTerm(t);
         p.layouter().end();
@@ -183,7 +185,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
         p.printSemisequent(s);
         return p.result();
     }
@@ -197,7 +199,7 @@ public class LogicPrinter {
      */
     public static String quickPrintSequent(Sequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
         p.printSequent(s);
         return p.result();
     }
@@ -617,7 +619,7 @@ public class LogicPrinter {
     private void printSourceElement(SourceElement element) {
         new PrettyPrinter(layouter, instantiations, services,
             notationInfo.isPrettySyntax(),
-            notationInfo.isUnicodeEnabled()).print(element);
+            notationInfo.isUnicodeEnabled(), notationInfo.isHidePackagePrefix()).print(element);
     }
 
     /**
@@ -939,19 +941,32 @@ public class LogicPrinter {
         } else {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
-            boolean alreadyPrinted = false;
+
             if (t.op() instanceof SortDependingFunction op) {
-                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
-                    layouter.print(op.getSortDependingOn().declarationString());
+
+                // remove package prefix from SortDependingFunction
+                if (notationInfo.isHidePackagePrefix()) {
+                    String sort = op.getSortDependingOn().declarationString();
+                    int index = sort.lastIndexOf('.');
+                    sort = sort.substring(index + 1);
+                    layouter.print(sort);
                     layouter.print("::");
-                    layouter.keyWord(op.getKind().toString());
-                    alreadyPrinted = true;
+
+                    name = op.getKind().toString();
+                }
+
+                // mark instance and exactInstance as keywords
+                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0
+                        || op.getKind().compareTo(JavaDLTheory.INSTANCE_NAME) == 0) {
+                    isKeyword = true;
                 }
             }
             if (isKeyword) {
                 layouter.markStartKeyword();
             }
-            if (!alreadyPrinted) {
+            if (isKeyword) {
+                layouter.keyWord(name);
+            } else {
                 layouter.print(name);
             }
             if (isKeyword) {
@@ -983,7 +998,13 @@ public class LogicPrinter {
 
         layouter.startTerm(t.arity());
         layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
+        String sort = cast.getSortDependingOn().toString();
+        // remove package prefix from sort name
+        if (notationInfo.isHidePackagePrefix()) {
+            int index = sort.lastIndexOf('.');
+            sort = sort.substring(index + 1);
+        }
+        layouter.print(sort);
         layouter.print(post);
         maybeParens(t.sub(0), ass);
     }

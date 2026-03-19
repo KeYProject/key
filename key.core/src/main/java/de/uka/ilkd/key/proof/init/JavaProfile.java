@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
+import de.uka.ilkd.key.strategy.ModularJavaDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.prover.rules.RuleApp;
@@ -71,7 +71,7 @@ public class JavaProfile extends AbstractProfile {
     public static JavaProfile defaultInstance;
     public static JavaProfile defaultInstancePermissions;
 
-    public static final StrategyFactory DEFAULT = new JavaCardDLStrategyFactory();
+    public static final StrategyFactory DEFAULT = new ModularJavaDLStrategyFactory();
 
     private boolean permissions = false;
 

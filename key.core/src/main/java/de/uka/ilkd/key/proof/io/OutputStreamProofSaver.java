@@ -871,7 +871,7 @@ public class OutputStreamProofSaver {
 
     private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
 
-        final NotationInfo ni = new NotationInfo();
+        final NotationInfo ni = new NotationInfo(false, false, false);
 
         return LogicPrinter.purePrinter(ni, (shortAttrNotation ? serv : null));
     }
