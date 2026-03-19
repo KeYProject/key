@@ -128,7 +128,8 @@ public abstract class AbstractCounterExampleGenerator {
      *
      * @param ui The {@link UserInterfaceControl} to use.
      */
-    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {}
+    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
+    }
 
     /**
      * Creates the {@link SolverLauncherListener} which handles the results of the launched SMT
