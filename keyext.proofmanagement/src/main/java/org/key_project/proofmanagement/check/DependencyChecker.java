@@ -178,8 +178,7 @@ public class DependencyChecker implements Checker {
     /**
      * Checks if the given graph is legal, i.e. has no unsound cyclic dependencies.
      *
-     * @param graph
-     *        the graph to check
+     * @param graph the graph to check
      * @return true iff the graph is legal
      */
     private boolean hasIllegalCycles(DependencyGraph graph) {
@@ -210,8 +209,7 @@ public class DependencyChecker implements Checker {
     /**
      * Checks if all edges inside the given SCC are termination insensitive.
      *
-     * @param scc
-     *        the given strongly connected component
+     * @param scc the given strongly connected component
      * @return true iff all edges are termination insensitive
      */
     private boolean terminationInsensitive(DependencyGraph.SCC scc) {
@@ -233,8 +231,7 @@ public class DependencyChecker implements Checker {
      * <b>Note:</b> We do not check here that the decreases clause is actually proven/the proof
      * is actually closed.
      *
-     * @param scc
-     *        the given strongly connected component
+     * @param scc the given strongly connected component
      * @return true iff termination is ensured for all contracts in SCC
      */
     private boolean terminationEnsured(DependencyGraph.SCC scc) {

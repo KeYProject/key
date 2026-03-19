@@ -28,8 +28,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     /**
      * Creates a new DirectoryProofBundleHandler for a directory with the given path.
      *
-     * @param rootPath
-     *        the path of the root directory of the bundle
+     * @param rootPath the path of the root directory of the bundle
      */
     DirectoryProofBundleHandler(Path rootPath) {
         this.rootPath = rootPath;
@@ -39,13 +38,10 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
      * Creates a list of those paths of files/directories inside the given directory that are
      * matched by given matcher. The method does not recursively descend into subdirectories.
      *
-     * @param directory
-     *        the directory to list
-     * @param matcher
-     *        the matcher for filtering
+     * @param directory the directory to list
+     * @param matcher the matcher for filtering
      * @return the list of paths
-     * @throws IOException
-     *         if the directory can not be opened
+     * @throws IOException if the directory can not be opened
      */
     private static List<Path> getFiles(Path directory, PathMatcher matcher) throws IOException {
         if (Files.isDirectory(directory)) {
@@ -106,6 +102,15 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
         Path bootclasspath = rootPath.resolve(Paths.get("bootclasspath"));
         if (Files.isDirectory(bootclasspath)) {
             return bootclasspath;
+        }
+        return null;
+    }
+
+    @Override
+    public Path getTopLevelProjectFile() {
+        Path projectFile = rootPath.resolve(Paths.get("project.key"));
+        if (Files.isRegularFile(projectFile)) {
+            return projectFile;
         }
         return null;
     }

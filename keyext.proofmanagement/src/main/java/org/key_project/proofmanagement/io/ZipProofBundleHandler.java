@@ -47,10 +47,8 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     /**
      * Create a new ZipProofBundleHandler for the zipped bundle with the given path.
      *
-     * @param zipPath
-     *        the path of the zip (usually, the file extension is "zproof")
-     * @throws IOException
-     *         if an I/O error occurs
+     * @param zipPath the path of the zip (usually, the file extension is "zproof")
+     * @throws IOException if an I/O error occurs
      */
     ZipProofBundleHandler(Path zipPath) throws IOException {
         this.zipPath = zipPath;
@@ -111,6 +109,11 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     public Path getBootclasspath() throws IOException {
         // return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
         return dbh.getBootclasspath();
+    }
+
+    @Override
+    public Path getTopLevelProjectFile() {
+        return dbh.getTopLevelProjectFile();
     }
 
     @Override

@@ -24,10 +24,8 @@ public abstract class DependencyGraphBuilder {
     /**
      * Builds a new DependencyGraph from the given proof entries.
      *
-     * @param proofEntries
-     *        the proof entries to build the graph from
-     * @param logger
-     *        the logger to print out error messages generated during graph creation
+     * @param proofEntries the proof entries to build the graph from
+     * @param logger the logger to print out error messages generated during graph creation
      * @return the newly created DependencyGraph
      */
     public static DependencyGraph buildGraph(List<CheckerData.ProofEntry> proofEntries,

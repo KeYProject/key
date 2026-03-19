@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check.dependency;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -62,12 +66,9 @@ public class ContractAppCollector extends NodeIntermediateWalker {
     /**
      * Creates a new collector for the given proof, starting at given root node.
      *
-     * @param root
-     *        the root node to start from
-     * @param proof
-     *        the proof object (needed to get SpecificationRepository, JavaInfo, ...)
-     * @param logger
-     *        the logger to print out messages
+     * @param root the root node to start from
+     * @param proof the proof object (needed to get SpecificationRepository, JavaInfo, ...)
+     * @param logger the logger to print out messages
      */
     public ContractAppCollector(NodeIntermediate root, Proof proof, Logger logger) {
         super(root);
@@ -88,7 +89,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             // relevant rules are:
             // Use Operation Contract builtin-rule
             // Use Dependency Contract builtin-rule
-            // Contract_axiom_for_... Taclet (model methods)
+            // Contract_axiom_for_... taclet (model methods)
             if (ruleName.equals("Use Operation Contract")
                     || ruleName.equals("Use Dependency Contract")) {
                 BuiltInAppIntermediate biApp = (BuiltInAppIntermediate) appIntermediate;
@@ -103,8 +104,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
     /**
      * Extracts the contract from the given Taclet node.
      *
-     * @param tacletApp
-     *        the Taclet node to extract the contract from
+     * @param tacletApp the Taclet node to extract the contract from
      */
     private void extractContractFromContractTaclet(TacletAppIntermediate tacletApp) {
         /*
@@ -182,8 +182,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
      * Extracts the contracts from a builtin rule. Note that these may be multiple contracts,
      * since KeY sometimes combines contracts!
      *
-     * @param biApp
-     *        the builtin rule node to extract the contracts from
+     * @param biApp the builtin rule node to extract the contracts from
      */
     private void extractContractsFromBuiltin(BuiltInAppIntermediate biApp) {
         // The string may still contain multiple contracts, syntax: contract1#contract2#...
