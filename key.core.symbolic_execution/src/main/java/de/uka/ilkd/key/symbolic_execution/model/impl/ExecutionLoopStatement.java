@@ -22,10 +22,8 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionLoopStatement(ITreeSettings settings, Node proofNode) {

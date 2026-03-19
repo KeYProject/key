@@ -36,10 +36,8 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * Constructor.
      *
-     * @param equivalenceClasses
-     *        The provided equivalence classes.
-     * @param settings
-     *        The {@link IModelSettings} to use.
+     * @param equivalenceClasses The provided equivalence classes.
+     * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicLayout(IModelSettings settings,
             ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
@@ -59,8 +57,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * Sets the {@link ISymbolicState}.
      *
-     * @param state
-     *        The {@link ISymbolicState} to set.
+     * @param state The {@link ISymbolicState} to set.
      */
     public void setState(ISymbolicState state) {
         this.state = state;
@@ -77,8 +74,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * Adds a new {@link ISymbolicObject}.
      *
-     * @param object
-     *        The new {@link ISymbolicObject} to add.
+     * @param object The new {@link ISymbolicObject} to add.
      */
     public void addObject(ISymbolicObject object) {
         objects = objects.append(object);

@@ -20,10 +20,8 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionJoin(ITreeSettings settings, Node proofNode) {

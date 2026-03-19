@@ -27,10 +27,8 @@ public class SideProofStoreEvent extends EventObject {
     /**
      * Constructor.
      *
-     * @param source
-     *        The source.
-     * @param entries
-     *        The added or removed {@link Entry}s.
+     * @param source The source.
+     * @param entries The added or removed {@link Entry}s.
      */
     public SideProofStoreEvent(SideProofStore source, Entry[] entries) {
         super(source);

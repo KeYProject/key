@@ -111,12 +111,9 @@ public class TestSideProofStore {
     /**
      * Ensures the {@link Entry} is {@link SideProofStore#DEFAULT_INSTANCE}.
      *
-     * @param allProofs
-     *        All available {@link Proof}s.
-     * @param disposedProofs
-     *        The expected disposed {@link Proof}s.
-     * @param expectedEntries
-     *        The expected entries in {@link SideProofStore#DEFAULT_INSTANCE}.
+     * @param allProofs All available {@link Proof}s.
+     * @param disposedProofs The expected disposed {@link Proof}s.
+     * @param expectedEntries The expected entries in {@link SideProofStore#DEFAULT_INSTANCE}.
      */
     @SuppressWarnings("unchecked")
     private void assertEntries(Proof[] allProofs, Proof[] disposedProofs,
@@ -187,8 +184,7 @@ public class TestSideProofStore {
         /**
          * Compares the log with the given events and clears the log.
          *
-         * @param expectedEvents
-         *        The expected {@link SideProofStoreEvent}s.
+         * @param expectedEvents The expected {@link SideProofStoreEvent}s.
          */
         public void assertAddedLog(SideProofStoreEvent... expectedEvents) {
             assertLog(addedLog, expectedEvents);
@@ -197,8 +193,7 @@ public class TestSideProofStore {
         /**
          * Compares the log with the given events and clears the log.
          *
-         * @param expectedEvents
-         *        The expected {@link SideProofStoreEvent}s.
+         * @param expectedEvents The expected {@link SideProofStoreEvent}s.
          */
         public void assertRemovedLog(SideProofStoreEvent... expectedEvents) {
             assertLog(removedLog, expectedEvents);
@@ -207,10 +202,8 @@ public class TestSideProofStore {
         /**
          * Compares the log with the given events and clears the log.
          *
-         * @param log
-         *        The logged events.
-         * @param expectedEvents
-         *        The expected {@link SideProofStoreEvent}s.
+         * @param log The logged events.
+         * @param expectedEvents The expected {@link SideProofStoreEvent}s.
          */
         protected void assertLog(List<SideProofStoreEvent> log,
                 SideProofStoreEvent... expectedEvents) {
@@ -290,8 +283,7 @@ public class TestSideProofStore {
         /**
          * Compares the log with the given events and clears the log.
          *
-         * @param expectedEvents
-         *        The expected {@link PropertyChangeEvent}s.
+         * @param expectedEvents The expected {@link PropertyChangeEvent}s.
          */
         public void assertLog(PropertyChangeEvent... expectedEvents) {
             assertEquals(expectedEvents.length, log.size());

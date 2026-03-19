@@ -47,8 +47,7 @@ public class CompoundStopCondition implements StopCondition<Goal> {
     /**
      * Constructor.
      *
-     * @param children
-     *        The child {@link StopCondition}s to use.
+     * @param children The child {@link StopCondition}s to use.
      */
     @SafeVarargs
     public CompoundStopCondition(StopCondition<Goal>... children) {
@@ -58,8 +57,7 @@ public class CompoundStopCondition implements StopCondition<Goal> {
     /**
      * Adds new child {@link StopCondition}s.
      *
-     * @param children
-     *        The child {@link StopCondition}s to use.
+     * @param children The child {@link StopCondition}s to use.
      */
     @SafeVarargs
     public final void addChildren(StopCondition<Goal>... children) {

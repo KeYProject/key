@@ -44,14 +44,10 @@ public abstract class AbstractWriter {
     /**
      * Appends an empty tag to the given {@link StringBuilder}.
      *
-     * @param level
-     *        The level.
-     * @param tagName
-     *        The tag name.
-     * @param attributeValues
-     *        The attributes.
-     * @param sb
-     *        The {@link StringBuilder} to append to.
+     * @param level The level.
+     * @param tagName The tag name.
+     * @param attributeValues The attributes.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues,
             StringBuilder sb) {
@@ -61,14 +57,10 @@ public abstract class AbstractWriter {
     /**
      * Appends a start tag to the given {@link StringBuilder}.
      *
-     * @param level
-     *        The level.
-     * @param tagName
-     *        The tag name.
-     * @param attributeValues
-     *        The attributes.
-     * @param sb
-     *        The {@link StringBuilder} to append to.
+     * @param level The level.
+     * @param tagName The tag name.
+     * @param attributeValues The attributes.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues,
             StringBuilder sb) {
@@ -85,12 +77,9 @@ public abstract class AbstractWriter {
     /**
      * Appends an end tag to the given {@link StringBuilder}.
      *
-     * @param level
-     *        The level.
-     * @param tagName
-     *        The tag name.
-     * @param sb
-     *        The {@link StringBuilder} to append to.
+     * @param level The level.
+     * @param tagName The tag name.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendEndTag(int level, String tagName, StringBuilder sb) {
         appendWhiteSpace(level, sb);
@@ -103,10 +92,8 @@ public abstract class AbstractWriter {
     /**
      * Adds leading white space to the {@link StringBuilder}.
      *
-     * @param level
-     *        The level in the tree used for leading white space (formatting).
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param level The level in the tree used for leading white space (formatting).
+     * @param sb The {@link StringBuilder} to write to.
      */
     protected void appendWhiteSpace(int level, StringBuilder sb) {
         sb.append(LEADING_WHITE_SPACE_PER_LEVEL.repeat(Math.max(0, level)));
@@ -115,12 +102,9 @@ public abstract class AbstractWriter {
     /**
      * Adds an XML attribute to the given {@link StringBuilder}.
      *
-     * @param attributeName
-     *        The attribute name.
-     * @param value
-     *        The attribute value.
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param attributeName The attribute name.
+     * @param value The attribute value.
+     * @param sb The {@link StringBuilder} to write to.
      */
     protected void appendAttribute(String attributeName, String value, StringBuilder sb) {
         if (attributeName != null && value != null) {
@@ -135,10 +119,8 @@ public abstract class AbstractWriter {
     /**
      * Adds an XML header to the given {@link StringBuilder}.
      *
-     * @param encoding
-     *        The encoding to use.
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param encoding The encoding to use.
+     * @param sb The {@link StringBuilder} to write to.
      */
     protected void appendXmlHeader(String encoding, StringBuilder sb) {
         sb.append("<?xml version=\"1.0\"");
@@ -150,8 +132,7 @@ public abstract class AbstractWriter {
     /**
      * Adds a line break to the given {@link StringBuilder}.
      *
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
     protected void appendNewLine(StringBuilder sb) {
         sb.append(NEW_LINE);

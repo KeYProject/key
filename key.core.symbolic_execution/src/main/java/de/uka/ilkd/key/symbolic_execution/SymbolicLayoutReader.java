@@ -47,15 +47,11 @@ public class SymbolicLayoutReader {
     /**
      * Reads the given {@link File}.
      *
-     * @param file
-     *        The {@link File} to read.
+     * @param file The {@link File} to read.
      * @return The root of the model.
-     * @throws ParserConfigurationException
-     *         Occurred Exception.
-     * @throws SAXException
-     *         Occurred Exception.
-     * @throws IOException
-     *         Occurred Exception.
+     * @throws ParserConfigurationException Occurred Exception.
+     * @throws SAXException Occurred Exception.
+     * @throws IOException Occurred Exception.
      */
     public ISymbolicLayout read(File file)
             throws ParserConfigurationException, SAXException, IOException {
@@ -65,15 +61,11 @@ public class SymbolicLayoutReader {
     /**
      * Reads from the given {@link InputStream} and closes it.
      *
-     * @param in
-     *        The {@link InputStream} to read from.
+     * @param in The {@link InputStream} to read from.
      * @return The root of the model.
-     * @throws ParserConfigurationException
-     *         Occurred Exception.
-     * @throws SAXException
-     *         Occurred Exception.
-     * @throws IOException
-     *         Occurred Exception.
+     * @throws ParserConfigurationException Occurred Exception.
+     * @throws SAXException Occurred Exception.
+     * @throws IOException Occurred Exception.
      */
     public ISymbolicLayout read(InputStream in)
             throws ParserConfigurationException, SAXException, IOException {
@@ -233,12 +225,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents an {@link ISymbolicLayout}.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents an {@link ISymbolicLayout}, {@code false} is something else.
      */
     protected boolean isModel(String uri, String localName, String qName) {
@@ -248,12 +237,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents an {@link ISymbolicAssociation}.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents an {@link ISymbolicAssociation}, {@code false} is something
      *         else.
      */
@@ -264,12 +250,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents an {@link ISymbolicValue}.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents an {@link ISymbolicValue}, {@code false} is something else.
      */
     protected boolean isValue(String uri, String localName, String qName) {
@@ -279,12 +262,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents an {@link ISymbolicObject}.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents an {@link ISymbolicObject}, {@code false} is something else.
      */
     protected boolean isObject(String uri, String localName, String qName) {
@@ -294,12 +274,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents an {@link ISymbolicState}.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents an {@link ISymbolicState}, {@code false} is something else.
      */
     protected boolean isState(String uri, String localName, String qName) {
@@ -309,12 +286,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents an {@link ISymbolicEquivalenceClass}.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents an {@link ISymbolicEquivalenceClass}, {@code false} is
      *         something else.
      */
@@ -325,12 +299,9 @@ public class SymbolicLayoutReader {
     /**
      * Checks if the currently parsed tag represents a term.
      *
-     * @param uri
-     *        The URI.
-     * @param localName
-     *        THe local name.
-     * @param qName
-     *        The qName.
+     * @param uri The URI.
+     * @param localName THe local name.
+     * @param qName The qName.
      * @return {@code true} represents a term, {@code false} is something else.
      */
     protected boolean isTerm(String uri, String localName, String qName) {
@@ -340,8 +311,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the value value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getValueString(Attributes attributes) {
@@ -351,8 +321,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the condition value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getConditionString(Attributes attributes) {
@@ -362,8 +331,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the type value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getTypeString(Attributes attributes) {
@@ -373,8 +341,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the program variable value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getProgramVariableString(Attributes attributes) {
@@ -384,8 +351,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the name value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getName(Attributes attributes) {
@@ -395,8 +361,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the array index value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getArrayIndexString(Attributes attributes) {
@@ -406,8 +371,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the is array index flag.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected boolean isArrayIndex(Attributes attributes) {
@@ -418,8 +382,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the ID value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getId(Attributes attributes) {
@@ -429,8 +392,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the target value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getTarget(Attributes attributes) {
@@ -440,8 +402,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the representative term value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getRepresentativeTerm(Attributes attributes) {
@@ -451,8 +412,7 @@ public class SymbolicLayoutReader {
     /**
      * Returns the term value.
      *
-     * @param attributes
-     *        The {@link Attributes} which provides the content.
+     * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
     protected String getTerm(Attributes attributes) {
@@ -510,8 +470,7 @@ public class SymbolicLayoutReader {
         /**
          * Sets the state.
          *
-         * @param state
-         *        The state to set.
+         * @param state The state to set.
          */
         public void setState(ISymbolicState state) {
             this.state = state;
@@ -528,8 +487,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child {@link ISymbolicObject}.
          *
-         * @param object
-         *        The {@link ISymbolicObject} to add.
+         * @param object The {@link ISymbolicObject} to add.
          */
         public void addObject(ISymbolicObject object) {
             objects = objects.append(object);
@@ -546,8 +504,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child {@link ISymbolicEquivalenceClass}.
          *
-         * @param ec
-         *        The {@link ISymbolicEquivalenceClass} to add.
+         * @param ec The {@link ISymbolicEquivalenceClass} to add.
          */
         public void addEquivalenceClass(ISymbolicEquivalenceClass ec) {
             equivalenceClasses = equivalenceClasses.append(ec);
@@ -583,8 +540,7 @@ public class SymbolicLayoutReader {
         /**
          * Adds a new child {@link ISymbolicAssociation}
          *
-         * @param association
-         *        The {@link ISymbolicAssociation} to add.
+         * @param association The {@link ISymbolicAssociation} to add.
          */
         public void addAssociation(ISymbolicAssociation association) {
             associations = associations.append(association);
@@ -601,8 +557,7 @@ public class SymbolicLayoutReader {
         /**
          * Adds a new child {@link ISymbolicValue}.
          *
-         * @param value
-         *        The value to add.
+         * @param value The value to add.
          */
         public void addValue(ISymbolicValue value) {
             values = values.append(value);
@@ -625,8 +580,7 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param name
-         *        The name.
+         * @param name The name.
          */
         public KeYlessState(String name) {
             super();
@@ -681,10 +635,8 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param nameString
-         *        The name.
-         * @param typeString
-         *        The type.
+         * @param nameString The name.
+         * @param typeString The type.
          */
         public KeYlessObject(String nameString, String typeString) {
             super();
@@ -796,20 +748,13 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param name
-         *        The name.
-         * @param programVariableString
-         *        The program variable.
-         * @param isArrayIndex
-         *        The is array index flag.
-         * @param arrayIndexString
-         *        The array index.
-         * @param valueString
-         *        The value.
-         * @param typeString
-         *        The type.
-         * @param conditionString
-         *        The optional condition under which this value is valid.
+         * @param name The name.
+         * @param programVariableString The program variable.
+         * @param isArrayIndex The is array index flag.
+         * @param arrayIndexString The array index.
+         * @param valueString The value.
+         * @param typeString The type.
+         * @param conditionString The optional condition under which this value is valid.
          */
         public KeYlessValue(String name, String programVariableString, boolean isArrayIndex,
                 String arrayIndexString, String valueString, String typeString,
@@ -970,16 +915,11 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param name
-         *        The name.
-         * @param programVariableString
-         *        The program variable.
-         * @param isArrayIndex
-         *        The is array index flag.
-         * @param arrayIndexString
-         *        The array index.
-         * @param conditionString
-         *        The optional condition under which this association is valid.
+         * @param name The name.
+         * @param programVariableString The program variable.
+         * @param isArrayIndex The is array index flag.
+         * @param arrayIndexString The array index.
+         * @param conditionString The optional condition under which this association is valid.
          */
         public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex,
                 String arrayIndexString, String conditionString) {
@@ -990,18 +930,12 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param name
-         *        The name.
-         * @param programVariableString
-         *        The program variable.
-         * @param isArrayIndex
-         *        The is array index flag.
-         * @param arrayIndexString
-         *        The array index.
-         * @param target
-         *        The target.
-         * @param conditionString
-         *        The optional condition under which this association is valid.
+         * @param name The name.
+         * @param programVariableString The program variable.
+         * @param isArrayIndex The is array index flag.
+         * @param arrayIndexString The array index.
+         * @param target The target.
+         * @param conditionString The optional condition under which this association is valid.
          */
         public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex,
                 String arrayIndexString, ISymbolicObject target, String conditionString) {
@@ -1041,8 +975,7 @@ public class SymbolicLayoutReader {
         /**
          * Sets the target.
          *
-         * @param target
-         *        The target to set.
+         * @param target The target to set.
          */
         public void setTarget(ISymbolicObject target) {
             this.target = target;
@@ -1126,8 +1059,7 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param representativeString
-         *        The representative term.
+         * @param representativeString The representative term.
          */
         public KeYlessEquivalenceClass(String representativeString) {
             this(ImmutableSLList.nil(), representativeString);
@@ -1136,10 +1068,8 @@ public class SymbolicLayoutReader {
         /**
          * Constructor.
          *
-         * @param termStrings
-         *        The terms.
-         * @param representativeString
-         *        The representative term.
+         * @param termStrings The terms.
+         * @param representativeString The representative term.
          */
         public KeYlessEquivalenceClass(ImmutableList<String> termStrings,
                 String representativeString) {
@@ -1166,8 +1096,7 @@ public class SymbolicLayoutReader {
         /**
          * Add a new child term string.
          *
-         * @param termString
-         *        The term string to add.
+         * @param termString The term string to add.
          */
         public void addTermString(String termString) {
             this.termStrings = termStrings.append(termString);

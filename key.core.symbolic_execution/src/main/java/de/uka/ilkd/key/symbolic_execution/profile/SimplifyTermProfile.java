@@ -51,7 +51,8 @@ public class SimplifyTermProfile extends JavaProfile {
     /**
      * Constructor.
      */
-    public SimplifyTermProfile() {}
+    public SimplifyTermProfile() {
+    }
 
     /**
      * {@inheritDoc}

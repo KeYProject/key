@@ -26,8 +26,7 @@ public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<Sourc
      * Returns the human readable node name including the return value ({@link #getReturnValues()}).
      *
      * @return The human readable node name including the return value.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     String getNameIncludingReturnValue() throws ProofInputException;
 
@@ -35,8 +34,7 @@ public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<Sourc
      * Returns the human readable signature including the return value ({@link #getReturnValues()}).
      *
      * @return The human readable signature including the return value.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     String getSignatureIncludingReturnValue() throws ProofInputException;
 
@@ -52,8 +50,7 @@ public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<Sourc
      * Returns the possible return values.
      *
      * @return The possible return values.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException;
 }

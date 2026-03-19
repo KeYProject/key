@@ -28,13 +28,10 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param methodCall
-     *        The {@link IExecutionMethodCall} which is now returned.
+     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionExceptionalMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {

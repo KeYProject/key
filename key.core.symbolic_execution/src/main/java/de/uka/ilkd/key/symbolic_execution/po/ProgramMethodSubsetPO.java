@@ -108,18 +108,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Constructor.
      *
-     * @param initConfig
-     *        The {@link InitConfig} to use.
-     * @param name
-     *        The name to use.
-     * @param pm
-     *        The {@link IProgramMethod} to execute code parts from.
-     * @param precondition
-     *        An optional precondition to use.
-     * @param startPosition
-     *        The start position.
-     * @param endPosition
-     *        The end position.
+     * @param initConfig The {@link InitConfig} to use.
+     * @param name The name to use.
+     * @param pm The {@link IProgramMethod} to execute code parts from.
+     * @param precondition An optional precondition to use.
+     * @param startPosition The start position.
+     * @param endPosition The end position.
      */
     public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
             String precondition, Position startPosition, Position endPosition) {
@@ -133,23 +127,15 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Constructor.
      *
-     * @param initConfig
-     *        The {@link InitConfig} to use.
-     * @param name
-     *        The name to use.
-     * @param pm
-     *        The {@link IProgramMethod} to execute code parts from.
-     * @param precondition
-     *        An optional precondition to use.
-     * @param startPosition
-     *        The start position.
-     * @param endPosition
-     *        The end position.
-     * @param addUninterpretedPredicate
-     *        {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig The {@link InitConfig} to use.
+     * @param name The name to use.
+     * @param pm The {@link IProgramMethod} to execute code parts from.
+     * @param precondition An optional precondition to use.
+     * @param startPosition The start position.
+     * @param endPosition The end position.
+     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel
-     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
@@ -197,10 +183,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * Collects recursive the {@link Statement}s which are in the given source range defined by
      * {@link #startPosition} and {@link #endPosition}.
      *
-     * @param toFill
-     *        The result {@link List} to fill.
-     * @param container
-     *        The {@link StatementContainer} to seach in.
+     * @param toFill The result {@link List} to fill.
+     * @param container The {@link StatementContainer} to seach in.
      */
     protected void collectStatementsToExecute(List<Statement> toFill,
             StatementContainer container) {
@@ -227,8 +211,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Checks if the last statement is a {@link Return} statement.
      *
-     * @param statements
-     *        The statements to check.
+     * @param statements The statements to check.
      * @return {@code true} last statement is {@link Return}, {@code false} statements are empty or
      *         last statement is something else.
      */
@@ -280,8 +263,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Converts the given {@link Collection} into an {@link ImmutableList}.
      *
-     * @param c
-     *        The {@link Collection} to convert.
+     * @param c The {@link Collection} to convert.
      * @return The created {@link ImmutableList}.
      */
     protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
@@ -355,11 +337,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * Extracts the start position from the given {@link Properties}.
      *
-     * @param properties
-     *        The proof obligation settings to read from.
+     * @param properties The proof obligation settings to read from.
      * @return The defined start {@link Position}.
-     * @throws IOException
-     *         Occurred Exception if it was not possible to read the start position.
+     * @throws IOException Occurred Exception if it was not possible to read the start position.
      */
     protected static Position getStartPosition(Configuration properties) throws IOException {
         String line = properties.getString(START_LINE);

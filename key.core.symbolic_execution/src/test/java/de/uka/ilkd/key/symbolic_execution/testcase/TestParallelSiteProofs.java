@@ -84,8 +84,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
      * Executes the test steps to make sure that parallel tests are working without thrown
      * {@link Exception}s.
      *
-     * @param env
-     *        The {@link SymbolicExecutionEnvironment} to use.
+     * @param env The {@link SymbolicExecutionEnvironment} to use.
      */
     protected void doParallelSiteProofTest(
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env)
@@ -125,8 +124,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
     /**
      * Waits until the given {@link Thread}s have terminated.
      *
-     * @param threads
-     *        The {@link Thread}s to wait for.
+     * @param threads The {@link Thread}s to wait for.
      */
     public static void waitForThreads(List<SiteProofThread<?>> threads, long timeout)
             throws InterruptedException {
@@ -174,8 +172,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         /**
          * Sets the caught exception.
          *
-         * @param exception
-         *        The caught exception.
+         * @param exception The caught exception.
          */
         protected void setException(Exception exception) {
             this.exception = exception;
@@ -193,8 +190,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         /**
          * Sets the result of the site proof.
          *
-         * @param result
-         *        The site proof result.
+         * @param result The site proof result.
          */
         protected void setResult(T result) {
             this.result = result;
@@ -217,8 +213,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor.
          *
-         * @param node
-         *        The {@link IExecutionNode} to read variables from.
+         * @param node The {@link IExecutionNode} to read variables from.
          */
         public ExecutionVariableSiteProofThread(IExecutionNode<?> node) {
             this.node = node;
@@ -252,8 +247,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         /**
          * Constructor
          *
-         * @param returnNode
-         *        The {@link IExecutionMethodReturn} to read method return value from.
+         * @param returnNode The {@link IExecutionMethodReturn} to read method return value from.
          */
         public ExecutionReturnValueSiteProofThread(IExecutionMethodReturn returnNode) {
             this.returnNode = returnNode;

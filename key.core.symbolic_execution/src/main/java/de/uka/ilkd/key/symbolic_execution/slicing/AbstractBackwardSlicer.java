@@ -90,19 +90,13 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     /**
      * Decides if the given {@link Node} is part of the slice or not.
      *
-     * @param node
-     *        The {@link Node} to check.
-     * @param previousChild
-     *        The previously visited child {@link Node} or {@code null} the first
+     * @param node The {@link Node} to check.
+     * @param previousChild The previously visited child {@link Node} or {@code null} the first
      *        time.
-     * @param services
-     *        The {@link Services} to use.
-     * @param relevantLocations
-     *        The relevant locations.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
-     * @param activeStatement
-     *        The currently active statement.
+     * @param services The {@link Services} to use.
+     * @param relevantLocations The relevant locations.
+     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param activeStatement The currently active statement.
      * @return {@code true} {@link Node} should be part of slice, {@code false} {@link Node} should
      *         not be part of slice.
      */
@@ -113,14 +107,10 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     /**
      * Updates the relevant locations.
      *
-     * @param read
-     *        The {@link Expression} which provides new relevant locations.
-     * @param relevantLocations
-     *        The relevant locations to update.
-     * @param info
-     *        The {@link SequentInfo} with the aliases and so on.
-     * @param services
-     *        The {@link Services} to use.
+     * @param read The {@link Expression} which provides new relevant locations.
+     * @param relevantLocations The relevant locations to update.
+     * @param info The {@link SequentInfo} with the aliases and so on.
+     * @param services The {@link Services} to use.
      */
     protected void updateRelevantLocations(final ProgramElement read,
             final Set<Location> relevantLocations, final SequentInfo info,

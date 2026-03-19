@@ -33,10 +33,8 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionMethodCall(ITreeSettings settings, Node proofNode) {
@@ -69,8 +67,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * Removes the given {@link IExecutionBaseMethodReturn}.
      *
-     * @param methodReturn
-     *        The {@link IExecutionBaseMethodReturn} to be deleted.
+     * @param methodReturn The {@link IExecutionBaseMethodReturn} to be deleted.
      * @author Anna Filighera
      */
     public void removeMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
@@ -152,8 +149,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * Registers the given {@link IExecutionBaseMethodReturn}.
      *
-     * @param methodReturn
-     *        The {@link IExecutionBaseMethodReturn} to register.
+     * @param methodReturn The {@link IExecutionBaseMethodReturn} to register.
      */
     public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
         if (methodReturn != null) {

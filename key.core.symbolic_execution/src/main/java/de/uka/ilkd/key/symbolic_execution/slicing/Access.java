@@ -24,8 +24,7 @@ public class Access {
     /**
      * Constructor.
      *
-     * @param programVariable
-     *        The accessed {@link ProgramVariable}.
+     * @param programVariable The accessed {@link ProgramVariable}.
      */
     public Access(ProgramVariable programVariable) {
         assert programVariable != null;
@@ -36,8 +35,7 @@ public class Access {
     /**
      * Constructor.
      *
-     * @param dimensionExpressions
-     *        The accessed array index.
+     * @param dimensionExpressions The accessed array index.
      */
     public Access(ImmutableArray<JTerm> dimensionExpressions) {
         assert dimensionExpressions != null;
@@ -48,8 +46,7 @@ public class Access {
     /**
      * Constructor.
      *
-     * @param dimensionExpressions
-     *        The accessed array index.
+     * @param dimensionExpressions The accessed array index.
      */
     public Access(JTerm... dimensionExpressions) {
         assert dimensionExpressions != null;

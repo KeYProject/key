@@ -43,7 +43,7 @@ public interface IBreakpoint {
             int countApplied);
 
     /**
-     * Determines if the breakpoint represented by this BreakpointStopCondition is triggered.
+     * Determines if the breakpoint represented by this BreakpointStopConition is triggered.
      * Override this method in order to suspend execution when a breakpoint is hit.
      *
      * @param activeStatement the activeStatement of the node
