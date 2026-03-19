@@ -67,7 +67,7 @@ public class NJmlTranslatorTests {
         assertEquals(
             "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
                 + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO ("
-                + Path.of("Test.java").toUri() + ", 1/34)",
+                + Path.of("Test.java").toUri() + ", 5/38)",
             message.toString());
     }
 

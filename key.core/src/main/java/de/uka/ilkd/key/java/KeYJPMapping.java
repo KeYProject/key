@@ -241,7 +241,7 @@ public class KeYJPMapping {
     }
 
     public void registerType(ResolvedType ref, KeYJavaType kjt) {
-        System.out.println("Registered " + ref + "   " + kjt);
+        LOGGER.trace("Registered {} // {}", ref, kjt);
         this.typeMap.put(ref, kjt);
         this.typeMapRev.put(kjt, ref);
     }
