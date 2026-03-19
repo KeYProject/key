@@ -131,7 +131,8 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             // Compute contract text
             return FunctionalOperationContractImpl.getText(contract, contractParams, resultTerm,
                 selfTerm, exceptionTerm, baseHeap, baseHeapTerm, heapContext, atPres, false,
-                services, getSettings().usePrettyPrinting(), getSettings().useUnicode()).trim();
+                services, getSettings().usePrettyPrinting(), getSettings().useUnicode(),
+                false).trim();
         } else {
             return null;
         }
