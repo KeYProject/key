@@ -1006,7 +1006,7 @@ public class IntermediateProofReplayer {
             sort = app.getRealSort(sv, services);
         } else {
             name = value.substring(0, colon);
-            sort = services.getNamespaces().sorts().lookup(value.substring(colon + 1));
+            sort = services.getNamespaces().lookupSortOrAlias(value.substring(colon + 1));
 
         }
         LogicVariable lv = new LogicVariable(new Name(name), sort);

@@ -19,6 +19,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NamespaceSet {
 
@@ -219,6 +220,19 @@ public class NamespaceSet {
         return null;
     }
 
+    public @Nullable Sort lookupSortOrAlias(String name) {
+        return lookupSortOrAlias(new Name(name));
+    }
+
+    public @Nullable Sort lookupSortOrAlias(Name name) {
+        var sort = sorts().lookup(name);
+        if (sort != null)
+            return sort;
+        SortAlias alias = sortAliases.lookup(name);
+        if (alias != null)
+            return alias.aliasedSort();
+        return null;
+    }
 
     @Override
     public String toString() {
