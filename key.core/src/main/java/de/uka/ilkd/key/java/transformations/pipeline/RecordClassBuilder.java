@@ -5,9 +5,11 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.key.JmlDocModifier;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
@@ -17,6 +19,7 @@ import javax.annotation.processing.Generated;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
@@ -32,7 +35,6 @@ public class RecordClassBuilder extends JavaTransformer {
 
     @Override
     public void apply(CompilationUnit cu) {
-        System.out.println(cu);
         cu.walk(RecordDeclaration.class, it -> {
             ClassOrInterfaceDeclaration clazz = transform(it);
             it.replace(clazz);
@@ -56,6 +58,12 @@ public class RecordClassBuilder extends JavaTransformer {
             MethodDeclaration getter = clazz.addMethod(parameter.getNameAsString());
             getter.setType(parameter.type());
             getter.addModifier(PUBLIC, FINAL);
+            for(var mod : parameter.getModifiers()) {
+              if(mod.getKeyword() instanceof JmlDocModifier) {
+                  getter.getModifiers().add(mod.clone());
+              }
+            }
+            getter.getBody().get().addStatement(new ReturnStmt(parameter.getNameAsExpression()));
         }
 
         // TODO generate equals and hashcode
@@ -69,17 +77,17 @@ public class RecordClassBuilder extends JavaTransformer {
             Type tObject = StaticJavaParser.parseType("java.lang.Object");
             equals.getParameters().add(new Parameter(tObject, "o"));
             BlockStmt body = equals.getBody().get();
-            body.addStatement("if(this == other) return true;");
-            body.addStatement("if(!(o instanceof %s that)) return false;".formatted(clazz.getNameAsString()));
+            body.addStatement(services.parseStatement("if(this == o) return true;"));
+            body.addStatement(services.parseStatement("if(!(o instanceof %s that)) return false;".formatted(clazz.getNameAsString())));
 
             Expression equalFields = recordDeclaration.getParameters().stream()
                     .map(it -> callObjects("equals", it.getNameAsExpression(),
-                            new FieldAccessExpr(new NameExpr("o"), it.getNameAsString())))
+                            new FieldAccessExpr(new NameExpr("that"), it.getNameAsString())))
                     .reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND))
                     .orElse(new BooleanLiteralExpr(true));
             body.addStatement(new ReturnStmt(equalFields));
 
-            body.addStatement("return true");
+            body.addStatement(new ReturnStmt(new BooleanLiteralExpr(true)));
         }
 
         if (hasNoHashcode) {
@@ -95,7 +103,7 @@ public class RecordClassBuilder extends JavaTransformer {
                     .addStatement(new ReturnStmt(call));
         }
 
-        // TODO generate to String
+        // TODO generate toString
         boolean hasNoToString = recordDeclaration.getMethodsBySignature("toString").isEmpty();
         if (hasNoToString) {
             MethodDeclaration toString = clazz.addMethod("toString", PUBLIC, FINAL, JML_NON_NULL);

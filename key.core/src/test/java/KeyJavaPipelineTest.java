@@ -1,6 +1,28 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.Problem;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
+import com.github.javaparser.printer.Printer;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.PrinterConfiguration;
+import com.google.common.truth.Truth;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
+import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
+import de.uka.ilkd.key.nparser.NamespaceBuilder;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,29 +32,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
-import de.uka.ilkd.key.nparser.NamespaceBuilder;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.Problem;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.printer.DefaultPrettyPrinter;
-import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
-import com.github.javaparser.printer.Printer;
-import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
-import com.github.javaparser.printer.configuration.PrinterConfiguration;
-import com.google.common.truth.Truth;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -51,7 +50,7 @@ class KeyJavaPipelineTest {
         assertNotNull(nss.sorts().lookup("int"));
         assertNotNull(nss.sorts().lookup("boolean"));
         var inputFolder = testFolder.resolve("input");
-        var js = services.activateJava(null, Collections.singleton(inputFolder), null);
+        var js = services.activateJava(null, Collections.emptyList(), null);
         js.parseSpecialClasses();
 
         final var jp = js.getProgramFactory().createJavaParser();
@@ -73,15 +72,15 @@ class KeyJavaPipelineTest {
                 }
             });
             var tservices =
-                new TransformationPipelineServices(services.getJavaService().getProgramFactory(),
-                    new TransformationPipelineServices.TransformerCache(cu));
+                    new TransformationPipelineServices(services.getJavaService().getProgramFactory(),
+                            new TransformationPipelineServices.TransformerCache(cu));
             var kjp = KeYJavaPipeline.createDefault(tservices);
             var kjp2 = new KeYJavaPipeline(tservices);
             var cnt = 0;
             for (JavaTransformer step : kjp.getSteps()) {
                 kjp2.add(step);
                 final var file = testFolder.resolve("actual").resolve(
-                    String.format("%02d_%s", ++cnt, step.getClass().getSimpleName()));
+                        String.format("%02d_%s", ++cnt, step.getClass().getSimpleName()));
                 kjp2.add(new DebugOutputTransformer(file, tservices));
             }
             return kjp2;
@@ -91,6 +90,11 @@ class KeyJavaPipelineTest {
     @TestFactory
     Stream<DynamicTest> simple() throws IOException {
         return generatePipelineTests(Paths.get("pipelineTests/simple").toAbsolutePath());
+    }
+
+    @TestFactory
+    Stream<DynamicTest> records() throws IOException {
+        return generatePipelineTests(Paths.get("pipelineTests/records").toAbsolutePath());
     }
 
     @TestFactory
@@ -108,7 +112,7 @@ class KeyJavaPipelineTest {
         return Files.walk(expected)
                 .filter(Files::isRegularFile)
                 .map(it -> DynamicTest.dynamicTest(it.toString(),
-                    () -> checkEqualFile(it, expected, actual)));
+                        () -> checkEqualFile(it, expected, actual)));
     }
 
     private void checkEqualFile(Path expectedFile, Path expectedFolder, Path actualFolder)
@@ -128,8 +132,8 @@ class KeyJavaPipelineTest {
         final Set<Path> alreadyWritten = new HashSet<>();
         private static final Logger LOGGER = LoggerFactory.getLogger(DebugOutputTransformer.class);
         private final Printer myPrinter = new DefaultPrettyPrinter(
-            MyPrintVisitor::new,
-            new DefaultPrinterConfiguration());
+                MyPrintVisitor::new,
+                new DefaultPrinterConfiguration());
 
 
         public DebugOutputTransformer(Path s, TransformationPipelineServices services) {
@@ -138,24 +142,19 @@ class KeyJavaPipelineTest {
         }
 
         @Override
-        public void apply(TypeDeclaration<?> td) {
+        public void apply(CompilationUnit unit) {
             try {
                 Files.createDirectories(outputFolder);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            for (CompilationUnit unit : services.getCache().getUnits()) {
-                var name = unit.getPrimaryTypeName().get();
-                var file = outputFolder.resolve(name + ".java");
-                if (!alreadyWritten.contains(file)) {
-                    alreadyWritten.add(file);
-                    try {
-                        unit.printer(myPrinter);
-                        Files.writeString(file, unit.toString());
-                    } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
+            var name = unit.getStorage().get().getFileName();
+            var file = outputFolder.resolve(name);
+            try {
+                unit.printer(myPrinter);
+                Files.writeString(file, unit.toString());
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }

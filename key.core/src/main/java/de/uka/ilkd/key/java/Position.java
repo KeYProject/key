@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java;
 
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The position of a source element, given by its line and column number. Depending on the
@@ -87,8 +88,8 @@ public class Position implements Comparable<Position> {
         return fromOneZeroBased(token.getLine(), token.getCharPositionInLine());
     }
 
-    public static Position fromJPPosition(com.github.javaparser.Position p) {
-        if (p.invalid() || (p.line == -1 && p.column == -1)) {
+    public static Position fromJPPosition(com.github.javaparser.@Nullable Position p) {
+        if (p == null || p.invalid() || (p.line == -1 && p.column == -1)) {
             return UNDEFINED;
         } else {
             return newOneBased(p.line, p.column);

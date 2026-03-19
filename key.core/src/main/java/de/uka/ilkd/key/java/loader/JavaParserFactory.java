@@ -90,7 +90,6 @@ public class JavaParserFactory {
         typeSolver.lazyRebuild();
     }
 
-    @NonNull
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();

@@ -283,6 +283,10 @@ public class TransformationPipelineServices {
         return javaParserFactory.createJavaParser();
     }
 
+    public Statement parseStatement(String code) {
+        return getParser().parseStatement(code).getResult().orElseThrow();
+    }
+
 
     /**
      * Cache of important data. This is done mainly for performance reasons.
