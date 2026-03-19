@@ -33,7 +33,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Alexander Weigl
@@ -54,7 +53,7 @@ public class SchemaJavaRegressionTest {
         }
     }
 
-    @Test
+    // @Test
     void createOracle() throws IOException {
         var factory = YAMLFactory.builder()
                 .enable(YAMLGenerator.Feature.SPLIT_LINES)
