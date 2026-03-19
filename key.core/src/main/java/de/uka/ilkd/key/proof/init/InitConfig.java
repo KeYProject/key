@@ -472,10 +472,12 @@ public class InitConfig {
                     .add(choice));
     }
 
+    /// returns the user-given declarations used during loading
     public KeyAst.@Nullable Declarations getProblemHeader() {
         return header;
     }
 
+    /// sets the user-given declarations that are used during saving proofs
     public void setHeader(KeyAst.@Nullable Declarations header) {
         this.header = header;
     }

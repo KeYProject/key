@@ -255,7 +255,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
 
-    ///
+    /// returns the user-local definition given in the file.
     public KeyAst.@Nullable Declarations getProblemHeader() {
         return getParseContext().getProblemHeader();
     }
