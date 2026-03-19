@@ -21,10 +21,8 @@ public class ClosedGoal extends GraphNode {
     /**
      * Construct a new closed goal node.
      *
-     * @param serialNr
-     *        serial number of the proof node
-     * @param branchLocation
-     *        branch that was closed
+     * @param serialNr serial number of the proof node
+     * @param branchLocation branch that was closed
      */
     public ClosedGoal(int serialNr, BranchLocation branchLocation) {
         super(branchLocation);

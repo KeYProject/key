@@ -21,8 +21,7 @@ public class AddedRule extends GraphNode {
     /**
      * Construct a new graph node for a dynamically added rule.
      *
-     * @param name
-     *        the name of the rule (must be unique per proof)
+     * @param name the name of the rule (must be unique per proof)
      */
     public AddedRule(String name) {
         super(BranchLocation.ROOT); // branch location does not matter since the rule name is

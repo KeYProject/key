@@ -56,12 +56,9 @@ public class PanZoomImageView extends JComponent
      * Construct a new image view for the given image and initial dimensions.
      * The component will react to resize events.
      *
-     * @param img
-     *        image to display
-     * @param width
-     *        width of the component
-     * @param height
-     *        height of the component
+     * @param img image to display
+     * @param width width of the component
+     * @param height height of the component
      */
     public PanZoomImageView(BufferedImage img, int width, int height) {
         this.image = img;
@@ -104,7 +101,8 @@ public class PanZoomImageView extends JComponent
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -112,13 +110,16 @@ public class PanZoomImageView extends JComponent
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+    }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
     @Override
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -128,7 +129,8 @@ public class PanZoomImageView extends JComponent
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+    }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {

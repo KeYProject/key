@@ -31,10 +31,8 @@ public class RuleStatistics {
     /**
      * Register one rule application (proof step).
      *
-     * @param rule
-     *        the rule
-     * @param branches
-     *        whether this rule application creates new proof branches
+     * @param rule the rule
+     * @param branches whether this rule application creates new proof branches
      */
     public void addApplication(Rule rule, boolean branches) {
         String name = rule.displayName();
@@ -49,10 +47,8 @@ public class RuleStatistics {
     /**
      * Register a useless rule application (proof step).
      *
-     * @param rule
-     *        the rule
-     * @param branches
-     *        whether this rule application creates new proof branches
+     * @param rule the rule
+     * @param branches whether this rule application creates new proof branches
      */
     public void addUselessApplication(Rule rule, boolean branches) {
         String name = rule.displayName();
@@ -67,10 +63,8 @@ public class RuleStatistics {
     /**
      * Register an "initial useless" rule application (proof step).
      *
-     * @param rule
-     *        the rule
-     * @param branches
-     *        whether this rule application creates new proof branches
+     * @param rule the rule
+     * @param branches whether this rule application creates new proof branches
      */
     public void addInitialUselessApplication(Rule rule, boolean branches) {
         String name = rule.displayName();
@@ -87,8 +81,7 @@ public class RuleStatistics {
      * The comparator receives: the rule name, the number of rule applications, the number of
      * useless applications and the number of "initial useless" applications.
      *
-     * @param comparator
-     *        custom comparator
+     * @param comparator custom comparator
      * @return list of rule names + counters
      */
     public List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
@@ -102,8 +95,7 @@ public class RuleStatistics {
     }
 
     /**
-     * @param rule
-     *        rule display name
+     * @param rule rule display name
      * @return whether that rule creates new branches
      */
     public boolean branches(String rule) {
