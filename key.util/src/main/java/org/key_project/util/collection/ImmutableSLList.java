@@ -108,8 +108,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     /**
      * prepends array (O(n))
      *
-     * @param array
-     *        the array of the elements to be prepended
+     * @param array the array of the elements to be prepended
      * @return IList<T> the new list
      */
     @Override
@@ -121,10 +120,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     /**
      * prepends the first <code>n</code> elements of an array (O(n))
      *
-     * @param array
-     *        the array of the elements to be prepended
-     * @param n
-     *        an int specifying the number of elements to be prepended
+     * @param array the array of the elements to be prepended
+     * @param n an int specifying the number of elements to be prepended
      * @return IList<T> the new list
      */
     protected ImmutableList<T> prepend(T[] array, int n) {
@@ -158,8 +155,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     /**
      * first <code>n</code> elements of the list are truncated
      *
-     * @param n
-     *        an int specifying the number of elements to be truncated
+     * @param n an int specifying the number of elements to be truncated
      * @return IList<T> this list without the first <code>n</code> elements
      */
     @Override
@@ -196,8 +192,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * new list with only one element
          *
-         * @param element
-         *        the only element in list
+         * @param element the only element in list
          */
         Cons(S element) {
             this.element = element;
@@ -208,10 +203,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * constructs a new list with element as head and cons as tail
          *
-         * @param element
-         *        a <T> stored in the head element of the list
-         * @param cons
-         *        tail of the list
+         * @param element a <T> stored in the head element of the list
+         * @param cons tail of the list
          */
         Cons(S element, ImmutableSLList<S> cons) {
             this.element = element;
@@ -222,8 +215,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * creates a new list with element as head and the momentan list as tail (O(1))
          *
-         * @param e
-         *        the <T> to be prepended
+         * @param e the <T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -234,8 +226,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * prepends list (O(n)+O(m))
          *
-         * @param list
-         *        the IList<T> to be prepended
+         * @param list the IList<T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -263,8 +254,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * prepends list (O(n)+O(m)) in reversed order
          *
-         * @param list
-         *        the IList<T> to be prepended
+         * @param list the IList<T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -285,8 +275,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * return true if predicate is fullfilled for at least one element
          *
-         * @param predicate
-         *        the predicate
+         * @param predicate the predicate
          * @return true if predicate is fullfilled for at least one element
          */
         @Override
@@ -305,8 +294,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * appends element at end (non-destructive) (O(n))
          *
-         * @param e
-         *        the <T> to be prepended
+         * @param e the <T> to be prepended
          * @return IList<T> the new list
          */
         @Override
@@ -317,8 +305,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * appends element at end (non-destructive) (O(n))
          *
-         * @param list
-         *        the IList<T> to be appended
+         * @param list the IList<T> to be appended
          * @return IList<T> the new list
          */
         @Override
@@ -329,8 +316,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * appends element at end (non-destructive) (O(n))
          *
-         * @param array
-         *        the array to be appended
+         * @param array the array to be appended
          * @return IList<T> the new list
          */
         @Override
@@ -495,8 +481,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * constructs the iterator
          *
-         * @param list
-         *        the IList<T> that has to be iterated
+         * @param list the IList<T> that has to be iterated
          */
         public SLListIterator(ImmutableList<T> list) {
             this.list = list;
@@ -543,7 +528,8 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         private final transient Iterator<S> iterator = new SLNilListIterator();
 
-        private NIL() {}
+        private NIL() {
+        }
 
         /**
          * the NIL list is a singleton. Deserialization builds a new NIL object that has to be
@@ -606,8 +592,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         /**
          * return true if predicate is fullfilled for at least one element
          *
-         * @param predicate
-         *        the predicate
+         * @param predicate the predicate
          * @return true if predicate is fullfilled for at least one element
          */
         @Override

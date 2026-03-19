@@ -35,8 +35,7 @@ public abstract class AbstractRunnableWithException implements IRunnableWithExce
     /**
      * Sets the occurred exception.
      *
-     * @param exception
-     *        The occurred exception.
+     * @param exception The occurred exception.
      */
     protected void setException(Exception exception) {
         this.exception = exception;

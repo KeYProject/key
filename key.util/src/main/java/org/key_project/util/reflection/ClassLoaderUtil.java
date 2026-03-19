@@ -56,8 +56,7 @@ public class ClassLoaderUtil {
     /**
      * Sets the {@link IClassLoader} instance to use.
      *
-     * @param classLoader
-     *        The {@link IClassLoader} instance to use.
+     * @param classLoader The {@link IClassLoader} instance to use.
      */
     public static void setClassLoader(IClassLoader classLoader) {
         ClassLoaderUtil.classLoader = classLoader;
@@ -67,11 +66,9 @@ public class ClassLoaderUtil {
      * Returns the {@link Class} for the given class name similar to {@link Class#forName(String)}
      * but with same behavior in all supported application types.
      *
-     * @param className
-     *        The name of the class.
+     * @param className The name of the class.
      * @return The {@link Class} instance.
-     * @throws ClassNotFoundException
-     *         Occurred Exception if {@link Class} is not available.
+     * @throws ClassNotFoundException Occurred Exception if {@link Class} is not available.
      */
     public static Class<?> getClassforName(String className) throws ClassNotFoundException {
         return classLoader.getClassforName(className);
@@ -81,8 +78,7 @@ public class ClassLoaderUtil {
      * Loads all configured services similar to {@link ServiceLoader#load(Class)} but with same
      * behavior in all supported application types.
      *
-     * @param service
-     *        The requested service.
+     * @param service The requested service.
      * @return An {@link Iterable} with the created service instances.
      */
     public static <S> Iterable<S> loadServices(Class<S> service) {
@@ -93,11 +89,9 @@ public class ClassLoaderUtil {
      * Loads all configured services similar to {@link ServiceLoader#load(Class)} but with same
      * behavior in all supported application types.
      *
-     * @param contextClass
-     *        The calling {@link Class} which {@link ClassLoader} knows the
+     * @param contextClass The calling {@link Class} which {@link ClassLoader} knows the
      *        configuration-file.
-     * @param service
-     *        The requested service.
+     * @param service The requested service.
      * @return An {@link Iterable} with the created service instances.
      */
     public static <S> Iterable<S> loadServices(Class<?> contextClass, Class<S> service) {

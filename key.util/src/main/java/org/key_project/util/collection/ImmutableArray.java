@@ -43,8 +43,7 @@ public class ImmutableArray<S extends @Nullable Object>
     /**
      * creates a new <S>Array
      *
-     * @param arr
-     *        the ProgrammElement array to wrap
+     * @param arr the ProgrammElement array to wrap
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(S... arr) {
@@ -67,8 +66,7 @@ public class ImmutableArray<S extends @Nullable Object>
      * The order of elements is defined by the collection.
      * </p>
      *
-     * @param list
-     *        a non-null collection (order is preserved)
+     * @param list a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(@NonNull Collection<? extends S> list) {
@@ -78,8 +76,7 @@ public class ImmutableArray<S extends @Nullable Object>
     /**
      * gets the element at the specified position
      *
-     * @param pos
-     *        an int describing the position
+     * @param pos an int describing the position
      * @return the element at pos
      */
     public final S get(int pos) {
@@ -96,9 +93,7 @@ public class ImmutableArray<S extends @Nullable Object>
     }
 
 
-    /**
-     * @return size of the array
-     */
+    /** @return size of the array */
     public int size() {
         return content.length;
     }
@@ -123,8 +118,7 @@ public class ImmutableArray<S extends @Nullable Object>
     /**
      * Convert the array to a Java array (O(n))
      *
-     * @throws ClassCastException
-     *         if T is not a supertype of S
+     * @throws ClassCastException if T is not a supertype of S
      */
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] array) {

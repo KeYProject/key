@@ -27,15 +27,14 @@ public final class XMLUtil {
     /**
      * Forbid instances.
      */
-    private XMLUtil() {}
+    private XMLUtil() {
+    }
 
     /**
      * Replaces all tags in the given text with help of the given {@link ITagReplacer}.
      *
-     * @param text
-     *        The text to execute replacements on.
-     * @param replacer
-     *        The {@link ITagReplacer} to use.
+     * @param text The text to execute replacements on.
+     * @param replacer The {@link ITagReplacer} to use.
      * @return The new created text.
      */
     public static String replaceTags(String text, ITagReplacer replacer) {
@@ -81,8 +80,7 @@ public final class XMLUtil {
         /**
          * Replaces the given tag by something else.
          *
-         * @param tag
-         *        The found tag.
+         * @param tag The found tag.
          * @return The replacement to use or {@code null} to remove the tag.
          */
         @Nullable
@@ -120,8 +118,7 @@ public final class XMLUtil {
     /**
      * Removes all tags from the given text.
      *
-     * @param text
-     *        The text to remove tags from.
+     * @param text The text to remove tags from.
      * @return The text without tags.
      */
     public static String removeTags(String text) {
@@ -166,8 +163,7 @@ public final class XMLUtil {
      * </pre>
      * </p>
      *
-     * @param text
-     *        The text to encode.
+     * @param text The text to encode.
      * @return The encoded text.
      */
     public static String encodeText(String text) {
@@ -189,8 +185,7 @@ public final class XMLUtil {
     /**
      * Checks if the given character is valid to be used in entity names (between {@code &...;}).
      *
-     * @param character
-     *        The character to check.
+     * @param character The character to check.
      * @return {@code true} is valid, {@code false} is not valid.
      */
     public static boolean isEntityNameCharacter(char character) {
@@ -202,14 +197,10 @@ public final class XMLUtil {
     /**
      * Appends an empty tag to the given {@link StringBuilder}.
      *
-     * @param level
-     *        The level.
-     * @param tagName
-     *        The tag name.
-     * @param attributeValues
-     *        The attributes.
-     * @param sb
-     *        The {@link StringBuilder} to append to.
+     * @param level The level.
+     * @param tagName The tag name.
+     * @param attributeValues The attributes.
+     * @param sb The {@link StringBuilder} to append to.
      */
     public static void appendEmptyTag(int level, String tagName,
             Map<String, String> attributeValues, StringBuilder sb) {
@@ -226,14 +217,10 @@ public final class XMLUtil {
     /**
      * Appends a start tag to the given {@link StringBuilder}.
      *
-     * @param level
-     *        The level.
-     * @param tagName
-     *        The tag name.
-     * @param attributeValues
-     *        The attributes.
-     * @param sb
-     *        The {@link StringBuilder} to append to.
+     * @param level The level.
+     * @param tagName The tag name.
+     * @param attributeValues The attributes.
+     * @param sb The {@link StringBuilder} to append to.
      */
     public static void appendStartTag(int level, String tagName,
             Map<String, String> attributeValues, StringBuilder sb) {
@@ -252,12 +239,9 @@ public final class XMLUtil {
     /**
      * Appends an end tag to the given {@link StringBuilder}.
      *
-     * @param level
-     *        The level.
-     * @param tagName
-     *        The tag name.
-     * @param sb
-     *        The {@link StringBuilder} to append to.
+     * @param level The level.
+     * @param tagName The tag name.
+     * @param sb The {@link StringBuilder} to append to.
      */
     public static void appendEndTag(int level, String tagName, StringBuilder sb) {
         appendWhiteSpace(level, sb);
@@ -270,10 +254,8 @@ public final class XMLUtil {
     /**
      * Adds leading white space to the {@link StringBuilder}.
      *
-     * @param level
-     *        The level in the tree used for leading white space (formatting).
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param level The level in the tree used for leading white space (formatting).
+     * @param sb The {@link StringBuilder} to write to.
      */
     public static void appendWhiteSpace(int level, StringBuilder sb) {
         sb.append(LEADING_WHITE_SPACE_PER_LEVEL.repeat(Math.max(0, level)));
@@ -282,12 +264,9 @@ public final class XMLUtil {
     /**
      * Adds an XML attribute to the given {@link StringBuilder}.
      *
-     * @param attributeName
-     *        The attribute name.
-     * @param value
-     *        The attribute value.
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param attributeName The attribute name.
+     * @param value The attribute value.
+     * @param sb The {@link StringBuilder} to write to.
      */
     public static void appendAttribute(String attributeName, String value, StringBuilder sb) {
         if (attributeName != null && value != null) {
@@ -302,10 +281,8 @@ public final class XMLUtil {
     /**
      * Adds an XML header to the given {@link StringBuilder}.
      *
-     * @param encoding
-     *        The encoding to use.
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param encoding The encoding to use.
+     * @param sb The {@link StringBuilder} to write to.
      */
     public static void appendXmlHeader(String encoding, StringBuilder sb) {
         sb.append("<?xml version=\"1.0\"");
@@ -317,8 +294,7 @@ public final class XMLUtil {
     /**
      * Adds a line break to the given {@link StringBuilder}.
      *
-     * @param sb
-     *        The {@link StringBuilder} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
     public static void appendNewLine(StringBuilder sb) {
         sb.append(StringUtil.NEW_LINE);

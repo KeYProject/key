@@ -22,16 +22,14 @@ public interface GraphEdge {
     /**
      * Specify the source of this edge.
      *
-     * @param source
-     *        source node
+     * @param source source node
      */
     void setSource(Object source);
 
     /**
      * Specify the target of this edge.
      *
-     * @param target
-     *        target node
+     * @param target target node
      */
     void setTarget(Object target);
 }
