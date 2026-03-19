@@ -159,6 +159,16 @@ public class DeclarationBuilder extends DefaultBuilder {
         ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
                 : Immutables.createSetFrom(sortExt);
 
+        if (ctx.ALIAS() != null) {
+            String aliasId = accept(ctx.simple_ident_dots());
+            Name name = new Name(aliasId);
+            Sort aliased = accept(ctx.sortId());
+            var alias = new SortAlias(name, aliased);
+            // TODO: check for duplicates
+            namespaces().sortAliases().addSafely(alias);
+            return alias;
+        }
+
         if (ctx.sortIds != null) {
             for (var idCtx : ctx.sortIds.simple_ident_dots()) {
                 String sortId = accept(idCtx);

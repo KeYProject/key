@@ -964,7 +964,7 @@ public class IntermediateProofReplayer {
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(),
+                varNS, functNS, proof.getNamespaces().sorts(), proof.getNamespaces().sortAliases(),
                 proof.getNamespaces().parametricSorts(),
                 proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
