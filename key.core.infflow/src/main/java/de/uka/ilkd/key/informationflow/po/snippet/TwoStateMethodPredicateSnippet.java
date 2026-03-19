@@ -113,8 +113,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * Parameters and the result of a method only have to appear once in the predicate. This method
      * chooses the right variables out of the poVars.
      *
-     * @param poVars
-     *        The proof obligation variables.
+     * @param poVars The proof obligation variables.
      * @return
      */
     private ImmutableList<JTerm> extractTermListForPredicate(IProgramMethod pm,

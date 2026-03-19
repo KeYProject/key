@@ -186,8 +186,6 @@ abstract class ReplaceAndRegisterMethod {
         @Override
         public void subtreeLeft(JTerm subtreeRoot) { /* nothing to do */ }
 
-        public Set<QuantifiableVariable> getResult() {
-            return vars;
-        }
+        public Set<QuantifiableVariable> getResult() { return vars; }
     }
 }

@@ -92,8 +92,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             // assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {
             assert (!pm.isVoid() && !pm.isConstructor())
-                    : "non-null result variable for void method or constructor "
-                        + pm
+                    : "non-null result variable for void method or constructor " + pm
                         + " with return type " + pm.getReturnType();
         }
         assert exc != null;

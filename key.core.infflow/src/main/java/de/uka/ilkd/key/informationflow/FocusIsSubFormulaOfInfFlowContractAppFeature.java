@@ -36,7 +36,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
 
 
-    protected FocusIsSubFormulaOfInfFlowContractAppFeature() {}
+    protected FocusIsSubFormulaOfInfFlowContractAppFeature() {
+    }
 
 
     @Override

@@ -45,7 +45,8 @@ public class InfFlowContractAppFeature implements Feature {
     public static final Feature INSTANCE = new InfFlowContractAppFeature();
 
 
-    protected InfFlowContractAppFeature() {}
+    protected InfFlowContractAppFeature() {
+    }
 
 
     /**

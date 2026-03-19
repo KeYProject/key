@@ -61,19 +61,13 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             }
 
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
         };
 
         final SequentialProofMacro finishMainCompMacro = new SequentialOnLastGoalProofMacro() {
@@ -84,36 +78,24 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             }
 
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
         };
 
         return new AlternativeMacro() {
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
 
             @Override
             protected ProofMacro[] createProofMacroArray() {

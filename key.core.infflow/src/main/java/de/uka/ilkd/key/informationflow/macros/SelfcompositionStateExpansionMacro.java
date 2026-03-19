@@ -157,7 +157,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {}
+                RuleAppCostCollector collector) {
+        }
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
