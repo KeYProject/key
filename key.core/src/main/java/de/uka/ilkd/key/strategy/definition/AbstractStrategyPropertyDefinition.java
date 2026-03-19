@@ -40,7 +40,7 @@ public abstract class AbstractStrategyPropertyDefinition {
      * Constructor.
      *
      * @param apiKey The key used in KeY's API.
-     * @param name The human readable name of the property.
+     * @param name The human-readable name of the property.
      * @param tooltip The optional tooltip text which describes this property.
      * @param subProperties Optional children which edits related properties to this.
      */
@@ -54,8 +54,6 @@ public abstract class AbstractStrategyPropertyDefinition {
 
     /**
      * Returns the key used in KeY's API.
-     *
-     * @return The key used in KeY's API.
      */
     public String getApiKey() {
         return apiKey;
@@ -63,8 +61,6 @@ public abstract class AbstractStrategyPropertyDefinition {
 
     /**
      * Returns the human-readable name of the property.
-     *
-     * @return The human-readable name of the property.
      */
     public String getName() {
         return name;
@@ -72,8 +68,6 @@ public abstract class AbstractStrategyPropertyDefinition {
 
     /**
      * Returns the optional tooltip text which describes this property.
-     *
-     * @return The optional tooltip text which describes this property.
      */
     public String getTooltip() {
         return tooltip;
