@@ -158,8 +158,7 @@ public final class SourceView extends JComponent {
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
      *
-     * @param mainWindow
-     *        the MainWindow of the GUI
+     * @param mainWindow the MainWindow of the GUI
      */
     private SourceView(MainWindow mainWindow) {
         super();
@@ -255,8 +254,7 @@ public final class SourceView extends JComponent {
     /**
      * Returns the singleton instance of the SourceView.
      *
-     * @param mainWindow
-     *        KeY's main window
+     * @param mainWindow KeY's main window
      * @return the component responsible for showing source code and symbolic execution information
      */
     public static SourceView getSourceView(MainWindow mainWindow) {
@@ -282,20 +280,14 @@ public final class SourceView extends JComponent {
      * {@code Integer.maxValue() - 1}.
      * </p>
      *
-     * @param fileURI
-     *        the URI of the file in which to create the highlight.
-     * @param line
-     *        the line to highlight.
-     * @param color
-     *        the color to use for the highlight.
-     * @param level
-     *        the level of the highlight.
+     * @param fileURI the URI of the file in which to create the highlight.
+     * @param line the line to highlight.
+     * @param color the color to use for the highlight.
+     * @param level the level of the highlight.
      * @return the highlight.
      *
-     * @throws BadLocationException
-     *         if the line number is invalid.
-     * @throws IOException
-     *         if the file cannot be read.
+     * @throws BadLocationException if the line number is invalid.
+     * @throws IOException if the file cannot be read.
      */
     public Highlight addHighlight(URI fileURI, int line, Color color, int level)
             throws BadLocationException, IOException {
@@ -334,20 +326,14 @@ public final class SourceView extends JComponent {
      * {@code firstLine}.
      * </p>
      *
-     * @param fileURI
-     *        the URI of the file in which to create the highlights.
-     * @param firstLine
-     *        the first line to highlight.
-     * @param color
-     *        the color to use for the highlights.
-     * @param level
-     *        the level of the highlights.
+     * @param fileURI the URI of the file in which to create the highlights.
+     * @param firstLine the first line to highlight.
+     * @param color the color to use for the highlights.
+     * @param level the level of the highlights.
      * @return the highlights.
      *
-     * @throws BadLocationException
-     *         if the line number is invalid.
-     * @throws IOException
-     *         if the file cannot be read.
+     * @throws BadLocationException if the line number is invalid.
+     * @throws IOException if the file cannot be read.
      */
     public Set<Highlight> addHighlightsForJMLStatement(URI fileURI, int firstLine, Color color,
             int level) throws BadLocationException, IOException {
@@ -389,13 +375,10 @@ public final class SourceView extends JComponent {
     /**
      * Moves an existing highlight to another line.
      *
-     * @param highlight
-     *        the highlight to change.
-     * @param newLine
-     *        the line to move the highlight to.
+     * @param highlight the highlight to change.
+     * @param newLine the line to move the highlight to.
      *
-     * @throws BadLocationException
-     *         if the line number is invalid.
+     * @throws BadLocationException if the line number is invalid.
      */
     public void changeHighlight(Highlight highlight, int newLine) throws BadLocationException {
         URI fileURI = highlight.getFileURI();
@@ -431,8 +414,7 @@ public final class SourceView extends JComponent {
     /**
      * Removes a highlight.
      *
-     * @param highlight
-     *        the highlight to remove.
+     * @param highlight the highlight to remove.
      * @return {@code true} iff this {@code SourceView} previously contained the specified
      *         highlight.
      */
@@ -469,11 +451,9 @@ public final class SourceView extends JComponent {
     /**
      * Adds an additional tab for the specified file.
      *
-     * @param fileURI
-     *        the URI of the file to open.
+     * @param fileURI the URI of the file to open.
      *
-     * @throws IOException
-     *         if the file cannot be opened.
+     * @throws IOException if the file cannot be opened.
      */
     public void openFile(URI fileURI) throws IOException {
         openFiles(Collections.singleton(fileURI));
@@ -482,11 +462,9 @@ public final class SourceView extends JComponent {
     /**
      * Adds additional tabs for the specified files.
      *
-     * @param fileURIs
-     *        the URIs of the files to open.
+     * @param fileURIs the URIs of the files to open.
      *
-     * @throws IOException
-     *         if one of the files cannot be opened.
+     * @throws IOException if one of the files cannot be opened.
      */
     public void openFiles(Iterable<URI> fileURIs) throws IOException {
         boolean updateNecessary = false;
@@ -513,10 +491,8 @@ public final class SourceView extends JComponent {
      * Calculates the range of actual text (not whitespace) in the line containing the given
      * position.
      *
-     * @param textPane
-     *        the JTextPane with the text
-     * @param pos
-     *        the position to check
+     * @param textPane the JTextPane with the text
+     * @param pos the position to check
      * @return the range of text (may be empty if there is just whitespace in the line)
      */
     private static Range calculateLineRange(JTextPane textPane, int pos) {
@@ -547,8 +523,7 @@ public final class SourceView extends JComponent {
     /**
      * Replaces each tab in the given String by TAB_SIZE spaces.
      *
-     * @param s
-     *        the String to replace
+     * @param s the String to replace
      * @return the resulting String (without tabs)
      */
     private static String replaceTabs(String s) {
@@ -568,8 +543,7 @@ public final class SourceView extends JComponent {
      * little bit imprecise: The last char in a line is not detected as highlighted, this method
      * wrongly returns false.
      *
-     * @param point
-     *        the point to check, usually the position of the mouse cursor
+     * @param point the point to check, usually the position of the mouse cursor
      * @return true iff the point is on a highlight
      */
     private boolean isHighlighted(Point point) {
@@ -628,11 +602,9 @@ public final class SourceView extends JComponent {
     /**
      * Adds a file (identified by its URI) to this source view.
      *
-     * @param fileURI
-     *        the URI of the file to add.
+     * @param fileURI the URI of the file to add.
      * @return {@code true} if this source view did not already contain the file.
-     * @throws IOException
-     *         if the file cannot be opened.
+     * @throws IOException if the file cannot be opened.
      */
     private boolean addFile(URI fileURI) throws IOException {
         final Proof proof = mainWindow.getMediator().getSelectedProof();
@@ -732,8 +704,7 @@ public final class SourceView extends JComponent {
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
      *
-     * @param node
-     *        the given node
+     * @param node the given node
      * @return a linked list of pairs of PositionInfo objects containing the start and end positions
      *         for the highlighting and Nodes.
      */
@@ -861,8 +832,7 @@ public final class SourceView extends JComponent {
      * <li>...</li>
      * </ul>
      *
-     * @param node
-     *        the current node
+     * @param node the current node
      * @return a String containing the path information to display
      */
     private static String collectPathInformation(Node node) {
@@ -1197,10 +1167,8 @@ public final class SourceView extends JComponent {
         /**
          * Paints the highlight for the line where the mouse pointer currently points to.
          *
-         * @param p
-         *        the current position of the mouse pointer
-         * @param highlight
-         *        the highlight to change
+         * @param p the current position of the mouse pointer
+         * @param highlight the highlight to change
          */
         private void paintSelectionHighlight(Point p, Highlight highlight) {
             try {
@@ -1252,14 +1220,10 @@ public final class SourceView extends JComponent {
         /**
          * Creates a new highlight.
          *
-         * @param fileURI
-         *        URI of the file in which this highlight is used.
-         * @param line
-         *        the line being highlighted.
-         * @param color
-         *        this highlight's color.
-         * @param level
-         *        this highlight's level.
+         * @param fileURI URI of the file in which this highlight is used.
+         * @param line the line being highlighted.
+         * @param color this highlight's color.
+         * @param level this highlight's level.
          */
         private Highlight(URI fileURI, int line, Color color, int level) {
             this.level = level;
@@ -1332,8 +1296,7 @@ public final class SourceView extends JComponent {
 
         /**
          *
-         * @param tag
-         *        the new tag wrapped by this object.
+         * @param tag the new tag wrapped by this object.
          *
          * @see Highlighter#addHighlight(int, int, HighlightPainter)
          * @see Highlighter#changeHighlight(Object, int, int)

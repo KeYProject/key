@@ -21,8 +21,7 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
     /**
      * creates the action to increase the font size of the sequent and proof view
      *
-     * @param mainWindow
-     *        the main window
+     * @param mainWindow the main window
      */
     public IncreaseFontSizeAction(MainWindow mainWindow) {
         super(mainWindow);

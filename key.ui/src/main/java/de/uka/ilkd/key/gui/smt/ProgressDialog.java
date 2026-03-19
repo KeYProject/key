@@ -378,9 +378,7 @@ class ProgressTable extends JTable {
                 return data.getSelectedTextColor();
             }
 
-            protected Color getSelectionBackground() {
-                return data.getTextColor();
-            }
+            protected Color getSelectionBackground() { return data.getTextColor(); }
         });
 
     }

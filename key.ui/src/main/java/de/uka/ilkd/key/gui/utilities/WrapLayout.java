@@ -25,8 +25,7 @@ public class WrapLayout extends FlowLayout {
      * horizontal and vertical gap. The value of the alignment argument must be one of
      * <code>WrapLayout</code>, <code>WrapLayout</code>, or <code>WrapLayout</code>.
      *
-     * @param align
-     *        the alignment value
+     * @param align the alignment value
      */
     public WrapLayout(int align) {
         super(align);
@@ -39,12 +38,9 @@ public class WrapLayout extends FlowLayout {
      * The value of the alignment argument must be one of <code>WrapLayout</code>,
      * <code>WrapLayout</code>, or <code>WrapLayout</code>.
      *
-     * @param align
-     *        the alignment value
-     * @param hgap
-     *        the horizontal gap between components
-     * @param vgap
-     *        the vertical gap between components
+     * @param align the alignment value
+     * @param hgap the horizontal gap between components
+     * @param vgap the vertical gap between components
      */
     public WrapLayout(int align, int hgap, int vgap) {
         super(align, hgap, vgap);
@@ -54,8 +50,7 @@ public class WrapLayout extends FlowLayout {
      * Returns the preferred dimensions for this layout given the <i>visible</i> components in the
      * specified target container.
      *
-     * @param target
-     *        the component which needs to be laid out
+     * @param target the component which needs to be laid out
      * @return the preferred dimensions to lay out the subcomponents of the specified container
      */
     @Override
@@ -67,8 +62,7 @@ public class WrapLayout extends FlowLayout {
      * Returns the minimum dimensions needed to layout the <i>visible</i> components contained in
      * the specified target container.
      *
-     * @param target
-     *        the component which needs to be laid out
+     * @param target the component which needs to be laid out
      * @return the minimum dimensions to lay out the subcomponents of the specified container
      */
     @Override
@@ -81,10 +75,8 @@ public class WrapLayout extends FlowLayout {
     /**
      * Returns the minimum or preferred dimension needed to layout the target container.
      *
-     * @param target
-     *        target to get layout size for
-     * @param preferred
-     *        should preferred size be calculated
+     * @param target target to get layout size for
+     * @param preferred should preferred size be calculated
      * @return the dimension to layout the target container
      */
     private Dimension layoutSize(Container target, boolean preferred) {

@@ -35,8 +35,7 @@ public final class QuickSaveAction extends MainWindowAction {
     /**
      * Create a new action.
      *
-     * @param mainWindow
-     *        the main window.
+     * @param mainWindow the main window.
      */
     public QuickSaveAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -48,8 +47,7 @@ public final class QuickSaveAction extends MainWindowAction {
     /**
      * Immediately saves the currently selected proof to a temporaly location.
      *
-     * @param mainWindow
-     *        the main window.
+     * @param mainWindow the main window.
      */
     public static void quickSave(MainWindow mainWindow) {
         if (mainWindow.getMediator().ensureProofLoaded()) {

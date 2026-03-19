@@ -18,8 +18,7 @@ public interface KeYSelectionListener {
      * Do not modify the list of selection listeners in this callback!
      * </p>
      *
-     * @param e
-     *        event with details about the new selection
+     * @param e event with details about the new selection
      */
     default void selectedNodeChanged(KeYSelectionEvent<Node> e) {
 
@@ -31,8 +30,7 @@ public interface KeYSelectionListener {
      * Do not modify the list of selection listeners in this callback!
      * </p>
      *
-     * @param e
-     *        event with details about the new selection
+     * @param e event with details about the new selection
      */
     default void selectedProofChanged(KeYSelectionEvent<Proof> e) {
 

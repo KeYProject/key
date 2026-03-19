@@ -19,10 +19,8 @@ public class KeYSelectionEvent<Sel> {
     /**
      * creates a new SelectedNodeEvent
      *
-     * @param source
-     *        the SelectedNodeModel where the event had its origin
-     * @param previousSelection
-     *        the previous selected item
+     * @param source the SelectedNodeModel where the event had its origin
+     * @param previousSelection the previous selected item
      */
     public KeYSelectionEvent(KeYSelectionModel source, Sel previousSelection) {
         this.source = source;
@@ -32,8 +30,7 @@ public class KeYSelectionEvent<Sel> {
     /**
      * creates a new SelectedNodeEvent
      *
-     * @param source
-     *        the SelectedNodeModel where the event had its origin
+     * @param source the SelectedNodeModel where the event had its origin
      */
     public KeYSelectionEvent(KeYSelectionModel source) {
         this(source, null);

@@ -15,8 +15,7 @@ public class ConfigChangeEvent {
     /**
      * creates a new ConfigChangeEvent
      *
-     * @param source
-     *        the Config where the event had its origin
+     * @param source the Config where the event had its origin
      */
     public ConfigChangeEvent(Config source) {
         this.source = source;

@@ -83,8 +83,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      * Adds a new taclet to be displayed by this component it is assumed that the app has been
      * tested before by {@link #isResponsible}.
      *
-     * @param app
-     *        the TacletApp to be added
+     * @param app the TacletApp to be added
      */
     public void add(TacletApp app) {
         insertionTaclets.add(createListItem(app));
@@ -124,8 +123,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /**
      * tests if this class is responsible for the given taclet
      *
-     * @param t
-     *        the Taclet to be checked
+     * @param t the Taclet to be checked
      * @return true if this item implementation shall be used
      */
     public boolean isResponsible(Taclet t) {

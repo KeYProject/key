@@ -31,8 +31,7 @@ public abstract class ShowDisplayPane implements NotificationAction {
     /**
      * sets the message to be displayed
      *
-     * @param message
-     *        the String to be displayed
+     * @param message the String to be displayed
      */
     public void setMessage(String message) {
         this.message = message;

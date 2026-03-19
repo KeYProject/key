@@ -35,8 +35,7 @@ public class SourceViewFrame extends JSplitPane {
     /**
      * Creates a new {@code SourceViewFrame}
      *
-     * @param mainWindow
-     *        the main window.
+     * @param mainWindow the main window.
      */
     public SourceViewFrame(MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
@@ -72,8 +71,7 @@ public class SourceViewFrame extends JSplitPane {
     /**
      * Adds a component to be shown below the source view.
      *
-     * @param component
-     *        the component to be shown.
+     * @param component the component to be shown.
      */
     public void addComponent(JComponent component) {
         addComponent(component, null, new AbstractAction() {
@@ -96,11 +94,9 @@ public class SourceViewFrame extends JSplitPane {
      * If this frame does not contain the specified component, this method has no effect.
      * </p>
      *
-     * @param component
-     *        the component to select.
+     * @param component the component to select.
      *
-     * @throws IllegalArgumentException
-     *         if this frame does not contain the specified component.
+     * @throws IllegalArgumentException if this frame does not contain the specified component.
      */
     public void toFront(JComponent component) throws IllegalArgumentException {
         tabbedPane.setSelectedComponent(component);
@@ -109,12 +105,9 @@ public class SourceViewFrame extends JSplitPane {
     /**
      * Adds a component to be shown below the source view.
      *
-     * @param component
-     *        the component to be shown.
-     * @param toolTipText
-     *        the tool tip text for the new tab.
-     * @param closeAction
-     *        the action to perform when the tab is closed.
+     * @param component the component to be shown.
+     * @param toolTipText the tool tip text for the new tab.
+     * @param closeAction the action to perform when the tab is closed.
      */
     public void addComponent(JComponent component, String toolTipText, Action closeAction) {
         tabbedPane.add(component);
@@ -139,8 +132,7 @@ public class SourceViewFrame extends JSplitPane {
      * If this frame does not contain the specified component, this method has no effect.
      * </p>
      *
-     * @param component
-     *        the component to be removed.
+     * @param component the component to be removed.
      */
     public void removeComponent(JComponent component) {
         tabbedPane.remove(component);

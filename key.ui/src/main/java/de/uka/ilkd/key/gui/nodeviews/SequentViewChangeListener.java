@@ -45,10 +45,12 @@ class SequentViewChangeListener
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
     @Override
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     @Override
     public void componentResized(ComponentEvent e) {
@@ -56,13 +58,16 @@ class SequentViewChangeListener
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {}
+    public void componentShown(ComponentEvent e) {
+    }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {}
+    public void propertyChange(PropertyChangeEvent evt) {
+    }
 
     @Override
-    public void ancestorMoved(HierarchyEvent e) {}
+    public void ancestorMoved(HierarchyEvent e) {
+    }
 
     @Override
     public void ancestorResized(HierarchyEvent e) {

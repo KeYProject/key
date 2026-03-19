@@ -10,10 +10,8 @@ import org.key_project.util.LRUCache;
 /**
  * Caches a computation using a lru cache
  *
- * @param <A>
- *        arguments for the computation
- * @param <T>
- *        return type
+ * @param <A> arguments for the computation
+ * @param <T> return type
  */
 public class LruCached<A, T> {
     private final LRUCache<A, T> lru = new LRUCache<>(32);
@@ -22,8 +20,7 @@ public class LruCached<A, T> {
     /**
      * Constructor
      *
-     * @param update
-     *        the computation
+     * @param update the computation
      */
     public LruCached(Function<A, T> update) {
         this.update = update;
@@ -32,8 +29,7 @@ public class LruCached<A, T> {
     /**
      * Gets a possibly cached value
      *
-     * @param args
-     *        the arguments
+     * @param args the arguments
      * @return the value
      */
     public T get(A args) {

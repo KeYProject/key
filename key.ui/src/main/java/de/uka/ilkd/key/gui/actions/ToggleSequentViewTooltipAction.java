@@ -35,8 +35,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
     /**
      * Crate a new action.
      *
-     * @param mainWindow
-     *        the main window.
+     * @param mainWindow the main window.
      */
     public ToggleSequentViewTooltipAction(MainWindow mainWindow) {
         super(mainWindow);

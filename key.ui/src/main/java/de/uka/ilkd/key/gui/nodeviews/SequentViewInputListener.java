@@ -154,8 +154,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     /**
      * Highlights the origin of the term at the specified position.
      *
-     * @param pos
-     *        the position of the term whose origin should be highlighted.
+     * @param pos the position of the term whose origin should be highlighted.
      */
     public void highlightOriginInSourceView(PosInSequent pos) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
@@ -214,8 +213,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     /**
      * Show info about the term at the specified point in the status line.
      *
-     * @param p
-     *        a point.
+     * @param p a point.
      */
     protected void showTermInfo(Point p) {
         MainWindow mainWindow = sequentView.getMainWindow();

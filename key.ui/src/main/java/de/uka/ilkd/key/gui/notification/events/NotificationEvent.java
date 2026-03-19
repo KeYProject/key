@@ -20,8 +20,7 @@ public abstract class NotificationEvent {
     /**
      * creates an instance of this event
      *
-     * @param eventID
-     *        the int identifying the kind of this event
+     * @param eventID the int identifying the kind of this event
      * @see NotificationEventID
      */
     protected NotificationEvent(NotificationEventID eventID) {

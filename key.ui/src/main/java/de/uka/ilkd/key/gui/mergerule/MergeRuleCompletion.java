@@ -30,7 +30,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
     private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeByIfThenElse.instance();
 
-    private MergeRuleCompletion() {}
+    private MergeRuleCompletion() {
+    }
 
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal, boolean forced) {

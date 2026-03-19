@@ -214,10 +214,8 @@ public class ClassTree extends JTree {
      * static utility method.
      * </p>
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param ov
-     *        The {@link ObserverFunction} for that a display name is needed.
+     * @param services The {@link Services} to use.
+     * @param ov The {@link ObserverFunction} for that a display name is needed.
      * @return The display name for the given {@link ObserverFunction}.
      */
     public static final String getDisplayName(Services services, IObserverFunction ov) {
@@ -333,10 +331,8 @@ public class ClassTree extends JTree {
     /**
      * Searches the {@link DefaultMutableTreeNode} child with the given text.
      *
-     * @param parent
-     *        The {@link DefaultMutableTreeNode} to search in.
-     * @param text
-     *        The text of the {@link DefaultMutableTreeNode} to search.
+     * @param parent The {@link DefaultMutableTreeNode} to search in.
+     * @param text The text of the {@link DefaultMutableTreeNode} to search.
      * @return The first found {@link DefaultMutableTreeNode} with the given text or {@code null} if
      *         no {@link DefaultMutableTreeNode} was found.
      */

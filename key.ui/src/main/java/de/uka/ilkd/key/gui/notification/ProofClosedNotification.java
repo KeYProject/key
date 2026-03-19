@@ -18,7 +18,8 @@ public class ProofClosedNotification extends NotificationTask {
     /**
      * Creates a proof closed notification task.
      */
-    public ProofClosedNotification() {}
+    public ProofClosedNotification() {
+    }
 
     public ProofClosedNotification(JFrame comp) {
         addNotificationAction(new ProofClosedJTextPaneDisplay(comp));

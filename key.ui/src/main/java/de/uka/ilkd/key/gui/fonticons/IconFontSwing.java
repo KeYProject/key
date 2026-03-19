@@ -17,10 +17,8 @@ public final class IconFontSwing {
     /**
      * Builds an image.
      *
-     * @param iconCode
-     *        the icon code.
-     * @param size
-     *        the size.
+     * @param iconCode the icon code.
+     * @param size the size.
      * @return the image.
      */
     public static Image buildImage(IconFont iconCode, float size) {
@@ -30,12 +28,9 @@ public final class IconFontSwing {
     /**
      * Builds an image.
      *
-     * @param iconCode
-     *        the icon code.
-     * @param size
-     *        the size.
-     * @param color
-     *        the size.
+     * @param iconCode the icon code.
+     * @param size the size.
+     * @param color the size.
      * @return the image.
      */
     public static Image buildImage(IconFont iconCode, float size, Color color) {
@@ -65,10 +60,8 @@ public final class IconFontSwing {
     /**
      * Builds an icon.
      *
-     * @param iconCode
-     *        the icon code.
-     * @param size
-     *        the size.
+     * @param iconCode the icon code.
+     * @param size the size.
      * @return the icon.
      */
     public static Icon buildIcon(IconFont iconCode, float size) {
@@ -78,12 +71,9 @@ public final class IconFontSwing {
     /**
      * Builds an icon.
      *
-     * @param iconCode
-     *        the icon code.
-     * @param size
-     *        the size.
-     * @param color
-     *        the size.
+     * @param iconCode the icon code.
+     * @param size the size.
+     * @param color the size.
      * @return the icon.
      */
     public static Icon buildIcon(IconFont iconCode, float size, Color color) {

@@ -26,8 +26,7 @@ public final class SaveBundleAction extends MainWindowAction {
     /**
      * Creates a new SaveBundleAction with the required listeners.
      *
-     * @param mainWindow
-     *        the main window of the program
+     * @param mainWindow the main window of the program
      */
     public SaveBundleAction(MainWindow mainWindow) {
         super(mainWindow);

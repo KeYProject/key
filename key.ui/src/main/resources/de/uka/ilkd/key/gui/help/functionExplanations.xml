@@ -23,14 +23,14 @@ Integers are used to access the entries of entries within arrays stored on the h
 
 The array access a[i], for instance for an int-array a, becomes int::select(heap, a, arr(i)).</entry>
 
-<entry key="field/java.lang.Object::$transient">tbd</entry>
-<entry key="field/java.lang.Object::$transactionConditionallyUpdated">tbd</entry>
-<entry key="field/java.lang.Object::$created;">tbd</entry>
-<entry key="field/java.lang.Object::$initialized">tbd</entry>
-<entry key="field/alpha::$classPrepared">tbd</entry>
-<entry key="field/alpha::$classInitialized">tbd</entry>
-<entry key="field/alpha::$classInitializationInProgress">tbd</entry>
-<entry key="field/alpha::$classErroneous">tbd</entry>
+<entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
+<entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>
+<entry key="field/java.lang.Object::&lt;created&gt;">tbd</entry>
+<entry key="field/java.lang.Object::&lt;initialized&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classPrepared&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classInitialized&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classInitializationInProgress&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classErroneous&gt;">tbd</entry>
 
 <entry key="heap/heap">This program variable holds to the current heap state. Its type is Heap. Any assignment statement in a modality modifies the value of this program variable and any expression reading from the heap within a Java modality refers to the heap stored in this program variable.</entry>
 

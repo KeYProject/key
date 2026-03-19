@@ -41,7 +41,8 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseExited(MouseEvent me) {}
+    public void mouseExited(MouseEvent me) {
+    }
 
     @Override
     public void mouseClicked(MouseEvent me) {
@@ -93,7 +94,8 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mousePressed(MouseEvent me) {}
+    public void mousePressed(MouseEvent me) {
+    }
 
     @Override
     public void mouseReleased(MouseEvent me) {
@@ -104,7 +106,8 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseEntered(MouseEvent me) {}
+    public void mouseEntered(MouseEvent me) {
+    }
 
     public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;

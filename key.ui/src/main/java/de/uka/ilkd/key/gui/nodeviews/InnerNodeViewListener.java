@@ -26,8 +26,7 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
     /**
      * Creates a new listener.
      *
-     * @param innerNodeView
-     *        an {@code InnerNodeView}.
+     * @param innerNodeView an {@code InnerNodeView}.
      */
     InnerNodeViewListener(final InnerNodeView innerNodeView) {
         super(innerNodeView);

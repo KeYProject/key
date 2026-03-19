@@ -22,8 +22,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
     /**
      * Creates a new EnsureSourceConsistencyToggleAction.
      *
-     * @param mainWindow
-     *        the main window of the program
+     * @param mainWindow the main window of the program
      */
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
         super(mainWindow);

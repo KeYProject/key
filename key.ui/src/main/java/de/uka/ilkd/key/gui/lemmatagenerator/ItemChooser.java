@@ -298,9 +298,7 @@ class SelectionPanel<T> extends JPanel {
                 }
 
                 @Override
-                public void insertUpdate(DocumentEvent e) {
-                    search();
-                }
+                public void insertUpdate(DocumentEvent e) { search(); }
 
                 @Override
                 public void changedUpdate(DocumentEvent arg0) {}

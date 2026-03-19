@@ -36,8 +36,7 @@ public class StateChangeListener implements InteractionListener {
     /**
      * Construct and register a new state change listener.
      *
-     * @param mediator
-     *        mediator
+     * @param mediator mediator
      */
     StateChangeListener(KeYMediator mediator) {
         this.mediator = mediator;

@@ -60,8 +60,7 @@ public class TextLineNumber extends JPanel
      * Create a line number component for a text component. This minimum display width will be based
      * on 3 digits.
      *
-     * @param component
-     *        the related text component
+     * @param component the related text component
      */
     public TextLineNumber(JTextComponent component) {
         this(component, 3);
@@ -70,10 +69,8 @@ public class TextLineNumber extends JPanel
     /**
      * Create a line number component for a text component.
      *
-     * @param component
-     *        the related text component
-     * @param minimumDisplayDigits
-     *        the number of digits used to calculate the minimum width of the
+     * @param component the related text component
+     * @param minimumDisplayDigits the number of digits used to calculate the minimum width of the
      *        component
      */
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits) {
@@ -103,8 +100,7 @@ public class TextLineNumber extends JPanel
      * Set the update font property. Indicates whether this Font should be updated automatically
      * when the Font of the related text component is changed.
      *
-     * @param updateFont
-     *        when true update the Font and repaint the line numbers, otherwise just
+     * @param updateFont when true update the Font and repaint the line numbers, otherwise just
      *        repaint the line numbers.
      */
     public void setUpdateFont(boolean updateFont) {
@@ -124,8 +120,7 @@ public class TextLineNumber extends JPanel
      * The border gap is used in calculating the left and right insets of the border. Default value
      * is 5.
      *
-     * @param borderGap
-     *        the gap in pixels
+     * @param borderGap the gap in pixels
      */
     public void setBorderGap(int borderGap) {
         this.borderGap = borderGap;
@@ -152,8 +147,7 @@ public class TextLineNumber extends JPanel
      * <li>TextLineNumber.RIGHT (default)
      * </ul>
      *
-     * @param digitAlignment
-     *        the new alignment.
+     * @param digitAlignment the new alignment.
      */
     public void setDigitAlignment(float digitAlignment) {
         this.digitAlignment =
@@ -173,8 +167,7 @@ public class TextLineNumber extends JPanel
      * Specify the mimimum number of digits used to calculate the preferred width of the component.
      * Default is 3.
      *
-     * @param minimumDisplayDigits
-     *        the number digits used in the preferred width calculation
+     * @param minimumDisplayDigits the number digits used in the preferred width calculation
      */
     public void setMinimumDisplayDigits(int minimumDisplayDigits) {
         this.minimumDisplayDigits = minimumDisplayDigits;
@@ -255,8 +248,7 @@ public class TextLineNumber extends JPanel
      * Get the line number to be drawn. The empty string will be returned when a line of text has
      * wrapped.
      *
-     * @param rowStartOffset
-     *        offset.
+     * @param rowStartOffset offset.
      * @return the line number to be drawn.
      */
     protected String getTextLineNumber(int rowStartOffset) {

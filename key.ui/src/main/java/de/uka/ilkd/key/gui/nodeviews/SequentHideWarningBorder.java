@@ -48,10 +48,8 @@ public class SequentHideWarningBorder extends TitledBorder {
     /**
      * Instantiates a new sequent border.
      *
-     * @param title
-     *        the title to display
-     * @param sequentView
-     *        the sequent view which will be wrapped by the component
+     * @param title the title to display
+     * @param sequentView the sequent view which will be wrapped by the component
      */
     public SequentHideWarningBorder(String title, SequentView sequentView) {
         super(title);
