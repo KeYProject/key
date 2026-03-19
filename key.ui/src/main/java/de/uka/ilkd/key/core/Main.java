@@ -133,13 +133,6 @@ public final class Main implements Callable<Integer> {
     private @Nullable String examplesFolder = null;
 
     /**
-     * Path to a RIFL specification file.
-     */
-    @Option(names = "--rifl", paramLabel = "FILE",
-        description = "load RIFL specifications from file (requires GUI and startup file)")
-    public @Nullable Path riflFileName = null;
-
-    /**
      * Save all contracts in selected location to automate the creation of multiple
      * ".key"-files
      */
@@ -310,14 +303,6 @@ public final class Main implements Callable<Integer> {
         }
 
         LOGGER.info("Debug.ENABLE_ASSERTION = {}", Debug.ENABLE_ASSERTION);
-
-        if (riflFileName != null) {
-            LOGGER.info("Loading RIFL specification from {}", riflFileName);
-            if (!Files.exists(riflFileName)) {
-                LOGGER.info("RIFL does not exists {}", riflFileName);
-                return 2;
-            }
-        }
 
         if (justifyRulesOptions != null) {
             try {
@@ -524,23 +509,6 @@ public final class Main implements Callable<Integer> {
      */
     private void preProcessInput()
             throws ParserException, IOException, ParserConfigurationException, SAXException {
-        // RIFL to JML transformation
-        if (riflFileName != null) {
-            if (inputFiles.isEmpty()) {
-                LOGGER.info("[RIFL] No Java file to load from.");
-                System.exit(-130826);
-            }
-            // only use one input file
-            Path fileNameOnStartUp = inputFiles.getFirst().toAbsolutePath();
-            /*
-             * RIFLTransformer transformer = new RIFLTransformer();
-             * transformer.doTransform(riflFileName, fileNameOnStartUp,
-             * RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
-             * LOGGER.info("[RIFL] Writing transformed Java files to {}  ...", fileNameOnStartUp);
-             * inputFiles = transformer.getProblemFiles();
-             */
-        }
-
         if (inputFiles != null && !inputFiles.isEmpty()) {
             Path f = inputFiles.get(0);
             if (Files.isDirectory(f)) {
