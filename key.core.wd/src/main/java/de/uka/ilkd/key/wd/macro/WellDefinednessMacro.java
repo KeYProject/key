@@ -99,7 +99,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name(WellDefinednessStrategy.class.getSimpleName());
 
-        public WellDefinednessStrategy() {}
+        public WellDefinednessStrategy() {
+        }
 
         @Override
         public Name name() {
@@ -126,7 +127,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {}
+                RuleAppCostCollector collector) {
+        }
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
