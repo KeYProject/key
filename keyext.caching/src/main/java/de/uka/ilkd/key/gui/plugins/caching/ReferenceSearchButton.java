@@ -39,8 +39,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     /**
      * Construct a new button.
      *
-     * @param mediator
-     *        the mediator
+     * @param mediator the mediator
      */
     public ReferenceSearchButton(KeYMediator mediator) {
         super("Proof Caching");
@@ -80,8 +79,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     /**
      * Update the UI state of this button.
      *
-     * @param p
-     *        the currently selected proof
+     * @param p the currently selected proof
      */
     public void updateState(Proof p) {
         if (p == null) {

@@ -39,10 +39,8 @@ public class CloseAllByReference extends KeyAction {
     /**
      * Construct new action.
      *
-     * @param mediator
-     *        the mediator
-     * @param proof
-     *        the proof
+     * @param mediator the mediator
+     * @param proof the proof
      */
     public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
             Proof proof) {

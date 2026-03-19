@@ -54,10 +54,8 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * Construct a new dialog. Use {@link #setVisible(boolean)} afterwards to show it.
      *
-     * @param proof
-     *        the proof
-     * @param listener
-     *        control listener
+     * @param proof the proof
+     * @param listener control listener
      */
     public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
@@ -148,8 +146,7 @@ public class ReferenceSearchDialog extends JDialog {
      * Set the maximum value of the progress bar.
      * Also resets progress to zero.
      *
-     * @param total
-     *        total value
+     * @param total total value
      */
     public void setMaximum(int total) {
         progressBar.setMaximum(total);
