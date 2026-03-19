@@ -10,7 +10,8 @@ public class LemmaJustification implements RuleJustification {
 
     public static final LemmaJustification INSTANCE = new LemmaJustification();
 
-    private LemmaJustification() {}
+    private LemmaJustification() {
+    }
 
     @Override
     public boolean isAxiomJustification() {

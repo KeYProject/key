@@ -234,10 +234,8 @@ public class SwitchToIf extends ProgramTransformer {
     /**
      * Collects the Statements in a switch statement from branch <code>count</code> downward.
      *
-     * @param s
-     *        the switch statement.
-     * @param count
-     *        the branch where the collecting of statements starts.
+     * @param s the switch statement.
+     * @param count the branch where the collecting of statements starts.
      */
     private StatementBlock collectStatements(Switch s, int count) {
         List<Statement> stats = new ArrayList<>();

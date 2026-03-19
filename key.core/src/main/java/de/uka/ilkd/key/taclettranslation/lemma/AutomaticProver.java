@@ -32,8 +32,7 @@ public class AutomaticProver {
      * @param proof
      * @param maxNumberOfRules
      * @param timeout
-     * @throws InterruptedException
-     *         If the prover is interrupted by the user, this exception is
+     * @throws InterruptedException If the prover is interrupted by the user, this exception is
      *         thrown
      */
     public void start(Proof proof, int maxNumberOfRules, long timeout) throws InterruptedException {

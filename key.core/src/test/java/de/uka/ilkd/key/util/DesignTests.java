@@ -56,7 +56,8 @@ public class DesignTests {
     /**
      * Creates an instance used to test if design principles have been hurt.
      */
-    public DesignTests() {}
+    public DesignTests() {
+    }
 
     @BeforeEach
     public void setUp() {
@@ -69,8 +70,7 @@ public class DesignTests {
      * iterates through the directory structure starting at <code>topDir</code> and collects all
      * found classes.
      *
-     * @param path
-     *        File giving the directory where to start the iteration
+     * @param path File giving the directory where to start the iteration
      */
     public static ArrayList<Class<?>> getAllClasses(Path path, Path root) {
         ArrayList<Class<?>> acc = new ArrayList<>();

@@ -46,12 +46,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * creates the WhileLoopTransformation for the transformation mode
      *
-     * @param root
-     *        the ProgramElement where to begin
-     * @param outerLabel
-     *        the ProgramElementName of the outer label
-     * @param innerLabel
-     *        the ProgramElementName of the inner label
+     * @param root the ProgramElement where to begin
+     * @param outerLabel the ProgramElementName of the outer label
+     * @param innerLabel the ProgramElementName of the inner label
      */
     public WhileInvariantTransformation(
             ProgramElement root, ProgramElementName outerLabel,
@@ -75,10 +72,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * creates the WhileLoopTransformation for the check mode
      *
-     * @param root
-     *        the ProgramElement where to begin
-     * @param inst
-     *        the SVInstantiations if available
+     * @param root the ProgramElement where to begin
+     * @param inst the SVInstantiations if available
      */
     public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
             Services services) {

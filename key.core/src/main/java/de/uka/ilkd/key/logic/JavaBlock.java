@@ -66,16 +66,12 @@ public final class JavaBlock implements Program {
         return 0;
     }
 
-    /**
-     * returns the hashCode
-     */
+    /** returns the hashCode */
     public int hashCode() {
         return 17 + ((program() == null) ? 0 : program().hashCode());
     }
 
-    /**
-     * returns true iff the program elements are equal
-     */
+    /** returns true iff the program elements are equal */
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -100,9 +96,7 @@ public final class JavaBlock implements Program {
         return prg;
     }
 
-    /**
-     * toString
-     */
+    /** toString */
     public String toString() {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
         printer.print(prg);

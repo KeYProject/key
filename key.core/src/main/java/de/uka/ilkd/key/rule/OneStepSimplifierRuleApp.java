@@ -27,8 +27,7 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
     }
 
     /**
-     * @param protocol
-     *        the protocol to set
+     * @param protocol the protocol to set
      */
     public void setProtocol(OneStepSimplifier.Protocol protocol) {
         this.protocol = protocol;
@@ -45,8 +44,7 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
     /**
      * Restrict the assume instantions usable in this rule application.
      *
-     * @param assumeInsts
-     *        available formulas for \assume instantiations
+     * @param assumeInsts available formulas for \assume instantiations
      */
     public void restrictAssumeInsts(
             ImmutableList<PosInOccurrence> assumeInsts) {

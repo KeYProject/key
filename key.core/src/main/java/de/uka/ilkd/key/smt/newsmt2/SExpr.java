@@ -64,10 +64,8 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr without children, but with a given type.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param type
-     *        the non-null type to use
+     * @param name the non-null name of the atom
+     * @param type the non-null type to use
      */
     public SExpr(String name, Type type) {
         this.name = Objects.requireNonNull(name);
@@ -78,8 +76,7 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr without children of type {@link Type#NONE}.
      *
-     * @param name
-     *        the non-null name of the atom
+     * @param name the non-null name of the atom
      */
     public SExpr(String name) {
         this(name, Type.NONE);
@@ -88,12 +85,9 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr with children and a given type.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param type
-     *        the non-null type to use
-     * @param children
-     *        the list of children to use. Should not be modified elsewhere
+     * @param name the non-null name of the atom
+     * @param type the non-null type to use
+     * @param children the list of children to use. Should not be modified elsewhere
      */
     public SExpr(String name, Type type, List<SExpr> children) {
         this.name = name;
@@ -104,10 +98,8 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr with children and type {@link Type#NONE}.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param children
-     *        the list of children to use. Should not be modified elsewhere
+     * @param name the non-null name of the atom
+     * @param children the list of children to use. Should not be modified elsewhere
      */
     public SExpr(String name, List<SExpr> children) {
         this(name, Type.NONE, children);
@@ -118,12 +110,9 @@ public class SExpr implements Writable {
      *
      * The array of String children is mapped to a list of {@link SExpr}s.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param type
-     *        the non-null type to use
-     * @param children
-     *        the list of children to use.
+     * @param name the non-null name of the atom
+     * @param type the non-null type to use
+     * @param children the list of children to use.
      */
     public SExpr(String name, Type type, String... children) {
         this(name, type, asSExprs(children));
@@ -142,10 +131,8 @@ public class SExpr implements Writable {
      *
      * The array of String children is mapped to a list of {@link SExpr}s.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param children
-     *        the list of children to use.
+     * @param name the non-null name of the atom
+     * @param children the list of children to use.
      */
     public SExpr(String name, String... children) {
         this(name, Type.NONE, children);
@@ -154,12 +141,9 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr with children and a given type.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param type
-     *        the non-null type to use
-     * @param children
-     *        the list of children to use.
+     * @param name the non-null name of the atom
+     * @param type the non-null type to use
+     * @param children the list of children to use.
      */
     public SExpr(String name, Type type, SExpr... children) {
         this(name, type, Arrays.asList(children));
@@ -168,10 +152,8 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr with children and type {@link Type#NONE}.
      *
-     * @param name
-     *        the non-null name of the atom
-     * @param children
-     *        the list of children to use.
+     * @param name the non-null name of the atom
+     * @param children the list of children to use.
      */
     public SExpr(String name, SExpr... children) {
         this(name, Type.NONE, children);
@@ -180,8 +162,7 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr without atomic name (set to "") with children and type {@link Type#NONE}.
      *
-     * @param children
-     *        the list of children to use.
+     * @param children the list of children to use.
      */
     public SExpr(SExpr... children) {
         this("", Type.NONE, children);
@@ -190,8 +171,7 @@ public class SExpr implements Writable {
     /**
      * Create a new s-expr without atomic name (set to "") with children and type {@link Type#NONE}.
      *
-     * @param children
-     *        the list of children to use. Should not be modified elsewhere.
+     * @param children the list of children to use. Should not be modified elsewhere.
      */
     public SExpr(List<SExpr> children) {
         this("", Type.NONE, children);
@@ -244,8 +224,7 @@ public class SExpr implements Writable {
     /**
      * Append the SMTLIB2-representation of this object to the given string builder.
      *
-     * @param sb
-     *        a non-null string builder to write to.
+     * @param sb a non-null string builder to write to.
      */
     @Override
     public void appendTo(StringBuilder sb) {
@@ -271,8 +250,7 @@ public class SExpr implements Writable {
      *
      * The atomic name is not modified, nor is the function applied in depth.
      *
-     * @param mapFunction
-     *        a non-null function to be applied to the children.
+     * @param mapFunction a non-null function to be applied to the children.
      *
      * @return a new SEXpr with the same name and type and with the mapFunction applied to all
      *         children.

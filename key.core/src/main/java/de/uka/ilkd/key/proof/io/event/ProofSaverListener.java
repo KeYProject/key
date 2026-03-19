@@ -16,8 +16,7 @@ public interface ProofSaverListener extends EventListener {
     /**
      * This method is called when a file was saved via {@link ProofSaver#save()}.
      *
-     * @param e
-     *        The {@link ProofSaverEvent}.
+     * @param e The {@link ProofSaverEvent}.
      */
     void proofSaved(ProofSaverEvent e);
 }

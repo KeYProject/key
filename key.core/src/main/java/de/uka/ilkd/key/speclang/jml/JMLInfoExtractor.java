@@ -119,14 +119,6 @@ public final class JMLInfoExtractor {
      * @return modifiers
      */
     public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
-
-        /*
-         * var pure = checkFor("pure", comments);
-         * var strictlyPure = checkFor("strictly_pure", comments);
-         * var helper = checkFor("helper", comments);
-         * var specMathMode = checkForSpecMathMode(comments);
-         */
-
         var pure = methodDeclaration.containsModifier(Modifiers.JML_PURE.class);
         var strictlyPure = methodDeclaration.containsModifier(Modifiers.JML_STRICTLY_PURE.class);
         var helper = methodDeclaration.containsModifier(Modifiers.JML_HELPER.class);

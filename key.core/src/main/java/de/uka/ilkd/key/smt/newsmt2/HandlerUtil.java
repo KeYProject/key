@@ -59,10 +59,8 @@ public class HandlerUtil {
     /**
      * Generate a smtlib expression for the smtlib declaration that represents the operator op.
      *
-     * @param op
-     *        the operator to be declared in smtlib
-     * @param name
-     *        the name to use on the smt lib side.
+     * @param op the operator to be declared in smtlib
+     * @param name the name to use on the smt lib side.
      * @return an SExpr of type {@code (declare-fun ...)}
      */
     public static SExpr funDeclaration(SortedOperator op, String name) {
@@ -77,12 +75,9 @@ public class HandlerUtil {
      * as a function "ui_f (U) U" along with the assertion that if x is an int, f(x) will be a
      * boolean.
      *
-     * @param op
-     *        the operator to translate
-     * @param name
-     *        the name of the function
-     * @param master
-     *        the associated master handler
+     * @param op the operator to translate
+     * @param name the name of the function
+     * @param master the associated master handler
      * @return the function expression
      */
     static SExpr funTypeAxiom(SortedOperator op, String name, MasterHandler master)
@@ -96,14 +91,10 @@ public class HandlerUtil {
      * as a function "ui_f (U) U" along with the assertion that if x is an int, f(x) will be a
      * boolean.
      *
-     * @param name
-     *        the name of the function
-     * @param arity
-     *        the number of parameters that the function accepts
-     * @param sort
-     *        the result type of the function
-     * @param master
-     *        the associated master handler
+     * @param name the name of the function
+     * @param arity the number of parameters that the function accepts
+     * @param sort the result type of the function
+     * @param master the associated master handler
      * @return the function expression
      */
     static SExpr funTypeAxiom(String name, int arity, Sort sort, MasterHandler master)

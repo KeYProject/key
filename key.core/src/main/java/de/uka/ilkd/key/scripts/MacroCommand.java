@@ -155,8 +155,7 @@ public class MacroCommand extends AbstractCommand {
     /**
      * Removes spaces and line breaks from the string representation of a term.
      *
-     * @param str
-     *        The string to "clean up".
+     * @param str The string to "clean up".
      * @return The original without spaces and line breaks.
      */
     private static String formatTermString(String str) {

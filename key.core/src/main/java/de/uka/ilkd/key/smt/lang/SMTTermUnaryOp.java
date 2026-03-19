@@ -40,8 +40,7 @@ public class SMTTermUnaryOp extends SMTTerm {
     }
 
     /**
-     * @param operator
-     *        the operator to set
+     * @param operator the operator to set
      */
     public void setOperator(Op operator) {
         this.operator = operator;
@@ -55,8 +54,7 @@ public class SMTTermUnaryOp extends SMTTerm {
     }
 
     /**
-     * @param subForm
-     *        the subForm to set
+     * @param subForm the subForm to set
      */
     public void setSub(SMTTerm subForm) {
         this.sub = subForm;

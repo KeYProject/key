@@ -48,10 +48,8 @@ public final class PartialInvAxiom extends ClassAxiom {
     /**
      * Creates a new class axiom.
      *
-     * @param inv
-     *        (partial) invariant from which the axiom is derived
-     * @param isStatic
-     *        whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
+     * @param inv (partial) invariant from which the axiom is derived
+     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or
      *        instance invariants (i.e., &lt;inv&gt;)
      * @param services
      */

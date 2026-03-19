@@ -93,8 +93,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     // -------------------------------------------------------------------------
 
     /**
-     * @param services
-     *        pointer to services object
+     * @param services pointer to services object
      */
     protected VariableNamer(Services services) {
         this.services = services;
@@ -302,12 +301,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      * conflicts between the new variable and other global variables by renaming the new variable
      * and / or other variables
      *
-     * @param var
-     *        the new program variable
-     * @param goal
-     *        the goal
-     * @param posOfFind
-     *        the PosInOccurrence of the currently executed program
+     * @param var the new program variable
+     * @param goal the goal
+     * @param posOfFind the PosInOccurrence of the currently executed program
      * @return the renamed version of the var parameter
      */
     public abstract LocationVariable rename(LocationVariable var, Goal goal,
@@ -346,17 +342,12 @@ public abstract class VariableNamer implements InstantiationProposer {
      * proposes a unique name for the instantiation of a schema variable (like getProposal(), but
      * somewhat less nicely)
      *
-     * @param basename
-     *        desired base name, or null to use default
-     * @param sv
-     *        the schema variable
-     * @param posOfFind
-     *        the PosInOccurrence containing the name's target program
-     * @param posOfDeclaration
-     *        the PosInProgram where the name will be declared (or null to just be
+     * @param basename desired base name, or null to use default
+     * @param sv the schema variable
+     * @param posOfFind the PosInOccurrence containing the name's target program
+     * @param posOfDeclaration the PosInProgram where the name will be declared (or null to just be
      *        pessimistic about the scope)
-     * @param previousProposals
-     *        list of names which should be considered taken, or null
+     * @param previousProposals list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
@@ -414,8 +405,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * proposes a unique name; intended for use in places where the information required by
      * getProposal() is not available
      *
-     * @param basename
-     *        desired base name, or null to use default
+     * @param basename desired base name, or null to use default
      * @return the name proposal
      */
     public ProgramElementName getTemporaryNameProposal(String basename) {
@@ -434,16 +424,11 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * proposes a unique name for the instantiation of a schema variable
      *
-     * @param app
-     *        the taclet app
-     * @param var
-     *        the schema variable to be instantiated
-     * @param services
-     *        not used
-     * @param undoAnchor
-     *        not used
-     * @param previousProposals
-     *        list of names which should be considered taken, or null
+     * @param app the taclet app
+     * @param var the schema variable to be instantiated
+     * @param services not used
+     * @param undoAnchor not used
+     * @param previousProposals list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
     @Override
@@ -494,14 +479,10 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * tells whether a name for instantiating a schema variable is unique within its scope
      *
-     * @param name
-     *        the name to be checked
-     * @param sv
-     *        the schema variable
-     * @param posOfFind
-     *        the PosInOccurrence of the name's target program
-     * @param posOfDeclaration
-     *        the PosInProgram where the name will be declared
+     * @param name the name to be checked
+     * @param sv the schema variable
+     * @param posOfFind the PosInOccurrence of the name's target program
+     * @param posOfDeclaration the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be checked, else false
      */
     public boolean isUniqueNameForSchemaVariable(String name, ProgramSV sv,
@@ -527,12 +508,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      * the name unique - if that is necessary, use either getTemporaryNameProposal() or
      * getProposal())
      *
-     * @param name
-     *        the name as a string
-     * @param creationInfo
-     *        optional name creation info the name should carry
-     * @param comments
-     *        any comments the name should carry
+     * @param name the name as a string
+     * @param creationInfo optional name creation info the name should carry
+     * @param comments any comments the name should carry
      * @return the name as a ProgramElementName
      */
     public static ProgramElementName parseName(String name, NameCreationInfo creationInfo,

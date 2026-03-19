@@ -23,10 +23,8 @@ public abstract class LDTHandler implements JMLOperatorHandler {
     /**
      * Pair (KJT, Operator)
      *
-     * @param type
-     *        type
-     * @param operator
-     *        operator
+     * @param type type
+     * @param operator operator
      */
     public record TypedOperator(KeYJavaType type, Operator operator) {
     }

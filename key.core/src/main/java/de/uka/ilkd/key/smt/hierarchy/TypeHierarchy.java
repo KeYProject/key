@@ -98,8 +98,7 @@ public class TypeHierarchy {
     /**
      * Returns the children of a sort s.
      *
-     * @param s
-     *        A sort s.
+     * @param s A sort s.
      * @return The SortNodes containing the children of s.
      */
     public Set<SortNode> getChildren(Sort s) {
@@ -113,8 +112,7 @@ public class TypeHierarchy {
     /**
      * Returns the parents of a sort s.
      *
-     * @param s
-     *        A sort s.
+     * @param s A sort s.
      * @return The SortNodes containing the parents of s.
      */
     public Set<SortNode> getParents(Sort s) {
@@ -177,8 +175,7 @@ public class TypeHierarchy {
      * Contracts a sort s. Removes s as child of its parents and parent of its children. The
      * children of s become the children of all parents of s and vice-versa.
      *
-     * @param s
-     *        The sort to be contracted.
+     * @param s The sort to be contracted.
      */
     private void contractNode(Sort s) {
         SortNode node = sortMap.get(s);

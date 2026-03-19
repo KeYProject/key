@@ -96,14 +96,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
      * creates the WhileLoopTransformation for the transformation mode
      *
-     * @param root
-     *        the ProgramElement where to begin
-     * @param outerLabel
-     *        the ProgramElementName of the outer label
-     * @param innerLabel
-     *        the ProgramElementName of the inner label
-     * @param services
-     *        services instance
+     * @param root the ProgramElement where to begin
+     * @param outerLabel the ProgramElementName of the outer label
+     * @param innerLabel the ProgramElementName of the inner label
+     * @param services services instance
      */
     public WhileLoopTransformation(ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, Services services) {
@@ -119,12 +115,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
      * creates the WhileLoopTransformation for the check mode
      *
-     * @param root
-     *        the ProgramElement where to begin
-     * @param inst
-     *        the SVInstantiations if available
-     * @param services
-     *        services instance
+     * @param root the ProgramElement where to begin
+     * @param inst the SVInstantiations if available
+     * @param services services instance
      */
     public WhileLoopTransformation(ProgramElement root, SVInstantiations inst, Services services) {
         super(root, services);
@@ -183,8 +176,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
      * the action that is performed just before leaving the node the last time
      *
-     * @param node
-     *        respective node as program element
+     * @param node respective node as program element
      */
     @Override
     protected void doAction(ProgramElement node) {
@@ -220,8 +212,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
      * walks through the AST. While keeping track of the current node
      *
-     * @param node
-     *        the JavaProgramElement the walker is at
+     * @param node the JavaProgramElement the walker is at
      */
     @Override
     protected void walk(ProgramElement node) {
@@ -258,8 +249,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * the implemented default action is called if a program element is, and if it has children all
      * its children too are left unchanged
      *
-     * @param x
-     *        source element
+     * @param x source element
      */
     @Override
     protected void doDefaultAction(SourceElement x) {
@@ -532,8 +522,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * If it is a loop deeper in the AST a new object is created if needed or the original loop
      * returned.
      *
-     * @param x
-     *        EnhancedFor loop statement
+     * @param x EnhancedFor loop statement
      * @author mulbrich
      */
     @Override
@@ -564,8 +553,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * <code> Label1:if(c) l':{l'':{p#} while(c){b}}</code> Check if this is ok when labeled
      * continue statements are involved.
      *
-     * @param x
-     *        the while statement
+     * @param x the while statement
      */
     @Override
     public void performActionOnWhile(While x) {

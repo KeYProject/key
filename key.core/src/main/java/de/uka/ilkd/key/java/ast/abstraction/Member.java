@@ -16,7 +16,8 @@ public interface Member extends ProgramModelElement {
     boolean isFinal();
 
     /**
-     * Checks if this member is static. Returns <CODE>true</CODE> for Constructors.
+     * Checks if this member is static. Returns <CODE>true</CODE> for
+     * {@link recoder.abstraction.Constructor}s.
      *
      * @return <CODE>true</CODE> if this member is static, <CODE>false</CODE> otherwise.
      */

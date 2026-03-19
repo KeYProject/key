@@ -12,13 +12,19 @@ import org.jspecify.annotations.NonNull;
  * used to print
  *
  * <pre>
- * while (i > 0) { i--; j++; }
+ * while (i > 0) {
+ *     i--;
+ *     j++;
+ * }
  * </pre>
  *
  * instead of
  *
  * <pre>
- * while (i > 0) { i--; j++; }
+ * while (i > 0) {
+ *     i--;
+ *     j++;
+ * }
  * </pre>
  *
  * if a maximum line width of 15 characters is chosen.
@@ -52,13 +58,19 @@ import org.jspecify.annotations.NonNull;
  * Consider the program above. It should be printed either as
  *
  * <pre>
- * while (i > 0) { i--; j++; }
+ * while (i > 0) {
+ *     i--;
+ *     j++;
+ * }
  * </pre>
  *
  * or, if there is not enough space on the line, as
  *
  * <pre>
- * while (i > 0) { i--; j++; }
+ * while (i > 0) {
+ *     i--;
+ *     j++;
+ * }
  * </pre>
  *
  * Given a Layouter object <code>l</code>, we could say:
@@ -201,10 +213,8 @@ public class Layouter<M> {
      * Constructs a newly allocated Layouter which will send output to the given {@link Backend} and
      * has the given default indentation.
      *
-     * @param back
-     *        the Backend
-     * @param indentation
-     *        the default indentation
+     * @param back the Backend
+     * @param indentation the default indentation
      *
      */
 
@@ -244,8 +254,7 @@ public class Layouter<M> {
      * have a string with newline characters, and want to retain its formatting, consider using the
      * {@link #pre(String s)} method. The Layouter will not insert any line breaks in such a string.
      *
-     * @param s
-     *        the String to print.
+     * @param s the String to print.
      * @return this
      */
     public Layouter<M> print(String s) {
@@ -269,12 +278,9 @@ public class Layouter<M> {
      * Begin a block. If <code>consistent</code> is set, breaks are either all broken or all not
      * broken. The indentation level is increased by <code>indent</code>.
      *
-     * @param consistent
-     *        <code>true</code> for consistent block
-     * @param relative
-     *        <code>true</code> for indentation relative to parent block
-     * @param indent
-     *        increment to indentation level
+     * @param consistent <code>true</code> for consistent block
+     * @param relative <code>true</code> for indentation relative to parent block
+     * @param indent increment to indentation level
      * @return this
      */
     public Layouter<M> begin(boolean consistent, boolean relative, int indent) {
@@ -317,10 +323,8 @@ public class Layouter<M> {
      * at this point. If it <em>is</em> broken, indentation is added to the current indentation
      * level, plus the value of <code>offset</code>.
      *
-     * @param width
-     *        space to insert if not broken
-     * @param offset
-     *        offset relative to current indentation level
+     * @param width space to insert if not broken
+     * @param offset offset relative to current indentation level
      * @return this
      */
     public Layouter<M> brk(int width, int offset) {
@@ -346,10 +350,8 @@ public class Layouter<M> {
      * on the current line. If that is the case, nothing is printed. No line break is possible at
      * this point.
      *
-     * @param width
-     *        space to insert if not broken
-     * @param offset
-     *        offset relative to current indentation level
+     * @param width space to insert if not broken
+     * @param offset offset relative to current indentation level
      * @return this
      */
     public Layouter<M> ind(int width, int offset) {
@@ -371,8 +373,7 @@ public class Layouter<M> {
      * passed through unchanged to the backend and may be used by the application to pass
      * information about the purpose of the mark.
      *
-     * @param o
-     *        an object to be passed through to the backend.
+     * @param o an object to be passed through to the backend.
      * @return this
      *
      */
@@ -405,10 +406,8 @@ public class Layouter<M> {
      * Begin a block. If <code>consistent</code> is set, breaks are either all broken or all not
      * broken. The indentation level is increased by <code>indent</code>.
      *
-     * @param consistent
-     *        <code>true</code> for consistent block
-     * @param indent
-     *        increment to indentation level
+     * @param consistent <code>true</code> for consistent block
+     * @param indent increment to indentation level
      * @return this
      */
     public Layouter<M> begin(boolean consistent, int indent) {
@@ -420,10 +419,8 @@ public class Layouter<M> {
      * all not
      * broken. The indentation level is increased by <code>indent</code>.
      *
-     * @param consistent
-     *        <code>true</code> for consistent block
-     * @param indent
-     *        increment to indentation level
+     * @param consistent <code>true</code> for consistent block
+     * @param indent increment to indentation level
      * @return this
      */
     public Layouter<M> beginRelative(boolean consistent, int indent) {
@@ -457,8 +454,7 @@ public class Layouter<M> {
      * indentation
      * level.
      *
-     * @param indent
-     *        the indentation for this block
+     * @param indent the indentation for this block
      * @return this
      */
     public Layouter<M> beginRelativeC(int indent) {
@@ -487,8 +483,7 @@ public class Layouter<M> {
     /**
      * Begin an inconsistent block. Add <code>indent</code> to the indentation level.
      *
-     * @param indent
-     *        the indentation for this block
+     * @param indent the indentation for this block
      * @return this
      */
     public Layouter<M> beginI(int indent) {
@@ -498,8 +493,7 @@ public class Layouter<M> {
     /**
      * Begin a consistent block. Add <code>indent</code> to the indentation level.
      *
-     * @param indent
-     *        the indentation for this block
+     * @param indent the indentation for this block
      * @return this
      */
     public Layouter<M> beginC(int indent) {
@@ -510,8 +504,7 @@ public class Layouter<M> {
      * Begin a block with default indentation. Add this Layouter's default indentation to the
      * indentation level.
      *
-     * @param consistent
-     *        <code>true</code> for consistent block
+     * @param consistent <code>true</code> for consistent block
      * @return this
      */
     public Layouter<M> begin(boolean consistent) {
@@ -522,8 +515,7 @@ public class Layouter<M> {
     /**
      * Print a break with zero offset.
      *
-     * @param width
-     *        space to insert if not broken
+     * @param width space to insert if not broken
      * @return this
      */
     public Layouter<M> brk(int width) {
@@ -565,8 +557,7 @@ public class Layouter<M> {
      * line of <code>s</code> (separated by \n) gets printed as a string and newlines become forced
      * breaks.
      *
-     * @param s
-     *        the pre-formatted string
+     * @param s the pre-formatted string
      * @return this
      */
     public Layouter<M> pre(String s) {

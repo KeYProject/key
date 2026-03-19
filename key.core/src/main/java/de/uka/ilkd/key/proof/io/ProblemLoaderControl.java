@@ -24,24 +24,18 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
     /**
      * The loading has started.
      *
-     * @param loader
-     *        The source {@link AbstractProblemLoader}.
+     * @param loader The source {@link AbstractProblemLoader}.
      */
     void loadingStarted(AbstractProblemLoader loader);
 
     /**
      * The loading has stopped.
      *
-     * @param loader
-     *        The source {@link AbstractProblemLoader}.
-     * @param poContainer
-     *        The loaded {@link LoadedPOContainer}.
-     * @param proofList
-     *        The created {@link ProofAggregate}.
-     * @param result
-     *        The occurred {@link ReplayResult}.
-     * @throws ProblemLoaderException
-     *         Occurred Exception.
+     * @param loader The source {@link AbstractProblemLoader}.
+     * @param poContainer The loaded {@link LoadedPOContainer}.
+     * @param proofList The created {@link ProofAggregate}.
+     * @param result The occurred {@link ReplayResult}.
+     * @throws ProblemLoaderException Occurred Exception.
      */
     void loadingFinished(AbstractProblemLoader loader, @Nullable LoadedPOContainer poContainer,
             @Nullable ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
@@ -58,8 +52,7 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
     /**
      * Report the occurred warnings.
      *
-     * @param warnings
-     *        The occurred warnings.
+     * @param warnings The occurred warnings.
      */
     void reportWarnings(ImmutableSet<PositionedString> warnings);
 }

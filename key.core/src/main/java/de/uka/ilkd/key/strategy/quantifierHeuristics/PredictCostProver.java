@@ -158,10 +158,8 @@ public class PredictCostProver {
     /**
      * try to prove <code>problem</code> by know <code>assertLits</code>
      *
-     * @param problem
-     *        a literal to be proved
-     * @param assertLits
-     *        a set of term assertLiterals in which all literals are true
+     * @param problem a literal to be proved
+     * @param assertLits a set of term assertLiterals in which all literals are true
      * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
      *         false, and <code>atom</code> if it cann't be proved.
      */

@@ -182,8 +182,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * defined in the proof's {@link StrategySettings} or the default one of this
      * {@link ApplyStrategy#defaultGoalChooser} otherwise.
      *
-     * @param proof
-     *        The {@link Proof} for which an {@link GoalChooser} is required.
+     * @param proof The {@link Proof} for which an {@link GoalChooser} is required.
      * @return The {@link GoalChooser} to use.
      */
     private GoalChooser<Proof, Goal> getGoalChooserForProof(Proof proof) {

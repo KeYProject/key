@@ -262,8 +262,7 @@ public final class ProgVarReplacer {
      * replaces a program variable on the lefthandside of an elementary update
      * requires the given term to have an elementary update operator as top level operator
      *
-     * @param t
-     *        the Term where to replace renamed variables
+     * @param t the Term where to replace renamed variables
      * @return the term with all replacements done
      */
     private JTerm replaceProgramVariableInLHSOfElementaryUpdate(JTerm t) {

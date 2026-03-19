@@ -72,8 +72,7 @@ public class ModalityCache {
     /**
      * Checks for a modality term in a sequent
      *
-     * @param sequent
-     *        the sequent
+     * @param sequent the sequent
      * @return whether the sequent contained a modality term
      */
     public boolean hasModality(Sequent sequent) {

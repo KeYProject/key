@@ -72,8 +72,7 @@ public class OriginTermLabel implements TermLabel {
      * Find a term's origin. If the term has no origin, iterate through its parent terms until we
      * find one with an origin.
      *
-     * @param pis
-     *        the position of the term whose origin to find.
+     * @param pis the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
     public static Origin getOrigin(PosInSequent pis) {
@@ -88,8 +87,7 @@ public class OriginTermLabel implements TermLabel {
      * Find a term's origin. If the term has no origin, iterate through its parent terms until we
      * find one with an origin.
      *
-     * @param pio
-     *        the position of the term whose origin to find.
+     * @param pio the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
     public static Origin getOrigin(PosInOccurrence pio) {
@@ -135,8 +133,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param origin
-     *        the term's origin.
+     * @param origin the term's origin.
      */
     OriginTermLabel(Origin origin) {
         this.origin = origin;
@@ -146,10 +143,8 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param origin
-     *        the term's origin.
-     * @param subtermOrigins
-     *        the origins of the term's (former) subterms.
+     * @param origin the term's origin.
+     * @param subtermOrigins the origins of the term's (former) subterms.
      */
     OriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
         this(origin);
@@ -162,8 +157,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Creates a new {@link OriginTermLabel}.
      *
-     * @param subtermOrigins
-     *        the origins of the term's (former) subterms.
+     * @param subtermOrigins the origins of the term's (former) subterms.
      */
     OriginTermLabel(Set<Origin> subtermOrigins) {
         this.origin = new Origin(SpecType.NONE);
@@ -201,10 +195,8 @@ public class OriginTermLabel implements TermLabel {
      * various problems during proof search.
      * </p>
      *
-     * @param term
-     *        a term
-     * @param services
-     *        services.
+     * @param term a term
+     * @param services services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to the specified term.
      */
     public static boolean canAddLabel(JTerm term, Services services) {
@@ -222,10 +214,8 @@ public class OriginTermLabel implements TermLabel {
      * various problems during proof search.
      * </p>
      *
-     * @param op
-     *        the specified operator.
-     * @param services
-     *        services.
+     * @param op the specified operator.
+     * @param services services.
      * @return {@code true} iff an {@code OriginTermLabel} can be added to a term with the specified
      *         operator.
      */
@@ -258,10 +248,8 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Removes all {@link OriginTermLabel} from the specified sequent.
      *
-     * @param seq
-     *        the sequent to transform.
-     * @param services
-     *        services.
+     * @param seq the sequent to transform.
+     * @param services services.
      * @return the resulting sequent change info.
      */
     public static SequentChangeInfo removeOriginLabels(
@@ -291,10 +279,8 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Removes all {@link OriginTermLabel} from the specified term and its sub-terms.
      *
-     * @param term
-     *        the term to transform.
-     * @param services
-     *        services.
+     * @param term the term to transform.
+     * @param services services.
      * @return the transformed term.
      */
     public static JTerm removeOriginLabels(JTerm term, Services services) {
@@ -323,8 +309,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Compute the common origin from all origins in the passed origins set.
      *
-     * @param origins
-     *        the passed origins set
+     * @param origins the passed origins set
      * @return the computed common origin
      */
     public static Origin computeCommonFileOrigin(final Set<FileOrigin> origins) {
@@ -367,8 +352,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Compute the common origin from all origins in the passed origins set.
      *
-     * @param origins
-     *        the passed origins set
+     * @param origins the passed origins set
      * @return the computed common origin
      */
     public static Origin computeCommonNodeOrigin(final Set<NodeOrigin> origins) {
@@ -406,8 +390,7 @@ public class OriginTermLabel implements TermLabel {
     /**
      * Compute the common origin from all origins in the passed origins set.
      *
-     * @param origins
-     *        the passed origins set
+     * @param origins the passed origins set
      * @return the computed common origin
      */
     @SuppressWarnings("unchecked")
@@ -448,10 +431,8 @@ public class OriginTermLabel implements TermLabel {
      * This method transforms a term in such a way that every {@link OriginTermLabel} contains all
      * the correct {@link #getSubtermOrigins()}.
      *
-     * @param term
-     *        the term to transform.
-     * @param services
-     *        services.
+     * @param term the term to transform.
+     * @param services services.
      * @return the transformed term.
      */
     public static JTerm collectSubtermOrigins(JTerm term, Services services) {
@@ -545,10 +526,8 @@ public class OriginTermLabel implements TermLabel {
     }
 
     /**
-     * @param subs
-     *        the sub-terms to be searched
-     * @param services
-     *        a services object used for getting type information and creating the new
+     * @param subs the sub-terms to be searched
+     * @param services a services object used for getting type information and creating the new
      *        sub-term
      * @return origin information about the searched sub-terms stored in a {@link SubTermOriginData}
      *         object.
@@ -588,10 +567,8 @@ public class OriginTermLabel implements TermLabel {
         /**
          * This method constructs an object of type {@link SubTermOriginData}.
          *
-         * @param subterms
-         *        the collected sub-terms
-         * @param subtermOrigins
-         *        the origin information collected from these sub-terms
+         * @param subterms the collected sub-terms
+         * @param subtermOrigins the origin information collected from these sub-terms
          */
         public SubTermOriginData(JTerm[] subterms, Set<Origin> subtermOrigins) {
             this.terms = subterms;
@@ -613,8 +590,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType
-         *        the spec type the term originates from.
+         * @param specType the spec type the term originates from.
          */
         public Origin(SpecType specType) {
             assert specType != null;
@@ -665,12 +641,9 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType
-         *        the spec type the term originates from.
-         * @param ruleName
-         *        the name of the rule applied at the node the term originates from.
-         * @param nodeNr
-         *        the {@link Node#serialNr()} of the node the term originates from.
+         * @param specType the spec type the term originates from.
+         * @param ruleName the name of the rule applied at the node the term originates from.
+         * @param nodeNr the {@link Node#serialNr()} of the node the term originates from.
          */
         public NodeOrigin(SpecType specType, String ruleName, int nodeNr) {
             super(specType);
@@ -738,12 +711,9 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@link OriginTermLabel.Origin}.
          *
-         * @param specType
-         *        the spec type the term originates from.
-         * @param fileName
-         *        the file the term originates from.
-         * @param line
-         *        the line in the file.
+         * @param specType the spec type the term originates from.
+         * @param fileName the file the term originates from.
+         * @param line the line in the file.
          */
         public FileOrigin(SpecType specType, @Nullable URI fileName, int line) {
             super(specType);
@@ -936,8 +906,7 @@ public class OriginTermLabel implements TermLabel {
         /**
          * Creates a new {@code SpecType}
          *
-         * @param name
-         *        the {@code SpecType}'s string representation.
+         * @param name the {@code SpecType}'s string representation.
          */
         SpecType(String name) {
             this.name = name;

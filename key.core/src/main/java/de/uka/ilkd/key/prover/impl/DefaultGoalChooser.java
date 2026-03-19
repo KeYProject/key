@@ -46,7 +46,8 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
 
     protected Node currentSubtreeRoot = null;
 
-    public DefaultGoalChooser() {}
+    public DefaultGoalChooser() {
+    }
 
     /**
      * {@inheritDoc}

@@ -12,8 +12,7 @@ public interface RuleAppListener {
     /**
      * Invoked when a rule has been applied.
      *
-     * @param e
-     *        the proof event containing the rule application.
+     * @param e the proof event containing the rule application.
      */
     void ruleApplied(ProofEvent e);
 }

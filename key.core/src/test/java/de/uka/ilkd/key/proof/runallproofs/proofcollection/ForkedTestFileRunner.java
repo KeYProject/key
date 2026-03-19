@@ -80,10 +80,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
     /**
      * Process a list of {@link TestFile}s in a separate subprocess.
      *
-     * @param testFiles
-     *        files to be tested
-     * @param pathToTempDir
-     *        a path to the temporary data directory
+     * @param testFiles files to be tested
+     * @param pathToTempDir a path to the temporary data directory
      */
     public static List<TestResult> processTestFiles(List<TestFile> testFiles, Path pathToTempDir)
             throws Exception {
@@ -205,8 +203,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * <p>
      * If no timeout has been specified, no thread is launched.
      *
-     * @param settings
-     *        the (non-null) settings to take the timeout from.
+     * @param settings the (non-null) settings to take the timeout from.
      * @param tempDirectory
      */
     private static void installTimeoutWatchdog(ProofCollectionSettings settings,

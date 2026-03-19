@@ -23,24 +23,18 @@ import org.key_project.logic.SyntaxElement;
  *
  * @author lanzinger
  *
- * @param <S>
- *        the type of the elements to replace.
- * @param <T>
- *        the type of the replacements.
+ * @param <S> the type of the elements to replace.
+ * @param <T> the type of the replacements.
  */
 public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
 
     /**
      * Creates a new replacement map.
      *
-     * @param <S>
-     *        the type of the elements to replace.
-     * @param <T>
-     *        the type of the replacements.
-     * @param tf
-     *        a term factory.
-     * @param proof
-     *        the currently loaded proof, or {@code null} if no proof is loaded.
+     * @param <S> the type of the elements to replace.
+     * @param <T> the type of the replacements.
+     * @param tf a term factory.
+     * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @return a new replacement map.
      */
     static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
@@ -58,16 +52,11 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
     /**
      * Creates a new replacement map.
      *
-     * @param <S>
-     *        the type of the elements to replace.
-     * @param <T>
-     *        the type of the replacements.
-     * @param tf
-     *        a term factory.
-     * @param proof
-     *        the currently loaded proof, or {@code null} if no proof is loaded.
-     * @param initialMappings
-     *        a map whose mapping should be added to the new replacement map.
+     * @param <S> the type of the elements to replace.
+     * @param <T> the type of the replacements.
+     * @param tf a term factory.
+     * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
+     * @param initialMappings a map whose mapping should be added to the new replacement map.
      * @return a new replacement map.
      */
     static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
@@ -86,10 +75,8 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
      *
      * @author lanzinger
      *
-     * @param <S>
-     *        the type of the operators to replace.
-     * @param <T>
-     *        the type of the replacements.
+     * @param <S> the type of the operators to replace.
+     * @param <T> the type of the replacements.
      */
     class DefaultReplacementMap<S extends SyntaxElement, T> extends LinkedHashMap<S, T>
             implements ReplacementMap<S, T> {
@@ -107,10 +94,8 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
      *
      * @author lanzinger
      *
-     * @param <S>
-     *        the type of the operators to replace.
-     * @param <T>
-     *        the type of the replacements.
+     * @param <S> the type of the operators to replace.
+     * @param <T> the type of the replacements.
      *
      * @see OriginTermLabel
      */
@@ -130,8 +115,7 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
         /**
          * Create a new map
          *
-         * @param tf
-         *        a term factory.
+         * @param tf a term factory.
          */
         public NoIrrelevantLabelsReplacementMap(TermFactory tf) {
             this.tf = tf;

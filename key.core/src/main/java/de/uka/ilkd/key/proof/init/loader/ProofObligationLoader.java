@@ -31,13 +31,10 @@ public interface ProofObligationLoader {
     /**
      * Builds the PO from the given environment and {@code \proofObligation} configuration.
      *
-     * @param initConfig
-     *        the key environment
-     * @param properties
-     *        the {@code \proofObligation} configuration
+     * @param initConfig the key environment
+     * @param properties the {@code \proofObligation} configuration
      * @return always a valid PO
-     * @throws Exception
-     *         in case of an arbitrary exception, e.g., missing information
+     * @throws Exception in case of an arbitrary exception, e.g., missing information
      *         {@code properties}
      */
     IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig, Configuration properties)
@@ -50,8 +47,7 @@ public interface ProofObligationLoader {
      * {@code \proofObligation} entry in the
      * {@link de.uka.ilkd.key.proof.init.KeYUserProblemFile}.
      *
-     * @param identifier
-     *        non-null string
+     * @param identifier non-null string
      * @return true if this load handles this type of PO
      */
     boolean handles(String identifier);

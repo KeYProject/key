@@ -55,7 +55,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     // constructors
     // -------------------------------------------------------------------------
 
-    private UseDependencyContractRule() {}
+    private UseDependencyContractRule() {
+    }
 
 
     // -------------------------------------------------------------------------

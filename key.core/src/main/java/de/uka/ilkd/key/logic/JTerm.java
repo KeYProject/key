@@ -91,8 +91,7 @@ public interface JTerm
     /**
      * checks if the given label is attached to the term
      *
-     * @param label
-     *        the TermLabel for which to look (must not be null)
+     * @param label the TermLabel for which to look (must not be null)
      */
     boolean containsLabel(TermLabel label);
 
@@ -106,8 +105,7 @@ public interface JTerm
     /**
      * Returns the first {@link TermLabel} with the given {@link Name}.
      *
-     * @param termLabelName
-     *        The {@link Name} of the {@link TermLabel} to search.
+     * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
     TermLabel getLabel(Name termLabelName);
@@ -124,7 +122,5 @@ public interface JTerm
     /**
      * Returns a human-readable source of this term. For example the filename with line and offset.
      */
-    default @Nullable String getOrigin() {
-        return null;
-    }
+    default @Nullable String getOrigin() { return null; }
 }

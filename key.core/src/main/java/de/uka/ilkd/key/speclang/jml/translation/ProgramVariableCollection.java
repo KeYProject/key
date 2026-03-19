@@ -59,19 +59,13 @@ public class ProgramVariableCollection {
     /**
      * Create a collection containing the specified variables.
      *
-     * @param selfVar
-     *        {@code self}
-     * @param paramVars
-     *        the list of method parameters if the textual specification case is a method
+     * @param selfVar {@code self}
+     * @param paramVars the list of method parameters if the textual specification case is a method
      *        contract.
-     * @param resultVar
-     *        {@code result}
-     * @param excVar
-     *        {@code exception}
-     * @param atPreVars
-     *        a map from every variable {@code var} to {@code \old(var)}.
-     * @param atPres
-     *        a map from every variable {@code var} to {@code \old(var)}.
+     * @param resultVar {@code result}
+     * @param excVar {@code exception}
+     * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.
+     * @param atPres a map from every variable {@code var} to {@code \old(var)}.
      */
     public ProgramVariableCollection(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
@@ -83,24 +77,16 @@ public class ProgramVariableCollection {
     /**
      * Create a collection containing the specified variables.
      *
-     * @param selfVar
-     *        {@code self}
-     * @param paramVars
-     *        the list of method parameters if the textual specification case is a method
+     * @param selfVar {@code self}
+     * @param paramVars the list of method parameters if the textual specification case is a method
      *        contract.
-     * @param resultVar
-     *        {@code result}
-     * @param excVar
-     *        {@code exception}
-     * @param atPreVars
-     *        a map from every variable {@code var} to {@code \old(var)}.
-     * @param atPres
-     *        a map from every variable {@code var} to {@code \old(var)}.
-     * @param atBeforeVars
-     *        a map from every variable {@code var} to {@code \before(var)} (if
+     * @param resultVar {@code result}
+     * @param excVar {@code exception}
+     * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.
+     * @param atPres a map from every variable {@code var} to {@code \old(var)}.
+     * @param atBeforeVars a map from every variable {@code var} to {@code \before(var)} (if
      *        applicable).
-     * @param atBefores
-     *        a map from every variable {@code var} to {@code \before(var)} (if
+     * @param atBefores a map from every variable {@code var} to {@code \before(var)} (if
      *        applicable).
      */
     public ProgramVariableCollection(LocationVariable selfVar,
@@ -123,5 +109,6 @@ public class ProgramVariableCollection {
     /**
      * Create an empty collection.
      */
-    public ProgramVariableCollection() {}
+    public ProgramVariableCollection() {
+    }
 }

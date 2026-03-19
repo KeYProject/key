@@ -41,8 +41,7 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe
-     *        the instance of expression contained by the meta construct
+     * @param pe the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
         super("#evaluate-arguments", pe);
@@ -51,14 +50,10 @@ public class EvaluateArgs extends ProgramTransformer {
     /**
      * TODO Comment.
      *
-     * @param e
-     *        TODO
-     * @param l
-     *        TODO
-     * @param services
-     *        TODO
-     * @param ec
-     *        TODO
+     * @param e TODO
+     * @param l TODO
+     * @param services TODO
+     * @param ec TODO
      * @return TODO
      */
     public static ProgramVariable evaluate(Expression e, List<? super LocalVariableDeclaration> l,

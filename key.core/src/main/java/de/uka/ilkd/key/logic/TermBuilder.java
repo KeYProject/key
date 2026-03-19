@@ -38,7 +38,6 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
-
 /**
  * <p>
  * Use this class if you intend to build complex terms by hand. It is more convenient than

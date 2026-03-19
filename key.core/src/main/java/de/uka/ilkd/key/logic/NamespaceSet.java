@@ -31,7 +31,8 @@ public class NamespaceSet {
     private Namespace<@NonNull ParametricFunctionDecl> parametricFuncNS = new Namespace<>();
     private Namespace<@NonNull Choice> choiceNS = new Namespace<>();
 
-    public NamespaceSet() {}
+    public NamespaceSet() {
+    }
 
     public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull Function> funcNS,

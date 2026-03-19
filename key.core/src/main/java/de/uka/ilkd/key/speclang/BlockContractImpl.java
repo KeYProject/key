@@ -43,39 +43,23 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     private LoopContract loopContract = null;
 
     /**
-     * @param baseName
-     *        the base name.
-     * @param block
-     *        the block this contract belongs to.
-     * @param labels
-     *        all labels belonging to the block.
-     * @param method
-     *        the method containing the block.
-     * @param modalityKind
-     *        this contract's modality.
-     * @param preconditions
-     *        this contract's preconditions on every heap.
-     * @param measuredBy
-     *        this contract's measured-by term.
-     * @param postconditions
-     *        this contract's postconditions on every heap.
-     * @param modifiableClauses
-     *        this contract's modifiable clauses on every heap.
-     * @param freeModifiableClauses
-     *        this contract's free modifiable clauses on every heap.
-     * @param infFlowSpecs
-     *        this contract's information flow specifications.
-     * @param variables
-     *        this contract's variables.
-     * @param transactionApplicable
-     *        whether or not this contract is applicable for transactions.
-     * @param hasModifiable
-     *        a map specifying on which heaps this contract has a modifiable clause.
-     * @param hasFreeModifiable
-     *        a map specifying on which heaps this contract has a free modifiable
+     * @param baseName the base name.
+     * @param block the block this contract belongs to.
+     * @param labels all labels belonging to the block.
+     * @param method the method containing the block.
+     * @param modalityKind this contract's modality.
+     * @param preconditions this contract's preconditions on every heap.
+     * @param measuredBy this contract's measured-by term.
+     * @param postconditions this contract's postconditions on every heap.
+     * @param modifiableClauses this contract's modifiable clauses on every heap.
+     * @param freeModifiableClauses this contract's free modifiable clauses on every heap.
+     * @param infFlowSpecs this contract's information flow specifications.
+     * @param variables this contract's variables.
+     * @param transactionApplicable whether or not this contract is applicable for transactions.
+     * @param hasModifiable a map specifying on which heaps this contract has a modifiable clause.
+     * @param hasFreeModifiable a map specifying on which heaps this contract has a free modifiable
      *        clause.
-     * @param functionalContracts
-     *        the functional contracts corresponding to this contract.
+     * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method,
@@ -99,10 +83,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
     /**
      *
-     * @param contracts
-     *        a set of block contracts to combine.
-     * @param services
-     *        services.
+     * @param contracts a set of block contracts to combine.
+     * @param services services.
      * @return the combination of the specified block contracts.
      */
     public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
@@ -112,8 +94,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
     /**
      *
-     * @param loopContract
-     *        the loop contract from which this block contract was created.
+     * @param loopContract the loop contract from which this block contract was created.
      * @see #toLoopContract()
      */
     void setLoopContract(LoopContract loopContract) {
@@ -247,48 +228,29 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
         /**
          *
-         * @param baseName
-         *        the contract's base name.
-         * @param block
-         *        the block the contract belongs to.
-         * @param labels
-         *        all labels belonging to the block.
-         * @param method
-         *        the method containing the block.
-         * @param behavior
-         *        the contract's behavior.
-         * @param variables
-         *        the variables.
-         * @param requires
-         *        the contract's precondition.
-         * @param measuredBy
-         *        the contract's measured-by clause.
-         * @param ensures
-         *        the contracts postcondition due to normal termination.
-         * @param infFlowSpecs
-         *        the contract's information flow specifications.
-         * @param breaks
-         *        the contract's postconditions for abrupt termination with {@code break}
+         * @param baseName the contract's base name.
+         * @param block the block the contract belongs to.
+         * @param labels all labels belonging to the block.
+         * @param method the method containing the block.
+         * @param behavior the contract's behavior.
+         * @param variables the variables.
+         * @param requires the contract's precondition.
+         * @param measuredBy the contract's measured-by clause.
+         * @param ensures the contracts postcondition due to normal termination.
+         * @param infFlowSpecs the contract's information flow specifications.
+         * @param breaks the contract's postconditions for abrupt termination with {@code break}
          *        statements.
-         * @param continues
-         *        the contract's postconditions for abrupt termination with
+         * @param continues the contract's postconditions for abrupt termination with
          *        {@code continue} statements.
-         * @param returns
-         *        the contract's postcondition for abrupt termination with {@code return}
+         * @param returns the contract's postcondition for abrupt termination with {@code return}
          *        statements.
-         * @param signals
-         *        the contract's postcondition for abrupt termination due to abrupt
+         * @param signals the contract's postcondition for abrupt termination due to abrupt
          *        termination.
-         * @param signalsOnly
-         *        a term specifying which uncaught exceptions may occur.
-         * @param diverges
-         *        a diverges clause.
-         * @param modifiables
-         *        map from every heap to an modifiable term.
-         * @param hasModifiable
-         *        map specifying on which heaps this contract has a modifiable clause.
-         * @param services
-         *        services.
+         * @param signalsOnly a term specifying which uncaught exceptions may occur.
+         * @param diverges a diverges clause.
+         * @param modifiables map from every heap to an modifiable term.
+         * @param hasModifiable map specifying on which heaps this contract has a modifiable clause.
+         * @param services services.
          */
         public Creator(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
@@ -336,10 +298,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
         /**
          *
-         * @param contracts
-         *        the contracts to combine.
-         * @param services
-         *        services.
+         * @param contracts the contracts to combine.
+         * @param services services.
          */
         public Combinator(BlockContract[] contracts, Services services) {
             super(contracts, services);

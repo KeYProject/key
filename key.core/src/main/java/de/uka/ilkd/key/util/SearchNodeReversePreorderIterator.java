@@ -31,8 +31,7 @@ public class SearchNodeReversePreorderIterator {
     /**
      * Constructor.
      *
-     * @param start
-     *        The {@link Node} to iterate over its sub tree.
+     * @param start The {@link Node} to iterate over its sub tree.
      */
     public SearchNodeReversePreorderIterator(Node start) {
         this.previous = start;
@@ -78,8 +77,7 @@ public class SearchNodeReversePreorderIterator {
     /**
      * Returns the last leaf node.
      *
-     * @param node
-     *        The current {@link Node}.
+     * @param node The current {@link Node}.
      * @return The last leaf of the given {@link Node}.
      */
     protected Node lastLeaf(Node node) {

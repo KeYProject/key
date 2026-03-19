@@ -37,8 +37,7 @@ public class RenameTable {
      * returns true iff the given variable is mapped to an abstract name. The test is performed in
      * the local as well as in the parent renaming table.
      *
-     * @param n
-     *        the QuantifiableVariable object the existence of an abstract name is checked.
+     * @param n the QuantifiableVariable object the existence of an abstract name is checked.
      * @return true if <code>n</code> has been already assigned to an abstract name
      */
     public boolean contains(QuantifiableVariable n) {
@@ -50,8 +49,7 @@ public class RenameTable {
      * on
      * the local table
      *
-     * @param n
-     *        the QuantifiableVariable object the existence of an abstract name is checked.
+     * @param n the QuantifiableVariable object the existence of an abstract name is checked.
      * @return true if <code>n</code> has been already locally assigned to an abstract name
      */
     public boolean containsLocally(QuantifiableVariable n) {
@@ -62,11 +60,9 @@ public class RenameTable {
      * tests if both QuantifiableVariables are assigned to the same abstract name (locally or by the
      * parent)
      *
-     * @param n1
-     *        one of the QuantifiableVariables to be tested iff they have been assigned the same
+     * @param n1 one of the QuantifiableVariables to be tested iff they have been assigned the same
      *        abstract name
-     * @param n2
-     *        one of the QuantifiableVariables to be tested
+     * @param n2 one of the QuantifiableVariables to be tested
      * @return true iff <code>n1</code> and <code>n2</code> are mapped to the same abstract name
      */
     public boolean sameAbstractName(QuantifiableVariable n1, QuantifiableVariable n2) {
@@ -123,8 +119,7 @@ public class RenameTable {
          * returns true iff the given name is mapped to an abstract name. The test is performed in
          * the local as well as in the parent renaming table.
          *
-         * @param n
-         *        the QuantifiableVariable object the existence of an abstract name is checked.
+         * @param n the QuantifiableVariable object the existence of an abstract name is checked.
          * @return true if <code>n</code> has been already assigned to an abstract name
          */
         public boolean contains(QuantifiableVariable n) {
@@ -135,8 +130,7 @@ public class RenameTable {
          * does nearly the same as {@link #contains(QuantifiableVariable)} but performs the test
          * only on the local table-
          *
-         * @param n
-         *        the QuantifiableVariable object the existence of an abstract name is checked.
+         * @param n the QuantifiableVariable object the existence of an abstract name is checked.
          * @return true if <code>n</code> has been already locally assigned to an abstract name
          */
         public boolean containsLocally(QuantifiableVariable n) {
@@ -147,11 +141,9 @@ public class RenameTable {
          * tests if both QuantifiableVariable object are assigned to the same abstract name (locally
          * or by the parent)
          *
-         * @param n1
-         *        one of the QuantifiableVariable objects to be tested iff they have been
+         * @param n1 one of the QuantifiableVariable objects to be tested iff they have been
          *        assigned the same abstract name
-         * @param n2
-         *        one of the QuantifiableVariable objects to be tested
+         * @param n2 one of the QuantifiableVariable objects to be tested
          * @return true iff <code>n1</code> and <code>n2</code> are mapped to the same abstract name
          */
         public boolean sameAbstractName(QuantifiableVariable n1, QuantifiableVariable n2) {

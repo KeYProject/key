@@ -19,8 +19,7 @@ public class TypeOf extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe
-     *        the instance of expression contained by the meta construct
+     * @param pe the instance of expression contained by the meta construct
      */
     public TypeOf(ProgramElement pe) {
         super("#typeof", pe);

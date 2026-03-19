@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.net.URI;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
@@ -28,7 +29,8 @@ import org.jspecify.annotations.NonNull;
  */
 public final class JmlFacade {
 
-    private JmlFacade() {}
+    private JmlFacade() {
+    }
 
     /**
      * Creates an JML lexer for the give stream.
@@ -44,7 +46,13 @@ public final class JmlFacade {
     public static @NonNull JmlLexer createLexer(@NonNull PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text,
             ps.getLocation().getFileURI().map(URI::toString).orElse(null));
-        return createLexer(result);
+        JmlLexer lexer = createLexer(result);
+        Position pos = ps.getLocation().getPosition();
+        if (!pos.isNegative()) {
+            lexer.getInterpreter().setCharPositionInLine(pos.column() - 1);
+            lexer.getInterpreter().setLine(pos.line());
+        }
+        return lexer;
     }
 
     /**

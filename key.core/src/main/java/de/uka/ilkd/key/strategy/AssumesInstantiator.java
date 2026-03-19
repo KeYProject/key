@@ -195,15 +195,11 @@ public class AssumesInstantiator {
     /**
      * Recursive function for matching the remaining tail of an if sequent
      *
-     * @param p_ifSeqTail
-     *        tail of the current semisequent as list
-     * @param p_ifSeqTail2nd
-     *        the following semisequent (i.e. antecedent) or null
-     * @param p_matchCond
-     *        match conditions until now, i.e. after matching the first formulas of the
+     * @param p_ifSeqTail tail of the current semisequent as list
+     * @param p_ifSeqTail2nd the following semisequent (i.e. antecedent) or null
+     * @param p_matchCond match conditions until now, i.e. after matching the first formulas of the
      *        assumes-sequent
-     * @param p_alreadyMatchedNewFor
-     *        at least one new formula has already been matched, i.e. a
+     * @param p_alreadyMatchedNewFor at least one new formula has already been matched, i.e. a
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(

@@ -15,8 +15,7 @@ public class IllegalRegexException extends Exception {
     /**
      * constructor
      *
-     * @param cause
-     *        the cause of the exception
+     * @param cause the cause of the exception
      */
     public IllegalRegexException(Throwable cause) {
         super(cause);

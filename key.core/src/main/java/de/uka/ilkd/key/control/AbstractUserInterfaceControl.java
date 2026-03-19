@@ -77,8 +77,7 @@ public abstract class AbstractUserInterfaceControl
     /**
      * Fires the event {@link ProverTaskListener#taskStarted(TaskStartedInfo)} to all listener.
      *
-     * @param info
-     *        the {@link TaskStartedInfo} containing general information about the task that is
+     * @param info the {@link TaskStartedInfo} containing general information about the task that is
      *        just about to start
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
@@ -92,8 +91,7 @@ public abstract class AbstractUserInterfaceControl
     /**
      * Fires the event {@link ProverTaskListener#taskProgress(int)} to all listener.
      *
-     * @param position
-     *        The current position.
+     * @param position The current position.
      */
     protected void fireTaskProgress(int position) {
         synchronized (proverTaskListener) {
@@ -106,8 +104,7 @@ public abstract class AbstractUserInterfaceControl
     /**
      * Fires the event {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} to all listener.
      *
-     * @param info
-     *        The {@link TaskFinishedInfo}.
+     * @param info The {@link TaskFinishedInfo}.
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         try {
@@ -151,12 +148,9 @@ public abstract class AbstractUserInterfaceControl
     /**
      * registers the proof aggregate at the UI
      *
-     * @param proofOblInput
-     *        the {@link ProofOblInput}
-     * @param proofList
-     *        the {@link ProofAggregate}
-     * @param initConfig
-     *        the {@link InitConfig} to be used
+     * @param proofOblInput the {@link ProofOblInput}
+     * @param proofList the {@link ProofAggregate}
+     * @param initConfig the {@link InitConfig} to be used
      * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
      */
     protected abstract ProofEnvironment createProofEnvironmentAndRegisterProof(
@@ -250,8 +244,7 @@ public abstract class AbstractUserInterfaceControl
      * This method is used by nearly all Eclipse based product that uses KeY.
      * </p>
      *
-     * @param profile
-     *        The {@link Profile} to use.
+     * @param profile The {@link Profile} to use.
      * @return The instantiated {@link ProblemInitializer}.
      */
     protected ProblemInitializer createProblemInitializer(Profile profile) {

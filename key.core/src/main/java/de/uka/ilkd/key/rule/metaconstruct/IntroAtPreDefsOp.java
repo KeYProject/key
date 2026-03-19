@@ -67,14 +67,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * of all block contracts for blocks in {@code blocks} by {@code atPreVars} and
      * {@code atPreHeapVars}
      *
-     * @param statements
-     *        the blocks and loops whose contracts to update.
-     * @param atPreVars
-     *        all remembrance variables.
-     * @param atPreHeapVars
-     *        all remembrance heaps.
-     * @param services
-     *        services.
+     * @param statements the blocks and loops whose contracts to update.
+     * @param atPreVars all remembrance variables.
+     * @param atPreHeapVars all remembrance heaps.
+     * @param services services.
      */
     public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
             Map<LocationVariable, LocationVariable> atPreVars,

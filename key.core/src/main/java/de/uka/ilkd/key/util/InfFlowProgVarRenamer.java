@@ -133,10 +133,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     /**
      * Returns an equivalent variable with the new name.
      *
-     * @param newName
-     *        the new name
-     * @param pv
-     *        the program variable to be renamed
+     * @param newName the new name
+     * @param pv the program variable to be renamed
      * @return equivalent operator with the new name
      */
     public static ProgramVariable rename(Name newName, ProgramVariable pv) {

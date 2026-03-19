@@ -42,8 +42,7 @@ public class NodeChangeJournal implements GoalListener {
         DefaultImmutableMap.nilMap();
 
     /**
-     * @param p_goal
-     *        the original goal/node
+     * @param p_goal the original goal/node
      */
     public NodeChangeJournal(Proof p_proof, Goal p_goal) {
         proof = p_proof;

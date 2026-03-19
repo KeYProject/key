@@ -51,8 +51,7 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     /**
      * creates the WhileLoopTransformation for the transformation mode
      *
-     * @param root
-     *        the ProgramElement where to begin
+     * @param root the ProgramElement where to begin
      *
      */
     public ReplaceWhileLoop(ProgramElement root, StatementBlock toInsert, Services services) {
@@ -64,10 +63,8 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     /**
      * creates the WhileLoopTransformation for the check mode
      *
-     * @param root
-     *        the ProgramElement where to begin
-     * @param inst
-     *        the SVInstantiations if available
+     * @param root the ProgramElement where to begin
+     * @param inst the SVInstantiations if available
      */
     public ReplaceWhileLoop(ProgramElement root, SVInstantiations inst, StatementBlock toInsert,
             Services services) {

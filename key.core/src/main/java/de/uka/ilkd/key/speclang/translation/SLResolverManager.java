@@ -173,12 +173,9 @@ public abstract class SLResolverManager {
     /**
      * Resolves arbitrary property calls.
      *
-     * @param receiver
-     *        the specified explicit receiver, or null
-     * @param name
-     *        name of the property
-     * @param parameters
-     *        actual parameters of the property call, or null
+     * @param receiver the specified explicit receiver, or null
+     * @param name name of the property
+     * @param parameters actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
     public SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)

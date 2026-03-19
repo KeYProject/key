@@ -57,14 +57,12 @@ public abstract class GenericSortCondition {
     }
 
     /**
-     * Create the conditions to make a generic sort (s0) (or a collection sort of a generic sort)
-     * and
+     * Create the condition to make a generic sort (s0) (or a collection sort of a generic sort) and
      * a concrete sort (s1) equal
      *
-     * @param p_identity
-     *        true iff an identity condition should be generated (otherwise: a supersort
+     * @param p_identity true iff an identity condition should be generated (otherwise: a supersort
      *        condition is generated)
-     * @return the resulting conditions, if "s0" is of generic sort; null, if the sorts are either
+     * @return the resulting condition, if "s0" is of generic sort; null, if the sorts are either
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
      *         don't match)
      */
@@ -117,8 +115,7 @@ public abstract class GenericSortCondition {
     /**
      * Create the condition to force the instantiation of a given (possibly generic) sort
      *
-     * @param p_maximum
-     *        hint whether the generic sort should be instantiated with the maximum or
+     * @param p_maximum hint whether the generic sort should be instantiated with the maximum or
      *        mimimum possible concrete sort (this hint is currently not used by
      *        GenericSortInstantiations)
      * @return the resulting condition, or null if "p_s" is not generic
@@ -153,8 +150,7 @@ public abstract class GenericSortCondition {
 
     /**
      * @return a condition that specifies the given generic sort to be instantiated
-     * @param p_maximum
-     *        hint whether the generic sort should be instantiated with the maximum or
+     * @param p_maximum hint whether the generic sort should be instantiated with the maximum or
      *        mimimum possible concrete sort (this hint is currently not used by
      *        GenericSortInstantiations)
      */
@@ -176,10 +172,8 @@ public abstract class GenericSortCondition {
     /**
      * returns true if the given sort <code>s</code> satisfies this generic sort condition
      *
-     * @param s
-     *        the Sort to check
-     * @param insts
-     *        a map containing already found instantiations
+     * @param s the Sort to check
+     * @param insts a map containing already found instantiations
      * @return true if the given sort <code>s</code> satisfies this generic sort condition
      */
     public abstract boolean check(Sort s, GenericSortInstantiations insts);

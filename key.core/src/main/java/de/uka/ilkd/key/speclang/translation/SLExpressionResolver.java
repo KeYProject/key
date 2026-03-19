@@ -134,12 +134,9 @@ public abstract class SLExpressionResolver {
     /**
      * Resolves property calls on explicit receivers.
      *
-     * @param receiver
-     *        receiver (may *not* be null)
-     * @param name
-     *        name of the property
-     * @param parameters
-     *        the actual parameters, or null if not applicable
+     * @param receiver receiver (may *not* be null)
+     * @param name name of the property
+     * @param parameters the actual parameters, or null if not applicable
      * @return a suitable term or collection if successful, null otherwise
      * @throws SLTranslationException
      */

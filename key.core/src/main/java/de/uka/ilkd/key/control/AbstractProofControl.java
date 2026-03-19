@@ -70,8 +70,7 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * Constructor.
      *
-     * @param defaultProverTaskListener
-     *        The default {@link ProverTaskListener} which will be added
+     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
      *        to all started {@link ApplyStrategy} instances.
      */
     protected AbstractProofControl(ProverTaskListener defaultProverTaskListener) {
@@ -81,11 +80,9 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * Constructor.
      *
-     * @param defaultProverTaskListener
-     *        The default {@link ProverTaskListener} which will be added
+     * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
      *        to all started {@link ApplyStrategy} instances.
-     * @param ruleCompletionHandler
-     *        An optional {@link RuleCompletionHandler}.
+     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
     protected AbstractProofControl(ProverTaskListener defaultProverTaskListener,
             RuleCompletionHandler ruleCompletionHandler) {
@@ -231,6 +228,7 @@ public abstract class AbstractProofControl implements ProofControl {
                     // clear up any missing
                     // generic sort instantiations.
                 }
+
             }
             if (ifSeqInteraction || !firstApp.complete()) {
                 LinkedList<TacletApp> l = new LinkedList<>();
@@ -285,8 +283,7 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * Undo the last rule application on the given goal.
      *
-     * @param goal
-     *        a non-null goal
+     * @param goal a non-null goal
      * @see {@link Proof#pruneProof(Goal)}
      */
     public void pruneTo(Goal goal) {
@@ -307,12 +304,9 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * collects all Taclet applications at the given position of the specified taclet
      *
-     * @param goal
-     *        the Goal for which the applications should be returned
-     * @param name
-     *        the String with the taclet names whose applications are looked for
-     * @param pos
-     *        the PosInOccurrence describing the position
+     * @param goal the Goal for which the applications should be returned
+     * @param name the String with the taclet names whose applications are looked for
+     * @param pos the PosInOccurrence describing the position
      * @return a list of all found rule applications of the given rule at position pos
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
@@ -324,14 +318,10 @@ public abstract class AbstractProofControl implements ProofControl {
      * collects all taclet applications for the given position and taclet (identified by its name)
      * matching the filter condition
      *
-     * @param goal
-     *        the Goal for which the applications should be returned
-     * @param name
-     *        the String with the taclet names whose applications are looked for
-     * @param pos
-     *        the PosInOccurrence describing the position
-     * @param filter
-     *        the TacletFilter expressing restrictions
+     * @param goal the Goal for which the applications should be returned
+     * @param name the String with the taclet names whose applications are looked for
+     * @param pos the PosInOccurrence describing the position
+     * @param filter the TacletFilter expressing restrictions
      * @return a list of all found rule applications of the given rule at position <tt>pos</tt>
      *         passing the filter
      */
@@ -441,10 +431,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * collects all built-in rule applications for the given rule that are applicable at position
      * 'pos' and the current user constraint
      *
-     * @param rule
-     *        the BuiltInRule for which the applications are collected
-     * @param pos
-     *        the PosInSequent the position information
+     * @param rule the BuiltInRule for which the applications are collected
+     * @param pos the PosInSequent the position information
      * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
     public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(Goal focusedGoal, BuiltInRule rule,
@@ -465,10 +453,8 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * collects all applications of a rule given by its name at a give position in the sequent
      *
-     * @param name
-     *        the name of the BuiltInRule for which applications are collected.
-     * @param pos
-     *        the position in the sequent where the BuiltInRule should be applied
+     * @param name the name of the BuiltInRule for which applications are collected.
+     * @param pos the position in the sequent where the BuiltInRule should be applied
      * @return a SetOf<RuleApp> with all possible applications of the rule
      */
     protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name,
@@ -665,10 +651,12 @@ public abstract class AbstractProofControl implements ProofControl {
         }
 
         @Override
-        public void taskStarted(TaskStartedInfo info) {}
+        public void taskStarted(TaskStartedInfo info) {
+        }
 
         @Override
-        public void taskProgress(int position) {}
+        public void taskProgress(int position) {
+        }
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {

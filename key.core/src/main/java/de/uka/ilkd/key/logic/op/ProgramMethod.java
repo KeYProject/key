@@ -78,8 +78,7 @@ public final class ProgramMethod extends ObserverFunction
     /**
      * Get the java types of the parameters required by the method md.
      *
-     * @param md
-     *        some method declaration
+     * @param md some method declaration
      * @return java types of the parameters required by md
      */
     private static ImmutableArray<KeYJavaType> getParamTypes(MethodDeclaration md) {
@@ -149,8 +148,7 @@ public final class ProgramMethod extends ObserverFunction
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {

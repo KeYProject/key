@@ -46,9 +46,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return contract;
     }
 
-    public String getModality() {
-        return modality;
-    }
+    public String getModality() { return modality; }
 
     public ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
         return builtInIfInsts;

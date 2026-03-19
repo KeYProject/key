@@ -8,7 +8,8 @@ public class AxiomJustification implements RuleJustification {
 
     public static final AxiomJustification INSTANCE = new AxiomJustification();
 
-    private AxiomJustification() {}
+    private AxiomJustification() {
+    }
 
     public String toString() {
         return "axiom justification";

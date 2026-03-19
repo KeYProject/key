@@ -81,14 +81,10 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     /**
      * Instantiate a new variable condition.
      *
-     * @param receiver
-     *        program schema var for the receiver, may be null for class-local calls
-     * @param methname
-     *        non-null program schema var for the methodname
-     * @param args
-     *        non-null program schema var for the arguments of the call
-     * @param negation
-     *        {@code true} iff the condition is to be negated
+     * @param receiver program schema var for the receiver, may be null for class-local calls
+     * @param methname non-null program schema var for the methodname
+     * @param args non-null program schema var for the arguments of the call
+     * @param negation {@code true} iff the condition is to be negated
      */
     public MayExpandMethodCondition(SchemaVariable receiver, SchemaVariable methname,
             SchemaVariable args, boolean negation) {

@@ -21,10 +21,8 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
     /**
      * new textual representation.
      *
-     * @param modifiers
-     *        modifiers (are currently ignored)
-     * @param inv
-     *        the expression in this clause
+     * @param modifiers modifiers (are currently ignored)
+     * @param inv the expression in this clause
      */
     public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
             LabeledParserRuleContext inv) {

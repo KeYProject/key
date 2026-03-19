@@ -20,8 +20,7 @@ public interface JmlCheck {
     /**
      * Checks for the given parse tree and returns warnings if necessary.
      *
-     * @param ctx
-     *        an arbitrary {@link ParserRuleContext} from the {@link JmlParser}
+     * @param ctx an arbitrary {@link ParserRuleContext} from the {@link JmlParser}
      * @return a potential empty list of warnings
      */
     @NonNull

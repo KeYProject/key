@@ -16,8 +16,7 @@ public class NodeRedundantAddChange implements NodeChange {
     /**
      * creates an instance
      *
-     * @param pio
-     *        the PosInOccurrence of the formula that has been tried to add
+     * @param pio the PosInOccurrence of the formula that has been tried to add
      */
     public NodeRedundantAddChange(PosInOccurrence pio) {
         this.pio = pio;

@@ -79,15 +79,11 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * <h3>Postcondition</h3> It returns a formula that is a conjunction. It implies the equality of
      * termExt and termBase.
      *
-     * @param term
-     *        A term of the type {@code #ObserverEquality(t1, t2)}, not null.
-     * @param svInst
-     *        instantiations of schema variables, not used
-     * @param services
-     *        non-null {@link Services}
+     * @param term A term of the type {@code #ObserverEquality(t1, t2)}, not null.
+     * @param svInst instantiations of schema variables, not used
+     * @param services non-null {@link Services}
      * @return a non-null Term of sort FORMULA
-     * @throws IllegalArgumentException
-     *         if the term argument is not as expected
+     * @throws IllegalArgumentException if the term argument is not as expected
      */
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         JTerm termExt = term.sub(0);

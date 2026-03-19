@@ -23,8 +23,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     /**
      * Create a new {@link ShowSelectedSequentPrintFilter}.
      *
-     * @param pos
-     *        the position of the only sub-formula to show.
+     * @param pos the position of the only sub-formula to show.
      */
     public ShowSelectedSequentPrintFilter(PosInOccurrence pos) {
         this.pos = pos;

@@ -39,8 +39,7 @@ class TypeManager {
      * Creates a translated type hierarchy from the KeY sorts of the master handler by asserting the
      * subtype relationship (or its absence).
      *
-     * @param master
-     *        the master handler
+     * @param master the master handler
      */
     private void createSortTypeHierarchy(MasterHandler master, Services services) {
 
@@ -79,10 +78,8 @@ class TypeManager {
     }
 
     /**
-     * @param parent
-     *        the (possible) parent sort
-     * @param child
-     *        the (possible) child sort
+     * @param parent the (possible) parent sort
+     * @param child the (possible) child sort
      * @return true iff parent is a direct parent sort of child
      */
     private boolean isDirectParentOf(Sort parent, Sort child, Services s) {
@@ -90,10 +87,8 @@ class TypeManager {
     }
 
     /**
-     * @param s
-     *        The parent sort
-     * @param sorts
-     *        the set of sorts to test
+     * @param s The parent sort
+     * @param sorts the set of sorts to test
      * @return all direct child sorts of s in the set sorts
      */
     private Set<Sort> directChildSorts(Sort s, Set<Sort> sorts, Services services) {
@@ -116,8 +111,7 @@ class TypeManager {
      * Those symbols which are already known to the master handler are not created in the handler
      * but are still included in the result value.
      *
-     * @param master
-     *        the handler do which the declarations are added.
+     * @param master the handler do which the declarations are added.
      * @return a freshly created list
      */
     private List<SExpr> makeSortDecls(MasterHandler master) {
@@ -140,8 +134,7 @@ class TypeManager {
      * The sorts added to the handler are analysed, the respective constants are declared and axioms
      * regarding distinction and subtyping are added to master.
      *
-     * @param master
-     *        a master handler with collected sorts, will be modified
+     * @param master a master handler with collected sorts, will be modified
      */
     public void handle(MasterHandler master) {
         // declare the sort symbols ...

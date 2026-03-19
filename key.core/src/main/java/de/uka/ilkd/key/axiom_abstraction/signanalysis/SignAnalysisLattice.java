@@ -136,7 +136,8 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {}
+            public void remove() {
+            }
         };
     }
 

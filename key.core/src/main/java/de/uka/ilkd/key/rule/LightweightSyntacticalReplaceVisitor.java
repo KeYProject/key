@@ -59,10 +59,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param svInst
-     *        mapping of schemavariables to their instantiation
-     * @param services
-     *        the Services
+     * @param svInst mapping of schemavariables to their instantiation
+     * @param services the Services
      */
     public LightweightSyntacticalReplaceVisitor(SVInstantiations svInst, Services services) {
         this.services = services;
@@ -301,8 +299,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
      * can override this method when the visitor behaviour depends on information bound to
      * subtrees.
      *
-     * @param subtreeRoot
-     *        root of the subtree which the visitor leaves.
+     * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
     public void subtreeLeft(Term subtreeRoot) {

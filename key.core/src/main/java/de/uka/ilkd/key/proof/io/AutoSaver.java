@@ -55,10 +55,8 @@ public class AutoSaver implements ProverTaskListener {
     /**
      * Set default values.
      *
-     * @param saveInterval
-     *        the interval (= number of proof steps) to periodically save
-     * @param saveClosedProof
-     *        whether to save the final closed proof
+     * @param saveInterval the interval (= number of proof steps) to periodically save
+     * @param saveClosedProof whether to save the final closed proof
      */
     public static void setDefaultValues(int saveInterval, boolean saveClosedProof) {
         defaultSaveInterval = saveInterval;
@@ -98,8 +96,7 @@ public class AutoSaver implements ProverTaskListener {
      * Set the proof to be saved. Call this method <b>before</b> adding this listener to the
      * strategy.
      *
-     * @param p
-     *        proof to save, must not be null
+     * @param p proof to save, must not be null
      */
     public void setProof(Proof p) {
         proof = p;
@@ -108,8 +105,7 @@ public class AutoSaver implements ProverTaskListener {
     /**
      * Saves the proof at the end of an interval.
      *
-     * @throws IllegalStateException
-     *         if no proof was set
+     * @throws IllegalStateException if no proof was set
      */
     @Override
     public void taskProgress(int progress) {

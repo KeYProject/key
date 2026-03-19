@@ -21,8 +21,7 @@ public class TermLabelVisibilityManagerEvent extends EventObject {
     /**
      * Constructor.
      *
-     * @param source
-     *        The source {@link TermLabelVisibilityManager}.
+     * @param source The source {@link TermLabelVisibilityManager}.
      */
     public TermLabelVisibilityManagerEvent(TermLabelVisibilityManager source) {
         super(source);

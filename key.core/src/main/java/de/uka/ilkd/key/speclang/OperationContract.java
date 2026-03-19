@@ -41,14 +41,10 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifiable clause of the contract.
      *
-     * @param heapVar
-     *        the heap variable.
-     * @param selfVar
-     *        the self variable.
-     * @param paramVars
-     *        the list of parameter variables.
-     * @param services
-     *        the services object.
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services the services object.
      * @return the modifiable clause.
      */
     JTerm getModifiable(LocationVariable heapVar, LocationVariable selfVar,
@@ -57,16 +53,11 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifiable clause of the contract.
      *
-     * @param heapVar
-     *        the heap variable
-     * @param heapTerm
-     *        the heap variable term.
-     * @param selfTerm
-     *        the self variable term.
-     * @param paramTerms
-     *        the list of parameter variable terms.
-     * @param services
-     *        the services object.
+     * @param heapVar the heap variable
+     * @param heapTerm the heap variable term.
+     * @param selfTerm the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param services the services object.
      * @return the modifiable clause.
      */
     JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, JTerm selfTerm,
@@ -75,14 +66,10 @@ public interface OperationContract extends Contract {
     /**
      * Returns the free modifiable clause of the contract.
      *
-     * @param heapVar
-     *        the heap variable.
-     * @param selfVar
-     *        the self variable.
-     * @param paramVars
-     *        the list of parameter variables.
-     * @param services
-     *        the services object.
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services the services object.
      * @return the free modifiable clause.
      */
     JTerm getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
@@ -92,16 +79,11 @@ public interface OperationContract extends Contract {
     /**
      * Returns the free modifiable clause of the contract.
      *
-     * @param heapVar
-     *        the heap variable
-     * @param heapTerm
-     *        the heap variable term.
-     * @param selfTerm
-     *        the self variable term.
-     * @param paramTerms
-     *        the list of parameter variable terms.
-     * @param services
-     *        the services object.
+     * @param heapVar the heap variable
+     * @param heapTerm the heap variable term.
+     * @param selfTerm the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param services the services object.
      * @return the free modifiable clause.
      */
     JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,

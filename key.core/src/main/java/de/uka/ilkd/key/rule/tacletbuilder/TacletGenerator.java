@@ -49,7 +49,8 @@ public class TacletGenerator {
     private static final TacletGenerator instance = new TacletGenerator();
 
 
-    private TacletGenerator() {}
+    private TacletGenerator() {
+    }
 
 
     public static TacletGenerator getInstance() {
@@ -808,8 +809,7 @@ public class TacletGenerator {
      * Replaces any bound logical variables in t with schema variables (necessary for proof
      * saving/loading, if t occurs as part of a taclet).
      *
-     * @param services
-     *        TODO
+     * @param services TODO
      */
     private TermAndBoundVarPair replaceBoundLogicVars(JTerm t, TermServices services) {
         // recursive replacement process

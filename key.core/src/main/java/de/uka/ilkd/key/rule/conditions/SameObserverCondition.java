@@ -55,12 +55,9 @@ public final class SameObserverCondition implements VariableCondition {
     /**
      * Create a new condition
      *
-     * @param schema1
-     *        first argument, must be schema variable
-     * @param schema2
-     *        2nd argument, must be schema variable
-     * @throws IllegalArgumentException
-     *         if the args are not schema variables.
+     * @param schema1 first argument, must be schema variable
+     * @param schema2 2nd argument, must be schema variable
+     * @throws IllegalArgumentException if the args are not schema variables.
      */
     public SameObserverCondition(ParsableVariable schema1, ParsableVariable schema2) {
         try {

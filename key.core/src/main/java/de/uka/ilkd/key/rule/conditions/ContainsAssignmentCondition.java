@@ -39,12 +39,9 @@ public class ContainsAssignmentCondition extends VariableConditionAdapter {
     /**
      * creates an instance of the variable condition
      *
-     * @param x
-     *        the schemavariable whose instantiation is to be checked
-     * @param negated
-     *        true iff the check should ensure the absence of an assignment statement
-     * @throws IllegalArgumentException
-     *         if the given schemavariable is not a {@link ProgramSV}
+     * @param x the schemavariable whose instantiation is to be checked
+     * @param negated true iff the check should ensure the absence of an assignment statement
+     * @throws IllegalArgumentException if the given schemavariable is not a {@link ProgramSV}
      */
     public ContainsAssignmentCondition(SchemaVariable x, boolean negated) {
         if (!(x instanceof ProgramSV)) {

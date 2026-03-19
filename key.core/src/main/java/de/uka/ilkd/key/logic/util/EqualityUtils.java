@@ -13,8 +13,7 @@ public class EqualityUtils {
      * Computes the hashcode modulo a given property of an iterable of elements that implement
      * {@link EqualsModProperty}.
      *
-     * @param iter
-     *        iterable of terms
+     * @param iter iterable of terms
      * @return combined hashcode
      */
     public static <T> int hashCodeModPropertyOfIterable(

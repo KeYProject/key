@@ -82,10 +82,8 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * Replace sorts.
      *
-     * @param extendsSorts
-     *        the extends sorts
-     * @param services
-     *        the services
+     * @param extendsSorts the extends sorts
+     * @param services the services
      * @return the immutable set
      */
     private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts,

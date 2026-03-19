@@ -25,8 +25,7 @@ public class DoBreak extends ProgramTransformer {
     /**
      * creates a do-break ProgramTransformer
      *
-     * @param labeledBreak
-     *        the LabeledStatement contained by the meta construct
+     * @param labeledBreak the LabeledStatement contained by the meta construct
      */
     public DoBreak(LabeledStatement labeledBreak) {
         super("do-break", labeledBreak);
@@ -35,10 +34,8 @@ public class DoBreak extends ProgramTransformer {
     /**
      * a helper method to perform the symbolic execution of the doBreak metaconstruct.
      *
-     * @param block
-     *        the NonTerminalProgramElement to go through and look for the label
-     * @param breakLabel
-     *        the Label the break statement marked
+     * @param block the NonTerminalProgramElement to go through and look for the label
+     * @param breakLabel the Label the break statement marked
      */
     private ProgramElement doBreak(NonTerminalProgramElement block, Label breakLabel, Break b) {
 
@@ -62,8 +59,7 @@ public class DoBreak extends ProgramTransformer {
     /**
      * performs the program transformation needed for symbolic program transformation
      *
-     * @param services
-     *        the Services with all necessary information about the java programs
+     * @param services the Services with all necessary information about the java programs
      * @return the transformated program
      */
     @Override

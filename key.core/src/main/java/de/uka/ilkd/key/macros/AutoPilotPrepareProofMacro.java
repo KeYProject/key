@@ -32,9 +32,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULE_SETS =
         Set.of(new String[] { "update_elim", "update_join" });
 
-    public AutoPilotPrepareProofMacro() {
-        super();
-    }
+    public AutoPilotPrepareProofMacro() { super(); }
 
     @Override
     public String getName() {

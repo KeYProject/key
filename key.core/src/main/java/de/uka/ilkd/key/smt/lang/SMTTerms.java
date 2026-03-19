@@ -40,8 +40,7 @@ public class SMTTerms extends SMTTerm {
     }
 
     /**
-     * @param terms
-     *        the terms to set
+     * @param terms the terms to set
      */
     public void setTerms(List<SMTTerm> terms) {
         this.terms = terms;

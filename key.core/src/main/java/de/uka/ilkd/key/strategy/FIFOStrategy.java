@@ -25,7 +25,8 @@ public class FIFOStrategy implements Strategy<Goal> {
 
     private static final Name NAME = new Name("FIFO");
 
-    private FIFOStrategy() {}
+    private FIFOStrategy() {
+    }
 
     /**
      * Evaluate the cost of a <code>RuleApp</code>.

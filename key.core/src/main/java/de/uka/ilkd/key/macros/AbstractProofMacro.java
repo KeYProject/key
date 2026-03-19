@@ -57,7 +57,8 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public void resetParams() {}
+    public void resetParams() {
+    }
 
     @Override
     public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {

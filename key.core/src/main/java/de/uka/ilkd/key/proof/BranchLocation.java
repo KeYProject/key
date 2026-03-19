@@ -30,8 +30,7 @@ public class BranchLocation {
     /**
      * Construct a new branch location given a list of branch choices.
      *
-     * @param location
-     *        series of branch choices
+     * @param location series of branch choices
      */
     public BranchLocation(ImmutableList<Pair<Node, Integer>> location) {
         this.location = location;
@@ -40,8 +39,7 @@ public class BranchLocation {
     /**
      * Compute the (longest) common prefix of a set of branch locations.
      *
-     * @param locations
-     *        branch locations
+     * @param locations branch locations
      * @return their common prefix
      */
     public static BranchLocation commonPrefix(BranchLocation... locations) {
@@ -80,8 +78,7 @@ public class BranchLocation {
     /**
      * Remove a prefix from this branch location.
      *
-     * @param prefix
-     *        prefix to remove
+     * @param prefix prefix to remove
      * @return the remaining suffix
      */
     public BranchLocation stripPrefix(BranchLocation prefix) {
@@ -91,8 +88,7 @@ public class BranchLocation {
     /**
      * Add a branch choice to this branch location.
      *
-     * @param newBranch
-     *        branch choice
+     * @param newBranch branch choice
      * @return extnded branch location
      */
     public BranchLocation append(Pair<Node, Integer> newBranch) {
@@ -131,8 +127,7 @@ public class BranchLocation {
     /**
      * Get the branching proof node of the branch choice at the specified index.
      *
-     * @param idx
-     *        index
+     * @param idx index
      * @return branching proof node
      */
     public Node getNode(int idx) {
@@ -140,8 +135,7 @@ public class BranchLocation {
     }
 
     /**
-     * @param prefix
-     *        other branch location
+     * @param prefix other branch location
      * @return whether this branch location is built on the provided location
      */
     public boolean hasPrefix(BranchLocation prefix) {

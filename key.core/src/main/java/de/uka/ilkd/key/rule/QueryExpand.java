@@ -111,10 +111,8 @@ public class QueryExpand implements BuiltInRule {
      * This is a utility method, that may also be used by other classes.
      *
      * @param services
-     * @param query
-     *        The query on which the query expand rule is applied
-     * @param instVars
-     *        If null, then the result of the query can be stored in a constant (e.g.
+     * @param query The query on which the query expand rule is applied
+     * @param instVars If null, then the result of the query can be stored in a constant (e.g.
      *        {@code res=query(a)}). Otherwise, it is a list of logical variables that can be
      *        instantiated
      *        (using the rules allLeft, exRight) and therefore the result of the query must be
@@ -271,13 +269,10 @@ public class QueryExpand implements BuiltInRule {
      * evaluations/expansions are inserted into a copy of <code>term</code> that is returned.
      *
      * @param services
-     * @param term
-     *        A formula that potentially contains queries that should be evaluated/expanded.
-     * @param positiveContext
-     *        Set false iff the <code>term</code> is in a logically negated context
+     * @param term A formula that potentially contains queries that should be evaluated/expanded.
+     * @param positiveContext Set false iff the <code>term</code> is in a logically negated context
      *        wrt. to the succedent.
-     * @param allowExpandBelowInstQuantifier
-     *        TODO
+     * @param allowExpandBelowInstQuantifier TODO
      * @return A modified version of the <code>term</code> with inserted "query evalutions".
      * @author gladisch
      */
@@ -322,30 +317,22 @@ public class QueryExpand implements BuiltInRule {
      * Find queries in t and suitable positions where to insert their evaluations in t. This method
      * is called by the method <code>evaluateQueries<\code>.
      *
-     * @param t
-     *        The term where to search for queries and query evaluation positions.
-     * @param level
-     *        The current recursion level of this method call.
-     * @param pathInTerm
-     *        List of integers describing the current path in the syntax tree (of the
+     * @param t The term where to search for queries and query evaluation positions.
+     * @param level The current recursion level of this method call.
+     * @param pathInTerm List of integers describing the current path in the syntax tree (of the
      *        term at level 0).
-     * @param instVars
-     *        If null, then query evaluation below instantiable quantifiers (i.e.
+     * @param instVars If null, then query evaluation below instantiable quantifiers (i.e.
      *        non-Skolemizable quantifiers) is suppressed. If not null, then this list collects the
      *        logical variables of instantiable quantifers that the query evaluation depends on.
      *        This is to needed to create e.g. (forall i; query(i)=res(i)) instead of (forall
      *        i;query(i)=res); the latter is unsound.
-     * @param curPosIsPositive
-     *        True iff the current position in the formula we are in is a logically
+     * @param curPosIsPositive True iff the current position in the formula we are in is a logically
      *        positive context (when considering polarity wrt. logical negation).
-     * @param qepLevel
-     *        The top-most level on the current path where the query evaluation could be
+     * @param qepLevel The top-most level on the current path where the query evaluation could be
      *        inserted. Its either top-level (0) or below a quantifier.
-     * @param qepIsPositive
-     *        True iff the logical context at position qepLevel is positive (i.e., not
+     * @param qepIsPositive True iff the logical context at position qepLevel is positive (i.e., not
      *        negated, or negations have cancelled out).
-     * @param qeps
-     *        The resulting collection of query evaluation positions.
+     * @param qeps The resulting collection of query evaluation positions.
      * @author gladisch
      */
     @SuppressWarnings("unchecked")
@@ -564,10 +551,8 @@ public class QueryExpand implements BuiltInRule {
      *
      * @param term
      * @param with
-     * @param it
-     *        iterator with argument positions. This is the path in the syntax tree of term.
-     * @param services
-     *        TODO
+     * @param it iterator with argument positions. This is the path in the syntax tree of term.
+     * @param services TODO
      * @return Resulting term after replacement.
      * @note Was originally implemented in QueryExpand.java.
      */

@@ -27,8 +27,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
     /**
      * returns the type signature of the parameter list
      *
-     * @param services
-     *        the Services
+     * @param services the Services
      * @return the list of types that compose the type signature
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {

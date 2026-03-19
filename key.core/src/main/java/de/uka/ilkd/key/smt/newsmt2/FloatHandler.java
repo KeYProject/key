@@ -203,8 +203,7 @@ public class FloatHandler implements SMTHandler {
     /**
      * Translate a float literal of sort "float" in FP notation to an SMTLIB fp literal
      *
-     * @param term
-     *        an application of FP
+     * @param term an application of FP
      * @return A string containing the translated literal
      */
     public static SExpr floatLiteralToSMT(Term term, Services services) {
@@ -222,8 +221,7 @@ public class FloatHandler implements SMTHandler {
     /**
      * Translate a double literal of sort "double" in DFP notation to an SMTLIB fp literal
      *
-     * @param term
-     *        an application of DFP
+     * @param term an application of DFP
      * @return An sexpr containing the translated literal
      */
     public static SExpr doubleLiteralToSMT(Term term, Services services) {

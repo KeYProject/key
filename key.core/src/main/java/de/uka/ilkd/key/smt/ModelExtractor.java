@@ -56,8 +56,7 @@ abstract class AbstractQuery implements Query {
     }
 
     /**
-     * @param result
-     *        the result to set
+     * @param result the result to set
      */
     public void setResult(String result) {
         this.result = result;

@@ -118,8 +118,7 @@ public final class ParameterlessTermLabel implements TermLabel {
     /**
      * Instantiates a new simple term label.
      *
-     * @param name
-     *        the name, not <code>null</code> The fixed associated instantiator, may be
+     * @param name the name, not <code>null</code> The fixed associated instantiator, may be
      *        <code>null</code>.
      */
     public ParameterlessTermLabel(Name name) {

@@ -19,10 +19,8 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
      * Construct this class with the parameters for {@link #isSuitableFor(String)} and
      * {@link #getArgumentTypes()}.
      *
-     * @param triggerName
-     *        the name of this command.
-     * @param argumentsTypes
-     *        the argument type of this command.
+     * @param triggerName the name of this command.
+     * @param argumentsTypes the argument type of this command.
      */
     protected AbstractTacletBuilderCommand(@NonNull String triggerName,
             @NonNull ArgumentType... argumentsTypes) {

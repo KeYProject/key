@@ -38,13 +38,10 @@ public class PosInProgram {
     /**
      * returns the ProgramElement at the given position
      *
-     * @param pos
-     *        the PosInProgram
-     * @param prg
-     *        the ProgramElement we walk through
+     * @param pos the PosInProgram
+     * @param prg the ProgramElement we walk through
      * @return the ProgramElement at the given position
-     * @throws IndexOutOfBoundsException
-     *         if position <code>pos</code> refers to a non-existent
+     * @throws IndexOutOfBoundsException if position <code>pos</code> refers to a non-existent
      *         program element
      */
     public static ProgramElement getProgramAt(PosInProgram pos, ProgramElement prg) {
@@ -92,8 +89,7 @@ public class PosInProgram {
     /**
      * descending downwards choosing the n'th statement of the program
      *
-     * @param n
-     *        the int describes the position of the statement in the block
+     * @param n the int describes the position of the statement in the block
      * @return position of the statement
      */
     public PosInProgram down(int n) {

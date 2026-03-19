@@ -35,8 +35,7 @@ public final class ProofCollection {
      * {@link ProofCollectionUnit}s.
      *
      * @return A list of {@link RunAllProofsTestUnit}s.
-     * @throws IOException
-     *         Names of {@link SingletonProofCollectionUnit}s are
+     * @throws IOException Names of {@link SingletonProofCollectionUnit}s are
      *         determined by their
      *         corresponding file names. In case file name can't be read
      *         {@link IOException} may be

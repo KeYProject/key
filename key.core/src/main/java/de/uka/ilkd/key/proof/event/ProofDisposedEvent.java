@@ -21,8 +21,7 @@ public class ProofDisposedEvent extends EventObject {
     /**
      * Constructor.
      *
-     * @param source
-     *        The {@link Proof}.
+     * @param source The {@link Proof}.
      */
     public ProofDisposedEvent(Proof source) {
         super(source);

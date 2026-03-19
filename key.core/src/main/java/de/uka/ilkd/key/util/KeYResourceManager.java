@@ -125,14 +125,11 @@ public class KeYResourceManager {
      * Copies the specified resource to targetLocation if such a file does not exist yet. The
      * created file is removed automatically after finishing JAVA.
      *
-     * @param o
-     *        an Object the directory from where <code>resourcename</code> is copied is determined
+     * @param o an Object the directory from where <code>resourcename</code> is copied is determined
      *        by looking on the package where <code>o.getClass()</code> is declared
-     * @param resourcename
-     *        String the name of the file to search (only relative pathname to the path
+     * @param resourcename String the name of the file to search (only relative pathname to the path
      *        of the calling class)
-     * @param targetLocation
-     *        target for copying
+     * @param targetLocation target for copying
      * @return true if resource was copied
      */
     public boolean copyIfNotExists(Object o, String resourcename, String targetLocation) {
@@ -196,10 +193,8 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param cl
-     *        the Class used to determine the resource
-     * @param resourcename
-     *        the String that contains the name of the resource
+     * @param cl the Class used to determine the resource
+     * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
     public @Nullable URL getResourceFile(Class<?> cl, String resourcename) {
@@ -213,10 +208,8 @@ public class KeYResourceManager {
     /**
      * loads a resource and returns its URL
      *
-     * @param o
-     *        the Object used to determine the resource
-     * @param resourcename
-     *        the String that contains the name of the resource
+     * @param o the Object used to determine the resource
+     * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
     public @Nullable URL getResourceFile(Object o, String resourcename) {
