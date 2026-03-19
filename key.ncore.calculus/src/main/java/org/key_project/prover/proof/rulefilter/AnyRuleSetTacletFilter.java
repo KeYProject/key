@@ -9,7 +9,8 @@ import org.key_project.prover.rules.Taclet;
 /// applied automatically.
 public class AnyRuleSetTacletFilter extends TacletFilter {
 
-    private AnyRuleSetTacletFilter() {}
+    private AnyRuleSetTacletFilter() {
+    }
 
     /// @return true iff <code>taclet</code> should be included in the result
     public boolean filter(Taclet taclet) {
