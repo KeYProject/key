@@ -31,5 +31,6 @@ public class Icons {
     public static final IconFontProvider EXPLORE_DISABLE =
         new IconFontProvider(MaterialDesignRegular.EXPLORE, Color.GRAY);
 
-    private Icons() {}
+    private Icons() {
+    }
 }
