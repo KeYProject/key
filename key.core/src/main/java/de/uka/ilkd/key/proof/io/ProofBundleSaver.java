@@ -54,7 +54,8 @@ public class ProofBundleSaver extends ProofSaver {
         String proofFileName = MiscTools.toValidFileName(proof.name() + ".proof");
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
-        save(repo.createOutputStream(Paths.get(proofFileName)));
+        final var path = Paths.get(proofFileName);
+        save(path.toAbsolutePath().getParent(), repo.createOutputStream(path));
 
         // save proof bundle with the help of the FileRepo
         ((AbstractFileRepo) repo).saveProof(file);
