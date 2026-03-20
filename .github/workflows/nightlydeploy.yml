@@ -81,7 +81,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |          
           gh release create --generate-notes --title "Nightly Release" \
-             --prerelease --notes-start-tag KEY-2.12.4-rc \
+             --prerelease --notes-start-tag KEY-2.12.3 \
              nightly key.ui/build/libs/key-*-exe.jar
 
   deploy-maven:
