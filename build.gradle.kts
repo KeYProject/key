@@ -14,6 +14,8 @@ plugins {
 
     // Code formatting
     id("com.diffplug.spotless")
+
+    id("com.github.ben-manes.versions")
 }
 
 // Configure this project for use inside IntelliJ:
