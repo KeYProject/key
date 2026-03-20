@@ -5,8 +5,8 @@ package de.uka.ilkd.key.java;
 
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -41,7 +41,7 @@ public final class TypeConverter {
     private final Services services;
 
     // Maps LDT names to LDT instances.
-    private final Map<Name, LDT> LDTs = new HashMap<>();
+    private final Map<Name, LDT> LDTs = new TreeMap<>();
 
     private HeapLDT heapLDT = null;
     // private IntegerLDT integerLDT = null;

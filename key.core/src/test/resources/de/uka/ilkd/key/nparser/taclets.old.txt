@@ -34,7 +34,7 @@ Choices: (programRules:Java & JavaCard:on)}
 accDefinition {
 \find(acc(h,s,o,o2))
 \varcond(\notFreeIn(fv (variable), o2 (deltaObject term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(fv (variable), h (Heap term)))
-\replacewith(and(and(not(equals(o,null)),not(equals(o2,null))),exists{fv (variable)}(and(elementOf(o,fv,s),equals(select<[deltaObject]>(h,o,fv),o2))))) 
+\replacewith(and(and(not(equals(o,null)),not(equals(o2,null))),exists{fv (variable)}(and(elementOf(o,fv,s),equals(select<[deltaObject]>(h,o,fv),o2)))))
 \heuristics(simplify)
 Choices: reach:on}
 -----------------------------------------------------
@@ -679,7 +679,7 @@ allocateInstance {
   #lhs = #t.#allocate()@#t;
 ... }}| (post))
 \varcond(\hasSort(#t2 (program Type), alphaObj))
-\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),equals(select<[boolean]>(heap,#lhs,java.lang.Object::<created>),FALSE))),equals(exactInstance<[alphaObj]>(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(create(heap,#lhs)),#allmodal(post))]) 
+\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),equals(select<[boolean]>(heap,#lhs,java.lang.Object::<created>),FALSE))),equals(exactInstance<[alphaObj]>(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(create(heap,#lhs)),#allmodal(post))])
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
 -----------------------------------------------------
@@ -689,7 +689,7 @@ allocateInstanceWithLength {
   #lhs = #t.#allocate(#len)@#t;
 ... }}| (post))
 \varcond(\hasSort(#t2 (program Type), alphaObj))
-\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(select<[boolean]>(heap,#lhs,java.lang.Object::<created>),FALSE),equals(length(#lhs),#len)))),equals(exactInstance<[alphaObj]>(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::<transient>,Z(0(#))),#lhs,java.lang.Object::<transactionConditionallyUpdated>,FALSE)),#allmodal(post))]) 
+\add [and(and(not(equals(#lhs,null)),imp(wellFormed(heap),and(equals(select<[boolean]>(heap,#lhs,java.lang.Object::<created>),FALSE),equals(length(#lhs),#len)))),equals(exactInstance<[alphaObj]>(#lhs),TRUE))]==>[] \replacewith([]==>[update-application(elem-update(heap)(store(store(create(heap,#lhs),#lhs,java.lang.Object::<transient>,Z(0(#))),#lhs,java.lang.Object::<transactionConditionallyUpdated>,FALSE)),#allmodal(post))])
 \heuristics(method_expand)
 Choices: (programRules:Java & permissions:off)}
 -----------------------------------------------------
@@ -1076,7 +1076,7 @@ Choices: true}
 array2seqDef {
 \find(array2seq(h,a))
 \varcond(\notFreeIn(u (variable), h (Heap term)), \notFreeIn(u (variable), a (java.lang.Object term)))
-\replacewith(seqDef{u (variable)}(Z(0(#)),length(a),select<[any]>(h,a,arr(u)))) 
+\replacewith(seqDef{u (variable)}(Z(0(#)),length(a),select<[any]>(h,a,arr(u))))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -1148,24 +1148,24 @@ array_self_reference {
 \assumes ([wellFormed(heapSV)]==>[equals(array,null)]) 
 \find(arrayStoreValid(array,select<[G]>(heapSV,array,arr(idx))))
 \sameUpdateLevel\replacewith(true) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == array_self_reference_eq (array_self_reference_eq) =========================================
 array_self_reference_eq {
-\assumes ([wellFormed(heapSV),equals(select<[G]>(heapSV,array,arr(idx)),EQ)]==>[equals(array,null)]) 
+\assumes ([wellFormed(heapSV),equals(select<[G]>(heapSV,array,arr(idx)),EQ)]==>[equals(array,null)])
 \find(arrayStoreValid(array,EQ))
 \sameUpdateLevel\replacewith(true) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == array_store_known_dynamic_array_type (known dynamic array type) =========================================
 array_store_known_dynamic_array_type {
-\assumes ([equals(exactInstance<[J]>(array),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[J]>(array),TRUE)]==>[])
 \find(arrayStoreValid(array,obj))
 \sameUpdateLevel\varcond(\isReference[non_null]( J ))
-\replacewith(or(equals(obj,null),equals(#arrayBaseInstanceOf(exactInstance<[J]>(array),obj),TRUE))) 
-\heuristics(simplify)
+\replacewith(or(equals(obj,null),equals(#arrayBaseInstanceOf(exactInstance<[J]>(array),obj),TRUE)))
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == asinIsNaN (asinIsNaN) =========================================
@@ -1235,7 +1235,7 @@ Choices: (programRules:Java & assertions:safe)}
 assignableDefinition {
 \find(assignable(heapNew,heapOld,locs))
 \varcond(\notFreeIn(f (variable), heapNew (Heap term)), \notFreeIn(f (variable), heapOld (Heap term)), \notFreeIn(f (variable), locs (LocSet term)), \notFreeIn(o (variable), heapNew (Heap term)), \notFreeIn(o (variable), heapOld (Heap term)), \notFreeIn(o (variable), locs (LocSet term)))
-\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(select<[boolean]>(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(select<[any]>(heapNew,o,f),select<[any]>(heapOld,o,f)))))) 
+\replacewith(all{f (variable)}(all{o (variable)}(or(or(elementOf(o,f,locs),and(not(equals(o,null)),not(equals(select<[boolean]>(heapOld,o,java.lang.Object::<created>),TRUE)))),equals(select<[any]>(heapNew,o,f),select<[any]>(heapOld,o,f))))))
 \heuristics(delayedExpansion)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1838,7 +1838,7 @@ assignment_array2 {
 \varcond(\hasSort(\elemSort(#v0 (program Variable)), G))
 \add [and(not(equals(#v0,null)),or(leq(length(#v0),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v0,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(#v (program Variable))(select<[G]>(heap,#v0,arr(#se))),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#v (program Variable))(select<[G]>(heap,#v0,arr(#se))),#allmodal(post))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
@@ -1849,7 +1849,7 @@ assignment_read_attribute {
 ... }}| (post))
 \varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)),  \not \final(#a (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(select<[G]>(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(select<[G]>(heap,#v,#memberPVToField(#a))),#allmodal(post))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
@@ -1860,7 +1860,7 @@ assignment_read_attribute_final {
 ... }}| (post))
 \varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), \final(#a (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(final<[G]>(#v,#memberPVToField(#a))),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(final<[G]>(#v,#memberPVToField(#a))),#allmodal(post))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
@@ -1870,7 +1870,7 @@ assignment_read_attribute_this {
   #v0 = #v.#a;
 ... }}| (post))
 \varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)),  \not \final(#a (program Variable)))
-\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(select<[G]>(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(select<[G]>(heap,#v,#memberPVToField(#a))),#allmodal(post))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
@@ -1880,7 +1880,7 @@ assignment_read_attribute_this_final {
   #v0 = #v.#a;
 ... }}| (post))
 \varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), \final(#a (program Variable)))
-\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(final<[G]>(#v,#memberPVToField(#a))),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(final<[G]>(#v,#memberPVToField(#a))),#allmodal(post))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
@@ -1911,7 +1911,7 @@ assignment_read_static_attribute {
   #v0 = @(#sv);
 ... }}| (post))
 \sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G),  \not \final(#sv (program StaticVariable)))
-\replacewith(update-application(elem-update(#v0 (program Variable))(select<[G]>(heap,null,#memberPVToField(#sv))),#allmodal(post))) 
+\replacewith(update-application(elem-update(#v0 (program Variable))(select<[G]>(heap,null,#memberPVToField(#sv))),#allmodal(post)))
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & finalFields:immutable)}
 -----------------------------------------------------
@@ -1921,7 +1921,7 @@ assignment_read_static_attribute_final {
   #v0 = @(#sv);
 ... }}| (post))
 \sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G), \final(#sv (program StaticVariable)))
-\replacewith(update-application(elem-update(#v0 (program Variable))(final<[G]>(null,#memberPVToField(#sv))),#allmodal(post))) 
+\replacewith(update-application(elem-update(#v0 (program Variable))(final<[G]>(null,#memberPVToField(#sv))),#allmodal(post)))
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: (programRules:Java & finalFields:immutable)}
 -----------------------------------------------------
@@ -1931,7 +1931,7 @@ assignment_read_static_attribute_with_variable_prefix {
   #loc = @(#v.#sv);
 ... }}| (post))
 \varcond(\hasSort(#sv (program StaticVariable), G))
-\replacewith(update-application(elem-update(#loc (program Variable))(select<[G]>(heap,#v,#memberPVToField(#sv))),#allmodal(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(select<[G]>(heap,#v,#memberPVToField(#sv))),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -1955,7 +1955,7 @@ assignment_to_primitive_array_component_transaction {
 \varcond( \not \isReferenceArray(#v (program Variable)))
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(select<[int]>(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(select<[boolean]>(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))]) 
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(select<[int]>(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(select<[boolean]>(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & JavaCard:on)}
 -----------------------------------------------------
@@ -1981,7 +1981,7 @@ assignment_to_reference_array_component_transaction {
 \add [and(and(and(not(equals(#v,null)),lt(#se,length(#v))),geq(#se,Z(0(#)))),not(arrayStoreValid(#v,#se0)))]==>[] \replacewith([]==>[false]) ;
 \add [and(not(equals(#v,null)),or(leq(length(#v),#se),lt(#se,Z(0(#)))))]==>[] \replacewith([]==>[false]) ;
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
-\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(select<[int]>(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(select<[boolean]>(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))]) 
+\replacewith([]==>[update-application(elem-update(heap)(store(heap,#v,arr(#se),#se0)),update-application(elem-update(savedHeap)(if-then-else(equals(select<[int]>(heap,#v,java.lang.Object::<transient>),Z(0(#))),store(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>,TRUE),if-then-else(equals(select<[boolean]>(savedHeap,#v,java.lang.Object::<transactionConditionallyUpdated>),FALSE),store(savedHeap,#v,arr(#se),#se0),savedHeap))),#transaction(post)))])
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: ((programRules:Java & runtimeExceptions:ban) & JavaCard:on)}
 -----------------------------------------------------
@@ -3446,9 +3446,9 @@ Choices: true}
 -----------------------------------------------------
 == castAdd (narrow type) =========================================
 castAdd {
-\assumes ([equals(instance<[CSub]>(strictCTerm2),TRUE)]==>[]) 
+\assumes ([equals(instance<[CSub]>(strictCTerm2),TRUE)]==>[])
 \find(strictCTerm2)
-\sameUpdateLevel\replacewith(cast<[CSub]>(strictCTerm2)) 
+\sameUpdateLevel\replacewith(cast<[CSub]>(strictCTerm2))
 
 Choices: true}
 -----------------------------------------------------
@@ -3457,7 +3457,7 @@ castAdd2 {
 \assumes ([equals(cs,gt)]==>[]) 
 \find(gt)
 \sameUpdateLevel\varcond(\strict\sub(C, G))
-\replacewith(cast<[C]>(gt)) 
+\replacewith(cast<[C]>(gt))
 
 Choices: true}
 -----------------------------------------------------
@@ -3481,7 +3481,7 @@ castLongToFloatAddition2 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seFloat + #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat,cast<[float]>(#seLong))),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat,cast<[float]>(#seLong))),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -3498,7 +3498,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == castTrueImpliesOriginalTrue (castTrueImpliesOriginalTrue) =========================================
 castTrueImpliesOriginalTrue {
-\assumes ([equals(select<[boolean]>(h,o,f),TRUE)]==>[]) 
+\assumes ([equals(select<[boolean]>(h,o,f),TRUE)]==>[])
 \find(==>equals(select<[any]>(h,o,f),TRUE))
 \replacewith([]==>[true]) 
 \heuristics(concrete)
@@ -3506,24 +3506,24 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == castType (castType) =========================================
 castType {
-\assumes ([equals(instance<[H]>(cast<[C]>(s)),TRUE)]==>[]) 
+\assumes ([equals(instance<[H]>(cast<[C]>(s)),TRUE)]==>[])
 \find(equals(instance<[CSub]>(s),TRUE)==>)
-\replacewith([equals(instance<[H]>(s),TRUE)]==>[]) 
+\replacewith([equals(instance<[H]>(s),TRUE)]==>[])
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == castType2 (castType) =========================================
 castType2 {
-\assumes ([]==>[equals(instance<[H]>(cast<[C]>(s)),TRUE)]) 
+\assumes ([]==>[equals(instance<[H]>(cast<[C]>(s)),TRUE)])
 \find(equals(instance<[CSub]>(s),TRUE)==>)
-\replacewith([]==>[equals(instance<[H]>(s),TRUE)]) 
+\replacewith([]==>[equals(instance<[H]>(s),TRUE)])
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == castedGetAny (castedGetAny) =========================================
 castedGetAny {
 \find(cast<[beta]>(seqGet<[any]>(seq,idx)))
-\replacewith(seqGet<[beta]>(seq,idx)) 
+\replacewith(seqGet<[beta]>(seq,idx))
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -3562,14 +3562,14 @@ Choices: true}
 -----------------------------------------------------
 == closeType (closeType) =========================================
 closeType {
-\assumes ([]==>[equals(instance<[G]>(t1),TRUE)]) 
+\assumes ([]==>[equals(instance<[G]>(t1),TRUE)])
 \find(equals(instance<[GSub]>(t1),TRUE)==>)
 \closegoal\heuristics(closure)
 Choices: true}
 -----------------------------------------------------
 == closeTypeSwitched (closeType) =========================================
 closeTypeSwitched {
-\assumes ([equals(instance<[GSub]>(t1),TRUE)]==>[]) 
+\assumes ([equals(instance<[GSub]>(t1),TRUE)]==>[])
 \find(==>equals(instance<[G]>(t1),TRUE))
 \closegoal\heuristics(closure)
 Choices: true}
@@ -5163,14 +5163,14 @@ Choices: true}
 createdInHeapToElementOf {
 \find(createdInHeap(s,h))
 \varcond(\notFreeIn(fv (variable), h (Heap term)), \notFreeIn(fv (variable), s (LocSet term)), \notFreeIn(ov (variable), h (Heap term)), \notFreeIn(ov (variable), s (LocSet term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),or(equals(ov,null),equals(select<[boolean]>(h,ov,java.lang.Object::<created>),TRUE)))))) 
+\replacewith(all{ov (variable)}(all{fv (variable)}(imp(elementOf(ov,fv,s),or(equals(ov,null),equals(select<[boolean]>(h,ov,java.lang.Object::<created>),TRUE))))))
 \heuristics(classAxiom)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithAllFields (createdInHeapWithAllFields) =========================================
 createdInHeapWithAllFields {
 \find(createdInHeap(allFields(o),h))
-\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5178,14 +5178,14 @@ Choices: programRules:Java}
 createdInHeapWithAllFieldsEQ {
 \assumes ([equals(allFields(o),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\sameUpdateLevel\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))) 
+\sameUpdateLevel\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithArrayRange (createdInHeapWithArrayRange) =========================================
 createdInHeapWithArrayRange {
 \find(createdInHeap(arrayRange(o,lower,upper),h))
-\replacewith(or(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)),lt(upper,lower))) 
+\replacewith(or(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)),lt(upper,lower)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5193,7 +5193,7 @@ Choices: programRules:Java}
 createdInHeapWithArrayRangeEQ {
 \assumes ([equals(arrayRange(o,lower,upper),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\sameUpdateLevel\replacewith(or(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)),lt(upper,lower))) 
+\sameUpdateLevel\replacewith(or(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)),lt(upper,lower)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5230,7 +5230,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == createdInHeapWithSelectEQ (createdInHeapWithSelectEQ) =========================================
 createdInHeapWithSelectEQ {
-\assumes ([equals(select<[LocSet]>(h,o,f),EQ)]==>[]) 
+\assumes ([equals(select<[LocSet]>(h,o,f),EQ)]==>[])
 \find(==>createdInHeap(EQ,h))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
@@ -5254,7 +5254,7 @@ Choices: programRules:Java}
 == createdInHeapWithSingleton (createdInHeapWithSingleton) =========================================
 createdInHeapWithSingleton {
 \find(createdInHeap(singleton(o,f),h))
-\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5262,7 +5262,7 @@ Choices: programRules:Java}
 createdInHeapWithSingletonEQ {
 \assumes ([equals(singleton(o,f),EQ)]==>[]) 
 \find(createdInHeap(EQ,h))
-\sameUpdateLevel\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))) 
+\sameUpdateLevel\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5335,7 +5335,7 @@ Choices: true}
 defInDomainImpliesCreated {
 \find(inDomainImpliesCreated(m))
 \varcond(\notFreeIn(o (variable), m (Map term)))
-\replacewith(all{o (variable)}(imp(inDomain(m,o),equals(select<[boolean]>(heap,o,java.lang.Object::<created>),TRUE)))) 
+\replacewith(all{o (variable)}(imp(inDomain(m,o),equals(select<[boolean]>(heap,o,java.lang.Object::<created>),TRUE))))
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -5343,7 +5343,7 @@ Choices: true}
 defIsFinite {
 \find(isFinite(m))
 \varcond(\notFreeIn(s (variable), m (Map term)), \notFreeIn(vx (variable), m (Map term)))
-\replacewith(exists{s (variable)}(all{vx (variable)}(equiv(inDomain(m,vx),exists{ix (variable)}(and(and(leq(Z(0(#)),ix),lt(ix,seqLen(s))),equals(seqGet<[any]>(s,ix),vx))))))) 
+\replacewith(exists{s (variable)}(all{vx (variable)}(equiv(inDomain(m,vx),exists{ix (variable)}(and(and(leq(Z(0(#)),ix),lt(ix,seqLen(s))),equals(seqGet<[any]>(s,ix),vx)))))))
 
 Choices: true}
 -----------------------------------------------------
@@ -5382,7 +5382,7 @@ Choices: true}
 defMapSingleton {
 \find(mapSingleton(xa,y))
 \varcond(\notFreeIn(vy (variable), y (any term)), \notFreeIn(vy (variable), xa (alpha term)))
-\replacewith(mapForeach{vy (variable)}(if-then-else(equals(vy,cast<[any]>(xa)),TRUE,FALSE),y)) 
+\replacewith(mapForeach{vy (variable)}(if-then-else(equals(vy,cast<[any]>(xa)),TRUE,FALSE),y))
 
 Choices: true}
 -----------------------------------------------------
@@ -5406,7 +5406,7 @@ Choices: sequences:on}
 defOfSeqConcat {
 \find(seqConcat(seq1,seq2))
 \varcond(\notFreeIn(uSub (variable), seq2 (Seq term)), \notFreeIn(uSub (variable), seq1 (Seq term)))
-\replacewith(seqDef{uSub (variable)}(Z(0(#)),add(seqLen(seq1),seqLen(seq2)),if-then-else(lt(uSub,seqLen(seq1)),seqGet<[any]>(seq1,uSub),seqGet<[any]>(seq2,sub(uSub,seqLen(seq1)))))) 
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),add(seqLen(seq1),seqLen(seq2)),if-then-else(lt(uSub,seqLen(seq1)),seqGet<[any]>(seq1,uSub),seqGet<[any]>(seq2,sub(uSub,seqLen(seq1))))))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5414,7 +5414,7 @@ Choices: sequences:on}
 defOfSeqReverse {
 \find(seqReverse(seq))
 \varcond(\notFreeIn(uSub (variable), seq (Seq term)))
-\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),seqGet<[any]>(seq,sub(sub(seqLen(seq),uSub),Z(1(#)))))) 
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),seqGet<[any]>(seq,sub(sub(seqLen(seq),uSub),Z(1(#))))))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5430,7 +5430,7 @@ Choices: sequences:on}
 defOfSeqSub {
 \find(seqSub(seq,from,to))
 \varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)), \notFreeIn(uSub (variable), seq (Seq term)))
-\replacewith(seqDef{uSub (variable)}(from,to,seqGet<[any]>(seq,uSub))) 
+\replacewith(seqDef{uSub (variable)}(from,to,seqGet<[any]>(seq,uSub)))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5438,7 +5438,7 @@ Choices: sequences:on}
 defOfSeqUpd {
 \find(seqUpd(seq,idx,value))
 \varcond(\notFreeIn(uSub (variable), seq (Seq term)), \notFreeIn(uSub (variable), value (any term)), \notFreeIn(uSub (variable), idx (int term)))
-\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,seqGet<[any]>(seq,uSub)))) 
+\replacewith(seqDef{uSub (variable)}(Z(0(#)),seqLen(seq),if-then-else(equals(uSub,idx),value,seqGet<[any]>(seq,uSub))))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5446,7 +5446,7 @@ Choices: sequences:on}
 defSeq2Map {
 \find(seq2map(s))
 \varcond(\notFreeIn(ix (variable), s (Seq term)))
-\replacewith(mapForeach{ix (variable)}(if-then-else(and(leq(Z(0(#)),ix),lt(ix,seqLen(s))),TRUE,FALSE),seqGet<[any]>(s,ix))) 
+\replacewith(mapForeach{ix (variable)}(if-then-else(and(leq(Z(0(#)),ix),lt(ix,seqLen(s))),TRUE,FALSE),seqGet<[any]>(s,ix)))
 
 Choices: true}
 -----------------------------------------------------
@@ -5461,7 +5461,7 @@ Choices: true}
 definitionAllElementsOfArray {
 \find(allElementsOfArray(h,array,singleton(o,f)))
 \varcond(\notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), o (java.lang.Object term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),singleton(select<[java.lang.Object]>(h,array,arr(j)),f),empty))) 
+\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),singleton(select<[java.lang.Object]>(h,array,arr(j)),f),empty)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5469,7 +5469,7 @@ Choices: programRules:Java}
 definitionAllElementsOfArray2 {
 \find(allElementsOfArray(h,array,allFields(o)))
 \varcond(\notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),allFields(select<[java.lang.Object]>(h,array,arr(j))),empty))) 
+\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),allFields(select<[java.lang.Object]>(h,array,arr(j))),empty)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5477,7 +5477,7 @@ Choices: programRules:Java}
 definitionAllElementsOfArrayLocsets {
 \find(allElementsOfArrayLocsets(h,array,singleton(o,f)))
 \varcond(\notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), o (java.lang.Object term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),select<[LocSet]>(h,select<[java.lang.Object]>(h,array,arr(j)),f),empty))) 
+\replacewith(infiniteUnion{j (variable)}(if-then-else(and(leq(Z(0(#)),j),lt(j,length(array))),select<[LocSet]>(h,select<[java.lang.Object]>(h,array,arr(j)),f),empty)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5495,7 +5495,7 @@ Choices: true}
 definitionOfNewOnHeap {
 \find(==>newOnHeap(h,s))
 \varcond(\notFreeIn(i (variable), h (Heap term)), \notFreeIn(i (variable), s (Seq term)))
-\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s))),and(imp(equals(instance<[java.lang.Object]>(seqGet<[any]>(s,i)),TRUE),equals(select<[boolean]>(h,seqGet<[java.lang.Object]>(s,i),java.lang.Object::<created>),FALSE)),imp(equals(instance<[Seq]>(seqGet<[any]>(s,i)),TRUE),newOnHeap(h,seqGet<[Seq]>(s,i))))))]) 
+\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s))),and(imp(equals(instance<[java.lang.Object]>(seqGet<[any]>(s,i)),TRUE),equals(select<[boolean]>(h,seqGet<[java.lang.Object]>(s,i),java.lang.Object::<created>),FALSE)),imp(equals(instance<[Seq]>(seqGet<[any]>(s,i)),TRUE),newOnHeap(h,seqGet<[Seq]>(s,i))))))])
 \heuristics(comprehensions)
 Choices: true}
 -----------------------------------------------------
@@ -5503,7 +5503,7 @@ Choices: true}
 definitionOfObjectIsomorphic {
 \find(==>objectIsomorphic(s1,o1,s2,o2))
 \varcond(\notFreeIn(i (variable), o2 (java.lang.Object term)), \notFreeIn(i (variable), o1 (java.lang.Object term)), \notFreeIn(i (variable), s2 (Seq term)), \notFreeIn(i (variable), s1 (Seq term)))
-\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s1))),and(imp(equals(instance<[java.lang.Object]>(seqGet<[any]>(s1,i)),TRUE),equiv(equals(seqGet<[java.lang.Object]>(s1,i),o1),equals(seqGet<[java.lang.Object]>(s2,i),o2))),imp(equals(instance<[Seq]>(seqGet<[any]>(s1,i)),TRUE),objectIsomorphic(seqGet<[Seq]>(s1,i),o1,seqGet<[Seq]>(s2,i),o2)))))]) 
+\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s1))),and(imp(equals(instance<[java.lang.Object]>(seqGet<[any]>(s1,i)),TRUE),equiv(equals(seqGet<[java.lang.Object]>(s1,i),o1),equals(seqGet<[java.lang.Object]>(s2,i),o2))),imp(equals(instance<[Seq]>(seqGet<[any]>(s1,i)),TRUE),objectIsomorphic(seqGet<[Seq]>(s1,i),o1,seqGet<[Seq]>(s2,i),o2)))))])
 \heuristics(comprehensions)
 Choices: true}
 -----------------------------------------------------
@@ -5511,7 +5511,7 @@ Choices: true}
 definitionOfObjectsIsomorphic {
 \find(==>objectsIsomorphic(s1,t1,s2,t2))
 \varcond(\notFreeIn(i (variable), t2 (Seq term)), \notFreeIn(i (variable), t1 (Seq term)), \notFreeIn(i (variable), s2 (Seq term)), \notFreeIn(i (variable), s1 (Seq term)))
-\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(t1))),and(imp(equals(instance<[java.lang.Object]>(seqGet<[any]>(t1,i)),TRUE),objectIsomorphic(s1,seqGet<[java.lang.Object]>(t1,i),s2,seqGet<[java.lang.Object]>(t2,i))),imp(equals(instance<[Seq]>(seqGet<[any]>(t1,i)),TRUE),objectsIsomorphic(s1,seqGet<[Seq]>(t1,i),s2,seqGet<[Seq]>(t2,i))))))]) 
+\replacewith([]==>[all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(t1))),and(imp(equals(instance<[java.lang.Object]>(seqGet<[any]>(t1,i)),TRUE),objectIsomorphic(s1,seqGet<[java.lang.Object]>(t1,i),s2,seqGet<[java.lang.Object]>(t2,i))),imp(equals(instance<[Seq]>(seqGet<[any]>(t1,i)),TRUE),objectsIsomorphic(s1,seqGet<[Seq]>(t1,i),s2,seqGet<[Seq]>(t2,i))))))])
 \heuristics(comprehensions)
 Choices: true}
 -----------------------------------------------------
@@ -5519,7 +5519,7 @@ Choices: true}
 definitionOfSameTypes {
 \find(==>sameTypes(s1,s2))
 \varcond(\notFreeIn(i (variable), s2 (Seq term)), \notFreeIn(i (variable), s1 (Seq term)))
-\replacewith([]==>[and(equals(seqLen(s1),seqLen(s2)),all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s1))),and(sameType(seqGet<[any]>(s1,i),seqGet<[any]>(s2,i)),imp(equals(instance<[Seq]>(seqGet<[any]>(s1,i)),TRUE),sameTypes(seqGet<[Seq]>(s1,i),seqGet<[Seq]>(s2,i)))))))]) 
+\replacewith([]==>[and(equals(seqLen(s1),seqLen(s2)),all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,seqLen(s1))),and(sameType(seqGet<[any]>(s1,i),seqGet<[any]>(s2,i)),imp(equals(instance<[Seq]>(seqGet<[any]>(s1,i)),TRUE),sameTypes(seqGet<[Seq]>(s1,i),seqGet<[Seq]>(s2,i)))))))])
 \heuristics(comprehensions)
 Choices: true}
 -----------------------------------------------------
@@ -5527,7 +5527,7 @@ Choices: true}
 definitionSeqdefWorkaround {
 \find(seq_def_workaround(h,lower,upper,array))
 \varcond(\notFreeIn(j (variable), upper (int term)), \notFreeIn(j (variable), lower (int term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(seqDef{j (variable)}(lower,upper,select<[any]>(h,array,arr(j)))) 
+\replacewith(seqDef{j (variable)}(lower,upper,select<[any]>(h,array,arr(j))))
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5535,7 +5535,7 @@ Choices: sequences:on}
 definitionSeqdefWorkaround2 {
 \find(seq_def_workaround2(h,lower,upper,array,singleton(o,f)))
 \varcond(\notFreeIn(j (variable), upper (int term)), \notFreeIn(j (variable), lower (int term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), h (Heap term)))
-\replacewith(seqDef{j (variable)}(lower,upper,select<[any]>(h,select<[java.lang.Object]>(h,array,arr(j)),f))) 
+\replacewith(seqDef{j (variable)}(lower,upper,select<[any]>(h,select<[java.lang.Object]>(h,array,arr(j)),f)))
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5554,7 +5554,7 @@ delete_unnecessary_cast {
   #lhs = (#npit) #se;
 ... }}| (post))
 \sameUpdateLevel\varcond(\hasSort(#npit (program NonPrimitiveType), G), \sub(\typeof(#se (program SimpleExpression)), G))
-\add [or(equals(#se,null),equals(instance<[G]>(#se),TRUE))]==>[] \replacewith(update-application(elem-update(#lhs (program LeftHandSide))(#addCast(#se,#lhs)),#allmodal(post))) 
+\add [or(equals(#se,null),equals(instance<[G]>(#se),TRUE))]==>[] \replacewith(update-application(elem-update(#lhs (program LeftHandSide))(#addCast(#se,#lhs)),#allmodal(post)))
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5819,7 +5819,7 @@ Choices: programRules:Java}
 dismissNonSelectedField {
 \find(select<[alpha]>(store(h,o,f1,x),u,f2))
 \varcond(\differentFields (f1 (Field term), f2 (Field term)))
-\replacewith(select<[alpha]>(h,u,f2)) 
+\replacewith(select<[alpha]>(h,u,f2))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -5828,7 +5828,7 @@ dismissNonSelectedFieldEQ {
 \assumes ([equals(store(h,o,f1,x),EQ)]==>[]) 
 \find(select<[alpha]>(EQ,u,f2))
 \sameUpdateLevel\varcond(\differentFields (f1 (Field term), f2 (Field term)))
-\replacewith(select<[alpha]>(h,u,f2)) 
+\replacewith(select<[alpha]>(h,u,f2))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6248,7 +6248,7 @@ Choices: programRules:Java}
 dynamic_type_for_null {
 \find(exactInstance<[G]>(null))
 \varcond(\not\same(G, Null))
-\replacewith(FALSE) 
+\replacewith(FALSE)
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6307,7 +6307,7 @@ Choices: programRules:Java}
 == elementOfFreshLocs (elementOfFreshLocs) =========================================
 elementOfFreshLocs {
 \find(elementOf(o,f,freshLocs(h)))
-\replacewith(and(not(equals(o,null)),not(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)))) 
+\replacewith(and(not(equals(o,null)),not(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))))
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -6616,7 +6616,7 @@ Choices: true}
 elim_exists2 {
 \find(exists{Gvar (variable)}(equals(Gvar,Hterm)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(equals(instance<[G]>(Hterm),TRUE)) 
+\replacewith(equals(instance<[G]>(Hterm),TRUE))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6624,7 +6624,7 @@ Choices: true}
 elim_exists3 {
 \find(exists{Gvar (variable)}(equals(Hterm,Gvar)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(equals(instance<[G]>(Hterm),TRUE)) 
+\replacewith(equals(instance<[G]>(Hterm),TRUE))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6648,7 +6648,7 @@ Choices: true}
 elim_exists6 {
 \find(exists{Gvar (variable)}(and(phi,equals(Gvar,Hterm))))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(and(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),TRUE))) 
+\replacewith(and(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),TRUE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6656,7 +6656,7 @@ Choices: true}
 elim_exists7 {
 \find(exists{Gvar (variable)}(and(phi,equals(Hterm,Gvar))))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(and(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),TRUE))) 
+\replacewith(and(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),TRUE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6760,7 +6760,7 @@ Choices: true}
 elim_forall10 {
 \find(all{Gvar (variable)}(imp(equals(Gvar,Hterm),phi)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6768,7 +6768,7 @@ Choices: true}
 elim_forall11 {
 \find(all{Gvar (variable)}(imp(equals(Hterm,Gvar),phi)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6792,7 +6792,7 @@ Choices: true}
 elim_forall14 {
 \find(all{Gvar (variable)}(imp(and(psi,equals(Gvar,Hterm)),phi)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6800,7 +6800,7 @@ Choices: true}
 elim_forall15 {
 \find(all{Gvar (variable)}(imp(and(psi,equals(Hterm,Gvar)),phi)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6824,7 +6824,7 @@ Choices: true}
 elim_forall18 {
 \find(all{Gvar (variable)}(imp(and(equals(Gvar,Hterm),psi),phi)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6832,7 +6832,7 @@ Choices: true}
 elim_forall19 {
 \find(all{Gvar (variable)}(imp(and(equals(Hterm,Gvar),psi),phi)))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),imp(psi,phi)),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6840,7 +6840,7 @@ Choices: true}
 elim_forall2 {
 \find(all{Gvar (variable)}(not(equals(Gvar,Hterm))))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(equals(instance<[G]>(Hterm),FALSE)) 
+\replacewith(equals(instance<[G]>(Hterm),FALSE))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6848,7 +6848,7 @@ Choices: true}
 elim_forall3 {
 \find(all{Gvar (variable)}(not(equals(Hterm,Gvar))))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(equals(instance<[G]>(Hterm),FALSE)) 
+\replacewith(equals(instance<[G]>(Hterm),FALSE))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6872,7 +6872,7 @@ Choices: true}
 elim_forall6 {
 \find(all{Gvar (variable)}(or(phi,not(equals(Gvar,Hterm)))))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -6880,7 +6880,7 @@ Choices: true}
 elim_forall7 {
 \find(all{Gvar (variable)}(or(phi,not(equals(Hterm,Gvar)))))
 \varcond(\notFreeIn(Gvar (variable), Hterm (H term)))
-\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE))) 
+\replacewith(or(subst{Gvar (variable)}(cast<[G]>(Hterm),phi),equals(instance<[G]>(Hterm),FALSE)))
 \heuristics(elimQuantifierWithCast, elimQuantifier)
 Choices: true}
 -----------------------------------------------------
@@ -7320,7 +7320,7 @@ Choices: programRules:Java}
 equalityToSelect {
 \find(equals(h,h2))
 \varcond(\notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), h (Heap term)))
-\replacewith(all{ov (variable)}(all{fv (variable)}(equals(select<[any]>(h,ov,fv),select<[any]>(h2,ov,fv))))) 
+\replacewith(all{ov (variable)}(all{fv (variable)}(equals(select<[any]>(h,ov,fv),select<[any]>(h2,ov,fv)))))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -7328,7 +7328,7 @@ Choices: programRules:Java}
 equalityToSeqGetAndSeqLen {
 \find(equals(left,right))
 \varcond(\notFreeIn(iv (variable), right (Seq term)), \notFreeIn(iv (variable), left (Seq term)))
-\replacewith(and(equals(seqLen(left),seqLen(right)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(left))),equals(seqGet<[any]>(left,iv),seqGet<[any]>(right,iv)))))) 
+\replacewith(and(equals(seqLen(left),seqLen(right)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(left))),equals(seqGet<[any]>(left,iv),seqGet<[any]>(right,iv))))))
 \heuristics(defOpsSeqEquality)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -7336,7 +7336,7 @@ Choices: sequences:on}
 equalityToSeqGetAndSeqLenLeft {
 \find(equals(s,s2)==>)
 \varcond(\notFreeIn(iv (variable), s2 (Seq term)), \notFreeIn(iv (variable), s (Seq term)))
-\add [and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<[any]>(s,iv),seqGet<[any]>(s2,iv)))))]==>[] 
+\add [and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<[any]>(s,iv),seqGet<[any]>(s2,iv)))))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -7344,7 +7344,7 @@ Choices: sequences:on}
 equalityToSeqGetAndSeqLenRight {
 \find(==>equals(s,s2))
 \varcond(\notFreeIn(iv (variable), s2 (Seq term)), \notFreeIn(iv (variable), s (Seq term)))
-\replacewith([]==>[and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<[any]>(s,iv),seqGet<[any]>(s2,iv)))))]) 
+\replacewith([]==>[and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<[any]>(s,iv),seqGet<[any]>(s2,iv)))))])
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -8032,7 +8032,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == exact_instance_known_dynamic_type (exact_instance_known_dynamic_type) =========================================
 exact_instance_known_dynamic_type {
-\assumes ([equals(exactInstance<[G]>(a),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[G]>(a),TRUE)]==>[])
 \find(exactInstance<[H]>(a))
 \sameUpdateLevel\varcond(\not\same(G, H))
 \replacewith(FALSE) 
@@ -9590,7 +9590,7 @@ Choices: true}
 getAnyOfArray2seq {
 \find(seqGet<[any]>(array2seq(h,a),idx))
 \sameUpdateLevel\add []==>[and(leq(Z(0(#)),idx),lt(idx,length(a)))] ;
-\replacewith(select<[any]>(h,a,arr(idx))) 
+\replacewith(select<[any]>(h,a,arr(idx)))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9602,7 +9602,7 @@ getJavaCardTransient {
   #jcsystemType.#getTransient(#se)@#jcsystemType;
 ... }}| (post))
 \replacewith([]==>[not(equals(#se,null))]) ;
-\replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(select<[int]>(heap,#se,java.lang.Object::<transient>)),#allmodal(post))]) 
+\replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(select<[int]>(heap,#se,java.lang.Object::<transient>)),#allmodal(post))])
 \heuristics(simplify_prog)
 Choices: (programRules:Java & JavaCard:on)}
 -----------------------------------------------------
@@ -9610,7 +9610,7 @@ Choices: (programRules:Java & JavaCard:on)}
 getOfArray2seq {
 \find(seqGet<[alpha]>(array2seq(h,a),idx))
 \sameUpdateLevel\add []==>[and(leq(Z(0(#)),idx),lt(idx,length(a)))] ;
-\replacewith(select<[alpha]>(h,a,arr(idx))) 
+\replacewith(select<[alpha]>(h,a,arr(idx)))
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9624,7 +9624,7 @@ Choices: true}
 == getOfMapForeach (getOfMapForeach) =========================================
 getOfMapForeach {
 \find(mapGet(mapForeach{v (variable)}(b,y),x))
-\sameUpdateLevel\replacewith(if-then-else(inDomain(mapForeach{v (variable)}(b,y),x),subst{v (variable)}(cast<[alpha]>(x),y),mapUndef)) 
+\sameUpdateLevel\replacewith(if-then-else(inDomain(mapForeach{v (variable)}(b,y),x),subst{v (variable)}(cast<[alpha]>(x),y),mapUndef))
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -9659,14 +9659,14 @@ Choices: true}
 == getOfSeq2Map (getOfSeq2Map) =========================================
 getOfSeq2Map {
 \find(mapGet(seq2map(s),x))
-\sameUpdateLevel\replacewith(if-then-else(and(and(equals(instance<[int]>(x),TRUE),leq(Z(0(#)),cast<[int]>(x))),lt(cast<[int]>(x),seqLen(s))),seqGet<[any]>(s,cast<[int]>(x)),mapUndef)) 
+\sameUpdateLevel\replacewith(if-then-else(and(and(equals(instance<[int]>(x),TRUE),leq(Z(0(#)),cast<[int]>(x))),lt(cast<[int]>(x),seqLen(s))),seqGet<[any]>(s,cast<[int]>(x)),mapUndef))
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfSeqConcat (getOfSeqConcat) =========================================
 getOfSeqConcat {
 \find(seqGet<[alpha]>(seqConcat(seq,seq2),idx))
-\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<[alpha]>(seq,idx),seqGet<[alpha]>(seq2,sub(idx,seqLen(seq))))) 
+\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<[alpha]>(seq,idx),seqGet<[alpha]>(seq2,sub(idx,seqLen(seq)))))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9674,7 +9674,7 @@ Choices: sequences:on}
 getOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
-\sameUpdateLevel\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<[alpha]>(seq,idx),seqGet<[alpha]>(seq2,sub(idx,seqLen(seq))))) 
+\sameUpdateLevel\replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<[alpha]>(seq,idx),seqGet<[alpha]>(seq2,sub(idx,seqLen(seq)))))
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9682,7 +9682,7 @@ Choices: sequences:on}
 getOfSeqDef {
 \find(seqGet<[alpha]>(seqDef{uSub (variable)}(from,to,t),idx))
 \varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
-\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),cast<[alpha]>(subst{uSub (variable)}(add(idx,from),t)),cast<[alpha]>(seqGetOutside))) 
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),cast<[alpha]>(subst{uSub (variable)}(add(idx,from),t)),cast<[alpha]>(seqGetOutside)))
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9691,14 +9691,14 @@ getOfSeqDefEQ {
 \assumes ([equals(seqDef{uSub (variable)}(from,to,t),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
 \sameUpdateLevel\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
-\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),cast<[alpha]>(subst{uSub (variable)}(add(idx,from),t)),cast<[alpha]>(seqGetOutside))) 
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),cast<[alpha]>(subst{uSub (variable)}(add(idx,from),t)),cast<[alpha]>(seqGetOutside)))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqReverse (getOfSeqReverse) =========================================
 getOfSeqReverse {
 \find(seqGet<[alpha]>(seqReverse(seq),idx))
-\replacewith(seqGet<[alpha]>(seq,sub(sub(seqLen(seq),Z(1(#))),idx))) 
+\replacewith(seqGet<[alpha]>(seq,sub(sub(seqLen(seq),Z(1(#))),idx)))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9706,21 +9706,21 @@ Choices: sequences:on}
 getOfSeqReverseEQ {
 \assumes ([equals(seqReverse(seq),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
-\sameUpdateLevel\replacewith(seqGet<[alpha]>(seq,sub(sub(seqLen(seq),Z(1(#))),idx))) 
+\sameUpdateLevel\replacewith(seqGet<[alpha]>(seq,sub(sub(seqLen(seq),Z(1(#))),idx)))
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSingleton (getOfSeqSingleton) =========================================
 getOfSeqSingleton {
 \find(seqGet<[alpha]>(seqSingleton(x),idx))
-\replacewith(if-then-else(equals(idx,Z(0(#))),cast<[alpha]>(x),cast<[alpha]>(seqGetOutside))) 
+\replacewith(if-then-else(equals(idx,Z(0(#))),cast<[alpha]>(x),cast<[alpha]>(seqGetOutside)))
 \heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSingletonConcrete (getOfSeqSingletonConcrete) =========================================
 getOfSeqSingletonConcrete {
 \find(seqGet<[alpha]>(seqSingleton(x),Z(0(#))))
-\replacewith(cast<[alpha]>(x)) 
+\replacewith(cast<[alpha]>(x))
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9728,14 +9728,14 @@ Choices: sequences:on}
 getOfSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
-\sameUpdateLevel\replacewith(if-then-else(equals(idx,Z(0(#))),cast<[alpha]>(x),cast<[alpha]>(seqGetOutside))) 
+\sameUpdateLevel\replacewith(if-then-else(equals(idx,Z(0(#))),cast<[alpha]>(x),cast<[alpha]>(seqGetOutside)))
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSub (getOfSeqSub) =========================================
 getOfSeqSub {
 \find(seqGet<[alpha]>(seqSub(seq,from,to),idx))
-\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<[alpha]>(seq,add(idx,from)),cast<[alpha]>(seqGetOutside))) 
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<[alpha]>(seq,add(idx,from)),cast<[alpha]>(seqGetOutside)))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -9743,14 +9743,14 @@ Choices: sequences:on}
 getOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqGet<[alpha]>(EQ,idx))
-\sameUpdateLevel\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<[alpha]>(seq,add(idx,from)),cast<[alpha]>(seqGetOutside))) 
+\sameUpdateLevel\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<[alpha]>(seq,add(idx,from)),cast<[alpha]>(seqGetOutside)))
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqUpd (getOfSeqUpd) =========================================
 getOfSeqUpd {
 \find(seqGet<[alpha]>(seqUpd(seq,idx,value),jdx))
-\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),cast<[alpha]>(value),seqGet<[alpha]>(seq,jdx))) 
+\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),cast<[alpha]>(value),seqGet<[alpha]>(seq,jdx)))
 \heuristics(simplify_enlarging)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -10015,7 +10015,7 @@ ifElseSkipElse {
   #loc = true;
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSkipElseConditionInBlock (ifElseSkipElse) =========================================
@@ -10033,7 +10033,7 @@ ifElseSkipElseConditionInBlock {
   }
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSkipThen (ifElseSkipThen) =========================================
@@ -10047,7 +10047,7 @@ ifElseSkipThen {
   #loc = false;
   #s1
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSkipThenConditionInBlock (ifElseSkipThen) =========================================
@@ -10065,7 +10065,7 @@ ifElseSkipThenConditionInBlock {
   }
   #s1
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifElseSplit (ifElseSplit) =========================================
@@ -10139,7 +10139,7 @@ ifEnterThen {
   #loc = true;
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifEnterThenConditionInBlock (ifEnterThen) =========================================
@@ -10156,7 +10156,7 @@ ifEnterThenConditionInBlock {
   }
   #s0
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifEqualsInteger (ifEqualsInteger) =========================================
@@ -10345,7 +10345,7 @@ ifSkipThen {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #loc = false;
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifSkipThenConditionInBlock (ifSkipThen) =========================================
@@ -10361,7 +10361,7 @@ ifSkipThenConditionInBlock {
     #loc = false;
   }
 ... }}| (post)) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == ifSplit (ifElseSplit) =========================================
@@ -10610,7 +10610,7 @@ Choices: true}
 == inDomainOfMapForeach (inDomainOfMapForeach) =========================================
 inDomainOfMapForeach {
 \find(inDomain(mapForeach{v (variable)}(b,y),x))
-\replacewith(and(equals(subst{v (variable)}(cast<[alpha]>(x),b),TRUE),equals(instance<[alpha]>(x),TRUE))) 
+\replacewith(and(equals(subst{v (variable)}(cast<[alpha]>(x),b),TRUE),equals(instance<[alpha]>(x),TRUE)))
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -10645,7 +10645,7 @@ Choices: true}
 == inDomainOfSeq2Map (inDomainOfSeq2Map) =========================================
 inDomainOfSeq2Map {
 \find(inDomain(seq2map(s),x))
-\replacewith(and(and(equals(instance<[int]>(x),TRUE),leq(Z(0(#)),cast<[int]>(x))),lt(cast<[int]>(x),seqLen(s)))) 
+\replacewith(and(and(equals(instance<[int]>(x),TRUE),leq(Z(0(#)),cast<[int]>(x))),lt(cast<[int]>(x),seqLen(s))))
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -11185,7 +11185,7 @@ Choices: true}
 indexOf {
 \find(clIndexOfChar(l,c,i))
 \varcond(\notFreeIn(iv (variable), i (int term)), \notFreeIn(iv (variable), c (int term)), \notFreeIn(iv (variable), l (Seq term)))
-\replacewith(ifExThenElse{iv (variable)}(and(and(and(geq(i,Z(0(#))),geq(iv,i)),lt(iv,seqLen(l))),equals(seqGet<[int]>(l,iv),c)),iv,Z(neglit(1(#))))) 
+\replacewith(ifExThenElse{iv (variable)}(and(and(and(geq(i,Z(0(#))),geq(iv,i)),lt(iv,seqLen(l))),equals(seqGet<[int]>(l,iv),c)),iv,Z(neglit(1(#)))))
 \heuristics(stringsExpandDefNormalOp)
 Choices: Strings:on}
 -----------------------------------------------------
@@ -11233,9 +11233,9 @@ Choices: Strings:on}
 -----------------------------------------------------
 == ineffectiveCast (ineffectiveCast) =========================================
 ineffectiveCast {
-\assumes ([equals(instance<[H]>(t),TRUE)]==>[]) 
+\assumes ([equals(instance<[H]>(t),TRUE)]==>[])
 \find(cast<[H]>(t))
-\sameUpdateLevel\add [equals(cast<[H]>(t),t)]==>[] 
+\sameUpdateLevel\add [equals(cast<[H]>(t),t)]==>[]
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
@@ -11243,15 +11243,15 @@ Choices: true}
 ineffectiveCast2 {
 \assumes ([equals(cs,gt)]==>[]) 
 \find(cast<[C]>(gt))
-\sameUpdateLevel\add [equals(cast<[C]>(gt),gt)]==>[] 
+\sameUpdateLevel\add [equals(cast<[C]>(gt),gt)]==>[]
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
 == ineffectiveCast3 (ineffectiveCast3) =========================================
 ineffectiveCast3 {
-\assumes ([equals(exactInstance<[H]>(t),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[H]>(t),TRUE)]==>[])
 \find(cast<[H]>(t))
-\sameUpdateLevel\add [equals(cast<[H]>(t),t)]==>[] 
+\sameUpdateLevel\add [equals(cast<[H]>(t),t)]==>[]
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
@@ -11307,7 +11307,7 @@ Choices: programRules:Java}
 insert_constant_string_value {
 \assumes ([wellFormed(heap)]==>[]) 
 \find(#csv)
-\sameUpdateLevel\replacewith(if-then-else(equals(#constantvalue(#csv),null),null,strPool(cast<[Seq]>(#constantvalue(#csv))))) 
+\sameUpdateLevel\replacewith(if-then-else(equals(#constantvalue(#csv),null),null,strPool(cast<[Seq]>(#constantvalue(#csv)))))
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
@@ -11315,7 +11315,7 @@ Choices: true}
 insert_constant_value {
 \find(#cv)
 \replacewith(#constantvalue(#cv)) 
-\heuristics(concrete)
+\heuristics(concrete_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == insert_eq_all (insert_eq_all) =========================================
@@ -11442,7 +11442,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == instance_for_final_types (instance_for_final_types) =========================================
 instance_for_final_types {
-\assumes ([]==>[equals(exactInstance<[J]>(a),TRUE)]) 
+\assumes ([]==>[equals(exactInstance<[J]>(a),TRUE)])
 \find(equals(instance<[J]>(a),TRUE)==>)
 \varcond(\isFinal (J))
 \replacewith([equals(a,null)]==>[]) 
@@ -11464,7 +11464,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == instanceof_known_dynamic_type (instanceof_known_dynamic_type) =========================================
 instanceof_known_dynamic_type {
-\assumes ([equals(exactInstance<[G]>(a),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[G]>(a),TRUE)]==>[])
 \find(instance<[H]>(a))
 \sameUpdateLevel\varcond(\sub(G, H))
 \replacewith(TRUE) 
@@ -11473,7 +11473,7 @@ Choices: true}
 -----------------------------------------------------
 == instanceof_known_dynamic_type_2 (instanceof_known_dynamic_type_2) =========================================
 instanceof_known_dynamic_type_2 {
-\assumes ([equals(exactInstance<[G]>(a),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[G]>(a),TRUE)]==>[])
 \find(instance<[H]>(a))
 \sameUpdateLevel\varcond(\not\sub(G, H))
 \replacewith(FALSE) 
@@ -11514,7 +11514,7 @@ Choices: true}
 -----------------------------------------------------
 == instanceof_not_compatible_5 (instanceof disjoint type) =========================================
 instanceof_not_compatible_5 {
-\assumes ([equals(instance<[H]>(a),TRUE)]==>[]) 
+\assumes ([equals(instance<[H]>(a),TRUE)]==>[])
 \find(equals(instance<[G]>(a),TRUE))
 \varcond(\sub(Null, G), \disjointModuloNull(G, H))
 \replacewith(equals(a,null)) 
@@ -11550,7 +11550,7 @@ intLongToFloatAddition1 {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seLong + #seFloat;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(cast<[float]>(#seLong),#seFloat)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(cast<[float]>(#seLong),#seFloat)),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11559,7 +11559,7 @@ intToFloatAddition {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = #seCharByteShortInt + #seFloat;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(cast<[float]>(#seCharByteShortInt),#seFloat)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(cast<[float]>(#seCharByteShortInt),#seFloat)),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -11581,7 +11581,7 @@ Choices: true}
 == intersectAllFieldsFreshLocs (intersectAllFieldsFreshLocs) =========================================
 intersectAllFieldsFreshLocs {
 \find(equals(intersect(allFields(o),freshLocs(h)),empty))
-\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -12058,7 +12058,7 @@ Choices: true}
 lastIndexOf {
 \find(clLastIndexOfChar(sourceStr,c,i))
 \varcond(\notFreeIn(iv (variable), sourceStr (Seq term)), \notFreeIn(iv (variable), i (int term)), \notFreeIn(iv (variable), c (int term)))
-\replacewith(ifExThenElse{iv (variable)}(and(and(and(gt(iv,Z(0(#))),geq(i,iv)),lt(sub(i,iv),seqLen(sourceStr))),equals(seqGet<[int]>(sourceStr,sub(i,iv)),c)),sub(i,iv),Z(neglit(1(#))))) 
+\replacewith(ifExThenElse{iv (variable)}(and(and(and(gt(iv,Z(0(#))),geq(i,iv)),lt(sub(i,iv),seqLen(sourceStr))),equals(seqGet<[int]>(sourceStr,sub(i,iv)),c)),sub(i,iv),Z(neglit(1(#)))))
 \heuristics(stringsExpandDefNormalOp)
 Choices: Strings:on}
 -----------------------------------------------------
@@ -13547,7 +13547,7 @@ narrowFinalArrayType {
 \assumes ([]==>[equals(o,null)]) 
 \find(final<[beta]>(o,arr(idx)))
 \sameUpdateLevel\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \strict\sub(alpha, beta))
-\replacewith(final<[alpha]>(o,arr(idx))) 
+\replacewith(final<[alpha]>(o,arr(idx)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13556,7 +13556,7 @@ narrowSelectArrayType {
 \assumes ([wellFormed(h)]==>[equals(o,null)]) 
 \find(select<[beta]>(h,o,arr(idx)))
 \sameUpdateLevel\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \strict\sub(alpha, beta))
-\replacewith(select<[alpha]>(h,o,arr(idx))) 
+\replacewith(select<[alpha]>(h,o,arr(idx)))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13565,7 +13565,7 @@ narrowSelectType {
 \assumes ([wellFormed(h)]==>[]) 
 \find(select<[beta]>(h,o,f))
 \varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
-\replacewith(select<[alpha]>(h,o,f)) 
+\replacewith(select<[alpha]>(h,o,f))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13573,7 +13573,7 @@ Choices: programRules:Java}
 narrowTypeFinal {
 \find(final<[beta]>(o,f))
 \varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
-\replacewith(final<[alpha]>(o,f)) 
+\replacewith(final<[alpha]>(o,f))
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13618,7 +13618,7 @@ narrowingCastFloatToInt {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (int) #seFloat;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(cast<[int]>(#seFloat)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(cast<[int]>(#seFloat)),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13627,7 +13627,7 @@ narrowingCastFloatToLong {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (long) #seFloat;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(cast<[int]>(#seFloat)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(cast<[int]>(#seFloat)),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13875,7 +13875,7 @@ Choices: programRules:Java}
 nonNull {
 \find(nonNull(heapSV,o,depth))
 \varcond(\notFreeIn(i (variable), depth (int term)), \notFreeIn(i (variable), heapSV (Heap term)), \notFreeIn(i (variable), o (java.lang.Object term)), \isReferenceArray(o (java.lang.Object term)))
-\replacewith(and(not(equals(o,null)),imp(gt(depth,Z(0(#))),all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,length(o))),nonNull(heapSV,select<[java.lang.Object]>(heapSV,o,arr(i)),sub(depth,Z(1(#))))))))) 
+\replacewith(and(not(equals(o,null)),imp(gt(depth,Z(0(#))),all{i (variable)}(imp(and(leq(Z(0(#)),i),lt(i,length(o))),nonNull(heapSV,select<[java.lang.Object]>(heapSV,o,arr(i)),sub(depth,Z(1(#)))))))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13909,7 +13909,7 @@ Choices: true}
 -----------------------------------------------------
 == nullCreated (nullCreated) =========================================
 nullCreated {
-\add [or(all{h (variable)}(equals(select<[boolean]>(h,null,java.lang.Object::<created>),TRUE)),all{h (variable)}(equals(select<[boolean]>(h,null,java.lang.Object::<created>),FALSE)))]==>[] 
+\add [or(all{h (variable)}(equals(select<[boolean]>(h,null,java.lang.Object::<created>),TRUE)),all{h (variable)}(equals(select<[boolean]>(h,null,java.lang.Object::<created>),FALSE)))]==>[]
 
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13933,7 +13933,7 @@ null_can_always_be_stored_in_a_reference_type_array {
 \find(arrayStoreValid(array,null))
 \sameUpdateLevel\varcond(\isReferenceArray(array (GOS term)))
 \replacewith(true) 
-\heuristics(simplify)
+\heuristics(simplify_java)
 Choices: programRules:Java}
 -----------------------------------------------------
 == observerDependency (observerDependency) =========================================
@@ -13976,23 +13976,23 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSets {
 \assumes ([wellFormed(h)]==>[]) 
 \find(elementOf(o2,f2,select<[LocSet]>(h,o,f))==>)
-\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsEQ (onlyCreatedObjectsAreInLocSetsEQ) =========================================
 onlyCreatedObjectsAreInLocSetsEQ {
-\assumes ([wellFormed(h),equals(select<[LocSet]>(h,o,f),EQ)]==>[]) 
+\assumes ([wellFormed(h),equals(select<[LocSet]>(h,o,f),EQ)]==>[])
 \find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreInLocSetsEQFinal (onlyCreatedObjectsAreInLocSetsEQFinal) =========================================
 onlyCreatedObjectsAreInLocSetsEQFinal {
-\assumes ([wellFormed(h),equals(final<[LocSet]>(o,f),EQ)]==>[]) 
+\assumes ([wellFormed(h),equals(final<[LocSet]>(o,f),EQ)]==>[])
 \find(elementOf(o2,f2,EQ)==>)
-\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14000,7 +14000,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreInLocSetsFinal {
 \assumes ([wellFormed(h)]==>[]) 
 \find(elementOf(o2,f2,final<[LocSet]>(o,f))==>)
-\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o2,null),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14008,7 +14008,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreObserved {
 \find(obs)
 \sameUpdateLevel\varcond(\isObserver (obs (deltaObject term), h (Heap term)))
-\add [or(equals(obs,null),equals(select<[boolean]>(h,obs,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(obs,null),equals(select<[boolean]>(h,obs,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14016,7 +14016,7 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreObservedInLocSets {
 \find(elementOf(o,f,obs)==>)
 \varcond(\isObserver (obs (LocSet term), h (Heap term)))
-\add [or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14025,7 +14025,7 @@ onlyCreatedObjectsAreObservedInLocSetsEQ {
 \assumes ([equals(obs,EQ)]==>[]) 
 \find(elementOf(o,f,EQ)==>)
 \varcond(\isObserver (obs (LocSet term), h (Heap term)))
-\add [or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(equals(o,null),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14033,15 +14033,15 @@ Choices: programRules:Java}
 onlyCreatedObjectsAreReferenced {
 \assumes ([wellFormed(h)]==>[]) 
 \find(select<[deltaObject]>(h,o,f))
-\sameUpdateLevel\add [or(equals(select<[deltaObject]>(h,o,f),null),equals(select<[boolean]>(h,select<[deltaObject]>(h,o,f),java.lang.Object::<created>),TRUE))]==>[] 
+\sameUpdateLevel\add [or(equals(select<[deltaObject]>(h,o,f),null),equals(select<[boolean]>(h,select<[deltaObject]>(h,o,f),java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
 == onlyCreatedObjectsAreReferencedFinal (onlyCreatedObjectsAreReferencedFinal) =========================================
 onlyCreatedObjectsAreReferencedFinal {
-\assumes ([wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)]==>[]) 
+\assumes ([wellFormed(h),equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)]==>[])
 \find(final<[deltaObject]>(o,f))
-\sameUpdateLevel\add [or(equals(final<[deltaObject]>(o,f),null),equals(select<[boolean]>(h,final<[deltaObject]>(o,f),java.lang.Object::<created>),TRUE))]==>[] 
+\sameUpdateLevel\add [or(equals(final<[deltaObject]>(o,f),null),equals(select<[boolean]>(h,final<[deltaObject]>(o,f),java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -14049,7 +14049,7 @@ Choices: programRules:Java}
 only_created_objects_are_reachable {
 \assumes ([wellFormed(h)]==>[equals(o,null)]) 
 \find(reach(h,s,o,o2,n)==>)
-\add [or(not(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\add [or(not(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE)),equals(select<[boolean]>(h,o2,java.lang.Object::<created>),TRUE))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: reach:on}
 -----------------------------------------------------
@@ -14770,7 +14770,7 @@ Choices: true}
 precOfSeq {
 \find(prec(s1,s2))
 \varcond(\notFreeIn(jv (variable), s2 (Seq term)), \notFreeIn(jv (variable), s1 (Seq term)), \notFreeIn(iv (variable), s2 (Seq term)), \notFreeIn(iv (variable), s1 (Seq term)))
-\replacewith(or(and(equals(seqLen(s1),seqLen(s2)),exists{iv (variable)}(and(and(and(leq(Z(0(#)),iv),lt(iv,seqLen(s1))),prec(seqGet<[any]>(s1,iv),seqGet<[any]>(s2,iv))),all{jv (variable)}(imp(and(leq(Z(0(#)),jv),lt(jv,iv)),equals(seqGet<[any]>(s1,jv),seqGet<[any]>(s2,jv))))))),lt(seqLen(s1),seqLen(s2)))) 
+\replacewith(or(and(equals(seqLen(s1),seqLen(s2)),exists{iv (variable)}(and(and(and(leq(Z(0(#)),iv),lt(iv,seqLen(s1))),prec(seqGet<[any]>(s1,iv),seqGet<[any]>(s2,iv))),all{jv (variable)}(imp(and(leq(Z(0(#)),jv),lt(jv,iv)),equals(seqGet<[any]>(s1,jv),seqGet<[any]>(s2,jv))))))),lt(seqLen(s1),seqLen(s2))))
 
 Choices: true}
 -----------------------------------------------------
@@ -14960,7 +14960,7 @@ Choices: true}
 == pullOutSelect (pullOutSelect) =========================================
 pullOutSelect {
 \find(select<[beta]>(h,o,f))
-\sameUpdateLevel\add [equals(select<[beta]>(h,o,f),selectSK<<selectSK>>)]==>[] \replacewith(selectSK<<selectSK>>) 
+\sameUpdateLevel\add [equals(select<[beta]>(h,o,f),selectSK<<selectSK>>)]==>[] \replacewith(selectSK<<selectSK>>)
 \heuristics(pull_out_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15086,7 +15086,7 @@ Choices: reach:on}
 -----------------------------------------------------
 == reachEndOfUniquePath (reachEndOfUniquePath) =========================================
 reachEndOfUniquePath {
-\assumes ([reach(h,allObjects(f),o,o2,n),equals(select<[alpha]>(h,o2,f),null),equals(select<[alpha]>(h,o3,f),null)]==>[]) 
+\assumes ([reach(h,allObjects(f),o,o2,n),equals(select<[alpha]>(h,o2,f),null),equals(select<[alpha]>(h,o3,f),null)]==>[])
 \find(reach(h,allObjects(f),o,o3,n2)==>)
 \varcond(\different (n (int term), n2 (int term)))
 \add [and(equals(o2,o3),equals(n,n2))]==>[] 
@@ -15095,7 +15095,7 @@ Choices: reach:on}
 -----------------------------------------------------
 == reachEndOfUniquePath2 (reachEndOfUniquePath2) =========================================
 reachEndOfUniquePath2 {
-\assumes ([reach(h,allObjects(f),o,o2,n),equals(select<[alpha]>(h,o2,f),null)]==>[]) 
+\assumes ([reach(h,allObjects(f),o,o2,n),equals(select<[alpha]>(h,o2,f),null)]==>[])
 \find(reach(h,allObjects(f),o,o3,n2)==>)
 \varcond(\different (o (java.lang.Object term), o2 (java.lang.Object term)), \different (n (int term), n2 (int term)))
 \add [or(lt(n2,n),and(equals(o2,o3),equals(n,n2)))]==>[] 
@@ -15184,15 +15184,15 @@ Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
 == referencedObjectIsCreatedRighFinalEQ (referencedObjectIsCreatedRighFinalEQ) =========================================
 referencedObjectIsCreatedRighFinalEQ {
-\assumes ([equals(final<[deltaObject]>(o,f),EQ)]==>[equals(EQ,null)]) 
+\assumes ([equals(final<[deltaObject]>(o,f),EQ)]==>[equals(EQ,null)])
 \find(==>equals(select<[boolean]>(h,EQ,java.lang.Object::<created>),TRUE))
-\add []==>[or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(o,null))] 
+\add []==>[or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]
 \heuristics(concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
 == referencedObjectIsCreatedRight (referencedObjectIsCreatedRight) =========================================
 referencedObjectIsCreatedRight {
-\assumes ([]==>[equals(select<[deltaObject]>(h,o,f),null)]) 
+\assumes ([]==>[equals(select<[deltaObject]>(h,o,f),null)])
 \find(==>equals(select<[boolean]>(h,select<[deltaObject]>(h,o,f),java.lang.Object::<created>),TRUE))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
@@ -15200,7 +15200,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == referencedObjectIsCreatedRightEQ (referencedObjectIsCreatedRightEQ) =========================================
 referencedObjectIsCreatedRightEQ {
-\assumes ([equals(select<[deltaObject]>(h,o,f),EQ)]==>[equals(EQ,null)]) 
+\assumes ([equals(select<[deltaObject]>(h,o,f),EQ)]==>[equals(EQ,null)])
 \find(==>equals(select<[boolean]>(h,EQ,java.lang.Object::<created>),TRUE))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
@@ -15208,9 +15208,9 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == referencedObjectIsCreatedRightFinal (referencedObjectIsCreatedRightFinal) =========================================
 referencedObjectIsCreatedRightFinal {
-\assumes ([]==>[equals(final<[deltaObject]>(o,f),null)]) 
+\assumes ([]==>[equals(final<[deltaObject]>(o,f),null)])
 \find(==>equals(select<[boolean]>(h,final<[deltaObject]>(o,f),java.lang.Object::<created>),TRUE))
-\replacewith([]==>[or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]) 
+\replacewith([]==>[or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(o,null))])
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15290,7 +15290,7 @@ Choices: Strings:on}
 == removeZeros (removeZeros) =========================================
 removeZeros {
 \find(clRemoveZeros(l))
-\replacewith(if-then-else(or(equals(l,seqEmpty),equals(seqGet<[int]>(l,Z(0(#))),C(8(4(#))))),l,clRemoveZeros(seqSub(l,Z(1(#)),seqLen(l))))) 
+\replacewith(if-then-else(or(equals(l,seqEmpty),equals(seqGet<[int]>(l,Z(0(#))),C(8(4(#))))),l,clRemoveZeros(seqSub(l,Z(1(#)),seqLen(l)))))
 \heuristics(integerToString)
 Choices: Strings:on}
 -----------------------------------------------------
@@ -15390,7 +15390,7 @@ Choices: Strings:on}
 replaceDef {
 \find(clReplace(str,searchChar,replChar))
 \sameUpdateLevel\varcond(\notFreeIn(pos (variable), replChar (int term)), \notFreeIn(pos (variable), searchChar (int term)), \notFreeIn(pos (variable), str (Seq term)))
-\add [and(equals(clReplace(str,searchChar,replChar),newSym),equals(seqDef{pos (variable)}(Z(0(#)),seqLen(str),if-then-else(equals(seqGet<[int]>(str,pos),searchChar),replChar,seqGet<[int]>(str,pos))),newSym))]==>[] 
+\add [and(equals(clReplace(str,searchChar,replChar),newSym),equals(seqDef{pos (variable)}(Z(0(#)),seqLen(str),if-then-else(equals(seqGet<[int]>(str,pos),searchChar),replChar,seqGet<[int]>(str,pos))),newSym))]==>[]
 \heuristics(stringsIntroduceNewSym, defOpsReplace)
 Choices: Strings:on}
 -----------------------------------------------------
@@ -15601,7 +15601,7 @@ Choices: true}
 -----------------------------------------------------
 == sameTypeFalse (sameTypeFalse) =========================================
 sameTypeFalse {
-\assumes ([equals(exactInstance<[G]>(x1),TRUE),equals(exactInstance<[H]>(x2),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[G]>(x1),TRUE),equals(exactInstance<[H]>(x2),TRUE)]==>[])
 \find(sameType(x1,x2))
 \varcond(\not\same(G, H))
 \replacewith(false) 
@@ -15610,7 +15610,7 @@ Choices: true}
 -----------------------------------------------------
 == sameTypeTrue (sameTypeTrue) =========================================
 sameTypeTrue {
-\assumes ([equals(exactInstance<[G]>(x1),TRUE),equals(exactInstance<[G]>(x2),TRUE)]==>[]) 
+\assumes ([equals(exactInstance<[G]>(x1),TRUE),equals(exactInstance<[G]>(x2),TRUE)]==>[])
 \find(sameType(x1,x2))
 \replacewith(true) 
 \heuristics(concrete)
@@ -15676,7 +15676,7 @@ Choices: programRules:Java}
 schiffl_lemma_2 {
 \find(seqPerm(s,t)==>)
 \varcond(\notFreeIn(y (variable), t (Seq term)), \notFreeIn(y (variable), s (Seq term)), \notFreeIn(x (variable), t (Seq term)), \notFreeIn(x (variable), s (Seq term)), \notFreeIn(r (variable), t (Seq term)), \notFreeIn(r (variable), s (Seq term)), \notFreeIn(iv (variable), t (Seq term)), \notFreeIn(iv (variable), s (Seq term)))
-\add [all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(equals(seqGet<[any]>(s,x),seqGet<[any]>(t,x)),equals(seqGet<[any]>(s,y),seqGet<[any]>(t,y))),leq(Z(0(#)),x)),lt(x,seqLen(s))),leq(Z(0(#)),y)),lt(y,seqLen(s))),exists{r (variable)}(and(and(and(and(equals(seqLen(r),seqLen(s)),seqNPerm(r)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<[any]>(s,iv),seqGet<[any]>(t,seqGet<[int]>(r,iv)))))),equals(seqGet<[int]>(r,x),x)),equals(seqGet<[int]>(r,y),y))))))]==>[] 
+\add [all{x (variable)}(all{y (variable)}(imp(and(and(and(and(and(equals(seqGet<[any]>(s,x),seqGet<[any]>(t,x)),equals(seqGet<[any]>(s,y),seqGet<[any]>(t,y))),leq(Z(0(#)),x)),lt(x,seqLen(s))),leq(Z(0(#)),y)),lt(y,seqLen(s))),exists{r (variable)}(and(and(and(and(equals(seqLen(r),seqLen(s)),seqNPerm(r)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<[any]>(s,iv),seqGet<[any]>(t,seqGet<[int]>(r,iv)))))),equals(seqGet<[int]>(r,x),x)),equals(seqGet<[int]>(r,y),y))))))]==>[]
 
 Choices: true}
 -----------------------------------------------------
@@ -15684,7 +15684,7 @@ Choices: true}
 schiffl_thm_1 {
 \find(seqPerm(s,t)==>)
 \varcond(\notFreeIn(idx (variable), t (Seq term)), \notFreeIn(idx (variable), s (Seq term)), \notFreeIn(idx (variable), b (any term)), \notFreeIn(idx (variable), a (any term)), \notFreeIn(idx (variable), y (int term)), \notFreeIn(idx (variable), x (int term)))
-\add [imp(and(and(and(and(and(and(seqPerm(s,t),equals(seqGet<[any]>(s,x),seqGet<[any]>(t,x))),equals(seqGet<[any]>(s,y),seqGet<[any]>(t,y))),leq(Z(0(#)),x)),lt(x,seqLen(s))),leq(Z(0(#)),y)),lt(y,seqLen(s))),seqPerm(seqDef{idx (variable)}(Z(0(#)),seqLen(s),if-then-else(equals(idx,y),b,if-then-else(equals(idx,x),a,seqGet<[any]>(s,idx)))),seqDef{idx (variable)}(Z(0(#)),seqLen(s),if-then-else(equals(idx,y),b,if-then-else(equals(idx,x),a,seqGet<[any]>(t,idx))))))]==>[] 
+\add [imp(and(and(and(and(and(and(seqPerm(s,t),equals(seqGet<[any]>(s,x),seqGet<[any]>(t,x))),equals(seqGet<[any]>(s,y),seqGet<[any]>(t,y))),leq(Z(0(#)),x)),lt(x,seqLen(s))),leq(Z(0(#)),y)),lt(y,seqLen(s))),seqPerm(seqDef{idx (variable)}(Z(0(#)),seqLen(s),if-then-else(equals(idx,y),b,if-then-else(equals(idx,x),a,seqGet<[any]>(s,idx)))),seqDef{idx (variable)}(Z(0(#)),seqLen(s),if-then-else(equals(idx,y),b,if-then-else(equals(idx,x),a,seqGet<[any]>(t,idx))))))]==>[]
 
 Choices: true}
 -----------------------------------------------------
@@ -15698,14 +15698,14 @@ Choices: true}
 == selectCreatedOfAnon (selectCreatedOfAnon) =========================================
 selectCreatedOfAnon {
 \find(select<[boolean]>(anon(h,s,h2),o,java.lang.Object::<created>))
-\replacewith(if-then-else(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),TRUE,select<[boolean]>(h2,o,java.lang.Object::<created>))) 
+\replacewith(if-then-else(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),TRUE,select<[boolean]>(h2,o,java.lang.Object::<created>)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonAsFormula (selectCreatedOfAnonAsFormula) =========================================
 selectCreatedOfAnonAsFormula {
 \find(equals(select<[boolean]>(anon(h,s,h2),o,java.lang.Object::<created>),TRUE))
-\replacewith(or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(select<[boolean]>(h2,o,java.lang.Object::<created>),TRUE))) 
+\replacewith(or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(select<[boolean]>(h2,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15713,7 +15713,7 @@ Choices: programRules:Java}
 selectCreatedOfAnonAsFormulaEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(equals(select<[boolean]>(EQ,o,java.lang.Object::<created>),TRUE))
-\sameUpdateLevel\replacewith(or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(select<[boolean]>(h2,o,java.lang.Object::<created>),TRUE))) 
+\sameUpdateLevel\replacewith(or(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),equals(select<[boolean]>(h2,o,java.lang.Object::<created>),TRUE)))
 \heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15721,14 +15721,14 @@ Choices: programRules:Java}
 selectCreatedOfAnonEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(select<[boolean]>(EQ,o,java.lang.Object::<created>))
-\sameUpdateLevel\replacewith(if-then-else(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),TRUE,select<[boolean]>(h2,o,java.lang.Object::<created>))) 
+\sameUpdateLevel\replacewith(if-then-else(equals(select<[boolean]>(h,o,java.lang.Object::<created>),TRUE),TRUE,select<[boolean]>(h2,o,java.lang.Object::<created>)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfAnon (selectOfAnon) =========================================
 selectOfAnon {
 \find(select<[beta]>(anon(h,s,h2),o,f))
-\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f))) 
+\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15736,14 +15736,14 @@ Choices: programRules:Java}
 selectOfAnonEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(select<[beta]>(EQ,o,f))
-\sameUpdateLevel\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f))) 
+\sameUpdateLevel\replacewith(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfCreate (selectOfCreate) =========================================
 selectOfCreate {
 \find(select<[beta]>(create(h,o),o2,f))
-\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f))) 
+\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15751,14 +15751,14 @@ Choices: programRules:Java}
 selectOfCreateEQ {
 \assumes ([equals(create(h,o),EQ)]==>[]) 
 \find(select<[beta]>(EQ,o2,f))
-\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f))) 
+\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfMemset (selectOfMemset) =========================================
 selectOfMemset {
 \find(select<[beta]>(memset(h,s,x),o,f))
-\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o,f))) 
+\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o,f)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15766,14 +15766,14 @@ Choices: programRules:Java}
 selectOfMemsetEQ {
 \assumes ([equals(memset(h,s,x),EQ)]==>[]) 
 \find(select<[beta]>(EQ,o,f))
-\sameUpdateLevel\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o,f))) 
+\sameUpdateLevel\replacewith(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o,f)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectOfStore (selectOfStore) =========================================
 selectOfStore {
 \find(select<[beta]>(store(h,o,f,x),o2,f2))
-\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2))) 
+\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2)))
 \heuristics(semantics_blasting)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15781,7 +15781,7 @@ Choices: programRules:Java}
 selectOfStoreEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(select<[beta]>(EQ,o2,f2))
-\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2))) 
+\sameUpdateLevel\replacewith(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2)))
 \heuristics(simplify_heap_high_costs)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15910,7 +15910,7 @@ Choices: sequences:on}
 == seqGetAlphaCast (seqGetAlphaCast) =========================================
 seqGetAlphaCast {
 \find(seqGet<[alpha]>(seq,at))
-\add [equals(cast<[alpha]>(seqGet<[any]>(seq,at)),seqGet<[alpha]>(seq,at))]==>[] 
+\add [equals(cast<[alpha]>(seqGet<[any]>(seq,at)),seqGet<[alpha]>(seq,at))]==>[]
 \heuristics(inReachableStateImplication)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -15944,7 +15944,7 @@ Choices: programRules:Java}
 seqIndexOf {
 \find(seqIndexOf(s,t))
 \varcond(\notFreeIn(m (variable), t (any term)), \notFreeIn(m (variable), s (Seq term)), \notFreeIn(n (variable), t (any term)), \notFreeIn(n (variable), s (Seq term)))
-\add [imp(exists{n (variable)}(and(and(leq(Z(0(#)),n),lt(n,seqLen(s))),equals(seqGet<[any]>(s,n),t))),and(and(and(leq(Z(0(#)),seqIndexOf(s,t)),lt(seqIndexOf(s,t),seqLen(s))),equals(seqGet<[any]>(s,seqIndexOf(s,t)),t)),all{m (variable)}(imp(and(leq(Z(0(#)),m),lt(m,seqIndexOf(s,t))),not(equals(seqGet<[any]>(s,m),t))))))]==>[] 
+\add [imp(exists{n (variable)}(and(and(leq(Z(0(#)),n),lt(n,seqLen(s))),equals(seqGet<[any]>(s,n),t))),and(and(and(leq(Z(0(#)),seqIndexOf(s,t)),lt(seqIndexOf(s,t),seqLen(s))),equals(seqGet<[any]>(s,seqIndexOf(s,t)),t)),all{m (variable)}(imp(and(leq(Z(0(#)),m),lt(m,seqIndexOf(s,t))),not(equals(seqGet<[any]>(s,m),t))))))]==>[]
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -15990,7 +15990,7 @@ Choices: programRules:Java}
 == seqOutsideValue (seqOutsideValue) =========================================
 seqOutsideValue {
 \find(seqGetOutside)
-\add [all{s (variable)}(all{iv (variable)}(imp(or(lt(iv,Z(0(#))),leq(seqLen(s),iv)),equals(seqGet<[any]>(s,iv),seqGetOutside))))]==>[] 
+\add [all{s (variable)}(all{iv (variable)}(imp(or(lt(iv,Z(0(#))),leq(seqLen(s),iv)),equals(seqGet<[any]>(s,iv),seqGetOutside))))]==>[]
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16017,7 +16017,7 @@ Choices: programRules:Java}
 == seqSelfDefinition (seqSelfDefinition) =========================================
 seqSelfDefinition {
 \find(seq)
-\add [all{s (variable)}(equals(s,seqDef{u (variable)}(Z(0(#)),seqLen(s),seqGet<[any]>(s,u))))]==>[] 
+\add [all{s (variable)}(equals(s,seqDef{u (variable)}(Z(0(#)),seqLen(s),seqGet<[any]>(s,u))))]==>[]
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16345,7 +16345,7 @@ simplifySelectOfAnon {
 \find(select<[beta]>(anon(h,s,h2),o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16357,7 +16357,7 @@ simplifySelectOfAnonEQ {
 \find(select<[beta]>(EQ,o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(or(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),elementOf(o,f,freshLocs(h))),select<[beta]>(h2,o,f),select<[beta]>(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16368,7 +16368,7 @@ simplifySelectOfCreate {
 \find(select<[beta]>(create(h,o),o2,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16380,7 +16380,7 @@ simplifySelectOfCreateEQ {
 \find(select<[beta]>(EQ,o2,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),not(equals(o,null))),equals(f,java.lang.Object::<created>)),cast<[beta]>(TRUE),select<[beta]>(h,o2,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16391,7 +16391,7 @@ simplifySelectOfMemset {
 \find(select<[beta]>(memset(h,s,x),o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),x,select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),x,select<[beta]>(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16403,7 +16403,7 @@ simplifySelectOfMemsetEQ {
 \find(select<[beta]>(EQ,o,f))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),x,select<[beta]>(h,o,f)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(elementOf(o,f,s),not(equals(f,java.lang.Object::<created>))),x,select<[beta]>(h,o,f)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16414,7 +16414,7 @@ simplifySelectOfStore {
 \find(select<[beta]>(store(h,o,f,x),o2,f2))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16426,7 +16426,7 @@ simplifySelectOfStoreEQ {
 \find(select<[beta]>(EQ,o2,f2))
 \inSequentState\replacewith(sk) 
 \heuristics(concrete)
-Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[]) 
+Choices: programRules:Java}] \replacewith([equals(if-then-else(and(and(equals(o,o2),equals(f,f2)),not(equals(f,java.lang.Object::<created>))),cast<[beta]>(x),select<[beta]>(h,o2,f2)),sk)]==>[])
 \heuristics(simplify_select)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -16759,7 +16759,7 @@ stringAssignment {
 \find(#normalassign ((modal operator))|{{ ..
   #v = #slit;
 ... }}| (post))
-\sameUpdateLevel\add [not(equals(strPool(#slit),null)),equals(select<[boolean]>(heap,strPool(#slit),java.lang.Object::<created>),TRUE)]==>[] \replacewith(update-application(elem-update(#v (program Variable))(strPool(#slit)),#normalassign(post))) 
+\sameUpdateLevel\add [not(equals(strPool(#slit),null)),equals(select<[boolean]>(heap,strPool(#slit),java.lang.Object::<created>),TRUE)]==>[] \replacewith(update-application(elem-update(#v (program Variable))(strPool(#slit)),#normalassign(post)))
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: true}
 -----------------------------------------------------
@@ -16890,7 +16890,7 @@ Choices: sequences:on}
 subSeqConcatEQ {
 \assumes ([equals(seqConcat(s1,s2),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
-\sameUpdateLevel\replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1))))) 
+\sameUpdateLevel\replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1)))))
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16912,7 +16912,7 @@ Choices: sequences:on}
 subSeqHeadSeqDefEQ {
 \assumes ([equals(seqDef{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
 \find(seqSub(seqConcat(EQ,seq),Z(0(#)),u))
-\sameUpdateLevel\replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
+\sameUpdateLevel\replacewith(seqDef{i (variable)}(Z(0(#)),u,a))
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16934,7 +16934,7 @@ Choices: sequences:on}
 subSeqSingleton2EQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
-\sameUpdateLevel\replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
+\sameUpdateLevel\replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#)))))))
 \heuristics(simplify_enlarging, no_self_application)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -16942,7 +16942,7 @@ Choices: sequences:on}
 subSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,Z(0(#)),Z(1(#))))
-\sameUpdateLevel\replacewith(seqSingleton(x)) 
+\sameUpdateLevel\replacewith(seqSingleton(x))
 \heuristics(concrete)
 Choices: sequences:on}
 -----------------------------------------------------
@@ -18272,7 +18272,7 @@ Choices: programRules:Java}
 == typeEq (typeEq) =========================================
 typeEq {
 \find(equals(s,t1)==>)
-\add [equals(instance<[H]>(s),TRUE),equals(instance<[G]>(t1),TRUE)]==>[] 
+\add [equals(instance<[H]>(s),TRUE),equals(instance<[G]>(t1),TRUE)]==>[]
 
 Choices: true}
 -----------------------------------------------------
@@ -18295,7 +18295,7 @@ Choices: true}
 == typeStatic (typeStatic) =========================================
 typeStatic {
 \find(s)
-\sameUpdateLevel\add [equals(instance<[G]>(s),TRUE)]==>[] 
+\sameUpdateLevel\add [equals(instance<[G]>(s),TRUE)]==>[]
 
 Choices: true}
 -----------------------------------------------------
@@ -18599,7 +18599,7 @@ Choices: programRules:Java}
 wellFormedMemsetArrayObject {
 \find(wellFormed(memset(h,arrayRange(ar,lo,up),x)))
 \succedentPolarity\varcond(\hasSort(\elemSort(ar (java.lang.Object term)), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(ar,x))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(ar,x)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18615,7 +18615,7 @@ Choices: programRules:Java}
 wellFormedStoreArray {
 \find(wellFormed(store(h,o,arr(idx),x)))
 \succedentPolarity\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(o,x))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),arrayStoreValid(o,x)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18639,7 +18639,7 @@ Choices: programRules:Java}
 wellFormedStoreObject {
 \find(wellFormed(store(h,o,f,x)))
 \succedentPolarity\varcond(\fieldType(f (Field term), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),equals(instance<[alpha]>(x),TRUE))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),equals(instance<[alpha]>(x),TRUE)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18648,7 +18648,7 @@ wellFormedStoreObjectEQ {
 \assumes ([equals(store(h,o,f,x),EQ)]==>[]) 
 \find(wellFormed(EQ))
 \sameUpdateLevel\succedentPolarity\varcond(\fieldType(f (Field term), alpha))
-\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),equals(instance<[alpha]>(x),TRUE))))) 
+\replacewith(and(wellFormed(h),or(equals(x,null),and(equals(select<[boolean]>(h,x,java.lang.Object::<created>),TRUE),equals(instance<[alpha]>(x),TRUE)))))
 \heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18682,7 +18682,7 @@ wideningCastIntToFloat {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (float) #seCharByteShortInt;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(cast<[float]>(#seCharByteShortInt)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(cast<[float]>(#seCharByteShortInt)),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -18691,7 +18691,7 @@ wideningCastLongToFloat {
 \find(#normalassign ((modal operator))|{{ ..
   #loc = (float) #seLong;
 ... }}| (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(cast<[float]>(#seLong)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(cast<[float]>(#seLong)),#normalassign(post)))
 \heuristics(executeFloatAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
