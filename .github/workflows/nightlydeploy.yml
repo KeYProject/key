@@ -1,0 +1,50 @@
+name: Weekly Builds of KeY
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * 1' # every monday morning
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  JAVA_VERSION: 17
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build with Gradle
+        run: ./gradlew --parallel alldoc
+
+      - name: Upload ShadowJar
+        uses: actions/upload-artifact@v7
+        with:
+          name: shadowjars
+          path: "*/build/libs/*-exe.jar"
+          retention-days: 1
+
+      - name: Package
+        run: tar cvf key-javadoc.tar.xz build/docs/javadoc
+
+      - name: Upload Javadoc
+        uses: actions/upload-artifact@v7
+        with:
+          name: javadoc
+          path: "key-javadoc.tar.xz"
+          retention-days: 1
