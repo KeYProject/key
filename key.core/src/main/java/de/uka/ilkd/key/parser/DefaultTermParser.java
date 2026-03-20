@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
+import de.uka.ilkd.key.logic.sort.SortAlias;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
@@ -48,11 +49,12 @@ public final class DefaultTermParser {
     public JTerm parse(Reader in, Sort sort, Services services,
             Namespace<@NonNull QuantifiableVariable> var_ns,
             Namespace<@NonNull Function> func_ns,
-            Namespace<@NonNull Sort> sort_ns, Namespace<@NonNull ParametricSortDecl> paraSort_ns,
+            Namespace<@NonNull Sort> sort_ns, Namespace<@NonNull SortAlias> sortAlias_ns,
+            Namespace<@NonNull ParametricSortDecl> paraSort_ns,
             Namespace<@NonNull ParametricFunctionDecl> paraFunc_ns,
             Namespace<@NonNull IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
-        return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
+        return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns, sortAlias_ns,
             new Namespace<>(), paraSort_ns, paraFunc_ns, new Namespace<>(), progVar_ns), scm);
     }
 

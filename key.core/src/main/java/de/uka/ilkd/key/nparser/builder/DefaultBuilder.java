@@ -236,6 +236,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 result = sorts().lookup(new Name("java.lang." + name));
             }
         }
+        // Look for alias
+        if (result == null) {
+            SortAlias alias = namespaces().sortAliases().lookup(name);
+            if (alias != null) {
+                result = alias.aliasedSort();
+            }
+        }
         return result;
     }
 

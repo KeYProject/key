@@ -755,7 +755,7 @@ public class Recoder2KeYConverter {
 
         if (name.startsWith(PREFIX)) { // handle default value resolution
             String sortName = name.substring(PREFIX.length()).trim();
-            Sort sort = namespaceSet.sorts().lookup(sortName);
+            Sort sort = namespaceSet.lookupSortOrAlias(sortName);
             if (sort == null) {
                 throw new ConvertException(format(
                     "Requested to find the default value of an unknown sort '%s'. " + "Line/Col:%s",
