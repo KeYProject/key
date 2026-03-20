@@ -78,6 +78,7 @@ PROXY : '\\proxy';
 EXTENDS : '\\extends';
 ONEOF : '\\oneof';
 ABSTRACT : '\\abstract';
+ALIAS: '\\alias';
 
 // Keywords used in schema variable declarations
 SCHEMAVARIABLES : '\\schemaVariables';

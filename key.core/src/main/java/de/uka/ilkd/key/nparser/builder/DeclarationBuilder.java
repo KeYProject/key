@@ -159,6 +159,22 @@ public class DeclarationBuilder extends DefaultBuilder {
         ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
                 : Immutables.createSetFrom(sortExt);
 
+        if (ctx.ALIAS() != null) {
+            String aliasId = accept(ctx.simple_ident_dots());
+            assert aliasId != null;
+            Name name = new Name(aliasId);
+            if (namespaces().sorts().lookup(name) != null) {
+                semanticError(ctx, "A sort of name %s already exists", name);
+            }
+            if (namespaces().sortAliases().lookup(name) != null) {
+                semanticError(ctx, "A sort alias of name %s already exists", name);
+            }
+            Sort aliased = accept(ctx.sortId());
+            var alias = new SortAlias(name, aliased);
+            namespaces().sortAliases().addSafely(alias);
+            return alias;
+        }
+
         if (ctx.sortIds != null) {
             for (var idCtx : ctx.sortIds.simple_ident_dots()) {
                 String sortId = accept(idCtx);
