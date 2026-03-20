@@ -10,12 +10,14 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.logic.Named;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+
 
 
 /**
@@ -78,5 +80,13 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(p);
 
         proof.setActiveStrategy(strategy);
+    }
+
+    default boolean isResponsibleFor(RuleSet rs) { return false; }
+
+    default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            de.uka.ilkd.key.proof.Goal goal,
+            MutableState mState) {
+        return null;
     }
 }

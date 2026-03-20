@@ -219,9 +219,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                // weigl: fix #3721, absolute path is required to solve relative filenames.
-                Path absPath = file.file().toAbsolutePath().getParent();
-                includes = ctx.getIncludes(absPath.toUri().toURL());
+                includes = ctx.getIncludes(file.file().getParent());
             } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
             } catch (Exception e) {

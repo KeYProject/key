@@ -140,7 +140,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }
     }
 
-
     @Override
     public String chooseContract() {
         return getProblemFinder().getChooseContract();

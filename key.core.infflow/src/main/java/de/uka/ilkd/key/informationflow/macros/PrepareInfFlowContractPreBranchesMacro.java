@@ -138,17 +138,9 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             return parentRuleName;
         }
 
-
-        @Override
-        protected RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                MutableState mState) {
-            return computeCost(app, pio, goal, mState);
-        }
-
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {
             return false;
         }
     }
-
 }
