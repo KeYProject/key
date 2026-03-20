@@ -56,8 +56,7 @@ public class TestAlias {
         var pSet = new ParametricSortDecl(new Name("PSet"), false, ImmutableSet.empty(),
             ImmutableList.of(
                 new GenericParameter(new GenericSort(new Name("A")),
-                    GenericParameter.Variance.INVARIANT)),
-            "", "");
+                    GenericParameter.Variance.INVARIANT)), "");
         nss.parametricSorts().add(pSet);
         ParametricSortInstance intSet = ParametricSortInstance.get(pSet,
             ImmutableList.of(new GenericArgument(nss.lookupSortOrAlias("int"))), services);

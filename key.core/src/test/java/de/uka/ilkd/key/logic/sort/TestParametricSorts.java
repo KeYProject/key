@@ -60,8 +60,7 @@ class TestParametricSorts {
             GenericSort genSort = (GenericSort) nss.sorts().lookup("G" + (i + 1));
             params = params.prepend(new GenericParameter(genSort, varia));
         }
-        ParametricSortDecl psd = new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(),
-            params, "", "");
+        ParametricSortDecl psd = new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(), params, "");
         nss.parametricSorts().add(psd);
         return psd;
     }

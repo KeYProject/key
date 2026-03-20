@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -68,8 +70,9 @@ public class DeclarationBuilder extends DefaultBuilder {
         var origin = BuilderHelpers.getPosition(ctx);
         List<GenericParameter> typeParameters = accept(ctx.formal_sort_param_decls());
         if (typeParameters == null) {
-            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
+            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, origin);
             sorts().addSafely(s);
+            docsSpace().describe(s, doc);
         } else {
             var doubled = CollectionUtil.findDuplicates(typeParameters);
             if (!doubled.isEmpty()) {
@@ -78,10 +81,10 @@ public class DeclarationBuilder extends DefaultBuilder {
                     doubled.getFirst());
             }
             var s = new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(),
-                ImmutableList.fromList(typeParameters), doc, origin);
+                ImmutableList.fromList(typeParameters), origin);
             namespaces().parametricSorts().addSafely(s);
+            docsSpace().describe(s, doc);
         }
-        docsSpace().describe(s, doc);
         return null;
     }
 
@@ -257,8 +260,13 @@ public class DeclarationBuilder extends DefaultBuilder {
                     sortName);
             }
             var sortDecl = new ParametricSortDecl(sortName, isAbstractSort, ext, params,
-                documentation, BuilderHelpers.getPosition(declCtx));
+                    BuilderHelpers.getPosition(declCtx));
             namespaces().parametricSorts().addSafely(sortDecl);
+
+            var doc = processDocumentation(declCtx.DOC_COMMENT());
+            docsSpace().describe(sortDecl,
+                    Stream.of(doc, sectionDoc).filter(Objects::nonNull)
+                            .collect(Collectors.joining("\n")));
         }
         return createdSorts;
     }
