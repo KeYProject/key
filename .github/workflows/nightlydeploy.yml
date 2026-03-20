@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 env:
-  JAVA_VERSION: 17
+  JAVA_VERSION: 11
 
 jobs:
   build:
@@ -26,9 +26,13 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
+      - run: cd key
+          
+          
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
+        
       - name: Build with Gradle
         run: ./gradlew --parallel alldoc
 
