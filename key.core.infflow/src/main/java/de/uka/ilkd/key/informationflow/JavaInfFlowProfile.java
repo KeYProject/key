@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow;
 
-import de.uka.ilkd.key.InfFlowUseOperationContractRule;
 import de.uka.ilkd.key.informationflow.rule.InfFlowBlockContractInternalRule;
 import de.uka.ilkd.key.informationflow.rule.InfFlowWhileInvariantRule;
 import de.uka.ilkd.key.proof.init.JavaProfile;

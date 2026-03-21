@@ -28,13 +28,10 @@ public class HandleArith {
 
     private HandleArith() {}
 
-    /**
-     * try to prove atom by using polynomial
-     *
-     * @param problem
-     * @return <code>trueT</code> if if formu is proved to true, <code>falseT</code> if false, and
-     *         <code>problem</code> if it cann't be proved.
-     */
+    /// try to prove atom by using polynomial
+    ///
+    /// @return `trueT` if if formu is proved to true, `falseT` if false, and
+    ///         `problem` if it cann't be proved.
     public static JTerm provedByArith(JTerm problem, Services services) {
         final LRUCache<JTerm, JTerm> provedByArithCache =
             services.getCaches().getProvedByArithFstCache();
@@ -83,7 +80,6 @@ public class HandleArith {
     }
 
     /**
-     * @param problem
      * @return true if atom.sub(0) is euqual to atom.sub(1), false if not equal, else return atom
      */
     private static JTerm provedArithEqual(JTerm problem, TermBuilder tb, Services services) {
@@ -180,13 +176,11 @@ public class HandleArith {
     }
 
 
-    /**
-     * Format literal to a form of "geq",linke a>=b;For example, a <=b to b>=a;a>b to a>=b+1;!(a>=b)
-     * to b>=a+1..
-     *
-     * @param problem
-     * @return falseT if <code>term</code>'s operator is not >= or <=
-     */
+    /// Format literal to a form of "geq",linke `a>=b`.
+    /// For example, `a<=b` to `b>=a;a>b` to `a>=b+1;!(a>=b)`
+    /// to `b>=a+1`.
+    ///
+    /// @return falseT if `term`'s operator is not `>=` or `<=`
     private static JTerm formatArithTerm(final JTerm problem, TermBuilder tb, IntegerLDT ig,
             ServiceCaches caches) {
         final LRUCache<JTerm, JTerm> formattedTermCache = caches.getFormattedTermCache();

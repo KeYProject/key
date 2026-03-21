@@ -37,7 +37,6 @@ public final class FindResources {
         if (classLoader == null)
             return null;
 
-        @Nullable
         URL dirURL = classLoader.getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             /* A file path: easy enough */

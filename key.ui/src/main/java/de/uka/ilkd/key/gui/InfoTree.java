@@ -10,7 +10,7 @@ import javax.swing.tree.DefaultTreeModel;
 /**
  * This class is used by {@link InfoView} to display its contents.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class InfoTree extends JTree {
 

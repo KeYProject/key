@@ -22,7 +22,7 @@ import org.key_project.logic.sort.Sort;
  *
  * Almost exact copy of SelectPrinter without the heap printing.
  *
- * @author Julian Wiesler <wiesleju@gmail.com>
+ * @author Julian Wiesler
  */
 class FinalPrinter extends FieldPrinter {
 

@@ -12,32 +12,11 @@ import de.uka.ilkd.key.java.ast.declaration.Modifier;
 /**
  * Abstract.
  */
-
 public class Abstract extends Modifier {
-
-    /**
-     * Abstract.
-     */
     public Abstract() {}
-
-
-    /**
-     * Abstract.
-     *
-     * @param children
-     *        list of children. May contain: Comments
-     */
     public Abstract(PositionInfo pi, List<Comment> c) {
         super(pi, c);
     }
-
-
-
-    /**
-     * Get symbol.
-     *
-     * @return the string.
-     */
     protected String getSymbol() {
         return "abstract";
     }

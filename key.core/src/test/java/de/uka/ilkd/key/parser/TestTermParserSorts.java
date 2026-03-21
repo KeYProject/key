@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class TestTermParserSorts extends AbstractTestTermParser {
     @BeforeEach

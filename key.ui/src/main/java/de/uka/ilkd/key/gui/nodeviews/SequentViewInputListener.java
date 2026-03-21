@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class implements all input listener interfaces for SequentView.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class SequentViewInputListener implements MouseMotionListener, MouseListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentViewInputListener.class);

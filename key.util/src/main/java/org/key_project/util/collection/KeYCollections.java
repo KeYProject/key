@@ -113,7 +113,6 @@ public class KeYCollections {
      *
      * @param string an arbitrary string
      * @return a string which is a sub-structure of the original character sequence
-     * @author mattias ulbrich
      */
     public static /* @ non_null @ */ String filterAlphabetic(/* @ non_null @ */ String string) {
         StringBuilder res = new StringBuilder();

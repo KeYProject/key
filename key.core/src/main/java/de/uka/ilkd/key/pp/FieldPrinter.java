@@ -21,7 +21,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 class FieldPrinter {
 

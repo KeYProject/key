@@ -12,24 +12,9 @@ import de.uka.ilkd.key.java.ast.declaration.Modifier;
 
 /**
  * Final.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public class Final extends Modifier {
-
-    /**
-     * Final.
-     */
-
     public Final() {}
-
-    /**
-     * Abstract.
-     *
-     * @param children
-     *        list of children. May contain: Comments
-     */
     public Final(PositionInfo pi, List<Comment> c) {
         super(pi, c);
     }

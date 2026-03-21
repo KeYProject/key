@@ -4,7 +4,7 @@ package MapCaseStudy;
  * This is a simple test for {@link MapImplementation}, to see if it works as
  * expected.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class TestImplementation {
 

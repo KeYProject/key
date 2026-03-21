@@ -18,7 +18,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
  * {@link de.uka.ilkd.key.gui.nodeviews.SequentView}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 @Deprecated
 public class MainWindowTabbedPane extends JTabbedPane {

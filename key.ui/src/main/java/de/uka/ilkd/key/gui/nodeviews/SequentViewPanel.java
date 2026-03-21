@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 /**
  * Creates the layout for SequentViews.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 class SequentViewPanel extends JPanel {
 

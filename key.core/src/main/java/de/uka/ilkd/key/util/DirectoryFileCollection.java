@@ -62,8 +62,6 @@ public class DirectoryFileCollection implements FileCollection {
      * the following criteria: - File paths that contain the subpath "java/lang" are stored before
      * other file paths. - If there is a File that contains the subpath "java/lang/Object.java" then
      * it is stored at the very beginning of the list.
-     *
-     * @author gladisch
      */
     private static void sortFiles(List<Path> files) {
         for (int a = 0; a < files.size() - 1; a++) {

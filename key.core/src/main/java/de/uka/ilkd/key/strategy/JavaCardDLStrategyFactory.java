@@ -15,7 +15,7 @@ import org.key_project.logic.Name;
 
 /// Factory for [JavaCardDLStrategy]. Additionally, handles all strategy settings
 /// relevant to it.
-/// @author Kai Wallisch <kai.wallisch@ira.uka.de>
+/// @author Kai Wallisch 
 public class JavaCardDLStrategyFactory implements StrategyFactory {
 
     /**

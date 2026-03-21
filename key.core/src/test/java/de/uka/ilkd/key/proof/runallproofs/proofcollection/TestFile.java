@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * consists of a {@link #testProperty} and a {@link #path} String for the file location. Method
  * {@link #runKey()} will verify {@link #testProperty} for the given file.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class TestFile implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestFile.class);

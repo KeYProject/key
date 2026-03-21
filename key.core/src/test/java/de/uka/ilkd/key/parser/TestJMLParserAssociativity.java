@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test behaviour of for inputs in which braces are omitted.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class TestJMLParserAssociativity extends AbstractTestTermParser {
 

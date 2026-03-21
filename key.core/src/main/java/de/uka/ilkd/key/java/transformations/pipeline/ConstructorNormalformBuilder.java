@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Transforms the constructors of the given class to their
  * normalform. The constructor normalform can then be accessed via a
- * methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of
+ * methodcall <code>&lt;init&gt;(cons_args)</code>. The visibility of
  * the normalform is the same as for the original constructor.
  */
 public class ConstructorNormalformBuilder extends JavaTransformer {
@@ -250,13 +250,11 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
 
     @Nullable
     private ConstructorDeclaration attachConstructorDecl(TypeDeclaration<?> td) {
-        if (td.getParentNode().get() instanceof ObjectCreationExpr) {
-            var n = (ObjectCreationExpr) td.getParentNode().get();
+        if (td.getParentNode().get() instanceof ObjectCreationExpr n) {
             final var args = n.getArguments();
             if (args == null || args.size() == 0)
                 return null;
 
-            var type = n.getType().resolve();
             ConstructorDeclaration constructorDecl =
                 (ConstructorDeclaration) n.resolve().toAst().get();
             constructorDecl = constructorDecl.clone();
@@ -277,9 +275,8 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      * @param td
      *        the TypeDeclaration
      */
-    public void apply(TypeDeclaration<?> td) {
-        if (td instanceof ClassOrInterfaceDeclaration) {
-            var cd = (ClassOrInterfaceDeclaration) td;
+    public void apply(@NonNull TypeDeclaration<?> td) {
+        if (td instanceof ClassOrInterfaceDeclaration cd) {
             if (cd.isInterface()) {
                 return;
             }

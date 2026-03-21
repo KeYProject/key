@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts.meta;
 
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -16,6 +15,6 @@ public @interface Argument {
     /// Position of this argument in the positional argument list.
     ///
     /// @return a non-null string
-    /// @see ScriptCommandAst#positionalArgs()
+    /// @see de.uka.ilkd.key.scripts.ScriptCommandAst#positionalArgs()
     int value() default 0;
 }

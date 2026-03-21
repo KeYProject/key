@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * A {@link ProofCollectionUnit} that is created from a single {@link TestFile} that is not declared
  * as part of a group.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class SingletonProofCollectionUnit extends ProofCollectionUnit {
     private final TestFile file;

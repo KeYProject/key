@@ -11,7 +11,7 @@ import org.key_project.logic.Name;
  * This abstract class is used by SequentViewLogicPrinter to determine the set of printed
  * TermLabels.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public interface VisibleTermLabels {
     boolean contains(TermLabel label);

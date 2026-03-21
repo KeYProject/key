@@ -10,7 +10,7 @@ import javax.swing.JTextArea;
 /**
  * This class is used to display descriptions in {@link InfoView}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class InfoViewContentPane extends JScrollPane {
 

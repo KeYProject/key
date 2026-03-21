@@ -14,7 +14,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * {@link ProofCollection} by the parser. See implementations {@link GroupedProofCollectionUnit} and
  * {@link SingletonProofCollectionUnit} for further details.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public abstract class ProofCollectionUnit implements Serializable {
 

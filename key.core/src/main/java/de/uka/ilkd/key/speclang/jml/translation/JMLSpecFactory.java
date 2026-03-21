@@ -659,11 +659,9 @@ public class JMLSpecFactory {
         }
     }
 
-    /**
-     * Clauses are expected to be conjoined in a right-associative way, i.e. A & (B & ( C (...&
-     * N))). When using auto induction with lemmas, then A will be used as a lemma for B, A & B will
-     * be used as a lemma for C and so on. This mimics the Isabelle-style of proving.
-     */
+    /// Clauses are expected to be conjoined in a right-associative way, i.e. A & (B & ( C (...&
+    /// N))). When using auto induction with lemmas, then A will be used as a lemma for B, A & B will
+    /// be used as a lemma for C and so on. This mimics the Isabelle-style of proving.
     private JTerm translateAndClauses(Context context, ImmutableList<LocationVariable> paramVars,
             LocationVariable resultVar, LocationVariable excVar,
             Map<LocationVariable, JTerm> atPres,

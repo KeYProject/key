@@ -35,7 +35,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
  * Collection of strategy features that can be accessed statically. This class is essentially a
  * collection of constructors for various features.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public abstract class StaticFeatureCollection {
 

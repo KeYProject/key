@@ -1,0 +1,178 @@
+<h1 id="key----deductive-java-program-verifier">KeY -- Deductive Java
+    Program Verifier</h1>
+<p><a
+        href="https://github.com/KeYProject/key/actions/workflows/tests.yml"><img
+        src="https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg"
+        alt="Tests"/></a> <a
+        href="https://github.com/KeYProject/key/actions/workflows/codeql.yml"><img
+        src="https://github.com/KeYProject/key/actions/workflows/codeql.yml/badge.svg"
+        alt="CodeQL"/></a> <a
+        href="https://github.com/KeYProject/key/actions/workflows/code_quality.yml"><img
+        src="https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg"
+        alt="CodeQuality"/></a></p>
+<p>This repository is the home of the interactive theorem prover KeY for
+    formal verification and analysis of Java programs. KeY comes as a
+    standalone GUI application, which allows you to verify the functional
+    correctness of Java programs with respect to formal specifications
+    formulated in the Java Modeling Language JML. Moreover, KeY can also be
+    used as a library e.g. for symbolic program execution, first order
+    reasoning, or test case generation.</p>
+<p>For more information, refer to</p>
+<ul>
+    <li><a href="https://key-project.org">The KeY homepage</a></li>
+    <li><a href="https://www.key-project.org/thebook2/">The KeY
+        book</a></li>
+    <li><a href="https://keyproject.github.io/key-docs/">The KeY developer
+        documentation</a></li>
+    <li>KeY's success stories:
+        <ul>
+            <li><a
+                    href="http://www.envisage-project.eu/proving-android-java-and-python-sorting-algorithm-is-broken-and-how-to-fix-it/">Severe
+                bug discovered in JDK sorting routine (TimSort)</a>,
+            </li>
+            <li><a href="https://doi.org/10.1007/978-3-031-07727-2_4">Verification
+                of <code>java.util.IdentityHashMap</code></a>,
+            </li>
+            <li><a
+                    href="https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/">Google
+                Award for analysing a bug in <code>LinkedList</code></a></li>
+        </ul>
+    </li>
+</ul>
+<p>The current version of KeY is 2.12.2, licensed under GPL v2.</p>
+<p>Feel free to use the project templates to get started using KeY:</p>
+<ul>
+    <li><a
+            href="https://github.com/KeYProject/verification-project-template">For
+        Verification Projects</a></li>
+    <li><a href="https://github.com/KeYProject/key-java-example">Using as a
+        Library</a></li>
+    <li><a href="https://github.com/KeYProject/symbex-java-example">Using as
+        a Symbolic Execution Backend</a></li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<ul>
+    <li>Hardware: &gt;=2 GB RAM</li>
+    <li>Operating System: Linux/Unix, MacOSX, Windows</li>
+    <li>Java 17 or newer</li>
+    <li>Optionally, KeY can make use of the following binaries:
+        <ul>
+            <li>SMT Solvers:
+                <ul>
+                    <li><a href="https://github.com/Z3Prover/z3#z3">Z3</a></li>
+                    <li><a href="https://cvc5.github.io/">cvc5</a></li>
+                    <li><a href="https://cvc4.github.io/">CVC4</a></li>
+                    <li><a
+                            href="http://www.philipp.ruemmer.org/princess.shtml">Princess</a></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+<h2 id="content-of-the-key-folder">Content of the KeY folder</h2>
+<p>This folder provides a <a
+        href="https://gradle.org">gradle</a>-managed project following <a
+        href="https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html">Maven's
+    standard folder layout</a>. There are several subprojects in this
+    folder. In general, every <code>key.*/</code> subproject contains a core
+    component of KeY. Additional and optional components are in
+    <code>keyext.*/</code> folders. The file <code>build.gradle</code> is
+    the root build script describing the dependencies and common build tasks
+    for all subprojects.</p>
+<p><code>key.util</code>, <code>key.core</code> and <code>key.ui</code>
+    are the base for the product "KeY Prover". Special care is needed if you
+    plan to make changes here.</p>
+<h2 id="compile-and-run-key">Compile and Run KeY</h2>
+<p>Assuming you are in the directory of this README file, you can create
+    a runnable and deployable version with one of these commands:</p>
+<ol type="1">
+    <li><p>With <code>./gradlew key.ui:run</code> you can run the user
+        interface of KeY directly from the repository. Use
+        <code>./gradlew key.ui:run --args='--experimental'</code> to enable
+        experimental features.</p></li>
+    <li><p>Use <code>./gradlew classes</code> to compile KeY, which includes
+        running JavaCC and Antlr. Likewise, use
+        <code>./gradlew testClasses</code> if you also want to compile the JUnit
+        test classes.</p></li>
+    <li><p>Test your installation with <code>./gradlew test</code>. Be aware
+        that this will usually take multiple hours to complete. With
+        <code>./gradlew testFast</code>, you can run a more lightweight test
+        suite that should complete in a few minutes.</p>
+        <p>You can select a specific test case with the <code>--tests</code>
+            argument. Wildcards are allowed.</p>
+        <div class="sourceCode" id="cb1">
+            <pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"
+                                                                                         aria-hidden="true"
+                                                                                         tabindex="-1"></a><span
+                    class="ex">./gradlew</span> :key.<span class="op">&lt;</span>subproject<span class="op">&gt;</span>:test <span
+                    class="at">--tests</span> <span
+                    class="st">&quot;&lt;class&gt;.&lt;method&gt;&quot;</span></span></code></pre>
+        </div>
+        <p>You can debug KeY by adding the <code>--debug-jvm</code> option, then
+            attaching a debugger at <code>localhost:5005</code>.</p></li>
+    <li><p>You can create a single jar-version, aka <em>fat jar</em>, of KeY
+        with</p>
+        <div class="sourceCode" id="cb2">
+            <pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"
+                                                                                         aria-hidden="true"
+                                                                                         tabindex="-1"></a><span
+                    class="ex">./gradlew</span> :key.ui:shadowJar</span></code></pre>
+        </div>
+        <p>The file is generated in
+            <code>key.ui/build/libs/key-*-exe.jar</code>.</p></li>
+    <li><p>A distribution is build with</p>
+        <div class="sourceCode" id="cb3">
+            <pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"
+                                                                                         aria-hidden="true"
+                                                                                         tabindex="-1"></a><span
+                    class="ex">./gradlew</span> :key.ui:installDist :key.ui:distZip</span></code></pre>
+        </div>
+        <p>The distribution can be tested by calling
+            <code>key.ui/install/key/bin/key.ui</code> and is zipped in
+            <code>key.ui/build/distributions</code>.</p>
+        <p>The distribution gives you potential of using single jar
+            files.</p></li>
+</ol>
+<h1 id="developing-key">Developing KeY</h1>
+<ul>
+    <li><p>Quality is automatically assessed using <a
+            href="https://sonarqube.org">SonarQube</a> on each pull request. The
+        results of the assessments (pass/fail) can be inspected in the checks
+        section of the PR.</p>
+        <p>The rules and quality gate are maintained by Alexander Weigl <a
+                href="mailto:weigl@kit.edu">weigl@kit.edu</a> currently.</p></li>
+    <li><p>More guideline and documentation for the KeY development can be
+        found under <a
+                href="https://keyproject.github.io/key-docs/devel/">key-docs</a>.</p></li>
+</ul>
+<h1 id="issues-and-bug-reports">Issues and Bug Reports</h1>
+<ul>
+    <li><p>For bug reports, please use the <a
+            href="https://github.com/KeYProject/key/issues">issue tracker</a> or
+        send a mail to <a
+                href="mailto:support@key-project.org">support@key-project.org</a>.</p></li>
+    <li><p>For discussions, you may want to subscribe and use the mailing
+        list <a
+                href="mailto:key-all@lists.informatik.kit.edu">key-all@lists.informatik.kit.edu</a>
+        or use <a href="https://github.com/KeYProject/key/discussions">GitHub
+            discussions</a>.</p></li>
+</ul>
+<h1 id="contributing-to-key">Contributing to KeY</h1>
+<p>Feel free to submit <a
+        href="https://github.com/KeYProject/key/pulls">pull requests</a> via
+    GitHub. Pull requests are assessed using automatic tests, formatting and
+    static source checkers, as well as a manual review by one of the
+    developers. More guidelines and documentation for the KeY development
+    can be found under <a
+            href="https://keyproject.github.io/key-docs/devel/">key-docs</a>.</p>
+<h1 id="license-remark">License Remark</h1>
+<pre><code>This is the KeY project - Integrated Deductive Software Design
+Copyright (C) 2001-2011 Universität Karlsruhe, Germany
+                        Universität Koblenz-Landau, Germany
+                        and Chalmers University of Technology, Sweden
+Copyright (C) 2011-2024 Karlsruhe Institute of Technology, Germany
+                        Technical University Darmstadt, Germany
+                        Chalmers University of Technology, Sweden
+
+The KeY system is protected by the GNU General Public License.
+See LICENSE.TXT for details.</code></pre>

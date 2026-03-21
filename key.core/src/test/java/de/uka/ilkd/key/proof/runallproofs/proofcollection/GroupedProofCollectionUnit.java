@@ -14,7 +14,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s that are grouped
  * together.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     private static final long serialVersionUID = 1L;

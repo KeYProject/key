@@ -724,8 +724,6 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @param currNode The current proof node.
      * @param partnerNodesInfo Information about join partner nodes.
-     * @param currNode
-     * @param partnerNodesInfo
      * @return The instantiated Join Rule application.
      * @throws SkipSMTRuleException If the proof has been loaded, but the SMT solvers have not been
      *         run.

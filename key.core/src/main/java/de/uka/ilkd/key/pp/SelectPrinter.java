@@ -21,7 +21,7 @@ import org.key_project.logic.sort.Sort;
  * This class is used by LogicPrinter.java to print out select-terms, i.e. terms of the following
  * form: T::select(heap, object, field)
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 class SelectPrinter extends FieldPrinter {
 

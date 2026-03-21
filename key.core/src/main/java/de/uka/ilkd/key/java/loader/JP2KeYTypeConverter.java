@@ -72,9 +72,6 @@ public class JP2KeYTypeConverter {
 
     private final Services services;
 
-    /**
-     * The associated Recoder<->KeY object
-     */
     private final KeYJPMapping jp2KeY;
     private final TypeSolver typeSolver;
 
@@ -143,7 +140,6 @@ public class JP2KeYTypeConverter {
      *
      * @param typeName name of a type to be converted
      * @return the KJT for the string representation.
-     * @author mu
      * @see #getKeYJavaType(ResolvedType)
      */
     public KeYJavaType getKeYJavaType(String typeName) {

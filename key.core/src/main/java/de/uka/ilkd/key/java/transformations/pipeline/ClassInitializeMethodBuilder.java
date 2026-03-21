@@ -118,16 +118,14 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      * <p>
      * some special settings for implicit fields are performed here as well
      *
-     * @param typeDeclaration
-     *        the TypeDeclaration<?> whose fields have to be prepared
+     * @param typeDeclaration the {@link TypeDeclaration} whose fields have to be prepared
      * @return the list of copy assignments
      */
     @NonNull
     private NodeList<Statement> getInitializers(@NonNull TypeDeclaration<?> typeDeclaration) {
         NodeList<Statement> result = new NodeList<>();
         for (Node childNode : typeDeclaration.getChildNodes()) {
-            if (childNode instanceof InitializerDeclaration) {
-                var init = (InitializerDeclaration) childNode;
+            if (childNode instanceof InitializerDeclaration init) {
                 if (init.isStatic()) {
                     result.add(init.getBody().clone());
                 }
@@ -176,8 +174,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         // try block
         NodeList<Statement> initializerExecutionBody = getInitializers(td);
 
-        if (td instanceof ClassOrInterfaceDeclaration && !td.resolve().isJavaLangObject()) {
-            var cd = (ClassOrInterfaceDeclaration) td;
+        if (td instanceof ClassOrInterfaceDeclaration cd && !td.resolve().isJavaLangObject()) {
             var type = cd.resolve();
             final var ancestors = type.getAncestors();
             if (!ancestors.isEmpty()) {

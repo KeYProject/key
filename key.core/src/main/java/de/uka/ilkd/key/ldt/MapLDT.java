@@ -20,7 +20,7 @@ import org.key_project.util.ExtList;
 /**
  * LDT for maps.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public final class MapLDT extends LDT {
 

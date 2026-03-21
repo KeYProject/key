@@ -27,7 +27,7 @@ import org.key_project.prover.sequent.SequentFormula;
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class TermLabelMenu extends JMenu {
     public static final String TERM_LABEL_MENU = "Term Labels";

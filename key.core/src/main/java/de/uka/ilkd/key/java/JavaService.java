@@ -377,7 +377,6 @@ public class JavaService {
      *
      * @param fileRepo the FileRepo for obtaining InputStreams
      * @throws IOException an exception
-     * @author mulbrich
      */
     private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
         List<FileCollection> sources = new ArrayList<>();

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 /**
  * This class can be used for adding Checkboxes to the menu.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 

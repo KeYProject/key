@@ -13,7 +13,7 @@ import org.key_project.logic.op.Function;
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms of the following
  * form: store(heap, object, field, value)
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 class StorePrinter extends FieldPrinter {
 

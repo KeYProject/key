@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * An instance of this class loads several XML files, whose contents are displayed in
  * {@link de.uka.ilkd.key.gui.InfoView}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class XMLResources {
 

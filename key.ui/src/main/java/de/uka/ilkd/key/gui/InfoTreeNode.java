@@ -15,7 +15,7 @@ import de.uka.ilkd.key.rule.Taclet;
 /**
  * Every node of {@link InfoTree} is an instance of this class.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 

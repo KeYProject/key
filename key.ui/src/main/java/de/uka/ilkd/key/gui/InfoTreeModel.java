@@ -20,7 +20,7 @@ import org.key_project.logic.Name;
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class InfoTreeModel extends DefaultTreeModel {
 

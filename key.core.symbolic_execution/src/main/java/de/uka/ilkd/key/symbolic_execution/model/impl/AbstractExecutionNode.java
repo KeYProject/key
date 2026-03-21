@@ -420,7 +420,6 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * Removes the given {@link IExecutionBlockStartNode} from registration.
      *
      * @param completedBlock The {@link IExecutionBlockStartNode} to be remove.
-     * @author Anna Filighera
      */
     public void removeCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
         if (completedBlock != null && completedBlocks.contains(completedBlock)) {
@@ -507,7 +506,6 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * Removes the given child.
      *
      * @param child The child to be removed.
-     * @author Anna Filighera
      */
     public void removeChild(IExecutionNode<?> child) {
         children.remove(child);

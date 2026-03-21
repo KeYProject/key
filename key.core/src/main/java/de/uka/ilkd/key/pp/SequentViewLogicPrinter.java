@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be
  * put in here, so that code of {@link LogicPrinter} stays independent of GUI as much as possible.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class SequentViewLogicPrinter extends LogicPrinter {
 

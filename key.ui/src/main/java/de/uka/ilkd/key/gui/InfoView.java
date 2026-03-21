@@ -32,7 +32,7 @@ import de.uka.ilkd.key.util.XMLResources;
 /**
  * Class for info contents displayed in {@link MainWindow}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch 
  */
 public class InfoView extends JSplitPane implements TabPanel {
 

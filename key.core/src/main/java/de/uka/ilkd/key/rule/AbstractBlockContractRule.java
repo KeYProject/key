@@ -118,7 +118,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
                 && contract.getBlock().equals(functionalBlockContractPO.getBlock());
     }
 
-    /// Searches backwards for a [{@link BlockContractInternalBuiltInRuleApp] on the parent path of
+    /// Searches backwards for a [BlockContractInternalBuiltInRuleApp] on the parent path of
     /// `goal`.
     /// @param contract a block contract.
     /// @param goal the current goal.

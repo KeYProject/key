@@ -77,7 +77,7 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      * some special settings for implicit fields are performed here as well
      *
      * @param typeDeclaration
-     *        the TypeDeclaration<?> whose fields have to be prepared
+     *        the {@link TypeDeclaration} whose fields have to be prepared
      * @return the list of copy assignments
      */
     private NodeList<Statement> prepareFields(TypeDeclaration<?> typeDeclaration) {
@@ -152,7 +152,7 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
 
 
     /**
-     * entry method for the constructor normalform builder
+     * entry method for the constructor normal-form builder
      *
      * @param td
      *        the TypeDeclaration
