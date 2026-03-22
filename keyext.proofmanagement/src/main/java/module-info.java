@@ -15,4 +15,5 @@ import org.jspecify.annotations.NullMarked;
     requires key.ui;
     requires org.slf4j;
     requires org.jspecify;
+    requires info.picocli;
 }

@@ -20,4 +20,6 @@ import org.jspecify.annotations.NullMarked;
     requires org.checkerframework.checker.qual;
     requires java.compiler;
     requires info.picocli;
+    requires java.desktop;
+
 }

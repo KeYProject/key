@@ -82,6 +82,12 @@ import org.jspecify.annotations.NullMarked;
     exports de.uka.ilkd.key.util.parsing;
     exports de.uka.ilkd.key.proof.io.intermediate;
     exports de.uka.ilkd.key.smt.lang;
+    exports de.uka.ilkd.key.java.declaration.modifier;
+    exports de.uka.ilkd.key.speclang.infflow;
+    exports de.uka.ilkd.key.util.properties;
+    exports de.uka.ilkd.key.rule.executor.javadl;
+    exports de.uka.ilkd.key.proof.rules;
+    exports de.uka.ilkd.key.java.expression.literal;
 
     requires org.slf4j;
     requires key.recoder;

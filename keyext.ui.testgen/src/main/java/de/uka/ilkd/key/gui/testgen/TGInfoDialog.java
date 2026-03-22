@@ -10,7 +10,9 @@ import javax.swing.text.DefaultCaret;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.testgen.TGReporter;
+import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 import de.uka.ilkd.key.ui.util.ThreadUtilities;
 
 import org.slf4j.Logger;

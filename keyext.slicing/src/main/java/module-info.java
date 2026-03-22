@@ -19,4 +19,5 @@ import org.jspecify.annotations.NullMarked;
     requires org.jspecify;
     requires dockingframes.common;
     requires com.miglayout.core;
+    requires info.picocli;
 }

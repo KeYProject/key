@@ -24,6 +24,7 @@ import org.jspecify.annotations.NullMarked;
 
     requires org.slf4j;
     requires key.core;
+    requires key.core.infflow;
     requires org.jspecify;
     requires org.key_project.util;
     requires key.ncore;
@@ -43,6 +44,7 @@ import org.jspecify.annotations.NullMarked;
     requires com.formdev.flatlaf;
     requires java.desktop;
     requires java.prefs;
+    requires info.picocli;
 
     provides de.uka.ilkd.key.gui.extension.api.KeYGuiExtension with
             de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt,
