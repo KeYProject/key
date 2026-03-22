@@ -117,11 +117,11 @@ public abstract class Taclet implements Rule {
     /// or recursive use of the Taclet.
     @EnsuresNonNull({ "matcher", "executor" })
     protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
-                     ImmutableList<TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
-                     TacletAttributes attrs,
-                     ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
-                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
         this.find = find;

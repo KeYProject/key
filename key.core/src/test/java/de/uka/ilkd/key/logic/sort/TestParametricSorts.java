@@ -61,7 +61,7 @@ class TestParametricSorts {
             params = params.prepend(new GenericParameter(genSort, varia));
         }
         ParametricSortDecl psd =
-            new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(), params, "");
+            new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(), params);
         nss.parametricSorts().add(psd);
         return psd;
     }

@@ -47,10 +47,11 @@ public abstract class LexerHighlighter {
         Matcher match = pattern.matcher(text);
         var sd = contentPane.getStyledDocument();
 
+        var prefixLength = getPatternPrefixLength();
         while (match.find()) {
             var lexer = ParsingFacade.createLexer(CharStreams.fromString(match.group(1)));
             var toks = lexer.getAllTokens();
-            int startIdx = match.start() + "```key".length();
+            int startIdx = match.start() + prefixLength;
             for (var tok : toks) {
                 highlightToken(sd, startIdx, tok);
             }
@@ -59,6 +60,8 @@ public abstract class LexerHighlighter {
         contentPane.repaint();
         contentPane.repaint();
     }
+
+    protected abstract int getPatternPrefixLength();
 
     public final void highlightPaneAll(JTextPane contentPane, int startIdx, int stopIdx) {
         String text = contentPane.getText();
@@ -122,8 +125,6 @@ public abstract class LexerHighlighter {
         private final AttributeSet STYLE_COMMENT = define(COLOR_COMMENT.get(), false, true);
         private final AttributeSet STYLE_DEFAULT = define(COLOR_IDENTIFIER.get(), false, false);
 
-        private final Pattern MARKDOWN = Pattern.compile("```key(.*?)```",
-            Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
         @Override
         protected @Nullable AttributeSet getStyle(int tokType) {
@@ -182,8 +183,14 @@ public abstract class LexerHighlighter {
         }
 
         @Override
+        protected int getPatternPrefixLength() {
+            return "```key".length();
+        }
+
+        @Override
         protected Pattern getMarkdownPattern() {
-            return MARKDOWN;
+            return Pattern.compile("```key(.*?)```",
+                Pattern.MULTILINE | Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
         }
     }
 }

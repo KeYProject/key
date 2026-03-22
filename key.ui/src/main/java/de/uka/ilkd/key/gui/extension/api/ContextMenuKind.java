@@ -12,8 +12,12 @@ import de.uka.ilkd.key.proof.Proof;
  * @version 1 (07.04.19)
  */
 public interface ContextMenuKind<T> {
-    ContextMenuKind<Proof> PROOF_LIST = new ContextMenuKind<>() {};
-    ContextMenuKind<Node> PROOF_TREE = new ContextMenuKind<>() {};
-    ContextMenuKind<Object> INFO_TREE = new ContextMenuKind<>() {};
-    ContextMenuKind<PosInSequent> SEQUENT_VIEW = new ContextMenuKind<>() {};
+    ContextMenuKind<Proof> PROOF_LIST = new ContextMenuKind<>() {
+    };
+    ContextMenuKind<Node> PROOF_TREE = new ContextMenuKind<>() {
+    };
+    ContextMenuKind<Object> INFO_TREE = new ContextMenuKind<>() {
+    };
+    ContextMenuKind<PosInSequent> SEQUENT_VIEW = new ContextMenuKind<>() {
+    };
 }

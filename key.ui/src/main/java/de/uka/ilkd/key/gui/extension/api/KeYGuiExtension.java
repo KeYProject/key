@@ -163,7 +163,7 @@ public interface KeYGuiExtension {
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
         <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
-                                           @Nullable T underlyingObject);
+                @Nullable T underlyingObject);
     }
 
     /**

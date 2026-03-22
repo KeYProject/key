@@ -43,7 +43,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NullMarked;
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -52,6 +51,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -163,14 +163,15 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
 
             private void checkPopup(MouseEvent e) {
-                  if (e.isPopupTrigger()) {
-                      Object selected = ((InfoTreeNode) infoTree.getLastSelectedPathComponent()).getUserObject();
-                      JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                              ContextMenuKind.INFO_TREE, selected, mediator);
-                      if (menu.getComponentCount() > 0) {
-                          menu.show(InfoView.this, e.getX(), e.getY());
-                      }
-                  }
+                if (e.isPopupTrigger()) {
+                    Object selected =
+                        ((InfoTreeNode) infoTree.getLastSelectedPathComponent()).getUserObject();
+                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                        ContextMenuKind.INFO_TREE, selected, mediator);
+                    if (menu.getComponentCount() > 0) {
+                        menu.show(InfoView.this, e.getX(), e.getY());
+                    }
+                }
             }
         });
 
@@ -423,9 +424,10 @@ public class InfoView extends JSplitPane implements TabPanel {
             String origin = metaSpace.findOrigin(taclet);
 
             return create(taclet.name().toString(),
-                    () -> (doc != null ? doc + "\n\n" : "") +
-                            ("```key\n%s\n```\n\n".formatted(lp.result())) +
-                            ("Defined at: %s \n under options: (%s)".formatted(origin, taclet.getChoices())));
+                () -> (doc != null ? doc + "\n\n" : "") +
+                        ("```key\n%s\n```\n\n".formatted(lp.result())) +
+                        ("Defined at: %s \n under options: (%s)".formatted(origin,
+                            taclet.getChoices())));
         }
 
         public InfoTreeNode create(BuiltInRule br, MetaSpace docs) {

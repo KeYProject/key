@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 
 import org.key_project.logic.HasMeta;
-import org.key_project.logic.HasOrigin;
 
 import org.jspecify.annotations.NonNull;
 

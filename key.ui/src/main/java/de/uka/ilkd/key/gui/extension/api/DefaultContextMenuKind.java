@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.api;
 
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
 
 /**
  * @author Alexander Weigl

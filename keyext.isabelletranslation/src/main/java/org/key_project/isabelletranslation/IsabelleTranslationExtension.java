@@ -41,7 +41,8 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
         @Override
         public <T> List<Action> getContextActions(
                 KeYMediator mediator, ContextMenuKind<T> kind, T object) {
-            if(kind != ContextMenuKind.SEQUENT_VIEW) return Collections.emptyList();
+            if (kind != ContextMenuKind.SEQUENT_VIEW)
+                return Collections.emptyList();
             var pos = (PosInSequent) object;
             if (pos.getPosInOccurrence() != null || mediator.getSelectedGoal() == null) {
                 return List.of();

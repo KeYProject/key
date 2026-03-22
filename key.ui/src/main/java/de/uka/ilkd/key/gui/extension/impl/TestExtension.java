@@ -20,7 +20,6 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 
 import org.jspecify.annotations.NullMarked;
@@ -45,7 +44,8 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private final KeyAction actionTest = new TestAction();
     private final ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
         @Override
-        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind, @Nullable T underlyingObject) {
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                @Nullable T underlyingObject) {
             return Collections.singletonList(actionTest);
         }
     };
@@ -57,7 +57,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
 
     @Override
     public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
-                                              @Nullable T underlyingObject) {
+            @Nullable T underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -80,7 +80,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
 
     @Override
     public Collection<TabPanel> getPanels(MainWindow window,
-                                          KeYMediator mediator) {
+            KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
             public String getTitle() {

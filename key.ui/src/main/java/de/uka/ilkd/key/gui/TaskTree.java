@@ -303,7 +303,7 @@ public class TaskTree extends JPanel {
                     Proof p = task.proof();
                     delegateView.setSelectionPath(selPath);
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                         ContextMenuKind.PROOF_LIST, p, mediator);
+                        ContextMenuKind.PROOF_LIST, p, mediator);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }

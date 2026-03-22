@@ -23,8 +23,9 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.prover.sequent.PosInOccurrence;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelVisualizer}s.

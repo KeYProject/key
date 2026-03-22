@@ -188,7 +188,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     @Override
-    public @NonNull TacletExecutor<?,?> getExecutor() {
+    public @NonNull TacletExecutor getExecutor() {
         return executor;
     }
 

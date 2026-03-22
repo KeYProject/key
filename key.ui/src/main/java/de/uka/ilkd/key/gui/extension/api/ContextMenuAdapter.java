@@ -8,10 +8,6 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -24,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu {
     @Override
     public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
-                                                    @Nullable T underlyingObject) {
+            @Nullable T underlyingObject) {
         return Collections.emptyList();
     }
 }

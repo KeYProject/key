@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -260,7 +261,7 @@ public final class KeYGuiExtensionFacade {
     }
 
     public static <T> List<Action> getContextMenuItems(ContextMenuKind<T> kind,
-             @Nullable T underlyingObject, KeYMediator mediator) {
+            @Nullable T underlyingObject, KeYMediator mediator) {
         return getContextMenuExtensions().stream()
                 .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
                 .collect(Collectors.toList());
