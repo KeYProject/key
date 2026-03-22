@@ -3,18 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,6 +11,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH;
 
@@ -88,8 +89,8 @@ public class RecentFileMenu {
      * add path to the menu
      */
     private void addNewToModelAndView(final String path,
-                                      @Nullable Profile profile,
-                                      boolean singleJava, @Nullable Configuration additionalOption) {
+            @Nullable Profile profile,
+            boolean singleJava, @Nullable Configuration additionalOption) {
         // do not add quick save location to recent files
         if (QUICK_SAVE_PATH.endsWith(path)) {
             return;
@@ -97,12 +98,12 @@ public class RecentFileMenu {
 
         if (new File(path).exists()) {
             var entry = new RecentFileEntry(path, profile != null ? profile.ident() : null,
-                    singleJava, additionalOption);
+                singleJava, additionalOption);
             insertFirstEntry(entry);
 
             // Recalculate unique names
             final String[] paths =
-                    recentFiles.stream().map(RecentFileEntry::getAbsolutePath).toArray(String[]::new);
+                recentFiles.stream().map(RecentFileEntry::getAbsolutePath).toArray(String[]::new);
             final ShortUniqueFileNames.Name[] names = ShortUniqueFileNames.makeUniqueNames(paths);
 
             // Set the names
@@ -114,9 +115,9 @@ public class RecentFileMenu {
     }
 
     private void addRecentFileNoSave(final String path,
-                                     @Nullable Profile profile,
-                                     boolean singleJava,
-                                     @Nullable Configuration additionalOption) {
+            @Nullable Profile profile,
+            boolean singleJava,
+            @Nullable Configuration additionalOption) {
         LOGGER.trace("Adding file: {}", path);
 
         Optional<RecentFileEntry> existingEntry = recentFiles.stream()
@@ -147,12 +148,12 @@ public class RecentFileMenu {
      * maximum number of names will be allowed in the list, and additional names will be removed at
      * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
      *
-     * @param path       the path of the file.
+     * @param path the path of the file.
      * @param singleJava
      */
     public void addRecentFile(final String path,
-                              @Nullable Profile profile, boolean singleJava,
-                              @Nullable Configuration additionalOption) {
+            @Nullable Profile profile, boolean singleJava,
+            @Nullable Configuration additionalOption) {
         addRecentFileNoSave(path, profile, singleJava, additionalOption);
         save();
     }
@@ -217,7 +218,7 @@ public class RecentFileMenu {
      */
     public void store(Path filename) {
         List<Configuration> config =
-                recentFiles.stream().map(RecentFileEntry::asConfiguration).toList();
+            recentFiles.stream().map(RecentFileEntry::asConfiguration).toList();
         try (var fin = Files.newBufferedWriter(filename)) {
             var writer = new Configuration.ConfigurationWriter(fin);
             writer.printValue(config);
@@ -256,9 +257,9 @@ public class RecentFileMenu {
 
         public RecentFileEntry(Configuration options) {
             this(Objects.requireNonNull(options.getString(KEY_PATH)),
-                    options.getString(KEY_PROFILE),
-                    options.getBool(KEY_LOAD_SINGLE_JAVA, false),
-                    options.getTable(KEY_OPTIONS));
+                options.getString(KEY_PROFILE),
+                options.getBool(KEY_LOAD_SINGLE_JAVA, false),
+                options.getTable(KEY_OPTIONS));
         }
 
         public Configuration asConfiguration() {
@@ -307,16 +308,16 @@ public class RecentFileMenu {
             } else {
                 String profileName = fileEntry.profile;
                 var selectedProfile =
-                        ServiceLoader.load(DefaultProfileResolver.class)
-                                .stream()
-                                .filter(it -> it.get().getProfileName().equals(profileName))
-                                .findFirst()
-                                .map(it -> it.get().getDefaultProfile());
+                    ServiceLoader.load(DefaultProfileResolver.class)
+                            .stream()
+                            .filter(it -> it.get().getProfileName().equals(profileName))
+                            .findFirst()
+                            .map(it -> it.get().getDefaultProfile());
 
 
                 if (profileName != null && selectedProfile.isEmpty()) {
                     JOptionPane.showMessageDialog(mainWindow,
-                            "Could not find previous selected profile %s.".formatted(profileName));
+                        "Could not find previous selected profile %s.".formatted(profileName));
                     return;
                 }
 

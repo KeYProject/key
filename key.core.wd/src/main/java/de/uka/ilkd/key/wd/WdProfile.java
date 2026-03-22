@@ -113,12 +113,12 @@ public class WdProfile extends JavaProfile {
 
         if (additionalProfileOptions != null) {
             final var selectedWdOperator = additionalProfileOptions.getString("wdOperator");
-            if(selectedWdOperator == null) {
+            if (selectedWdOperator == null) {
                 return;
             }
 
             var wdOperator = baseConfig.choiceNS().lookup(selectedWdOperator);
-            if(wdOperator == null) {
+            if (wdOperator == null) {
                 var choices = baseConfig.choiceNS().allElements()
                         .stream()
                         .filter(it -> it.category().equals("wdOperator"))
@@ -127,7 +127,7 @@ public class WdProfile extends JavaProfile {
 
                 throw new IllegalStateException("Could not find choice for %s. \n Choices known %s."
                         .formatted(additionalProfileOptions, choices));
-            }else {
+            } else {
                 baseConfig.activateChoice(wdOperator);
             }
         }
