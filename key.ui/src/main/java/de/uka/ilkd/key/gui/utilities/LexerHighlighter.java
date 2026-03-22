@@ -99,22 +99,25 @@ public abstract class LexerHighlighter {
 
     public static class KeYLexerHighlighter extends LexerHighlighter {
         public static final ColorSettings.ColorProperty COLOR_KEYWORD =
-            ColorSettings.define("syntax.keyword", "", Color.BLUE, Color.ORANGE);
+            ColorSettings.define("infotree.syntax.keyword", "", Color.BLUE, Color.ORANGE);
 
         public static final ColorSettings.ColorProperty COLOR_IDENTIFIER =
-            ColorSettings.define("syntax.identifier", "", Color.BLACK, Color.WHITE);
+            ColorSettings.define("infotree.syntax.identifier", "", Color.BLACK, Color.WHITE);
 
         public static final ColorSettings.ColorProperty COLOR_COMMENT =
-            ColorSettings.define("syntax.comment", "", Color.GREEN, Color.GREEN);
+            ColorSettings.define("infotree.syntax.comment", "", Color.GREEN, Color.GREEN);
 
         public static final ColorSettings.ColorProperty COLOR_OPERATORS =
-            ColorSettings.define("syntax.operators", "", Color.BLACK, Color.ORANGE);
+            ColorSettings.define("infotree.syntax.operators", "", Color.BLACK, Color.ORANGE);
 
         public static final ColorSettings.ColorProperty COLOR_ERROR =
-            ColorSettings.define("syntax.error", "", Color.RED, Color.WHITE);
+            ColorSettings.define("infotree.syntax.error", "", Color.RED, Color.WHITE);
 
         public static final ColorSettings.ColorProperty COLOR_LITERALS =
-            ColorSettings.define("syntax.literals", "", Color.GREEN, Color.GREEN);
+                ColorSettings.define("infotree.syntax.literals", "", Color.GREEN, Color.GREEN);
+
+        public static final ColorSettings.ColorProperty COLOR_MODALITY =
+                ColorSettings.define("infotree.syntax.modality", "", Color.PINK, Color.PINK);
 
 
         private final AttributeSet STYLE_OPERATORS = define(COLOR_OPERATORS.get(), false, false);
@@ -123,6 +126,7 @@ public abstract class LexerHighlighter {
         private final AttributeSet STYLE_KEYWORDS = define(COLOR_KEYWORD.get(), true, false);
         private final AttributeSet STYLE_IDENTIFIER = define(COLOR_IDENTIFIER.get(), true, false);
         private final AttributeSet STYLE_COMMENT = define(COLOR_COMMENT.get(), false, true);
+        private final AttributeSet STYLE_MODALITY = define(COLOR_COMMENT.get(), false, true);
         private final AttributeSet STYLE_DEFAULT = define(COLOR_IDENTIFIER.get(), false, false);
 
 
@@ -158,8 +162,10 @@ public abstract class LexerHighlighter {
                         MODALITYBB, MODAILITYGENERIC1, MODAILITYGENERIC2, MODAILITYGENERIC3,
                         MODAILITYGENERIC4, MODAILITYGENERIC5, MODAILITYGENERIC6, MODAILITYGENERIC7,
                         MODALITYD_END, MODALITYD_STRING, MODALITYD_CHAR, MODALITYG_END,
-                        MODALITYB_END, MODALITYBB_END ->
+                     MODALITYB_END, MODALITYBB_END, MODALOPERATOR, PROGRAM ->
                     STYLE_KEYWORDS;
+
+                case MODALITY -> STYLE_MODALITY;
 
                 case AT, PARALLEL, OR, AND, NOT, IMP,
                         EQUALS, NOT_EQUALS, SEQARROW, EXP, TILDE, PERCENT,
