@@ -24,6 +24,7 @@ import org.jspecify.annotations.NullMarked;
     exports org.key_project.prover.strategy.costbased.termgenerator;
     exports org.key_project.prover.strategy.costbased.feature.instantiator;
     exports org.key_project.prover.rules.matcher.vm;
+    exports org.key_project.prover.indexing;
 
     requires key.ncore;
     requires org.key_project.util;

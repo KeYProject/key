@@ -34,7 +34,6 @@ import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.macros.TestGenMacro;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 

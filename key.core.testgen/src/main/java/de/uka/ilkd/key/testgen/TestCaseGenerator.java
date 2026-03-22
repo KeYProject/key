@@ -8,7 +8,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.lang.model.element.Modifier;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -32,8 +31,6 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.logic.Term;
@@ -48,6 +45,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.lang.model.element.Modifier;
 
 import static de.uka.ilkd.key.testgen.Constants.*;
 import static de.uka.ilkd.key.testgen.TestgenUtils.*;

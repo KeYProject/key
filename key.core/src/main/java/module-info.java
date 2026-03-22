@@ -67,7 +67,6 @@ import org.jspecify.annotations.NullMarked;
     exports de.uka.ilkd.key.rule.merge.procedures;
     exports de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
     exports de.uka.ilkd.key.control.event;
-    exports de.uka.ilkd.key.informationflow.macros;
     exports de.uka.ilkd.key.proof.io.consistency;
     exports de.uka.ilkd.key.taclettranslation.lemma;
     exports de.uka.ilkd.key.nparser;
@@ -96,16 +95,9 @@ import org.jspecify.annotations.NullMarked;
     requires org.checkerframework.checker.qual;
 
     provides ProofMacro with
-            de.uka.ilkd.key.informationflow.macros.FullInformationFlowAutoPilotMacro,
-            de.uka.ilkd.key.informationflow.macros.AuxiliaryComputationAutoPilotMacro,
-            de.uka.ilkd.key.informationflow.macros.StartAuxiliaryComputationMacro,
-            de.uka.ilkd.key.informationflow.macros.FinishAuxiliaryComputationMacro,
             de.uka.ilkd.key.macros.FullAutoPilotProofMacro,
             de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro,
             de.uka.ilkd.key.macros.SMTPreparationMacro,
-            de.uka.ilkd.key.informationflow.macros.StateExpansionAndInfFlowContractApplicationMacro,
-            de.uka.ilkd.key.informationflow.macros.SelfcompositionStateExpansionMacro,
-            de.uka.ilkd.key.informationflow.macros.FullUseInformationFlowContractMacro,
             de.uka.ilkd.key.macros.PropositionalExpansionMacro,
             de.uka.ilkd.key.macros.FullPropositionalExpansionMacro,
             de.uka.ilkd.key.macros.TryCloseMacro,
@@ -114,7 +106,6 @@ import org.jspecify.annotations.NullMarked;
             de.uka.ilkd.key.macros.HeapSimplificationMacro,
             de.uka.ilkd.key.macros.IntegerSimplificationMacro,
             de.uka.ilkd.key.macros.OneStepProofMacro,
-            de.uka.ilkd.key.macros.WellDefinednessMacro,
             de.uka.ilkd.key.macros.UpdateSimplificationMacro,
             de.uka.ilkd.key.macros.TranscendentalFloatSMTMacro;
 
@@ -142,7 +133,6 @@ import org.jspecify.annotations.NullMarked;
             de.uka.ilkd.key.scripts.SchemaVarCommand,
             de.uka.ilkd.key.scripts.JavascriptCommand,
             de.uka.ilkd.key.scripts.SkipCommand,
-            de.uka.ilkd.key.scripts.AxiomCommand,
             de.uka.ilkd.key.scripts.AssumeCommand,
             de.uka.ilkd.key.scripts.AssertCommand,
             de.uka.ilkd.key.scripts.RewriteCommand,
