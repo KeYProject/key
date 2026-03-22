@@ -80,7 +80,7 @@ public class Configuration {
      * @see #getTable(String)
      */
     public <T> boolean exists(String name, Class<T> clazz) {
-        return data.containsKey(name) && data.get(name)!=null
+        return data.containsKey(name) && data.get(name) != null
                 && clazz.isAssignableFrom(data.get(name).getClass());
     }
 

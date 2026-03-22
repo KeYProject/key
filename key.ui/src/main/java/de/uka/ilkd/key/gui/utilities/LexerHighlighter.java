@@ -114,10 +114,10 @@ public abstract class LexerHighlighter {
             ColorSettings.define("infotree.syntax.error", "", Color.RED, Color.WHITE);
 
         public static final ColorSettings.ColorProperty COLOR_LITERALS =
-                ColorSettings.define("infotree.syntax.literals", "", Color.GREEN, Color.GREEN);
+            ColorSettings.define("infotree.syntax.literals", "", Color.GREEN, Color.GREEN);
 
         public static final ColorSettings.ColorProperty COLOR_MODALITY =
-                ColorSettings.define("infotree.syntax.modality", "", Color.PINK, Color.PINK);
+            ColorSettings.define("infotree.syntax.modality", "", Color.PINK, Color.PINK);
 
 
         private final AttributeSet STYLE_OPERATORS = define(COLOR_OPERATORS.get(), false, false);
@@ -162,7 +162,7 @@ public abstract class LexerHighlighter {
                         MODALITYBB, MODAILITYGENERIC1, MODAILITYGENERIC2, MODAILITYGENERIC3,
                         MODAILITYGENERIC4, MODAILITYGENERIC5, MODAILITYGENERIC6, MODAILITYGENERIC7,
                         MODALITYD_END, MODALITYD_STRING, MODALITYD_CHAR, MODALITYG_END,
-                     MODALITYB_END, MODALITYBB_END, MODALOPERATOR, PROGRAM ->
+                        MODALITYB_END, MODALITYBB_END, MODALOPERATOR, PROGRAM ->
                     STYLE_KEYWORDS;
 
                 case MODALITY -> STYLE_MODALITY;
