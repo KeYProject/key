@@ -80,7 +80,8 @@ public class Configuration {
      * @see #getTable(String)
      */
     public <T> boolean exists(String name, Class<T> clazz) {
-        return data.containsKey(name) && clazz.isAssignableFrom(data.get(name).getClass());
+        return data.containsKey(name) && data.get(name)!=null
+                && clazz.isAssignableFrom(data.get(name).getClass());
     }
 
     /**
@@ -207,8 +208,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link String}
      */
-    @Nullable
-    public String getString(String name) {
+    public @Nullable String getString(String name) {
         return get(name, String.class);
     }
 

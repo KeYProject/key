@@ -34,6 +34,9 @@ class ConfigurationBuilder extends KeYParserBaseVisitor<Object> {
 
     @Override
     public String visitCsymbol(KeYParser.CsymbolContext ctx) {
+        if(ctx.getText().equals("null")){
+            return null;
+        }
         return ctx.IDENT().getText();
     }
 
