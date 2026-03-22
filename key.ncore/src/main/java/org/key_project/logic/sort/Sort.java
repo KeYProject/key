@@ -4,13 +4,12 @@
 package org.key_project.logic.sort;
 
 import org.key_project.logic.HasMeta;
-import org.key_project.logic.HasOrigin;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
 
 
-public interface Sort extends Named, HasOrigin, HasMeta {
+public interface Sort extends Named, HasMeta {
     /// @return the direct supersorts of this sort. Not supported by `NullSort`.
     ImmutableSet<Sort> extendsSorts();
 

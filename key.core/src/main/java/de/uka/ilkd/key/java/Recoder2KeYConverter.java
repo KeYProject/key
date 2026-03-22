@@ -763,12 +763,13 @@ public class Recoder2KeYConverter {
             }
 
             var doc = namespaceSet.docs().findDocumentation(sort);
+            var origin = namespaceSet.docs().findOrigin(sort);
 
             if (doc == null) {
                 throw new ConvertException(
                     format("Requested to find the default value for the sort '%s', "
                         + "which does not have a documentary comment. The sort is defined at %s. "
-                        + "Line/Col: %s", sortName, sort.getOrigin(), e.getStartPosition()));
+                        + "Line/Col: %s", sortName, origin, e.getStartPosition()));
             }
 
             int pos = doc.indexOf(DEFVALUE);
@@ -779,7 +780,7 @@ public class Recoder2KeYConverter {
                 if (closing < 0) {
                     throw new ConvertException(format(
                         "Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
-                        sortName, sort.getOrigin()));
+                        sortName, origin));
                 }
 
                 // set this as the function name, as the user had written \dl_XXX
