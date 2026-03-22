@@ -20,10 +20,10 @@ import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
-import org.key_project.util.java.SwingUtil;
+import org.key_project.dockingframes.core.gui.dock.dockable.AbstractDockable;
 
-import bibliothek.gui.dock.dockable.AbstractDockable;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,6 +6,7 @@ package org.key_project.proofmanagement;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
 import org.key_project.proofmanagement.check.*;

@@ -60,7 +60,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
-import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
 
 /**

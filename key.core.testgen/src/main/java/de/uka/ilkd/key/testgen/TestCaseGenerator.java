@@ -8,7 +8,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.lang.model.element.Modifier;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -46,6 +45,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.lang.model.element.Modifier;
 
 import static de.uka.ilkd.key.testgen.Constants.*;
 import static de.uka.ilkd.key.testgen.TestgenUtils.*;

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
@@ -30,7 +31,6 @@ import recoder.bytecode.ClassFile;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * This class provides an infrastructure to read in multiple class files and to manufacture

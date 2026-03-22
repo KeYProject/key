@@ -6,6 +6,8 @@ package org.key_project.proofmanagement.check;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a node in a file tree where nodes contain Path objects.
  *
@@ -19,12 +21,12 @@ public class PathNode extends Node<Path> {
      * @param parent the parent of the new node
      * @param element the Path to store at the new PathNode
      */
-    public PathNode(PathNode parent, Path element) {
+    public PathNode(@Nullable PathNode parent, Path element) {
         super(parent, element);
     }
 
     @Override
-    public PathNode getParent() {
+    public @Nullable PathNode getParent() {
         return (PathNode) super.getParent();
     }
 
