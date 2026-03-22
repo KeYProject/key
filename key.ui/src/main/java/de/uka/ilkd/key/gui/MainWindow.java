@@ -322,7 +322,7 @@ public final class MainWindow extends JFrame {
         proofListView = new JScrollPane(proofList);
 
         notificationManager = new NotificationManager(mediator, this);
-        recentFileMenu = new RecentFileMenu(mediator);
+        recentFileMenu = new RecentFileMenu(this);
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);
