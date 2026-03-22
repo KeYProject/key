@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
@@ -74,8 +75,11 @@ public class SlicingExtension implements KeYGuiExtension,
      */
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(
-                KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind, T object) {
+            if(kind != ContextMenuKind.SEQUENT_VIEW) {
+                return Collections.emptyList();
+            }
+            PosInSequent pos = (PosInSequent) object;
 
             DependencyTracker tracker = trackers.get(mediator.getSelectedProof());
             if (tracker == null
@@ -107,9 +111,9 @@ public class SlicingExtension implements KeYGuiExtension,
     };
 
     @Override
-    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
-            @NonNull ContextMenuKind kind,
-            @NonNull Object underlyingObject) {
+    public <T> @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind<T> kind,
+            @NonNull T underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 

@@ -22,12 +22,9 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +35,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Test Extension",
     description = "Should only be used for testing of the extension facade", priority = 100000,
     optional = true)
+@NullMarked
 public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.Settings {
@@ -47,26 +45,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private final KeyAction actionTest = new TestAction();
     private final ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                Proof underlyingObject) {
-            return Collections.singletonList(actionTest);
-        }
-
-        @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                Node underlyingObject) {
-            return Collections.singletonList(actionTest);
-        }
-
-        @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                PosInSequent underlyingObject) {
-            return Collections.singletonList(actionTest);
-        }
-
-        @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                Rule underlyingObject) {
+        public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind, @Nullable T underlyingObject) {
             return Collections.singletonList(actionTest);
         }
     };
@@ -77,8 +56,8 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-            Object underlyingObject) {
+    public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                                              @Nullable T underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -100,8 +79,8 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
-            @NonNull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(MainWindow window,
+                                          KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
             public String getTitle() {
@@ -122,8 +101,6 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     private static class TestAction extends KeyAction {
-        private static final long serialVersionUID = -2701623640497343330L;
-
         public TestAction() {
             setName("Test");
             setMenuPath("Test.Test.Test");
@@ -153,7 +130,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         }
 
         @Override
-        public void applySettings(MainWindow window) throws InvalidSettingsInputException {
+        public void applySettings(MainWindow window) {
             LOGGER.trace("TestSettingsProvider.applySettings");
         }
     }

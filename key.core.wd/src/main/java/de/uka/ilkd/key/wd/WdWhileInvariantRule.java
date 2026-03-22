@@ -38,10 +38,6 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
         return NAME;
     }
 
-    @Override
-    public @Nullable String getOrigin() {
-        return super.getOrigin();
-    }
 
     protected static class WdWhileInvariantRuleApplier extends WhileInvariantRuleApplier {
         public WdWhileInvariantRuleApplier(Goal goal, LoopInvariantBuiltInRuleApp<?> ruleApp) {

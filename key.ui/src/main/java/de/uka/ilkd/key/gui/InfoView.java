@@ -20,12 +20,13 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.InfoView.InfoNodeFactory.InfoTreeNode;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
-import de.uka.ilkd.key.logic.DocSpace;
+import de.uka.ilkd.key.logic.MetaSpace;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -55,8 +57,10 @@ import org.jspecify.annotations.Nullable;
 /**
  * Class for info contents displayed in {@link MainWindow}.
  *
- * @author Kai Wallisch <kai.wallisch@ira.uka.de>
+ * @author Kai Wallisch
+ * @author weigl
  */
+@NullMarked
 public class InfoView extends JSplitPane implements TabPanel {
     public static final Icon INFO_ICON =
         IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
@@ -159,17 +163,14 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
 
             private void checkPopup(MouseEvent e) {
-                /*
-                 * if (e.isPopupTrigger()) {
-                 * Rule selected = ((InfoTreeNode)
-                 * infoTree.getLastSelectedPathComponent()).getRule();
-                 * JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                 * DefaultContextMenuKind.TACLET_INFO, selected, mediator);
-                 * if (menu.getComponentCount() > 0) {
-                 * menu.show(InfoView.this, e.getX(), e.getY());
-                 * }
-                 * }
-                 */
+                  if (e.isPopupTrigger()) {
+                      Object selected = ((InfoTreeNode) infoTree.getLastSelectedPathComponent()).getUserObject();
+                      JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                              ContextMenuKind.INFO_TREE, selected, mediator);
+                      if (menu.getComponentCount() > 0) {
+                          menu.show(InfoView.this, e.getX(), e.getY());
+                      }
+                  }
             }
         });
 
@@ -263,7 +264,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             InfoTreeNode root = create(
                 "This is the root node of InfoTreeModel. It should not be visible.", "");
 
-            DocSpace docs = g.proof().getServices().getNamespaces().docs();
+            MetaSpace docs = g.proof().getServices().getNamespaces().docs();
 
             root.add(createNodeRules(docs, g));
             root.add(createNodeTermLabels(docs, g.proof()));
@@ -272,7 +273,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             return root;
         }
 
-        private InfoTreeNode createNodeRules(DocSpace docs, Goal g) {
+        private InfoTreeNode createNodeRules(MetaSpace docs, Goal g) {
             var tlRoot = create("Rules", "Browse descriptions for currently available rules.");
 
             List<NoPosTacletApp> set =
@@ -298,7 +299,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             return tlRoot;
         }
 
-        private MutableTreeNode createNodeBuiltInRules(DocSpace docs, Goal g) {
+        private MutableTreeNode createNodeBuiltInRules(MetaSpace docs, Goal g) {
             InfoTreeNode builtInRoot = create("Built-In",
                 "Some logical rules are implemented in Java code. This is because their semantics "
                     +
@@ -311,7 +312,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             return builtInRoot;
         }
 
-        private MutableTreeNode createNodeAxiom(DocSpace docs, Stream<NoPosTacletApp> seq) {
+        private MutableTreeNode createNodeAxiom(MetaSpace docs, Stream<NoPosTacletApp> seq) {
             InfoTreeNode axiomTacletRoot = create(TACLET_BASE, """
                     Most logical rules are implemented as Taclets.
 
@@ -336,7 +337,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             return axiomTacletRoot;
         }
 
-        private MutableTreeNode createNodeLemmas(DocSpace docs, Stream<NoPosTacletApp> seq) {
+        private MutableTreeNode createNodeLemmas(MetaSpace docs, Stream<NoPosTacletApp> seq) {
             InfoTreeNode proveableTacletsRoot = create(LEMMAS,
                 """
                         Taclets which have been introduced using File->Load User-Defined Taclets are filed here.
@@ -347,7 +348,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             return proveableTacletsRoot;
         }
 
-        private MutableTreeNode createNodeTermLabels(DocSpace docs, Proof proof) {
+        private MutableTreeNode createNodeTermLabels(MetaSpace docs, Proof proof) {
             var tlRoot =
                 create("Term Labels", "Show descriptions for currently available term labels.");
             var mgr = TermLabelManager.getTermLabelManager(proof.getServices());
@@ -363,7 +364,7 @@ public class InfoView extends JSplitPane implements TabPanel {
             return tlRoot;
         }
 
-        private InfoTreeNode createNodeFunctions(DocSpace docs, Namespace<Function> functions) {
+        private InfoTreeNode createNodeFunctions(MetaSpace docs, Namespace<Function> functions) {
             var fnRoot = create("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
             var fnByName = create("By Name", DEFAULT_FUNCTIONS_LABEL);
             var fnByReturnType = create("By Return Type", DEFAULT_FUNCTIONS_LABEL);
@@ -386,7 +387,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                 var fnSort = fn.sort();
 
                 // flat list:
-                Supplier<String> stringSupplier = () -> docs.find(fn);
+                Supplier<String> stringSupplier = () -> docs.findDocumentation(fn);
                 fnByName.add(new InfoTreeNode(fnName, stringSupplier));
 
                 // by return type
@@ -403,31 +404,33 @@ public class InfoView extends JSplitPane implements TabPanel {
             return fnRoot;
         }
 
-        private InfoTreeNode createNodeTacletOptions(DocSpace docs, InitConfig initConfig) {
+        private InfoTreeNode createNodeTacletOptions(MetaSpace docs, InitConfig initConfig) {
             InfoTreeNode localRoot =
                 create("Active Taclet Options", "Shows the activated Taclet options");
             for (Choice activatedChoice : initConfig.getActivatedChoices()) {
                 localRoot.add(
                     create(activatedChoice.name().toString(),
-                        docs.find(activatedChoice)));
+                        docs.findDocumentation(activatedChoice)));
             }
             return localRoot;
         }
 
 
-        public InfoTreeNode create(Taclet taclet, DocSpace docs) {
+        public InfoTreeNode create(Taclet taclet, MetaSpace metaSpace) {
             LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
             lp.printTaclet(taclet);
+            String doc = metaSpace.findDocumentation(taclet);
+            String origin = metaSpace.findOrigin(taclet);
+
             return create(taclet.name().toString(),
-                () -> Stream.of(docs.find(taclet), "```key\n" + lp.result() + "\n```",
-                    "Defined at:" + taclet.getOrigin() + "under options:" + taclet.getChoices())
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.joining("\n\n")));
+                    () -> (doc != null ? doc + "\n\n" : "") +
+                            ("```key\n%s\n```\n\n".formatted(lp.result())) +
+                            ("Defined at: %s \n under options: (%s)".formatted(origin, taclet.getChoices())));
         }
 
-        public InfoTreeNode create(BuiltInRule br, DocSpace docs) {
-            var description = "Defined at: " + br.getOrigin();
-            return create(br.displayName(), () -> Stream.of(docs.find(br), description)
+        public InfoTreeNode create(BuiltInRule br, MetaSpace docs) {
+            var description = "Defined at in Java class" + br.getClass();
+            return create(br.displayName(), () -> Stream.of(docs.findDocumentation(br), description)
                     .filter(Objects::nonNull)
                     .collect(Collectors.joining("\n\n")));
         }
@@ -442,14 +445,14 @@ public class InfoView extends JSplitPane implements TabPanel {
 
 
         public static class InfoTreeNode extends DefaultMutableTreeNode {
-            private final Supplier<String> description;
+            private final Supplier<@Nullable String> description;
 
-            public InfoTreeNode(String name, Supplier<String> description) {
+            public InfoTreeNode(String name, Supplier<@Nullable String> description) {
                 super(name);
                 this.description = description;
             }
 
-            public String getDescription() {
+            public @Nullable String getDescription() {
                 return description.get();
             }
         }

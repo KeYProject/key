@@ -21,11 +21,12 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.Configuration;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A marker interface for extension of the KeY GUI. Every extension should implement this interface
@@ -39,6 +40,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
+@NullMarked
 public interface KeYGuiExtension {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Info {
@@ -74,8 +76,6 @@ public interface KeYGuiExtension {
 
         /**
          * Loading priority of this extension. Baseline is zero
-         *
-         * @return
          */
         int priority() default 0;
 
@@ -103,8 +103,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NonNull
-        List<Action> getMainMenuActions(@NonNull MainWindow mainWindow);
+        List<Action> getMainMenuActions(MainWindow mainWindow);
     }
 
     /**
@@ -140,8 +139,7 @@ public interface KeYGuiExtension {
          * @param window parent of this extension
          * @param mediator the current mediator
          */
-        @NonNull
-        Collection<TabPanel> getPanels(@NonNull MainWindow window, @NonNull KeYMediator mediator);
+        Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator);
     }
 
     /**
@@ -164,9 +162,8 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NonNull
-        List<Action> getContextActions(@NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
-                @NonNull Object underlyingObject);
+        <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+                                           @Nullable T underlyingObject);
     }
 
     /**
@@ -181,7 +178,6 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @NonNull
         JToolBar getToolbar(MainWindow mainWindow);
     }
 
@@ -244,9 +240,6 @@ public interface KeYGuiExtension {
         String SOURCE_VIEW = SourceView.class.getName();
 
         /**
-         * @param
-         * @param mediator
-         * @param component
          * @return non-null settings provider
          */
         Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
@@ -266,8 +259,7 @@ public interface KeYGuiExtension {
          * @param pos the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @NonNull
-        List<String> getTermInfoStrings(@NonNull MainWindow mainWindow, @NonNull PosInSequent pos);
+        List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;
@@ -309,6 +301,7 @@ public interface KeYGuiExtension {
         /// The object needs to compatible with the assigned profile in {@link LoadOptionPanel}.
         ///
         /// @see Profile#prepareInitConfig(InitConfig, Object)
+        @SuppressWarnings("JavadocReference")
         @Nullable
         Configuration getResult();
     }

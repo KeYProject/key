@@ -6,7 +6,7 @@ package org.key_project.logic.op;
 import org.key_project.logic.*;
 import org.key_project.logic.sort.Sort;
 
-public interface Operator extends Named, HasDocumentation, SyntaxElement {
+public interface Operator extends Named, HasMeta, SyntaxElement {
     /// the arity of this operator
     int arity();
 
@@ -40,7 +40,7 @@ public interface Operator extends Named, HasDocumentation, SyntaxElement {
     <T extends Term> void validTopLevelException(T term) throws TermCreationException;
 
     @Override
-    default String getDocumentationKey() {
+    default String getMetaKey() {
         return "operator/" + name();
     }
 }

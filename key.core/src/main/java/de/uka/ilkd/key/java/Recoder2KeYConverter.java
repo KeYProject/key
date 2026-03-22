@@ -762,7 +762,7 @@ public class Recoder2KeYConverter {
                     sortName, e.getStartPosition()));
             }
 
-            var doc = namespaceSet.docs().find(sort);
+            var doc = namespaceSet.docs().findDocumentation(sort);
 
             if (doc == null) {
                 throw new ConvertException(

@@ -127,12 +127,12 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genericParams == null) {
                 var fn = new JFunction(name, sort, args, null, true, false);
                 functions().addSafely(fn);
-                docsSpace().describe(fn, doc);
+                docsSpace().setDocumentation(fn, doc);
             } else {
                 var fn = new ParametricFunctionDecl(name, genericParams, new ImmutableArray<>(args),
                     sort, null, true, true, false);
                 namespaces().parametricFunctions().add(fn);
-                docsSpace().describe(fn, doc);
+                docsSpace().setDocumentation(fn, doc);
             }
         }
         if (genericParams != null) {
@@ -200,7 +200,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         if (lookup(p.name()) == null) {
             functions().add(p);
-            docsSpace().describe(p, doc);
+            docsSpace().setDocumentation(p, doc);
         } else {
             // weigl: agreement on KaKeY meeting: this should be an error.
             semanticError(ctx, "Predicate '" + p.name() + "' is already defined!");

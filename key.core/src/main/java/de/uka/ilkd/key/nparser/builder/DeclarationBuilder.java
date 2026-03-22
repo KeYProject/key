@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.Choice;
-import org.key_project.logic.HasDocumentation;
+import org.key_project.logic.HasMeta;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -70,9 +70,10 @@ public class DeclarationBuilder extends DefaultBuilder {
         var origin = BuilderHelpers.getPosition(ctx);
         List<GenericParameter> typeParameters = accept(ctx.formal_sort_param_decls());
         if (typeParameters == null) {
-            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, origin);
+            var s = new SortImpl(new Name(name), ImmutableSet.empty(), false);
             sorts().addSafely(s);
-            docsSpace().describe(s, doc);
+            docsSpace().setDocumentation(s, doc);
+            docsSpace().setOrigin(s, origin);
         } else {
             var doubled = CollectionUtil.findDuplicates(typeParameters);
             if (!doubled.isEmpty()) {
@@ -81,9 +82,10 @@ public class DeclarationBuilder extends DefaultBuilder {
                     doubled.getFirst());
             }
             var s = new ParametricSortDecl(new Name(name), false, ImmutableSet.empty(),
-                ImmutableList.fromList(typeParameters), origin);
+                ImmutableList.fromList(typeParameters));
             namespaces().parametricSorts().addSafely(s);
-            docsSpace().describe(s, doc);
+            docsSpace().setDocumentation(s, doc);
+            docsSpace().setOrigin(s, origin);
         }
         return null;
     }
@@ -123,7 +125,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
         String catDoc = processDocumentation(ctx.maindoc);
-        docsSpace().describe(new HasDocumentation.OptionCategory(cat), catDoc);
+        docsSpace().setDocumentation(new HasMeta.OptionCategory(cat), catDoc);
 
         for (KeYParser.OptionDeclContext optdecl : ctx.optionDecl()) {
             Token catctx = optdecl.IDENT;
@@ -135,7 +137,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                 choices().add(c);
 
                 var doc = processDocumentation(optdecl.DOC_COMMENT);
-                docsSpace().describe(c, doc);
+                docsSpace().setDocumentation(c, doc);
             }
             category2Default.putIfAbsent(cat, name);
         }
@@ -201,9 +203,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                     Sort s = null;
                     if (isGenericSort) {
                         try {
-                            var gs = new GenericSort(sortName, ext, oneOf,
-                                BuilderHelpers.getPosition(idCtx));
-                            s = gs;
+                            s = new GenericSort(sortName, ext, oneOf);
                         } catch (GenericSupersortException e) {
                             semanticError(ctx, "Illegal sort given");
                         }
@@ -211,32 +211,29 @@ public class DeclarationBuilder extends DefaultBuilder {
                         s = JavaDLTheory.ANY;
                     } else {
                         if (isProxySort) {
-                            var ps =
-                                new ProxySort(sortName, ext, BuilderHelpers.getPosition(idCtx));
-                            s = ps;
+                            s = new ProxySort(sortName, ext);
                         } else {
-                            var si = new SortImpl(sortName, ext, isAbstractSort,
-                                BuilderHelpers.getPosition(idCtx));
-                            s = si;
+                            s = new SortImpl(sortName, ext, isAbstractSort);
                         }
                     }
                     assert s != null;
                     String doc = processDocumentation(idCtx.DOC_COMMENT());
-                    docsSpace().describe(s,
+                    String origin = BuilderHelpers.getPosition(idCtx);
+                    docsSpace().setOrigin(s, origin);
+                    docsSpace().setDocumentation(s,
                         Stream.of(doc, sectionDoc).filter(Objects::nonNull)
                                 .collect(Collectors.joining("\n")));
                     sorts().add(s);
                     createdSorts.add(s);
                 } else {
                     // weigl: agreement on KaKeY meeting: this should be ignored until we finally
-                    // have
-                    // local namespaces for generic sorts
+                    // have local namespaces for generic sorts
                     // addWarning(ctx, "Sort declaration is ignored, due to collision.");
                     LOGGER.debug(
                         "Sort declaration of {} in {} is ignored due to collision (already "
                             + "present in {}).",
                         sortName, BuilderHelpers.getPosition(ctx),
-                        existingSort.getOrigin());
+                        docsSpace().findOrigin(existingSort));
                 }
             }
         } else {
@@ -259,14 +256,13 @@ public class DeclarationBuilder extends DefaultBuilder {
                     "Cannot declare parametric sort %s, as a sort of the same name has already been declared",
                     sortName);
             }
-            var sortDecl = new ParametricSortDecl(sortName, isAbstractSort, ext, params,
-                    BuilderHelpers.getPosition(declCtx));
+            var sortDecl = new ParametricSortDecl(sortName, isAbstractSort, ext, params);
             namespaces().parametricSorts().addSafely(sortDecl);
-
+            docsSpace().setOrigin(sortDecl, BuilderHelpers.getPosition(declCtx));
             var doc = processDocumentation(declCtx.DOC_COMMENT());
-            docsSpace().describe(sortDecl,
-                    Stream.of(doc, sectionDoc).filter(Objects::nonNull)
-                            .collect(Collectors.joining("\n")));
+            docsSpace().setDocumentation(sortDecl,
+                Stream.of(doc, sectionDoc).filter(Objects::nonNull)
+                        .collect(Collectors.joining("\n")));
         }
         return createdSorts;
     }
@@ -295,7 +291,7 @@ public class DeclarationBuilder extends DefaultBuilder {
             RuleSet h = new RuleSet(new Name(id));
             if (ruleSets().lookup(new Name(id)) == null) {
                 ruleSets().add(h);
-                docsSpace().describe(h, doc);
+                docsSpace().setDocumentation(h, doc);
             }
         }
         return null;

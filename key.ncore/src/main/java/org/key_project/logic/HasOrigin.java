@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// @author Alexander Weigl
 /// @version 1 (12/30/21)
+@Deprecated(forRemoval = true)
 public interface HasOrigin {
     /// Information about the origin of the rule.
     ///

@@ -32,8 +32,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 
 
 /**
@@ -190,7 +188,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     @Override
-    public @NonNull TacletExecutor getExecutor() {
+    public @NonNull TacletExecutor<?,?> getExecutor() {
         return executor;
     }
 
@@ -518,23 +516,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     }
 
     public abstract @NonNull Taclet setName(@NonNull String s);
-
-    /**
-     * Information about the origin of the taclet. Should be a location where the user can find the
-     * declaration of the taclet.
-     * <p>
-     * This field is set by the parser with [url]:[lineNumber]
-     */
-    private @Nullable String origin;
-
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(@Nullable String origin) {
-        this.origin = origin;
-    }
 
     StringBuffer toStringAttribs(StringBuffer sb) {
         // if (noninteractive()) sb = sb.append(" \\noninteractive");

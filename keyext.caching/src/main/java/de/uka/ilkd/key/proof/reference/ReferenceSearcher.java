@@ -3,21 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.reference;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
-
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for proof caching.
@@ -33,7 +32,7 @@ public final class ReferenceSearcher {
      * Try to find a closed branch in another proof that is equivalent to the <code>newNode</code>.
      *
      * @param previousProofs old proofs
-     * @param newNode new node (must be an open goal)
+     * @param newNode        new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
     public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
@@ -54,10 +53,13 @@ public final class ReferenceSearcher {
             var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
             Set<NoPosTacletApp> newTaclets = newTacletIndex.allNoPosTacletApps();
             var tacletsOk = true;
-            for (var taclet : tacletIndex.allNoPosTacletApps().stream()
-                    .filter(x -> x.taclet().getOrigin() != null
-                            && x.taclet().getOrigin().contains(proofFile))
-                    .toList()) {
+            final var list = tacletIndex.allNoPosTacletApps().stream()
+                    .filter(x -> {
+                        var origin = newNode.proof().getServices().getNamespaces().docs().findOrigin(x.taclet());
+                        return origin != null && origin.contains(proofFile);
+                    })
+                    .toList();
+            for (NoPosTacletApp taclet : list) {
                 if (newTaclets.stream().noneMatch(newTaclet -> Objects
                         .equals(taclet.taclet().toString(), newTaclet.taclet().toString()))) {
                     tacletsOk = false;
@@ -142,7 +144,7 @@ public final class ReferenceSearcher {
      * Check whether all formulas in {@code subset} are conatined in {@code superset}.
      *
      * @param superset Semisequent supposed to contain {@code subset}
-     * @param subset Semisequent supposed to be in {@code superset}
+     * @param subset   Semisequent supposed to be in {@code superset}
      * @return whether all formulas are present
      */
     private static boolean containedIn(Semisequent superset, Semisequent subset) {

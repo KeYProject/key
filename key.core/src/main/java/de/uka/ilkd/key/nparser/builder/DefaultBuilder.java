@@ -278,7 +278,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().choices();
     }
 
-    protected DocSpace docsSpace() {
+    protected MetaSpace docsSpace() {
         return namespaces().docs();
     }
 

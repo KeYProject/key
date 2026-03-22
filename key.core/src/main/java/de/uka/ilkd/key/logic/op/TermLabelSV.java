@@ -33,7 +33,7 @@ public final class TermLabelSV extends JOperatorSV implements TermLabel {
     }
 
     @Override
-    public String getDocumentationKey() {
-        return super.getDocumentationKey();
+    public String getMetaKey() {
+        return super.getMetaKey();
     }
 }

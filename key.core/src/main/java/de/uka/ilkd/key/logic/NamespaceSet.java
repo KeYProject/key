@@ -19,7 +19,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -33,11 +32,11 @@ public class NamespaceSet {
     private Namespace<Function> funcNS = new Namespace<>();
     private Namespace<RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<Sort> sortNS = new Namespace<>();
-    private Namespace<@NonNull SortAlias> sortAliases = new Namespace<>();
+    private Namespace<SortAlias> sortAliases = new Namespace<>();
     private Namespace<ParametricSortDecl> parametricSortNS = new Namespace<>();
     private Namespace<ParametricFunctionDecl> parametricFuncNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
-    private final DocSpace documentation = new DocSpace();
+    private MetaSpace documentation = new MetaSpace();
 
     public NamespaceSet() {
     }
@@ -53,7 +52,7 @@ public class NamespaceSet {
             Namespace<IProgramVariable> programVarNS) {
         this(varNS, funcNS, sortNS, sortAliases, ruleSetNS,
             parametricSortNS, parametricFuncNS,
-            choiceNS, programVarNS, new DocSpace());
+            choiceNS, programVarNS, new MetaSpace());
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
@@ -65,7 +64,7 @@ public class NamespaceSet {
             Namespace<ParametricFunctionDecl> parametricFuncNS,
             Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS,
-            DocSpace documentation) {
+            MetaSpace documentation) {
         this.varNS = varNS;
         this.progVarNS = programVarNS;
         this.funcNS = funcNS;
@@ -75,7 +74,7 @@ public class NamespaceSet {
         this.choiceNS = choiceNS;
         this.parametricSortNS = parametricSortNS;
         this.parametricFuncNS = parametricFuncNS;
-        this.documentation.add(documentation);
+        this.documentation = documentation;
     }
 
 
@@ -91,7 +90,7 @@ public class NamespaceSet {
         return new NamespaceSet(variables(), functions(), sorts(), sortAliases(), ruleSets(),
             parametricSorts(),
             parametricFunctions(),
-            choices(), programVariables(), new DocSpace(documentation));
+            choices(), programVariables(), new MetaSpace(documentation));
     }
 
     // TODO MU: Rename into sth with wrap or similar
@@ -101,7 +100,7 @@ public class NamespaceSet {
             new Namespace<>(ruleSets()), new Namespace<>(parametricSorts()),
             new Namespace<>(parametricFunctions()), new Namespace<>(choices()),
             new Namespace<>(programVariables()),
-            new DocSpace(documentation));
+            new MetaSpace(documentation));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -144,11 +143,11 @@ public class NamespaceSet {
         this.sortNS = sortNS;
     }
 
-    public Namespace<@NonNull SortAlias> sortAliases() {
+    public Namespace<SortAlias> sortAliases() {
         return sortAliases;
     }
 
-    public void setSortAliases(Namespace<@NonNull SortAlias> sortAliases) {
+    public void setSortAliases(Namespace<SortAlias> sortAliases) {
         this.sortAliases = sortAliases;
     }
 
@@ -325,7 +324,7 @@ public class NamespaceSet {
             choiceNS.parent(), progVarNS.parent(), documentation.parent());
     }
 
-    public DocSpace docs() {
+    public MetaSpace docs() {
         return documentation;
     }
 }

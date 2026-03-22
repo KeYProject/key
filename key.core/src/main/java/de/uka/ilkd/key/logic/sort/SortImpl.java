@@ -11,42 +11,27 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Abstract base class for implementations of the Sort interface.
  */
 public class SortImpl extends AbstractSort {
-    /** Information of the origin of this sort */
-    private final String origin;
-
     private ImmutableSet<Sort> ext;
 
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract, String origin) {
+    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, isAbstract);
         this.ext = ext;
-        this.origin = origin;
-    }
-
-    public SortImpl(Name name, ImmutableSet<Sort> ext, String origin) {
-        this(name, ext, false, origin);
-    }
-
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
-        this(name, ext, isAbstract, "");
     }
 
     public SortImpl(Name name, ImmutableSet<Sort> ext) {
-        this(name, ext, false, "");
+        this(name, ext, false);
     }
 
     public SortImpl(Name name, Sort ext) {
-        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false, "");
+        this(name, DefaultImmutableSet.<Sort>nil().add(ext), false);
     }
 
-
     public SortImpl(Name name) {
-        this(name, DefaultImmutableSet.nil(), "");
+        this(name, DefaultImmutableSet.nil());
     }
 
     @Override
@@ -78,11 +63,6 @@ public class SortImpl extends AbstractSort {
 
     public String declarationString() {
         return name().toString();
-    }
-
-    @Override
-    public @Nullable String getOrigin() {
-        return origin;
     }
 
     @Override

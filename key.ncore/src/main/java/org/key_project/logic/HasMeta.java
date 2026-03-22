@@ -5,15 +5,19 @@ package org.key_project.logic;
 
 import org.jspecify.annotations.Nullable;
 
-public interface HasDocumentation {
-    String getDocumentationKey();
+/// Mark items of the namespace which can have entries in the {@link
+/// de.uka.ilkd.key.logic.MetaSpace}.
+///
+/// @author weigl
+public interface HasMeta {
+    String getMetaKey();
 
     default @Nullable String getDocumentation() {
         return null;
     }
 
-    record OptionCategory(String name) implements HasDocumentation {
-        public String getDocumentationKey() {
+    record OptionCategory(String name) implements HasMeta {
+        public String getMetaKey() {
             return "category/" + name;
         }
     }
