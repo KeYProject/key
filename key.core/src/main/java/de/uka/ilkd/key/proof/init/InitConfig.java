@@ -131,29 +131,22 @@ public class InitConfig {
     /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
-        boolean changed = false;
-        for (final Map.Entry<String, String> entry : init.entrySet()) {
-            final Choice c = choiceNS().lookup(new Name(entry.getKey()));
-            if (c != null && !category2DefaultChoice.containsKey(c.category())) {
-                changed = true;
-                category2DefaultChoice.put(c.category(), c);
-            }
+    public void addCategory2DefaultChoices(@NonNull Map<String,Choice> init) {
+        if(init.isEmpty()) {
+            return;
         }
-
-        if (changed) {
-            // FIXME weigl: I do not understand why the default choices are back progragated!
-            // For me this is a design flaw.
-            // weigl(2026): This is the way, how the settings are getting updated by the current
-            // known choices. This is not good!
-            Map<String, String> clone = new HashMap<>();
-            for (Map.Entry<String, Choice> entry : category2DefaultChoice.entrySet()) {
-                clone.put(entry.getKey(), entry.getValue().name().toString());
-            }
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-            // invalidate active taclet cache
-            activatedTacletCache = null;
+        category2DefaultChoice.putAll(init);
+        // FIXME weigl: I do not understand why the default choices are back progragated!
+        // For me this is a design flaw.
+        // weigl(2026): This is the way, how the settings are getting updated by the current
+        // known choices. This is not good!
+        Map<String, String> clone = new HashMap<>();
+        for (Map.Entry<String, Choice> entry : category2DefaultChoice.entrySet()) {
+            clone.put(entry.getKey(), entry.getValue().name().toString());
         }
+        ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+        // invalidate active taclet cache
+        activatedTacletCache = null;
     }
 
 
