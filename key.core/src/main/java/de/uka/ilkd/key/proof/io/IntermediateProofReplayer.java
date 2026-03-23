@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.util.Levensthein;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
@@ -64,6 +66,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.Streams;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -463,8 +466,12 @@ public class IntermediateProofReplayer {
         }
 
         if (ourApp == null) {
+            var availableTaclets = currGoal.indexOfTaclets().getAllTacletNames().map(Name::toString)
+                    .collect(Collectors.toSet());
+            var similarNames = Levensthein.findSimilarNames(tacletName, availableTaclets);
+            var three = similarNames.stream().limit(3).collect(Collectors.joining(", "));
             throw new TacletAppConstructionException(
-                "Unknown taclet with name \"" + tacletName + "\"");
+                    "Unknown taclet with name \"" + tacletName + "\". Most three similar names are: " + three);
         }
 
         Services services = proof.getServices();

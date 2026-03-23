@@ -131,8 +131,8 @@ public class InitConfig {
     /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@NonNull Map<String,Choice> init) {
-        if(init.isEmpty()) {
+    public void addCategory2DefaultChoices(@NonNull Map<String, Choice> init) {
+        if (init.isEmpty()) {
             return;
         }
         category2DefaultChoice.putAll(init);
