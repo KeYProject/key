@@ -236,8 +236,17 @@ public class OutputStreamProofSaver {
             out.println();
             Path bootClassPath = jm.getBootClassPath();
             if (bootClassPath != null) {
-                out.printf("\\bootclasspath \"%s\";\n",
-                    safePathRelativeTo(bootClassPath, basePath));
+                if (!bootClassPath.toUri().getScheme().equals("file")) {
+                    /*
+                     * This happens if JavaRedux (the default bootclasspath) is read from a zip.
+                     * Since we do not support non-file includes, we need to skip it ...
+                     */
+                    LOGGER.info("Bootclasspath is not a file (probably default bcp inside a zip/jar"
+                        + " file), skipping: " + bootClassPath);
+                } else {
+                    out.printf("\\bootclasspath \"%s\";\n",
+                        safePathRelativeTo(bootClassPath, basePath));
+                }
             }
 
             List<Path> classPath = jm.getClassPath();
