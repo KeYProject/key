@@ -194,7 +194,8 @@ public class TacletFindModel extends AbstractTableModel {
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
         KeYParser.Id_declarationContext ctx =
             ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
-        Sort sort = ctx.s != null ? services.getNamespaces().sorts().lookup(ctx.s.getText()) : null;
+        Sort sort =
+            ctx.s != null ? services.getNamespaces().lookupSortOrAlias(ctx.s.getText()) : null;
         return new IdDeclaration(ctx.id.getText(), sort);
     }
 

@@ -95,6 +95,7 @@ one_sort_decl
         (EXTENDS sortExt = extends_sorts)? SEMI
     | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
     | ABSTRACT? (sortIds=simple_ident_dots_comma_list | parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
+    | ALIAS simple_ident_dots EQUALS sortId SEMI
   )
 ;
 

@@ -964,7 +964,7 @@ public class IntermediateProofReplayer {
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(),
+                varNS, functNS, proof.getNamespaces().sorts(), proof.getNamespaces().sortAliases(),
                 proof.getNamespaces().parametricSorts(),
                 proof.getNamespaces().parametricFunctions(),
                 progVarNS, new AbbrevMap());
@@ -1006,7 +1006,7 @@ public class IntermediateProofReplayer {
             sort = app.getRealSort(sv, services);
         } else {
             name = value.substring(0, colon);
-            sort = services.getNamespaces().sorts().lookup(value.substring(colon + 1));
+            sort = services.getNamespaces().lookupSortOrAlias(value.substring(colon + 1));
 
         }
         LogicVariable lv = new LogicVariable(new Name(name), sort);

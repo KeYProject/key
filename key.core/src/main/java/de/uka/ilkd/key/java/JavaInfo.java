@@ -24,7 +24,6 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
@@ -292,8 +291,7 @@ public final class JavaInfo {
             ldtName = type.getCorrespondingLDTName();
         }
 
-        Namespace<Sort> sorts = services.getNamespaces().sorts();
-        Sort sort = sorts.lookup(ldtName);
+        Sort sort = services.getNamespaces().lookupSortOrAlias(ldtName);
 
         if (sort == null) {
             throw new IllegalStateException(

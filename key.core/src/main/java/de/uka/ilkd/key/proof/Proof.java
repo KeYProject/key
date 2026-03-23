@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -41,7 +42,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -94,7 +94,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * declarations &c, read from a problem file or otherwise
      */
-    private String problemHeader = "";
+    private KeyAst.@Nullable Declarations problemHeader = null;
 
     /**
      * the proof environment (optional)
@@ -134,7 +134,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
     private long autoModeTime = 0;
 
-    private @Nullable Strategy<@NonNull Goal> activeStrategy;
+    private @Nullable Strategy<Goal> activeStrategy;
 
     private PropertyChangeListener settingsListener;
 
@@ -237,7 +237,8 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     @Deprecated
-    public Proof(String name, Sequent problem, String header, InitConfig initConfig,
+    public Proof(String name, Sequent problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig,
             @Nullable Path proofFile) {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
@@ -245,7 +246,8 @@ public class Proof implements ProofObject<Goal>, Named {
         this.proofFile = proofFile;
     }
 
-    public Proof(String name, JTerm problem, String header, InitConfig initConfig) {
+    public Proof(String name, JTerm problem, KeyAst.@Nullable Declarations header,
+            InitConfig initConfig) {
         this(name,
             JavaDLSequentKit
                     .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
@@ -254,7 +256,8 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Proof(String name, Sequent sequent, String header, TacletIndex rules,
+    public Proof(String name, Sequent sequent, KeyAst.@Nullable Declarations header,
+            TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
         this(name, sequent, rules, builtInRules, initConfig);
         problemHeader = header;
@@ -324,7 +327,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public String header() {
+    public KeyAst.@Nullable Declarations header() {
         return problemHeader;
     }
 
@@ -388,7 +391,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Strategy<@NonNull Goal> getActiveStrategy() {
+    public Strategy<Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -396,7 +399,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public void setActiveStrategy(Strategy<@NonNull Goal> activeStrategy) {
+    public void setActiveStrategy(Strategy<Goal> activeStrategy) {
         this.activeStrategy = activeStrategy;
         getSettings().getStrategySettings().setStrategy(activeStrategy.name());
         updateStrategyOnGoals();
@@ -408,7 +411,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
 
     private void updateStrategyOnGoals() {
-        Strategy<@NonNull Goal> ourStrategy = getActiveStrategy();
+        Strategy<Goal> ourStrategy = getActiveStrategy();
 
         for (Goal goal : openGoals()) {
             goal.setGoalStrategy(ourStrategy);
@@ -774,7 +777,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
      */
-    public @Nullable Node findAny(@NonNull Predicate<Node> pred) {
+    public @Nullable Node findAny(Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
@@ -972,7 +975,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(@NonNull Node node) {
+    public Goal getOpenGoal(Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -1315,7 +1318,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the associated lookup
      */
-    public @NonNull Lookup getUserData() {
+    public Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }

@@ -471,6 +471,11 @@ public final class ProblemInitializer {
             printMatcher(ic);
             print(ic);
         }
+
+        if (envInput instanceof KeYUserProblemFile uf) {
+            ic.setHeader(uf.getProblemHeader());
+        }
+
         return ic;
     }
 
