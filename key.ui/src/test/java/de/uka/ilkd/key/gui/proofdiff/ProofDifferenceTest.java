@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.gui.proofdiff.ProofDifference.Levensthein.calculate;
+import static de.uka.ilkd.key.util.Levensthein.calculate;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
