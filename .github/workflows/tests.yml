@@ -8,6 +8,7 @@ on:
     branches:
       - "main"
       - "KeY-*"
+      - "releases/*"
   merge_group:
 
 permissions:
