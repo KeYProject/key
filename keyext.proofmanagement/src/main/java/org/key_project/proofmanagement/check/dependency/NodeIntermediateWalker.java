@@ -37,7 +37,16 @@ public abstract class NodeIntermediateWalker {
     protected void walk(NodeIntermediate node) {
         doAction(node);
 
-        for (NodeIntermediate child : node.getChildren()) {
+        // Optimization: for the common case of a single child node,
+        // avoid recursion (prevents stack overflow for large proof)
+        var children = node.getChildren();
+        while (children.size() == 1) {
+            var nextNode = children.getFirst();
+            doAction(nextNode);
+            children = nextNode.getChildren();
+        }
+
+        for (NodeIntermediate child : children) {
             walk(child);
         }
     }
