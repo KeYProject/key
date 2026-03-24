@@ -210,6 +210,8 @@ public class RecentFileMenu {
             LOGGER.debug("Could not read RecentFileList. Did not find file {}", filename);
         } catch (IOException ioe) {
             LOGGER.debug("Could not read RecentFileList. Some IO Error occured ", ioe);
+        } catch (Throwable t) {
+            LOGGER.debug("Could not read RecentFileList. Some Error occured ", t);
         }
     }
 
