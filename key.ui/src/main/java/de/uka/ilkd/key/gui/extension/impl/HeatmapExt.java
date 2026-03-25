@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Extension adapter for Heatmap
@@ -36,7 +37,7 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private HeatmapSettingsAction settingsAction;
 
     @Override
-    public List<Action> getMainMenuActions(MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(MainWindow mainWindow) {
         return getActions(mainWindow);
     }
 
