@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.CompilationUnit;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
-import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -39,10 +39,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -61,7 +57,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.*;
-import com.github.javaparser.ast.jml.*;
 import com.github.javaparser.ast.key.sv.*;
 import com.github.javaparser.ast.modules.*;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
@@ -751,23 +746,40 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
+    public Object visit(JmlExpressionStmt n, Void arg) {
+        var pi = createPositionInfo(n);
+        switch (n.getKind()) {
+            case ASSUME, ASSUME_REDUNDANTLY-> {
+                var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
+                yield new JmlAssert(JmlAssert.Kind.ASSERT, construct, pi);
+            }
+            case ASSERT, ASSERT_REDUNDANTLY  -> {
+                var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
+                yield new JmlAssert(JmlAssert.Kind.ASSUME, construct, pi);
+            }
+            case SET -> {
+                var context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
+                yield new SetStatement(context, pi);
+            }
+        }
+    }
+
+    @Override
     public Object visit(KeYMarkerStatement n, Void arg) {
         var pi = createPositionInfo(n);
         return switch (n.getKind()) {
             case MarkerStatementHelper.KIND_ASSERT -> {
                 var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
-                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
+                yield new JmlAssert(JmlAssert.Kind.ASSERT, construct, pi);
             }
             case MarkerStatementHelper.KIND_ASSUME -> {
                 var construct = n.getData(MarkerStatementHelper.KEY_EXPR);
-                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
+                yield new JmlAssert(JmlAssert.Kind.ASSUME, construct, pi);
             }
             case MarkerStatementHelper.KIND_SET -> {
                 var context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
                 yield new SetStatement(context, pi);
             }
-
-
             case MarkerStatementHelper.KIND_MERGE_POINT -> {
                 var loc = new LocationVariable(
                     services.getVariableNamer().getTemporaryNameProposal("x"),

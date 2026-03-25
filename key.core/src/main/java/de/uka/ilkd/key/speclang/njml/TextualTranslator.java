@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 
 import org.key_project.logic.Name;
@@ -498,13 +496,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
-        TextualJMLSetStatement inv = new TextualJMLSetStatement(mods, ctx);
-        finishConstruct(inv);
-        return null;
-    }
-
-    @Override
     public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
         loopContract = new TextualJMLLoopSpec(mods);
         methodContract = null;
@@ -536,24 +527,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
-
-    @Override
-    public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        TextualJMLAssertStatement b =
-            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
-                new KeyAst.Expression(ctx.expression()));
-        finishConstruct(b);
-        return null;
-    }
-
-
-    @Override
-    public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
-            TextualJMLAssertStatement.Kind.ASSERT, new KeyAst.Expression(ctx.expression()));
-        finishConstruct(b);
-        return null;
-    }
 
     @Override
     public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {

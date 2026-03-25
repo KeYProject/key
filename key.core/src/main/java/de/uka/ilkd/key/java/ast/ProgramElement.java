@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.java.ast;
 
 
+import com.github.javaparser.ast.jml.clauses.JmlContract;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -27,7 +27,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
     Comment[] getComments();
 
     ///
-    default ImmutableList<TextualJMLConstruct> getAttachedJml() {
+    default ImmutableList<JmlContract> getAttachedJml() {
         return ImmutableSLList.nil();
     }
 

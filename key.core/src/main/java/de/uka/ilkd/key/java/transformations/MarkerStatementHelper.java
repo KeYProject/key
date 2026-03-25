@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.java.transformations;
 
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
 import com.github.javaparser.ast.DataKey;
 
