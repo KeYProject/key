@@ -56,6 +56,7 @@ import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -1045,6 +1046,7 @@ public final class MainWindow extends JFrame {
         help.add(new KeYProjectHomepageAction(this));
         // help.add(new SystemInfoAction(this));
         help.add(new MenuSendFeedackAction(this));
+        help.add(new CreateGithubIssueAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -1394,6 +1396,11 @@ public final class MainWindow extends JFrame {
 
     public void openExamples() {
         openExampleAction.actionPerformed(null);
+    }
+
+    /// @see WindowUserInterfaceControl#loadProblem(Path, Consumer)
+    public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
+        getUserInterface().loadProblem(file, configure);
     }
 
     public void loadProblem(Path file) {

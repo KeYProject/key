@@ -74,7 +74,8 @@ public class TrackedFormula extends GraphNode {
             (JTerm) formula.formula(),
             services,
             true, // pretty print
-            true // using unicode symbols
+            true, // using unicode symbols
+            true // hide package prefix
         ).trim();
         if (!omitBranch) {
             term = term + branchLocation.toString();

@@ -4,6 +4,7 @@
 package org.key_project.isabelletranslation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
@@ -38,8 +39,11 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
      */
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(
-                KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+        public <T> List<Action> getContextActions(
+                KeYMediator mediator, ContextMenuKind<T> kind, T object) {
+            if (kind != ContextMenuKind.SEQUENT_VIEW)
+                return Collections.emptyList();
+            var pos = (PosInSequent) object;
             if (pos.getPosInOccurrence() != null || mediator.getSelectedGoal() == null) {
                 return List.of();
             }

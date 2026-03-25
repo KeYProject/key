@@ -8,7 +8,7 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.NameCreationInfo;
@@ -81,7 +81,7 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
      */
     protected void addExtensionMenu() {
         List<Action> actions =
-            KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW, getPos(),
+            KeYGuiExtensionFacade.getContextMenuItems(ContextMenuKind.SEQUENT_VIEW, getPos(),
                 getSequentView().getMainWindow().getMediator());
 
         for (Action action : actions) {
