@@ -4,10 +4,7 @@
 package de.uka.ilkd.key.java.loader;
 
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
@@ -95,7 +92,11 @@ public class JavaParserFactory {
         if (config == null) {
             config = new ParserConfiguration();
             config.setStoreTokens(true);
+            config.setKeepJmlDocs(false);
+            config.setProcessJml(true);
         }
+        // TODO update the activated JML keys with the current settings.
+        config.setJmlKeys(Collections.singletonList(Collections.singletonList("key")));
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.RAW);
         config.setSymbolResolver(getSymbolSolver());
         return config;

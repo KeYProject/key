@@ -24,6 +24,7 @@ import org.jspecify.annotations.NonNull;
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
  * form.
  */
+@Deprecated
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> modifiers;
